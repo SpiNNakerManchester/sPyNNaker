@@ -116,13 +116,29 @@
     <span class="k">del</span> <span class="n">__readonly__</span>
 
 
+<span class="k">def</span> <span class="nf">get_sampling_interval</span><span class="p">(</span><span class="n">sampling_rate</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Return the current sampling interval given a sampling rate</span>
+
+<span class="sd">    :param float sampling_rate: The sampling rate in time steps</span>
+<span class="sd">    :return: Sampling interval in microseconds</span>
+<span class="sd">    :rtype: float</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">step</span> <span class="o">=</span> <span class="p">(</span><span class="n">globals_variables</span><span class="o">.</span><span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">machine_time_step</span> <span class="o">/</span>
+            <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">sampling_rate</span> <span class="o">*</span> <span class="n">step</span>
+
+
 <div class="viewcode-block" id="NeuronRecorder"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.NeuronRecorder">[docs]</a><span class="k">class</span> <span class="nc">NeuronRecorder</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;__indexes&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__n_neurons&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__sampling_rates&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__data_types&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__bitfield_variables&quot;</span><span class="p">]</span>
+        <span class="s2">&quot;__bitfield_variables&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__per_timestep_variables&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__per_timestep_datatypes&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__per_timestep_recording&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__region_ids&quot;</span><span class="p">]</span>
 
     <span class="n">_N_BYTES_FOR_TIMESTAMP</span> <span class="o">=</span> <span class="n">BYTES_PER_WORD</span>
     <span class="n">_N_BYTES_PER_RATE</span> <span class="o">=</span> <span class="n">BYTES_PER_WORD</span>
@@ -152,11 +168,17 @@
     <span class="c1">#: flag for spikes</span>
     <span class="n">SPIKES</span> <span class="o">=</span> <span class="s2">&quot;spikes&quot;</span>
 
+    <span class="c1">#: packets-per-timestep</span>
+    <span class="n">PACKETS</span> <span class="o">=</span> <span class="s2">&quot;packets-per-timestep&quot;</span>
+
+    <span class="c1">#: packets-per-timestep data type</span>
+    <span class="n">PACKETS_TYPE</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UINT32</span>
+
     <span class="n">_MAX_RATE</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="mi">32</span> <span class="o">-</span> <span class="mi">1</span>  <span class="c1"># To allow a unit32_t to be used to store the rate</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">allowed_variables</span><span class="p">,</span> <span class="n">data_types</span><span class="p">,</span> <span class="n">bitfield_variables</span><span class="p">,</span>
-            <span class="n">n_neurons</span><span class="p">):</span>
+            <span class="n">n_neurons</span><span class="p">,</span> <span class="n">per_timestep_variables</span><span class="p">,</span> <span class="n">per_timestep_datatypes</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param list(str) allowed_variables:</span>
 <span class="sd">        :param list(str) data_types:</span>
@@ -168,9 +190,19 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__data_types</span> <span class="o">=</span> <span class="n">data_types</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__n_neurons</span> <span class="o">=</span> <span class="n">n_neurons</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__bitfield_variables</span> <span class="o">=</span> <span class="n">bitfield_variables</span>
-        <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="p">(</span><span class="n">allowed_variables</span><span class="p">,</span> <span class="n">bitfield_variables</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__per_timestep_variables</span> <span class="o">=</span> <span class="n">per_timestep_variables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__per_timestep_datatypes</span> <span class="o">=</span> <span class="n">per_timestep_datatypes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__per_timestep_recording</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__region_ids</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">region_id</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">region_id</span><span class="p">,</span> <span class="n">variable</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="p">(</span>
+                <span class="n">allowed_variables</span><span class="p">,</span> <span class="n">bitfield_variables</span><span class="p">)):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__region_ids</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span> <span class="o">=</span> <span class="n">region_id</span>
+        <span class="k">for</span> <span class="n">ts_region_id</span><span class="p">,</span> <span class="n">variable</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+                <span class="n">per_timestep_variables</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">region_id</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__region_ids</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span> <span class="o">=</span> <span class="n">ts_region_id</span>
 
     <span class="k">def</span> <span class="nf">_count_recording_per_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -207,18 +239,17 @@
 <span class="sd">        :return: Sampling interval in microseconds</span>
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">step</span> <span class="o">=</span> <span class="p">(</span><span class="n">globals_variables</span><span class="o">.</span><span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">machine_time_step</span> <span class="o">/</span>
-                <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span> <span class="o">*</span> <span class="n">step</span></div>
+        <span class="k">if</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__per_timestep_variables</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">get_sampling_interval</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">get_sampling_interval</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="p">[</span><span class="n">variable</span><span class="p">])</span></div>
 
     <span class="k">def</span> <span class="nf">_convert_placement_matrix_data</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">row_data</span><span class="p">,</span> <span class="n">n_rows</span><span class="p">,</span> <span class="n">data_row_length</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">row_data</span><span class="p">,</span> <span class="n">n_rows</span><span class="p">,</span> <span class="n">data_row_length</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">data_type</span><span class="p">):</span>
 
         <span class="n">surplus_bytes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_N_BYTES_FOR_TIMESTAMP</span>
         <span class="n">var_data</span> <span class="o">=</span> <span class="p">(</span><span class="n">row_data</span><span class="p">[:,</span> <span class="n">surplus_bytes</span><span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
             <span class="n">n_rows</span> <span class="o">*</span> <span class="n">data_row_length</span><span class="p">))</span>
-        <span class="n">dtype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data_types</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span>
-        <span class="n">placement_data</span> <span class="o">=</span> <span class="n">dtype</span><span class="o">.</span><span class="n">decode_array</span><span class="p">(</span><span class="n">var_data</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+        <span class="n">placement_data</span> <span class="o">=</span> <span class="n">data_type</span><span class="o">.</span><span class="n">decode_array</span><span class="p">(</span><span class="n">var_data</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
             <span class="n">n_rows</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">placement_data</span>
 
@@ -247,16 +278,14 @@
         <span class="k">return</span> <span class="n">fragment</span>
 
     <span class="k">def</span> <span class="nf">_get_placement_matrix_data</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">vertex</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span>
-            <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">expected_rows</span><span class="p">,</span> <span class="n">missing_str</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">vertex</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">expected_rows</span><span class="p">,</span>
+            <span class="n">missing_str</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">data_type</span><span class="p">,</span> <span class="n">n_per_timestep</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; processes a placement for matrix data</span>
 
-<span class="sd">        :param variable: the variable to read</span>
 <span class="sd">        :param ~pacman.model.placements.Placements placements:</span>
 <span class="sd">            the placements object</span>
 <span class="sd">        :param ~pacman.model.graphs.machine.MachineVertex vertex:</span>
 <span class="sd">            the vertex to read from</span>
-<span class="sd">        :param list(int) indexes: the indexes of neurons to be added to</span>
 <span class="sd">        :param int region: the recording region id</span>
 <span class="sd">        :param ~.BufferManager buffer_manager: the buffer manager</span>
 <span class="sd">        :param int expected_rows:</span>
@@ -269,11 +298,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">placement</span> <span class="o">=</span> <span class="n">placements</span><span class="o">.</span><span class="n">get_placement_of_vertex</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span>
-        <span class="n">neurons</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_neurons_recording</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">)</span>
-        <span class="n">n_neurons</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">neurons</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">n_neurons</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">n_per_timestep</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
-        <span class="n">indexes</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">neurons</span><span class="p">)</span>
 
         <span class="c1"># for buffering output info is taken form the buffer manager</span>
         <span class="n">record_raw</span><span class="p">,</span> <span class="n">missing_data</span> <span class="o">=</span> <span class="n">buffer_manager</span><span class="o">.</span><span class="n">get_data_by_placement</span><span class="p">(</span>
@@ -282,16 +308,17 @@
 
         <span class="c1"># If there is no data, return empty for all timesteps</span>
         <span class="k">if</span> <span class="n">record_length</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">expected_rows</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float64&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">expected_rows</span><span class="p">,</span> <span class="n">n_per_timestep</span><span class="p">),</span>
+                               <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float64&quot;</span><span class="p">)</span>
 
         <span class="c1"># There is one column for time and one for each neuron recording</span>
-        <span class="n">data_row_length</span> <span class="o">=</span> <span class="n">n_neurons</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data_types</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span><span class="o">.</span><span class="n">size</span>
+        <span class="n">data_row_length</span> <span class="o">=</span> <span class="n">n_per_timestep</span> <span class="o">*</span> <span class="n">data_type</span><span class="o">.</span><span class="n">size</span>
         <span class="n">full_row_length</span> <span class="o">=</span> <span class="n">data_row_length</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_N_BYTES_FOR_TIMESTAMP</span>
         <span class="n">n_rows</span> <span class="o">=</span> <span class="n">record_length</span> <span class="o">//</span> <span class="n">full_row_length</span>
         <span class="n">row_data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">record_raw</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint8&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
             <span class="n">n_rows</span><span class="p">,</span> <span class="n">full_row_length</span><span class="p">)</span>
         <span class="n">placement_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_placement_matrix_data</span><span class="p">(</span>
-            <span class="n">row_data</span><span class="p">,</span> <span class="n">n_rows</span><span class="p">,</span> <span class="n">data_row_length</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">)</span>
+            <span class="n">row_data</span><span class="p">,</span> <span class="n">n_rows</span><span class="p">,</span> <span class="n">data_row_length</span><span class="p">,</span> <span class="n">n_per_timestep</span><span class="p">,</span> <span class="n">data_type</span><span class="p">)</span>
 
         <span class="c1"># If everything is there, return it</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">missing_data</span> <span class="ow">and</span> <span class="n">n_rows</span> <span class="o">==</span> <span class="n">expected_rows</span><span class="p">:</span>
@@ -305,7 +332,7 @@
 
         <span class="c1"># process data from core for missing data</span>
         <span class="n">placement_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_missing_data</span><span class="p">(</span>
-            <span class="n">missing_str</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">expected_rows</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span>
+            <span class="n">missing_str</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">expected_rows</span><span class="p">,</span> <span class="n">n_per_timestep</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span>
             <span class="n">sampling_rate</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">placement_data</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">placement_data</span>
 
@@ -320,47 +347,35 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">n_machine_time_steps</span> <span class="o">/</span> <span class="n">sampling_rate</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="NeuronRecorder.get_matrix_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.NeuronRecorder.get_matrix_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_matrix_data</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span>
-            <span class="n">application_vertex</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">n_machine_time_steps</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Read a uint32 mapped to time and neuron IDs from the SpiNNaker\</span>
-<span class="sd">            machine and converts to required data types with scaling if needed.</span>
-
-<span class="sd">        :param str label: vertex label</span>
-<span class="sd">        :param buffer_manager: the manager for buffered data</span>
-<span class="sd">        :type buffer_manager:</span>
-<span class="sd">            ~spinn_front_end_common.interface.buffer_management.BufferManager</span>
-<span class="sd">        :param int region: the DSG region ID used for this data</span>
-<span class="sd">        :param ~pacman.model.placements.Placements placements:</span>
-<span class="sd">            the placements object</span>
-<span class="sd">        :param application_vertex:</span>
-<span class="sd">        :type application_vertex:</span>
-<span class="sd">            ~pacman.model.graphs.application.ApplicationVertex</span>
-<span class="sd">        :param str variable: PyNN name for the variable (`V`, `gsy_inh`, etc.)</span>
-<span class="sd">        :param int n_machine_time_steps:</span>
-<span class="sd">        :return: (data, recording_indices, sampling_interval)</span>
-<span class="sd">        :rtype: tuple(~numpy.ndarray, list(int), float)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__bitfield_variables</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Variable </span><span class="si">{}</span><span class="s2"> is not supported, use get_spikes&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">variable</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">__read_data</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">application_vertex</span><span class="p">,</span>
+            <span class="n">sampling_rate</span><span class="p">,</span> <span class="n">data_type</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">n_machine_time_steps</span><span class="p">):</span>
         <span class="n">vertices</span> <span class="o">=</span> <span class="n">application_vertex</span><span class="o">.</span><span class="n">machine_vertices</span>
-        <span class="n">progress</span> <span class="o">=</span> <span class="n">ProgressBar</span><span class="p">(</span>
-            <span class="n">vertices</span><span class="p">,</span> <span class="s2">&quot;Getting </span><span class="si">{}</span><span class="s2"> for </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">label</span><span class="p">))</span>
-        <span class="n">sampling_rate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span>
+        <span class="n">region</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__region_ids</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span>
         <span class="n">missing_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
         <span class="n">pop_level_data</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">sampling_interval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_neuron_sampling_interval</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
+        <span class="n">sampling_interval</span> <span class="o">=</span> <span class="n">get_sampling_interval</span><span class="p">(</span><span class="n">sampling_rate</span><span class="p">)</span>
+
+        <span class="n">progress</span> <span class="o">=</span> <span class="n">ProgressBar</span><span class="p">(</span>
+            <span class="n">vertices</span><span class="p">,</span> <span class="s2">&quot;Getting </span><span class="si">{}</span><span class="s2"> for </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">label</span><span class="p">))</span>
 
         <span class="n">indexes</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">vertex</span> <span class="ow">in</span> <span class="n">progress</span><span class="o">.</span><span class="n">over</span><span class="p">(</span><span class="n">vertices</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">vertex</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">progress</span><span class="o">.</span><span class="n">over</span><span class="p">(</span><span class="n">vertices</span><span class="p">)):</span>
             <span class="n">expected_rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expected_rows_for_a_run_time</span><span class="p">(</span>
                 <span class="n">n_machine_time_steps</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="p">)</span>
 
+            <span class="n">n_items_per_timestep</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="p">:</span>
+                <span class="n">neurons</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_neurons_recording</span><span class="p">(</span>
+                    <span class="n">variable</span><span class="p">,</span> <span class="n">vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">)</span>
+                <span class="n">n_items_per_timestep</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">neurons</span><span class="p">)</span>
+                <span class="n">indexes</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">neurons</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">indexes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
             <span class="n">placement_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_placement_matrix_data</span><span class="p">(</span>
-                <span class="n">variable</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">vertex</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span>
-                <span class="n">expected_rows</span><span class="p">,</span> <span class="n">missing_str</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+                <span class="n">placements</span><span class="p">,</span> <span class="n">vertex</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">expected_rows</span><span class="p">,</span>
+                <span class="n">missing_str</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">data_type</span><span class="p">,</span>
+                <span class="n">n_items_per_timestep</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">placement_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="c1"># append to the population data</span>
@@ -378,19 +393,52 @@
                 <span class="s2">&quot;Population </span><span class="si">{}</span><span class="s2"> is missing recorded data in region </span><span class="si">{}</span><span class="s2"> from the&quot;</span>
                 <span class="s2">&quot; following cores: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">missing_str</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">pop_level_data</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">sampling_interval</span></div>
+        <span class="k">return</span> <span class="n">pop_level_data</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">sampling_interval</span>
+
+<div class="viewcode-block" id="NeuronRecorder.get_matrix_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.NeuronRecorder.get_matrix_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_matrix_data</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span>
+            <span class="n">application_vertex</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">n_machine_time_steps</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Read a data mapped to time and neuron IDs from the SpiNNaker\</span>
+<span class="sd">            machine and converts to required data types with scaling if needed.</span>
+
+<span class="sd">        :param str label: vertex label</span>
+<span class="sd">        :param buffer_manager: the manager for buffered data</span>
+<span class="sd">        :type buffer_manager:</span>
+<span class="sd">            ~spinn_front_end_common.interface.buffer_management.BufferManager</span>
+<span class="sd">        :param ~pacman.model.placements.Placements placements:</span>
+<span class="sd">            the placements object</span>
+<span class="sd">        :param application_vertex:</span>
+<span class="sd">        :type application_vertex:</span>
+<span class="sd">            ~pacman.model.graphs.application.ApplicationVertex</span>
+<span class="sd">        :param str variable: PyNN name for the variable (`V`, `gsy_inh`, etc.)</span>
+<span class="sd">        :param int n_machine_time_steps:</span>
+<span class="sd">        :return: (data, recording_indices, sampling_interval)</span>
+<span class="sd">        :rtype: tuple(~numpy.ndarray, list(int), float)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__bitfield_variables</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Variable </span><span class="si">{}</span><span class="s2"> is not supported, use get_spikes&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">variable</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__per_timestep_variables</span><span class="p">:</span>
+            <span class="n">sampling_rate</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">data_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__per_timestep_datatypes</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sampling_rate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span>
+            <span class="n">data_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data_types</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__read_data</span><span class="p">(</span>
+            <span class="n">label</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">application_vertex</span><span class="p">,</span>
+            <span class="n">sampling_rate</span><span class="p">,</span> <span class="n">data_type</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">n_machine_time_steps</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="NeuronRecorder.get_spikes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.NeuronRecorder.get_spikes">[docs]</a>    <span class="k">def</span> <span class="nf">get_spikes</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span>
             <span class="n">application_vertex</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Read a uint32 mapped to time and neuron IDs from the SpiNNaker\</span>
+        <span class="sd">&quot;&quot;&quot; Read spikes mapped to time and neuron IDs from the SpiNNaker\</span>
 <span class="sd">            machine.</span>
 
 <span class="sd">        :param str label: vertex label</span>
 <span class="sd">        :param buffer_manager: the manager for buffered data</span>
 <span class="sd">        :type buffer_manager:</span>
 <span class="sd">            ~spinn_front_end_common.interface.buffer_management.BufferManager</span>
-<span class="sd">        :param int region: the DSG region ID used for this data</span>
 <span class="sd">        :param ~pacman.model.placements.Placements placements:</span>
 <span class="sd">            the placements object</span>
 <span class="sd">        :param application_vertex:</span>
@@ -428,6 +476,7 @@
             <span class="n">n_words_with_timestamp</span> <span class="o">=</span> <span class="n">n_words</span> <span class="o">+</span> <span class="mi">1</span>
 
             <span class="c1"># for buffering output info is taken form the buffer manager</span>
+            <span class="n">region</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__region_ids</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span>
             <span class="n">record_raw</span><span class="p">,</span> <span class="n">data_missing</span> <span class="o">=</span> <span class="n">buffer_manager</span><span class="o">.</span><span class="n">get_data_by_placement</span><span class="p">(</span>
                     <span class="n">placement</span><span class="p">,</span> <span class="n">region</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">data_missing</span><span class="p">:</span>
@@ -471,7 +520,9 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: iterable(str)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span></div>
+        <span class="n">variables</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">variables</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__per_timestep_variables</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">variables</span></div>
 
 <div class="viewcode-block" id="NeuronRecorder.is_recording"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.NeuronRecorder.is_recording">[docs]</a>    <span class="k">def</span> <span class="nf">is_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -481,9 +532,12 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span>
         <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Variable </span><span class="si">{}</span><span class="s2"> is not supported. Supported variables are </span><span class="si">{}</span><span class="s2">&quot;</span> \
-                  <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_recordable_variables</span><span class="p">())</span>
-            <span class="n">raise_from</span><span class="p">(</span><span class="n">ConfigurationException</span><span class="p">(</span><span class="n">msg</span><span class="p">),</span> <span class="n">e</span><span class="p">)</span></div>
+            <span class="k">if</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__per_timestep_recording</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">elif</span> <span class="n">variable</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__per_timestep_variables</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Variable </span><span class="si">{}</span><span class="s2"> is not supported. Supported variables are&quot;</span>
+                       <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_recordable_variables</span><span class="p">()))</span>
+                <span class="n">raise_from</span><span class="p">(</span><span class="n">ConfigurationException</span><span class="p">(</span><span class="n">msg</span><span class="p">),</span> <span class="n">e</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">recording_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -491,9 +545,12 @@
 <span class="sd">        :rtype: list(str)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">results</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">region</span><span class="p">,</span> <span class="n">rate</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">variable</span><span class="p">,</span> <span class="n">rate</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">rate</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">region</span><span class="p">)</span>
+                <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__per_timestep_variables</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__per_timestep_recording</span><span class="p">:</span>
+                <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">results</span>
 
     <span class="nd">@property</span>
@@ -502,9 +559,13 @@
 <span class="sd">        :rtype: list(int)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">results</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">_id</span><span class="p">,</span> <span class="n">rate</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+        <span class="k">for</span> <span class="n">variable</span><span class="p">,</span> <span class="n">rate</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">rate</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_id</span><span class="p">)</span>
+                <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__region_ids</span><span class="p">[</span><span class="n">variable</span><span class="p">])</span>
+        <span class="c1"># Per timestep regions come after normal regions</span>
+        <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__per_timestep_variables</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__per_timestep_recording</span><span class="p">:</span>
+                <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__region_ids</span><span class="p">[</span><span class="n">variable</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">results</span>
 
     <span class="k">def</span> <span class="nf">_is_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
@@ -513,6 +574,9 @@
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
 <span class="sd">        :rtype: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Per timestep variables are not recorded by slice, so True if present</span>
+        <span class="k">if</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__per_timestep_recording</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -528,9 +592,17 @@
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
 <span class="sd">        :rtype: list(int)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">_id</span>
-                <span class="k">for</span> <span class="n">_id</span><span class="p">,</span> <span class="n">variable</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_recording</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">)]</span></div>
+        <span class="n">variables</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__region_ids</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_recording</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">)]</span>
+        <span class="c1"># per-timestep variables are always defined, but the region is declared</span>
+        <span class="c1"># after the other variables</span>
+        <span class="n">variables</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__region_ids</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__per_timestep_variables</span>
+            <span class="k">if</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__per_timestep_recording</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">variables</span></div>
 
     <span class="k">def</span> <span class="nf">_compute_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Convert a sampling interval into a rate. \</span>
@@ -583,12 +655,36 @@
             <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
                 <span class="s2">&quot;All indexes larger than population size&quot;</span><span class="p">)</span></div>
 
+    <span class="k">def</span> <span class="nf">__check_per_timestep_params</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">,</span> <span class="n">indexes</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Check if certain parameters have been provided for a per-timestep</span>
+<span class="sd">            variable and if so, raise an Exception</span>
+
+<span class="sd">        :param str variable:</span>
+<span class="sd">        :param int sampling_interval:</span>
+<span class="sd">        :param iterable(int) indexes:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">sampling_interval</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="s2">&quot;Variable </span><span class="si">{}</span><span class="s2"> does not support a sampling interval&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">variable</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">indexes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="s2">&quot;Variable </span><span class="si">{}</span><span class="s2"> can only be recorded on the whole population&quot;</span>
+                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">variable</span><span class="p">))</span>
+
     <span class="k">def</span> <span class="nf">_turn_off_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">,</span> <span class="n">remove_indexes</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param str variable:</span>
 <span class="sd">        :param int sampling_interval:</span>
 <span class="sd">        :param iterable(int) remove_indexes:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># If a per-timestep variable, remove it and return</span>
+        <span class="k">if</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__per_timestep_variables</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__per_timestep_recording</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__per_timestep_recording</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
+            <span class="k">return</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="c1"># Already off so ignore other parameters</span>
             <span class="k">return</span>
@@ -649,6 +745,13 @@
 <span class="sd">        :param int sampling_interval:</span>
 <span class="sd">        :param iterable(int) indexes:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># If a per-timestep variable, update</span>
+        <span class="k">if</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__per_timestep_variables</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__check_per_timestep_params</span><span class="p">(</span>
+                <span class="n">variable</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">,</span> <span class="n">indexes</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__per_timestep_recording</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
+            <span class="k">return</span>
+
         <span class="n">rate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_rate</span><span class="p">(</span><span class="n">sampling_interval</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="c1"># Previously not recording so OK</span>
@@ -682,7 +785,11 @@
         <span class="k">if</span> <span class="n">variable</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">set_recording</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">new_state</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">,</span> <span class="n">indexes</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__per_timestep_variables</span><span class="p">:</span>
+                <span class="c1"># Skip the unsupported items for a per-timestep variable</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">set_recording</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">new_state</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span> <span class="ow">or</span>
+                <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__per_timestep_variables</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">new_state</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_turn_on_recording</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">,</span> <span class="n">indexes</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
@@ -698,7 +805,8 @@
 <span class="sd">        :rtype: list(int)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__per_timestep_variables</span><span class="p">):</span>
             <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_buffered_sdram</span><span class="p">(</span>
                 <span class="n">variable</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">n_machine_time_steps</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">values</span>
@@ -719,7 +827,7 @@
         <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">get_recording_header_array</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_get_buffered_sdram</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">,</span> <span class="n">data_n_time_steps</span><span class="p">)))</span>
 
-        <span class="c1"># Write the number of variables and bitfields</span>
+        <span class="c1"># Write the number of variables and bitfields (ignore per-timestep)</span>
         <span class="n">n_vars</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__bitfield_variables</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">n_vars</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__bitfield_variables</span><span class="p">))</span>
@@ -736,6 +844,11 @@
 <span class="sd">        :return:</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__per_timestep_variables</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">variable</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__per_timestep_recording</span><span class="p">:</span>
+                <span class="k">return</span> <span class="mi">0</span>
+            <span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__per_timestep_datatypes</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span><span class="o">.</span><span class="n">size</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_N_BYTES_FOR_TIMESTAMP</span> <span class="o">+</span> <span class="n">size</span>
         <span class="n">n_neurons</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_count_recording_per_slice</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">n_neurons</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="mi">0</span>
@@ -759,9 +872,14 @@
 <span class="sd">        :return:</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">rate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">rate</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__per_timestep_variables</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">variable</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__per_timestep_recording</span><span class="p">:</span>
+                <span class="k">return</span> <span class="mi">0</span>
+            <span class="n">rate</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">rate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">rate</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="mi">0</span>
 
         <span class="n">data_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_buffered_sdram_per_record</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">rate</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
@@ -784,6 +902,8 @@
 <span class="sd">        :return: Highest possible overflow needed</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># No need to consider per-timestep variables here as they won&#39;t</span>
+        <span class="c1"># overflow</span>
         <span class="n">overflow</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">variable</span><span class="p">,</span> <span class="n">rate</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="p">):</span>
             <span class="c1"># If rate is 0 no recording so no overflow</span>
@@ -806,6 +926,11 @@
 <span class="sd">        :return: data size</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Per timestep variables can&#39;t be done at a specific rate</span>
+        <span class="k">if</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__per_timestep_variables</span><span class="p">:</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_buffered_sdram_per_record</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">item</span> <span class="o">*</span> <span class="n">n_machine_time_steps</span>
+
         <span class="n">rate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">rate</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="mi">0</span>
@@ -828,6 +953,8 @@
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># This calculates the size of the metadata only; thus no reference to</span>
+        <span class="c1"># per-timestep variables which have no metadata</span>
         <span class="n">n_words_for_n_neurons</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_bytes_to_n_words</span><span class="p">(</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
         <span class="n">n_bytes_for_n_neurons</span> <span class="o">=</span> <span class="n">n_words_for_n_neurons</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
         <span class="n">var_bytes</span> <span class="o">=</span> <span class="p">(</span>
@@ -891,6 +1018,9 @@
                     <span class="n">per_timestep_sdram</span> <span class="o">+=</span> <span class="n">average_per_timestep</span>
                     <span class="c1"># Add the rest once to fixed for worst case</span>
                     <span class="n">fixed_sdram</span> <span class="o">+=</span> <span class="p">(</span><span class="n">per_record</span> <span class="o">-</span> <span class="n">average_per_timestep</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__per_timestep_recording</span><span class="p">:</span>
+            <span class="n">per_timestep_sdram</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_buffered_sdram_per_record</span><span class="p">(</span>
+                <span class="n">variable</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">VariableSDRAM</span><span class="p">(</span><span class="n">fixed_sdram</span><span class="p">,</span> <span class="n">per_timestep_sdram</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="NeuronRecorder.get_dtcm_usage_in_bytes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.NeuronRecorder.get_dtcm_usage_in_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">get_dtcm_usage_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
@@ -898,6 +1028,7 @@
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Note: Per-timestep variables uses no DTCM</span>
         <span class="c1"># *_rate + n_neurons_recording_* + *_indexes</span>
         <span class="n">usage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_sdram_usage_in_bytes</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">)</span>
 
@@ -968,6 +1099,7 @@
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
 <span class="sd">        :rtype: ~numpy.ndarray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># There is no data here for per-timestep variables by design</span>
         <span class="n">data</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="p">:</span>
             <span class="c1"># Do bitfields afterwards</span>

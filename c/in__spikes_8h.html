@@ -114,6 +114,13 @@ Functions</h2></td></tr>
 <tr class="memitem:a4fdfc400d8b3a5f4456b56de6e1b42a1"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="in__spikes_8h.html#a4fdfc400d8b3a5f4456b56de6e1b42a1">in_spikes_real_size</a> (void)</td></tr>
 <tr class="memdesc:a4fdfc400d8b3a5f4456b56de6e1b42a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the size of the input spike buffer.  <a href="in__spikes_8h.html#a4fdfc400d8b3a5f4456b56de6e1b42a1">More...</a><br /></td></tr>
 <tr class="separator:a4fdfc400d8b3a5f4456b56de6e1b42a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad5a175358e725bd447fc7cb91124c30e"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="in__spikes_8h.html#ad5a175358e725bd447fc7cb91124c30e">in_spikes_size</a> (void)</td></tr>
+<tr class="memdesc:ad5a175358e725bd447fc7cb91124c30e"><td class="mdescLeft">&#160;</td><td class="mdescRight">get the size of the input spike buffer  <a href="in__spikes_8h.html#ad5a175358e725bd447fc7cb91124c30e">More...</a><br /></td></tr>
+<tr class="separator:ad5a175358e725bd447fc7cb91124c30e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac887c7341817b49b9ce0ecb9a0fa479c"><td class="memItemLeft" align="right" valign="top"><a id="ac887c7341817b49b9ce0ecb9a0fa479c"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="in__spikes_8h.html#ac887c7341817b49b9ce0ecb9a0fa479c">in_spikes_clear</a> (void)</td></tr>
+<tr class="memdesc:ac887c7341817b49b9ce0ecb9a0fa479c"><td class="mdescLeft">&#160;</td><td class="mdescRight">clears the input spike buffer. <br /></td></tr>
+<tr class="separator:ac887c7341817b49b9ce0ecb9a0fa479c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a645f3cede41ec753b8d9cae272b37dda"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="in__spikes_8h.html#a645f3cede41ec753b8d9cae272b37dda">in_spikes_value_at_index</a> (uint32_t index)</td></tr>
 <tr class="memdesc:a645f3cede41ec753b8d9cae272b37dda"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the spike at a specific index of the input spike buffer.  <a href="in__spikes_8h.html#a645f3cede41ec753b8d9cae272b37dda">More...</a><br /></td></tr>
 <tr class="separator:a645f3cede41ec753b8d9cae272b37dda"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -477,6 +484,37 @@ static <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/
 
 </div>
 </div>
+<a id="ad5a175358e725bd447fc7cb91124c30e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad5a175358e725bd447fc7cb91124c30e">&#9670;&nbsp;</a></span>in_spikes_size()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static uint32_t in_spikes_size </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>get the size of the input spike buffer </p>
+<dl class="section return"><dt>Returns</dt><dd>The size of the buffer. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="in__spikes_8h_source.html#l00122">122</a> of file <a class="el" href="in__spikes_8h_source.html">in_spikes.h</a>.</p>
+
+</div>
+</div>
 <a id="a645f3cede41ec753b8d9cae272b37dda"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a645f3cede41ec753b8d9cae272b37dda">&#9670;&nbsp;</a></span>in_spikes_value_at_index()</h2>
 
@@ -510,14 +548,14 @@ static <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The spike at the index. <b>WARNING:</b> <em>if there is no spike at that index, the value returned may be arbitrary.</em> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="in__spikes_8h_source.html#l00125">125</a> of file <a class="el" href="in__spikes_8h_source.html">in_spikes.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="in__spikes_8h_source.html#l00136">136</a> of file <a class="el" href="in__spikes_8h_source.html">in_spikes.h</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Sep 16 2020 13:10:59 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Sep 16 2020 14:41:48 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.17
 </small></address>

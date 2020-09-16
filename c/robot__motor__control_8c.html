@@ -94,6 +94,9 @@ Data Structures</h2></td></tr>
 <tr class="memitem:structmotor__control__config__t"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="robot__motor__control_8c.html#structmotor__control__config__t">motor_control_config_t</a></td></tr>
 <tr class="memdesc:structmotor__control__config__t"><td class="mdescLeft">&#160;</td><td class="mdescRight">The structure of our configuration region in SDRAM.  <a href="robot__motor__control_8c.html#structmotor__control__config__t">More...</a><br /></td></tr>
 <tr class="separator:structmotor__control__config__t"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:structrobot__motor__control__provenance"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="robot__motor__control_8c.html#structrobot__motor__control__provenance">robot_motor_control_provenance</a></td></tr>
+<tr class="memdesc:structrobot__motor__control__provenance"><td class="mdescLeft">&#160;</td><td class="mdescRight">The provenance information written on application shutdown.  <a href="robot__motor__control_8c.html#structrobot__motor__control__provenance">More...</a><br /></td></tr>
+<tr class="separator:structrobot__motor__control__provenance"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
@@ -121,7 +124,8 @@ Enumerations</h2></td></tr>
 <tr class="memdesc:ae9ae980041e438eed7a3af43ce4e9f6b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The "directions" that the motors can move in.  <a href="robot__motor__control_8c.html#ae9ae980041e438eed7a3af43ce4e9f6b">More...</a><br /></td></tr>
 <tr class="separator:ae9ae980041e438eed7a3af43ce4e9f6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7f61ffa202f9ba34d1917f6f83d8bf9d"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="robot__motor__control_8c.html#a7f61ffa202f9ba34d1917f6f83d8bf9d">robot_motor_control_regions_e</a> { <a class="el" href="robot__motor__control_8c.html#a7f61ffa202f9ba34d1917f6f83d8bf9dad102acc20b0123ad06640d8c591c304f">SYSTEM_REGION</a>, 
-<a class="el" href="robot__motor__control_8c.html#a7f61ffa202f9ba34d1917f6f83d8bf9da91faf3838b3b1ca64895b4f7bc331410">PARAMS_REGION</a>
+<a class="el" href="robot__motor__control_8c.html#a7f61ffa202f9ba34d1917f6f83d8bf9da91faf3838b3b1ca64895b4f7bc331410">PARAMS_REGION</a>, 
+<a class="el" href="robot__motor__control_8c.html#a7f61ffa202f9ba34d1917f6f83d8bf9da9dcdca344c3940f5dabd669af51fede2">PROVENANCE_DATA_REGION</a>
  }</td></tr>
 <tr class="memdesc:a7f61ffa202f9ba34d1917f6f83d8bf9d"><td class="mdescLeft">&#160;</td><td class="mdescRight">DSG regions in use.  <a href="robot__motor__control_8c.html#a7f61ffa202f9ba34d1917f6f83d8bf9d">More...</a><br /></td></tr>
 <tr class="separator:a7f61ffa202f9ba34d1917f6f83d8bf9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -153,6 +157,12 @@ Functions</h2></td></tr>
 <tr class="memitem:a95885055138e174e0b8e70fcafa07388"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="robot__motor__control_8c.html#a95885055138e174e0b8e70fcafa07388">incoming_spike_callback</a> (<a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> <a class="el" href="robot__motor__control_8c.html#a6d4ec8e4f3148d51041635da9986c3fa">key</a>, <a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> payload)</td></tr>
 <tr class="memdesc:a95885055138e174e0b8e70fcafa07388"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add incoming spike message (in FIQ) to circular buffer.  <a href="robot__motor__control_8c.html#a95885055138e174e0b8e70fcafa07388">More...</a><br /></td></tr>
 <tr class="separator:a95885055138e174e0b8e70fcafa07388"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a55ebafbff10f99685495e8f745ff53ca"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="robot__motor__control_8c.html#a55ebafbff10f99685495e8f745ff53ca">incoming_spike_callback_payload</a> (<a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> <a class="el" href="robot__motor__control_8c.html#a6d4ec8e4f3148d51041635da9986c3fa">key</a>, <a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> payload)</td></tr>
+<tr class="memdesc:a55ebafbff10f99685495e8f745ff53ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add incoming spike message (in FIQ) to circular buffer.  <a href="robot__motor__control_8c.html#a55ebafbff10f99685495e8f745ff53ca">More...</a><br /></td></tr>
+<tr class="separator:a55ebafbff10f99685495e8f745ff53ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1dc4d17392d4c0a6dac7ab12267da487"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="robot__motor__control_8c.html#a1dc4d17392d4c0a6dac7ab12267da487">c_main_store_provenance_data</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> provenance_region)</td></tr>
+<tr class="memdesc:a1dc4d17392d4c0a6dac7ab12267da487"><td class="mdescLeft">&#160;</td><td class="mdescRight">Callback to store provenance data (format: <a class="el" href="c__main_8c.html#structneuron__provenance" title="The provenance information written on application shutdown.">neuron_provenance</a>).  <a href="robot__motor__control_8c.html#a1dc4d17392d4c0a6dac7ab12267da487">More...</a><br /></td></tr>
+<tr class="separator:a1dc4d17392d4c0a6dac7ab12267da487"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a37f0b2315f3101f6ff9936c212c5bd84"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="robot__motor__control_8c.html#a37f0b2315f3101f6ff9936c212c5bd84">initialize</a> (uint32_t *<a class="el" href="spike__source__poisson_8c.html#ac0c27301e134af3ce80814a553601074">timer_period</a>)</td></tr>
 <tr class="memdesc:a37f0b2315f3101f6ff9936c212c5bd84"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read all application configuration.  <a href="robot__motor__control_8c.html#a37f0b2315f3101f6ff9936c212c5bd84">More...</a><br /></td></tr>
 <tr class="separator:a37f0b2315f3101f6ff9936c212c5bd84"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -280,6 +290,32 @@ Whether we should continue moving if there is no change. </td></tr>
 
 </div>
 </div>
+<a name="structrobot__motor__control__provenance" id="structrobot__motor__control__provenance"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#structrobot__motor__control__provenance">&#9670;&nbsp;</a></span>robot_motor_control_provenance</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">struct robot_motor_control_provenance</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="textblock"><p>The provenance information written on application shutdown. </p>
+
+<p class="definition">Definition at line <a class="el" href="robot__motor__control_8c_source.html#l00053">53</a> of file <a class="el" href="robot__motor__control_8c_source.html">robot_motor_control.c</a>.</p>
+</div><table class="fieldtable">
+<tr><th colspan="3">Data Fields</th></tr>
+<tr><td class="fieldtype">
+<a id="adaf680d39b72069f2abf3665d1e2138e"></a>uint32_t</td>
+<td class="fieldname">
+n_input_buffer_overflows</td>
+<td class="fielddoc">
+A count of the times that the synaptic input circular buffers overflowed. </td></tr>
+</table>
+
+</div>
+</div>
 <h2 class="groupheader">Enumeration Type Documentation</h2>
 <a id="ae9ae980041e438eed7a3af43ce4e9f6b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae9ae980041e438eed7a3af43ce4e9f6b">&#9670;&nbsp;</a></span>direction_t</h2>
@@ -309,7 +345,7 @@ Whether we should continue moving if there is no change. </td></tr>
 </td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="robot__motor__control_8c_source.html#l00056">56</a> of file <a class="el" href="robot__motor__control_8c_source.html">robot_motor_control.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="robot__motor__control_8c_source.html#l00062">62</a> of file <a class="el" href="robot__motor__control_8c_source.html">robot_motor_control.c</a>.</p>
 
 </div>
 </div>
@@ -331,9 +367,11 @@ Whether we should continue moving if there is no change. </td></tr>
 </td></tr>
 <tr><td class="fieldname"><a id="a7f61ffa202f9ba34d1917f6f83d8bf9da91faf3838b3b1ca64895b4f7bc331410"></a>PARAMS_REGION&#160;</td><td class="fielddoc"><p>Configuration region for this application. </p>
 </td></tr>
+<tr><td class="fieldname"><a id="a7f61ffa202f9ba34d1917f6f83d8bf9da9dcdca344c3940f5dabd669af51fede2"></a>PROVENANCE_DATA_REGION&#160;</td><td class="fielddoc"><p>Provenance region for this application. </p>
+</td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="robot__motor__control_8c_source.html#l00095">95</a> of file <a class="el" href="robot__motor__control_8c_source.html">robot_motor_control.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="robot__motor__control_8c_source.html#l00101">101</a> of file <a class="el" href="robot__motor__control_8c_source.html">robot_motor_control.c</a>.</p>
 
 </div>
 </div>
@@ -361,7 +399,7 @@ Whether we should continue moving if there is no change. </td></tr>
 </td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="robot__motor__control_8c_source.html#l00101">101</a> of file <a class="el" href="robot__motor__control_8c_source.html">robot_motor_control.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="robot__motor__control_8c_source.html#l00108">108</a> of file <a class="el" href="robot__motor__control_8c_source.html">robot_motor_control.c</a>.</p>
 
 </div>
 </div>
@@ -409,7 +447,7 @@ Whether we should continue moving if there is no change. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="robot__motor__control_8c_source.html#l00113">113</a> of file <a class="el" href="robot__motor__control_8c_source.html">robot_motor_control.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="robot__motor__control_8c_source.html#l00120">120</a> of file <a class="el" href="robot__motor__control_8c_source.html">robot_motor_control.c</a>.</p>
 
 </div>
 </div>
@@ -470,7 +508,7 @@ Whether we should continue moving if there is no change. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="robot__motor__control_8c_source.html#l00128">128</a> of file <a class="el" href="robot__motor__control_8c_source.html">robot_motor_control.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="robot__motor__control_8c_source.html#l00135">135</a> of file <a class="el" href="robot__motor__control_8c_source.html">robot_motor_control.c</a>.</p>
 
 </div>
 </div>
@@ -531,7 +569,7 @@ Whether we should continue moving if there is no change. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="robot__motor__control_8c_source.html#l00163">163</a> of file <a class="el" href="robot__motor__control_8c_source.html">robot_motor_control.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="robot__motor__control_8c_source.html#l00170">170</a> of file <a class="el" href="robot__motor__control_8c_source.html">robot_motor_control.c</a>.</p>
 
 </div>
 </div>
@@ -578,7 +616,7 @@ Whether we should continue moving if there is no change. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="robot__motor__control_8c_source.html#l00187">187</a> of file <a class="el" href="robot__motor__control_8c_source.html">robot_motor_control.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="robot__motor__control_8c_source.html#l00194">194</a> of file <a class="el" href="robot__motor__control_8c_source.html">robot_motor_control.c</a>.</p>
 
 </div>
 </div>
@@ -614,7 +652,7 @@ Whether we should continue moving if there is no change. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="robot__motor__control_8c_source.html#l00234">234</a> of file <a class="el" href="robot__motor__control_8c_source.html">robot_motor_control.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="robot__motor__control_8c_source.html#l00241">241</a> of file <a class="el" href="robot__motor__control_8c_source.html">robot_motor_control.c</a>.</p>
 
 </div>
 </div>
@@ -661,7 +699,90 @@ Whether we should continue moving if there is no change. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="robot__motor__control_8c_source.html#l00262">262</a> of file <a class="el" href="robot__motor__control_8c_source.html">robot_motor_control.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="robot__motor__control_8c_source.html#l00269">269</a> of file <a class="el" href="robot__motor__control_8c_source.html">robot_motor_control.c</a>.</p>
+
+</div>
+</div>
+<a id="a55ebafbff10f99685495e8f745ff53ca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a55ebafbff10f99685495e8f745ff53ca">&#9670;&nbsp;</a></span>incoming_spike_callback_payload()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void incoming_spike_callback_payload </td>
+          <td>(</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a>&#160;</td>
+          <td class="paramname"><em>key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a>&#160;</td>
+          <td class="paramname"><em>payload</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Add incoming spike message (in FIQ) to circular buffer. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">key</td><td>The received spike </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">payload</td><td>ignored </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="robot__motor__control_8c_source.html#l00279">279</a> of file <a class="el" href="robot__motor__control_8c_source.html">robot_motor_control.c</a>.</p>
+
+</div>
+</div>
+<a id="a1dc4d17392d4c0a6dac7ab12267da487"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1dc4d17392d4c0a6dac7ab12267da487">&#9670;&nbsp;</a></span>c_main_store_provenance_data()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void c_main_store_provenance_data </td>
+          <td>(</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
+          <td class="paramname"><em>provenance_region</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Callback to store provenance data (format: <a class="el" href="c__main_8c.html#structneuron__provenance" title="The provenance information written on application shutdown.">neuron_provenance</a>). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[out]</td><td class="paramname">provenance_region</td><td>Where to write the provenance data </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="robot__motor__control_8c_source.html#l00292">292</a> of file <a class="el" href="robot__motor__control_8c_source.html">robot_motor_control.c</a>.</p>
 
 </div>
 </div>
@@ -698,14 +819,14 @@ Whether we should continue moving if there is no change. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if initialisation succeeded </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="robot__motor__control_8c_source.html#l00272">272</a> of file <a class="el" href="robot__motor__control_8c_source.html">robot_motor_control.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="robot__motor__control_8c_source.html#l00305">305</a> of file <a class="el" href="robot__motor__control_8c_source.html">robot_motor_control.c</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Sep 16 2020 13:10:59 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Sep 16 2020 14:41:48 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.17
 </small></address>

@@ -110,7 +110,9 @@
 
 <span class="c1"># TODO: Make sure these values are correct (particularly CPU cycles)</span>
 <span class="n">_SYNAPSES_BASE_DTCM_USAGE_IN_BYTES</span> <span class="o">=</span> <span class="mi">7</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
-<span class="n">_SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="c1"># 1 for drop late packets.</span>
+<span class="n">_SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
 <span class="n">_SYNAPSES_BASE_N_CPU_CYCLES_PER_NEURON</span> <span class="o">=</span> <span class="mi">10</span>
 <span class="n">_SYNAPSES_BASE_N_CPU_CYCLES</span> <span class="o">=</span> <span class="mi">8</span>
 
@@ -152,6 +154,7 @@
         <span class="s2">&quot;__gen_on_machine&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__max_row_info&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__synapse_indices&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__drop_late_spikes&quot;</span><span class="p">,</span>
         <span class="s2">&quot;_host_generated_block_addr&quot;</span><span class="p">,</span>
         <span class="s2">&quot;_on_chip_generated_block_addr&quot;</span><span class="p">,</span>
         <span class="c1"># Overridable (for testing only) region IDs</span>
@@ -166,8 +169,12 @@
     <span class="c1"># TODO make this right</span>
     <span class="n">FUDGE</span> <span class="o">=</span> <span class="mi">0</span>
 
+    <span class="c1"># 1. address of direct addresses, 2. size of direct addresses matrix size</span>
+    <span class="n">STATIC_SYNAPSE_MATRIX_SDRAM_IN_BYTES</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">ring_buffer_sigma</span><span class="p">,</span> <span class="n">spikes_per_second</span><span class="p">,</span>
-                 <span class="n">config</span><span class="p">,</span> <span class="n">population_table_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">synapse_io</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                 <span class="n">config</span><span class="p">,</span> <span class="n">drop_late_spikes</span><span class="p">,</span> <span class="n">population_table_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">synapse_io</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param int n_synapse_types:</span>
 <span class="sd">            number of synapse types on a neuron (e.g., 2 for excitatory and</span>
@@ -185,10 +192,12 @@
 <span class="sd">        :type population_table_type: MasterPopTableAsBinarySearch or None</span>
 <span class="sd">        :param synapse_io: How IO for synapses is performed</span>
 <span class="sd">        :type synapse_io: SynapseIORowBased or None</span>
+<span class="sd">        :param bool drop_late_spikes: control flag for dropping late packets.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__n_synapse_types</span> <span class="o">=</span> <span class="n">n_synapse_types</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__ring_buffer_sigma</span> <span class="o">=</span> <span class="n">ring_buffer_sigma</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__spikes_per_second</span> <span class="o">=</span> <span class="n">spikes_per_second</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__drop_late_spikes</span> <span class="o">=</span> <span class="n">drop_late_spikes</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_synapse_params_region</span> <span class="o">=</span> \
             <span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">SYNAPSE_PARAMS</span><span class="o">.</span><span class="n">value</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_pop_table_region</span> <span class="o">=</span> \
@@ -221,6 +230,10 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spikes_per_second</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__spikes_per_second</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">getfloat</span><span class="p">(</span>
                 <span class="s2">&quot;Simulation&quot;</span><span class="p">,</span> <span class="s2">&quot;spikes_per_second&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__drop_late_spikes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__drop_late_spikes</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">getboolean</span><span class="p">(</span>
+                <span class="s2">&quot;Simulation&quot;</span><span class="p">,</span> <span class="s2">&quot;drop_late_spikes&quot;</span><span class="p">)</span>
 
         <span class="c1"># Prepare for dealing with STDP - there can only be one (non-static)</span>
         <span class="c1"># synapse dynamics per vertex at present</span>
@@ -270,6 +283,10 @@
 <span class="sd">        :rtype: AbstractSynapseDynamics or None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_dynamics</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">drop_late_spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__drop_late_spikes</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">__combine_structural_stdp_dynamics</span><span class="p">(</span><span class="n">structural</span><span class="p">,</span> <span class="n">stdp</span><span class="p">):</span>
@@ -381,7 +398,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># 4 for address of direct addresses, and</span>
         <span class="c1"># 4 for the size of the direct addresses matrix in bytes</span>
-        <span class="k">return</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">STATIC_SYNAPSE_MATRIX_SDRAM_IN_BYTES</span>
 
     <span class="k">def</span> <span class="nf">__get_max_row_info</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span>
@@ -786,6 +803,11 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Write the ring buffer shifts</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_synapse_params_region</span><span class="p">)</span>
+
+        <span class="c1"># write the bool for deleting packets that were too late for a timer</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__drop_late_spikes</span><span class="p">))</span>
+
+        <span class="c1"># Write the ring buffer shifts</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">ring_buffer_shifts</span><span class="p">)</span>
 
         <span class="c1"># Return the weight scaling factors</span>
@@ -877,6 +899,7 @@
                         <span class="n">generate_on_machine</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_Gen</span><span class="p">(</span>
                             <span class="n">synapse_info</span><span class="p">,</span> <span class="n">pre_slices</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span>
                             <span class="n">pre_vertex</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">edge</span><span class="o">.</span><span class="n">app_edge</span><span class="p">,</span> <span class="n">rinfo</span><span class="p">))</span>
+                        <span class="n">spec</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="s2">&quot;Will generate on machine&quot;</span><span class="p">)</span>
                         <span class="k">continue</span>
 
                     <span class="n">block_addr</span><span class="p">,</span> <span class="n">single_addr</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__write_block</span><span class="p">(</span>
@@ -1207,20 +1230,20 @@
         <span class="k">return</span> <span class="n">block_addr</span><span class="p">,</span> <span class="n">single_addr</span><span class="p">,</span> <span class="n">index</span>
 
     <span class="k">def</span> <span class="nf">_get_ring_buffer_shifts</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">application_vertex</span><span class="p">,</span> <span class="n">application_graph</span><span class="p">,</span> <span class="n">machine_timestep</span><span class="p">,</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">application_vertex</span><span class="p">,</span> <span class="n">application_graph</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span>
             <span class="n">weight_scale</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the ring buffer shifts for this vertex</span>
 
 <span class="sd">        :param .ApplicationVertex application_vertex:</span>
 <span class="sd">        :param .ApplicationGraph application_graph:</span>
-<span class="sd">        :param int machine_timestep:</span>
+<span class="sd">        :param int machine_time_step:</span>
 <span class="sd">        :param float weight_scale:</span>
 <span class="sd">        :rtype: list(int)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ring_buffer_shifts</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__ring_buffer_shifts</span> <span class="o">=</span> \
                 <span class="bp">self</span><span class="o">.</span><span class="n">_get_ring_buffer_to_input_left_shifts</span><span class="p">(</span>
-                    <span class="n">application_vertex</span><span class="p">,</span> <span class="n">application_graph</span><span class="p">,</span> <span class="n">machine_timestep</span><span class="p">,</span>
+                    <span class="n">application_vertex</span><span class="p">,</span> <span class="n">application_graph</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span>
                     <span class="n">weight_scale</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ring_buffer_shifts</span>
 
@@ -1231,6 +1254,8 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
 <span class="sd">            The data specification to write to</span>
+<span class="sd">        :param ~pacman.model.graphs.application_graph.ApplicationGraph \</span>
+<span class="sd">        application_graph: the app graph</span>
 <span class="sd">        :param AbstractPopulationVertex application_vertex:</span>
 <span class="sd">            The vertex owning the synapses</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice post_vertex_slice:</span>

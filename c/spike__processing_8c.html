@@ -88,6 +88,8 @@ $(function() {
 <code>#include &quot;<a class="el" href="synaptogenesis__dynamics_8h_source.html">structural_plasticity/synaptogenesis_dynamics.h</a>&quot;</code><br />
 <code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/simulation_8h.html">simulation.h</a>&gt;</code><br />
 <code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html">debug.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="in__spikes_8h_source.html">common/in_spikes.h</a>&gt;</code><br />
+<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/recording_8h.html">recording.h</a>&gt;</code><br />
 </div>
 <p><a href="spike__processing_8c_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -134,9 +136,12 @@ Functions</h2></td></tr>
 <tr class="memitem:a1a403a9ad2200bc3bd7650e18d78fc26"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#a1a403a9ad2200bc3bd7650e18d78fc26">user_event_callback</a> (<a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> unused0, <a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> unused1)</td></tr>
 <tr class="memdesc:a1a403a9ad2200bc3bd7650e18d78fc26"><td class="mdescLeft">&#160;</td><td class="mdescRight">Called when a user event is received.  <a href="spike__processing_8c.html#a1a403a9ad2200bc3bd7650e18d78fc26">More...</a><br /></td></tr>
 <tr class="separator:a1a403a9ad2200bc3bd7650e18d78fc26"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a917cfd58bb7d3180bad244f5b34909ef"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#a917cfd58bb7d3180bad244f5b34909ef">spike_processing_initialise</a> (<a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a29d85914ddff32967d85ada69854206d">size_t</a> <a class="el" href="bit__field__expander_8c.html#af9b6824a750777e79471f086307d51b9">row_max_n_words</a>, <a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> mc_packet_callback_priority, <a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> user_event_priority, <a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> incoming_spike_buffer_size)</td></tr>
-<tr class="memdesc:a917cfd58bb7d3180bad244f5b34909ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise the spike processing system.  <a href="spike__processing_8c.html#a917cfd58bb7d3180bad244f5b34909ef">More...</a><br /></td></tr>
-<tr class="separator:a917cfd58bb7d3180bad244f5b34909ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa0ddebf0b174a40cd3406916d98f6352"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#aa0ddebf0b174a40cd3406916d98f6352">spike_processing_clear_input_buffer</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#a3b72c02431c8c631ab35793169a96ca0">timer_t</a> <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>)</td></tr>
+<tr class="memdesc:aa0ddebf0b174a40cd3406916d98f6352"><td class="mdescLeft">&#160;</td><td class="mdescRight">clears the input buffer of packets and records them  <a href="spike__processing_8c.html#aa0ddebf0b174a40cd3406916d98f6352">More...</a><br /></td></tr>
+<tr class="separator:aa0ddebf0b174a40cd3406916d98f6352"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a27e88c158f59d59a461a579cde8f2d1f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#a27e88c158f59d59a461a579cde8f2d1f">spike_processing_initialise</a> (<a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a29d85914ddff32967d85ada69854206d">size_t</a> <a class="el" href="bit__field__expander_8c.html#af9b6824a750777e79471f086307d51b9">row_max_n_words</a>, <a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> mc_packet_callback_priority, <a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> user_event_priority, <a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> incoming_spike_buffer_size, bool clear_input_buffers_of_late_packets_init, uint32_t packets_per_timestep_region)</td></tr>
+<tr class="memdesc:a27e88c158f59d59a461a579cde8f2d1f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise the spike processing system.  <a href="spike__processing_8c.html#a27e88c158f59d59a461a579cde8f2d1f">More...</a><br /></td></tr>
+<tr class="separator:a27e88c158f59d59a461a579cde8f2d1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a31a23129c986ef03985d6c245cffb7ce"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#a31a23129c986ef03985d6c245cffb7ce">spike_processing_get_buffer_overflows</a> (void)</td></tr>
 <tr class="memdesc:a31a23129c986ef03985d6c245cffb7ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the number of times the input buffer has overflowed.  <a href="spike__processing_8c.html#a31a23129c986ef03985d6c245cffb7ce">More...</a><br /></td></tr>
 <tr class="separator:a31a23129c986ef03985d6c245cffb7ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -158,8 +163,14 @@ Functions</h2></td></tr>
 <tr class="memitem:abe273f1e2f87e852b3a8fc94b7029c60"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#abe273f1e2f87e852b3a8fc94b7029c60">spike_processing_get_successful_rewires</a> (void)</td></tr>
 <tr class="memdesc:abe273f1e2f87e852b3a8fc94b7029c60"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the number of successful rewires performed.  <a href="spike__processing_8c.html#abe273f1e2f87e852b3a8fc94b7029c60">More...</a><br /></td></tr>
 <tr class="separator:abe273f1e2f87e852b3a8fc94b7029c60"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6d16db10b568334607d2ff3ac4d0f9eb"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#a6d16db10b568334607d2ff3ac4d0f9eb">spike_processing_get_n_packets_dropped_from_lateness</a> (void)</td></tr>
+<tr class="memdesc:a6d16db10b568334607d2ff3ac4d0f9eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the number of packets dropped by the input buffer as they arrived too late to be processed  <a href="spike__processing_8c.html#a6d16db10b568334607d2ff3ac4d0f9eb">More...</a><br /></td></tr>
+<tr class="separator:a6d16db10b568334607d2ff3ac4d0f9eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a666a463b005baf510746d159f90318e9"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#a666a463b005baf510746d159f90318e9">spike_processing_get_max_filled_input_buffer_size</a> (void)</td></tr>
+<tr class="memdesc:a666a463b005baf510746d159f90318e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns how many packets were at max inside the input buffer at any given point.  <a href="spike__processing_8c.html#a666a463b005baf510746d159f90318e9">More...</a><br /></td></tr>
+<tr class="separator:a666a463b005baf510746d159f90318e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a392325c1b5bc32c222df0a35d3dcfad3"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#a392325c1b5bc32c222df0a35d3dcfad3">spike_processing_do_rewiring</a> (int number_of_rewires)</td></tr>
-<tr class="memdesc:a392325c1b5bc32c222df0a35d3dcfad3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the number of times spike_processing has to attempt rewiring.  <a href="spike__processing_8c.html#a392325c1b5bc32c222df0a35d3dcfad3">More...</a><br /></td></tr>
+<tr class="memdesc:a392325c1b5bc32c222df0a35d3dcfad3"><td class="mdescLeft">&#160;</td><td class="mdescRight">set the number of times spike_processing has to attempt rewiring  <a href="spike__processing_8c.html#a392325c1b5bc32c222df0a35d3dcfad3">More...</a><br /></td></tr>
 <tr class="separator:a392325c1b5bc32c222df0a35d3dcfad3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
@@ -193,17 +204,40 @@ static volatile uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a c
 <tr class="memitem:a2b782d1e539bf132657dd7c00abd91f5"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#a2b782d1e539bf132657dd7c00abd91f5">dma_n_spikes</a></td></tr>
 <tr class="separator:a2b782d1e539bf132657dd7c00abd91f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae5dfef7b91f7f0999e4c50dbda402c17"><td class="memItemLeft" align="right" valign="top"><a id="ae5dfef7b91f7f0999e4c50dbda402c17"></a>
-static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#ae5dfef7b91f7f0999e4c50dbda402c17">dma_complete_count</a> = 0</td></tr>
+static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#ae5dfef7b91f7f0999e4c50dbda402c17">dma_complete_count</a></td></tr>
 <tr class="memdesc:ae5dfef7b91f7f0999e4c50dbda402c17"><td class="mdescLeft">&#160;</td><td class="mdescRight">the number of dma completes (used in provenance generation) <br /></td></tr>
 <tr class="separator:ae5dfef7b91f7f0999e4c50dbda402c17"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1c63cfe14fca20ae057b01cf442f7abc"><td class="memItemLeft" align="right" valign="top"><a id="a1c63cfe14fca20ae057b01cf442f7abc"></a>
-static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#a1c63cfe14fca20ae057b01cf442f7abc">spike_processing_count</a> = 0</td></tr>
+static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#a1c63cfe14fca20ae057b01cf442f7abc">spike_processing_count</a></td></tr>
 <tr class="memdesc:a1c63cfe14fca20ae057b01cf442f7abc"><td class="mdescLeft">&#160;</td><td class="mdescRight">the number of spikes that were processed (used in provenance generation) <br /></td></tr>
 <tr class="separator:a1c63cfe14fca20ae057b01cf442f7abc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3a9f1e7d67f318a7a966f01ff80b49dd"><td class="memItemLeft" align="right" valign="top"><a id="a3a9f1e7d67f318a7a966f01ff80b49dd"></a>
-static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#a3a9f1e7d67f318a7a966f01ff80b49dd">n_successful_rewires</a> = 0</td></tr>
+static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#a3a9f1e7d67f318a7a966f01ff80b49dd">n_successful_rewires</a></td></tr>
 <tr class="memdesc:a3a9f1e7d67f318a7a966f01ff80b49dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of successful rewires. <br /></td></tr>
 <tr class="separator:a3a9f1e7d67f318a7a966f01ff80b49dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aec7439b9895311b77cf2ee71500b4206"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#aec7439b9895311b77cf2ee71500b4206">count_input_buffer_packets_late</a></td></tr>
+<tr class="separator:aec7439b9895311b77cf2ee71500b4206"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4f66959943819506f9e571db16a3b0f5"><td class="memItemLeft" align="right" valign="top"><a id="a4f66959943819506f9e571db16a3b0f5"></a>
+static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#a4f66959943819506f9e571db16a3b0f5">biggest_fill_size_of_input_buffer</a></td></tr>
+<tr class="memdesc:a4f66959943819506f9e571db16a3b0f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">tracker of how full the input buffer got. <br /></td></tr>
+<tr class="separator:a4f66959943819506f9e571db16a3b0f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6553b0c9813c830009e32639e34855a2"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#a6553b0c9813c830009e32639e34855a2">clear_input_buffers_of_late_packets</a></td></tr>
+<tr class="separator:a6553b0c9813c830009e32639e34855a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a72e1a0b25adf0ccbc7bc9d9f8ac69570"><td class="memItemLeft" ><a id="a72e1a0b25adf0ccbc7bc9d9f8ac69570"></a>
+struct {</td></tr>
+<tr class="memitem:af767a9506a866fa40813f0a79c42afec"><td class="memItemLeft" align="right" valign="top"><a id="af767a9506a866fa40813f0a79c42afec"></a>
+uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>time</b></td></tr>
+<tr class="separator:af767a9506a866fa40813f0a79c42afec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abd68e339bc7aba101b4c2477d3cd2d9e"><td class="memItemLeft" align="right" valign="top"><a id="abd68e339bc7aba101b4c2477d3cd2d9e"></a>
+uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>packets_this_time_step</b></td></tr>
+<tr class="separator:abd68e339bc7aba101b4c2477d3cd2d9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a72e1a0b25adf0ccbc7bc9d9f8ac69570"><td class="memItemLeft" valign="top">}&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#a72e1a0b25adf0ccbc7bc9d9f8ac69570">p_per_ts_struct</a></td></tr>
+<tr class="memdesc:a72e1a0b25adf0ccbc7bc9d9f8ac69570"><td class="mdescLeft">&#160;</td><td class="mdescRight">the number of packets received this time step <br /></td></tr>
+<tr class="separator:a72e1a0b25adf0ccbc7bc9d9f8ac69570"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a940ad8bd79b6fbdb1fbce1341f2edf92"><td class="memItemLeft" align="right" valign="top"><a id="a940ad8bd79b6fbdb1fbce1341f2edf92"></a>
+static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#a940ad8bd79b6fbdb1fbce1341f2edf92">p_per_ts_region</a></td></tr>
+<tr class="memdesc:a940ad8bd79b6fbdb1fbce1341f2edf92"><td class="mdescLeft">&#160;</td><td class="mdescRight">the region to record the packets per timestep in <br /></td></tr>
+<tr class="separator:a940ad8bd79b6fbdb1fbce1341f2edf92"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Implementation of non-inlined API in <a class="el" href="spike__processing_8h.html" title="Spike processing API.">spike_processing.h</a>. </p>
@@ -223,7 +257,7 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
 </div><div class="memdoc">
 <div class="textblock"><p>DMA buffer structure combines the row read from SDRAM with information about the read. </p>
 
-<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00031">31</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00033">33</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
@@ -276,7 +310,7 @@ Row data. </td></tr>
 </td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00050">50</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00052">52</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
 
 </div>
 </div>
@@ -331,7 +365,7 @@ Row data. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00098">98</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00120">120</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
 
 </div>
 </div>
@@ -400,7 +434,7 @@ Row data. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if there's something to do </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00126">126</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00148">148</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
 
 </div>
 </div>
@@ -455,7 +489,7 @@ Row data. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00188">188</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00217">217</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
 
 </div>
 </div>
@@ -502,7 +536,7 @@ Row data. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00232">232</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00264">264</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
 
 </div>
 </div>
@@ -544,12 +578,12 @@ Row data. </td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">key</td><td>The key of the packet. The spike. </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">payload</td><td>Ignored </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">payload</td><td>the payload of the packet. The count. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00261">261</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00293">293</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
 
 </div>
 </div>
@@ -596,7 +630,7 @@ Row data. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00285">285</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00329">329</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
 
 </div>
 </div>
@@ -635,12 +669,35 @@ Row data. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00353">353</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00398">398</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
 
 </div>
 </div>
-<a id="a917cfd58bb7d3180bad244f5b34909ef"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a917cfd58bb7d3180bad244f5b34909ef">&#9670;&nbsp;</a></span>spike_processing_initialise()</h2>
+<a id="aa0ddebf0b174a40cd3406916d98f6352"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa0ddebf0b174a40cd3406916d98f6352">&#9670;&nbsp;</a></span>spike_processing_clear_input_buffer()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void spike_processing_clear_input_buffer </td>
+          <td>(</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#a3b72c02431c8c631ab35793169a96ca0">timer_t</a>&#160;</td>
+          <td class="paramname"><em>time</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>clears the input buffer of packets and records them </p>
+<p>clears the input buffer of packets </p>
+
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00417">417</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+
+</div>
+</div>
+<a id="a27e88c158f59d59a461a579cde8f2d1f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a27e88c158f59d59a461a579cde8f2d1f">&#9670;&nbsp;</a></span>spike_processing_initialise()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -667,7 +724,19 @@ Row data. </td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a>&#160;</td>
-          <td class="paramname"><em>incoming_spike_buffer_size</em>&#160;</td>
+          <td class="paramname"><em>incoming_spike_buffer_size</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>clear_input_buffers_of_late_packets_init</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>packets_per_timestep_region</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -684,12 +753,13 @@ Row data. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">mc_packet_callback_priority</td><td>Multicast packet receive interrupt priority </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">user_event_priority</td><td>User event interrupt priority </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">incoming_spike_buffer_size</td><td>Size of buffer for receiving spikes </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">packets_per_timestep_region</td><td>The recording region to use for the packets per timestep </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if initialisation succeeded </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00371">371</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00432">432</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
 
 </div>
 </div>
@@ -712,7 +782,7 @@ Row data. </td></tr>
 <p>Gets the number of times the input buffer has overflowed. </p>
 <dl class="section return"><dt>Returns</dt><dd>the number of times the input buffer has overflowed </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00403">403</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00471">471</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
 
 </div>
 </div>
@@ -735,7 +805,7 @@ Row data. </td></tr>
 <p>Gets the number of ghost searches of the master population table that occurred. </p>
 <dl class="section return"><dt>Returns</dt><dd>the number of times a ghost search occurred. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00408">408</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00476">476</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
 
 </div>
 </div>
@@ -758,7 +828,7 @@ Row data. </td></tr>
 <p>Gets the number of master population table searches that failed to find a hit. </p>
 <dl class="section return"><dt>Returns</dt><dd>the number of times a spike did not have a master pop table entry </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00412">412</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00480">480</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
 
 </div>
 </div>
@@ -781,7 +851,7 @@ Row data. </td></tr>
 <p>Gets the number of DMA's that were completed. </p>
 <dl class="section return"><dt>Returns</dt><dd>the number of DMA's that were completed. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00416">416</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00484">484</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
 
 </div>
 </div>
@@ -804,7 +874,7 @@ Row data. </td></tr>
 <p>Gets the number of spikes that were processed. </p>
 <dl class="section return"><dt>Returns</dt><dd>the number of spikes that were processed </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00420">420</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00488">488</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
 
 </div>
 </div>
@@ -827,7 +897,7 @@ Row data. </td></tr>
 <p>get the address of the circular buffer used for buffering received spikes before processing them </p>
 <dl class="section return"><dt>Returns</dt><dd>address of circular buffer </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00427">427</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00495">495</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
 
 </div>
 </div>
@@ -850,7 +920,53 @@ Row data. </td></tr>
 <p>Gets the number of successful rewires performed. </p>
 <dl class="section return"><dt>Returns</dt><dd>the number of successful rewires </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00431">431</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00499">499</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+
+</div>
+</div>
+<a id="a6d16db10b568334607d2ff3ac4d0f9eb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6d16db10b568334607d2ff3ac4d0f9eb">&#9670;&nbsp;</a></span>spike_processing_get_n_packets_dropped_from_lateness()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t spike_processing_get_n_packets_dropped_from_lateness </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>return the number of packets dropped by the input buffer as they arrived too late to be processed </p>
+<dl class="section return"><dt>Returns</dt><dd>the number of packets dropped. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00503">503</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+
+</div>
+</div>
+<a id="a666a463b005baf510746d159f90318e9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a666a463b005baf510746d159f90318e9">&#9670;&nbsp;</a></span>spike_processing_get_max_filled_input_buffer_size()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t spike_processing_get_max_filled_input_buffer_size </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>returns how many packets were at max inside the input buffer at any given point. </p>
+<dl class="section return"><dt>Returns</dt><dd>the max size the input buffer reached </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00507">507</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
 
 </div>
 </div>
@@ -870,16 +986,11 @@ Row data. </td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Set the number of times spike_processing has to attempt rewiring. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">number_of_rewires</td><td>The number of rewirings to perform </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>currently always true </dd></dl>
+<p>set the number of times spike_processing has to attempt rewiring </p>
+<p>Set the number of times spike_processing has to attempt rewiring.</p>
+<dl class="section return"><dt>Returns</dt><dd>currently, always true </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00435">435</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00513">513</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
 
 </div>
 </div>
@@ -905,7 +1016,7 @@ Row data. </td></tr>
 </div><div class="memdoc">
 <p>The number of rewires to do when the DMA completes. When a DMA is first set up, only this or dma_n_spikes can be 1 with the other being 0. </p>
 
-<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00077">77</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00079">79</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
 
 </div>
 </div>
@@ -930,14 +1041,64 @@ Row data. </td></tr>
 </div><div class="memdoc">
 <p>The number of spikes to do when the DMA completes. When a DMA is first set up, only this or dma_n_rewires can be 1 with the other being 0. </p>
 
-<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00081">81</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00083">83</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+
+</div>
+</div>
+<a id="aec7439b9895311b77cf2ee71500b4206"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aec7439b9895311b77cf2ee71500b4206">&#9670;&nbsp;</a></span>count_input_buffer_packets_late</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t count_input_buffer_packets_late</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>count how many packets were lost from the input buffer because of late arrival </p>
+
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00096">96</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+
+</div>
+</div>
+<a id="a6553b0c9813c830009e32639e34855a2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6553b0c9813c830009e32639e34855a2">&#9670;&nbsp;</a></span>clear_input_buffers_of_late_packets</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool clear_input_buffers_of_late_packets</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>bool that governs if we should clear packets from the input buffer at the end of a timer tick. </p>
+
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00103">103</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Sep 16 2020 13:10:59 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Sep 16 2020 14:41:48 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.17
 </small></address>

@@ -100,6 +100,7 @@
         <span class="n">DELAY_PARAMS</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="n">PROVENANCE_REGION</span> <span class="o">=</span> <span class="mi">2</span>
         <span class="n">EXPANDER_REGION</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="n">TDMA_REGION</span> <span class="o">=</span> <span class="mi">4</span>
 
 <div class="viewcode-block" id="DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES">[docs]</a>    <span class="k">class</span> <span class="nc">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
         <span class="n">N_PACKETS_RECEIVED</span> <span class="o">=</span> <span class="mi">0</span>
@@ -107,7 +108,8 @@
         <span class="n">N_PACKETS_ADDED</span> <span class="o">=</span> <span class="mi">2</span>
         <span class="n">N_PACKETS_SENT</span> <span class="o">=</span> <span class="mi">3</span>
         <span class="n">N_BUFFER_OVERFLOWS</span> <span class="o">=</span> <span class="mi">4</span>
-        <span class="n">N_DELAYS</span> <span class="o">=</span> <span class="mi">5</span></div>
+        <span class="n">N_DELAYS</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="n">N_TIMES_TDMA_FELL_BEHIND</span> <span class="o">=</span> <span class="mi">6</span></div>
 
     <span class="n">N_EXTRA_PROVENANCE_DATA_ENTRIES</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="p">)</span>
 
@@ -169,6 +171,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="o">.</span><span class="n">N_BUFFER_OVERFLOWS</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
         <span class="n">n_delays</span> <span class="o">=</span> <span class="n">provenance_data</span><span class="p">[</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="o">.</span><span class="n">N_DELAYS</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
+        <span class="n">n_times_tdma_fell_behind</span> <span class="o">=</span> <span class="n">provenance_data</span><span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="o">.</span><span class="n">N_TIMES_TDMA_FELL_BEHIND</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
 
         <span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_placement_details</span><span class="p">(</span><span class="n">placement</span><span class="p">)</span>
 
@@ -210,6 +214,10 @@
         <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="s2">&quot;Number_of_times_delayed_to_spread_traffic&quot;</span><span class="p">),</span>
             <span class="n">n_delays</span><span class="p">))</span>
+        <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">get_tdma_provenance_item</span><span class="p">(</span>
+                <span class="n">names</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">n_times_tdma_fell_behind</span><span class="p">))</span>
+
         <span class="k">return</span> <span class="n">provenance_items</span></div>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">MachineVertex</span><span class="o">.</span><span class="n">get_n_keys_for_partition</span><span class="p">)</span>

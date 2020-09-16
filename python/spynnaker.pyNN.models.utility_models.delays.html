@@ -205,11 +205,16 @@ implements.</li>
 <code class="descname">N_PACKETS_SENT</code><em class="property"> = 3</em><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_PACKETS_SENT" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_TIMES_TDMA_FELL_BEHIND">
+<code class="descname">N_TIMES_TDMA_FELL_BEHIND</code><em class="property"> = 6</em><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_TIMES_TDMA_FELL_BEHIND" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.N_EXTRA_PROVENANCE_DATA_ENTRIES">
-<code class="descclassname">DelayExtensionMachineVertex.</code><code class="descname">N_EXTRA_PROVENANCE_DATA_ENTRIES</code><em class="property"> = 6</em><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.N_EXTRA_PROVENANCE_DATA_ENTRIES" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">DelayExtensionMachineVertex.</code><code class="descname">N_EXTRA_PROVENANCE_DATA_ENTRIES</code><em class="property"> = 7</em><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.N_EXTRA_PROVENANCE_DATA_ENTRIES" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -298,7 +303,7 @@ implements.</li>
 <dl class="class">
 <dt id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex">
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.utility_models.delays.</code><code class="descname">DelayExtensionVertex</code><span class="sig-paren">(</span><em>n_neurons</em>, <em>delay_per_stage</em>, <em>source_vertex</em>, <em>machine_time_step</em>, <em>time_scale_factor</em>, <em>constraints=None</em>, <em>label='DelayExtension'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/delays/delay_extension_vertex.html#DelayExtensionVertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pacman.model.graphs.application.application_vertex.ApplicationVertex</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_generates_data_specification.AbstractGeneratesDataSpecification</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_provides_outgoing_partition_constraints.AbstractProvidesOutgoingPartitionConstraints</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.impl.tdma_aware_application_vertex.TDMAAwareApplicationVertex</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_generates_data_specification.AbstractGeneratesDataSpecification</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_provides_outgoing_partition_constraints.AbstractProvidesOutgoingPartitionConstraints</span></code></p>
 <p>Provide delays to incoming spikes in multiples of the maximum delays        of a neuron (typically 16 or 32)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -559,7 +564,7 @@ CPUCyclesPerTickResource, DTCMResource and SDRAMResource</p>
 
 <dl class="method">
 <dt id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.write_delay_parameters">
-<code class="descname">write_delay_parameters</code><span class="sig-paren">(</span><em>spec</em>, <em>vertex_slice</em>, <em>key</em>, <em>incoming_key</em>, <em>incoming_mask</em>, <em>total_n_vertices</em>, <em>machine_time_step</em>, <em>time_scale_factor</em>, <em>n_outgoing_edges</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/delays/delay_extension_vertex.html#DelayExtensionVertex.write_delay_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.write_delay_parameters" title="Permalink to this definition">¶</a></dt>
+<code class="descname">write_delay_parameters</code><span class="sig-paren">(</span><em>spec</em>, <em>vertex_slice</em>, <em>key</em>, <em>incoming_key</em>, <em>incoming_mask</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/delays/delay_extension_vertex.html#DelayExtensionVertex.write_delay_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.write_delay_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate Delay Parameter data</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -571,10 +576,6 @@ CPUCyclesPerTickResource, DTCMResource and SDRAMResource</p>
 <li><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
 <li><strong>incoming_key</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
 <li><strong>incoming_mask</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
-<li><strong>total_n_vertices</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
-<li><strong>machine_time_step</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
-<li><strong>time_scale_factor</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
-<li><strong>n_outgoing_edges</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
 </ul>
 </td>
 </tr>

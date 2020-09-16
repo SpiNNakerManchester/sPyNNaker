@@ -96,9 +96,9 @@ Functions</h2></td></tr>
 <tr class="memitem:aa1ad92bb519344d001dba972cdd0be5f"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#aa1ad92bb519344d001dba972cdd0be5f">synapses_print_weight</a> (weight_t weight, uint32_t left_shift)</td></tr>
 <tr class="memdesc:aa1ad92bb519344d001dba972cdd0be5f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print the weight of a synapse.  <a href="synapses_8h.html#aa1ad92bb519344d001dba972cdd0be5f">More...</a><br /></td></tr>
 <tr class="separator:aa1ad92bb519344d001dba972cdd0be5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af18f202350f50a1bc5444062a9e1ee43"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#af18f202350f50a1bc5444062a9e1ee43">synapses_initialise</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> synapse_params_address, uint32_t <a class="el" href="synapses_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a>, uint32_t <a class="el" href="synapses_8c.html#adedb27b3ece4d4dece0aee776a136427">n_synapse_types</a>, uint32_t **ring_buffer_to_input_buffer_left_shifts)</td></tr>
-<tr class="memdesc:af18f202350f50a1bc5444062a9e1ee43"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise the synapse processing.  <a href="synapses_8h.html#af18f202350f50a1bc5444062a9e1ee43">More...</a><br /></td></tr>
-<tr class="separator:af18f202350f50a1bc5444062a9e1ee43"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afb7de7af1598c0248a5ac78921afadef"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#afb7de7af1598c0248a5ac78921afadef">synapses_initialise</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> synapse_params_address, uint32_t <a class="el" href="synapses_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a>, uint32_t <a class="el" href="synapses_8c.html#adedb27b3ece4d4dece0aee776a136427">n_synapse_types</a>, uint32_t **ring_buffer_to_input_buffer_left_shifts, bool *clear_input_buffers_of_late_packets_init)</td></tr>
+<tr class="memdesc:afb7de7af1598c0248a5ac78921afadef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise the synapse processing.  <a href="synapses_8h.html#afb7de7af1598c0248a5ac78921afadef">More...</a><br /></td></tr>
+<tr class="separator:afb7de7af1598c0248a5ac78921afadef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad88a7e6b3773f1e0f334b7410f182987"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#ad88a7e6b3773f1e0f334b7410f182987">synapses_do_timestep_update</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#a3b72c02431c8c631ab35793169a96ca0">timer_t</a> <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>)</td></tr>
 <tr class="memdesc:ad88a7e6b3773f1e0f334b7410f182987"><td class="mdescLeft">&#160;</td><td class="mdescRight">Do all the synapse processing for a timestep.  <a href="synapses_8h.html#ad88a7e6b3773f1e0f334b7410f182987">More...</a><br /></td></tr>
 <tr class="separator:ad88a7e6b3773f1e0f334b7410f182987"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -343,8 +343,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syna
 
 </div>
 </div>
-<a id="af18f202350f50a1bc5444062a9e1ee43"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af18f202350f50a1bc5444062a9e1ee43">&#9670;&nbsp;</a></span>synapses_initialise()</h2>
+<a id="afb7de7af1598c0248a5ac78921afadef"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afb7de7af1598c0248a5ac78921afadef">&#9670;&nbsp;</a></span>synapses_initialise()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -371,7 +371,13 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syna
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">uint32_t **&#160;</td>
-          <td class="paramname"><em>ring_buffer_to_input_buffer_left_shifts</em>&#160;</td>
+          <td class="paramname"><em>ring_buffer_to_input_buffer_left_shifts</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool *&#160;</td>
+          <td class="paramname"><em>clear_input_buffers_of_late_packets_init</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -421,7 +427,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syna
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00316">316</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00325">325</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
 
 </div>
 </div>
@@ -468,7 +474,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syna
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if successful </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00353">353</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00365">365</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
 
 </div>
 </div>
@@ -491,7 +497,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syna
 <p>returns the number of times the synapses have saturated their weights. </p>
 <dl class="section return"><dt>Returns</dt><dd>the number of times the synapses have saturated. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00392">392</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00404">404</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
 
 </div>
 </div>
@@ -514,7 +520,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syna
 <p>returns the counters for plastic and fixed pre synaptic events based on (if the model was compiled with SYNAPSE_BENCHMARK parameter) or returns 0 </p>
 <dl class="section return"><dt>Returns</dt><dd>the counter for plastic and fixed pre synaptic events or 0 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00400">400</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00412">412</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
 
 </div>
 </div>
@@ -539,14 +545,14 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syna
 <dd>
 true if successful </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00413">413</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00425">425</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Sep 16 2020 13:10:59 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Sep 16 2020 14:41:48 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.17
 </small></address>
