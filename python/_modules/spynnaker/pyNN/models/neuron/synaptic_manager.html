@@ -82,9 +82,7 @@
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">struct</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
-<span class="kn">import</span> <span class="nn">scipy.stats</span>  <span class="c1"># @UnresolvedImport</span>
 <span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">special</span>  <span class="c1"># @UnresolvedImport</span>
-<span class="kn">from</span> <span class="nn">pyNN.random</span> <span class="kn">import</span> <span class="n">RandomDistribution</span>
 <span class="kn">from</span> <span class="nn">data_specification.enums</span> <span class="kn">import</span> <span class="n">DataType</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.helpful_functions</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">locate_memory_region_for_placement</span><span class="p">)</span>
@@ -103,8 +101,7 @@
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.utility_models.delays</span> <span class="kn">import</span> <span class="n">DelayExtensionVertex</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">POPULATION_BASED_REGIONS</span><span class="p">,</span> <span class="n">POSSION_SIGMA_SUMMATION_LIMIT</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.utility_calls</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">get_maximum_probable_value</span><span class="p">,</span> <span class="n">get_n_bits</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.utility_calls</span> <span class="kn">import</span> <span class="p">(</span><span class="n">get_n_bits</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.running_stats</span> <span class="kn">import</span> <span class="n">RunningStats</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.master_pop_table</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">MasterPopTableAsBinarySearch</span><span class="p">)</span>
@@ -719,16 +716,9 @@
                         <span class="c1"># If non-zero rate then use it; otherwise keep default</span>
                         <span class="k">if</span> <span class="n">rate</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
                             <span class="n">spikes_per_second</span> <span class="o">=</span> <span class="n">rate</span>
-                        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">spikes_per_second</span><span class="p">,</span> <span class="s2">&quot;__getitem__&quot;</span><span class="p">):</span>
-                            <span class="n">spikes_per_second</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">spikes_per_second</span><span class="p">)</span>
-                        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spikes_per_second</span><span class="p">,</span> <span class="n">RandomDistribution</span><span class="p">):</span>
-                            <span class="n">spikes_per_second</span> <span class="o">=</span> <span class="n">get_maximum_probable_value</span><span class="p">(</span>
-                                <span class="n">spikes_per_second</span><span class="p">,</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
-                        <span class="n">prob</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="p">(</span>
-                            <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">100.0</span><span class="p">)</span> <span class="o">/</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
-                        <span class="n">spikes_per_tick</span> <span class="o">=</span> <span class="n">spikes_per_second</span> <span class="o">/</span> <span class="n">steps_per_second</span>
-                        <span class="n">spikes_per_tick</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">poisson</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span>
-                            <span class="n">prob</span><span class="p">,</span> <span class="n">spikes_per_tick</span><span class="p">)</span>
+                        <span class="n">spikes_per_tick</span> <span class="o">=</span> \
+                            <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">max_spikes_per_ts</span><span class="p">(</span>
+                                <span class="n">machine_timestep</span><span class="p">)</span>
                     <span class="n">rate_stats</span><span class="p">[</span><span class="n">synapse_type</span><span class="p">]</span><span class="o">.</span><span class="n">add_items</span><span class="p">(</span>
                         <span class="n">spikes_per_second</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n_connections</span><span class="p">)</span>
                     <span class="n">total_weights</span><span class="p">[</span><span class="n">synapse_type</span><span class="p">]</span> <span class="o">+=</span> <span class="n">spikes_per_tick</span> <span class="o">*</span> <span class="p">(</span>
