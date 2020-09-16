@@ -95,7 +95,8 @@ static inline void synapses_print_weight(
 bool synapses_initialise(
         address_t synapse_params_address,
         uint32_t n_neurons, uint32_t n_synapse_types,
-        uint32_t **ring_buffer_to_input_buffer_left_shifts);
+        uint32_t **ring_buffer_to_input_buffer_left_shifts,
+        bool* clear_input_buffers_of_late_packets_init);
 
 //! \brief Do all the synapse processing for a timestep.
 //! \param[in] time: the current simulation time
