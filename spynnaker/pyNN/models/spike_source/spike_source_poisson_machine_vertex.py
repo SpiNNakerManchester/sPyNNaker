@@ -31,6 +31,7 @@ from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.interface.profiling import AbstractHasProfileData
 from spinn_front_end_common.interface.profiling.profile_utils import (
     get_profiling_data)
+from spynnaker.pyNN.models.abstract_models import AbstractMaxSpikes
 from spynnaker.pyNN.utilities.constants import (
     LIVE_POISSON_CONTROL_PARTITION_ID)
 
@@ -131,9 +132,13 @@ class SpikeSourcePoissonMachineVertex(
     def get_binary_start_type(self):
         return ExecutableType.USES_SIMULATION_INTERFACE
 
-    @property
-    def max_rate(self):
+    @overrides(AbstractMaxSpikes.max_spikes_per_second)
+    def max_spikes_per_second(self):
         return self.app_vertex.max_rate
+
+    @overrides(AbstractMaxSpikes.max_spikes_per_ts)
+    def max_spikes_per_ts(self, machine_time_step):
+        return self.app_vertex.max_spikes_per_ts(machine_time_step)
 
     @property
     def application_n_atoms(self):

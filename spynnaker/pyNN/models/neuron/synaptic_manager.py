@@ -31,8 +31,8 @@ from spynnaker.pyNN.models.neural_projections import (
 from .synapse_dynamics import (
     AbstractSynapseDynamicsStructural,
     AbstractGenerateOnMachine, SynapseDynamicsStructuralSTDP)
+from spynnaker.pyNN.models.abstract_models import AbstractMaxSpikes
 from spynnaker.pyNN.models.neuron.synapse_io import SynapseIORowBased
-from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonMachineVertex
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 from spynnaker.pyNN.utilities.constants import (
     POPULATION_BASED_REGIONS, POSSION_SIGMA_SUMMATION_LIMIT)
@@ -651,8 +651,8 @@ class SynapticManager(object):
                 1.0, self.__spikes_per_second / steps_per_second)
             spikes_per_second = self.__spikes_per_second
             pre_vertex = synapse_map[synapse_info].pre_vertex
-            if isinstance(pre_vertex, SpikeSourcePoissonMachineVertex):
-                rate = pre_vertex.max_rate
+            if isinstance(pre_vertex, AbstractMaxSpikes):
+                rate = pre_vertex.max_spikes_per_second()
                 if rate != 0:
                     spikes_per_second = rate
                 spikes_per_tick = \
