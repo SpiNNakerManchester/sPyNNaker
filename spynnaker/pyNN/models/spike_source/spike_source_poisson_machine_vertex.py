@@ -167,11 +167,3 @@ class SpikeSourcePoissonMachineVertex(
     @overrides(AbstractMaxSpikes.max_spikes_per_ts)
     def max_spikes_per_ts(self, machine_time_step):
         return self.app_vertex.max_spikes_per_ts(machine_time_step)
-
-    @property
-    def application_n_atoms(self):
-        """
-        The application level n_atoms
-        :return: The application level n_atoms
-        """
-        return self.app_vertex.n_atoms
