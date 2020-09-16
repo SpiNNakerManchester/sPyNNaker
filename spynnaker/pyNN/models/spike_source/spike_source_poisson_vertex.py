@@ -442,7 +442,7 @@ class SpikeSourcePoissonVertex(
         SimplePopulationSettable.set_value(self, key, value)
         self.__change_requires_neuron_parameters_reload = True
 
-    def _max_spikes_per_ts(self, machine_time_step):
+    def max_spikes_per_ts(self, machine_time_step):
         """
         :param int machine_time_step:
         """
@@ -464,7 +464,7 @@ class SpikeSourcePoissonVertex(
         :param int machine_time_step:
         """
         variable_sdram = self.__spike_recorder.get_sdram_usage_in_bytes(
-            vertex_slice.n_atoms, self._max_spikes_per_ts(machine_time_step))
+            vertex_slice.n_atoms, self.max_spikes_per_ts(machine_time_step))
         constant_sdram = ConstantSDRAM(
             variable_sdram.per_timestep * OVERFLOW_TIMESTEPS_FOR_SDRAM)
         return variable_sdram + constant_sdram
