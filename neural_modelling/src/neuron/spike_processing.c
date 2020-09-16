@@ -327,7 +327,6 @@ static void multicast_packet_received_callback(uint key, uint payload) {
 //! \param unused: unused
 //! \param[in] tag: What sort of DMA has finished?
 static void dma_complete_callback(UNUSED uint unused, uint tag) {
-    use(unused);
 
     // increment the dma complete count for provenance generation
     dma_complete_count++;
