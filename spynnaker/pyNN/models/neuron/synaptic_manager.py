@@ -17,9 +17,7 @@ from collections import defaultdict, namedtuple
 import math
 import struct
 import numpy
-import scipy.stats  # @UnresolvedImport
 from scipy import special  # @UnresolvedImport
-from pyNN.random import RandomDistribution
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
@@ -38,8 +36,7 @@ from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex import (
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 from spynnaker.pyNN.utilities.constants import (
     POPULATION_BASED_REGIONS, POSSION_SIGMA_SUMMATION_LIMIT)
-from spynnaker.pyNN.utilities.utility_calls import (
-    get_maximum_probable_value, get_n_bits)
+from spynnaker.pyNN.utilities.utility_calls import (get_n_bits)
 from spynnaker.pyNN.utilities.running_stats import RunningStats
 from spynnaker.pyNN.models.neuron.master_pop_table import (
     MasterPopTableAsBinarySearch)
@@ -654,16 +651,9 @@ class SynapticManager(object):
                         # If non-zero rate then use it; otherwise keep default
                         if rate != 0:
                             spikes_per_second = rate
-                        if hasattr(spikes_per_second, "__getitem__"):
-                            spikes_per_second = numpy.max(spikes_per_second)
-                        elif isinstance(spikes_per_second, RandomDistribution):
-                            spikes_per_second = get_maximum_probable_value(
-                                spikes_per_second, app_edge.pre_vertex.n_atoms)
-                        prob = 1.0 - (
-                            (1.0 / 100.0) / app_edge.pre_vertex.n_atoms)
-                        spikes_per_tick = spikes_per_second / steps_per_second
-                        spikes_per_tick = scipy.stats.poisson.ppf(
-                            prob, spikes_per_tick)
+                        spikes_per_tick = \
+                            app_edge.pre_vertex.max_spikes_per_ts(
+                                machine_timestep)
                     rate_stats[synapse_type].add_items(
                         spikes_per_second, 0, n_connections)
                     total_weights[synapse_type] += spikes_per_tick * (
