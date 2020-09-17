@@ -40,6 +40,8 @@ N_RANDOM_NUMBERS = 4
 ARBITRARY_Y = 13031301
 MARS_C_MAX = 698769068
 
+FLOAT_GCD_TOLERANCE = 0.00001
+
 STATS_BY_NAME = {
     'binomial': RandomStatsBinomialImpl(),
     'gamma': RandomStatsGammaImpl(),
@@ -339,7 +341,7 @@ def float_gcd(a, b):
         return float_gcd(b, a)
 
     # base case
-    if (abs(b) < 0.001):
+    if (abs(b) < FLOAT_GCD_TOLERANCE):
         return a
     else:
         return (float_gcd(b, a - math.floor(a / b) * b))
