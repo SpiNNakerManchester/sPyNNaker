@@ -13,14 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from six import add_metaclass
-
-from pacman.model.partitioner_interfaces.abstract_splitter_common import (
-    AbstractSplitterCommon)
-from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_utilities.abstract_base import AbstractBase
 
 
 @add_metaclass(AbstractBase)
-class AbstractSpynnakerSplitter(AbstractSplitterCommon):
+class AbstractSpynnakerSplitterDelay(object):
 
     __slots__ = []
 
@@ -28,9 +25,6 @@ class AbstractSpynnakerSplitter(AbstractSplitterCommon):
 
     # max delays supported by a slice split machine vertex
     MAX_SUPPORTED_DELAY_TICS = 16
-
-    def __init__(self):
-        AbstractSplitterCommon.__init__(self)
 
     def __str__(self):
         return self.STR_MESSAGE.format(self._governed_app_vertex)
