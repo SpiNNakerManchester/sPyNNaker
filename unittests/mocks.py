@@ -95,7 +95,13 @@ class MockSimulator(object):
              "one_to_one_connection_dtcm_max_bytes": "0",
              "min_weights": "None",
              "weight_random_sigma": 2,
-             "max_stdp_spike_delta": 10}
+             "max_stdp_spike_delta": 10,
+             "drop_late_spikes": True,
+             "app_machine_quantity": 10,
+             "time_between_cores": 1.2,
+             "fraction_of_time_spike_sending": 0.5,
+             "fraction_of_time_before_sending": 0.01
+             }
         self.config["Buffers"] = {"time_between_requests": "10",
                                   "minimum_buffer_sdram": "10",
                                   "use_auto_pause_and_resume": "True",

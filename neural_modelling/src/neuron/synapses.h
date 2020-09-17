@@ -87,7 +87,8 @@ static inline void synapses_print_weight(
 //! \return True if successfully initialised. False otherwise.
 bool synapses_initialise(
         address_t synapse_params_address, uint32_t n_neurons,
-		uint32_t n_synapse_types, REAL **min_weights_out);
+		uint32_t n_synapse_types, REAL **min_weights_out,
+        bool* clear_input_buffers_of_late_packets_init);
 
 //! \brief Do all the synapse processing for a timestep.
 //! \param[in] time: the current simulation time

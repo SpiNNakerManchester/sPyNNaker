@@ -53,7 +53,7 @@ class ExternalDeviceLifControlVertex(
             pynn_model, translator=None, spikes_per_second=None, label=None,
             ring_buffer_sigma=None, min_weights=None, weight_random_sigma=None,
             max_stdp_spike_delta=None, incoming_spike_buffer_size=None,
-            constraints=None):
+            drop_late_spikes=None, constraints=None):
         """
         :param list(AbstractMulticastControllableDevice) devices:
             The AbstractMulticastControllableDevice instances to be controlled
@@ -110,7 +110,8 @@ class ExternalDeviceLifControlVertex(
             len(devices), label, constraints, max_atoms_per_core,
             spikes_per_second, ring_buffer_sigma, min_weights,
             weight_random_sigma, max_stdp_spike_delta,
-            incoming_spike_buffer_size, neuron_impl, pynn_model)
+            incoming_spike_buffer_size, neuron_impl, pynn_model,
+            drop_late_spikes)
 
     def routing_key_partition_atom_mapping(self, routing_info, partition):
         # pylint: disable=arguments-differ

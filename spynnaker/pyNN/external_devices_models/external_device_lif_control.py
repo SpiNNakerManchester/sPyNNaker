@@ -101,7 +101,7 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
             self, n_neurons, label, constraints, spikes_per_second,
             ring_buffer_sigma, min_weights, weight_random_sigma,
             max_stdp_spike_delta, incoming_spike_buffer_size,
-            n_steps_per_timestep):
+            n_steps_per_timestep, drop_late_spikes):
         if n_neurons != len(self._devices):
             raise ConfigurationException(
                 "Number of neurons does not match number of devices in {}"
@@ -112,4 +112,4 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
             self._devices, self._create_edges, max_atoms, self._model, self,
             self._translator, spikes_per_second, label, ring_buffer_sigma,
             min_weights, weight_random_sigma, max_stdp_spike_delta,
-            incoming_spike_buffer_size, constraints)
+            incoming_spike_buffer_size, constraints, drop_late_spikes)

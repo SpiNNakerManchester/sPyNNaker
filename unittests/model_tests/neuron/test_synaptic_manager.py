@@ -121,7 +121,7 @@ class TestSynapticManager(unittest.TestCase):
         synaptic_manager = SynapticManager(
             n_synapse_types=2, ring_buffer_sigma=5.0, spikes_per_second=100.0,
             min_weights=None, weight_random_sigma=None,
-            max_stdp_spike_delta=None, config=config,
+            max_stdp_spike_delta=None, config=config, drop_late_spikes=True,
             population_table_type=MockMasterPopulationTable(
                 {key: [(1, 0, False)]}),
             synapse_io=MockSynapseIO())
@@ -176,7 +176,7 @@ class TestSynapticManager(unittest.TestCase):
         synaptic_manager = SynapticManager(
             n_synapse_types=2, ring_buffer_sigma=5.0, spikes_per_second=100.0,
             min_weights=None, weight_random_sigma=None,
-            max_stdp_spike_delta=None, config=config,
+            max_stdp_spike_delta=None, config=config, drop_late_spikes=True,
             population_table_type=MockMasterPopulationTable(
                 {key: [(1, 0, True), (1, n_rows * 4, True)]}),
             synapse_io=MockSynapseIO())
@@ -221,7 +221,7 @@ class TestSynapticManager(unittest.TestCase):
             AbstractSpiNNakerCommon.CONFIG_FILE_NAME, default_config_paths)
         config.set("Simulation", "one_to_one_connection_dtcm_max_bytes", 40)
 
-        machine_time_step = 1000.0
+        machine_time_step = 1000
 
         pre_app_vertex = SimpleApplicationVertex(10)
         pre_vertex_slice = Slice(0, 9)
@@ -288,7 +288,7 @@ class TestSynapticManager(unittest.TestCase):
         synaptic_manager = SynapticManager(
             n_synapse_types=2, ring_buffer_sigma=5.0, spikes_per_second=100.0,
             min_weights=None, weight_random_sigma=None,
-            max_stdp_spike_delta=None, config=config)
+            max_stdp_spike_delta=None, config=config, drop_late_spikes=True)
         # Poke in our testing region IDs
         synaptic_manager._pop_table_region = master_pop_region
         synaptic_manager._synaptic_matrix_region = synapse_region
@@ -407,7 +407,7 @@ class TestSynapticManager(unittest.TestCase):
         synaptic_manager = SynapticManager(
             n_synapse_types=2, ring_buffer_sigma=5.0, spikes_per_second=100.0,
             min_weights=None, weight_random_sigma=None,
-            max_stdp_spike_delta=None, config=config)
+            max_stdp_spike_delta=None, config=config, drop_late_spikes=True)
 
         static = SynapseDynamicsStatic()
         stdp = SynapseDynamicsSTDP(
@@ -500,7 +500,7 @@ class TestSynapticManager(unittest.TestCase):
         synaptic_manager = SynapticManager(
             n_synapse_types=2, ring_buffer_sigma=5.0, spikes_per_second=100.0,
             min_weights=None, weight_random_sigma=None,
-            max_stdp_spike_delta=None, config=config)
+            max_stdp_spike_delta=None, config=config, drop_late_spikes=True)
 
         # STDP followed by structural STDP should result in Structural STDP
         synaptic_manager.synapse_dynamics = stdp
@@ -522,7 +522,7 @@ class TestSynapticManager(unittest.TestCase):
         synaptic_manager = SynapticManager(
             n_synapse_types=2, ring_buffer_sigma=5.0, spikes_per_second=100.0,
             min_weights=None, weight_random_sigma=None,
-            max_stdp_spike_delta=None, config=config)
+            max_stdp_spike_delta=None, config=config, drop_late_spikes=True)
 
         # Static followed by static structural should result in static
         # structural
@@ -559,7 +559,7 @@ class TestSynapticManager(unittest.TestCase):
         synaptic_manager = SynapticManager(
             n_synapse_types=2, ring_buffer_sigma=5.0, spikes_per_second=100.0,
             min_weights=None, weight_random_sigma=None,
-            max_stdp_spike_delta=None, config=config)
+            max_stdp_spike_delta=None, config=config, drop_late_spikes=True)
         synaptic_manager.synapse_dynamics = static_struct
         synaptic_manager.synapse_dynamics = stdp_struct
 
