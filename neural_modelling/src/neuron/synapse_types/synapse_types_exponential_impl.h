@@ -80,13 +80,14 @@ typedef enum input_buffer_regions {
 static inline void exp_shaping(exp_params_t* exp_params) {
     // RTN
     // decay value according to decay constant
-//	exp_params->synaptic_input_value =
-//			decay_s1615(exp_params->synaptic_input_value,
-//					exp_params->decay);
-
+    // RD
 	exp_params->synaptic_input_value =
-			MULT_ROUND_STOCHASTIC_ACCUM(exp_params->synaptic_input_value,
+			decay_s1615(exp_params->synaptic_input_value,
 					exp_params->decay);
+
+//	exp_params->synaptic_input_value =
+//			MULT_ROUND_STOCHASTIC_ACCUM(exp_params->synaptic_input_value,
+//					exp_params->decay);
 }
 
 static inline void synapse_types_shape_input(
@@ -101,11 +102,12 @@ static inline void synapse_types_shape_input(
 //! \param[in] input the inputs to add.
 //! \return None
 static inline void add_input_exp(exp_params_t* exp_params, input_t input) {
-    // RTN
-//	exp_params->synaptic_input_value = exp_params->synaptic_input_value +
-//			decay_s1615(input, exp_params->init);
+    // RD
 	exp_params->synaptic_input_value = exp_params->synaptic_input_value +
-			MULT_ROUND_STOCHASTIC_ACCUM(input, exp_params->init);
+			decay_s1615(input, exp_params->init);
+	// SR
+//	exp_params->synaptic_input_value = exp_params->synaptic_input_value +
+//			MULT_ROUND_STOCHASTIC_ACCUM(input, exp_params->init);
 }
 
 //! \brief adds the inputs for a give timer period to a given neuron that is
