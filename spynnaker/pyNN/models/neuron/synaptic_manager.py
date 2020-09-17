@@ -17,7 +17,7 @@ import math
 import struct
 import numpy
 import sys
-from scipy import special  # @UnresolvedImport
+
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement, read_config)
