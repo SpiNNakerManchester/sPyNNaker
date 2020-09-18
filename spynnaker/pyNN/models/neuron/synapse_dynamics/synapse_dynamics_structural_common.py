@@ -420,16 +420,16 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         :param int max_delay_ms: The maximum delay supported, in milliseconds
         :raises Exception: if the delay is out of range
         """
-        if isinstance(self.__initial_delay, collections.Iterable):
-            if (self.__initial_delay[0] > max_delay_ms or
-                    self.__initial_delay[1] > max_delay_ms):
+        if isinstance(self.initial_delay, collections.Iterable):
+            if (self.initial_delay[0] > max_delay_ms or
+                    self.initial_delay[1] > max_delay_ms):
                 raise Exception(
                     "The initial delay {} has one or more values that are"
                     " bigger than {}.  This is not supported in the current"
                     " implementation.".format(
-                        self.__initial_delay, max_delay_ms))
-        elif self.__initial_delay > max_delay_ms:
+                        self.initial_delay, max_delay_ms))
+        elif self.initial_delay > max_delay_ms:
             raise Exception(
                 "The initial delay {} is bigger than {}.  This is not"
                 " supported in the current implementation".format(
-                    self.__initial_delay, max_delay_ms))
+                    self.initial_delay, max_delay_ms))
