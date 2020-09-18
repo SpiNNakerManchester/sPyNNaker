@@ -1036,6 +1036,7 @@ class SynapticManager(object):
                     connector = synapse_info.connector
                     weight_min = connector.get_weight_minimum(
                         synapse_info.weights, self.__weight_random_sigma)
+                    weight_min = self.__get_closest_weight(weight_min)
                     weight_min *= weight_scale
                     if weight_min != 0:
                         min_weights[synapse_type] = min(
@@ -1045,6 +1046,7 @@ class SynapticManager(object):
                     if isinstance(synapse_dynamics, SynapseDynamicsSTDP):
                         min_delta = synapse_dynamics.get_weight_min_delta(
                             self.__max_stdp_spike_delta)
+                        min_delta = self.__get_closest_weight(min_delta)
                         min_delta *= weight_scale
                         # This also depends on the earlier calculated minimum
                         min_delta = float_gcd(min_delta, weight_min)
