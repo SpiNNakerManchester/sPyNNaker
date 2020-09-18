@@ -1,7 +1,7 @@
 #ifndef _TIMING_RECURRENT_CYCLIC_IMPL_H_
 #define _TIMING_RECURRENT_CYCLIC_IMPL_H_
 
-#define print_plasticity true
+#define print_plasticity false
 #define locked_weights_unchanged false
 
 //---------------------------------------
@@ -257,6 +257,7 @@ static inline update_state_t timing_apply_pre_spike(
         // The pre-spike has occurred inside a post window.
         // Get time of event relative to last post-synaptic event
         uint32_t time_since_last_post = time - last_post_time;
+        //io_printf(IO_BUF, "Dep time: %d was: %d\n", time, previous_state.dep_accumulator);
 
         if (previous_state.dep_accumulator >
             recurrent_plasticity_params.accum_dep_plus_one[syn_type]<<ACCUM_SCALING){
@@ -279,7 +280,7 @@ static inline update_state_t timing_apply_pre_spike(
         		}
         		if (previous_state.lock == 0){
                                 if (voltage_difference > 900.0k) {
-                                        io_printf(IO_BUF, "FF dep\n");
+                                        //io_printf(IO_BUF, "FF dep\n");
 					// Neuron fires by feedforward inout alone. No need for fuher change (but
                                         // may make small change to allow this state to be measured externally):
 					previous_state.lock = 1;
@@ -334,7 +335,9 @@ static inline update_state_t timing_apply_pre_spike(
             }
          }
     } else {
-    	io_printf (IO_BUF, "                                                               PRE SPIKE WAS NOT IN POST WINDOW!!\n");
+        if (print_plasticity){
+    	    io_printf (IO_BUF, "                                                               PRE SPIKE WAS NOT IN POST WINDOW!!\n");
+        }
     }
        // Set the post window to be just before this pre-spike. This is the only way I've found to
        // reset it. It means that the first window length will be garbage.
@@ -409,6 +412,8 @@ static inline update_state_t timing_apply_post_spike(
       // Now check if this post spike occurred in the open window created by the previous pre-spike:
       //Qif (time_since_last_pre <= my_last_pre_trace) {  // SD 16/6/20: Generate window length for each connection instead of sharing
       if (time_since_last_pre <= last_pre_trace) {
+         //io_printf(IO_BUF, "Pot time: %d was: %d\n", time, previous_state.pot_accumulator);
+
          if (previous_state.pot_accumulator <
              recurrent_plasticity_params.accum_pot_minus_one[syn_type]<<ACCUM_SCALING){
              // If accumulator's not going to hit potentiation limit, increment it:

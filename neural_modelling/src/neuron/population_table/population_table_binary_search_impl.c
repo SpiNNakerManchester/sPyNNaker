@@ -168,9 +168,9 @@ bool population_table_get_first_address(
             next_item = entry.start;
             items_to_go = entry.count;
 
-            io_printf(IO_BUF,
-                "\n\nspike = %08x, entry_index = %u, start = %u, count = %u\n",
-                spike, imid, next_item, items_to_go);
+            //io_printf(IO_BUF,
+            //    "\n\nspike = %08x, entry_index = %u, start = %u, count = %u\n",
+            //    spike, imid, next_item, items_to_go);
 
             return population_table_get_next_address(
                 row_address, n_bytes_to_transfer);
