@@ -421,8 +421,9 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         :raises Exception: if the delay is out of range
         """
         if isinstance(self.initial_delay, collections.Iterable):
-            if (self.initial_delay[0] > max_delay_ms or
-                    self.initial_delay[1] > max_delay_ms):
+            # For PyLint
+            init_del = self.initial_delay
+            if init_del[0] > max_delay_ms or init_del[1] > max_delay_ms:
                 raise Exception(
                     "The initial delay {} has one or more values that are"
                     " bigger than {}.  This is not supported in the current"
