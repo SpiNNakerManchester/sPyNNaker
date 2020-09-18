@@ -421,7 +421,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         :raises Exception: if the delay is out of range
         """
         if isinstance(self.initial_delay, collections.Iterable):
-            # For PyLint
+            # pylint: disable=unsubscriptable-object
             init_del = self.initial_delay
             if init_del[0] > max_delay_ms or init_del[1] > max_delay_ms:
                 raise Exception(
