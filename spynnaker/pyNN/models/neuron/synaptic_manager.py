@@ -16,10 +16,8 @@
 import math
 import struct
 import numpy
-import scipy.stats  # @UnresolvedImport
 from scipy import special  # @UnresolvedImport
 from six import itervalues
-from pyNN.random import RandomDistribution
 
 from spinn_utilities.progress_bar import ProgressBar
 
@@ -34,8 +32,7 @@ from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex import (
     SpikeSourcePoissonVertex)
 from spynnaker.pyNN.utilities.constants import (
     POPULATION_BASED_REGIONS, POSSION_SIGMA_SUMMATION_LIMIT)
-from spynnaker.pyNN.utilities.utility_calls import (
-    get_maximum_probable_value, get_n_bits)
+from spynnaker.pyNN.utilities.utility_calls import (get_n_bits)
 from spynnaker.pyNN.utilities.running_stats import RunningStats
 
 from .synapse_dynamics import (
@@ -47,7 +44,9 @@ TIME_STAMP_BYTES = BYTES_PER_WORD
 
 # TODO: Make sure these values are correct (particularly CPU cycles)
 _SYNAPSES_BASE_DTCM_USAGE_IN_BYTES = 7 * BYTES_PER_WORD
-_SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES = 0
+
+# 1 for drop late packets.
+_SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES = 1 * BYTES_PER_WORD
 _SYNAPSES_BASE_N_CPU_CYCLES_PER_NEURON = 10
 _SYNAPSES_BASE_N_CPU_CYCLES = 8
 
@@ -69,6 +68,7 @@ class SynapticManager(object):
         "__weight_scales",
         "__ring_buffer_shifts",
         "__synaptic_matrices",
+        "__drop_late_spikes",
         # Overridable (for testing only) region IDs
         "_synapse_params_region",
         "_pop_table_region",
@@ -81,8 +81,11 @@ class SynapticManager(object):
     # TODO make this right
     FUDGE = 0
 
+    # 1. address of direct addresses, 2. size of direct addresses matrix size
+    STATIC_SYNAPSE_MATRIX_SDRAM_IN_BYTES = 2 * BYTES_PER_WORD
+
     def __init__(self, n_synapse_types, ring_buffer_sigma, spikes_per_second,
-                 config):
+                 config, drop_late_spikes):
         """
         :param int n_synapse_types:
             number of synapse types on a neuron (e.g., 2 for excitatory and
@@ -95,10 +98,12 @@ class SynapticManager(object):
         :param spikes_per_second: Estimated spikes per second
         :type spikes_per_second: float or None
         :param ~configparser.RawConfigParser config: The system configuration
+        :param bool drop_late_spikes: control flag for dropping late packets.
         """
         self.__n_synapse_types = n_synapse_types
         self.__ring_buffer_sigma = ring_buffer_sigma
         self.__spikes_per_second = spikes_per_second
+        self.__drop_late_spikes = drop_late_spikes
         self._synapse_params_region = \
             POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value
         self._pop_table_region = \
@@ -124,6 +129,10 @@ class SynapticManager(object):
         if self.__spikes_per_second is None:
             self.__spikes_per_second = config.getfloat(
                 "Simulation", "spikes_per_second")
+
+        if self.__drop_late_spikes is None:
+            self.__drop_late_spikes = config.getboolean(
+                "Simulation", "drop_late_spikes")
 
         # Prepare for dealing with STDP - there can only be one (non-static)
         # synapse dynamics per vertex at present
@@ -189,6 +198,10 @@ class SynapticManager(object):
         :rtype: AbstractSynapseDynamics or None
         """
         return self.__synapse_dynamics
+
+    @property
+    def drop_late_spikes(self):
+        return self.__drop_late_spikes
 
     @synapse_dynamics.setter
     def synapse_dynamics(self, synapse_dynamics):
@@ -493,16 +506,9 @@ class SynapticManager(object):
                         # If non-zero rate then use it; otherwise keep default
                         if rate != 0:
                             spikes_per_second = rate
-                        if hasattr(spikes_per_second, "__getitem__"):
-                            spikes_per_second = numpy.max(spikes_per_second)
-                        elif isinstance(spikes_per_second, RandomDistribution):
-                            spikes_per_second = get_maximum_probable_value(
-                                spikes_per_second, app_edge.pre_vertex.n_atoms)
-                        prob = 1.0 - (
-                            (1.0 / 100.0) / app_edge.pre_vertex.n_atoms)
-                        spikes_per_tick = spikes_per_second / steps_per_second
-                        spikes_per_tick = scipy.stats.poisson.ppf(
-                            prob, spikes_per_tick)
+                        spikes_per_tick = \
+                            app_edge.pre_vertex.max_spikes_per_ts(
+                                machine_timestep)
                     rate_stats[synapse_type].add_items(
                         spikes_per_second, 0, n_connections)
                     total_weights[synapse_type] += spikes_per_tick * (
@@ -560,19 +566,19 @@ class SynapticManager(object):
         return float(math.pow(2, 16 - (ring_buffer_to_input_left_shift + 1)))
 
     def __update_ring_buffer_shifts_and_weight_scales(
-            self, application_vertex, application_graph, machine_timestep,
+            self, application_vertex, application_graph, machine_time_step,
             weight_scale):
         """ Update the ring buffer shifts and weight scales for this vertex
 
         :param .ApplicationVertex application_vertex:
         :param .ApplicationGraph application_graph:
-        :param int machine_timestep:
+        :param int machine_time_step:
         :param float weight_scale:
         """
         if self.__ring_buffer_shifts is None:
             self.__ring_buffer_shifts = \
                 self._get_ring_buffer_to_input_left_shifts(
-                    application_vertex, application_graph, machine_timestep,
+                    application_vertex, application_graph, machine_time_step,
                     weight_scale)
             self.__weight_scales = numpy.array([
                 self.__get_weight_scale(r) * weight_scale
@@ -585,6 +591,8 @@ class SynapticManager(object):
         """
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to
+        :param ~pacman.model.graphs.application_graph.ApplicationGraph \
+        application_graph: the app graph
         :param AbstractPopulationVertex application_vertex:
             The vertex owning the synapses
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
@@ -615,8 +623,10 @@ class SynapticManager(object):
         self.__update_ring_buffer_shifts_and_weight_scales(
             application_vertex, application_graph, machine_time_step,
             weight_scale)
-        # Write the ring buffer shifts
         spec.switch_write_focus(self._synapse_params_region)
+        # write the bool for deleting packets that were too late for a timer
+        spec.write_value(int(self.__drop_late_spikes))
+        # Write the ring buffer shifts
         spec.write_array(self.__ring_buffer_shifts)
 
         gen_data = matrices.write_synaptic_matrix_and_master_population_table(

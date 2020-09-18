@@ -30,10 +30,14 @@
 //!     Multicast packet receive interrupt priority
 //! \param[in] user_event_priority: User event interrupt priority
 //! \param[in] incoming_spike_buffer_size: Size of buffer for receiving spikes
+//! \param[in] packets_per_timestep_region:
+//!     The recording region to use for the packets per timestep
 //! \return True if initialisation succeeded
 bool spike_processing_initialise(
         size_t row_max_n_bytes, uint mc_packet_callback_priority,
-        uint user_event_priority, uint incoming_spike_buffer_size);
+        uint user_event_priority, uint incoming_spike_buffer_size,
+        bool clear_input_buffers_of_late_packets_init,
+        uint32_t packets_per_timestep_region);
 
 //! \brief Gets the number of times the input buffer has overflowed
 //! \return the number of times the input buffer has overflowed
@@ -65,5 +69,19 @@ uint32_t spike_processing_get_successful_rewires(void);
 //! \param[in] number_of_rewires: The number of rewirings to perform
 //! \return currently always true
 bool spike_processing_do_rewiring(int number_of_rewires);
+
+//! \brief return the number of packets dropped by the input buffer as they
+//! arrived too late to be processed
+//! \return the number of packets dropped.
+uint32_t spike_processing_get_n_packets_dropped_from_lateness(void);
+
+//! \brief clears the input buffer of packets
+//! \param[in] time: The current timestep
+void spike_processing_clear_input_buffer(timer_t time);
+
+//! \brief returns how many packets were at max inside the input buffer at
+//! any given point.
+//! \return the max size the input buffer reached
+uint32_t spike_processing_get_max_filled_input_buffer_size(void);
 
 #endif // _SPIKE_PROCESSING_H_

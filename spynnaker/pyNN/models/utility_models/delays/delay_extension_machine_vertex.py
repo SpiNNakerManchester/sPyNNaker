@@ -35,6 +35,7 @@ class DelayExtensionMachineVertex(
         DELAY_PARAMS = 1
         PROVENANCE_REGION = 2
         EXPANDER_REGION = 3
+        TDMA_REGION = 4
 
     class EXTRA_PROVENANCE_DATA_ENTRIES(Enum):
         N_PACKETS_RECEIVED = 0
@@ -43,6 +44,7 @@ class DelayExtensionMachineVertex(
         N_PACKETS_SENT = 3
         N_BUFFER_OVERFLOWS = 4
         N_DELAYS = 5
+        N_TIMES_TDMA_FELL_BEHIND = 6
 
     N_EXTRA_PROVENANCE_DATA_ENTRIES = len(EXTRA_PROVENANCE_DATA_ENTRIES)
 
@@ -104,6 +106,8 @@ class DelayExtensionMachineVertex(
             self.EXTRA_PROVENANCE_DATA_ENTRIES.N_BUFFER_OVERFLOWS.value]
         n_delays = provenance_data[
             self.EXTRA_PROVENANCE_DATA_ENTRIES.N_DELAYS.value]
+        n_times_tdma_fell_behind = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.N_TIMES_TDMA_FELL_BEHIND.value]
 
         label, x, y, p, names = self._get_placement_details(placement)
 
@@ -145,6 +149,10 @@ class DelayExtensionMachineVertex(
         provenance_items.append(ProvenanceDataItem(
             self._add_name(names, "Number_of_times_delayed_to_spread_traffic"),
             n_delays))
+        provenance_items.append(
+            self._app_vertex.get_tdma_provenance_item(
+                names, x, y, p, n_times_tdma_fell_behind))
+
         return provenance_items
 
     @overrides(MachineVertex.get_n_keys_for_partition)

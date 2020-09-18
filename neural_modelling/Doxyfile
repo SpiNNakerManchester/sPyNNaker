@@ -907,7 +907,7 @@ USE_MDFILE_AS_MAINPAGE =
 # also VERBATIM_HEADERS is set to NO.
 # The default value is: NO.
 
-SOURCE_BROWSER         = NO
+SOURCE_BROWSER         = YES
 
 # Setting the INLINE_SOURCES tag to YES will include the body of functions,
 # classes and enums directly into the documentation.
@@ -1513,7 +1513,7 @@ INCLUDE_FILE_PATTERNS  =
 # recursively expanded use the := operator instead of the = operator.
 # This tag requires that the tag ENABLE_PREPROCESSING is set to YES.
 
-PREDEFINED             = APPLICATION_NAME_HASH=1 SOMETIMES_UNUSED= UNUSED= 
+PREDEFINED             = APPLICATION_NAME_HASH=1 SOMETIMES_UNUSED= UNUSED=
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The
@@ -1551,7 +1551,7 @@ SKIP_FUNCTION_MACROS   = YES
 # the path). If a tag file is not located in the directory in which doxygen is
 # run, you must also specify the path to the tagfile here.
 
-TAGFILES               = sllt.tag=http://spinnakermanchester.github.io/spinnaker_tools/ common.tag=http://spinnakermanchester.github.io/spinn_common/ fec.tag=http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/ 
+TAGFILES               = sllt.tag=http://spinnakermanchester.github.io/spinnaker_tools/ common.tag=http://spinnakermanchester.github.io/spinn_common/ fec.tag=http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/
 
 # When a file name is specified after GENERATE_TAGFILE, doxygen will create a
 # tag file that is based on the input files it reads. See section "Linking to

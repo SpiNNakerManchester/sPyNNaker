@@ -249,7 +249,7 @@ def test_write_data_spec():
 
     synaptic_manager = SynapticManager(
         n_synapse_types=2, ring_buffer_sigma=5.0,
-        spikes_per_second=100.0, config=config)
+        spikes_per_second=100.0, config=config, drop_late_spikes=True)
     synaptic_manager.write_data_spec(
         spec, post_app_vertex, post_vertex_slice, post_vertex,
         graph, app_graph, routing_info, 1.0, machine_time_step)
@@ -321,7 +321,7 @@ def test_set_synapse_dynamics():
         AbstractSpiNNakerCommon.CONFIG_FILE_NAME, default_config_paths)
     synaptic_manager = SynapticManager(
         n_synapse_types=2, ring_buffer_sigma=5.0,
-        spikes_per_second=100.0, config=config)
+        spikes_per_second=100.0, config=config, drop_late_spikes=True)
 
     static = SynapseDynamicsStatic()
     stdp = SynapseDynamicsSTDP(
@@ -413,7 +413,7 @@ def test_set_synapse_dynamics():
     # Try starting again to get a couple more combinations
     synaptic_manager = SynapticManager(
         n_synapse_types=2, ring_buffer_sigma=5.0,
-        spikes_per_second=100.0, config=config)
+        spikes_per_second=100.0, config=config, drop_late_spikes=True)
 
     # STDP followed by structural STDP should result in Structural STDP
     synaptic_manager.synapse_dynamics = stdp
@@ -434,7 +434,7 @@ def test_set_synapse_dynamics():
     # One more time!
     synaptic_manager = SynapticManager(
         n_synapse_types=2, ring_buffer_sigma=5.0,
-        spikes_per_second=100.0, config=config)
+        spikes_per_second=100.0, config=config, drop_late_spikes=True)
 
     # Static followed by static structural should result in static
     # structural
@@ -470,7 +470,7 @@ def test_set_synapse_dynamics():
     # OK, just one more, honest
     synaptic_manager = SynapticManager(
         n_synapse_types=2, ring_buffer_sigma=5.0,
-        spikes_per_second=100.0, config=config)
+        spikes_per_second=100.0, config=config, drop_late_spikes=True)
     synaptic_manager.synapse_dynamics = static_struct
     synaptic_manager.synapse_dynamics = stdp_struct
 
@@ -604,7 +604,7 @@ def test_pop_based_master_pop_table_standard(
     spec = DataSpecificationGenerator(spec_writer, None)
     synaptic_manager = SynapticManager(
         n_synapse_types=2, ring_buffer_sigma=5.0,
-        spikes_per_second=100.0, config=config)
+        spikes_per_second=100.0, config=config, drop_late_spikes=True)
     synaptic_manager.write_data_spec(
         spec, post_app_vertex, post_vertex_slice, post_mac_vertex,
         mac_graph, app_graph, routing_info, 1.0, 1.0)

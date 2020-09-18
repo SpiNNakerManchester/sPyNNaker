@@ -48,7 +48,10 @@ static bool bit_field_filter_initialise(address_t bitfield_region_address) {
     if (connectivity_bit_field == NULL) {
         log_warning(
                 "couldn't initialise basic bit field holder. Will end up doing"
-                " possibly more DMA's during the execution than required");
+                " possibly more DMA's during the execution than required."
+                " We required %d bytes where %d are available",
+                sizeof(bit_field_t) * population_table_length(),
+                sark_heap_max(sark.heap, 0));
         return true;
     }
 

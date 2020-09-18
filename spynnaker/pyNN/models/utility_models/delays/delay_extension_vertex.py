@@ -16,13 +16,15 @@
 from collections import defaultdict
 import logging
 import math
+
+from spinn_front_end_common.abstract_models.impl.\
+    tdma_aware_application_vertex import TDMAAwareApplicationVertex
 from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
 from pacman.model.constraints.partitioner_constraints import (
     SameAtomsAsVertexConstraint)
-from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
 from spinn_front_end_common.abstract_models import (
@@ -45,7 +47,9 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 
 logger = logging.getLogger(__name__)
 
-_DELAY_PARAM_HEADER_WORDS = 8
+#  1. has_key 2. key 3. incoming_key 4. incoming_mask 5. n_atoms
+#  6. n_delay_stages
+_DELAY_PARAM_HEADER_WORDS = 6
 # pylint: disable=protected-access
 _DELEXT_REGIONS = DelayExtensionMachineVertex._DELAY_EXTENSION_REGIONS
 _EXPANDER_BASE_PARAMS_SIZE = 3 * BYTES_PER_WORD
@@ -55,7 +59,7 @@ _MAX_OFFSET_DENOMINATOR = 10
 
 
 class DelayExtensionVertex(
-        ApplicationVertex, AbstractGeneratesDataSpecification,
+        TDMAAwareApplicationVertex, AbstractGeneratesDataSpecification,
         AbstractProvidesOutgoingPartitionConstraints):
     """ Provide delays to incoming spikes in multiples of the maximum delays\
         of a neuron (typically 16 or 32)
@@ -112,7 +116,7 @@ class DelayExtensionVertex(
         self.add_constraint(
             SameAtomsAsVertexConstraint(source_vertex))
 
-    @overrides(ApplicationVertex.create_machine_vertex)
+    @overrides(TDMAAwareApplicationVertex.create_machine_vertex)
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
@@ -122,7 +126,7 @@ class DelayExtensionVertex(
 
     @inject_items({
         "graph": "MemoryApplicationGraph"})
-    @overrides(ApplicationVertex.get_resources_used_by_atoms,
+    @overrides(TDMAAwareApplicationVertex.get_resources_used_by_atoms,
                additional_arguments={"graph"})
     def get_resources_used_by_atoms(self, vertex_slice, graph):
         """
@@ -138,7 +142,7 @@ class DelayExtensionVertex(
                 self.get_cpu_usage_for_atoms(vertex_slice)))
 
     @property
-    @overrides(ApplicationVertex.n_atoms)
+    @overrides(TDMAAwareApplicationVertex.n_atoms)
     def n_atoms(self):
         return self.__n_atoms
 
@@ -208,7 +212,7 @@ class DelayExtensionVertex(
         :param int max_stage:
             The maximum delay stage
         """
-        self.__delay_generator_data[post_vertex_slice].append(
+        self.__delay_generator_data[pre_vertex_slice].append(
             DelayGeneratorData(
                 max_row_n_synapses, max_delayed_row_n_synapses,
                 pre_slices, pre_slice_index, post_slices, post_slice_index,
@@ -251,6 +255,10 @@ class DelayExtensionVertex(
             region=_DELEXT_REGIONS.DELAY_PARAMS.value,
             size=delay_params_sz, label='delay_params')
 
+        spec.reserve_memory_region(
+            region=_DELEXT_REGIONS.TDMA_REGION.value,
+            size=self.tdma_sdram_size_in_bytes, label="tdma data")
+
         # reserve region for provenance
         vertex.reserve_provenance_data_region(spec)
 
@@ -263,10 +271,6 @@ class DelayExtensionVertex(
         key = routing_infos.get_first_key_from_pre_vertex(
             vertex, SPIKE_PARTITION_ID)
 
-        # Default to zero in cases of unconnected vertexes
-        # https://github.com/SpiNNakerManchester/sPyNNaker/issues/850
-        if key is None:
-            key = 0
         incoming_key = 0
         incoming_mask = 0
         incoming_edges = machine_graph.get_edges_ending_at_vertex(
@@ -280,12 +284,8 @@ class DelayExtensionVertex(
                 incoming_key = r_info.first_key
                 incoming_mask = r_info.first_mask
 
-        n_outgoing_edges = len(
-            machine_graph.get_edges_starting_at_vertex(vertex))
         self.write_delay_parameters(
-            spec, vertex_slice, key, incoming_key, incoming_mask,
-            self.__n_subvertices, self.__machine_time_step,
-            self.__time_scale_factor, n_outgoing_edges)
+            spec, vertex_slice, key, incoming_key, incoming_mask)
 
         if vertex_slice in self.__delay_generator_data:
             generator_data = self.__delay_generator_data[vertex_slice]
@@ -300,6 +300,11 @@ class DelayExtensionVertex(
             spec.write_value(vertex_slice.n_atoms)
             for data in generator_data:
                 spec.write_array(data.gen_data)
+
+        # add tdma data
+        spec.switch_write_focus(_DELEXT_REGIONS.TDMA_REGION.value)
+        spec.write_array(self.generate_tdma_data_specification_data(
+            self.vertex_slices.index(vertex_slice)))
 
         # End-of-Spec:
         spec.end_specification()
@@ -318,9 +323,7 @@ class DelayExtensionVertex(
             binary_name, machine_time_step, time_scale_factor))
 
     def write_delay_parameters(
-            self, spec, vertex_slice, key, incoming_key, incoming_mask,
-            total_n_vertices, machine_time_step, time_scale_factor,
-            n_outgoing_edges):
+            self, spec, vertex_slice, key, incoming_key, incoming_mask):
         """ Generate Delay Parameter data
 
         :param ~data_specification.DataSpecificationGenerator spec:
@@ -328,10 +331,6 @@ class DelayExtensionVertex(
         :param int key:
         :param int incoming_key:
         :param int incoming_mask:
-        :param int total_n_vertices:
-        :param int machine_time_step:
-        :param int time_scale_factor:
-        :param int n_outgoing_edges:
         """
         # pylint: disable=too-many-arguments
 
@@ -344,7 +343,12 @@ class DelayExtensionVertex(
 
         # Write header info to the memory region:
         # Write Key info for this core and the incoming key and mask:
-        spec.write_value(data=key)
+        if key is None:
+            spec.write_value(0)
+            spec.write_value(0)
+        else:
+            spec.write_value(1)
+            spec.write_value(data=key)
         spec.write_value(data=incoming_key)
         spec.write_value(data=incoming_mask)
 
@@ -353,24 +357,6 @@ class DelayExtensionVertex(
 
         # Write the number of blocks of delays:
         spec.write_value(data=self.__n_delay_stages)
-
-        # Write the offset value
-        max_offset = (
-            machine_time_step * time_scale_factor) // _MAX_OFFSET_DENOMINATOR
-        spec.write_value(
-            int(math.ceil(max_offset / total_n_vertices)) *
-            self.__n_data_specs)
-        self.__n_data_specs += 1
-
-        # Write the time between spikes
-        spikes_per_timestep = self.__n_delay_stages * vertex_slice.n_atoms
-        time_between_spikes = (
-            (machine_time_step * time_scale_factor) /
-            (spikes_per_timestep * 2.0))
-        spec.write_value(data=int(time_between_spikes))
-
-        # Write the number of outgoing edges
-        spec.write_value(n_outgoing_edges)
 
         # Write the actual delay blocks (create a new one if it doesn't exist)
         if vertex_slice in self.__delay_blocks:
@@ -393,7 +379,7 @@ class DelayExtensionVertex(
         :rtype: int
         """
         return (
-            SYSTEM_BYTES_REQUIREMENT +
+            SYSTEM_BYTES_REQUIREMENT + self.tdma_sdram_size_in_bytes +
             DelayExtensionMachineVertex.get_provenance_data_size(
                 DelayExtensionMachineVertex.N_EXTRA_PROVENANCE_DATA_ENTRIES) +
             self._get_size_of_generator_information(out_edges))
