@@ -229,7 +229,6 @@ class TestSynapticManager(unittest.TestCase):
         post_vertex_slice = Slice(0, 9)
         post_vertex = post_app_vertex.create_machine_vertex(
             post_vertex_slice, None)
-        post_slice_index = 0
 
         one_to_one_connector_1 = OneToOneConnector(None)
         direct_synapse_information_1 = SynapseInformation(
