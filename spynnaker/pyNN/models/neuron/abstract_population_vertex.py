@@ -224,7 +224,11 @@ class AbstractPopulationVertex(
         return self.__n_atoms
 
     @property
-    def _neuron_recorder(self):  # for testing only
+    def _neuron_recorder(self):  # for testing only (can be deleted? todo)
+        return self.__neuron_recorder
+
+    @property
+    def neuron_recorder(self):  # for self partitioning splitters
         return self.__neuron_recorder
 
     @inject_items({
