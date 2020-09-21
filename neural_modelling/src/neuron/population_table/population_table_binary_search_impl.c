@@ -462,19 +462,6 @@ void population_table_set_connectivity_bit_field(
     connectivity_bit_field = connectivity_bit_fields;
 }
 
-bool population_table_shut_down(void) {
-    sark_free(address_list);
-    sark_free(master_population_table);
-    ghost_pop_table_searches = 0;
-    invalid_master_pop_hits = 0;
-    last_neuron_id = 0;
-    next_item = 0;
-    bit_field_filtered_packets = 0;
-    items_to_go = 0;
-    connectivity_bit_field = NULL;
-    return true;
-}
-
 uint32_t population_table_length(void) {
     return master_population_table_length;
 }

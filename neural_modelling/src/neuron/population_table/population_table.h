@@ -75,10 +75,6 @@ void population_table_set_connectivity_bit_field(
 //! \return the number of master pop table key misses
 uint32_t population_table_get_invalid_master_pop_hits(void);
 
-//! \brief Clears the DTCM allocated by the population table.
-//! \return If the clearing was successful or not.
-bool population_table_shut_down(void);
-
 //! \brief Get the length of master population table.
 //! \return Length of the master pop table
 uint32_t population_table_length(void);
