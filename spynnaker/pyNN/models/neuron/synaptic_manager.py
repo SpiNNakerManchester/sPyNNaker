@@ -837,11 +837,10 @@ class SynapticManager(object):
                         continue
 
                     block_addr, single_addr, index = self.__write_block(
-                        spec, synapse_info, pre_slices, pre_vertex.index,
-                        post_slices, pre_vertex_slice,
-                        post_vertex_slice, edge.app_edge, single_synapses,
-                        weight_scales, machine_time_step, rinfo,
-                        all_syn_block_sz, block_addr, single_addr,
+                        spec, synapse_info, pre_slices, post_slices,
+                        pre_vertex_slice, post_vertex_slice, edge.app_edge,
+                        single_synapses, weight_scales, machine_time_step,
+                        rinfo, all_syn_block_sz, block_addr, single_addr,
                         machine_edge=edge)
                     self.__synapse_indices[
                         synapse_info, pre_vertex_slice.lo_atom] = index
