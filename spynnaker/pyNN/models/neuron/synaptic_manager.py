@@ -22,9 +22,6 @@ from scipy import special  # @UnresolvedImport
 from pacman.model.partitioner_interfaces.\
     abstract_controls_destination_of_edges import \
     AbstractControlsDestinationOfEdges
-from pacman.model.partitioner_interfaces.\
-    abstract_controls_source_of_edges import \
-    AbstractControlsSourceOfEdges
 from pyNN.random import RandomDistribution
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.helpful_functions import (
@@ -109,6 +106,19 @@ class SynapticManager(object):
 
     # TODO make this right
     FUDGE = 0
+
+    NOT_EXACT_SLICES_ERROR_MESSAGE = (
+        "The machine vertex {} is returning estimated slices during DSG. "
+        "This is deemed an error. Please fix and try again")
+
+    TOO_MUCH_WRITTEN_SYNAPTIC_DATA = (
+        "Too much synaptic memory has been written: {} of {} ")
+
+    INDEXS_DONT_MATCH_ERROR_MESSAGE = (
+        "Delay index {} and normal index {} do not match")
+
+    NO_DELAY_EDGE_FOR_SRC_IDS_MESSAGE = (
+        "Found delayed source IDs but no delay machine edge for {}")
 
     def __init__(self, n_synapse_types, ring_buffer_sigma, spikes_per_second,
                  config, population_table_type=None, synapse_io=None):
@@ -807,42 +817,41 @@ class SynapticManager(object):
         generate_on_machine = list()
 
         # For each machine edge in the vertex, create a synaptic list
-        for edge in in_edges:
-            app_edge = edge.app_edge
+        for machine_edge in in_edges:
+            app_edge = machine_edge.app_edge
             if isinstance(app_edge, ProjectionApplicationEdge):
                 spec.comment("\nWriting matrix for edge:{}\n".format(
-                    edge.label))
-                if isinstance(
-                        app_edge.pre_vertex, AbstractControlsSourceOfEdges):
-                    pre_slices = app_edge.pre_vertex.get_out_going_slices()
-                    pre_vertex_slice = app_edge.pre_vertex.get_pre_slice_for(
-                        edge.pre_vertex)
-                else:
-                    pre_vertex = edge.pre_vertex
-                    pre_slices = app_edge.pre_vertex.vertex_slices
-                    pre_vertex_slice = edge.pre_vertex.vertex_slice
+                    machine_edge.label))
+                pre_slices, is_exact = (
+                    app_edge.pre_vertex.splitter_object.get_out_going_slices())
+                if not is_exact:
+                    raise Exception(
+                        self.NOT_EXACT_SLICES_ERROR_MESSAGE.format(
+                            app_edge.pre_vertex))
+                pre_vertex_slice = machine_edge.pre_vertex.vertex_slice
 
-                for synapse_info in edge.app_edge.synapse_information:
-                    rinfo = routing_info.get_routing_info_for_edge(edge)
+                for synapse_info in machine_edge.app_edge.synapse_information:
+                    rinfo = routing_info.get_routing_info_for_edge(machine_edge)
 
                     # If connector is being built on SpiNNaker,
                     # compute matrix sizes only
                     if self.__may_generate_on_machine(
                             synapse_info, single_addr, pre_vertex_slice,
-                            post_vertex_slice, edge.app_edge):
+                            post_vertex_slice, machine_edge.app_edge):
                         # We will process this a little later
                         generate_on_machine.append(_Gen(
                             synapse_info, pre_slices, pre_vertex_slice,
-                            pre_vertex.index, app_edge, rinfo))
+                            machine_edge.pre_vertex.index, app_edge, rinfo))
                         continue
 
                     block_addr, single_addr, index = self.__write_block(
-                        spec, synapse_info, pre_slices, pre_vertex.index,
+                        spec, synapse_info, pre_slices,
+                        machine_edge.pre_vertex.index,
                         post_slices, post_slice_index, pre_vertex_slice,
-                        post_vertex_slice, edge.app_edge, single_synapses,
-                        weight_scales, machine_time_step, rinfo,
-                        all_syn_block_sz, block_addr, single_addr,
-                        machine_edge=edge)
+                        post_vertex_slice, machine_edge.app_edge,
+                        single_synapses, weight_scales, machine_time_step,
+                        rinfo, all_syn_block_sz, block_addr, single_addr,
+                        machine_edge=machine_edge)
                     self.__synapse_indices[
                         synapse_info, pre_vertex_slice.lo_atom] = index
 
@@ -963,9 +972,8 @@ class SynapticManager(object):
                 0, 0, gen.rinfo.first_key_and_mask)
 
         if block_addr > all_syn_block_sz:
-            raise Exception(
-                "Too much synaptic memory has been written: {} of {} ".format(
-                    block_addr, all_syn_block_sz))
+            raise Exception(self.TOO_MUCH_WRITTEN_SYNAPTIC_DATA.format(
+                block_addr, all_syn_block_sz))
 
         # Skip over the delayed bytes but still write a master pop entry
         delayed_synaptic_matrix_offset = 0xFFFFFFFF
@@ -993,9 +1001,8 @@ class SynapticManager(object):
                 0, 0, delay_rinfo.first_key_and_mask)
 
         if block_addr > all_syn_block_sz:
-            raise Exception(
-                "Too much synaptic memory has been written: {} of {} ".format(
-                    block_addr, all_syn_block_sz))
+            raise Exception(self.TOO_MUCH_WRITTEN_SYNAPTIC_DATA.format(
+                block_addr, all_syn_block_sz))
 
         # Get additional data for the synapse expander
         generator_data.append(GeneratorData(
@@ -1009,8 +1016,7 @@ class SynapticManager(object):
 
         if index is not None and d_index is not None and index != d_index:
             raise Exception(
-                "Delay index {} and normal index {} do not match".format(
-                    d_index, index))
+                self.INDEXS_DONT_MATCH_ERROR_MESSAGE.format(d_index, index))
         return block_addr, index
 
     def __write_block(
@@ -1052,8 +1058,7 @@ class SynapticManager(object):
                 pre_vertex_slice, delayed_source_ids, delay_stages)
         elif delayed_source_ids.size != 0:
             raise Exception(
-                "Found delayed source IDs but no delay "
-                "machine edge for {}".format(app_edge.label))
+                self.NO_DELAY_EDGE_FOR_SRC_IDS_MESSAGE.format(app_edge.label))
 
         if (app_edge, synapse_info) in self.__pre_run_connection_holders:
             for conn_holder in self.__pre_run_connection_holders[
@@ -1077,9 +1082,8 @@ class SynapticManager(object):
         del row_data
 
         if block_addr > all_syn_block_sz:
-            raise Exception(
-                "Too much synaptic memory has been written: {} of {} ".format(
-                    block_addr, all_syn_block_sz))
+            raise Exception(self.TOO_MUCH_WRITTEN_SYNAPTIC_DATA.format(
+                block_addr, all_syn_block_sz))
 
         delay_rinfo = self.__delay_key_index.get(
             (app_edge.pre_vertex, pre_vertex_slice), None)
@@ -1096,13 +1100,11 @@ class SynapticManager(object):
         del delayed_row_data
 
         if block_addr > all_syn_block_sz:
-            raise Exception(
-                "Too much synaptic memory has been written: {} of {} ".format(
-                    block_addr, all_syn_block_sz))
+            raise Exception(self.TOO_MUCH_WRITTEN_SYNAPTIC_DATA.format(
+                block_addr, all_syn_block_sz))
         if d_index is not None and index is not None and index != d_index:
             raise Exception(
-                "Delay index {} and normal index {} do not match".format(
-                    d_index, index))
+                self.INDEXS_DONT_MATCH_ERROR_MESSAGE.format(d_index, index))
         return block_addr, single_addr, index
 
     def __is_direct(
@@ -1218,7 +1220,7 @@ class SynapticManager(object):
                     routing_info.get_routing_info_for_edge(m_edge)
 
         if isinstance(application_vertex, AbstractControlsDestinationOfEdges):
-            post_slices = application_vertex.get_in_coming_slices()
+            post_slices, _ = application_vertex.get_in_coming_slices()
         else:
             post_slices = application_vertex.vertex_slices
         post_slice_idx = machine_vertex.index
