@@ -510,4 +510,58 @@
             <param_name>application_graph</param_name>
         </required_inputs>
     </algorithm>
+    <algorithm name="SpYNNakerSplitterPartitioner">
+        <python_module>spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_partitioner</python_module>
+        <python_class>SpynnakerSplitterPartitioner</python_class>
+        <input_definitions>
+            <parameter>
+                <param_name>app_graph</param_name>
+                <param_type>MemoryApplicationGraph</param_type>
+            </parameter>
+            <parameter>
+                <param_name>machine</param_name>
+                <param_type>MemoryVirtualMachine</param_type>
+                <param_type>MemoryMachine</param_type>
+            </parameter>
+            <parameter>
+                <param_name>plan_n_time_steps</param_name>
+                <param_type>PlanNTimeSteps</param_type>
+            </parameter>
+            <parameter>
+                <param_name>pre_allocated_resources</param_name>
+                <param_type>MemoryPreAllocatedResources</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>app_graph</param_name>
+            <param_name>machine</param_name>
+            <param_name>plan_n_time_steps</param_name>
+            <token>SplitterObjectsAllocated</token>
+        </required_inputs>
+        <optional_inputs>
+            <token>GeneratedPreAllocatedResources</token>
+            <param_name>pre_allocated_resources</param_name>
+        </optional_inputs>
+        <outputs>
+            <param_type>MemoryMachineGraph</param_type>
+            <param_type>NChipsRequired</param_type>
+            <token>PartitioningDone</token>
+        </outputs>
+    </algorithm>
+    <algorithm name="SpynnakerSplitterSelector">
+        <python_module>spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_selector</python_module>
+        <python_class>SpynnakerSplitterSelector</python_class>
+        <input_definitions>
+            <parameter>
+                <param_name>app_graph</param_name>
+                <param_type>MemoryApplicationGraph</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>app_graph</param_name>
+        </required_inputs>
+        <outputs>
+            <token>SplitterObjectsAllocated</token>
+        </outputs>
+    </algorithm>
 </algorithms>
