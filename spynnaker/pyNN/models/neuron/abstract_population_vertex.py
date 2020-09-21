@@ -101,7 +101,6 @@ class AbstractPopulationVertex(
         "__synapse_manager",
         "__time_between_requests",
         "__units",
-        "__n_subvertices",
         "__n_data_specs",
         "__initial_state_variables",
         "__has_reset_last",
@@ -154,7 +153,6 @@ class AbstractPopulationVertex(
             self, label, constraints, max_atoms_per_core)
 
         self.__n_atoms = n_neurons
-        self.__n_subvertices = 0
         self.__n_data_specs = 0
 
         # buffer data
@@ -280,7 +278,6 @@ class AbstractPopulationVertex(
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
-        self.__n_subvertices += 1
         return PopulationMachineVertex(
             resources_required,
             self.__neuron_recorder.recorded_ids_by_slice(vertex_slice),
@@ -443,7 +440,7 @@ class AbstractPopulationVertex(
         max_offset = (
             machine_time_step * time_scale_factor) // _MAX_OFFSET_DENOMINATOR
         spec.write_value(
-            int(math.ceil(max_offset / self.__n_subvertices)) *
+            int(math.ceil(max_offset / len(self._machine_vertices))) *
             self.__n_data_specs)
         self.__n_data_specs += 1
 
