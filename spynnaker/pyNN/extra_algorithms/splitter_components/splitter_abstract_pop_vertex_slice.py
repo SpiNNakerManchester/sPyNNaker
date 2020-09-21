@@ -18,7 +18,8 @@ from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.exceptions import SpynnakerSplitterConfigurationException
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
     AbstractSpynnakerSplitterDelay)
-from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+from spynnaker.pyNN.models.neuron import (
+    AbstractPopulationVertex, PopulationMachineVertex)
 
 
 class SplitterAbstractPopulationVertexSlice(
@@ -48,7 +49,12 @@ class SplitterAbstractPopulationVertexSlice(
             raise SpynnakerSplitterConfigurationException(
                 self.INVALID_POP_ERROR_MESSAGE.format(app_vertex))
 
-    def create_machine_vertices(self, resource_tracker, machine_graph):
-        #todo needs filling in
-
-
+    @overrides(AbstractSplitterSlice.create_machine_vertex)
+    def create_machine_vertex(
+            self, vertex_slice, resources, label, remaining_constraints):
+        return PopulationMachineVertex(
+            resources,
+            self._governed_app_vertex.neuron_recorder.recorded_ids_by_slice(
+                vertex_slice),
+            label, remaining_constraints, self, vertex_slice,
+            self._get_binary_file_name())
