@@ -19,9 +19,6 @@ import struct
 import numpy
 import scipy.stats  # @UnresolvedImport
 from scipy import special  # @UnresolvedImport
-from pacman.model.partitioner_interfaces.\
-    abstract_controls_destination_of_edges import \
-    AbstractControlsDestinationOfEdges
 from pyNN.random import RandomDistribution
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.helpful_functions import (
@@ -108,7 +105,7 @@ class SynapticManager(object):
     FUDGE = 0
 
     NOT_EXACT_SLICES_ERROR_MESSAGE = (
-        "The machine vertex {} is returning estimated slices during DSG. "
+        "The splitter {} is returning estimated slices during DSG. "
         "This is deemed an error. Please fix and try again")
 
     TOO_MUCH_WRITTEN_SYNAPTIC_DATA = (
@@ -827,7 +824,7 @@ class SynapticManager(object):
                 if not is_exact:
                     raise Exception(
                         self.NOT_EXACT_SLICES_ERROR_MESSAGE.format(
-                            app_edge.pre_vertex))
+                            app_edge.pre_vertex.splitter_object))
                 pre_vertex_slice = machine_edge.pre_vertex.vertex_slice
 
                 for synapse_info in machine_edge.app_edge.synapse_information:
@@ -1219,10 +1216,11 @@ class SynapticManager(object):
                                        m_edge.pre_vertex.vertex_slice] = \
                     routing_info.get_routing_info_for_edge(m_edge)
 
-        if isinstance(application_vertex, AbstractControlsDestinationOfEdges):
-            post_slices, _ = application_vertex.get_in_coming_slices()
-        else:
-            post_slices = application_vertex.vertex_slices
+        post_slices, is_exact = (
+            application_vertex.splitter_object.get_out_going_slices())
+        if not is_exact:
+            raise Exception(self.NOT_EXACT_SLICES_ERROR_MESSAGE.format(
+                application_vertex.splitter_object))
         post_slice_idx = machine_vertex.index
 
         # Reserve the memory
