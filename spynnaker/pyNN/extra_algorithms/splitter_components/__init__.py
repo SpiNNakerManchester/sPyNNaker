@@ -14,5 +14,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
-from .abstract_spynanker_splitter_slice import AbstractSpynnakerSplitterSlice
-from .splitter_abstract_pop_vertex_slice import
+from .spynnaker_splitter_partitioner import SpynnakerSplitterPartitioner
+from .spynnaker_splitter_selector import SpynnakerSplitterSelector
+from.splitter_abstract_pop_vertex_slice import (
+    SplitterAbstractPopulationVertexSlice)
+
+__all__ = [
+    'AbstractSpynnakerSplitterDelay', 'SpynnakerSplitterPartitioner',
+    'SpynnakerSplitterSelector', 'SplitterAbstractPopulationVertexSlice']
