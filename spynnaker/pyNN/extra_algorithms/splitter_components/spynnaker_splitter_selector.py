@@ -52,13 +52,13 @@ class SpynnakerSplitterSelector(SplitterSelector):
                 if app_vertex.splitter_object is None:
                     if isinstance(app_vertex, AbstractPopulationVertex):
                         self.abstract_pop_heuristic(app_vertex)
-                    if isinstance(app_vertex, ApplicationSpiNNakerLinkVertex):
+                    elif isinstance(app_vertex, ApplicationSpiNNakerLinkVertex):
                         self.external_spinnaker_link_heuristic(app_vertex)
-                    if isinstance(app_vertex, ApplicationFPGAVertex):
+                    elif isinstance(app_vertex, ApplicationFPGAVertex):
                         self.external_fpga_link_heuristic(app_vertex)
-                    if isinstance(app_vertex, SpikeSourceArrayVertex):
+                    elif isinstance(app_vertex, SpikeSourceArrayVertex):
                         self.spike_source_array_heuristic(app_vertex)
-                    if isinstance(app_vertex, SpikeSourcePoissonVertex):
+                    elif isinstance(app_vertex, SpikeSourcePoissonVertex):
                         self.spike_source_poisson_heuristic(app_vertex)
                     else:  # go to basic selector. it might know what to do
                         self.vertex_selector(app_vertex)
