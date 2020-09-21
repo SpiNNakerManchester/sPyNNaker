@@ -285,7 +285,7 @@ class AbstractPopulationVertex(
             resources_required,
             self.__neuron_recorder.recorded_ids_by_slice(vertex_slice),
             label, constraints, self, vertex_slice,
-            self._get_binary_file_name())
+            self.get_binary_file_name())
 
     def get_cpu_usage_for_atoms(self, vertex_slice):
         """
@@ -564,7 +564,7 @@ class AbstractPopulationVertex(
         # Write the setup region
         spec.switch_write_focus(POPULATION_BASED_REGIONS.SYSTEM.value)
         spec.write_array(simulation_utilities.get_simulation_header_array(
-            self._get_binary_file_name(), machine_time_step,
+            self.get_binary_file_name(), machine_time_step,
             time_scale_factor))
 
         # Write the neuron recording region
@@ -610,7 +610,7 @@ class AbstractPopulationVertex(
         # End the writing of this specification:
         spec.end_specification()
 
-    def _get_binary_file_name(self):
+    def get_binary_file_name(self):
 
         # Split binary name into title and extension
         binary_title, binary_extension = os.path.splitext(
