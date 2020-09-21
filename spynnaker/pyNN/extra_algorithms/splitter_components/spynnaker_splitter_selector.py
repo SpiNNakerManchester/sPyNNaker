@@ -48,7 +48,7 @@ class SpynnakerSplitterSelector(SplitterSelector):
             :param ApplicationGraph app_graph: app graph
             :rtype: None
             """
-            for app_vertex in app_graph:
+            for app_vertex in app_graph.vertices:
                 if app_vertex.splitter_object is None:
                     if isinstance(app_vertex, AbstractPopulationVertex):
                         self.abstract_pop_heuristic(app_vertex)
