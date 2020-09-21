@@ -43,7 +43,10 @@ class ProjectionMachineEdge(
             pre_vertex, post_vertex, label=label, app_edge=app_edge,
             traffic_weight=traffic_weight)
 
+        for synapse_info in synapse_information:
+            synapse_info.cache_slices(pre_vertex, post_vertex)
         self.__synapse_information = synapse_information
+
 
     @property
     def synapse_information(self):

@@ -15,7 +15,7 @@
 
 from pyNN.random import NumpyRNG
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractGenerateConnectorOnMachine)
+    AbstractCachesSlices, AbstractGenerateConnectorOnMachine)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractGenerateOnMachine)
 
@@ -183,3 +183,14 @@ class SynapseInformation(object):
         synapse_gen = isinstance(
             self.synapse_dynamics, AbstractGenerateOnMachine)
         return connector_gen and synapse_gen
+
+    def cache_slices(self, pre_vertex, post_vertex):
+        """
+        Passes the pre and post slice to the connector if interested.
+
+        :param MachineVertex pre_vertex:
+        :param MachineVertexpost_vertex:
+        """
+        if isinstance(self.__connector, AbstractCachesSlices):
+            self.__connector.cache_slices(
+                pre_vertex.vertex_slice, post_vertex.vertex_slice)

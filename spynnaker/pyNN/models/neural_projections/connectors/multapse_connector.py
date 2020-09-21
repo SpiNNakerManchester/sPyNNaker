@@ -23,6 +23,7 @@ from pacman.model.graphs.common import Slice
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
+from .abstract_cache_slices import AbstractCachesSlices
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
@@ -35,7 +36,8 @@ logger = logging.getLogger(__name__)
 
 
 class MultapseConnector(AbstractGenerateConnectorOnMachine,
-                        AbstractConnectorSupportsViewsOnMachine):
+                        AbstractConnectorSupportsViewsOnMachine,
+                        AbstractCachesSlices):
     """ Create a multapse connector. The size of the source and destination\
         populations are obtained when the projection is connected. The number\
         of synapses is specified. when instantiated, the required number of\
@@ -71,8 +73,8 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
         self.__num_synapses = num_synapses
         self.__allow_self_connections = allow_self_connections
         self.__with_replacement = with_replacement
-        self.__pre_slices = None
-        self.__post_slices = None
+        self.__pre_slices = set()
+        self.__post_slices = set()
         self.__synapses_per_edge = None
         self._rng = rng
 
@@ -91,11 +93,21 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
         return self._get_delay_maximum(
             synapse_info.delays, self.__num_synapses)
 
-    def _update_synapses_per_post_vertex(self, pre_slices, post_slices):
+    def _update_synapses_per_post_vertex(self, pre_slicesX, post_slicesX):
         """
         :param list(~pacman.model.graphs.common.Slice) pre_slices:
         :param list(~pacman.model.graphs.common.Slice) post_slices:
         """
+        # To be moved below the if (self.__synapses_per_edge
+        pre_slices = sorted(list(self.__split_pre_slices),
+                            key=lambda x: x.lo_atom)
+        post_slices = sorted(list(self.__split_post_slices),
+                            key=lambda x: x.lo_atom)
+
+        # safety code to be removed
+        assert pre_slices == list(pre_slicesX)
+        assert post_slices == list(post_slicesX)
+
         if (self.__synapses_per_edge is None or
                 len(self.__pre_slices) != len(pre_slices) or
                 len(self.__post_slices) != len(post_slices)):
@@ -327,3 +339,9 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
         AbstractGenerateConnectorOnMachine.gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
         return self._view_params_bytes + (N_GEN_PARAMS * BYTES_PER_WORD)
+
+    @overrides(AbstractCachesSlices.cache_slices)
+    def cache_slices(self, pre_slice, post_slice):
+        self.__pre_slices.add(pre_slice)
+        self.__post_slices.add(post_slice)
+        self.__synapses_per_edge = None

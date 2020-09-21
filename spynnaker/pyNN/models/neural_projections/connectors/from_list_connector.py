@@ -21,6 +21,8 @@ from spinn_front_end_common.utilities.constants import \
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities import globals_variables
 from .abstract_connector import AbstractConnector
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    AbstractCachesSlices)
 from spynnaker.pyNN.exceptions import InvalidParameterType
 
 logger = logging.getLogger(__name__)
@@ -31,7 +33,7 @@ _TARGET = 1
 _FIRST_PARAM = 2
 
 
-class FromListConnector(AbstractConnector):
+class FromListConnector(AbstractConnector, AbstractCachesSlices):
     """ Make connections according to a list.
     """
     __slots__ = [
@@ -45,7 +47,8 @@ class FromListConnector(AbstractConnector):
         "__extra_parameter_names",
         "__split_conn_list",
         "__split_pre_slices",
-        "__split_post_slices"]
+        "__split_post_slices",
+        "__slices_changed"]
 
     def __init__(self, conn_list, safe=True, callback=None, verbose=False,
                  column_names=None):
@@ -74,8 +77,9 @@ class FromListConnector(AbstractConnector):
 
         self.__column_names = column_names
         self.__split_conn_list = None
-        self.__split_pre_slices = None
-        self.__split_post_slices = None
+        self.__split_pre_slices = set()
+        self.__split_post_slices = set()
+        self.__slices_changed = False
 
         # Call the conn_list setter, as this sets the internal values
         self.conn_list = conn_list
@@ -94,7 +98,7 @@ class FromListConnector(AbstractConnector):
         else:
             return numpy.var(self.__delays)
 
-    def _split_connections(self, pre_slices, post_slices):
+    def _split_connections(self, pre_slicesX, post_slicesX):
         """
         :param list(~pacman.model.graphs.commmon.Slice) pre_slices:
         :param list(~pacman.model.graphs.commmon.Slice) post_slices:
@@ -104,13 +108,19 @@ class FromListConnector(AbstractConnector):
         if not len(self.__sources):
             return False
 
-        # If nothing has changed, use the cache
-        if (self.__split_pre_slices == pre_slices and
-                self.__split_post_slices == post_slices):
-            return False
+        # To be moved below the  If nothing has changed
+        pre_slices = sorted(list(self.__split_pre_slices),
+                            key=lambda x: x.lo_atom)
+        post_slices = sorted(list(self.__split_post_slices),
+                            key=lambda x: x.lo_atom)
 
-        self.__split_pre_slices = list(pre_slices)
-        self.__split_post_slices = list(post_slices)
+        # safety code to be removed
+        assert pre_slices == list(pre_slicesX)
+        assert post_slices == list(post_slicesX)
+
+        # If nothing has changed, use the cache
+        if not self.__slices_changed:
+            return False
 
         # Create bins into which connections are to be grouped
         pre_bins = numpy.concatenate((
@@ -152,6 +162,7 @@ class FromListConnector(AbstractConnector):
             for pre_post, indices in zip(pre_post_bins, split_indices)
         }
 
+        self.__slices_changed = False
         return True
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
@@ -407,3 +418,9 @@ class FromListConnector(AbstractConnector):
                    (self.__sources <= _pre_slice.hi_atom) &
                    (_post_slice.lo_atom <= self.__targets) &
                    (self.__targets <= _post_slice.hi_atom))
+
+    @overrides(AbstractCachesSlices.cache_slices)
+    def cache_slices(self, pre_slice, post_slice):
+        self.__split_pre_slices.add(pre_slice)
+        self.__split_post_slices.add(post_slice)
+        self.__slices_changed = True

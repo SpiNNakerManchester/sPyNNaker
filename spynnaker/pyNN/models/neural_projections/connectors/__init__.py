@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from .abstract_cache_slices import AbstractCachesSlices
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine)
@@ -33,7 +34,8 @@ from .one_to_one_connector import OneToOneConnector
 from .small_world_connector import SmallWorldConnector
 from .kernel_connector import KernelConnector
 
-__all__ = ["AbstractConnector", "AbstractGenerateConnectorOnMachine",
+__all__ = ["AbstractCachesSlices",
+           "AbstractConnector", "AbstractGenerateConnectorOnMachine",
            "AbstractConnectorSupportsViewsOnMachine", "AllToAllConnector",
            "ArrayConnector", "CSAConnector",
            "DistanceDependentProbabilityConnector", "FixedNumberPostConnector",
