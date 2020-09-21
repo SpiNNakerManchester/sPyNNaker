@@ -140,7 +140,7 @@ class DelayExtensionVertex(
                 self.get_cpu_usage_for_atoms(vertex_slice)))
 
     @property
-    @overrides(ApplicationVertex.n_atoms)
+    @overrides(LegacyPartitionerAPI.n_atoms)
     def n_atoms(self):
         return self.__n_atoms
 

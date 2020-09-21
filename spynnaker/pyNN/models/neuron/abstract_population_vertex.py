@@ -219,7 +219,7 @@ class AbstractPopulationVertex(
         return self.__n_atoms
 
     @property
-    @overrides(ApplicationVertex.n_atoms)
+    @overrides(LegacyPartitionerAPI.n_atoms)
     def n_atoms(self):
         return self.__n_atoms
 
