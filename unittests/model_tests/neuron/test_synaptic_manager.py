@@ -18,7 +18,7 @@ import struct
 import tempfile
 import unittest
 import spinn_utilities.conf_loader as conf_loader
-from pacman.model.partitioner_interfaces import SplitterByAtoms
+from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
 from spinn_utilities.overrides import overrides
 from spinn_machine import SDRAM
 from pacman.model.placements import Placement
@@ -80,14 +80,14 @@ class MockTransceiverRawData(object):
         return self._data_to_read[base_address:base_address + length]
 
 
-class SimpleApplicationVertex(ApplicationVertex, SplitterByAtoms):
+class SimpleApplicationVertex(ApplicationVertex, LegacyPartitionerAPI):
 
     def __init__(self, n_atoms):
         super(SimpleApplicationVertex, self).__init__()
         self._n_atoms = n_atoms
 
     @property
-    @overrides(SplitterByAtoms.n_atoms)
+    @overrides(LegacyPartitionerAPI.n_atoms)
     def n_atoms(self):
         return self._n_atoms
 
@@ -95,14 +95,14 @@ class SimpleApplicationVertex(ApplicationVertex, SplitterByAtoms):
     def size(self):
         return self._n_atoms
 
-    @overrides(SplitterByAtoms.create_machine_vertex)
+    @overrides(LegacyPartitionerAPI.create_machine_vertex)
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
         return SimpleMachineVertex(
             resources_required, label, constraints, self, vertex_slice)
 
-    @overrides(SplitterByAtoms.get_resources_used_by_atoms)
+    @overrides(LegacyPartitionerAPI.get_resources_used_by_atoms)
     def get_resources_used_by_atoms(self, vertex_slice):
         return ResourceContainer()
 

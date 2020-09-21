@@ -15,8 +15,7 @@
 
 import logging
 
-from pacman.model.partitioner_interfaces.splitter_by_atoms import \
-    SplitterByAtoms
+from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
 from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.key_allocator_constraints import (
@@ -43,7 +42,7 @@ MOTOR_PARTITION_ID = "MOTOR"
 
 
 class _MunichMotorDevice(
-        ApplicationSpiNNakerLinkVertex, SplitterByAtoms):
+        ApplicationSpiNNakerLinkVertex, LegacyPartitionerAPI):
     __slots__ = []
 
     def __init__(self, spinnaker_link_id, board_address=None):
@@ -58,7 +57,7 @@ class MunichMotorDevice(
         ApplicationVertex, AbstractVertexWithEdgeToDependentVertices,
         AbstractGeneratesDataSpecification,
         AbstractProvidesOutgoingPartitionConstraints,
-        ProvidesKeyToAtomMappingImpl, SplitterByAtoms):
+        ProvidesKeyToAtomMappingImpl, LegacyPartitionerAPI):
     """ An Omnibot motor control device - has a real vertex and an external\
         device vertex
     """
@@ -106,17 +105,17 @@ class MunichMotorDevice(
             _MunichMotorDevice(spinnaker_link_id, board_address)]
 
     @property
-    @overrides(SplitterByAtoms.n_atoms)
+    @overrides(LegacyPartitionerAPI.n_atoms)
     def n_atoms(self):
         return 6
 
-    @overrides(SplitterByAtoms.create_machine_vertex)
+    @overrides(LegacyPartitionerAPI.create_machine_vertex)
     def create_machine_vertex(self, vertex_slice, resources_required,
                               label=None, constraints=None):
         return MachineMunichMotorDevice(
             resources_required, label, constraints, self, vertex_slice)
 
-    @overrides(SplitterByAtoms.get_resources_used_by_atoms)
+    @overrides(LegacyPartitionerAPI.get_resources_used_by_atoms)
     def get_resources_used_by_atoms(self, vertex_slice):
         return ResourceContainer(
             sdram=ConstantSDRAM(

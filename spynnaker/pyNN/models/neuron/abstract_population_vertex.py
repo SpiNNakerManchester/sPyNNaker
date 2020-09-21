@@ -17,7 +17,7 @@ import logging
 import os
 import math
 from spinn_utilities.overrides import overrides
-from pacman.model.partitioner_interfaces import SplitterByAtoms
+from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
 from pacman.executor.injection_decorator import inject_items
@@ -81,7 +81,7 @@ class AbstractPopulationVertex(
         AbstractChangableAfterRun, AbstractSendsOutgoingSynapses,
         AbstractRewritesDataSpecification, AbstractReadParametersBeforeSet,
         AbstractAcceptsIncomingSynapses, ProvidesKeyToAtomMappingImpl,
-        AbstractCanReset, SplitterByAtoms):
+        AbstractCanReset, LegacyPartitionerAPI):
     """ Underlying vertex model for Neural Populations.
         Not actually abstract.
     """
@@ -236,7 +236,7 @@ class AbstractPopulationVertex(
         "machine_time_step": "MachineTimeStep"
     })
     @overrides(
-        SplitterByAtoms.get_resources_used_by_atoms,
+        LegacyPartitionerAPI.get_resources_used_by_atoms,
         additional_arguments={
             "graph", "machine_time_step"
         }
@@ -276,7 +276,7 @@ class AbstractPopulationVertex(
         self.__change_requires_mapping = False
         self.__change_requires_data_generation = False
 
-    @overrides(SplitterByAtoms.create_machine_vertex)
+    @overrides(LegacyPartitionerAPI.create_machine_vertex)
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):

@@ -21,7 +21,7 @@ import struct
 
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
-from pacman.model.partitioner_interfaces import SplitterByAtoms
+from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
@@ -118,7 +118,7 @@ class SpikeSourcePoissonVertex(
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractChangableAfterRun, AbstractReadParametersBeforeSet,
         AbstractRewritesDataSpecification, SimplePopulationSettable,
-        ProvidesKeyToAtomMappingImpl, SplitterByAtoms):
+        ProvidesKeyToAtomMappingImpl, LegacyPartitionerAPI):
     """ A Poisson Spike source object
     """
 
@@ -475,7 +475,7 @@ class SpikeSourcePoissonVertex(
         "machine_time_step": "MachineTimeStep"
     })
     @overrides(
-        SplitterByAtoms.get_resources_used_by_atoms,
+        LegacyPartitionerAPI.get_resources_used_by_atoms,
         additional_arguments={"machine_time_step"}
     )
     def get_resources_used_by_atoms(self, vertex_slice, machine_time_step):
@@ -508,7 +508,7 @@ class SpikeSourcePoissonVertex(
     def n_atoms(self):
         return self.__n_atoms
 
-    @overrides(SplitterByAtoms.create_machine_vertex)
+    @overrides(LegacyPartitionerAPI.create_machine_vertex)
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):

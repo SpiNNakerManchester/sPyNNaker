@@ -25,7 +25,7 @@ from pacman.model.constraints.partitioner_constraints import (
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
-from pacman.model.partitioner_interfaces import SplitterByAtoms
+from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification,
     AbstractProvidesOutgoingPartitionConstraints)
@@ -59,7 +59,7 @@ _MAX_OFFSET_DENOMINATOR = 10
 
 class DelayExtensionVertex(
         ApplicationVertex, AbstractGeneratesDataSpecification,
-        SplitterByAtoms, AbstractProvidesOutgoingPartitionConstraints):
+        LegacyPartitionerAPI, AbstractProvidesOutgoingPartitionConstraints):
     """ Provide delays to incoming spikes in multiples of the maximum delays\
         of a neuron (typically 16 or 32)
     """
@@ -114,7 +114,7 @@ class DelayExtensionVertex(
         self.add_constraint(
             SameAtomsAsVertexConstraint(source_vertex))
 
-    @overrides(SplitterByAtoms.create_machine_vertex)
+    @overrides(LegacyPartitionerAPI.create_machine_vertex)
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
@@ -124,7 +124,7 @@ class DelayExtensionVertex(
 
     @inject_items({
         "graph": "MemoryApplicationGraph"})
-    @overrides(SplitterByAtoms.get_resources_used_by_atoms,
+    @overrides(LegacyPartitionerAPI.get_resources_used_by_atoms,
                additional_arguments={"graph"})
     def get_resources_used_by_atoms(self, vertex_slice, graph):
         """
