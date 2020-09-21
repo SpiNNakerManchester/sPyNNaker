@@ -56,5 +56,5 @@ class SplitterAbstractPopulationVertexSlice(
             resources,
             self._governed_app_vertex.neuron_recorder.recorded_ids_by_slice(
                 vertex_slice),
-            label, remaining_constraints, self, vertex_slice,
-            self._governed_app_vertex.get_binary_file_name())
+            label, remaining_constraints, self._governed_app_vertex,
+            vertex_slice, self._governed_app_vertex.get_binary_file_name())
