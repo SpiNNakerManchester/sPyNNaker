@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from pacman.operations.partition_algorithms import SplitterPartitioner
 from spinn_utilities.overrides import overrides
+from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 
 
 class SpynnakerSplitterPartitioner(SplitterPartitioner):
@@ -37,7 +38,11 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
         """
 
         # todo add code for handling delays
-
+        if isinstance(app_edge, ProjectionApplicationEdge):
+            self._search_for_delay_extension(
+                src_machine_vertex, dest_machine_vertex,
+                common_edge_type, app_edge, machine_graph,
+                app_outgoing_edge_partition)
 
         # build edge and add to machine graph
         machine_edge = common_edge_type(
@@ -46,3 +51,9 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
         machine_graph.add_edge(
             machine_edge,
             app_outgoing_edge_partition.identifier)
+
+    def _search_for_delay_extension(
+            self, src_machine_vertex, dest_machine_vertex,
+            common_edge_type, app_edge, machine_graph,
+            app_outgoing_edge_partition):
+        pass
