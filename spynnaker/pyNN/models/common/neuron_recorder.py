@@ -51,13 +51,29 @@ class _ReadOnlyDict(dict):
     del __readonly__
 
 
+def get_sampling_interval(sampling_rate):
+    """ Return the current sampling interval given a sampling rate
+
+    :param float sampling_rate: The sampling rate in time steps
+    :return: Sampling interval in microseconds
+    :rtype: float
+    """
+    step = (globals_variables.get_simulator().machine_time_step /
+            MICRO_TO_MILLISECOND_CONVERSION)
+    return sampling_rate * step
+
+
 class NeuronRecorder(object):
     __slots__ = [
         "__indexes",
         "__n_neurons",
         "__sampling_rates",
         "__data_types",
-        "__bitfield_variables"]
+        "__bitfield_variables",
+        "__per_timestep_variables",
+        "__per_timestep_datatypes",
+        "__per_timestep_recording",
+        "__region_ids"]
 
     _N_BYTES_FOR_TIMESTAMP = BYTES_PER_WORD
     _N_BYTES_PER_RATE = BYTES_PER_WORD
@@ -87,11 +103,17 @@ class NeuronRecorder(object):
     #: flag for spikes
     SPIKES = "spikes"
 
+    #: packets-per-timestep
+    PACKETS = "packets-per-timestep"
+
+    #: packets-per-timestep data type
+    PACKETS_TYPE = DataType.UINT32
+
     _MAX_RATE = 2 ** 32 - 1  # To allow a unit32_t to be used to store the rate
 
     def __init__(
             self, allowed_variables, data_types, bitfield_variables,
-            n_neurons):
+            n_neurons, per_timestep_variables, per_timestep_datatypes):
         """
         :param list(str) allowed_variables:
         :param list(str) data_types:
@@ -103,9 +125,19 @@ class NeuronRecorder(object):
         self.__data_types = data_types
         self.__n_neurons = n_neurons
         self.__bitfield_variables = bitfield_variables
-        for variable in itertools.chain(allowed_variables, bitfield_variables):
+        self.__per_timestep_variables = per_timestep_variables
+        self.__per_timestep_datatypes = per_timestep_datatypes
+        self.__per_timestep_recording = set()
+        self.__region_ids = dict()
+        region_id = 0
+        for region_id, variable in enumerate(itertools.chain(
+                allowed_variables, bitfield_variables)):
             self.__sampling_rates[variable] = 0
             self.__indexes[variable] = None
+            self.__region_ids[variable] = region_id
+        for ts_region_id, variable in enumerate(
+                per_timestep_variables, start=region_id + 1):
+            self.__region_ids[variable] = ts_region_id
 
     def _count_recording_per_slice(self, variable, vertex_slice):
         """
@@ -142,28 +174,17 @@ class NeuronRecorder(object):
         :return: Sampling interval in microseconds
         :rtype: float
         """
-        step = (globals_variables.get_simulator().machine_time_step /
-                MICRO_TO_MILLISECOND_CONVERSION)
-        return self.__sampling_rates[variable] * step
-
-    @staticmethod
-    def expected_rows_for_a_run_time(n_machine_time_steps, sampling_rate):
-        """ determines how many rows to see based off how long its ran for
-
-        :param n_machine_time_steps: how long ran for this time
-        :param sampling_rate: the sampling rate for a given variable
-        :return: how many rows there should be.
-        """
-        return int(math.ceil(n_machine_time_steps / sampling_rate))
+        if variable in self.__per_timestep_variables:
+            return get_sampling_interval(1)
+        return get_sampling_interval(self.__sampling_rates[variable])
 
     def _convert_placement_matrix_data(
-            self, row_data, n_rows, data_row_length, variable, n_neurons):
+            self, row_data, n_rows, data_row_length, n_neurons, data_type):
 
         surplus_bytes = self._N_BYTES_FOR_TIMESTAMP
         var_data = (row_data[:, surplus_bytes:].reshape(
             n_rows * data_row_length))
-        dtype = self.__data_types[variable]
-        placement_data = dtype.decode_array(var_data).reshape(
+        placement_data = data_type.decode_array(var_data).reshape(
             n_rows, n_neurons)
         return placement_data
 
@@ -192,16 +213,14 @@ class NeuronRecorder(object):
         return fragment
 
     def _get_placement_matrix_data(
-            self, variable, placements, vertex, indexes, region,
-            buffer_manager, expected_rows, missing_str, sampling_rate, label):
+            self, placements, vertex, region, buffer_manager, expected_rows,
+            missing_str, sampling_rate, label, data_type, n_per_timestep):
         """ processes a placement for matrix data
 
-        :param variable: the variable to read
         :param ~pacman.model.placements.Placements placements:
             the placements object
         :param ~pacman.model.graphs.machine.MachineVertex vertex:
             the vertex to read from
-        :param list(int) indexes: the indexes of neurons to be added to
         :param int region: the recording region id
         :param ~.BufferManager buffer_manager: the buffer manager
         :param int expected_rows:
@@ -214,11 +233,8 @@ class NeuronRecorder(object):
         """
 
         placement = placements.get_placement_of_vertex(vertex)
-        neurons = self._neurons_recording(variable, vertex.vertex_slice)
-        n_neurons = len(neurons)
-        if n_neurons == 0:
+        if n_per_timestep == 0:
             return None
-        indexes.extend(neurons)
 
         # for buffering output info is taken form the buffer manager
         record_raw, missing_data = buffer_manager.get_data_by_placement(
@@ -227,16 +243,17 @@ class NeuronRecorder(object):
 
         # If there is no data, return empty for all timesteps
         if record_length == 0:
-            return numpy.zeros((expected_rows, n_neurons), dtype="float64")
+            return numpy.zeros((expected_rows, n_per_timestep),
+                               dtype="float64")
 
         # There is one column for time and one for each neuron recording
-        data_row_length = n_neurons * self.__data_types[variable].size
+        data_row_length = n_per_timestep * data_type.size
         full_row_length = data_row_length + self._N_BYTES_FOR_TIMESTAMP
         n_rows = record_length // full_row_length
         row_data = numpy.asarray(record_raw, dtype="uint8").reshape(
             n_rows, full_row_length)
         placement_data = self._convert_placement_matrix_data(
-            row_data, n_rows, data_row_length, variable, n_neurons)
+            row_data, n_rows, data_row_length, n_per_timestep, data_type)
 
         # If everything is there, return it
         if not missing_data and n_rows == expected_rows:
@@ -250,52 +267,52 @@ class NeuronRecorder(object):
 
         # process data from core for missing data
         placement_data = self._process_missing_data(
-            missing_str, placement, expected_rows, n_neurons, times,
+            missing_str, placement, expected_rows, n_per_timestep, times,
             sampling_rate, label, placement_data)
         return placement_data
 
-    def get_matrix_data(
-            self, label, buffer_manager, region, placements,
-            application_vertex, variable, n_machine_time_steps):
-        """ Read a uint32 mapped to time and neuron IDs from the SpiNNaker\
-            machine and converts to required data types with scaling if needed.
+    @staticmethod
+    def expected_rows_for_a_run_time(n_machine_time_steps, sampling_rate):
+        """ determines how many rows to see based off how long its ran for
 
-        :param str label: vertex label
-        :param buffer_manager: the manager for buffered data
-        :type buffer_manager:
-            ~spinn_front_end_common.interface.buffer_management.BufferManager
-        :param int region: the DSG region ID used for this data
-        :param ~pacman.model.placements.Placements placements:
-            the placements object
-        :param application_vertex:
-        :type application_vertex:
-            ~pacman.model.graphs.application.ApplicationVertex
-        :param str variable: PyNN name for the variable (`V`, `gsy_inh`, etc.)
-        :param int n_machine_time_steps:
-        :return: (data, recording_indices, sampling_interval)
-        :rtype: tuple(~numpy.ndarray, list(int), float)
+        :param int n_machine_time_steps: map of vertex to time steps
+        :param float sampling_rate: the sampling rate for a given variable
+        :return: how many rows there should be.
+        :rtype: int
         """
-        if variable in self.__bitfield_variables:
-            msg = "Variable {} is not supported, use get_spikes".format(
-                variable)
-            raise ConfigurationException(msg)
+        return int(math.ceil(n_machine_time_steps / sampling_rate))
+
+    def __read_data(
+            self, label, buffer_manager, placements, application_vertex,
+            sampling_rate, data_type, variable, n_machine_time_steps):
         vertices = (
             application_vertex.splitter_object.machine_vertices_for_recording(
                 variable))
-        progress = ProgressBar(
-            vertices, "Getting {} for {}".format(variable, label))
-        sampling_rate = self.__sampling_rates[variable]
+        region = self.__region_ids[variable]
         missing_str = ""
         pop_level_data = None
-        sampling_interval = self.get_neuron_sampling_interval(variable)
+        sampling_interval = get_sampling_interval(sampling_rate)
+
+        progress = ProgressBar(
+            vertices, "Getting {} for {}".format(variable, label))
+
         indexes = []
-        for vertex in progress.over(vertices):
+        for i, vertex in enumerate(progress.over(vertices)):
             expected_rows = application_vertex.get_expected_n_rows(
                 n_machine_time_steps, sampling_rate, vertex, variable)
 
+            n_items_per_timestep = 1
+            if variable in self.__sampling_rates:
+                neurons = self._neurons_recording(
+                    variable, vertex.vertex_slice)
+                n_items_per_timestep = len(neurons)
+                indexes.extend(neurons)
+            else:
+                indexes.append(i)
             placement_data = self._get_placement_matrix_data(
-                variable, placements, vertex, indexes, region, buffer_manager,
-                expected_rows, missing_str, sampling_rate, label)
+                placements, vertex, region, buffer_manager, expected_rows,
+                missing_str, sampling_rate, label, data_type,
+                n_items_per_timestep)
 
             if placement_data is not None:
                 # append to the population data
@@ -315,17 +332,50 @@ class NeuronRecorder(object):
 
         return pop_level_data, indexes, sampling_interval
 
+    def get_matrix_data(
+            self, label, buffer_manager, placements,
+            application_vertex, variable, n_machine_time_steps):
+        """ Read a data mapped to time and neuron IDs from the SpiNNaker\
+            machine and converts to required data types with scaling if needed.
+
+        :param str label: vertex label
+        :param buffer_manager: the manager for buffered data
+        :type buffer_manager:
+            ~spinn_front_end_common.interface.buffer_management.BufferManager
+        :param ~pacman.model.placements.Placements placements:
+            the placements object
+        :param application_vertex:
+        :type application_vertex:
+            ~pacman.model.graphs.application.ApplicationVertex
+        :param str variable: PyNN name for the variable (`V`, `gsy_inh`, etc.)
+        :param int n_machine_time_steps:
+        :return: (data, recording_indices, sampling_interval)
+        :rtype: tuple(~numpy.ndarray, list(int), float)
+        """
+        if variable in self.__bitfield_variables:
+            msg = "Variable {} is not supported, use get_spikes".format(
+                variable)
+            raise ConfigurationException(msg)
+        if variable in self.__per_timestep_variables:
+            sampling_rate = 1
+            data_type = self.__per_timestep_datatypes[variable]
+        else:
+            sampling_rate = self.__sampling_rates[variable]
+            data_type = self.__data_types[variable]
+        return self.__read_data(
+            label, buffer_manager, placements, application_vertex,
+            sampling_rate, data_type, variable, n_machine_time_steps)
+
     def get_spikes(
-            self, label, buffer_manager, region, placements,
+            self, label, buffer_manager, placements,
             application_vertex, variable, machine_time_step):
-        """ Read a uint32 mapped to time and neuron IDs from the SpiNNaker\
+        """ Read spikes mapped to time and neuron IDs from the SpiNNaker\
             machine.
 
         :param str label: vertex label
         :param buffer_manager: the manager for buffered data
         :type buffer_manager:
             ~spinn_front_end_common.interface.buffer_management.BufferManager
-        :param int region: the DSG region ID used for this data
         :param ~pacman.model.placements.Placements placements:
             the placements object
         :param application_vertex:
@@ -365,6 +415,7 @@ class NeuronRecorder(object):
             n_words_with_timestamp = n_words + 1
 
             # for buffering output info is taken form the buffer manager
+            region = self.__region_ids[variable]
             record_raw, data_missing = buffer_manager.get_data_by_placement(
                     placement, region)
             if data_missing:
@@ -408,7 +459,9 @@ class NeuronRecorder(object):
         """
         :rtype: iterable(str)
         """
-        return self.__sampling_rates.keys()
+        variables = list(self.__sampling_rates.keys())
+        variables.extend(self.__per_timestep_variables)
+        return variables
 
     def is_recording(self, variable):
         """
@@ -418,9 +471,12 @@ class NeuronRecorder(object):
         try:
             return self.__sampling_rates[variable] > 0
         except KeyError as e:
-            msg = "Variable {} is not supported. Supported variables are {}" \
-                  "".format(variable, self.get_recordable_variables())
-            raise_from(ConfigurationException(msg), e)
+            if variable in self.__per_timestep_recording:
+                return True
+            elif variable not in self.__per_timestep_variables:
+                msg = ("Variable {} is not supported. Supported variables are"
+                       "{}".format(variable, self.get_recordable_variables()))
+                raise_from(ConfigurationException(msg), e)
 
     @property
     def recording_variables(self):
@@ -428,9 +484,12 @@ class NeuronRecorder(object):
         :rtype: list(str)
         """
         results = list()
-        for region, rate in self.__sampling_rates.items():
+        for variable, rate in self.__sampling_rates.items():
             if rate > 0:
-                results.append(region)
+                results.append(variable)
+        for variable in self.__per_timestep_variables:
+            if variable in self.__per_timestep_recording:
+                results.append(variable)
         return results
 
     @property
@@ -439,9 +498,13 @@ class NeuronRecorder(object):
         :rtype: list(int)
         """
         results = list()
-        for _id, rate in enumerate(self.__sampling_rates.values()):
+        for variable, rate in iteritems(self.__sampling_rates):
             if rate > 0:
-                results.append(_id)
+                results.append(self.__region_ids[variable])
+        # Per timestep regions come after normal regions
+        for variable in self.__per_timestep_variables:
+            if variable in self.__per_timestep_recording:
+                results.append(self.__region_ids[variable])
         return results
 
     def _is_recording(self, variable, vertex_slice):
@@ -450,6 +513,9 @@ class NeuronRecorder(object):
         :param ~pacman.model.graphs.common.Slice vertex_slice:
         :rtype: bool
         """
+        # Per timestep variables are not recorded by slice, so True if present
+        if variable in self.__per_timestep_recording:
+            return True
         if self.__sampling_rates[variable] == 0:
             return False
         if self.__indexes[variable] is None:
@@ -465,9 +531,17 @@ class NeuronRecorder(object):
         :param ~pacman.model.graphs.common.Slice vertex_slice:
         :rtype: list(int)
         """
-        return [_id
-                for _id, variable in enumerate(self.__sampling_rates.keys())
-                if self._is_recording(variable, vertex_slice)]
+        variables = [
+            self.__region_ids[variable]
+            for variable in self.__sampling_rates
+            if self._is_recording(variable, vertex_slice)]
+        # per-timestep variables are always defined, but the region is declared
+        # after the other variables
+        variables.extend([
+            self.__region_ids[variable]
+            for variable in self.__per_timestep_variables
+            if variable in self.__per_timestep_recording])
+        return variables
 
     def _compute_rate(self, sampling_interval):
         """ Convert a sampling interval into a rate. \
@@ -520,12 +594,36 @@ class NeuronRecorder(object):
             raise ConfigurationException(
                 "All indexes larger than population size")
 
+    def __check_per_timestep_params(
+            self, variable, sampling_interval, indexes):
+        """ Check if certain parameters have been provided for a per-timestep
+            variable and if so, raise an Exception
+
+        :param str variable:
+        :param int sampling_interval:
+        :param iterable(int) indexes:
+        """
+        if sampling_interval is not None:
+            raise Exception(
+                "Variable {} does not support a sampling interval".format(
+                    variable))
+        if indexes is not None:
+            raise Exception(
+                "Variable {} can only be recorded on the whole population"
+                .format(variable))
+
     def _turn_off_recording(self, variable, sampling_interval, remove_indexes):
         """
         :param str variable:
         :param int sampling_interval:
         :param iterable(int) remove_indexes:
         """
+        # If a per-timestep variable, remove it and return
+        if variable in self.__per_timestep_variables:
+            if variable in self.__per_timestep_recording:
+                self.__per_timestep_recording.remove(variable)
+            return
+
         if self.__sampling_rates[variable] == 0:
             # Already off so ignore other parameters
             return
@@ -586,6 +684,13 @@ class NeuronRecorder(object):
         :param int sampling_interval:
         :param iterable(int) indexes:
         """
+        # If a per-timestep variable, update
+        if variable in self.__per_timestep_variables:
+            self.__check_per_timestep_params(
+                variable, sampling_interval, indexes)
+            self.__per_timestep_recording.add(variable)
+            return
+
         rate = self._compute_rate(sampling_interval)
         if self.__sampling_rates[variable] == 0:
             # Previously not recording so OK
@@ -619,7 +724,11 @@ class NeuronRecorder(object):
         if variable == "all":
             for key in self.__sampling_rates.keys():
                 self.set_recording(key, new_state, sampling_interval, indexes)
-        elif variable in self.__sampling_rates:
+            for var in self.__per_timestep_variables:
+                # Skip the unsupported items for a per-timestep variable
+                self.set_recording(var, new_state)
+        elif (variable in self.__sampling_rates or
+                variable in self.__per_timestep_variables):
             if new_state:
                 self._turn_on_recording(variable, sampling_interval, indexes)
             else:
@@ -635,7 +744,8 @@ class NeuronRecorder(object):
         :rtype: list(int)
         """
         values = list()
-        for variable in self.__sampling_rates:
+        for variable in itertools.chain(
+                self.__sampling_rates, self.__per_timestep_variables):
             values.append(self.get_buffered_sdram(
                 variable, vertex_slice, n_machine_time_steps))
         return values
@@ -656,7 +766,7 @@ class NeuronRecorder(object):
         spec.write_array(get_recording_header_array(
             self._get_buffered_sdram(vertex_slice, data_n_time_steps)))
 
-        # Write the number of variables and bitfields
+        # Write the number of variables and bitfields (ignore per-timestep)
         n_vars = len(self.__sampling_rates) - len(self.__bitfield_variables)
         spec.write_value(data=n_vars)
         spec.write_value(data=len(self.__bitfield_variables))
@@ -673,6 +783,11 @@ class NeuronRecorder(object):
         :return:
         :rtype: int
         """
+        if variable in self.__per_timestep_variables:
+            if variable not in self.__per_timestep_recording:
+                return 0
+            size = self.__per_timestep_datatypes[variable].size
+            return self._N_BYTES_FOR_TIMESTAMP + size
         n_neurons = self._count_recording_per_slice(variable, vertex_slice)
         if n_neurons == 0:
             return 0
@@ -696,9 +811,14 @@ class NeuronRecorder(object):
         :return:
         :rtype: int
         """
-        rate = self.__sampling_rates[variable]
-        if rate == 0:
-            return 0
+        if variable in self.__per_timestep_variables:
+            if variable not in self.__per_timestep_recording:
+                return 0
+            rate = 1
+        else:
+            rate = self.__sampling_rates[variable]
+            if rate == 0:
+                return 0
 
         data_size = self.get_buffered_sdram_per_record(variable, vertex_slice)
         if rate == 1:
@@ -721,6 +841,8 @@ class NeuronRecorder(object):
         :return: Highest possible overflow needed
         :rtype: int
         """
+        # No need to consider per-timestep variables here as they won't
+        # overflow
         overflow = 0
         for variable, rate in iteritems(self.__sampling_rates):
             # If rate is 0 no recording so no overflow
@@ -743,6 +865,11 @@ class NeuronRecorder(object):
         :return: data size
         :rtype: int
         """
+        # Per timestep variables can't be done at a specific rate
+        if variable in self.__per_timestep_variables:
+            item = self.get_buffered_sdram_per_record(variable, vertex_slice)
+            return item * n_machine_time_steps
+
         rate = self.__sampling_rates[variable]
         if rate == 0:
             return 0
@@ -765,6 +892,8 @@ class NeuronRecorder(object):
         :param ~pacman.model.graphs.common.Slice vertex_slice:
         :rtype: int
         """
+        # This calculates the size of the metadata only; thus no reference to
+        # per-timestep variables which have no metadata
         n_words_for_n_neurons = self.__n_bytes_to_n_words(vertex_slice.n_atoms)
         n_bytes_for_n_neurons = n_words_for_n_neurons * BYTES_PER_WORD
         var_bytes = (
@@ -828,6 +957,9 @@ class NeuronRecorder(object):
                     per_timestep_sdram += average_per_timestep
                     # Add the rest once to fixed for worst case
                     fixed_sdram += (per_record - average_per_timestep)
+        for variable in self.__per_timestep_recording:
+            per_timestep_sdram += self.get_buffered_sdram_per_record(
+                variable, vertex_slice)
         return VariableSDRAM(fixed_sdram, per_timestep_sdram)
 
     def get_dtcm_usage_in_bytes(self, vertex_slice):
@@ -835,6 +967,7 @@ class NeuronRecorder(object):
         :param ~pacman.model.graphs.common.Slice vertex_slice:
         :rtype: int
         """
+        # Note: Per-timestep variables uses no DTCM
         # *_rate + n_neurons_recording_* + *_indexes
         usage = self.get_sdram_usage_in_bytes(vertex_slice)
 
@@ -905,6 +1038,7 @@ class NeuronRecorder(object):
         :param ~pacman.model.graphs.common.Slice vertex_slice:
         :rtype: ~numpy.ndarray
         """
+        # There is no data here for per-timestep variables by design
         data = list()
         for variable in self.__sampling_rates:
             # Do bitfields afterwards

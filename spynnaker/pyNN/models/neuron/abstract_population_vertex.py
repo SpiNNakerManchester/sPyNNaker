@@ -15,12 +15,15 @@
 
 import logging
 import os
-import math
+
+from spinn_front_end_common.abstract_models.impl.\
+    tdma_aware_application_vertex import TDMAAwareApplicationVertex
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
 from pacman.executor.injection_decorator import inject_items
-from pacman.model.graphs.application import ApplicationVertex
+from pacman.model.resources import (
+    ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
 from spinn_front_end_common.abstract_models import (
     AbstractChangableAfterRun, AbstractProvidesIncomingPartitionConstraints,
     AbstractProvidesOutgoingPartitionConstraints,
@@ -52,12 +55,14 @@ from .population_machine_vertex import PopulationMachineVertex
 
 logger = logging.getLogger(__name__)
 
-# The microseconds per timestep will be divided by this to get the max offset
-_MAX_OFFSET_DENOMINATOR = 10
+# TODO: Make sure these values are correct (particularly CPU cycles)
+_NEURON_BASE_DTCM_USAGE_IN_BYTES = 9 * BYTES_PER_WORD
+_NEURON_BASE_N_CPU_CYCLES_PER_NEURON = 22
+_NEURON_BASE_N_CPU_CYCLES = 10
 
 
 class AbstractPopulationVertex(
-        ApplicationVertex, AbstractGeneratesDataSpecification,
+        TDMAAwareApplicationVertex, AbstractGeneratesDataSpecification,
         AbstractContainsUnits, AbstractSpikeRecordable,
         AbstractNeuronRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
@@ -100,17 +105,15 @@ class AbstractPopulationVertex(
     #: The Buffer traffic type
     _TRAFFIC_IDENTIFIER = "BufferTraffic"
 
-    # 7 elements before the start of global parameters
-    # 1. random back off, 2. micro secs before spike, 3. has key, 4. key,
-    # 5. n atoms, 6. n synapse types, 7. incoming spike buffer size.
-    _BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 7 * BYTES_PER_WORD
-
-    _n_vertices = 0
+    # 5 elements before the start of global parameters
+    # 1. has key, 2. key, 3. n atoms,
+    # 4. n synapse types, 5. incoming spike buffer size.
+    _BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 5 * BYTES_PER_WORD
 
     def __init__(
             self, n_neurons, label, constraints, max_atoms_per_core,
             spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
-            neuron_impl, pynn_model):
+            neuron_impl, pynn_model, drop_late_spikes):
         """
         :param int n_neurons: The number of neurons in the population
         :param str label: The label on the population
@@ -127,6 +130,7 @@ class AbstractPopulationVertex(
         :type ring_buffer_sigma: float or None
         :param incoming_spike_buffer_size:
         :type incoming_spike_buffer_size: int or None
+        :param bool drop_late_spikes: control flag for dropping late packets.
         :param AbstractNeuronImpl neuron_impl:
             The (Python side of the) implementation of the neurons themselves.
         :param AbstractPyNNNeuronModel pynn_model:
@@ -134,7 +138,7 @@ class AbstractPopulationVertex(
         """
 
         # pylint: disable=too-many-arguments, too-many-locals
-        ApplicationVertex.__init__(
+        TDMAAwareApplicationVertex.__init__(
             self, label, constraints, max_atoms_per_core)
 
         self.__n_atoms = n_neurons
@@ -166,12 +170,13 @@ class AbstractPopulationVertex(
             self.__neuron_impl.get_recordable_data_types())
         self.__neuron_recorder = NeuronRecorder(
             recordable_variables, record_data_types, [NeuronRecorder.SPIKES],
-            n_neurons)
+            n_neurons, [NeuronRecorder.PACKETS],
+            {NeuronRecorder.PACKETS: NeuronRecorder.PACKETS_TYPE})
 
         # Set up synapse handling
         self.__synapse_manager = SynapticManager(
             self.__neuron_impl.get_n_synapse_types(), ring_buffer_sigma,
-            spikes_per_second, config)
+            spikes_per_second, config, drop_late_spikes)
 
         # bool for if state has changed.
         self.__change_requires_mapping = True
@@ -202,17 +207,16 @@ class AbstractPopulationVertex(
         return self.__n_atoms
 
     @property
+    @overrides(TDMAAwareApplicationVertex.n_atoms)
     def n_atoms(self):
         return self.__n_atoms
 
     @property
     def neuron_recorder(self):
         return self.__neuron_recorder
-
     @property
     def synapse_manager(self):
         return self.__synapse_manager
-
     @property
     def neuron_impl(self):
         return self.__neuron_impl
@@ -245,6 +249,7 @@ class AbstractPopulationVertex(
         """
         return (
             self._BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
+            self.tdma_sdram_size_in_bytes +
             self.__neuron_impl.get_sdram_usage_in_bytes(vertex_slice.n_atoms))
 
     def _reserve_memory_regions(
@@ -318,9 +323,7 @@ class AbstractPopulationVertex(
             target[key] = copy_list
         return target
 
-    def _write_neuron_parameters(
-            self, spec, key, vertex_slice, machine_time_step,
-            time_scale_factor):
+    def _write_neuron_parameters(self, spec, key, vertex_slice):
 
         # If resetting, reset any state variables that need to be reset
         if (self.__has_reset_last and
@@ -348,18 +351,10 @@ class AbstractPopulationVertex(
         spec.switch_write_focus(
             region=constants.POPULATION_BASED_REGIONS.NEURON_PARAMS.value)
 
-        # Write the random back off value
-        max_offset = (
-            machine_time_step * time_scale_factor) // _MAX_OFFSET_DENOMINATOR
-        spec.write_value(
-            int(math.ceil(max_offset / len(self._machine_vertices))) *
-            self.__n_data_specs)
-        self.__n_data_specs += 1
-
-        # Write the number of microseconds between sending spikes
-        time_between_spikes = (
-            (machine_time_step * time_scale_factor) / (n_atoms * 2.0))
-        spec.write_value(data=int(time_between_spikes))
+        # store the tdma data here for this slice.
+        data = self.generate_tdma_data_specification_data(
+            self.vertex_slices.index(vertex_slice))
+        spec.write_array(data)
 
         # Write whether the key is to be used, and then the key, or 0 if it
         # isn't to be used
@@ -384,18 +379,11 @@ class AbstractPopulationVertex(
             self._parameters, self._state_variables, vertex_slice)
         spec.write_array(neuron_data)
 
-    @inject_items({
-        "machine_time_step": "MachineTimeStep",
-        "time_scale_factor": "TimeScaleFactor",
-        "routing_info": "MemoryRoutingInfos"})
+    @inject_items({"routing_info": "MemoryRoutingInfos"})
     @overrides(
         AbstractRewritesDataSpecification.regenerate_data_specification,
-        additional_arguments={
-            "machine_time_step", "time_scale_factor",
-            "routing_info"})
-    def regenerate_data_specification(
-            self, spec, placement, machine_time_step, time_scale_factor,
-            routing_info):
+        additional_arguments={"routing_info"})
+    def regenerate_data_specification(self, spec, placement, routing_info):
         # pylint: disable=too-many-arguments, arguments-differ
         vertex_slice = placement.vertex.vertex_slice
 
@@ -406,10 +394,7 @@ class AbstractPopulationVertex(
         self._write_neuron_parameters(
             key=routing_info.get_first_key_from_pre_vertex(
                 placement.vertex, constants.SPIKE_PARTITION_ID),
-            machine_time_step=machine_time_step, spec=spec,
-            time_scale_factor=time_scale_factor,
-            vertex_slice=vertex_slice)
-
+            spec=spec, vertex_slice=vertex_slice)
         # close spec
         spec.end_specification()
 
@@ -450,6 +435,7 @@ class AbstractPopulationVertex(
         :param routing_info: (injected)
         :param data_n_time_steps: (injected)
         :param n_key_map: (injected)
+        :param tdma_data: (injected)
         """
         # pylint: disable=too-many-arguments, arguments-differ
         vertex = placement.vertex
@@ -482,8 +468,7 @@ class AbstractPopulationVertex(
             vertex_slice, data_n_time_steps)
 
         # Write the neuron parameters
-        self._write_neuron_parameters(
-            spec, key, vertex_slice, machine_time_step, time_scale_factor)
+        self._write_neuron_parameters(spec, key, vertex_slice)
 
         # write profile data
         profile_utils.write_profile_region_data(
@@ -533,9 +518,8 @@ class AbstractPopulationVertex(
     def get_spikes(
             self, placements, buffer_manager, machine_time_step):
         return self.__neuron_recorder.get_spikes(
-            self.label, buffer_manager,
-            len(self.__neuron_impl.get_recordable_variables()),
-            placements, self, NeuronRecorder.SPIKES, machine_time_step)
+            self.label, buffer_manager, placements, self,
+            NeuronRecorder.SPIKES, machine_time_step)
 
     @overrides(AbstractNeuronRecordable.get_recordable_variables)
     def get_recordable_variables(self):
@@ -557,9 +541,8 @@ class AbstractPopulationVertex(
                  buffer_manager, machine_time_step):
         # pylint: disable=too-many-arguments
         return self.__neuron_recorder.get_matrix_data(
-            self.label, buffer_manager,
-            self.__neuron_impl.get_recordable_variable_index(variable),
-            placements, self, variable, n_machine_time_steps)
+            self.label, buffer_manager, placements, self, variable,
+            n_machine_time_steps)
 
     @overrides(AbstractNeuronRecordable.get_neuron_sampling_interval)
     def get_neuron_sampling_interval(self, variable):
@@ -676,12 +659,14 @@ class AbstractPopulationVertex(
         # shift past the extra stuff before neuron parameters that we don't
         # need to read
         neuron_parameters_sdram_address = (
-            neuron_region_sdram_address +
+            neuron_region_sdram_address + self.tdma_sdram_size_in_bytes +
             self._BYTES_TILL_START_OF_GLOBAL_PARAMETERS)
 
         # get size of neuron params
         size_of_region = self.sdram_usage_for_neuron_params(vertex_slice)
-        size_of_region -= self._BYTES_TILL_START_OF_GLOBAL_PARAMETERS
+        size_of_region -= (
+            self._BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
+            self.tdma_sdram_size_in_bytes)
 
         # get data from the machine
         byte_array = transceiver.read_memory(
@@ -822,6 +807,8 @@ class AbstractPopulationVertex(
     def get_units(self, variable):
         if variable == NeuronRecorder.SPIKES:
             return NeuronRecorder.SPIKES
+        if variable == NeuronRecorder.PACKETS:
+            return "count"
         if self.__neuron_impl.is_recordable(variable):
             return self.__neuron_impl.get_recordable_units(variable)
         if variable not in self._parameters:
