@@ -70,7 +70,9 @@ class SplitterAbstractPopulationVertexSlice(
             self._governed_app_vertex.neuron_recorder.recorded_ids_by_slice(
                 vertex_slice),
             label, remaining_constraints, self._governed_app_vertex,
-            vertex_slice, self.__get_binary_file_name())
+            vertex_slice,
+            self._governed_app_vertex.synapse_manager.drop_late_spikes,
+            self.__get_binary_file_name())
 
     @inject_items({
         "graph": "MemoryApplicationGraph",

@@ -22,8 +22,6 @@ from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
 from pacman.executor.injection_decorator import inject_items
-from pacman.model.resources import (
-    ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
 from spinn_front_end_common.abstract_models import (
     AbstractChangableAfterRun, AbstractProvidesIncomingPartitionConstraints,
     AbstractProvidesOutgoingPartitionConstraints,
@@ -207,7 +205,6 @@ class AbstractPopulationVertex(
         return self.__n_atoms
 
     @property
-    @overrides(TDMAAwareApplicationVertex.n_atoms)
     def n_atoms(self):
         return self.__n_atoms
 

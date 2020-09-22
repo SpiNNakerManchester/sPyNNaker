@@ -473,7 +473,7 @@ class SpikeSourcePoissonVertex(
         "machine_time_step": "MachineTimeStep"
     })
     @overrides(
-        TDMAAwareApplicationVertex.get_resources_used_by_atoms,
+        LegacyPartitionerAPI.get_resources_used_by_atoms,
         additional_arguments={"machine_time_step"}
     )
     def get_resources_used_by_atoms(self, vertex_slice, machine_time_step):
@@ -506,7 +506,7 @@ class SpikeSourcePoissonVertex(
     def n_atoms(self):
         return self.__n_atoms
 
-    @overrides(TDMAAwareApplicationVertex.create_machine_vertex)
+    @overrides(LegacyPartitionerAPI.create_machine_vertex)
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
