@@ -42,14 +42,6 @@ class SplitterAbstractPopulationVertexSlice(
     _NEURON_BASE_N_CPU_CYCLES = 10
     _C_MAIN_BASE_N_CPU_CYCLES = 0
 
-    # TODO: Make sure these values are correct (particularly CPU cycles)
-    _C_MAIN_BASE_DTCM_USAGE_IN_BYTES = 3 * BYTES_PER_WORD
-    _C_MAIN_BASE_SDRAM_USAGE_IN_BYTES = 18 * BYTES_PER_WORD
-
-    # TODO: Make sure these values are correct (particularly CPU cycles)
-    _NEURON_BASE_DTCM_USAGE_IN_BYTES = 9 * BYTES_PER_WORD
-    _NEURON_BASE_SDRAM_USAGE_IN_BYTES = 3 * BYTES_PER_WORD
-
     SPLITTER_NAME = "SplitterAbstractPopulationVertexSlice"
 
     INVALID_POP_ERROR_MESSAGE = (
