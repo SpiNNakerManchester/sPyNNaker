@@ -17,13 +17,10 @@ import logging
 import os
 import math
 from spinn_utilities.overrides import overrides
-from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.graphs.application import ApplicationVertex
-from pacman.model.resources import (
-    ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
 from spinn_front_end_common.abstract_models import (
     AbstractChangableAfterRun, AbstractProvidesIncomingPartitionConstraints,
     AbstractProvidesOutgoingPartitionConstraints,
@@ -33,8 +30,7 @@ from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
 from spinn_front_end_common.utilities import (
     constants as common_constants, helpful_functions, globals_variables)
-from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, SYSTEM_BYTES_REQUIREMENT)
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spynnaker.pyNN.models.abstract_models.\
     abstract_sends_outgoing_synapses import AbstractSendsOutgoingSynapses
@@ -56,17 +52,6 @@ from .population_machine_vertex import PopulationMachineVertex
 
 logger = logging.getLogger(__name__)
 
-# TODO: Make sure these values are correct (particularly CPU cycles)
-_NEURON_BASE_DTCM_USAGE_IN_BYTES = 9 * BYTES_PER_WORD
-_NEURON_BASE_SDRAM_USAGE_IN_BYTES = 3 * BYTES_PER_WORD
-_NEURON_BASE_N_CPU_CYCLES_PER_NEURON = 22
-_NEURON_BASE_N_CPU_CYCLES = 10
-
-# TODO: Make sure these values are correct (particularly CPU cycles)
-_C_MAIN_BASE_DTCM_USAGE_IN_BYTES = 3 * BYTES_PER_WORD
-_C_MAIN_BASE_SDRAM_USAGE_IN_BYTES = 18 * BYTES_PER_WORD
-_C_MAIN_BASE_N_CPU_CYCLES = 0
-
 # The microseconds per timestep will be divided by this to get the max offset
 _MAX_OFFSET_DENOMINATOR = 10
 
@@ -81,7 +66,7 @@ class AbstractPopulationVertex(
         AbstractChangableAfterRun, AbstractSendsOutgoingSynapses,
         AbstractRewritesDataSpecification, AbstractReadParametersBeforeSet,
         AbstractAcceptsIncomingSynapses, ProvidesKeyToAtomMappingImpl,
-        AbstractCanReset, LegacyPartitionerAPI):
+        AbstractCanReset):
     """ Underlying vertex model for Neural Populations.
         Not actually abstract.
     """
@@ -201,7 +186,7 @@ class AbstractPopulationVertex(
     @overrides(AbstractNeuronRecordable.get_expected_n_rows)
     def get_expected_n_rows(
             self, n_machine_time_steps, sampling_rate, vertex, variable):
-        return self._neuron_recorder.expected_rows_for_a_run_time(
+        return self.__neuron_recorder.expected_rows_for_a_run_time(
             n_machine_time_steps, sampling_rate)
 
     @overrides(AbstractNeuronRecordable.get_recording_slice)
@@ -217,47 +202,24 @@ class AbstractPopulationVertex(
         return self.__n_atoms
 
     @property
-    @overrides(LegacyPartitionerAPI.n_atoms)
     def n_atoms(self):
         return self.__n_atoms
 
     @property
-    def _neuron_recorder(self):  # for testing only (can be deleted? todo)
+    def neuron_recorder(self):
         return self.__neuron_recorder
 
     @property
-    def neuron_recorder(self):  # for self partitioning splitters
-        return self.__neuron_recorder
+    def synapse_manager(self):
+        return self.__synapse_manager
 
-    @inject_items({
-        "graph": "MemoryApplicationGraph",
-        "machine_time_step": "MachineTimeStep"
-    })
-    @overrides(
-        LegacyPartitionerAPI.get_resources_used_by_atoms,
-        additional_arguments={
-            "graph", "machine_time_step"
-        }
-    )
-    def get_resources_used_by_atoms(
-            self, vertex_slice, graph, machine_time_step):
-        # pylint: disable=arguments-differ
+    @property
+    def neuron_impl(self):
+        return self.__neuron_impl
 
-        variableSDRAM = self.__neuron_recorder.get_variable_sdram_usage(
-            vertex_slice)
-        constantSDRAM = ConstantSDRAM(
-                self._get_sdram_usage_for_atoms(
-                    vertex_slice, graph, machine_time_step))
-
-        # set resources required from this object
-        container = ResourceContainer(
-            sdram=variableSDRAM + constantSDRAM,
-            dtcm=DTCMResource(self.get_dtcm_usage_for_atoms(vertex_slice)),
-            cpu_cycles=CPUCyclesPerTickResource(
-                self.get_cpu_usage_for_atoms(vertex_slice)))
-
-        # return the total resources.
-        return container
+    @property
+    def n_profile_samples(self):
+        return self.__n_profile_samples
 
     @property
     @overrides(AbstractChangableAfterRun.requires_mapping)
@@ -274,38 +236,7 @@ class AbstractPopulationVertex(
         self.__change_requires_mapping = False
         self.__change_requires_data_generation = False
 
-    @overrides(LegacyPartitionerAPI.create_machine_vertex)
-    def create_machine_vertex(
-            self, vertex_slice, resources_required, label=None,
-            constraints=None):
-        return PopulationMachineVertex(
-            resources_required,
-            self.__neuron_recorder.recorded_ids_by_slice(vertex_slice),
-            label, constraints, self, vertex_slice,
-            self.get_binary_file_name())
-
-    def get_cpu_usage_for_atoms(self, vertex_slice):
-        """
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-        """
-        return (
-            _NEURON_BASE_N_CPU_CYCLES + _C_MAIN_BASE_N_CPU_CYCLES +
-            (_NEURON_BASE_N_CPU_CYCLES_PER_NEURON * vertex_slice.n_atoms) +
-            self.__neuron_recorder.get_n_cpu_cycles(vertex_slice.n_atoms) +
-            self.__neuron_impl.get_n_cpu_cycles(vertex_slice.n_atoms) +
-            self.__synapse_manager.get_n_cpu_cycles())
-
-    def get_dtcm_usage_for_atoms(self, vertex_slice):
-        """
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-        """
-        return (
-            _NEURON_BASE_DTCM_USAGE_IN_BYTES +
-            self.__neuron_impl.get_dtcm_usage_in_bytes(vertex_slice.n_atoms) +
-            self.__neuron_recorder.get_dtcm_usage_in_bytes(vertex_slice) +
-            self.__synapse_manager.get_dtcm_usage_in_bytes())
-
-    def _get_sdram_usage_for_neuron_params(self, vertex_slice):
+    def sdram_usage_for_neuron_params(self, vertex_slice):
         """ Calculate the SDRAM usage for just the neuron parameters region.
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
@@ -315,25 +246,6 @@ class AbstractPopulationVertex(
         return (
             self._BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
             self.__neuron_impl.get_sdram_usage_in_bytes(vertex_slice.n_atoms))
-
-    def _get_sdram_usage_for_atoms(
-            self, vertex_slice, graph, machine_time_step):
-        sdram_requirement = (
-            SYSTEM_BYTES_REQUIREMENT +
-            self._get_sdram_usage_for_neuron_params(vertex_slice) +
-            self._neuron_recorder.get_static_sdram_usage(vertex_slice) +
-            PopulationMachineVertex.get_provenance_data_size(
-                len(PopulationMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES)) +
-            self.__synapse_manager.get_sdram_usage_in_bytes(
-                vertex_slice, machine_time_step, graph, self) +
-            profile_utils.get_profile_region_size(
-                self.__n_profile_samples) +
-            bit_field_utilities.get_estimated_sdram_for_bit_field_region(
-                graph, self) +
-            bit_field_utilities.get_estimated_sdram_for_key_region(
-                graph, self) +
-            bit_field_utilities.exact_sdram_for_bit_field_builder_region())
-        return sdram_requirement
 
     def _reserve_memory_regions(
             self, spec, vertex_slice, vertex, machine_graph, n_key_map):
@@ -360,7 +272,7 @@ class AbstractPopulationVertex(
 
         spec.reserve_memory_region(
             region=POPULATION_BASED_REGIONS.NEURON_RECORDING.value,
-            size=self._neuron_recorder.get_static_sdram_usage(vertex_slice),
+            size=self.__neuron_recorder.get_static_sdram_usage(vertex_slice),
             label="neuron recording")
 
         profile_utils.reserve_profile_region(
@@ -385,7 +297,7 @@ class AbstractPopulationVertex(
             the slice of atoms from the application vertex
         :return: None
         """
-        params_size = self._get_sdram_usage_for_neuron_params(vertex_slice)
+        params_size = self.sdram_usage_for_neuron_params(vertex_slice)
         spec.reserve_memory_region(
             region=POPULATION_BASED_REGIONS.NEURON_PARAMS.value,
             size=params_size, label='NeuronParams')
@@ -561,11 +473,11 @@ class AbstractPopulationVertex(
         # Write the setup region
         spec.switch_write_focus(POPULATION_BASED_REGIONS.SYSTEM.value)
         spec.write_array(simulation_utilities.get_simulation_header_array(
-            self.get_binary_file_name(), machine_time_step,
+            vertex.get_binary_file_name(), machine_time_step,
             time_scale_factor))
 
         # Write the neuron recording region
-        self._neuron_recorder.write_neuron_recording_region(
+        self.__neuron_recorder.write_neuron_recording_region(
             spec, POPULATION_BASED_REGIONS.NEURON_RECORDING.value,
             vertex_slice, data_n_time_steps)
 
@@ -606,17 +518,6 @@ class AbstractPopulationVertex(
 
         # End the writing of this specification:
         spec.end_specification()
-
-    def get_binary_file_name(self):
-
-        # Split binary name into title and extension
-        binary_title, binary_extension = os.path.splitext(
-            self.__neuron_impl.binary_name)
-
-        # Reunite title and extension and return
-        return (binary_title +
-                self.__synapse_manager.vertex_executable_suffix +
-                binary_extension)
 
     @overrides(AbstractSpikeRecordable.is_recording_spikes)
     def is_recording_spikes(self):
@@ -779,7 +680,7 @@ class AbstractPopulationVertex(
             self._BYTES_TILL_START_OF_GLOBAL_PARAMETERS)
 
         # get size of neuron params
-        size_of_region = self._get_sdram_usage_for_neuron_params(vertex_slice)
+        size_of_region = self.sdram_usage_for_neuron_params(vertex_slice)
         size_of_region -= self._BYTES_TILL_START_OF_GLOBAL_PARAMETERS
 
         # get data from the machine
