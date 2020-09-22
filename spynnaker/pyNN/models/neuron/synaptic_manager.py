@@ -773,7 +773,7 @@ class SynapticManager(object):
         return next_block_start_address
 
     def _write_synaptic_matrix_and_master_population_table(
-            self, spec, post_slices, post_slice_index, machine_vertex,
+            self, spec, post_slice_index, machine_vertex,
             post_vertex_slice, all_syn_block_sz, weight_scales,
             routing_info, machine_graph, machine_time_step):
         """ Simultaneously generates both the master population table and
@@ -820,7 +820,8 @@ class SynapticManager(object):
 
                 pre_vertex = edge.pre_vertex
                 pre_vertex_slice = pre_vertex.vertex_slice
-                pre_slices = edge.app_edge.pre_vertex.vertex_slices
+                post_slices = edge.post_slices
+                pre_slices = edge.app_edge.pre_slices
 
                 for synapse_info in edge.app_edge.synapse_information:
                     rinfo = routing_info.get_routing_info_for_edge(edge)
@@ -1220,7 +1221,6 @@ class SynapticManager(object):
                                        m_edge.pre_vertex.vertex_slice] = \
                     routing_info.get_routing_info_for_edge(m_edge)
 
-        post_slices = application_vertex.vertex_slices
         post_slice_idx = machine_vertex.index
 
         # Reserve the memory
@@ -1239,7 +1239,7 @@ class SynapticManager(object):
             spec, ring_buffer_shifts, weight_scale)
 
         gen_data = self._write_synaptic_matrix_and_master_population_table(
-            spec, post_slices, post_slice_idx, machine_vertex,
+            spec, post_slice_idx, machine_vertex,
             post_vertex_slice, all_syn_block_sz, weight_scales,
             routing_info, machine_graph, machine_time_step)
 
