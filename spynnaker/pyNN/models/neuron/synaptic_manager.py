@@ -820,7 +820,7 @@ class SynapticManager(object):
 
                 pre_vertex = edge.pre_vertex
                 pre_vertex_slice = pre_vertex.vertex_slice
-                post_slices = edge.post_slices
+                post_slices = edge.app_edge.post_slices
                 pre_slices = edge.app_edge.pre_slices
 
                 for synapse_info in edge.app_edge.synapse_information:
