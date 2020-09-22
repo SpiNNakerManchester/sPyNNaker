@@ -279,7 +279,9 @@ class NeuronRecorder(object):
             msg = "Variable {} is not supported, use get_spikes".format(
                 variable)
             raise ConfigurationException(msg)
-        vertices = application_vertex.machine_vertices
+        vertices = (
+            application_vertex.splitter_object.machine_vertices_for_recording(
+                variable))
         progress = ProgressBar(
             vertices, "Getting {} for {}".format(variable, label))
         sampling_rate = self.__sampling_rates[variable]
@@ -342,7 +344,9 @@ class NeuronRecorder(object):
         spike_times = list()
         spike_ids = list()
 
-        vertices = application_vertex.machine_vertices
+        vertices = (
+            application_vertex.splitter_object.machine_vertices_for_recording(
+                variable))
         missing_str = ""
         progress = ProgressBar(vertices, "Getting spikes for {}".format(label))
         for vertex in progress.over(vertices):
