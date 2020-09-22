@@ -126,8 +126,8 @@ class ProjectionApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
 
     @overrides(ApplicationEdge.remember_associated_machine_edge)
     def remember_associated_machine_edge(self, machine_edge):
-        super(ProjectionApplicationEdge, self).remember_associated_machine_edge(
-            machine_edge)
+        super(ProjectionApplicationEdge, self).\
+            remember_associated_machine_edge(machine_edge)
         if self.__slices_list_mode:
             # Unexpected but if extra remember after a get convert back to sets
             self.__pre_slices = set(self.__pre_slices)

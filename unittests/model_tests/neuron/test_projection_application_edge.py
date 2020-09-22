@@ -18,6 +18,7 @@ from pacman.model.graphs.machine import MachineEdge
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from pacman.model.graphs.machine import SimpleMachineVertex
 
+
 def test_slices():
     app_edge = ProjectionApplicationEdge(None, None, None)
     mv0_2 = SimpleMachineVertex(None, None, None, None, Slice(0, 1))
@@ -28,11 +29,10 @@ def test_slices():
     app_edge.remember_associated_machine_edge(MachineEdge(mv0_2, mv2_4))
     assert app_edge.pre_slices == [Slice(0, 1), Slice(4, 5)]
     post1 = app_edge.post_slices
-    assert post1 ==  [Slice(0, 1), Slice(2, 3)]
+    assert post1 == [Slice(0, 1), Slice(2, 3)]
     app_edge.remember_associated_machine_edge(MachineEdge(mv0_2, mv0_2))
     app_edge.remember_associated_machine_edge(MachineEdge(mv2_4, mv2_4))
     assert app_edge.pre_slices == [Slice(0, 1), Slice(2, 3), Slice(4, 5)]
     post2 = app_edge.post_slices
     assert post1 == post2
     assert id(post1) != id(post2)
-
