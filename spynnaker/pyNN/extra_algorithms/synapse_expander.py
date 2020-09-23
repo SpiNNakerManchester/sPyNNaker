@@ -83,7 +83,8 @@ def _plan_expansion(app_graph, placements, synapse_expander_bin,
                     placement = placements.get_placement_of_vertex(m_vertex)
                     expander_cores.add_processor(
                         synapse_expander_bin,
-                        placement.x, placement.y, placement.p)
+                        placement.x, placement.y, placement.p,
+                        executable_type=ExecutableType.SYSTEM)
                     expanded_pop_vertices.append((vertex, placement))
         elif isinstance(vertex, DelayExtensionVertex):
             for m_vertex in vertex.machine_vertices:
