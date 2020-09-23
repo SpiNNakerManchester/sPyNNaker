@@ -84,6 +84,13 @@ class AbstractSynapseDynamicsStructural(object):
         """
 
     @abstractproperty
+    def with_replacement(self):
+        """ Whether to allow replacement when creating synapses
+
+        :rtype: bool
+        """
+
+    @abstractproperty
     def seed(self):
         """ The seed to control the randomness
         """

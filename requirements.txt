@@ -25,6 +25,7 @@ numpy
 scipy
 lxml
 six
+statistics
 quantities >= 0.12.1
 pynn >= 0.9.1, < 0.10
 lazyarray >= 0.2.9, <= 0.4.0
