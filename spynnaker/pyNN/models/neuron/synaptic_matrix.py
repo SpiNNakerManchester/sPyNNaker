@@ -279,28 +279,6 @@ class SynapticMatrix(object):
         single_addr = single_addr + self.__single_matrix_size
         return single_addr
 
-    def write_on_chip_delay_data(self):
-        """ Write data for delayed on-chip generation
-        """
-        # If delay edge exists, tell this about the data too, so it can
-        # generate its own data
-        if (self.__max_row_info.delayed_max_n_synapses > 0 and
-                self.__app_edge.delay_edge is not None):
-            self.__app_edge.delay_edge.pre_vertex.add_generator_data(
-                self.__max_row_info.undelayed_max_n_synapses,
-                self.__max_row_info.delayed_max_n_synapses,
-                self.__app_edge.pre_vertex.vertex_slices,
-                self.__machine_edge.pre_vertex.index,
-                self.__app_edge.post_vertex.vertex_slices,
-                self.__machine_edge.post_vertex.index,
-                self.__machine_edge.pre_vertex.vertex_slice,
-                self.__machine_edge.post_vertex.vertex_slice,
-                self.__synapse_info, self.__app_edge.n_delay_stages + 1)
-        elif self.__max_row_info.delayed_max_n_synapses != 0:
-            raise Exception(
-                "Found delayed items but no delay machine edge for {}".format(
-                    self.__app_edge.label))
-
     def next_app_on_chip_address(self, app_block_addr, max_app_addr):
         """ Allocate a machine-level address of a matrix from within an
             app-level allocation
@@ -410,6 +388,7 @@ class SynapticMatrix(object):
             The synaptic matrix offset to write the delayed data to
         :rtype: GeneratorData
         """
+        self.__write_on_chip_delay_data()
         return GeneratorData(
             syn_mat_offset, d_mat_offset,
             self.__max_row_info.undelayed_max_words,
@@ -424,6 +403,28 @@ class SynapticMatrix(object):
             self.__machine_edge.post_vertex.vertex_slice,
             self.__synapse_info, self.__app_edge.n_delay_stages + 1,
             globals_variables.get_simulator().machine_time_step)
+
+    def __write_on_chip_delay_data(self):
+        """ Write data for delayed on-chip generation
+        """
+        # If delay edge exists, tell this about the data too, so it can
+        # generate its own data
+        if (self.__max_row_info.delayed_max_n_synapses > 0 and
+                self.__app_edge.delay_edge is not None):
+            self.__app_edge.delay_edge.pre_vertex.add_generator_data(
+                self.__max_row_info.undelayed_max_n_synapses,
+                self.__max_row_info.delayed_max_n_synapses,
+                self.__app_edge.pre_vertex.vertex_slices,
+                self.__machine_edge.pre_vertex.index,
+                self.__app_edge.post_vertex.vertex_slices,
+                self.__machine_edge.post_vertex.index,
+                self.__machine_edge.pre_vertex.vertex_slice,
+                self.__machine_edge.post_vertex.vertex_slice,
+                self.__synapse_info, self.__app_edge.n_delay_stages + 1)
+        elif self.__max_row_info.delayed_max_n_synapses != 0:
+            raise Exception(
+                "Found delayed items but no delay machine edge for {}".format(
+                    self.__app_edge.label))
 
     def __next_addr(self, block_addr, size, max_addr=None):
         """ Get the next block address and check it hasn't overflowed the
