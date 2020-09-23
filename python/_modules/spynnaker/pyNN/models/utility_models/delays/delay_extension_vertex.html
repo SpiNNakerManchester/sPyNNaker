@@ -81,9 +81,6 @@
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">math</span>
-
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models.impl.</span>\
-    <span class="n">tdma_aware_application_vertex</span> <span class="kn">import</span> <span class="nn">TDMAAwareApplicationVertex</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">pacman.executor.injection_decorator</span> <span class="kn">import</span> <span class="n">inject_items</span>
 <span class="kn">from</span> <span class="nn">pacman.model.constraints.key_allocator_constraints</span> <span class="kn">import</span> <span class="p">(</span>
@@ -95,6 +92,8 @@
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractGeneratesDataSpecification</span><span class="p">,</span>
     <span class="n">AbstractProvidesOutgoingPartitionConstraints</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models.impl</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">TDMAAwareApplicationVertex</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.simulation</span> <span class="kn">import</span> <span class="n">simulation_utilities</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">SYSTEM_BYTES_REQUIREMENT</span><span class="p">,</span> <span class="n">SIMULATION_N_BYTES</span><span class="p">,</span> <span class="n">BITS_PER_WORD</span><span class="p">,</span>

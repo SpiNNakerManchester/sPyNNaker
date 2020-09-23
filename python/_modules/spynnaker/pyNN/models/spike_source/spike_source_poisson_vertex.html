@@ -83,9 +83,6 @@
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">import</span> <span class="nn">scipy.stats</span>
 <span class="kn">import</span> <span class="nn">struct</span>
-
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models.impl.</span>\
-    <span class="n">tdma_aware_application_vertex</span> <span class="kn">import</span> <span class="nn">TDMAAwareApplicationVertex</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">data_specification.enums</span> <span class="kn">import</span> <span class="n">DataType</span>
 <span class="kn">from</span> <span class="nn">pacman.executor.injection_decorator</span> <span class="kn">import</span> <span class="n">inject_items</span>
@@ -98,7 +95,7 @@
     <span class="n">AbstractGeneratesDataSpecification</span><span class="p">,</span>
     <span class="n">AbstractRewritesDataSpecification</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models.impl</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">ProvidesKeyToAtomMappingImpl</span><span class="p">)</span>
+    <span class="n">ProvidesKeyToAtomMappingImpl</span><span class="p">,</span> <span class="n">TDMAAwareApplicationVertex</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.simulation</span> <span class="kn">import</span> <span class="n">simulation_utilities</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.buffer_management</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">recording_utilities</span><span class="p">)</span>

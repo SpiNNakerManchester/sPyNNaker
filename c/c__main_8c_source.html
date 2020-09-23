@@ -186,7 +186,7 @@ $(function() {
 <div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;        <a class="code" href="spike__processing_8c.html#a6d16db10b568334607d2ff3ac4d0f9eb">spike_processing_get_n_packets_dropped_from_lateness</a>();</div>
 <div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    prov-&gt;spike_processing_get_max_filled_input_buffer_size =</div>
 <div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;        <a class="code" href="spike__processing_8c.html#a666a463b005baf510746d159f90318e9">spike_processing_get_max_filled_input_buffer_size</a>();</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    prov-&gt;<a class="code" href="c__main_8c.html#a9567e9ef2fd91cdd106404ec2e2ed282">n_tdma_mises</a> = <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/tdma__processing_8h.html#ab31b83754d469760d2d1f45b1340994e">tdma_processing_times_behind</a>();</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    prov-&gt;<a class="code" href="c__main_8c.html#a9567e9ef2fd91cdd106404ec2e2ed282">n_tdma_mises</a> = tdma_processing_times_behind();</div>
 <div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160; </div>
 <div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a9845e8157cc395cb8f3ed1761048e4f3">log_debug</a>(<span class="stringliteral">&quot;finished other provenance data&quot;</span>);</div>
 <div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;}</div>
@@ -506,13 +506,12 @@ $(function() {
 <div class="ttc" id="ac__main_8c_html_a1dc4d17392d4c0a6dac7ab12267da487"><div class="ttname"><a href="c__main_8c.html#a1dc4d17392d4c0a6dac7ab12267da487">c_main_store_provenance_data</a></div><div class="ttdeci">static void c_main_store_provenance_data(address_t provenance_region)</div><div class="ttdoc">Callback to store provenance data (format: neuron_provenance).</div><div class="ttdef"><b>Definition:</b> <a href="c__main_8c_source.html#l00132">c_main.c:132</a></div></div>
 <div class="ttc" id="aneuron_8h_html"><div class="ttname"><a href="neuron_8h.html">neuron.h</a></div><div class="ttdoc">interface for neurons</div></div>
 <div class="ttc" id="adirect__synapses_8h_html"><div class="ttname"><a href="direct__synapses_8h.html">direct_synapses.h</a></div><div class="ttdoc">API for accessing directly encoded synapses.</div></div>
-<div class="ttc" id="atdma__processing_8h_html_ab31b83754d469760d2d1f45b1340994e"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/tdma__processing_8h.html#ab31b83754d469760d2d1f45b1340994e">tdma_processing_times_behind</a></div><div class="ttdeci">uint32_t tdma_processing_times_behind(void)</div></div>
 <div class="ttc" id="abit__field__expander_8c_html_a7e8f73474622d82215423413dec84223"><div class="ttname"><a href="bit__field__expander_8c.html#a7e8f73474622d82215423413dec84223">direct_synapses_address</a></div><div class="ttdeci">address_t direct_synapses_address</div><div class="ttdoc">Stores the DMA based master pop entries.</div><div class="ttdef"><b>Definition:</b> <a href="bit__field__expander_8c_source.html#l00064">bit_field_expander.c:64</a></div></div>
 <div class="ttc" id="abit__field__filter_8h_html_a3fe8cdf904112ab379545b0d8f7a5d20"><div class="ttname"><a href="bit__field__filter_8h.html#a3fe8cdf904112ab379545b0d8f7a5d20">failed_bit_field_reads</a></div><div class="ttdeci">uint32_t failed_bit_field_reads</div><div class="ttdoc">The number of bit fields which were not able to be read in due to DTCM limits.</div><div class="ttdef"><b>Definition:</b> <a href="bit__field__filter_8h_source.html#l00031">bit_field_filter.h:31</a></div></div>
 <div class="ttc" id="aprofiler_8h_html_a00487e25d583d5e3ed36762ac4c2b108"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/profiler_8h.html#a00487e25d583d5e3ed36762ac4c2b108">profiler_init</a></div><div class="ttdeci">void profiler_init(uint32_t *data_region)</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Sep 21 2020 23:46:31 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Sep 23 2020 15:42:15 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.17
 </small></address>
