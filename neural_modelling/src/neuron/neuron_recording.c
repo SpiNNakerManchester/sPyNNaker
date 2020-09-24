@@ -285,7 +285,7 @@ typedef struct neuron_recording_header {
 
 bool neuron_recording_initialise(
         void *recording_address, uint32_t *recording_flags,
-        uint32_t n_neurons) {
+        uint32_t n_neurons, uint32_t *n_rec_regions_used) {
     // boot up the basic recording
     void *data_addr = recording_address;
     bool success = recording_initialize(&data_addr, recording_flags);
@@ -308,6 +308,8 @@ bool neuron_recording_initialise(
                 header->n_bitfield_vars, N_BITFIELD_VARS);
         return false;
     }
+    // Copy the number of regions used
+    *n_rec_regions_used = header->n_recorded_vars + header->n_bitfield_vars;
     data_addr = &header[1];
     log_info("Recording %d variables and %d bitfield variables",
             N_RECORDED_VARS, N_BITFIELD_VARS);

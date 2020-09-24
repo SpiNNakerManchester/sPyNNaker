@@ -362,8 +362,7 @@ bool population_table_get_next_address(
 
                 *row_address = (synaptic_row_t) (block_address + neuron_offset);
                 *n_bytes_to_transfer = stride * sizeof(uint32_t);
-                log_debug(
-                        "neuron_id = %u, block_address = 0x%.8x,"
+                log_debug("neuron_id = %u, block_address = 0x%.8x, "
                         "row_length = %u, row_address = 0x%.8x, n_bytes = %u",
                         last_neuron_id, block_address, row_length,
                         *row_address, *n_bytes_to_transfer);

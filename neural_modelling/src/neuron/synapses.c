@@ -102,20 +102,18 @@ static inline void print_synaptic_row(synaptic_row_t synaptic_row) {
     address_t fixed_synapses = synapse_row_fixed_weight_controls(fixed_region);
     size_t n_fixed_synapses = synapse_row_num_fixed_synapses(fixed_region);
     log_debug("Fixed region %u fixed synapses (%u plastic control words):\n",
-            n_fixed_synapses,
-            synapse_row_num_plastic_controls(fixed_region));
+            n_fixed_synapses, synapse_row_num_plastic_controls(fixed_region));
 
     for (uint32_t i = 0; i < n_fixed_synapses; i++) {
         uint32_t synapse = fixed_synapses[i];
         uint32_t synapse_type = synapse_row_sparse_type(
                 synapse, synapse_index_bits, synapse_type_mask);
 
-        log_debug("%08x [%3d: (w: %5u (=",
+        io_printf(IO_BUF, "%08x [%3d: (w: %5u (=",
                 synapse, i, synapse_row_sparse_weight(synapse));
         synapses_print_weight(synapse_row_sparse_weight(synapse),
                 ring_buffer_to_input_left_shifts[synapse_type]);
-        log_debug(
-                "nA) d: %2u, %s, n = %3u)] - {%08x %08x}\n",
+        io_printf(IO_BUF, "nA) d: %2u, %s, n = %3u)] - {%08x %08x}\n",
                 synapse_row_sparse_delay(synapse, synapse_type_index_bits),
                 get_type_char(synapse_type),
                 synapse_row_sparse_index(synapse, synapse_index_mask),
@@ -249,7 +247,8 @@ static inline void print_synapse_parameters(void) {
 bool synapses_initialise(
         address_t synapse_params_address, uint32_t n_neurons_value,
         uint32_t n_synapse_types_value,
-        uint32_t **ring_buffer_to_input_buffer_left_shifts) {
+        uint32_t **ring_buffer_to_input_buffer_left_shifts,
+        bool* clear_input_buffers_of_late_packets_init) {
     log_debug("synapses_initialise: starting");
     n_neurons = n_neurons_value;
     n_synapse_types = n_synapse_types_value;
@@ -261,8 +260,15 @@ bool synapses_initialise(
         log_error("Not enough memory to allocate ring buffer");
         return false;
     }
-    spin1_memcpy(
-            ring_buffer_to_input_left_shifts, synapse_params_address,
+
+    // read bool flag about dropping packets that arrive too late
+    *clear_input_buffers_of_late_packets_init = synapse_params_address[0];
+
+    // shift read by 1 word.
+    synapse_params_address += 1;
+
+    // read in ring buffer to input left shifts
+    spin1_memcpy(ring_buffer_to_input_left_shifts, synapse_params_address,
             n_synapse_types * sizeof(uint32_t));
     *ring_buffer_to_input_buffer_left_shifts =
             ring_buffer_to_input_left_shifts;
@@ -313,25 +319,23 @@ void synapses_do_timestep_update(timer_t time) {
     // Disable interrupts to stop DMAs interfering with the ring buffers
     uint32_t state = spin1_irq_disable();
 
+    // Clear any outstanding spikes
+    spike_processing_clear_input_buffer(time);
+
     // Transfer the input from the ring buffers into the input buffers
-    for (uint32_t neuron_index = 0; neuron_index < n_neurons;
-            neuron_index++) {
+    for (uint32_t i = 0; i < n_neurons; i++) {
         // Loop through all synapse types
-        for (uint32_t synapse_type_index = 0;
-                synapse_type_index < n_synapse_types; synapse_type_index++) {
+        for (uint32_t j = 0; j < n_synapse_types; j++) {
             // Get index in the ring buffers for the current time slot for
             // this synapse type and neuron
             uint32_t ring_buffer_index = synapses_get_ring_buffer_index(
-                    time, synapse_type_index, neuron_index,
-                    synapse_type_index_bits, synapse_index_bits);
+                    time, j, i, synapse_type_index_bits, synapse_index_bits);
 
             // Convert ring-buffer entry to input and add on to correct
             // input for this synapse type and neuron
-            neuron_add_inputs(
-                    synapse_type_index, neuron_index,
-                    synapses_convert_weight_to_input(
-                            ring_buffers[ring_buffer_index],
-                            ring_buffer_to_input_left_shifts[synapse_type_index]));
+            neuron_add_inputs(j, i, synapses_convert_weight_to_input(
+                    ring_buffers[ring_buffer_index],
+                    ring_buffer_to_input_left_shifts[j]));
 
             // Clear ring buffer
             ring_buffers[ring_buffer_index] = 0;
@@ -395,7 +399,7 @@ uint32_t synapses_get_pre_synaptic_events(void) {
 }
 
 void synapses_flush_ring_buffers(void) {
-	for (uint32_t i = 0; i < ring_buffer_size; i++) {
+    for (uint32_t i = 0; i < ring_buffer_size; i++) {
         ring_buffers[i] = 0;
     }
 }

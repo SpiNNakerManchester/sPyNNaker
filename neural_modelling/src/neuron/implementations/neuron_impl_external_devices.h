@@ -39,6 +39,7 @@ enum send_type {
 #include <neuron/synapse_types/synapse_types_exponential_impl.h>
 #include <neuron/input_types/input_type_current.h>
 #include <neuron/additional_inputs/additional_input_none_impl.h>
+#include "tdma_processing.h"
 
 // Further includes
 #include <debug.h>
@@ -108,6 +109,15 @@ static synapse_param_t *neuron_synapse_shaping_params;
 
 //! The number of steps to run per timestep
 static uint n_steps_per_timestep;
+
+//! setup from c_main
+static uint32_t n_neurons;
+
+//! setup from c_main
+static uint32_t timer_period;
+
+//! setup from c_main
+static uint global_timer_count;
 
 #ifndef SOMETIMES_UNUSED
 #define SOMETIMES_UNUSED __attribute__((unused))
@@ -314,24 +324,6 @@ static void neuron_impl_load_neuron_parameters(
 #endif // LOG_LEVEL >= LOG_DEBUG
 }
 
-
-//! \brief Spread out the spikes over the timer tick
-//! \param[in] key: the key to fire
-//! \param[in] payload: the payload to fire
-//! \param[in] with_payload: Whether a payload is needed or not
-static inline void send_packet(
-        uint32_t key, uint32_t payload, bool with_payload) {
-    if (with_payload) {
-        while (!spin1_send_mc_packet(key, payload, WITH_PAYLOAD)) {
-            spin1_delay_us(1);
-        }
-    } else {// Send the spike
-        while (!spin1_send_mc_packet(key, 0, NO_PAYLOAD)) {
-            spin1_delay_us(1);
-        }
-    }
-}
-
 //! \brief Determine if the device should fire
 //! \param[in] packet_firing:
 //!     The parameters to use to determine if it should fire now
@@ -362,7 +354,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
     // Get threshold and additional input parameters for this neuron
     packet_firing_data_t *the_packet_firing =
-        &packet_firing_array[neuron_index];
+            &packet_firing_array[neuron_index];
     additional_input_t *additional_inputs =
             &additional_input_array[neuron_index];
     synapse_param_t *the_synapse_type =
@@ -445,10 +437,16 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
                 log_debug("Sending key=0x%08x payload=0x%08x",
                         the_packet_firing->key, payload);
-                send_packet(the_packet_firing->key, payload, true);
+
+                tdma_processing_send_packet(
+                        the_packet_firing->key, payload,
+                        WITH_PAYLOAD, global_timer_count);
             } else {
                 log_debug("Sending key=0x%08x", the_packet_firing->key);
-                send_packet(the_packet_firing->key, 0, false);
+
+                tdma_processing_send_packet(
+                        the_packet_firing->key, 0,
+                        NO_PAYLOAD, global_timer_count);
             }
         }
 
