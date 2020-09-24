@@ -39,14 +39,7 @@
 #include <profiler.h>
 #include <wfi.h>
 
-#ifndef UNUSED
-#define UNUSED __attribute__((__unused__))
-#endif
-
 // ----------------------------------------------------------------------
-
-//! Spin1 API ticks, to know when the timer wraps
-extern uint ticks;
 
 //! data structure for Poisson sources
 typedef struct spike_source_t {
@@ -135,7 +128,7 @@ typedef struct global_parameters {
 
 //! Structure of the provenance data
 struct poisson_extension_provenance {
-    //! number of times the tdma fell behind its slot
+    //! number of times the TDMA fell behind its slot
     uint32_t times_tdma_fell_behind;
 };
 
@@ -557,7 +550,7 @@ static inline void expand_spike_recording_buffer(uint32_t n_spikes) {
     n_spike_buffers_allocated = n_spikes;
 }
 
-//! \brief records spikes as needed
+//! \brief Record emitted spikes as needed
 //! \param[in] neuron_id: the neurons to store spikes from
 //! \param[in] n_spikes: the number of times this neuron has spiked
 static inline void mark_spike(uint32_t neuron_id, uint32_t n_spikes) {
@@ -574,12 +567,12 @@ static inline void mark_spike(uint32_t neuron_id, uint32_t n_spikes) {
     }
 }
 
-//! \brief callback for completed recording
+//! \brief Callback for completed recording
 static void recording_complete_callback(void) {
     recording_in_progress = false;
 }
 
-//! \brief writing spikes to SDRAM
+//! \brief Write spikes to SDRAM
 //! \param[in] time: the time to which these spikes are being recorded
 static inline void record_spikes(uint32_t time) {
     while (recording_in_progress) {
@@ -636,7 +629,7 @@ static void process_fast_source(
                 // Send spikes
                 const uint32_t spike_key = ssp_params.key | s_id;
                 tdma_processing_send_packet(
-                    spike_key, num_spikes, WITH_PAYLOAD, timer_count);
+                        spike_key, num_spikes, WITH_PAYLOAD, timer_count);
             }
         }
     }
@@ -659,7 +652,7 @@ static void process_slow_source(
             if (ssp_params.has_key) {
                 // Send package
                 tdma_processing_send_packet(
-                    ssp_params.key | s_id, 0, NO_PAYLOAD, timer_count);
+                        ssp_params.key | s_id, 0, NO_PAYLOAD, timer_count);
             }
 
             // Update time to spike (note, this might not get us back above

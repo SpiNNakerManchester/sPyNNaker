@@ -25,6 +25,17 @@
 //! Global plasticity parameter data
 plasticity_weight_region_data_t *plasticity_weight_region_data;
 
+//! \brief How the configuration data for additive_two_term is laid out in
+//!     SDRAM. The layout is an array of these.
+typedef struct {
+    int32_t min_weight;
+    int32_t max_weight;
+    int32_t a2_plus;
+    int32_t a2_minus;
+    int32_t a3_plus;
+    int32_t a3_minus;
+} additive_two_term_config_t;
+
 //---------------------------------------
 // Functions
 //---------------------------------------
@@ -36,20 +47,20 @@ address_t weight_initialise(
 
     // Copy plasticity region data from address
     // **NOTE** this seems somewhat safer than relying on sizeof
-    int32_t *plasticity_word = (int32_t *) address;
+    additive_two_term_config_t *config = (additive_two_term_config_t *) address;
     plasticity_weight_region_data =
             spin1_malloc(sizeof(plasticity_weight_region_data_t) * n_synapse_types);
     if (plasticity_weight_region_data == NULL) {
         log_error("Could not initialise weight region data");
         return NULL;
     }
-    for (uint32_t s = 0; s < n_synapse_types; s++) {
-        plasticity_weight_region_data[s].min_weight = *plasticity_word++;
-        plasticity_weight_region_data[s].max_weight = *plasticity_word++;
-        plasticity_weight_region_data[s].a2_plus = *plasticity_word++;
-        plasticity_weight_region_data[s].a2_minus = *plasticity_word++;
-        plasticity_weight_region_data[s].a3_plus = *plasticity_word++;
-        plasticity_weight_region_data[s].a3_minus = *plasticity_word++;
+    for (uint32_t s = 0; s < n_synapse_types; s++, config++) {
+        plasticity_weight_region_data[s].min_weight = config->min_weight;
+        plasticity_weight_region_data[s].max_weight = config->max_weight;
+        plasticity_weight_region_data[s].a2_plus = config->a2_plus;
+        plasticity_weight_region_data[s].a2_minus = config->a2_minus;
+        plasticity_weight_region_data[s].a3_plus = config->a3_plus;
+        plasticity_weight_region_data[s].a3_minus = config->a3_minus;
 
         log_debug("\tSynapse type %u: Min weight:%d, Max weight:%d, A2+:%d, A2-:%d,"
                 " A3+:%d, A3-:%d",
@@ -63,5 +74,5 @@ address_t weight_initialise(
     log_debug("weight_initialise: completed successfully");
 
     // Return end address of region
-    return (address_t) plasticity_word;
+    return (address_t) config;
 }

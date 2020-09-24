@@ -33,7 +33,7 @@ extern spike_t* last_spikes_buffer[2];
 //! \details Two counters, one for current timestep, one for previous
 extern uint32_t n_spikes[2];
 
-//! \brief Notifies the rule that a spike has been received
+//! \brief Notify the rule that a spike has been received
 //! \param[in] time: The time that the spike was received at
 //! \param[in] spike:
 //!     The spike that was received (includes the sending neuron ID)
@@ -61,7 +61,7 @@ static inline void partner_spike_received(uint32_t time, spike_t spike) {
 //! \param[out] neuron_id: The ID of the neuron within the subpopulation
 //! \param[out] spike: The spike that made this a meaningful choice
 //! \param[out] m_pop_index: The master population table index
-//! \return True if a choice was made
+//! \return Whether a choice was made
 static inline bool potential_presynaptic_partner(
         uint32_t time, uint32_t *restrict population_id,
         uint32_t *restrict sub_population_id, uint32_t *restrict neuron_id,

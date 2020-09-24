@@ -51,7 +51,7 @@ static void neuron_impl_load_neuron_parameters(
 static bool neuron_impl_do_timestep_update(
         index_t neuron_index, input_t external_bias);
 
-//! \brief Stores neuron parameters back into SDRAM
+//! \brief Store neuron parameters back into SDRAM
 //! \param[out] address: the address in SDRAM to start the store
 //! \param[in] next: Offset of next address in store
 //! \param[in] n_neurons: The number of neurons

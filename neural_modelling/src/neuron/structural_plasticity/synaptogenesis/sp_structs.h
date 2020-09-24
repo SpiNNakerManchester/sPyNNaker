@@ -26,6 +26,7 @@
 #include <neuron/synapse_row.h>
 #include <debug.h>
 #include <random.h>
+#include <stdfix-full-iso.h> // explicitly for ulrbits() and u032
 
 // Define the formation and elimination params
 struct elimination_params;
@@ -36,51 +37,52 @@ struct formation_params;
 
 //! Entry of map from post-connection to pre-connection neural indices
 typedef struct post_to_pre_entry {
-    uint8_t pop_index;
-    uint8_t sub_pop_index;
-    uint16_t neuron_index;
+    uint8_t pop_index;          //!< Population index
+    uint8_t sub_pop_index;      //!< Subpopulation index
+    uint16_t neuron_index;      //!< Neuron index
 } post_to_pre_entry;
 
-//! information per atom
+//! information per key
 typedef struct {
-    uint32_t key;
-    uint32_t mask;
-    uint32_t n_atoms;
-    uint32_t lo_atom;
-    uint32_t m_pop_index;
+    uint32_t key;               //!< The key
+    uint32_t mask;              //!< The mask
+    uint32_t n_atoms;           //!< Number of atoms from population
+    uint32_t lo_atom;           //!< First atom in contiguous range
+    uint32_t m_pop_index;       //!< Index into master population table
 } key_atom_info_t;
 
 //! individual pre-synaptic sub-population information
 typedef struct {
-    uint16_t no_pre_vertices;
-    uint16_t sp_control;
-    uint16_t delay_lo;
-    uint16_t delay_hi;
-    uint32_t weight;
-    uint32_t connection_type;
-    uint32_t total_no_atoms;
+    uint16_t no_pre_vertices;   //!< The number of pre-vertices on the connector
+    uint16_t sp_control;        //!< Control data
+    uint16_t delay_lo;          //!< Lower bound on delay
+    uint16_t delay_hi;          //!< Upper bound on delay
+    uint32_t weight;            //!< Weight
+    uint32_t connection_type;   //!< Type of connector
+    uint32_t total_no_atoms;    //!< Number of atoms
+    //! The mapping from keys to atom ranges
     key_atom_info_t key_atom_info[];
 } pre_info_t;
 
-//! table of individual pre-synaptic information
+//! Table of individual pre-synaptic information
 typedef struct {
-    uint32_t no_pre_pops;
-    pre_info_t **prepop_info;
+    uint32_t no_pre_pops;       //!< Number of entries
+    pre_info_t **prepop_info;   //!< Pointer to array of entries
 } pre_pop_info_table_t;
 
 //! parameters of the synaptic rewiring model
 typedef struct {
-    uint32_t fast;
-    uint32_t p_rew;
-    uint32_t s_max;
-    uint32_t app_no_atoms;
-    uint32_t machine_no_atoms;
-    uint32_t low_atom;
-    uint32_t high_atom;
+    uint32_t fast;              //!< Flag: whether using fast or slow rewiring
+    uint32_t p_rew;             //!< Probability of rewiring
+    uint32_t s_max;             //!< s<sub>max</sub>
+    uint32_t app_no_atoms;      //!< Number of application atoms
+    uint32_t machine_no_atoms;  //!< Number of machine atoms
+    uint32_t low_atom;          //!< Atom ID range: low
+    uint32_t high_atom;         //!< Atom ID range: high
     // the 2 seeds that are used: shared for sync, local for everything else
     mars_kiss64_seed_t shared_seed;
     mars_kiss64_seed_t local_seed;
-    uint32_t no_pre_pops;
+    uint32_t no_pre_pops;       //!< Number of populations on pre side
 } rewiring_data_t;
 
 //! struct representing the current state of rewiring
@@ -89,15 +91,20 @@ typedef struct {
     mars_kiss64_seed_t *local_seed;
     //! Low atom copied from rewiring data
     uint32_t post_low_atom;
-    // what are the currently selecting pre- and post-synaptic neurons
+    //! The currently selecting pre-synaptic neuron ID
     uint32_t pre_syn_id;
+    //! The currently selecting post-synaptic neuron ID
     uint32_t post_syn_id;
     //! does the connection already exist
     uint32_t element_exists;
     // information extracted from the post to pre table
+    //! Entry from ::post_to_pre_table
     post_to_pre_entry *post_to_pre_table_entry;
+    //! Entry from ::pre_pop_info_table_t.prepop_info
     pre_info_t *pre_population_info;
+    //! Entry from ::pre_info_t::key_atom_info
     key_atom_info_t *key_atom_info;
+    //! Copy of current post-to-pre entry
     post_to_pre_entry post_to_pre;
     //! offset in synaptic row (if exists)
     uint32_t offset;
@@ -109,15 +116,16 @@ typedef struct {
     uint32_t synapse_type;
 } current_state_t;
 
-//! Get a random unsigned integer up to (but not including) a given maximum
-//! \param[in] max The maximum value allowed
-//! \param[in] seed The random seed to use
+//! \brief Get a random unsigned integer up to (but not including) a given
+//!     maximum
+//! \param[in] max: The maximum value allowed
+//! \param[in] seed: The random seed to use
 //! \return The generated value
 static inline uint32_t rand_int(uint32_t max, mars_kiss64_seed_t seed) {
     return muliulr(max, ulrbits(mars_kiss64_seed(seed)));
 }
 
-//! \brief unpack the spike into key and identifying information for the
+//! \brief Unpack the spike into key and identifying information for the
 //!     neuron; Identify pop, sub-population and low and high atoms
 //! \param[in] pre_pop_info_table: The prepopulation information table
 //! \param[in] spike: The spike to look up the information from
@@ -181,12 +189,12 @@ static inline bool sp_structs_get_sub_pop_info(
     return false;
 }
 
-//! \brief Removes a synapse from the relevant structures
+//! \brief Remove a synapse from the relevant structures
 //! \param[in,out] current_state: Describes what is to be done
 //! \param[in,out] row: The row of the synaptic matrix to be updated
 //! \return True if the synapse was removed
 static inline bool sp_structs_remove_synapse(
-        current_state_t *restrict current_state, address_t restrict row) {
+        current_state_t *restrict current_state, synaptic_row_t restrict row) {
     if (!synapse_dynamics_remove_neuron(current_state->offset, row)) {
         return false;
     }
@@ -194,18 +202,17 @@ static inline bool sp_structs_remove_synapse(
     return true;
 }
 
-//! \brief Adds a synapse to the relevant structures
+//! \brief Add a synapse to the relevant structures
 //! \param[in,out] current_state: Describes what is to be done
 //! \param[in,out] row: The row of the synaptic matrix to be updated
 //! \return True if the synapse was added
 static inline bool sp_structs_add_synapse(
-        current_state_t *restrict current_state, address_t restrict row) {
+        current_state_t *restrict current_state, synaptic_row_t restrict row) {
     uint32_t appr_scaled_weight = current_state->pre_population_info->weight;
 
-    uint32_t actual_delay;
     uint32_t offset = current_state->pre_population_info->delay_hi -
             current_state->pre_population_info->delay_lo;
-    actual_delay = rand_int(offset, *(current_state->local_seed)) +
+    uint32_t actual_delay = rand_int(offset, *(current_state->local_seed)) +
             current_state->pre_population_info->delay_lo;
 
     if (!synapse_dynamics_add_neuron(
@@ -279,7 +286,7 @@ static inline uint8_t *sp_structs_read_in_common(
     uint32_t n_elements =
             rewiring_data->s_max * rewiring_data->machine_no_atoms;
 
-    for (uint32_t i=0; i < n_elements; i++){
+    for (uint32_t i=0; i < n_elements; i++) {
         log_debug("index %d, pop index %d, sub pop index %d, neuron_index %d",
                 i, post_to_pre_table[i]->pop_index,
                 post_to_pre_table[i]->sub_pop_index,

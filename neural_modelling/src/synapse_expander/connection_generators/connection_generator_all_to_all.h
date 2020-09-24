@@ -109,14 +109,14 @@ static uint32_t connection_generator_all_to_all_generate(
     // Add a connection to this pre-neuron for each post-neuron...
     uint32_t n_conns = 0;
     for (uint32_t i = 0; i < post_slice_count; i++) {
+        const uint32_t idx = post_slice_start + i;
         // ... unless this is a self connection and these are disallowed
-        if (!obj->allow_self_connections &&
-                (pre_neuron_index == post_slice_start + i)) {
-            log_debug("Not generating for post %u", post_slice_start + i);
+        if (!obj->allow_self_connections && (pre_neuron_index == idx)) {
+            log_debug("Not generating for post %u", idx);
             continue;
         }
         // ... or if the value is not in the range of the post-population view
-        if ((i + post_slice_start < obj->post_lo) || (i + post_slice_start > obj->post_hi)) {
+        if ((idx < obj->post_lo) || (idx > obj->post_hi)) {
             continue;
         }
         indices[n_conns++] = i;

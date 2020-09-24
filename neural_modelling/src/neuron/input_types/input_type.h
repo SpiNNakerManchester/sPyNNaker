@@ -48,7 +48,7 @@ typedef struct input_type_t input_type_t;
 //! Declaration of the input type pointer
 typedef input_type_t *input_type_pointer_t;
 
-//! \brief Gets the actual input value. This allows any scaling to take place
+//! \brief Get the actual input value. This allows any scaling to take place
 //! \param[in,out] value: The array of the receptor-based values of the input
 //!     before scaling
 //! \param[in] input_type: The input type pointer to the parameters
@@ -60,7 +60,7 @@ static input_t *input_type_get_input_value(
         input_t *restrict value, const input_type_t *input_type,
         uint16_t num_receptors);
 
-//! \brief Converts an excitatory input into an excitatory current
+//! \brief Convert an excitatory input into an excitatory current
 //! \param[in,out] exc_input: Pointer to array of excitatory inputs from
 //!     different receptors this timestep. Note that this will already have
 //!     been scaled by input_type_get_input_value()
@@ -70,7 +70,7 @@ static void input_type_convert_excitatory_input_to_current(
         input_t *restrict exc_input, const input_type_t *input_type,
         state_t membrane_voltage);
 
-//! \brief Converts an inhibitory input into an inhibitory current
+//! \brief Convert an inhibitory input into an inhibitory current
 //! \param[in,out] inh_input: Pointer to array of inhibitory inputs from
 //!     different receptors this timestep. Note that this will already have
 //!     been scaled by input_type_get_input_value()

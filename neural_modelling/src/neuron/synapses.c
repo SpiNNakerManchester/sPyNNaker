@@ -77,7 +77,7 @@ static uint32_t synapse_type_mask;
 /* PRIVATE FUNCTIONS */
 
 #if LOG_LEVEL >= LOG_DEBUG
-//! \brief get the synapse type character
+//! \brief Get the synapse type character
 //! \param[in] synapse_type: the synapse type
 //! \return a single character string describing the synapse type
 static inline const char *get_type_char(uint32_t synapse_type) {
@@ -86,39 +86,34 @@ static inline const char *get_type_char(uint32_t synapse_type) {
 #endif // LOG_LEVEL >= LOG_DEBUG
 
 //! \brief Print a synaptic row.
-//!
-//! Only does anything when debugging.
+//! \details Only does anything when debugging.
 //! \param[in] synaptic_row: The synaptic row to print
 static inline void print_synaptic_row(synaptic_row_t synaptic_row) {
 #if LOG_LEVEL >= LOG_DEBUG
     log_debug("Synaptic row, at address %08x Num plastic words:%u\n",
-            (uint32_t) synaptic_row, synapse_row_plastic_size(synaptic_row));
+            synaptic_row, synapse_row_plastic_size(synaptic_row));
     if (synaptic_row == NULL) {
         return;
     }
     log_debug("----------------------------------------\n");
 
     // Get details of fixed region
-    address_t fixed_region_address = synapse_row_fixed_region(synaptic_row);
-    address_t fixed_synapses =
-            synapse_row_fixed_weight_controls(fixed_region_address);
-    size_t n_fixed_synapses =
-            synapse_row_num_fixed_synapses(fixed_region_address);
+    synapse_row_fixed_part_t *fixed_region = synapse_row_fixed_region(synaptic_row);
+    address_t fixed_synapses = synapse_row_fixed_weight_controls(fixed_region);
+    size_t n_fixed_synapses = synapse_row_num_fixed_synapses(fixed_region);
     log_debug("Fixed region %u fixed synapses (%u plastic control words):\n",
-            n_fixed_synapses,
-            synapse_row_num_plastic_controls(fixed_region_address));
+            n_fixed_synapses, synapse_row_num_plastic_controls(fixed_region));
 
     for (uint32_t i = 0; i < n_fixed_synapses; i++) {
         uint32_t synapse = fixed_synapses[i];
         uint32_t synapse_type = synapse_row_sparse_type(
                 synapse, synapse_index_bits, synapse_type_mask);
 
-        log_debug("%08x [%3d: (w: %5u (=",
+        io_printf(IO_BUF, "%08x [%3d: (w: %5u (=",
                 synapse, i, synapse_row_sparse_weight(synapse));
         synapses_print_weight(synapse_row_sparse_weight(synapse),
                 ring_buffer_to_input_left_shifts[synapse_type]);
-        log_debug(
-                "nA) d: %2u, %s, n = %3u)] - {%08x %08x}\n",
+        io_printf(IO_BUF, "nA) d: %2u, %s, n = %3u)] - {%08x %08x}\n",
                 synapse_row_sparse_delay(synapse, synapse_type_index_bits),
                 get_type_char(synapse_type),
                 synapse_row_sparse_index(synapse, synapse_index_mask),
@@ -131,7 +126,7 @@ static inline void print_synaptic_row(synaptic_row_t synaptic_row) {
         address_t plastic_region_address =
                 synapse_row_plastic_region(synaptic_row);
         synapse_dynamics_print_plastic_synapses(
-                plastic_region_address, fixed_region_address,
+                plastic_region_address, fixed_region,
                 ring_buffer_to_input_left_shifts);
     }
 
@@ -142,8 +137,7 @@ static inline void print_synaptic_row(synaptic_row_t synaptic_row) {
 }
 
 //! \brief Print the contents of the ring buffers.
-//!
-//! Only does anything when debugging.
+//! \details Only does anything when debugging.
 //! \param[in] time: The current timestamp
 static inline void print_ring_buffers(uint32_t time) {
 #if LOG_LEVEL >= LOG_DEBUG
@@ -181,8 +175,7 @@ static inline void print_ring_buffers(uint32_t time) {
 }
 
 //! \brief Print the neuron inputs.
-//!
-//! Only does anything when debugging.
+//! \details Only does anything when debugging.
 static inline void print_inputs(void) {
 #if LOG_LEVEL >= LOG_DEBUG
     log_debug("Inputs\n");
@@ -192,13 +185,12 @@ static inline void print_inputs(void) {
 
 
 //! \brief This is the "inner loop" of the neural simulation.
-//!
-//! Every spike event could cause up to 256 different weights to
-//! be put into the ring buffer.
+//! \details Every spike event could cause up to 256 different weights to
+//!     be put into the ring buffer.
 //! \param[in] fixed_region_address: The fixed region of the synaptic matrix
 //! \param[in] time: The current simulation time
 static inline void process_fixed_synapses(
-        address_t fixed_region_address, uint32_t time) {
+        synapse_row_fixed_part_t *fixed_region_address, uint32_t time) {
     register uint32_t *synaptic_words =
             synapse_row_fixed_weight_controls(fixed_region_address);
     register uint32_t fixed_synapse =
@@ -241,7 +233,7 @@ static inline void process_fixed_synapses(
     }
 }
 
-//! private method for doing output debug data on the synapses
+//! Print output debug data on the synapses
 static inline void print_synapse_parameters(void) {
 // only if the models are compiled in debug mode will this method contain
 // said lines.
@@ -276,8 +268,7 @@ bool synapses_initialise(
     synapse_params_address += 1;
 
     // read in ring buffer to input left shifts
-    spin1_memcpy(
-            ring_buffer_to_input_left_shifts, synapse_params_address,
+    spin1_memcpy(ring_buffer_to_input_left_shifts, synapse_params_address,
             n_synapse_types * sizeof(uint32_t));
     *ring_buffer_to_input_buffer_left_shifts =
             ring_buffer_to_input_left_shifts;
@@ -332,24 +323,19 @@ void synapses_do_timestep_update(timer_t time) {
     spike_processing_clear_input_buffer(time);
 
     // Transfer the input from the ring buffers into the input buffers
-    for (uint32_t neuron_index = 0; neuron_index < n_neurons;
-            neuron_index++) {
+    for (uint32_t i = 0; i < n_neurons; i++) {
         // Loop through all synapse types
-        for (uint32_t synapse_type_index = 0;
-                synapse_type_index < n_synapse_types; synapse_type_index++) {
+        for (uint32_t j = 0; j < n_synapse_types; j++) {
             // Get index in the ring buffers for the current time slot for
             // this synapse type and neuron
             uint32_t ring_buffer_index = synapses_get_ring_buffer_index(
-                    time, synapse_type_index, neuron_index,
-                    synapse_type_index_bits, synapse_index_bits);
+                    time, j, i, synapse_type_index_bits, synapse_index_bits);
 
             // Convert ring-buffer entry to input and add on to correct
             // input for this synapse type and neuron
-            neuron_add_inputs(
-                    synapse_type_index, neuron_index,
-                    synapses_convert_weight_to_input(
-                            ring_buffers[ring_buffer_index],
-                            ring_buffer_to_input_left_shifts[synapse_type_index]));
+            neuron_add_inputs(j, i, synapses_convert_weight_to_input(
+                    ring_buffers[ring_buffer_index],
+                    ring_buffer_to_input_left_shifts[j]));
 
             // Clear ring buffer
             ring_buffers[ring_buffer_index] = 0;
@@ -364,9 +350,8 @@ void synapses_do_timestep_update(timer_t time) {
 
 bool synapses_process_synaptic_row(
         uint32_t time, synaptic_row_t row, bool *write_back) {
-
     // Get address of non-plastic region from row
-    address_t fixed_region_address = synapse_row_fixed_region(row);
+    synapse_row_fixed_part_t *fixed_region = synapse_row_fixed_region(row);
 
     // **TODO** multiple optimised synaptic row formats
     //if (plastic_tag(row) == 0) {
@@ -379,7 +364,7 @@ bool synapses_process_synaptic_row(
         profiler_write_entry_disable_fiq(
                 PROFILER_ENTER | PROFILER_PROCESS_PLASTIC_SYNAPSES);
         if (!synapse_dynamics_process_plastic_synapses(plastic_region_address,
-                fixed_region_address, ring_buffers, time)) {
+                fixed_region, ring_buffers, time)) {
             return false;
         }
         profiler_write_entry_disable_fiq(
@@ -393,21 +378,20 @@ bool synapses_process_synaptic_row(
     // **NOTE** this is done after initiating DMA in an attempt
     // to hide cost of DMA behind this loop to improve the chance
     // that the DMA controller is ready to read next synaptic row afterwards
-    process_fixed_synapses(fixed_region_address, time);
+    process_fixed_synapses(fixed_region, time);
     //}
     return true;
 }
 
-//! \brief returns the number of times the synapses have saturated their
-//!        weights.
+//! \brief Get the number of times the synapses have saturated their weights.
 //! \return the number of times the synapses have saturated.
 uint32_t synapses_get_saturation_count(void) {
     return saturation_count;
 }
 
-//! \brief returns the counters for plastic and fixed pre synaptic events
-//! based on (if the model was compiled with SYNAPSE_BENCHMARK parameter) or
-//! returns 0
+//! \brief Get the counters for plastic and fixed pre synaptic events based on
+//!     (if the model was compiled with SYNAPSE_BENCHMARK parameter) or
+//!     returns 0
 //! \return the counter for plastic and fixed pre synaptic events or 0
 uint32_t synapses_get_pre_synaptic_events(void) {
     return (num_fixed_pre_synaptic_events +
@@ -420,7 +404,7 @@ void synapses_flush_ring_buffers(void) {
     }
 }
 
-//! \brief allows clearing of DTCM used by synapses
+//! \brief Clear DTCM used by synapses
 //! \return true if successful
 bool synapses_shut_down(void) {
     sark_free(ring_buffer_to_input_left_shifts);

@@ -47,7 +47,7 @@ struct param_generator_normal_clipped_boundary {
 };
 
 /**
- * \brief How to initialise the clamped normal RNG parameter generator
+ * \brief Initialise the clamped normal RNG parameter generator
  * \param[in,out] region: Region to read setup from.  Should be updated
  *                        to position just after parameters after calling.
  * \return A data item to be passed in to other functions later on
@@ -72,7 +72,7 @@ static void *param_generator_normal_clipped_boundary_initialize(
 }
 
 /**
- * \brief How to free any data for the clamped normal RNG parameter generator
+ * \brief Free any data for the clamped normal RNG parameter generator
  * \param[in] generator: The generator to free
  */
 static void param_generator_normal_clipped_boundary_free(void *generator) {
@@ -81,15 +81,27 @@ static void param_generator_normal_clipped_boundary_free(void *generator) {
     sark_free(generator);
 }
 
+static inline accum _clamp(
+        const struct param_generator_normal_clipped_boundary *obj,
+        accum value) {
+    if (value < obj->params.low) {
+        return obj->params.low;
+    }
+    if (value > obj->params.high) {
+        return obj->params.high;
+    }
+    return value;
+}
+
 /**
- * \brief How to generate values with the clamped normal RNG parameter generator
+ * \brief Generate values with the clamped normal RNG parameter generator
  * \param[in] generator: The generator to use to generate values
  * \param[in] n_indices: The number of values to generate
- * \param[in] pre_neuron_index: The index of the neuron in the pre-population
- *                              being generated
+ * \param[in] pre_neuron_index:
+ *      The index of the neuron in the pre-population being generated
  * \param[in] indices: The \p n_indices post-neuron indices for each connection
- * \param[out] values: An array into which to place the values; will be
- *                     \p n_indices in size
+ * \param[out] values:
+ *      An array into which to place the values; will be \p n_indices in size
  */
 static void param_generator_normal_clipped_boundary_generate(
         void *generator, uint32_t n_indices, UNUSED uint32_t pre_neuron_index,
@@ -99,12 +111,6 @@ static void param_generator_normal_clipped_boundary_generate(
     struct param_generator_normal_clipped_boundary *obj = generator;
     for (uint32_t i = 0; i < n_indices; i++) {
         accum value = rng_normal(obj->rng);
-        values[i] = obj->params.mu + (value * obj->params.sigma);
-        if (values[i] < obj->params.low) {
-            values[i] = obj->params.low;
-        }
-        if (values[i] > obj->params.high) {
-            values[i] = obj->params.high;
-        }
+        values[i] = _clamp(obj->params.mu + (value * obj->params.sigma), obj);
     }
 }

@@ -63,7 +63,7 @@ static struct fixed_pre_globals_t fixed_pre_globals = {
 };
 
 /**
- * \brief Generates a uniformly-distributed random number
+ * \brief Generate a uniformly-distributed random number
  * \param[in,out] obj: the generator containing the RNG
  * \param[in] range: the (_upper, exclusive_) limit of the range of random
  *      numbers that may be generated. Should be in range 0..65536
@@ -94,10 +94,10 @@ static void *connection_generator_fixed_pre_initialise(address_t *region) {
     log_debug("Fixed Number Pre Connector parameters: pre_lo = %u, pre_hi = %u, "
             "post_lo = %u, post_hi = %u, allow self connections = %u, "
             "with replacement = %u, n_pre = %u, n pre neurons = %u",
-            obj->params.pre_lo, obj->params.pre_hi, obj->params.post_lo, obj->params.post_hi,
-            obj->params.allow_self_connections,
-            obj->params.with_replacement, obj->params.n_pre,
-            obj->params.n_pre_neurons);
+            obj->params.pre_lo, obj->params.pre_hi,
+            obj->params.post_lo, obj->params.post_hi,
+            obj->params.allow_self_connections, obj->params.with_replacement,
+            obj->params.n_pre, obj->params.n_pre_neurons);
 
     // Build the array
 
@@ -261,14 +261,15 @@ uint32_t connection_generator_fixed_pre_generate(
     uint32_t count_indices = 0;
     for (uint32_t n = 0; n < n_columns; n++) {
     	// Only generate within the post-population view
-    	if ((n + obj->params.post_lo >= post_slice_start) &&
-    			(n + obj->params.post_lo < (post_slice_start + post_slice_count))) {
+        uint32_t post_col = obj->params.post_lo + n;
+    	if ((post_col >= post_slice_start) &&
+    			(post_col < post_slice_start + post_slice_count)) {
     		for (uint32_t i = 0; i < n_conns; i++) {
     			uint32_t j = (*array)[n][i] + obj->params.pre_lo;
     			if (j == pre_neuron_index) {
     			    // The index is the value locally on the slice
-    				indices[count_indices] = n + obj->params.post_lo - post_slice_start;
-    				count_indices++;
+    				indices[count_indices++] =
+    				        post_col - post_slice_start;
     			}
     		}
         }

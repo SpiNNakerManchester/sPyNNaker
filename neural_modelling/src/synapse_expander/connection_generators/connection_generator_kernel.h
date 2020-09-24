@@ -139,14 +139,13 @@ static uint32_t connection_generator_kernel_generate(
     uint16_t pre_r = uidiv(pre_neuron_index, obj->preWidth, &pre_c);
 
     // Check whether these coordinates should be included based on step functions
-    if (!(((pre_r - obj->startPreHeight) % obj->stepPreHeight == 0) &&
-    		((pre_c - obj->startPreWidth) % obj->stepPreWidth == 0))) {
+    if (((pre_r - obj->startPreHeight) % obj->stepPreHeight != 0) ||
+    		((pre_c - obj->startPreWidth) % obj->stepPreWidth != 0)) {
     	return 0;
     }
 
     uint16_t hlf_kw = obj->kernelWidth >> 1;
     uint16_t hlf_kh = obj->kernelHeight >> 1;
-    int16_t k_r, k_c;
     for (uint16_t i = 0; i < post_slice_count; i++) {
         uint16_t post_r, post_c; //post raw
         uint16_t pac_r, pac_c; // post as common
@@ -163,14 +162,13 @@ static uint32_t connection_generator_kernel_generate(
                 pac_r, pac_c, obj->startPreHeight, obj->startPreWidth,
                 obj->stepPreHeight, obj->stepPreWidth, &pap_r, &pap_c);
 
-        int16_t r_diff = (int16_t) pap_r - (int16_t) pre_r;
-        int16_t c_diff = (int16_t) pap_c - (int16_t) pre_c;
+        int16_t r_diff = pap_r - (int16_t) pre_r;
+        int16_t c_diff = pap_c - (int16_t) pre_c;
+        int16_t k_r = hlf_kh - r_diff;
+        int16_t k_c = hlf_kw - c_diff;
 
-        k_r = hlf_kh - r_diff;
-        k_c = hlf_kw - c_diff;
-
-        if ((0 <= k_r) && (k_r < obj->kernelHeight) && (0 <= k_c)
-                && (k_c < obj->kernelWidth)) {
+        if ((0 <= k_r) && (k_r < obj->kernelHeight) &&
+                (0 <= k_c) && (k_c < obj->kernelWidth)) {
             indices[n_conns++] = i;
         }
     }

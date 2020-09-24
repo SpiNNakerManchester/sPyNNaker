@@ -85,8 +85,13 @@ static void connection_generator_fixed_total_free(void *generator) {
     sark_free(generator);
 }
 
-static inline uint32_t _pick(rng_t rng, uint32_t K, uint32_t not_K) {
-    return (uint32_t) (ulrbits(rng_generator(rng)) * (K + not_K));
+//! \brief A random boolean that's true \p K / (\p K + \p not_K) of the time.
+//! \param[in] rng: The uniform random number generator
+//! \param[in] K: The proportion of time to say yes
+//! \param[in] not_K: The proportion of time to say no
+//! \return A random boolean that's true the required fraction of the time
+static inline bool _pick(rng_t rng, uint32_t K, uint32_t not_K) {
+    return ((uint32_t) (ulrbits(rng_generator(rng)) * (K + not_K))) < K;
 }
 
 /**
@@ -101,7 +106,7 @@ static uint32_t binomial(uint32_t n, uint32_t N, uint32_t K, rng_t rng) {
     uint32_t count = 0;
     uint32_t not_K = N - K;
     for (uint32_t i = 0; i < n; i++) {
-        if (_pick(rng, K, not_K) < K) {
+        if (_pick(rng, K, not_K)) {
             count++;
         }
     }
@@ -121,7 +126,7 @@ static uint32_t hypergeom(uint32_t n, uint32_t N, uint32_t K, rng_t rng) {
     uint32_t K_remaining = K;
     uint32_t not_K_remaining = N - K;
     for (uint32_t i = 0; i < n; i++) {
-        if (_pick(rng, K_remaining, not_K_remaining) < K_remaining) {
+        if (_pick(rng, K_remaining, not_K_remaining)) {
             count++;
             K_remaining--;
         } else {
@@ -129,6 +134,21 @@ static uint32_t hypergeom(uint32_t n, uint32_t N, uint32_t K, rng_t rng) {
         }
     }
     return count;
+}
+
+/**
+ * \brief Pick a random index using a uniform distribution.
+ * \param[in] obj: Contains the random number state
+ * \param[in] n_values: The number of values to pick from.
+ *      Assume within uint16_t range.
+ * \return The random index.
+ */
+static inline uint32_t random_index(
+        struct fixed_total *obj, uint32_t n_values) {
+    const uint32_t SHIFT_BITS = 15;
+    const uint32_t MASK = (1 << SHIFT_BITS) - 1;
+    uint32_t u01 = rng_generator(obj->rng) & MASK;
+    return (u01 * n_values) >> SHIFT_BITS;
 }
 
 /**
@@ -169,7 +189,8 @@ static uint32_t connection_generator_fixed_total_generate(
 
     // Work out how many values can be sampled from (on this slice)
     uint32_t slice_lo = post_slice_start;
-    uint32_t slice_hi = post_slice_start + post_slice_count - 1;
+    const uint32_t slice_top = post_slice_start + post_slice_count;
+    uint32_t slice_hi = slice_top - 1;
 
     // If everything is off the current slice then don't generate
     if ((obj->params.post_hi < slice_lo) ||
@@ -179,21 +200,11 @@ static uint32_t connection_generator_fixed_total_generate(
 
     // Otherwise work out how many values can be sampled from
     if ((obj->params.post_lo >= post_slice_start) &&
-    		(obj->params.post_lo < post_slice_start + post_slice_count)) {
+    		(obj->params.post_lo < slice_top)) {
     	slice_lo = obj->params.post_lo;
-    	if (obj->params.post_hi >= post_slice_start + post_slice_count) {
-    		slice_hi = post_slice_start + post_slice_count - 1;
-    	} else {
-    		slice_hi = obj->params.post_hi;
-    	}
-    } else { // post_lo is less than slice_start
-    	slice_lo = post_slice_start;
-    	if (obj->params.post_hi >= post_slice_start + post_slice_count) {
-    		slice_hi = post_slice_start + post_slice_count - 1;
-    	}
-    	else {
-    		slice_hi = obj->params.post_hi;
-    	}
+    }
+    if (obj->params.post_hi < slice_top) {
+        slice_hi = obj->params.post_hi;
     }
 
     uint32_t n_values = slice_hi - slice_lo + 1;
@@ -208,18 +219,14 @@ static uint32_t connection_generator_fixed_total_generate(
     // sub-matrix connections get allocated to this row
     if (pre_neuron_index == obj->params.pre_hi) {
         n_conns = obj->params.n_connections;
-    } else {
+    } else if (obj->params.with_replacement) {
         // If with replacement, generate a binomial for this row
-        if (obj->params.with_replacement) {
-            n_conns = binomial(
-                    obj->params.n_connections,
-                    obj->params.n_potential_synapses, n_values, obj->rng);
+        n_conns = binomial(obj->params.n_connections,
+                obj->params.n_potential_synapses, n_values, obj->rng);
+    } else {
         // If without replacement, generate a hyper-geometric for this row
-        } else {
-            n_conns = hypergeom(
-                    obj->params.n_connections,
-                    obj->params.n_potential_synapses, n_values, obj->rng);
-        }
+        n_conns = hypergeom(obj->params.n_connections,
+                obj->params.n_potential_synapses, n_values, obj->rng);
     }
 
     // If too many connections, limit
@@ -236,20 +243,18 @@ static uint32_t connection_generator_fixed_total_generate(
     // Sample from the possible connections in this row n_conns times
     if (obj->params.with_replacement) {
         // Sample them with replacement
-        for (unsigned int i = 0; i < n_conns; i++) {
-            uint32_t u01 = rng_generator(obj->rng) & 0x00007fff;
-            uint32_t j = (u01 * n_values) >> 15;
+        for (uint32_t i = 0; i < n_conns; i++) {
+            const uint32_t j = random_index(obj, n_values);
             indices[i] = j + slice_lo - post_slice_start;
         }
     } else {
         // Sample them without replacement using reservoir sampling
-        for (unsigned int i = 0; i < n_conns; i++) {
+        for (uint32_t i = 0; i < n_conns; i++) {
             indices[i] = i + slice_lo - post_slice_start;
         }
-        for (unsigned int i = n_conns; i < n_values; i++) {
+        for (uint32_t i = n_conns; i < n_values; i++) {
             // j = random(0, i) (inclusive)
-            const unsigned int u01 = rng_generator(obj->rng) & 0x00007fff;
-            const unsigned int j = (u01 * (i + 1)) >> 15;
+            const uint32_t j = random_index(obj, i + 1);
             if (j < n_conns) {
                 indices[j] = i + slice_lo - post_slice_start;
             }

@@ -47,7 +47,7 @@ struct param_generator_normal_clipped {
 };
 
 /**
- * \brief How to initialise the clipped normal RNG parameter generator
+ * \brief Initialise the clipped normal RNG parameter generator
  * \param[in,out] region: Region to read setup from.  Should be updated
  *                        to position just after parameters after calling.
  * \return A data item to be passed in to other functions later on
@@ -72,7 +72,7 @@ static void *param_generator_normal_clipped_initialize(address_t *region) {
 }
 
 /**
- * \brief How to free any data for the clipped normal RNG parameter generator
+ * \brief Free any data for the clipped normal RNG parameter generator
  * \param[in] generator: The generator to free
  */
 static void param_generator_normal_clipped_free(void *generator) {
@@ -81,15 +81,20 @@ static void param_generator_normal_clipped_free(void *generator) {
     sark_free(generator);
 }
 
+static inline bool _in_range(
+        struct param_generator_normal_clipped *obj, accum value) {
+    return (value >= obj->params.low) && (value <= obj->params.high);
+}
+
 /**
- * \brief How to generate values with the clipped normal RNG parameter generator
+ * \brief Generate values with the clipped normal RNG parameter generator
  * \param[in] generator: The generator to use to generate values
  * \param[in] n_indices: The number of values to generate
- * \param[in] pre_neuron_index: The index of the neuron in the pre-population
- *                              being generated
+ * \param[in] pre_neuron_index:
+ *      The index of the neuron in the pre-population being generated
  * \param[in] indices: The \p n_indices post-neuron indices for each connection
- * \param[out] values: An array into which to place the values; will be
- *                     \p n_indices in size
+ * \param[out] values:
+ *      An array into which to place the values; will be \p n_indices in size
  */
 static void param_generator_normal_clipped_generate(
         void *generator, uint32_t n_indices, UNUSED uint32_t pre_neuron_index,
@@ -101,6 +106,6 @@ static void param_generator_normal_clipped_generate(
         do {
             accum value = rng_normal(obj->rng);
             values[i] = obj->params.mu + (value * obj->params.sigma);
-        } while (values[i] < obj->params.low || values[i] > obj->params.high);
+        } while (!_in_range(obj, values[i]));
     }
 }

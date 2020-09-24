@@ -1165,9 +1165,8 @@ static inline multicast_packet munich_protocol_set_retina_transmission(
 
         // verify that its what the end user wants.
         if (payload_holds_time_stamps || (size_of_time_stamp_in_bytes == 0)) {
-            log_error(
-                "If you are using payloads to store events, you cannot"
-                " have time stamps at all.");
+            log_error("If you are using payloads to store events, you cannot "
+                    "have time stamps at all.");
             rt_error(RTE_SWERR);
         }
 

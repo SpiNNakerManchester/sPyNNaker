@@ -27,6 +27,15 @@ plasticity_weight_region_data_t *plasticity_weight_region_data;
 //! Plasticity multiply shift array, in DTCM
 uint32_t *weight_multiply_right_shift;
 
+//! \brief How the configuration data for multiplicative is laid out in SDRAM.
+//! The layout is an array of these.
+typedef struct {
+    int32_t min_weight;
+    int32_t max_weight;
+    int32_t a2_plus;
+    int32_t a2_minus;
+} multiplicative_config_t;
+
 //---------------------------------------
 // Functions
 //---------------------------------------
@@ -51,13 +60,13 @@ address_t weight_initialise(
         return NULL;
     }
 
-    int32_t *plasticity_word = (int32_t *) address;
-    for (uint32_t s = 0; s < n_synapse_types; s++) {
+    multiplicative_config_t *config = (multiplicative_config_t *) address;
+    for (uint32_t s = 0; s < n_synapse_types; s++, config++) {
         // Copy parameters
-        plasticity_weight_region_data[s].min_weight = *plasticity_word++;
-        plasticity_weight_region_data[s].max_weight = *plasticity_word++;
-        plasticity_weight_region_data[s].a2_plus = *plasticity_word++;
-        plasticity_weight_region_data[s].a2_minus = *plasticity_word++;
+        plasticity_weight_region_data[s].min_weight = config->min_weight;
+        plasticity_weight_region_data[s].max_weight = config->max_weight;
+        plasticity_weight_region_data[s].a2_plus = config->a2_plus;
+        plasticity_weight_region_data[s].a2_minus = config->a2_minus;
 
         // Calculate the right shift required to fixed-point multiply weights
         weight_multiply_right_shift[s] =
@@ -75,5 +84,5 @@ address_t weight_initialise(
     log_debug("weight_initialise: completed successfully");
 
     // Return end address of region
-    return (address_t) plasticity_word;
+    return (address_t) config;
 }

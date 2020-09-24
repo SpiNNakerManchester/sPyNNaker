@@ -96,7 +96,7 @@ static void connection_generator_fixed_post_free(void *generator) {
 }
 
 /**
- * \brief Generates a uniformly-distributed random number
+ * \brief Generate a uniformly-distributed random number
  * \param[in,out] obj: the generator containing the RNG
  * \param[in] range: the (_upper, exclusive_) limit of the range of random
  *      numbers that may be generated. Should be in range 0..65536
@@ -228,7 +228,7 @@ static uint32_t connection_generator_fixed_post_generate(
 
     // Double-check for debug purposes
 #if 0
-    for (unsigned int i = 0; i < count_indices; i++) {
+    for (uint32_t i = 0; i < count_indices; i++) {
     	log_info("Check: indices[%u] is %u", i, indices[i]);
     }
     log_info("pre_neuron_index is %u count_indices is %u", pre_neuron_index, count_indices);

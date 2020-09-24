@@ -119,13 +119,13 @@ void matrix_generator_free(matrix_generator_t generator) {
  * \brief Generate a row of a synaptic matrix
  * \param[in] generator: The matrix generator
  * \param[out] synaptic_matrix: The address of the synaptic matrix to write to
- * \param[out] delayed_synaptic_matrix: The address of the synaptic matrix to
- *                                      write delayed connections to
+ * \param[out] delayed_synaptic_matrix:
+ *      The address of the synaptic matrix to write delayed connections to
  * \param[in] n_pre_neurons: The number of pre neurons to generate for
  * \param[in] pre_neuron_index: The index of the first pre neuron
  * \param[in] max_row_n_words: The maximum number of words in a normal row
- * \param[in] max_delayed_row_n_words: The maximum number of words in a
- *                                     delayed row
+ * \param[in] max_delayed_row_n_words:
+ *      The maximum number of words in a delayed row
  * \param[in] n_synapse_type_bits: The number of bits used for the synapse type
  * \param[in] n_synapse_index_bits: The number of bits used for the neuron id
  * \param[in] synapse_type: The synapse type of each connection
@@ -154,7 +154,7 @@ static void matrix_generator_write_row(
 
 // ---------------------------------------------------------------------
 
-//! \brief Rescales a delay to account for timesteps and type-converts it
+//! \brief Rescale a delay to account for timesteps and type-convert it
 //! \param[in] delay: the delay to rescale
 //! \param[in] timestep_per_delay: The timestep unit
 //! \return the rescaled delay
@@ -170,8 +170,8 @@ static inline uint16_t rescale_delay(accum delay, accum timestep_per_delay) {
     return delay_int;
 }
 
-//! \brief Rescales a weight to account for weight granularity and
-//!     type-converts it
+//! \brief Rescale a weight to account for weight granularity and
+//!     type-convert it
 //! \param[in] weight: the weight to rescale
 //! \param[in] weight_scale: The weight scaling factor
 //! \return the rescaled weight

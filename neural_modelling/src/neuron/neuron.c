@@ -53,15 +53,15 @@ struct neuron_parameters {
     ((sizeof(struct neuron_parameters) + \
       sizeof(struct tdma_parameters)) / sizeof(uint32_t))
 
-//! \brief does the memory copy for the neuron parameters
+//! \brief Copy the neuron parameters into working memory
 //! \param[in] address: the address where the neuron parameters are stored
 //!     in SDRAM
-//! \return bool which is true if the mem copy's worked, false otherwise
+//! \return true if the memory copies worked, false otherwise
 static bool neuron_load_neuron_parameters(address_t address) {
     log_debug("loading parameters");
     // call the neuron implementation functions to do the work
     neuron_impl_load_neuron_parameters(
-        address, START_OF_GLOBAL_PARAMETERS, n_neurons);
+            address, START_OF_GLOBAL_PARAMETERS, n_neurons);
     return true;
 }
 
@@ -145,8 +145,7 @@ void neuron_pause(address_t address) { // EXPORTED
 }
 
 void neuron_do_timestep_update(timer_t time, uint timer_count) { // EXPORTED
-
-    // the phase in this timer tick im in (not tied to neuron index)
+    // The phase in this timer tick I'm in (not tied to neuron index)
     tdma_processing_reset_phase();
 
     // Prepare recording for the next timestep
@@ -154,30 +153,30 @@ void neuron_do_timestep_update(timer_t time, uint timer_count) { // EXPORTED
 
     // update each neuron individually
     for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
-
         // Get external bias from any source of intrinsic plasticity
         input_t external_bias =
                 synapse_dynamics_get_intrinsic_bias(time, neuron_index);
 
         // call the implementation function (boolean for spike)
         bool spike = neuron_impl_do_timestep_update(
-            neuron_index, external_bias);
+                neuron_index, external_bias);
 
         // If the neuron has spiked
-        if (spike) {
-            log_debug("neuron %u spiked at time %u", neuron_index, time);
-
-            // Do any required synapse processing
-            synapse_dynamics_process_post_synaptic_event(time, neuron_index);
-
-            if (use_key) {
-                tdma_processing_send_packet(
-                    (key | neuron_index), 0, NO_PAYLOAD, timer_count);
-            }
-        } else {
+        if (!spike) {
             log_debug("the neuron %d has been determined to not spike",
                       neuron_index);
-         }
+            continue;
+        }
+
+        log_debug("neuron %u spiked at time %u", neuron_index, time);
+
+        // Do any required synapse processing
+        synapse_dynamics_process_post_synaptic_event(time, neuron_index);
+
+        if (use_key) {
+            tdma_processing_send_packet(
+                    (key | neuron_index), 0, NO_PAYLOAD, timer_count);
+        }
     }
 
     log_debug("time left of the timer after tdma is %d", tc[T1_COUNT]);

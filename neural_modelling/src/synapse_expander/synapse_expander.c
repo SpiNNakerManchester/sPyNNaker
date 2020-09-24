@@ -64,17 +64,17 @@ struct expander_config {
 
 /**
  * \brief Generate the synapses for a single connector
- * \param[in,out] in_region: The address to read the parameters from. Should be
- *                           updated to the position just after the parameters
- *                           after calling.
+ * \param[in,out] in_region:
+ *      The address to read the parameters from. Should be updated to the
+ *      position just after the parameters after calling.
  * \param[in] synaptic_matrix_region: The address of the synaptic matrices
- * \param[in] post_slice_start: The start of the slice of the post-population to
- *                              generate for
+ * \param[in] post_slice_start:
+ *      The start of the slice of the post-population to generate for
  * \param[in] post_slice_count: The number of neurons to generate for
  * \param[in] n_synapse_type_bits: The number of bits in the synapse type
  * \param[in] n_synapse_index_bits: The number of bits for the neuron index id
- * \param[in] weight_scales: An array of weight scales, one for each synapse
- *                           type
+ * \param[in] weight_scales:
+ *      An array of weight scales, one for each synapse type
  * \return true on success, false on failure
  */
 static bool read_connection_builder_region(address_t *in_region,
