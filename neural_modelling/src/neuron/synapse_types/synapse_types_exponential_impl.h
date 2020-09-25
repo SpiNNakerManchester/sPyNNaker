@@ -78,14 +78,10 @@ typedef enum input_buffer_regions {
 //! \param[in]  parameter: the pointer to the parameters to use
 //! \return nothing
 static inline void exp_shaping(exp_params_t* exp_params) {
-    // RTN
+    // RD
     // decay value according to decay constant
-//	exp_params->synaptic_input_value =
-//			decay_s1615(exp_params->synaptic_input_value,
-//					exp_params->decay);
-
 	exp_params->synaptic_input_value =
-			MULT_ROUND_STOCHASTIC_ACCUM(exp_params->synaptic_input_value,
+			decay_s1615(exp_params->synaptic_input_value,
 					exp_params->decay);
 }
 

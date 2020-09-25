@@ -54,12 +54,9 @@ static inline void input_type_convert_excitatory_input_to_current(
         input_t* exc_input, input_type_pointer_t input_type,
         state_t membrane_voltage) {
     for (int i=0; i < NUM_EXCITATORY_RECEPTORS; i++) {
-        // accum = accum * (accum - accum)
-//        exc_input[i] = exc_input[i] *
-//                (input_type->V_rev_E - membrane_voltage);
-        // RTN accum
-        exc_input[i] = MULT_ROUND_STOCHASTIC_ACCUM(exc_input[i],
-                (input_type->V_rev_E - membrane_voltage));
+        // RD
+        exc_input[i] = exc_input[i] *
+                (input_type->V_rev_E - membrane_voltage);
     }
 }
 
@@ -67,12 +64,9 @@ static inline void input_type_convert_inhibitory_input_to_current(
         input_t* inh_input, input_type_pointer_t input_type,
         state_t membrane_voltage) {
     for (int i=0; i < NUM_INHIBITORY_RECEPTORS; i++) {
-        // accum = accum * (accum - accum)
-//        inh_input[i] = -inh_input[i] *
-//                (input_type->V_rev_I - membrane_voltage);
-        // RTN accum
-        inh_input[i] = MULT_ROUND_STOCHASTIC_ACCUM(-inh_input[i],
-                (input_type->V_rev_I - membrane_voltage));
+        // RD
+        inh_input[i] = -inh_input[i] *
+                (input_type->V_rev_I - membrane_voltage);
     }
 }
 
