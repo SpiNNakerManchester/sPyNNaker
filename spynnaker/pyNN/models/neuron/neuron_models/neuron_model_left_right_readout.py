@@ -80,7 +80,8 @@ class NeuronModelLeftRightReadout(AbstractNeuronModel):
         "_cross_entropy",
         "_poisson_key",
         "_poisson_pop_size",
-        "_n_keys_in_target"
+        "_n_keys_in_target",
+        "_number_of_cues"
         ]
 
     def __init__(
@@ -88,7 +89,7 @@ class NeuronModelLeftRightReadout(AbstractNeuronModel):
             # mean_isi_ticks, time_to_spike_ticks,
             # rate_update_threshold,
             # prob_command,
-            rate_on, rate_off, poisson_pop_size, l, w_fb, eta, window_size):
+            rate_on, rate_off, poisson_pop_size, l, w_fb, eta, window_size, number_of_cues):
 
         global_data_types = [
                     DataType.UINT32,  # MARS KISS seed
@@ -106,6 +107,7 @@ class NeuronModelLeftRightReadout(AbstractNeuronModel):
                     DataType.UINT32,   # poisson key
                     DataType.UINT32,   # poisson pop size
                     DataType.S1615,    # eta
+                    DataType.UINT32,   # number of cues
                     ]
         data_types = [
             DataType.S1615,  # v
@@ -167,6 +169,7 @@ class NeuronModelLeftRightReadout(AbstractNeuronModel):
         self._w_fb = w_fb
         self._eta = eta
         self._window_size = window_size
+        self._number_of_cues = number_of_cues
 
         self._n_keys_in_target = poisson_pop_size * 4
 
@@ -307,7 +310,8 @@ class NeuronModelLeftRightReadout(AbstractNeuronModel):
                 self._cross_entropy,
                 self._poisson_key,
                 self._poisson_pop_size,
-                self._eta
+                self._eta,
+                self._number_of_cues
                 ]
         
         return vals

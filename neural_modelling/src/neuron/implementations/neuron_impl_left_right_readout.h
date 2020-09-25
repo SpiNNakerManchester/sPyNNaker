@@ -73,7 +73,6 @@ typedef enum
 current_state_t current_state = 0;
 uint32_t current_time = 0;
 uint32_t cue_number = 0;
-uint32_t total_cues = 1;
 uint32_t current_cue_direction = 2; // 0 = left, 1 = right
 uint32_t accumulative_direction = 0; // if > total_cues / 2 = right
 uint32_t wait_between_cues = 50; // ms
@@ -397,7 +396,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
                         j < current_cue_direction*global_parameters->p_pop_size + global_parameters->p_pop_size; j++){
                     spin1_send_mc_packet(global_parameters->p_key | j, bitsk(payload), WITH_PAYLOAD);
                 }
-                if (cue_number >= total_cues){
+                if (cue_number >= global_parameters->number_of_cues){
                     current_state = (current_state + 1) % 3;
                 }
             }
@@ -406,7 +405,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     else if (current_state == STATE_WAITING){
 //        io_printf(IO_BUF, "time entering wait %u\n", time);
         // waiting for prompt, all things ok
-        if (cue_number >= total_cues){
+        if (cue_number >= global_parameters->number_of_cues){
             current_time = time;
             cue_number = 0;
         }
@@ -465,7 +464,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
             }
 //            io_printf(IO_BUF, "soft0 %k - soft1 %k - v0 %k - v1 %k\n", softmax_0, softmax_1, global_parameters->readout_V_0, global_parameters->readout_V_1);
             // What to do if log(0)?
-            if (accumulative_direction > total_cues >> 1){
+            if (accumulative_direction > global_parameters->number_of_cues >> 1){
                 global_parameters->cross_entropy = -logk(softmax_1);
                 learning_signal = softmax_0;
                 is_it_right = 1;

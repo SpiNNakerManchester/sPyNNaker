@@ -92,6 +92,7 @@ typedef struct global_neuron_params_t {
 	uint32_t p_key;
 	uint32_t p_pop_size;
 	REAL eta;
+	uint32_t number_of_cues;
 } global_neuron_params_t;
 
 #endif // _NEURON_MODEL_LIF_CURR_POISSON_READOUT_IMPL_H_
