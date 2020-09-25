@@ -51,6 +51,8 @@ class SynapticMatrixApp(object):
         "__weight_scales",
         "__m_edges",
         "__use_app_keys",
+        "__n_rows",
+        "__n_delay_rows",
         "__matrix_size",
         "__delay_matrix_size",
         "__n_subatoms",
@@ -114,13 +116,14 @@ class SynapticMatrixApp(object):
         self.__m_edges = None
         self.__use_app_keys = None
 
+        self.__n_rows = self.__app_edge.pre_vertex.n_atoms
+        self.__n_delay_rows = (
+            self.__app_edge.pre_vertex.n_atoms *
+            self.__app_edge.n_delay_stages)
         self.__matrix_size = (
-            self.__app_edge.pre_vertex.n_atoms *
-            self.__max_row_info.undelayed_max_bytes)
+            self.__n_rows * self.__max_row_info.undelayed_max_bytes)
         self.__delay_matrix_size = (
-            self.__app_edge.pre_vertex.n_atoms *
-            self.__app_edge.n_delay_stages *
-            self.__max_row_info.delayed_max_bytes)
+            self.__n_delay_rows * self.__max_row_info.delayed_max_bytes)
         vertex = self.__app_edge.pre_vertex
         self.__n_subatoms = int(min(
             vertex.get_max_atoms_per_core(), vertex.n_atoms))
@@ -340,7 +343,8 @@ class SynapticMatrixApp(object):
         self.__index = self.__poptable.add_application_entry(
             block_addr,  self.__max_row_info.undelayed_max_words,
             self.__app_key_info.key_and_mask, self.__app_key_info.core_mask,
-            self.__app_key_info.core_shift, self.__app_key_info.n_neurons)
+            self.__app_key_info.core_shift, self.__app_key_info.n_neurons,
+            self.__n_rows)
         self.__syn_mat_offset = block_addr
 
         # Write all the row data for each machine vertex one after the other.
@@ -383,7 +387,7 @@ class SynapticMatrixApp(object):
             self.__delay_app_key_info.key_and_mask,
             self.__delay_app_key_info.core_mask,
             self.__delay_app_key_info.core_shift,
-            self.__delay_app_key_info.n_neurons)
+            self.__delay_app_key_info.n_neurons, self.__n_delay_rows)
         self.__delay_syn_mat_offset = block_addr
 
         # Write all the row data for each machine vertex one after the other.
@@ -488,7 +492,8 @@ class SynapticMatrixApp(object):
         self.__index = self.__poptable.add_application_entry(
             block_addr, self.__max_row_info.undelayed_max_words,
             self.__app_key_info.key_and_mask, self.__app_key_info.core_mask,
-            self.__app_key_info.core_shift, self.__app_key_info.n_neurons)
+            self.__app_key_info.core_shift, self.__app_key_info.n_neurons,
+            self.__n_rows)
         self.__syn_mat_offset = block_addr
         block_addr = self.__next_addr(block_addr, self.__matrix_size)
         return block_addr, self.__syn_mat_offset, block_addr
@@ -512,7 +517,7 @@ class SynapticMatrixApp(object):
             self.__delay_app_key_info.key_and_mask,
             self.__delay_app_key_info.core_mask,
             self.__delay_app_key_info.core_shift,
-            self.__delay_app_key_info.n_neurons)
+            self.__delay_app_key_info.n_neurons, self.__n_delay_rows)
         self.__delay_syn_mat_offset = block_addr
         block_addr = self.__next_addr(block_addr, self.__delay_matrix_size)
         return block_addr, self.__delay_syn_mat_offset, block_addr

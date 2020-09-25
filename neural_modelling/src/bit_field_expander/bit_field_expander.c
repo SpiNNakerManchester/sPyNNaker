@@ -70,9 +70,6 @@ uint32_t row_max_n_words;
 //! The list of key to max atom maps
 key_atom_data_t* keys_to_max_atoms;
 
-//! Tracker for length of the key to max atoms map
-uint32_t n_keys_to_max_atom_map = 0;
-
 //! The number of vertex regions to process
 uint32_t n_vertex_regions = 0;
 
@@ -201,31 +198,6 @@ static void print_key_to_max_atom_map(void) {
 }
 #endif
 
-//! \brief Deduce the number of neurons from the key.
-//! \param[in] key: the key to convert to n_neurons
-//! \return the number of neurons from the key map based off this key
-static uint32_t n_neurons_from_key(uint32_t key) {
-    int key_index = 0;
-    log_debug("n pairs is %d", keys_to_max_atoms->n_pairs);
-    while (key_index < keys_to_max_atoms->n_pairs) {
-        key_atom_pair_t entry = keys_to_max_atoms->pairs[key_index];
-        if (entry.key == key) {
-            return entry.n_atoms;
-        }
-        key_index++;
-    }
-
-    log_error("did not find the key %x in the map. WTF!", key);
-    log_error("n pairs is %d", keys_to_max_atoms->n_pairs);
-    for (int pair_id = 0; pair_id < keys_to_max_atoms->n_pairs; pair_id++) {
-        key_atom_pair_t entry = keys_to_max_atoms->pairs[key_index];
-        log_error("key at index %d is %x and equal = %d",
-                pair_id, entry.key, entry.key == key);
-    }
-    rt_error(RTE_SWERR);
-    return NULL;
-}
-
 //! \brief Create a fake bitfield where every bit is set to 1.
 //! \return whether the creation of the fake bitfield was successful.
 static bool create_fake_bit_field(void) {
@@ -350,7 +322,7 @@ static bool do_sdram_read_and_test(
 }
 
 //! Sort the bitfield filters to remove redundancy.
-static void sort_by_redunancy(void) {
+static void sort_by_redundancy(void) {
     // Semantic sugar to keep the code a little shorter
     filter_info_t *filters = bit_field_base_address->filters;
 
@@ -398,35 +370,33 @@ static void sort_by_redunancy(void) {
     }
 }
 
-//! \brief Create the bitfield for this master pop table and synaptic matrix.
+//! \brief Create the bitfields for this master pop table and synaptic matrix.
 //! \return Whether it was successful at generating the bitfield
-bool generate_bit_field(void) {
+bool generate_bit_fields(void) {
     // write how many entries (thus bitfields) are to be generated into sdram
     log_debug("update by pop length");
-    bit_field_base_address->n_filters = population_table_length();
+    bit_field_base_address->n_filters = keys_to_max_atoms->n_pairs;
 
     // location where to dump the bitfields into (right after the filter structs
     address_t bit_field_words_location = (address_t)
-            &bit_field_base_address->filters[population_table_length()];
+            &bit_field_base_address->filters[keys_to_max_atoms->n_pairs];
     log_info("words location is %x", bit_field_words_location);
     int position = 0;
 
      // iterate through the master pop entries
     log_debug("starting master pop entry bit field generation");
-    for (uint32_t master_pop_entry=0;
-            master_pop_entry < population_table_length();
-            master_pop_entry++) {
+    for (uint32_t entry=0; entry < keys_to_max_atoms->n_pairs; entry++) {
 
         // determine keys masks and n_neurons
-        spike_t key = population_table_get_spike_for_index(master_pop_entry);
-        uint32_t mask = population_table_get_mask_for_entry(master_pop_entry);
-        uint32_t n_neurons = n_neurons_from_key(key);
+        key_atom_pair_t *pair = &keys_to_max_atoms->pairs[entry];
+        uint32_t key = pair->key;
+        uint32_t n_neurons = pair->n_atoms;
 
         // generate the bitfield for this master pop entry
         uint32_t n_words = get_bit_field_size(n_neurons);
 
-        log_debug("pop entry %d, key = %d, mask = %0x, n_neurons = %d",
-                master_pop_entry, (uint32_t) key, mask, n_neurons);
+        log_debug("pop entry %d, key = %d, n_neurons = %d",
+                entry, key, n_neurons);
         bit_field_t bit_field = bit_field_alloc(n_neurons);
         if (bit_field == NULL) {
             log_error("could not allocate dtcm for bit field");
@@ -503,17 +473,17 @@ bool generate_bit_field(void) {
         }
 
         log_debug("writing bitfield to sdram for core use");
-        bit_field_base_address->filters[master_pop_entry].key = key;
-        log_debug("putting master pop key %d in entry %d", key, master_pop_entry);
-        bit_field_base_address->filters[master_pop_entry].n_atoms = n_neurons;
-        log_debug("putting n_atom %d in entry %d", n_neurons, master_pop_entry);
+        bit_field_base_address->filters[entry].key = key;
+        log_debug("putting master pop key %d in entry %d", key, entry);
+        bit_field_base_address->filters[entry].n_atoms = n_neurons;
+        log_debug("putting n_atom %d in entry %d", n_neurons, entry);
         // write bitfield to sdram.
         log_debug("writing to address %0x, %d words to write",
                 &bit_field_words_location[position], n_words);
         spin1_memcpy(&bit_field_words_location[position], bit_field,
                 n_words * BYTE_TO_WORD_CONVERSION);
         // update pointer to correct place
-        bit_field_base_address->filters[master_pop_entry].data =
+        bit_field_base_address->filters[entry].data =
                 (bit_field_t) &bit_field_words_location[position];
 
         // update tracker
@@ -523,7 +493,7 @@ bool generate_bit_field(void) {
         log_debug("freeing the bitfield dtcm");
         sark_free(bit_field);
     }
-    sort_by_redunancy();
+    sort_by_redundancy();
     return true;
 }
 
@@ -544,13 +514,13 @@ void c_main(void) {
     }
 
     if (can_run) {
-        log_info("generating bit field");
-        if (!generate_bit_field()) {
-            log_error("failed to generate bitfield");
+        log_info("generating bit fields");
+        if (!generate_bit_fields()) {
+            log_error("failed to generate bitfields");
             fail_shut_down();
         } else {
             success_shut_down();
-            log_info("successfully processed the bitfield");
+            log_info("successfully processed the bitfields");
         }
     }
 }

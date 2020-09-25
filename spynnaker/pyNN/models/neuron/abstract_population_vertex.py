@@ -39,7 +39,7 @@ from spinn_front_end_common.interface.profiling import profile_utils
 from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, AbstractNeuronRecordable, NeuronRecorder)
-from spynnaker.pyNN.utilities import constants, bit_field_utilities
+from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models import (
     AbstractPopulationInitializable, AbstractAcceptsIncomingSynapses,
     AbstractPopulationSettable, AbstractReadParametersBeforeSet,
@@ -47,7 +47,6 @@ from spynnaker.pyNN.models.abstract_models import (
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.utilities.ranged import (
     SpynnakerRangeDictionary, SpynnakerRangedList)
-from .synapse_dynamics import AbstractSynapseDynamicsStructural
 from .synaptic_manager import SynapticManager
 from .population_machine_vertex import PopulationMachineVertex
 
@@ -290,12 +289,7 @@ class AbstractPopulationVertex(
             self.__synapse_manager.get_sdram_usage_in_bytes(
                 vertex_slice, graph, self) +
             profile_utils.get_profile_region_size(
-                self.__n_profile_samples) +
-            bit_field_utilities.get_estimated_sdram_for_bit_field_region(
-                graph, self) +
-            bit_field_utilities.get_estimated_sdram_for_key_region(
-                graph, self) +
-            bit_field_utilities.exact_sdram_for_bit_field_builder_region())
+                self.__n_profile_samples))
         return sdram_requirement
 
     def _reserve_memory_regions(
@@ -329,13 +323,6 @@ class AbstractPopulationVertex(
         profile_utils.reserve_profile_region(
             spec, POPULATION_BASED_REGIONS.PROFILING.value,
             self.__n_profile_samples)
-
-        # reserve bit field region
-        bit_field_utilities.reserve_bit_field_regions(
-            spec, machine_graph, n_key_map, vertex,
-            POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER.value,
-            POPULATION_BASED_REGIONS.BIT_FIELD_FILTER.value,
-            POPULATION_BASED_REGIONS.BIT_FIELD_KEY_MAP.value)
 
         vertex.reserve_provenance_data_region(spec)
 
@@ -531,20 +518,6 @@ class AbstractPopulationVertex(
         vertex.set_on_chip_generatable_area(
             self.__synapse_manager.host_written_matrix_size(vertex_slice),
             self.__synapse_manager.on_chip_written_matrix_size(vertex_slice))
-
-        # write up the bitfield builder data
-        bit_field_utilities.write_bitfield_init_data(
-            spec, vertex, machine_graph, routing_info,
-            n_key_map, POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER.value,
-            POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
-            POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
-            POPULATION_BASED_REGIONS.DIRECT_MATRIX.value,
-            POPULATION_BASED_REGIONS.BIT_FIELD_FILTER.value,
-            POPULATION_BASED_REGIONS.BIT_FIELD_KEY_MAP.value,
-            POPULATION_BASED_REGIONS.STRUCTURAL_DYNAMICS.value,
-            isinstance(
-                self.__synapse_manager.synapse_dynamics,
-                AbstractSynapseDynamicsStructural))
 
         # End the writing of this specification:
         spec.end_specification()

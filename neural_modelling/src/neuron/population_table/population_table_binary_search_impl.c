@@ -23,16 +23,6 @@
 #include <stdbool.h>
 #include <bit_field.h>
 
-//! bits in a word
-#define BITS_PER_WORD 32
-
-//! \brief The highest bit within the word
-#define TOP_BIT_IN_WORD 31
-
-//! \brief The flag for when a spike isn't in the master pop table (so
-//!     shouldn't happen)
-#define NOT_IN_MASTER_POP_TABLE_FLAG -1
-
 //! \brief The number of bits of address.
 //!        This is a constant as it is used more than once below.
 #define N_ADDRESS_BITS 23
@@ -41,6 +31,14 @@
 //!    The address is in units of four words, so this multiplies by 16 (= up
 //!    shifts by 4)
 #define INDIRECT_ADDRESS_SHIFT 4
+
+//! \brief. An Invalid address and row length.
+//!    Used to keep indices aligned between delayed and undelayed tables
+#define INVALID_ADDRESS ((1 << N_ADDRESS_BITS) - 1)
+
+//! \brief The maximum row length supported in words.
+//!    This excludes the row header words.
+#define MAX_ROW_LENGTH 256
 
 //! \brief An entry in the master population table.
 typedef struct master_population_table_entry {
@@ -82,10 +80,6 @@ typedef union {
     address_and_row_length addr;
     extra_info extra;
 } address_list_entry;
-
-// An Invalid address and row length; used to keep indices aligned between
-// delayed and undelayed tables
-#define INVALID_ADDRESS ((1 << N_ADDRESS_BITS) - 1)
 
 //! The master population table. This is sorted.
 static master_population_table_entry *master_population_table;
@@ -304,7 +298,7 @@ bool population_table_initialise(
     synaptic_rows_base_address = (uint32_t) synapse_rows_address;
     direct_rows_base_address = (uint32_t) direct_rows_address;
 
-    *row_max_n_words = 0xFF + N_SYNAPSE_ROW_HEADER_WORDS;
+    *row_max_n_words = MAX_ROW_LENGTH + N_SYNAPSE_ROW_HEADER_WORDS;
 
     print_master_population_table();
     return true;
