@@ -105,7 +105,7 @@ state_t neuron_model_state_update(
 
 //  This parameter is OK to update, as the actual size of the array is set in the header file, which matches the Python code. This should make it possible to do a pause and resume cycle and have reliable unloading of data.
     uint32_t total_input_synapses_per_neuron = 40; //todo should this be fixed?
-    uint32_t total_recurrent_synapses_per_neuron = 20; //todo should this be fixed?
+    uint32_t total_recurrent_synapses_per_neuron = 100; //todo should this be fixed?
     uint32_t recurrent_offset = 100;
 
 
@@ -177,7 +177,8 @@ state_t neuron_model_state_update(
     else{
         neuron->L = new_learning_signal;
     }
-    neuron->L = learning_signal * neuron->w_fb; // turns of all reg
+//    neuron->L = learning_signal * neuron->w_fb; // turns of all reg
+    neuron->L = new_learning_signal;
 
 //    if (time % 99 == 0){
 //        io_printf(IO_BUF, "during B = %k, b = %k, time = %u\n", neuron->B, neuron->b, time);
