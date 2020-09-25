@@ -121,12 +121,12 @@ Functions</h2></td></tr>
 <tr class="memitem:abe727a061d0165e4205bb2764711e760"><td class="memItemLeft" align="right" valign="top">static uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator_8c.html#abe727a061d0165e4205bb2764711e760">rescale_delay</a> (accum delay, accum timestep_per_delay)</td></tr>
 <tr class="memdesc:abe727a061d0165e4205bb2764711e760"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rescales a delay to account for timesteps and type-converts it.  <a href="matrix__generator_8c.html#abe727a061d0165e4205bb2764711e760">More...</a><br /></td></tr>
 <tr class="separator:abe727a061d0165e4205bb2764711e760"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af997d4cb1d1b45d411e1a0f1506faf60"><td class="memItemLeft" align="right" valign="top">static uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator_8c.html#af997d4cb1d1b45d411e1a0f1506faf60">rescale_weight</a> (accum weight, accum weight_scale)</td></tr>
-<tr class="memdesc:af997d4cb1d1b45d411e1a0f1506faf60"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rescales a weight to account for weight granularity and type-converts it.  <a href="matrix__generator_8c.html#af997d4cb1d1b45d411e1a0f1506faf60">More...</a><br /></td></tr>
-<tr class="separator:af997d4cb1d1b45d411e1a0f1506faf60"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a89c345a0d16ecd5e110347ddf2253d08"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator_8c.html#a89c345a0d16ecd5e110347ddf2253d08">matrix_generator_generate</a> (matrix_generator_t generator, <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> synaptic_matrix, <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> delayed_synaptic_matrix, uint32_t max_row_n_words, uint32_t max_delayed_row_n_words, uint32_t max_row_n_synapses, uint32_t max_delayed_row_n_synapses, uint32_t n_synapse_type_bits, uint32_t n_synapse_index_bits, uint32_t synapse_type, accum *weight_scales, uint32_t post_slice_start, uint32_t post_slice_count, uint32_t pre_slice_start, uint32_t pre_slice_count, connection_generator_t <a class="el" href="connection__generator_8c.html#structconnection__generator">connection_generator</a>, param_generator_t delay_generator, param_generator_t weight_generator, uint32_t max_stage, accum timestep_per_delay)</td></tr>
-<tr class="memdesc:a89c345a0d16ecd5e110347ddf2253d08"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a matrix with a matrix generator.  <a href="matrix__generator_8c.html#a89c345a0d16ecd5e110347ddf2253d08">More...</a><br /></td></tr>
-<tr class="separator:a89c345a0d16ecd5e110347ddf2253d08"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5ee0662d7b826e8ba7abfa68bbe6a327"><td class="memItemLeft" align="right" valign="top">static uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator_8c.html#a5ee0662d7b826e8ba7abfa68bbe6a327">rescale_weight</a> (accum weight, unsigned long accum weight_scale)</td></tr>
+<tr class="memdesc:a5ee0662d7b826e8ba7abfa68bbe6a327"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rescales a weight to account for weight granularity and type-converts it.  <a href="matrix__generator_8c.html#a5ee0662d7b826e8ba7abfa68bbe6a327">More...</a><br /></td></tr>
+<tr class="separator:a5ee0662d7b826e8ba7abfa68bbe6a327"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a03cb6707e51f2de5b204c25d37011062"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator_8c.html#a03cb6707e51f2de5b204c25d37011062">matrix_generator_generate</a> (matrix_generator_t generator, <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> synaptic_matrix, <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> delayed_synaptic_matrix, uint32_t max_row_n_words, uint32_t max_delayed_row_n_words, uint32_t max_row_n_synapses, uint32_t max_delayed_row_n_synapses, uint32_t n_synapse_type_bits, uint32_t n_synapse_index_bits, uint32_t synapse_type, unsigned long accum *weight_scales, uint32_t post_slice_start, uint32_t post_slice_count, uint32_t pre_slice_start, uint32_t pre_slice_count, connection_generator_t <a class="el" href="connection__generator_8c.html#structconnection__generator">connection_generator</a>, param_generator_t delay_generator, param_generator_t weight_generator, uint32_t max_stage, accum timestep_per_delay)</td></tr>
+<tr class="memdesc:a03cb6707e51f2de5b204c25d37011062"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a matrix with a matrix generator.  <a href="matrix__generator_8c.html#a03cb6707e51f2de5b204c25d37011062">More...</a><br /></td></tr>
+<tr class="separator:a03cb6707e51f2de5b204c25d37011062"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
@@ -499,8 +499,8 @@ data</td>
 
 </div>
 </div>
-<a id="af997d4cb1d1b45d411e1a0f1506faf60"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af997d4cb1d1b45d411e1a0f1506faf60">&#9670;&nbsp;</a></span>rescale_weight()</h2>
+<a id="a5ee0662d7b826e8ba7abfa68bbe6a327"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5ee0662d7b826e8ba7abfa68bbe6a327">&#9670;&nbsp;</a></span>rescale_weight()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -517,7 +517,7 @@ data</td>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">accum&#160;</td>
+          <td class="paramtype">unsigned long accum&#160;</td>
           <td class="paramname"><em>weight_scale</em>&#160;</td>
         </tr>
         <tr>
@@ -547,8 +547,8 @@ data</td>
 
 </div>
 </div>
-<a id="a89c345a0d16ecd5e110347ddf2253d08"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a89c345a0d16ecd5e110347ddf2253d08">&#9670;&nbsp;</a></span>matrix_generator_generate()</h2>
+<a id="a03cb6707e51f2de5b204c25d37011062"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a03cb6707e51f2de5b204c25d37011062">&#9670;&nbsp;</a></span>matrix_generator_generate()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -616,7 +616,7 @@ data</td>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">accum *&#160;</td>
+          <td class="paramtype">unsigned long accum *&#160;</td>
           <td class="paramname"><em>weight_scales</em>, </td>
         </tr>
         <tr>
@@ -761,7 +761,7 @@ data</td>
 <div class="ttc" id="amatrix__generator__stdp_8h_html_aa0ccbf6127b7bd9ba00efc3ba17373e9"><div class="ttname"><a href="matrix__generator__stdp_8h.html#aa0ccbf6127b7bd9ba00efc3ba17373e9">matrix_generator_stdp_free</a></div><div class="ttdeci">void matrix_generator_stdp_free(void *generator)</div><div class="ttdoc">How to free any data for the STDP synaptic matrix generator.</div><div class="ttdef"><b>Definition:</b> <a href="matrix__generator__stdp_8h_source.html#l00093">matrix_generator_stdp.h:93</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Sep 24 2020 23:47:58 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Sep 25 2020 15:22:16 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.17
 </small></address>

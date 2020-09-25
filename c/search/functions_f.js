@@ -1,7 +1,7 @@
 var searchData=
 [
   ['rand_5fint_3102',['rand_int',['../sp__structs_8h.html#abfe9bbac4f366e370a68a174d26c0261',1,'sp_structs.h']]],
-  ['read_5fconnection_5fbuilder_5fregion_3103',['read_connection_builder_region',['../synapse__expander_8c.html#a796837af1a5d205aa367196d5a7001bf',1,'synapse_expander.c']]],
+  ['read_5fconnection_5fbuilder_5fregion_3103',['read_connection_builder_region',['../synapse__expander_8c.html#aa6bfc8d65fe33be9e28e4c0f18cd554b',1,'synapse_expander.c']]],
   ['read_5fdelay_5fbuilder_5fregion_3104',['read_delay_builder_region',['../delay__expander_8c.html#ae335350371ddbd7a0c4da33ab032fcd5',1,'delay_expander.c']]],
   ['read_5fglobal_5fparameters_3105',['read_global_parameters',['../spike__source__poisson_8c.html#a571b747b9d964eb5af02496ce866130b',1,'spike_source_poisson.c']]],
   ['read_5fin_5faddresses_3106',['read_in_addresses',['../bit__field__expander_8c.html#a4a87539383a9998fa1063e982f63e0a3',1,'bit_field_expander.c']]],
@@ -12,7 +12,7 @@ var searchData=
   ['recording_5fcomplete_5fcallback_3111',['recording_complete_callback',['../spike__source__poisson_8c.html#aef76853af3707b8ab86a141b0742623f',1,'spike_source_poisson.c']]],
   ['recording_5fdone_5fcallback_3112',['recording_done_callback',['../neuron__recording_8h.html#a4bbf0859d5fe0bbd7d4b3f63c0683608',1,'neuron_recording.h']]],
   ['rescale_5fdelay_3113',['rescale_delay',['../matrix__generator_8c.html#abe727a061d0165e4205bb2764711e760',1,'matrix_generator.c']]],
-  ['rescale_5fweight_3114',['rescale_weight',['../matrix__generator_8c.html#af997d4cb1d1b45d411e1a0f1506faf60',1,'matrix_generator.c']]],
+  ['rescale_5fweight_3114',['rescale_weight',['../matrix__generator_8c.html#a5ee0662d7b826e8ba7abfa68bbe6a327',1,'matrix_generator.c']]],
   ['reset_5frecord_5fcounter_3115',['reset_record_counter',['../neuron__recording_8c.html#a48e4d4f21167fadbe5b44ec1707677fe',1,'neuron_recording.c']]],
   ['reset_5fspikes_3116',['reset_spikes',['../spike__source__poisson_8c.html#a6965b6994e494500e00730df56c449b5',1,'spike_source_poisson.c']]],
   ['resume_5fcallback_3117',['resume_callback',['../c__main_8c.html#a8967e8eb09363007076f840186a20995',1,'resume_callback(void):&#160;c_main.c'],['../spike__source__poisson_8c.html#afb40f588131f69f1d033283921f1a811',1,'resume_callback(void):&#160;spike_source_poisson.c']]],

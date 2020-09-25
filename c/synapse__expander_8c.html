@@ -99,9 +99,9 @@ Data Structures</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a796837af1a5d205aa367196d5a7001bf"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__expander_8c.html#a796837af1a5d205aa367196d5a7001bf">read_connection_builder_region</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *in_region, <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> synaptic_matrix_region, uint32_t post_slice_start, uint32_t post_slice_count, uint32_t n_synapse_type_bits, uint32_t n_synapse_index_bits, accum *weight_scales)</td></tr>
-<tr class="memdesc:a796837af1a5d205aa367196d5a7001bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate the synapses for a single connector.  <a href="synapse__expander_8c.html#a796837af1a5d205aa367196d5a7001bf">More...</a><br /></td></tr>
-<tr class="separator:a796837af1a5d205aa367196d5a7001bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa6bfc8d65fe33be9e28e4c0f18cd554b"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__expander_8c.html#aa6bfc8d65fe33be9e28e4c0f18cd554b">read_connection_builder_region</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *in_region, <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> synaptic_matrix_region, uint32_t post_slice_start, uint32_t post_slice_count, uint32_t n_synapse_type_bits, uint32_t n_synapse_index_bits, unsigned long accum *weight_scales)</td></tr>
+<tr class="memdesc:aa6bfc8d65fe33be9e28e4c0f18cd554b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate the synapses for a single connector.  <a href="synapse__expander_8c.html#aa6bfc8d65fe33be9e28e4c0f18cd554b">More...</a><br /></td></tr>
+<tr class="separator:aa6bfc8d65fe33be9e28e4c0f18cd554b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab2b96fb3f7cddc88c3b12263c25f0fc1"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__expander_8c.html#ab2b96fb3f7cddc88c3b12263c25f0fc1">run_synapse_expander</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> params_address, <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> synaptic_matrix_region)</td></tr>
 <tr class="memdesc:ab2b96fb3f7cddc88c3b12263c25f0fc1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read the data for the expander.  <a href="synapse__expander_8c.html#ab2b96fb3f7cddc88c3b12263c25f0fc1">More...</a><br /></td></tr>
 <tr class="separator:ab2b96fb3f7cddc88c3b12263c25f0fc1"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -282,8 +282,8 @@ n_synapse_index_bits</td>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a796837af1a5d205aa367196d5a7001bf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a796837af1a5d205aa367196d5a7001bf">&#9670;&nbsp;</a></span>read_connection_builder_region()</h2>
+<a id="aa6bfc8d65fe33be9e28e4c0f18cd554b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa6bfc8d65fe33be9e28e4c0f18cd554b">&#9670;&nbsp;</a></span>read_connection_builder_region()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -330,7 +330,7 @@ n_synapse_index_bits</td>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">accum *&#160;</td>
+          <td class="paramtype">unsigned long accum *&#160;</td>
           <td class="paramname"><em>weight_scales</em>&#160;</td>
         </tr>
         <tr>
@@ -416,7 +416,7 @@ n_synapse_index_bits</td>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Sep 24 2020 23:47:59 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Sep 25 2020 15:22:16 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.17
 </small></address>

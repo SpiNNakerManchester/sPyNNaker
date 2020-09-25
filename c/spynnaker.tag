@@ -9236,15 +9236,15 @@
       <type>static uint16_t</type>
       <name>rescale_weight</name>
       <anchorfile>matrix__generator_8c.html</anchorfile>
-      <anchor>af997d4cb1d1b45d411e1a0f1506faf60</anchor>
-      <arglist>(accum weight, accum weight_scale)</arglist>
+      <anchor>a5ee0662d7b826e8ba7abfa68bbe6a327</anchor>
+      <arglist>(accum weight, unsigned long accum weight_scale)</arglist>
     </member>
     <member kind="function">
       <type>bool</type>
       <name>matrix_generator_generate</name>
       <anchorfile>matrix__generator_8c.html</anchorfile>
-      <anchor>a89c345a0d16ecd5e110347ddf2253d08</anchor>
-      <arglist>(matrix_generator_t generator, address_t synaptic_matrix, address_t delayed_synaptic_matrix, uint32_t max_row_n_words, uint32_t max_delayed_row_n_words, uint32_t max_row_n_synapses, uint32_t max_delayed_row_n_synapses, uint32_t n_synapse_type_bits, uint32_t n_synapse_index_bits, uint32_t synapse_type, accum *weight_scales, uint32_t post_slice_start, uint32_t post_slice_count, uint32_t pre_slice_start, uint32_t pre_slice_count, connection_generator_t connection_generator, param_generator_t delay_generator, param_generator_t weight_generator, uint32_t max_stage, accum timestep_per_delay)</arglist>
+      <anchor>a03cb6707e51f2de5b204c25d37011062</anchor>
+      <arglist>(matrix_generator_t generator, address_t synaptic_matrix, address_t delayed_synaptic_matrix, uint32_t max_row_n_words, uint32_t max_delayed_row_n_words, uint32_t max_row_n_synapses, uint32_t max_delayed_row_n_synapses, uint32_t n_synapse_type_bits, uint32_t n_synapse_index_bits, uint32_t synapse_type, unsigned long accum *weight_scales, uint32_t post_slice_start, uint32_t post_slice_count, uint32_t pre_slice_start, uint32_t pre_slice_count, connection_generator_t connection_generator, param_generator_t delay_generator, param_generator_t weight_generator, uint32_t max_stage, accum timestep_per_delay)</arglist>
     </member>
     <member kind="variable" static="yes">
       <type>static const struct matrix_generator_info</type>
@@ -9278,8 +9278,8 @@
       <type>bool</type>
       <name>matrix_generator_generate</name>
       <anchorfile>matrix__generator_8h.html</anchorfile>
-      <anchor>a89c345a0d16ecd5e110347ddf2253d08</anchor>
-      <arglist>(matrix_generator_t generator, address_t synaptic_matrix, address_t delayed_synaptic_matrix, uint32_t max_row_n_words, uint32_t max_delayed_row_n_words, uint32_t max_row_n_synapses, uint32_t max_delayed_row_n_synapses, uint32_t n_synapse_type_bits, uint32_t n_synapse_index_bits, uint32_t synapse_type, accum *weight_scales, uint32_t post_slice_start, uint32_t post_slice_count, uint32_t pre_slice_start, uint32_t pre_slice_count, connection_generator_t connection_generator, param_generator_t delay_generator, param_generator_t weight_generator, uint32_t max_stage, accum timestep_per_delay)</arglist>
+      <anchor>a03cb6707e51f2de5b204c25d37011062</anchor>
+      <arglist>(matrix_generator_t generator, address_t synaptic_matrix, address_t delayed_synaptic_matrix, uint32_t max_row_n_words, uint32_t max_delayed_row_n_words, uint32_t max_row_n_synapses, uint32_t max_delayed_row_n_synapses, uint32_t n_synapse_type_bits, uint32_t n_synapse_index_bits, uint32_t synapse_type, unsigned long accum *weight_scales, uint32_t post_slice_start, uint32_t post_slice_count, uint32_t pre_slice_start, uint32_t pre_slice_count, connection_generator_t connection_generator, param_generator_t delay_generator, param_generator_t weight_generator, uint32_t max_stage, accum timestep_per_delay)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -9891,8 +9891,8 @@
       <type>static bool</type>
       <name>read_connection_builder_region</name>
       <anchorfile>synapse__expander_8c.html</anchorfile>
-      <anchor>a796837af1a5d205aa367196d5a7001bf</anchor>
-      <arglist>(address_t *in_region, address_t synaptic_matrix_region, uint32_t post_slice_start, uint32_t post_slice_count, uint32_t n_synapse_type_bits, uint32_t n_synapse_index_bits, accum *weight_scales)</arglist>
+      <anchor>aa6bfc8d65fe33be9e28e4c0f18cd554b</anchor>
+      <arglist>(address_t *in_region, address_t synaptic_matrix_region, uint32_t post_slice_start, uint32_t post_slice_count, uint32_t n_synapse_type_bits, uint32_t n_synapse_index_bits, unsigned long accum *weight_scales)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static bool</type>
