@@ -301,7 +301,7 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
 
     /* if a fixed number of simulation ticks that were specified at startup
      * then do reporting for finishing */
-    if (infinite_run != TRUE && time >= simulation_ticks) {
+    if (simulation_is_finished()) {
 
         // Enter pause and resume state to avoid another tick
         simulation_handle_pause_resume(resume_callback);
