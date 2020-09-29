@@ -170,6 +170,9 @@ state_t neuron_model_state_update(
 //        new_learning_signal = learning_signal;
 //    }
 //    neuron->L = learning_signal;
+
+    uint32_t test_length = (150*neuron->number_of_cues)+1000+150;
+
     if (time % neuron->window_size > test_length * 2){ //todo make this relative to number of cues
         neuron->L = new_learning_signal + (reg_learning_signal);// * 0.1k);
     }
@@ -178,8 +181,6 @@ state_t neuron_model_state_update(
     }
 //    neuron->L = learning_signal * neuron->w_fb; // turns of all reg
     neuron->L = new_learning_signal;
-
-    uint32_t test_length = (150*neuron->number_of_cues)+1000+150;
 //    if (time % 99 == 0){
 //        io_printf(IO_BUF, "during B = %k, b = %k, time = %u\n", neuron->B, neuron->b, time);
 //    }
