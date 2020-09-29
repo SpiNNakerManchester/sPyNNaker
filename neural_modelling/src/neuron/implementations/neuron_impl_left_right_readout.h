@@ -524,7 +524,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     if (neuron_index == 2){ //this neuron does nothing
 //        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[90].z_bar;
 //        recorded_variable_values[V_RECORDING_INDEX] = neuron->syn_state[90].z_bar;
-        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[90].delta_w;
+        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[50].delta_w;
 //        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = is_it_right;
     }
     else if (neuron_index == 1){

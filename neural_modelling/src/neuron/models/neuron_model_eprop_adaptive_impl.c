@@ -27,7 +27,6 @@ REAL local_eta;
 extern uint32_t time;
 extern global_neuron_params_pointer_t global_parameters;
 extern uint32_t syn_dynamics_neurons_in_partition;
-//uint32_t window_size = 13000;
 
 // simple Leaky I&F ODE
 static inline void lif_neuron_closed_form(
@@ -105,7 +104,7 @@ state_t neuron_model_state_update(
 
 //  This parameter is OK to update, as the actual size of the array is set in the header file, which matches the Python code. This should make it possible to do a pause and resume cycle and have reliable unloading of data.
     uint32_t total_input_synapses_per_neuron = 40; //todo should this be fixed?
-    uint32_t total_recurrent_synapses_per_neuron = 20; //todo should this be fixed?
+    uint32_t total_recurrent_synapses_per_neuron = 0; //todo should this be fixed?
     uint32_t recurrent_offset = 100;
 
 
@@ -171,7 +170,7 @@ state_t neuron_model_state_update(
 //        new_learning_signal = learning_signal;
 //    }
 //    neuron->L = learning_signal;
-    if (time % neuron->window_size > 1300 * 2){
+    if (time % neuron->window_size > test_length * 2){ //todo make this relative to number of cues
         neuron->L = new_learning_signal + (reg_learning_signal);// * 0.1k);
     }
     else{
@@ -180,10 +179,11 @@ state_t neuron_model_state_update(
 //    neuron->L = learning_signal * neuron->w_fb; // turns of all reg
     neuron->L = new_learning_signal;
 
+    uint32_t test_length = (150*neuron->number_of_cues)+1000+150;
 //    if (time % 99 == 0){
 //        io_printf(IO_BUF, "during B = %k, b = %k, time = %u\n", neuron->B, neuron->b, time);
 //    }
-    if (time % 1300 == 0 || time % 1300 == 1){
+    if (time % test_length == 0 || time % test_length == 1){
 //        io_printf(IO_BUF, "before B = %k, b = %k\n", neuron->B, neuron->b);
         neuron->B = neuron->b_0;
         neuron->b = 0.k;
@@ -195,7 +195,7 @@ state_t neuron_model_state_update(
 //    io_printf(IO_BUF, "check B = %k, b = %k, time = %u\n", neuron->B, neuron->b, time);
     // All operations now need doing once per eprop synapse
     for (uint32_t syn_ind=0; syn_ind < total_input_synapses_per_neuron; syn_ind++){
-        if (time % 1300 == 0, time % 1300 == 1){
+        if (time % test_length == 0 || time % test_length == 1){
             neuron->syn_state[syn_ind].z_bar_inp = 0.k;
             neuron->syn_state[syn_ind].z_bar = 0.k;
             neuron->syn_state[syn_ind].el_a = 0.k;
@@ -274,7 +274,7 @@ state_t neuron_model_state_update(
 
     // All operations now need doing once per recurrent eprop synapse
     for (uint32_t syn_ind=recurrent_offset; syn_ind < total_recurrent_synapses_per_neuron+recurrent_offset; syn_ind++){
-        if (time % 1300 == 0){
+        if (time % test_length == 0 || time % test_length == 1){
             neuron->syn_state[syn_ind].z_bar_inp = 0.k;
             neuron->syn_state[syn_ind].z_bar = 0.k;
             neuron->syn_state[syn_ind].el_a = 0.k;
