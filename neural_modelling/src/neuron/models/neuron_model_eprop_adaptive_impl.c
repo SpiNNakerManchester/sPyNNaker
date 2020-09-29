@@ -177,7 +177,8 @@ state_t neuron_model_state_update(
     else{
         neuron->L = new_learning_signal;
     }
-    neuron->L = learning_signal * neuron->w_fb; // turns of all reg
+//    neuron->L = learning_signal * neuron->w_fb; // turns of all reg
+    neuron->L = new_learning_signal;
 
 //    if (time % 99 == 0){
 //        io_printf(IO_BUF, "during B = %k, b = %k, time = %u\n", neuron->B, neuron->b, time);
