@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import collections
-import math
 import numpy
 from six import add_metaclass
 from spinn_utilities.abstract_base import (
@@ -346,11 +345,9 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         param_sizes = (
             self.partner_selection.get_parameters_sdram_usage_in_bytes())
         for (in_edge, synapse_info) in structural_edges:
-            max_atoms = in_edge.pre_vertex.get_max_atoms_per_core()
-            if in_edge.pre_vertex.n_atoms < max_atoms:
-                max_atoms = in_edge.pre_vertex.n_atoms
-            n_sub_edges += int(math.ceil(
-                float(in_edge.pre_vertex.n_atoms) / float(max_atoms)))
+            slices, _ = (
+                in_edge.pre_vertex.splitter_object.get_out_going_slices())
+            n_sub_edges = len(slices)
             dynamics = synapse_info.synapse_dynamics
             param_sizes += dynamics.formation\
                 .get_parameters_sdram_usage_in_bytes()

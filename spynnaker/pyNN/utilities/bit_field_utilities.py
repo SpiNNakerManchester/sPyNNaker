@@ -52,21 +52,20 @@ def get_estimated_sdram_for_bit_field_region(app_graph, vertex):
     sdram = 0
     for incoming_edge in app_graph.get_edges_ending_at_vertex(vertex):
         if isinstance(incoming_edge, ProjectionApplicationEdge):
-            edge_pre_vertex = incoming_edge.pre_vertex
-            max_atoms = determine_max_atoms_for_vertex(edge_pre_vertex)
-            if incoming_edge.pre_vertex.n_atoms < max_atoms:
-                max_atoms = incoming_edge.pre_vertex.n_atoms
+            slices, _ = (
+                incoming_edge.pre_vertex.splitter_object.
+                get_out_going_slices())
+            n_machine_vertices = len(slices)
 
-            # Get the number of likely vertices
-            n_machine_vertices = int(math.ceil(
-                float(incoming_edge.pre_vertex.n_atoms) /
-                float(max_atoms)))
-            n_atoms_per_machine_vertex = int(math.ceil(
-                float(incoming_edge.pre_vertex.n_atoms) /
-                n_machine_vertices))
-            if isinstance(edge_pre_vertex, DelayExtensionVertex):
+            # TODO im sure this can be merged into the max function. but meh
+            slice_atoms = list()
+            for vertex_slice in slices:
+                slice_atoms.append(vertex_slice.n_atoms)
+            n_atoms_per_machine_vertex = max(slice_atoms)
+
+            if isinstance(incoming_edge.pre_vertex, DelayExtensionVertex):
                 n_atoms_per_machine_vertex *= \
-                    edge_pre_vertex.n_delay_stages
+                    incoming_edge.pre_vertex.n_delay_stages
             n_words_for_atoms = int(math.ceil(
                 n_atoms_per_machine_vertex / BIT_IN_A_WORD))
             sdram += (
@@ -89,14 +88,9 @@ def get_estimated_sdram_for_key_region(app_graph, vertex):
     for in_edge in app_graph.get_edges_ending_at_vertex(vertex):
 
         # Get the number of likely vertices
-        edge_pre_vertex = in_edge.pre_vertex
-        max_atoms = determine_max_atoms_for_vertex(edge_pre_vertex)
-        if in_edge.pre_vertex.n_atoms < max_atoms:
-            max_atoms = in_edge.pre_vertex.n_atoms
-        n_edge_vertices = int(math.ceil(
-            float(in_edge.pre_vertex.n_atoms) / float(max_atoms)))
-        sdram += (n_edge_vertices * N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP *
-                  BYTES_PER_WORD)
+        slices, _ = in_edge.pre_vertex.splitter_object.get_out_going_slices()
+        sdram += (
+            len(slices) * N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP * BYTES_PER_WORD)
     return sdram
 
 
