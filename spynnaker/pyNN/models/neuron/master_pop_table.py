@@ -111,7 +111,7 @@ class MasterPopTableAsBinarySearch(object):
     TOP_MEMORY_POINT = 0x7FFFFF
 
     MAX_ROW_LENGTH_ERROR_MSG = (
-        "Only rows of up to {}} entries are allowed".format(MAX_ROW_LENGTH))
+        "Only rows of up to {} entries are allowed".format(MAX_ROW_LENGTH))
 
     OUT_OF_RANGE_ERROR_MESSAGE = (
         "Address {} is out of range for this population table!")
