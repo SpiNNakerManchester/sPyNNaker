@@ -14,10 +14,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from pacman.model.graphs.application import (
     ApplicationSpiNNakerLinkVertex, ApplicationFPGAVertex)
-from spinn_front_end_common.interface.partitioner_splitters.\
-    splitter_one_to_one_legacy import SplitterOneToOneLegacy
-from spinn_front_end_common.interface.partitioner_splitters.\
-    splitter_slice_legacy import SplitterSliceLegacy
+from pacman.model.partitioner_splitters.splitter_one_to_one_legacy import (
+    SplitterOneToOneLegacy)
+from pacman.model.partitioner_splitters.splitter_slice_legacy import (
+    SplitterSliceLegacy)
 from spinn_front_end_common.interface.splitter_selectors import (
     SplitterSelector)
 from spynnaker.pyNN.extra_algorithms.splitter_components.\

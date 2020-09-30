@@ -17,8 +17,8 @@ from pacman.executor.injection_decorator import inject_items
 from pacman.model.partitioner_interfaces import AbstractSplitterCommon
 from pacman.model.resources import (
     ResourceContainer, ConstantSDRAM, DTCMResource, CPUCyclesPerTickResource)
-from spinn_front_end_common.interface.partitioner_splitters.\
-    abstract_splitters.abstract_splitter_slice import AbstractSplitterSlice
+from pacman.model.partitioner_splitters.abstract_splitters.\
+    abstract_splitter_slice import AbstractSplitterSlice
 from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT, BYTES_PER_WORD)
 from spinn_utilities.overrides import overrides
