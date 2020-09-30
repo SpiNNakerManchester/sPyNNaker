@@ -110,6 +110,12 @@ class MasterPopTableAsBinarySearch(object):
     UPPER_BOUND_FUDGE = 2
     TOP_MEMORY_POINT = 0x7FFFFF
 
+    MAX_ROW_LENGTH_ERROR_MSG = (
+        "Only rows of up to {}} entries are allowed".format(MAX_ROW_LENGTH))
+
+    OUT_OF_RANGE_ERROR_MESSAGE = (
+        "Address {} is out of range for this population table!")
+
     def __init__(self):
         self.__entries = None
         self.__n_addresses = 0
@@ -133,26 +139,22 @@ class MasterPopTableAsBinarySearch(object):
         n_entries = 0
         for in_edge in in_edges:
             if isinstance(in_edge, ProjectionApplicationEdge):
-                # TODO: Fix this to be more accurate!
-                # May require modification to the master population table
-                # Get the number of atoms per core incoming
-                max_atoms = in_edge.pre_vertex.get_max_atoms_per_core()
-                if in_edge.pre_vertex.n_atoms < max_atoms:
-                    max_atoms = in_edge.pre_vertex.n_atoms
+                slices, is_exact = (
+                    in_edge.pre_vertex.splitter_object.get_out_going_slices())
+                if is_exact:
+                    n_vertices += len(slices)
+                    n_entries += len(in_edge.synapse_information)
+                else:
+                    n_vertices += len(slices) * self.UPPER_BOUND_FUDGE
+                    n_entries += (
+                        len(in_edge.synapse_information) *
+                        self.UPPER_BOUND_FUDGE)
 
-                # Get the number of likely vertices
-                n_edge_vertices = int(math.ceil(
-                    float(in_edge.pre_vertex.n_atoms) / float(max_atoms)))
-                n_vertices += n_edge_vertices
-                n_entries += (
-                    n_edge_vertices * len(in_edge.synapse_information))
-
-        # Multiply by 2 to get an upper bound
+        # Multiply by each specific constant
         return (
-            (n_vertices * self.UPPER_BOUND_FUDGE *
-             _MASTER_POP_ENTRY_SIZE_BYTES) +
-            (n_entries * self.UPPER_BOUND_FUDGE *
-             _ADDRESS_LIST_ENTRY_SIZE_BYTES) + SARK_PER_MALLOC_SDRAM_USAGE)
+            (n_vertices * _MASTER_POP_ENTRY_SIZE_BYTES) +
+            (n_entries * _ADDRESS_LIST_ENTRY_SIZE_BYTES) +
+            SARK_PER_MALLOC_SDRAM_USAGE)
 
     def get_exact_master_population_table_size(self, vertex, machine_graph):
         """
@@ -169,12 +171,11 @@ class MasterPopTableAsBinarySearch(object):
             for in_edge in in_edges
             if isinstance(in_edge, ProjectionMachineEdge))
 
-        # Multiply by 2 to get an upper bound
+        # Multiply by each specific constant
         return (
-            (n_vertices * self.UPPER_BOUND_FUDGE *
-             _MASTER_POP_ENTRY_SIZE_BYTES) +
-            (n_entries * self.UPPER_BOUND_FUDGE *
-             _ADDRESS_LIST_ENTRY_SIZE_BYTES) + SARK_PER_MALLOC_SDRAM_USAGE)
+            (n_vertices * _MASTER_POP_ENTRY_SIZE_BYTES) +
+            (n_entries * _ADDRESS_LIST_ENTRY_SIZE_BYTES) +
+            SARK_PER_MALLOC_SDRAM_USAGE)
 
     def get_allowed_row_length(self, row_length):
         """
@@ -185,8 +186,7 @@ class MasterPopTableAsBinarySearch(object):
         """
         if row_length > self.MAX_ROW_LENGTH:
             raise SynapseRowTooBigException(
-                self.MAX_ROW_LENGTH,
-                "Only rows of up to 255 entries are allowed")
+                self.MAX_ROW_LENGTH, self.MAX_ROW_LENGTH_ERROR_MSG)
         return row_length
 
     def get_next_allowed_address(self, next_address):
@@ -202,8 +202,7 @@ class MasterPopTableAsBinarySearch(object):
             next_address += _ADDRESS_SCALE - over
         if next_address // _ADDRESS_SCALE > self.TOP_MEMORY_POINT:
             raise SynapticConfigurationException(
-                "Address {} is out of range for this population table!".format(
-                    hex(next_address)))
+                self.OUT_OF_RANGE_ERROR_MESSAGE.format(hex(next_address)))
         return next_address
 
     def initialise_table(self):
