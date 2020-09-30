@@ -57,7 +57,7 @@ _NEURON_BASE_N_CPU_CYCLES = 10
 class AbstractPopulationVertex(
         TDMAAwareApplicationVertex, AbstractGeneratesDataSpecification,
         AbstractContainsUnits, AbstractSpikeRecordable,
-        AbstractNeuronRecordable,
+        AbstractNeuronRecordable, AbstractAcceptsIncomingSynapses,
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractProvidesIncomingPartitionConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
