@@ -174,8 +174,8 @@ def _to_numpy(array):
     return numpy.ctypeslib.as_array(uint32_array, (n_words,))
 
 
-class MasterPopEntry(object):
-    """ A master population table entry
+class _MasterPopEntry(object):
+    """ Internal class that contains a master population table entry
     """
     __slots__ = [
         "__addresses_and_row_lengths",
@@ -188,12 +188,9 @@ class MasterPopEntry(object):
         # Where in the key that the core id is held
         "__core_shift",
         # The number of neurons on every core except the last
-        "__n_neurons_per_core",
-        # The total number of neurons in the source of the key
-        "__n_keys"]
+        "__n_neurons"]
 
-    def __init__(self, routing_key, mask, core_mask, core_shift,
-                 n_neurons_per_core, n_keys):
+    def __init__(self, routing_key, mask, core_mask, core_shift, n_neurons):
         """
         :param int routing_key: The key to match for this entry
         :param int mask: The mask to match for this entry
@@ -202,15 +199,12 @@ class MasterPopEntry(object):
         :param int core_shift: Where in the routing_key the core_id is held
         :param int n_neurons:
             The number of neurons on each core, except the last
-        :param int n_keys:
-            The number of keys sent by the source for this entry
         """
         self.__routing_key = routing_key
         self.__mask = mask
         self.__core_mask = core_mask
         self.__core_shift = core_shift
-        self.__n_neurons_per_core = n_neurons_per_core
-        self.__n_keys = n_keys
+        self.__n_neurons = n_neurons
         self.__addresses_and_row_lengths = list()
 
     def append(self, address, row_length, is_single):
@@ -259,14 +253,6 @@ class MasterPopEntry(object):
         return self.__mask
 
     @property
-    def n_keys(self):
-        """
-        :return: the number of keys expected by this entry
-        :rtype: int
-        """
-        return self.__n_keys
-
-    @property
     def addresses_and_row_lengths(self):
         """
         :return: the memory address that this master pop entry points at
@@ -301,7 +287,7 @@ class MasterPopEntry(object):
             entry.extra_info_flag = True
             extra_info = address_list[next_addr].extra
             extra_info.core_mask = self.__core_mask
-            extra_info.n_neurons = self.__n_neurons_per_core
+            extra_info.n_neurons = self.__n_neurons
             extra_info.mask_shift = self.__core_shift
             next_addr += 1
             n_entries += 1
@@ -407,15 +393,13 @@ class MasterPopTableAsBinarySearch(object):
         self.__n_addresses = 0
 
     def add_machine_entry(
-            self, block_start_addr, row_length, key_and_mask, n_keys,
-            is_single=False):
+            self, block_start_addr, row_length, key_and_mask, is_single=False):
         """ Add an entry for a machine-edge to the population table
 
         :param int block_start_addr: where the synaptic matrix block starts
         :param int row_length: how long in words each row is
         :param ~pacman.model.routing_info.BaseKeyAndMask key_and_mask:
             the key and mask for this master pop entry
-        :param int n_keys: the number of keys sent by the source core
         :param bool is_single:
             Flag that states if the entry is a direct entry for a single row.
         :return: The index of the entry, to be used to retrieve it
@@ -423,12 +407,11 @@ class MasterPopTableAsBinarySearch(object):
         :raises SynapticConfigurationException: If a bad address is used.
         """
         return self.__update_master_population_table(
-            block_start_addr, row_length, key_and_mask, 0, 0, 0, n_keys,
-            is_single)
+            block_start_addr, row_length, key_and_mask, 0, 0, 0, is_single)
 
     def add_application_entry(
             self, block_start_addr, row_length, key_and_mask, core_mask,
-            core_shift, n_neurons_per_core, n_keys):
+            core_shift, n_neurons):
         """ Add an entry for an application-edge to the population table
 
         :param int block_start_addr: where the synaptic matrix block starts
@@ -438,10 +421,8 @@ class MasterPopTableAsBinarySearch(object):
         :param int core_mask:
             Mask for the part of the key that identifies the core
         :param int core_shift: The shift of the mask to get to the core_mask
-        :param int n_neurons_per_core:
+        :param int n_neurons:
             The number of neurons in each machine vertex (bar the last)
-        :param int n_keys: The number of keys sent by the source
-            application vertex
         :param bool is_single:
             Flag that states if the entry is a direct entry for a single row.
         :return: The index of the entry, to be used to retrieve it
@@ -449,10 +430,10 @@ class MasterPopTableAsBinarySearch(object):
         :raises SynapticConfigurationException: If a bad address is used.
         """
         # If there are too many neurons per core, fail
-        if n_neurons_per_core > _MAX_N_NEURONS:
+        if n_neurons > _MAX_N_NEURONS:
             raise SynapticConfigurationException(
                 "The parameter n_neurons of {} is too big (maximum {})".format(
-                    n_neurons_per_core, _MAX_N_NEURONS))
+                    n_neurons, _MAX_N_NEURONS))
 
         # If the core mask is too big, fail
         if core_mask > _MAX_CORE_MASK:
@@ -462,11 +443,11 @@ class MasterPopTableAsBinarySearch(object):
 
         self.__update_master_population_table(
             block_start_addr, row_length, key_and_mask, core_mask, core_shift,
-            n_neurons_per_core, n_keys, False)
+            n_neurons, False)
 
     def __update_master_population_table(
             self, block_start_addr, row_length, key_and_mask, core_mask,
-            core_shift, n_neurons_per_core, n_keys, is_single):
+            core_shift, n_neurons, is_single):
         """ Add an entry in the binary search to deal with the synaptic matrix
 
         :param int block_start_addr: where the synaptic matrix block starts
@@ -476,10 +457,8 @@ class MasterPopTableAsBinarySearch(object):
         :param int core_mask:
             Mask for the part of the key that identifies the core
         :param int core_shift: The shift of the mask to get to the core_mask
-        :param int n_neurons_per_core:
+        :param int n_neurons:
             The number of neurons in each machine vertex (bar the last)
-        :param int n_keys:
-            The number of keys expected by this entry
         :param bool is_single:
             Flag that states if the entry is a direct entry for a single row.
         :return: The index of the entry, to be used to retrieve it
@@ -493,9 +472,9 @@ class MasterPopTableAsBinarySearch(object):
                 raise SynapticConfigurationException(
                     "The table already contains {} entries;"
                     " adding another is too many".format(self.__n_addresses))
-            self.__entries[key_and_mask.key] = MasterPopEntry(
+            self.__entries[key_and_mask.key] = _MasterPopEntry(
                 key_and_mask.key, key_and_mask.mask, core_mask, core_shift,
-                n_neurons_per_core, n_keys)
+                n_neurons)
             # Need to add an extra "address" for the extra_info if needed
             if core_mask != 0:
                 self.__n_addresses += 1
@@ -519,8 +498,7 @@ class MasterPopTableAsBinarySearch(object):
         return index
 
     def add_invalid_entry(
-            self, key_and_mask, n_keys, core_mask=0, core_shift=0,
-            n_neurons_per_core=0):
+            self, key_and_mask, core_mask=0, core_shift=0, n_neurons=0):
         """ Add an entry to the table that doesn't point to anywhere.  Used
             to keep indices in synchronisation between e.g. normal and delay
             entries and between entries on different cores
@@ -530,20 +508,18 @@ class MasterPopTableAsBinarySearch(object):
             an edge that will require being received to be stored in the
             master pop table; the whole edge will become multiple calls to
             this function
-        :param int n_keys:
-            The number of keys sent by the source vertex
         :param int core_mask:
             Mask for the part of the key that identifies the core
         :param int core_shift: The shift of the mask to get to the core_mask
-        :param int n_neurons_per_core:
+        :param int n_neurons:
             The number of neurons in each machine vertex (bar the last)
         :return: The index of the added entry
         :rtype: int
         """
         if key_and_mask.key not in self.__entries:
-            self.__entries[key_and_mask.key] = MasterPopEntry(
+            self.__entries[key_and_mask.key] = _MasterPopEntry(
                 key_and_mask.key, key_and_mask.mask, core_mask, core_shift,
-                n_neurons_per_core, n_keys)
+                n_neurons)
             # Need to add an extra "address" for the extra_info if needed
             if core_mask != 0:
                 self.__n_addresses += 1
@@ -560,7 +536,9 @@ class MasterPopTableAsBinarySearch(object):
             the region to which the master pop table is being stored
         """
         # sort entries by key
-        entries = self.ordered_entries
+        entries = sorted(
+            self.__entries.values(),
+            key=lambda a_entry: a_entry.routing_key)
         n_entries = len(entries)
 
         # reserve space and switch
@@ -588,19 +566,6 @@ class MasterPopTableAsBinarySearch(object):
         spec.write_array(_to_numpy(pop_table))
         spec.write_array(_to_numpy(address_list))
 
-    @property
-    def ordered_entries(self):
-        """ The entries in the table ordered by routing key
-
-        :rtype: list(_MasterPopEntry)
-        """
-        return sorted(
-            self.__entries.values(),
-            key=lambda a_entry: a_entry.routing_key)
-
-    def clear(self):
-        """ Remove all entries
-        """
         self.__entries.clear()
         del self.__entries
         self.__entries = None

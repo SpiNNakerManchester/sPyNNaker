@@ -100,15 +100,20 @@ def get_estimated_sdram_for_key_region(app_graph, vertex):
     return sdram
 
 
-def _exact_sdram_for_bit_field_region(entries):
-    """ calculates the correct sdram for the bitfield region
+def _exact_sdram_for_bit_field_region(
+        machine_graph, vertex, n_key_map):
+    """ calculates the correct sdram for the bitfield region based off \
+        the machine graph and graph mapper
 
-    :param list(MasterPopEntry): entries
+    :param machine_graph: machine graph
+    :param vertex: the machine vertex
+    :param n_key_map: n keys map
     :return: sdram in bytes
     """
     sdram = ELEMENTS_USED_IN_BIT_FIELD_HEADER * BYTES_PER_WORD
-    for entry in entries:
-        n_keys = entry.n_keys
+    for incoming_edge in machine_graph.get_edges_ending_at_vertex(vertex):
+        n_keys = n_key_map.n_keys_for_partition(
+            machine_graph.get_outgoing_partition_for_edge(incoming_edge))
         n_words_for_atoms = int(math.ceil(n_keys / BIT_IN_A_WORD))
 
         sdram += (
@@ -124,7 +129,7 @@ def exact_sdram_for_bit_field_builder_region():
     return N_REGIONS_ADDRESSES * BYTES_PER_WORD
 
 
-def _exact_sdram_for_bit_field_key_region(n_entries):
+def _exact_sdram_for_bit_field_key_region(machine_graph, vertex):
     """ calcs the exact sdram for the bitfield key region
 
     :param machine_graph: machine graph
@@ -132,17 +137,20 @@ def _exact_sdram_for_bit_field_key_region(n_entries):
     :return: bytes
     """
     return (
-        N_KEYS_DATA_SET_IN_WORDS +
-        n_entries * N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP) * BYTES_PER_WORD
+               N_KEYS_DATA_SET_IN_WORDS +
+               len(machine_graph.get_edges_ending_at_vertex(vertex)) *
+               N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP) * BYTES_PER_WORD
 
 
 def reserve_bit_field_regions(
-        spec, entries, bit_field_builder_region,
+        spec, machine_graph, n_key_map, vertex, bit_field_builder_region,
         bit_filter_region, bit_field_key_region):
     """ reserves the regions for the bitfields
 
     :param spec: dsg file
-    :param entries: The master population table entries
+    :param machine_graph: machine graph
+    :param n_key_map: map between partitions and n keys
+    :param vertex: machine vertex
     :param bit_field_builder_region: region id for the builder region
     :param bit_filter_region: region id for the bitfield region
     :param bit_field_key_region: region id for the key map
@@ -152,7 +160,8 @@ def reserve_bit_field_regions(
     # reserve the final destination for the bitfields
     spec.reserve_memory_region(
         region=bit_filter_region,
-        size=_exact_sdram_for_bit_field_region(entries),
+        size=_exact_sdram_for_bit_field_region(
+            machine_graph, vertex, n_key_map),
         label="bit_field region")
 
     # reserve region for the bitfield builder
@@ -164,12 +173,12 @@ def reserve_bit_field_regions(
     # reserve memory region for the key region
     spec.reserve_memory_region(
         region=bit_field_key_region,
-        size=_exact_sdram_for_bit_field_key_region(len(entries)),
+        size=_exact_sdram_for_bit_field_key_region(machine_graph, vertex),
         label="bit field key data")
 
 
 def write_bitfield_init_data(
-        spec, master_pop_table,
+        spec, machine_vertex, machine_graph, routing_info, n_key_map,
         bit_field_builder_region, master_pop_region_id,
         synaptic_matrix_region_id, direct_matrix_region_id,
         bit_field_region_id, bit_field_key_map_region_id,
@@ -177,7 +186,10 @@ def write_bitfield_init_data(
     """ writes the init data needed for the bitfield generator
 
     :param spec: data spec writer
-    :param master_pop_table: The master population table filled in with data
+    :param machine_vertex: machine vertex
+    :param machine_graph: machine graph
+    :param routing_info: keys
+    :param n_key_map: map for edge to n keys
     :param bit_field_builder_region: the region id for the bitfield builder
     :param master_pop_region_id: the region id for the master pop table
     :param synaptic_matrix_region_id: the region id for the synaptic matrix
@@ -189,10 +201,6 @@ def write_bitfield_init_data(
         bool saying if the core has a has_structural_dynamics_region or not
     :rtype: None
     """
-    entries = master_pop_table.ordered_entries
-    reserve_bit_field_regions(
-        spec, entries, bit_field_builder_region, bit_field_region_id,
-        bit_field_key_map_region_id)
 
     spec.switch_write_focus(bit_field_builder_region)
 
@@ -212,12 +220,18 @@ def write_bitfield_init_data(
     spec.switch_write_focus(bit_field_key_map_region_id)
 
     # write n keys max atom map
-    spec.write_value(len(entries))
+    spec.write_value(
+        len(machine_graph.get_edges_ending_at_vertex(machine_vertex)))
 
     # load in key to max atoms map
-    for entry in entries:
-        spec.write_value(entry.key)
-        spec.write_value(entry.n_keys)
+    for in_coming_edge in machine_graph.get_edges_ending_at_vertex(
+            machine_vertex):
+        out_going_partition = \
+            machine_graph.get_outgoing_partition_for_edge(in_coming_edge)
+        spec.write_value(
+            routing_info.get_first_key_from_partition(out_going_partition))
+        spec.write_value(
+            n_key_map.n_keys_for_partition(out_going_partition))
 
     # ensure if nothing else that n bitfields in bitfield region set to 0
     spec.switch_write_focus(bit_field_region_id)

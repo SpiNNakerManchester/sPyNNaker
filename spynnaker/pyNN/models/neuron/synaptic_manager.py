@@ -39,7 +39,6 @@ from .synapse_dynamics import (
     AbstractSynapseDynamics, AbstractSynapseDynamicsStructural)
 from .synaptic_matrices import SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES
 from .synaptic_matrices import SynapticMatrices
-from spynnaker.pyNN.utilities import bit_field_utilities
 
 TIME_STAMP_BYTES = BYTES_PER_WORD
 
@@ -323,12 +322,7 @@ class SynapticManager(object):
             self._get_synapse_params_size() +
             self._get_synapse_dynamics_parameter_size(
                 post_vertex_slice.n_atoms, application_graph, app_vertex) +
-            matrices.size(in_edges) +
-            bit_field_utilities.get_estimated_sdram_for_bit_field_region(
-                application_graph, self) +
-            bit_field_utilities.get_estimated_sdram_for_key_region(
-                application_graph, self) +
-            bit_field_utilities.exact_sdram_for_bit_field_builder_region())
+            matrices.size(in_edges))
 
     def _reserve_memory_regions(
             self, spec, vertex_slice, all_syn_block_sz, application_graph,
@@ -653,19 +647,6 @@ class SynapticManager(object):
                     matrices)
 
         self._write_on_machine_data_spec(spec, post_vertex_slice, gen_data)
-
-        bit_field_utilities.write_bitfield_init_data(
-            spec, self.__poptable,
-            POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER.value,
-            POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
-            POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
-            POPULATION_BASED_REGIONS.DIRECT_MATRIX.value,
-            POPULATION_BASED_REGIONS.BIT_FIELD_FILTER.value,
-            POPULATION_BASED_REGIONS.BIT_FIELD_KEY_MAP.value,
-            POPULATION_BASED_REGIONS.STRUCTURAL_DYNAMICS.value,
-            isinstance(
-                self.__synapse_manager.synapse_dynamics,
-                AbstractSynapseDynamicsStructural))
 
     def _write_on_machine_data_spec(
             self, spec, post_vertex_slice, generator_data):
