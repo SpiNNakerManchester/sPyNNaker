@@ -665,7 +665,7 @@ class SynapticManager(object):
 
         n_bytes = (
             SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES +
-            (self.__n_synapse_types * BYTES_PER_WORD))
+            (self.__n_synapse_types * 2 * BYTES_PER_WORD))
         for data in generator_data:
             n_bytes += data.size
 
@@ -684,8 +684,9 @@ class SynapticManager(object):
         for w in self.__weight_scales:
             # if the weights are high enough and the population size large
             # enough, then weight_scales < 1 will result in a zero scale
-            # if converted to an int, so this needs to be an S1615
-            dtype = DataType.S1615
+            # if converted to an int, so we use U3232 here instead (as there
+            # can be scales larger than U1616.max in conductance-based models)
+            dtype = DataType.U3232
             spec.write_value(data=min(w, dtype.max), data_type=dtype)
 
         for data in generator_data:

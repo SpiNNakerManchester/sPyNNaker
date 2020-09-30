@@ -16,9 +16,6 @@
 from collections import defaultdict
 import logging
 import math
-
-from spinn_front_end_common.abstract_models.impl.\
-    tdma_aware_application_vertex import TDMAAwareApplicationVertex
 from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.key_allocator_constraints import (
@@ -30,6 +27,8 @@ from pacman.model.resources import (
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification,
     AbstractProvidesOutgoingPartitionConstraints)
+from spinn_front_end_common.abstract_models.impl import (
+    TDMAAwareApplicationVertex)
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES, BITS_PER_WORD,
