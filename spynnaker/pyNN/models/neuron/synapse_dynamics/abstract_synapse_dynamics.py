@@ -137,6 +137,14 @@ class AbstractSynapseDynamics(object):
         """
         return connector.get_delay_maximum(synapse_info)
 
+    def get_delay_minimum(self, connector, synapse_info):
+        """ Get the minimum delay for the synapses
+
+        :param AbstractConnector connector: connector
+        :param ~numpy.ndarray synapse_info: synapse info
+        """
+        return connector.get_delay_minimum(synapse_info)
+
     def get_delay_variance(self, connector, delays):
         """ Get the variance in delay for the synapses
 

@@ -21,7 +21,6 @@ from spinn_front_end_common.utilities.constants import \
     MICRO_TO_MILLISECOND_CONVERSION, BYTES_PER_WORD
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
-from spynnaker.pyNN.utilities.constants import MAX_SUPPORTED_DELAY_TICS
 from spynnaker.pyNN.exceptions import SynapseRowTooBigException
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractStaticSynapseDynamics, AbstractSynapseDynamicsStructural,
@@ -116,15 +115,17 @@ class SynapseIORowBased(object):
     """
     __slots__ = []
 
-    def get_maximum_delay_supported_in_ms(self, machine_time_step):
+    def get_maximum_delay_supported_in_ms(
+            self, machine_time_step, post_vertex_max_delay_ticks):
         """ Get the maximum delay supported by the synapse representation \
             before extensions are required, or None if any delay is supported
 
-        :param int machine_time_step:
+        :param int machine_time_step: machine time step
+        :param int post_vertex_max_delay_ticks: post vertex max delay
         :rtype: int or None
         """
         # There are 16 slots, one per time step
-        return MAX_SUPPORTED_DELAY_TICS * (
+        return post_vertex_max_delay_ticks * (
             machine_time_step / MICRO_TO_MILLISECOND_CONVERSION)
 
     @staticmethod
@@ -179,7 +180,8 @@ class SynapseIORowBased(object):
         :raises SynapseRowTooBigException:
         """
         max_delay_supported = self.get_maximum_delay_supported_in_ms(
-            machine_time_step)
+            machine_time_step,
+            in_edge.post_vertex.splitter_object.max_support_delay())
         max_delay = max_delay_supported * (n_delay_stages + 1)
 
         # delay point where delay extensions start
@@ -330,7 +332,9 @@ class SynapseIORowBased(object):
         # pylint: disable=too-many-arguments, too-many-locals
         # pylint: disable=assignment-from-no-return
         # Get delays in timesteps
-        max_delay = self.get_maximum_delay_supported_in_ms(machine_time_step)
+        max_delay = self.get_maximum_delay_supported_in_ms(
+            machine_time_step,
+            app_edge.post_vertex.splitter_object.max_support_delay())
         if max_delay is not None:
             max_delay *= (MICRO_TO_MILLISECOND_CONVERSION / machine_time_step)
 

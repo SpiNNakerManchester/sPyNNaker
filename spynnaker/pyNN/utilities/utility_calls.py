@@ -217,6 +217,16 @@ def get_probable_maximum_selected(
     return binom.ppf(prob, n_trials, selection_prob)
 
 
+def get_probable_minimum_selected(
+        n_total_trials, n_trials, selection_prob, chance=(1.0 / 100.0)):
+    """ Get the likely minimum number of items that will be selected from a\
+        set of n_trials from a total set of n_total_trials\
+        with a probability of selection of selection_prob
+    """
+    prob = (chance / float(n_total_trials))
+    return binom.ppf(prob, n_trials, selection_prob)
+
+
 def get_probability_within_range(dist, lower, upper):
     """ Get the probability that a value will fall within the given range for\
         a given RandomDistribution

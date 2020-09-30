@@ -284,13 +284,6 @@ class SynapticManager(object):
     def spikes_per_second(self, spikes_per_second):
         self.__spikes_per_second = spikes_per_second
 
-    def get_maximum_delay_supported_in_ms(self, machine_time_step):
-        """
-        :rtype: int or None
-        """
-        return self.__synapse_io.get_maximum_delay_supported_in_ms(
-            machine_time_step)
-
     @property
     def vertex_executable_suffix(self):
         """ The suffix of the executable name due to the type of synapses \
@@ -840,7 +833,8 @@ class SynapticManager(object):
                 pre_vertex_slice = machine_edge.pre_vertex.vertex_slice
 
                 for synapse_info in machine_edge.app_edge.synapse_information:
-                    rinfo = routing_info.get_routing_info_for_edge(machine_edge)
+                    rinfo = routing_info.get_routing_info_for_edge(
+                        machine_edge)
 
                     # If connector is being built on SpiNNaker,
                     # compute matrix sizes only

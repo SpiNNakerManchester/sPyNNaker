@@ -77,13 +77,6 @@ class AbstractSpikeRecordable(object):
         """
 
     @abstractmethod
-    def get_spike_machine_vertices(self):
-        """ get the machine vertices from the app vertex
-
-        :return: iterable of machine vertices
-        """
-
-    @abstractmethod
     def get_spikes_sampling_interval(self):
         """ Return the current sampling interval for spikes
 

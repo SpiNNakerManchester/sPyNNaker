@@ -315,6 +315,18 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         # if not then use the values that came in
         return self._get_delay_maximum(synapse_info.delays, n_conns)
 
+    @overrides(AbstractConnector.get_delay_minimum)
+    def get_delay_minimum(self, synapse_info):
+        # I think this is overestimated, but not by much
+        n_conns = (
+            self._pre_w * self._pre_h * self._kernel_w * self._kernel_h)
+        # Use the kernel delays if user has supplied them
+        if self._krn_delays is not None:
+            return self._get_delay_minimum(self._krn_delays, n_conns)
+
+        # if not then use the values that came in
+        return self._get_delay_minimum(synapse_info.delays, n_conns)
+
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, post_vertex_slice, synapse_info, min_delay=None,

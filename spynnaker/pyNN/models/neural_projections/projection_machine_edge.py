@@ -25,6 +25,7 @@ from spynnaker.pyNN.models.abstract_models import AbstractWeightUpdatable
 class ProjectionMachineEdge(
         MachineEdge, AbstractWeightUpdatable,
         AbstractProvidesLocalProvenanceData):
+
     __slots__ = [
         "__synapse_information"]
 

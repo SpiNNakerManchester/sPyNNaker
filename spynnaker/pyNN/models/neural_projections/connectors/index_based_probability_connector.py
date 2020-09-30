@@ -90,6 +90,15 @@ class IndexBasedProbabilityConnector(AbstractConnector):
             numpy.amax(self.__probs))
         return self._get_delay_maximum(synapse_info.delays, n_connections)
 
+    @overrides(AbstractConnector.get_delay_minimum)
+    def get_delay_minimum(self, synapse_info):
+        self._update_probs_from_index_expression(synapse_info)
+        n_connections = utility_calls.get_probable_minimum_selected(
+            synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
+            synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
+            numpy.amax(self.__probs))
+        return self._get_delay_minimum(synapse_info.delays, n_connections)
+
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, post_vertex_slice, synapse_info, min_delay=None,

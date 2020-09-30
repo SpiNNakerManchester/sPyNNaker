@@ -17,14 +17,12 @@ from pacman.model.graphs.machine import MachineEdge
 
 
 class DelayedMachineEdge(MachineEdge):
-    __slots__ = [
-        "__synapse_information"]
+
+    __slots__ = []
 
     def __init__(
-            self, synapse_information, pre_vertex, post_vertex, app_edge,
-            label=None, weight=1):
+            self, pre_vertex, post_vertex, app_edge, label=None, weight=1):
         """
-        :param list(SynapseInformation) synapse_information:
         :param DelayExtensionMachineVertex pre_vertex:
         :param PopulationMachineVertex post_vertex:
         :param str label:
@@ -34,4 +32,3 @@ class DelayedMachineEdge(MachineEdge):
         super(DelayedMachineEdge, self).__init__(
             pre_vertex, post_vertex, label=label, traffic_weight=weight,
             app_edge=app_edge)
-        self.__synapse_information = synapse_information

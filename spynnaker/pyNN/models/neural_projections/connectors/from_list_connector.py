@@ -87,6 +87,13 @@ class FromListConnector(AbstractConnector):
         else:
             return numpy.max(self.__delays)
 
+    @overrides(AbstractConnector.get_delay_minimum)
+    def get_delay_minimum(self, synapse_info):
+        if self.__delays is None:
+            return numpy.min(synapse_info.delays)
+        else:
+            return numpy.min(self.__delays)
+
     @overrides(AbstractConnector.get_delay_variance)
     def get_delay_variance(self, delays):
         if self.__delays is None:

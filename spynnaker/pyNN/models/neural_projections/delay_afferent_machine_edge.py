@@ -16,7 +16,7 @@
 import logging
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.machine import MachineEdge
-from spynnaker.pyNN.models.abstract_models import (AbstractWeightUpdatable)
+from spynnaker.pyNN.models.abstract_models import AbstractWeightUpdatable
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +24,8 @@ logger = logging.getLogger(__name__)
 class DelayAfferentMachineEdge(MachineEdge, AbstractWeightUpdatable):
     __slots__ = []
 
-    def __init__(self, pre_vertex, post_vertex, label, app_edge, weight=1):
+    def __init__(
+            self, pre_vertex, post_vertex, app_edge, label=None, weight=1):
         """
         :param PopulationMachineVertex pre_vertex:
         :param DelayExtensionMachineVertex post_vertex:

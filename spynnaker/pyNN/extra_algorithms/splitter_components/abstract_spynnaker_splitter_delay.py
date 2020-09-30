@@ -32,10 +32,8 @@ class AbstractSpynnakerSplitterDelay(object):
     def __repr__(self):
         return self.__str__()
 
-    def can_support_delays_up_to(self, max_delay):
+    def max_support_delay(self):
+        """ returns the max amount of delay this post vertex can support.
+        :return: int saying max delay supported in ticks
         """
-
-        :param max_delay:
-        :return: bool
-        """
-        return max_delay <= self.MAX_SUPPORTED_DELAY_TICS
+        return self.MAX_SUPPORTED_DELAY_TICS

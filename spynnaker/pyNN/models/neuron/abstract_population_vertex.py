@@ -14,8 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-import os
-
 from spinn_front_end_common.abstract_models.impl.\
     tdma_aware_application_vertex import TDMAAwareApplicationVertex
 from spinn_utilities.overrides import overrides
@@ -33,8 +31,6 @@ from spinn_front_end_common.utilities import (
     constants as common_constants, helpful_functions, globals_variables)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.interface.simulation import simulation_utilities
-from spynnaker.pyNN.models.abstract_models.\
-    abstract_sends_outgoing_synapses import AbstractSendsOutgoingSynapses
 from spinn_front_end_common.interface.profiling import profile_utils
 from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
 from spynnaker.pyNN.models.common import (
@@ -49,7 +45,6 @@ from spynnaker.pyNN.utilities.ranged import (
     SpynnakerRangeDictionary, SpynnakerRangedList)
 from .synapse_dynamics import AbstractSynapseDynamicsStructural
 from .synaptic_manager import SynapticManager
-from .population_machine_vertex import PopulationMachineVertex
 
 logger = logging.getLogger(__name__)
 
@@ -66,9 +61,8 @@ class AbstractPopulationVertex(
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractProvidesIncomingPartitionConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
-        AbstractChangableAfterRun, AbstractSendsOutgoingSynapses,
-        AbstractRewritesDataSpecification, AbstractReadParametersBeforeSet,
-        AbstractAcceptsIncomingSynapses, ProvidesKeyToAtomMappingImpl,
+        AbstractChangableAfterRun, AbstractRewritesDataSpecification,
+        AbstractReadParametersBeforeSet, ProvidesKeyToAtomMappingImpl,
         AbstractCanReset):
     """ Underlying vertex model for Neural Populations.
         Not actually abstract.
@@ -191,18 +185,6 @@ class AbstractPopulationVertex(
             self, n_machine_time_steps, sampling_rate, vertex, variable):
         return self.__neuron_recorder.expected_rows_for_a_run_time(
             n_machine_time_steps, sampling_rate)
-
-    @overrides(AbstractNeuronRecordable.get_recording_slice)
-    def get_recording_slice(self, vertex):
-        return self.machine_vertices
-
-    @overrides(AbstractSendsOutgoingSynapses.get_out_going_size)
-    def get_out_going_size(self):
-        return self.__n_atoms
-
-    @overrides(AbstractAcceptsIncomingSynapses.get_in_coming_size)
-    def get_in_coming_size(self):
-        return self.__n_atoms
 
     @property
     def n_atoms(self):
@@ -742,10 +724,6 @@ class AbstractPopulationVertex(
     def clear_connection_cache(self):
         self.__synapse_manager.clear_connection_cache()
 
-    def get_maximum_delay_supported_in_ms(self, machine_time_step):
-        return self.__synapse_manager.get_maximum_delay_supported_in_ms(
-            machine_time_step)
-
     @overrides(AbstractProvidesIncomingPartitionConstraints.
                get_incoming_partition_constraints)
     def get_incoming_partition_constraints(self, partition):
@@ -781,10 +759,6 @@ class AbstractPopulationVertex(
         self._clear_recording_region(
             buffer_manager, placements,
             len(self.__neuron_impl.get_recordable_variables()))
-
-    @overrides(AbstractSpikeRecordable.get_spike_machine_vertices)
-    def get_spike_machine_vertices(self):
-        return self.machine_vertices
 
     def _clear_recording_region(
             self, buffer_manager, placements, recording_region_id):

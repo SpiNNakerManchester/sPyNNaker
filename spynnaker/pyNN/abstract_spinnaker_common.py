@@ -48,8 +48,8 @@ class AbstractSpiNNakerCommon(with_metaclass(
         "__edge_count",
         "__id_counter",
         "__live_spike_recorder",
-        "__max_delay",
         "__min_delay",
+        "__max_delay",
         "__neurons_per_core_set",
         "_populations",
         "_projections"]
@@ -123,7 +123,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
 
         # timing parameters
         self.__min_delay = None
-        self.__max_delay = None
+        self.__max_delay = max_delay
 
         self.__neurons_per_core_set = set()
 
@@ -145,6 +145,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
             front_end_versions=versions)
 
         extra_mapping_inputs = dict()
+        extra_mapping_inputs['UserDefinedMaxDelay'] = self.__max_delay
         extra_mapping_inputs['RouterBitfieldCompressionReport'] = \
             self.config.getboolean(
                 "Reports", "generate_router_compression_with_bitfield_report")
@@ -216,7 +217,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
 
         # set up machine targeted data
         self._set_up_timings(
-            timestep, min_delay, max_delay, self.config, time_scale_factor)
+            timestep, min_delay, self.config, time_scale_factor)
         self.set_up_machine_specifics(hostname)
 
         logger.info("Setting time scale factor to {}.",
@@ -226,8 +227,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
         logger.info("Setting machine time step to {} micro-seconds.",
                     self.machine_time_step)
 
-    def _set_up_timings(
-            self, timestep, min_delay, max_delay, config, time_scale_factor):
+    def _set_up_timings(self, timestep, min_delay, config, time_scale_factor):
         # pylint: disable=too-many-arguments
 
         # Get the standard values
@@ -251,30 +251,6 @@ class AbstractSpiNNakerCommon(with_metaclass(
         else:
             self.__min_delay = (
                 self.machine_time_step / MICRO_TO_MILLISECOND_CONVERSION)
-
-        # Sort out the maximum delay
-        natively_supported_delay_for_models = \
-            constants.MAX_SUPPORTED_DELAY_TICS
-        delay_extension_max_supported_delay = (
-            constants.MAX_DELAY_BLOCKS *
-            constants.MAX_TIMER_TICS_SUPPORTED_PER_BLOCK)
-        max_delay_tics_supported = \
-            natively_supported_delay_for_models + \
-            delay_extension_max_supported_delay
-        if (max_delay is not None and
-                max_delay * MICRO_TO_MILLISECOND_CONVERSION >
-                max_delay_tics_supported * self.machine_time_step):
-            raise ConfigurationException(
-                "Pacman does not support max delays above {} ms with the "
-                "current machine time step".format(
-                    0.144 * self.machine_time_step))
-        if max_delay is not None:
-            self.__max_delay = max_delay
-        else:
-            self.__max_delay = (
-                max_delay_tics_supported * (
-                    self.machine_time_step /
-                    MICRO_TO_MILLISECOND_CONVERSION))
 
         # Sort out the time scale factor if not user specified
         # (including config)
@@ -343,12 +319,6 @@ class AbstractSpiNNakerCommon(with_metaclass(
         """ The minimum supported delay, in milliseconds.
         """
         return self.__min_delay
-
-    @property
-    def max_delay(self):
-        """ The maximum supported delay, in milliseconds.
-        """
-        return self.__max_delay
 
     def add_application_vertex(self, vertex):
         if isinstance(vertex, CommandSender):

@@ -15,17 +15,20 @@
 import os
 
 from pacman.executor.injection_decorator import inject_items
-from pacman.model.resources import ResourceContainer, ConstantSDRAM, \
-    DTCMResource, CPUCyclesPerTickResource
+from pacman.model.graphs.machine import MachineEdge
+from pacman.model.resources import (ResourceContainer, ConstantSDRAM,
+    DTCMResource, CPUCyclesPerTickResource)
 from spinn_front_end_common.interface.partitioner_splitters.\
     abstract_splitters.abstract_splitter_slice import AbstractSplitterSlice
 from spinn_front_end_common.interface.profiling import profile_utils
-from spinn_front_end_common.utilities.constants import \
-    SYSTEM_BYTES_REQUIREMENT, BYTES_PER_WORD
+from spinn_front_end_common.utilities.constants import (
+    SYSTEM_BYTES_REQUIREMENT)
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.exceptions import SpynnakerSplitterConfigurationException
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
     AbstractSpynnakerSplitterDelay)
+from spynnaker.pyNN.models.neural_projections import (
+    DelayAfferentMachineEdge, DelayedMachineEdge)
 from spynnaker.pyNN.models.neuron import (
     AbstractPopulationVertex, PopulationMachineVertex)
 from spynnaker.pyNN.utilities import bit_field_utilities
@@ -61,6 +64,15 @@ class SplitterAbstractPopulationVertexSlice(
         if not isinstance(app_vertex, AbstractPopulationVertex):
             raise SpynnakerSplitterConfigurationException(
                 self.INVALID_POP_ERROR_MESSAGE.format(app_vertex))
+
+    @overrides(AbstractSplitterSlice.get_pre_vertices)
+    def get_pre_vertices(self, edge, outgoing_edge_partition):
+        return self._get_map([MachineEdge, DelayAfferentMachineEdge])
+
+    @overrides(AbstractSplitterSlice.get_post_vertices)
+    def get_post_vertices(
+            self, edge, outgoing_edge_partition, src_machine_vertex):
+        return self._get_map([MachineEdge, DelayedMachineEdge])
 
     @overrides(AbstractSplitterSlice.create_machine_vertex)
     def create_machine_vertex(
@@ -103,10 +115,24 @@ class SplitterAbstractPopulationVertexSlice(
         return container
 
     def get_variable_sdram(self, vertex_slice):
+        """ returns the variable sdram from the recorder.
+
+        :param vertex_slice: the atom slice for recording sdram
+        :return: the variable sdram used by the neuron recorder
+        :rtype: VariableSDRAM
+        """
+
         return self._governed_app_vertex.neuron_recorder.\
             get_variable_sdram_usage(vertex_slice)
 
     def constant_sdram(self, vertex_slice,  graph, machine_time_step):
+        """ returns the constant sdram used by the vertex slice.
+
+        :param Slice vertex_slice: the atoms to get constant sdram of
+        :param ApplicationGraph graph: app graph
+        :param int machine_time_step: machine time step of the sim.
+        :rtype: ConstantSDRAM
+        """
         sdram_requirement = (
             SYSTEM_BYTES_REQUIREMENT +
             self._governed_app_vertex.sdram_usage_for_neuron_params(
@@ -128,6 +154,11 @@ class SplitterAbstractPopulationVertexSlice(
         return ConstantSDRAM(sdram_requirement)
 
     def dtcm_cost(self, vertex_slice):
+        """ get the dtcm cost for the slice of atoms
+
+        :param vertex_slice: atom slice for dtcm calc.
+        :rtype: DTCMResource
+        """
         return DTCMResource(
             self._governed_app_vertex.neuron_impl.get_dtcm_usage_in_bytes(
                 vertex_slice.n_atoms) +
@@ -137,6 +168,11 @@ class SplitterAbstractPopulationVertexSlice(
             get_dtcm_usage_in_bytes())
 
     def cpu_cost(self, vertex_slice):
+        """ get cpu cost for a slice of atoms
+
+        :param vertex_slice: slice of atoms
+        :rtype: CPUCyclesPerTickResourcer
+        """
         return CPUCyclesPerTickResource(
             self._NEURON_BASE_N_CPU_CYCLES + self._C_MAIN_BASE_N_CPU_CYCLES +
             (self._NEURON_BASE_N_CPU_CYCLES_PER_NEURON *
@@ -148,6 +184,10 @@ class SplitterAbstractPopulationVertexSlice(
             self._governed_app_vertex.synapse_manager.get_n_cpu_cycles())
 
     def __get_binary_file_name(self):
+        """ returns the binary name for the machine vertices.
+
+        :rtype: str
+        """
 
         # Split binary name into title and extension
         binary_title, binary_extension = os.path.splitext(

@@ -25,25 +25,16 @@ from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
 from pacman.model.constraints.partitioner_constraints import (
     SameAtomsAsVertexConstraint)
-from pacman.model.resources import (
-    ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
-from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification,
     AbstractProvidesOutgoingPartitionConstraints)
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.constants import (
-    SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES, BITS_PER_WORD,
-    BYTES_PER_WORD)
+    SIMULATION_N_BYTES, BITS_PER_WORD, BYTES_PER_WORD)
 from .delay_block import DelayBlock
 from .delay_extension_machine_vertex import DelayExtensionMachineVertex
 from .delay_generator_data import DelayGeneratorData
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
-from spynnaker.pyNN.models.neural_projections import DelayedApplicationEdge
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractGenerateConnectorOnMachine)
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractGenerateOnMachine)
 
 logger = logging.getLogger(__name__)
 
@@ -60,7 +51,7 @@ _MAX_OFFSET_DENOMINATOR = 10
 
 class DelayExtensionVertex(
         TDMAAwareApplicationVertex, AbstractGeneratesDataSpecification,
-        AbstractProvidesOutgoingPartitionConstraints, LegacyPartitionerAPI):
+        AbstractProvidesOutgoingPartitionConstraints):
     """ Provide delays to incoming spikes in multiples of the maximum delays\
         of a neuron (typically 16 or 32)
     """
@@ -73,10 +64,15 @@ class DelayExtensionVertex(
         "__source_vertex",
         "__time_scale_factor",
         "__delay_generator_data",
-        "__n_subvertices",
         "__n_data_specs"]
 
-    ESTIMATED_CPU_CYCLES = 128
+    MAX_DELAY_BLOCKS = 8
+    MAX_TIMER_TICS_SUPPORTED_PER_BLOCK = 16
+
+    MAX_SUPPORTED_DELAY_IN_TICKS = (
+        MAX_DELAY_BLOCKS * MAX_TIMER_TICS_SUPPORTED_PER_BLOCK)
+
+    # The maximum delay supported by the Delay extension, in ticks.
 
     def __init__(self, n_neurons, delay_per_stage, source_vertex,
                  machine_time_step, time_scale_factor, constraints=None,
@@ -103,7 +99,6 @@ class DelayExtensionVertex(
         self.__delay_generator_data = defaultdict(list)
         self.__machine_time_step = machine_time_step
         self.__time_scale_factor = time_scale_factor
-        self.__n_subvertices = 0
         self.__n_data_specs = 0
 
         # atom store
@@ -115,33 +110,7 @@ class DelayExtensionVertex(
         self.add_constraint(
             SameAtomsAsVertexConstraint(source_vertex))
 
-    @overrides(LegacyPartitionerAPI.create_machine_vertex)
-    def create_machine_vertex(
-            self, vertex_slice, resources_required, label=None,
-            constraints=None):
-        self.__n_subvertices += 1
-        return DelayExtensionMachineVertex(
-            resources_required, label, constraints, self, vertex_slice)
-
-    @inject_items({
-        "graph": "MemoryApplicationGraph"})
-    @overrides(LegacyPartitionerAPI.get_resources_used_by_atoms,
-               additional_arguments={"graph"})
-    def get_resources_used_by_atoms(self, vertex_slice, graph):
-        """
-        :param ~pacman.model.graphs.application.ApplicationGraph graph:
-        """
-        # pylint: disable=arguments-differ
-        out_edges = graph.get_edges_starting_at_vertex(self)
-        return ResourceContainer(
-            sdram=ConstantSDRAM(
-                self.get_sdram_usage_for_atoms(out_edges)),
-            dtcm=DTCMResource(self.get_dtcm_usage_for_atoms(vertex_slice)),
-            cpu_cycles=CPUCyclesPerTickResource(
-                self.get_cpu_usage_for_atoms(vertex_slice)))
-
     @property
-    @overrides(LegacyPartitionerAPI.n_atoms)
     def n_atoms(self):
         return self.__n_atoms
 
@@ -351,82 +320,6 @@ class DelayExtensionVertex(
             delay_block = DelayBlock(
                 self.__n_delay_stages, self.__delay_per_stage, vertex_slice)
         spec.write_array(array_values=delay_block.delay_block)
-
-    def get_cpu_usage_for_atoms(self, vertex_slice):
-        """
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-        :rtype: int
-        """
-        return self.ESTIMATED_CPU_CYCLES * vertex_slice.n_atoms
-
-    def get_sdram_usage_for_atoms(self, out_edges):
-        """
-        :param list(.ApplicationEdge) out_edges:
-        :rtype: int
-        """
-        return (
-            SYSTEM_BYTES_REQUIREMENT + self.tdma_sdram_size_in_bytes +
-            DelayExtensionMachineVertex.get_provenance_data_size(
-                DelayExtensionMachineVertex.N_EXTRA_PROVENANCE_DATA_ENTRIES) +
-            self._get_size_of_generator_information(out_edges))
-
-    def _get_edge_generator_size(self, synapse_info):
-        """ Get the size of the generator data for a given synapse info object
-
-        :param SynapseInformation synapse_info:
-        """
-        connector = synapse_info.connector
-        dynamics = synapse_info.synapse_dynamics
-        connector_gen = isinstance(
-            connector, AbstractGenerateConnectorOnMachine) and \
-            connector.generate_on_machine(
-                synapse_info.weights, synapse_info.delays)
-        synapse_gen = isinstance(
-            dynamics, AbstractGenerateOnMachine)
-        if connector_gen and synapse_gen:
-            return sum((
-                DelayGeneratorData.BASE_SIZE,
-                connector.gen_delay_params_size_in_bytes(
-                    synapse_info.delays),
-                connector.gen_connector_params_size_in_bytes,
-            ))
-        return 0
-
-    def _get_size_of_generator_information(self, out_edges):
-        """ Get the size of the generator data for all edges
-
-        :param list(.ApplicationEdge) out_edges:
-        :rtype: int
-        """
-        gen_on_machine = False
-        size = 0
-        for out_edge in out_edges:
-            if isinstance(out_edge, DelayedApplicationEdge):
-                for synapse_info in out_edge.synapse_information:
-
-                    # Get the number of likely vertices
-                    max_atoms = out_edge.post_vertex.get_max_atoms_per_core()
-                    if out_edge.post_vertex.n_atoms < max_atoms:
-                        max_atoms = out_edge.post_vertex.n_atoms
-                    n_edge_vertices = int(math.ceil(float(
-                        out_edge.post_vertex.n_atoms) / float(max_atoms)))
-
-                    # Get the size
-                    gen_size = self._get_edge_generator_size(synapse_info)
-                    if gen_size > 0:
-                        gen_on_machine = True
-                        size += gen_size * n_edge_vertices
-        if gen_on_machine:
-            size += _EXPANDER_BASE_PARAMS_SIZE
-        return size
-
-    def get_dtcm_usage_for_atoms(self, vertex_slice):
-        """
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-        :rtype: int
-        """
-        words_per_atom = 11 + 16
-        return words_per_atom * BYTES_PER_WORD * vertex_slice.n_atoms
 
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
                get_outgoing_partition_constraints)

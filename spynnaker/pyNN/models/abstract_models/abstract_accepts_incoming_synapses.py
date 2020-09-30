@@ -39,14 +39,6 @@ class AbstractAcceptsIncomingSynapses(object):
         """
 
     @abstractmethod
-    def get_maximum_delay_supported_in_ms(self, machine_time_step):
-        """ Get the maximum delay supported by this vertex.
-
-        :param int machine_time_step: microseconds
-        :rtype: int
-        """
-
-    @abstractmethod
     def add_pre_run_connection_holder(
             self, connection_holder, projection_edge, synapse_information):
         """ Add a connection holder to the vertex to be filled in when the\
@@ -87,12 +79,6 @@ class AbstractAcceptsIncomingSynapses(object):
     @abstractmethod
     def clear_connection_cache(self):
         """ Clear the connection data stored in the vertex so far.
-        """
-
-    @abstractmethod
-    def get_in_coming_size(self):
-        """ returns how many atoms are to be considered in incoming projections
-        :return: returns the number of neurons to receive spikes from
         """
 
     @abstractmethod

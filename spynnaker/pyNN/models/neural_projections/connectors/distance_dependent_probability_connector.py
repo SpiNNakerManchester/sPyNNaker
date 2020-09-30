@@ -118,6 +118,15 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
                 synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
                 numpy.amax(self.__probs)))
 
+    @overrides(AbstractConnector.get_delay_minimum)
+    def get_delay_minimum(self, synapse_info):
+        return self._get_delay_minimum(
+            synapse_info.delays,
+            utility_calls.get_probable_minimum_selected(
+                synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
+                synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
+                numpy.amax(self.__probs)))
+
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, post_vertex_slice, synapse_info, min_delay=None,

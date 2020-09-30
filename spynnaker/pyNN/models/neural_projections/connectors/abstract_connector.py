@@ -130,6 +130,31 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         self._check_parameter(weights, "weights", allow_lists)
         self._check_parameter(delays, "delays", allow_lists)
 
+    def _get_delay_minimum(self, delays, n_connections):
+        """ Get the minimum delay given a float, RandomDistribution or list of\
+            delays.
+
+        :param delays:
+        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float
+            or list(int) or list(float)
+        :param int n_connections:
+        """
+        if isinstance(delays, RandomDistribution):
+            low_estimated_delay = utility_calls.get_minimum_probable_value(
+                delays, n_connections)
+            low = utility_calls.low(delays)
+            if low is None:
+                return low_estimated_delay
+
+            # The minimum is the maximum of the possible maximums
+            return max(low_estimated_delay, low, 1)
+        elif numpy.isscalar(delays):
+            return delays
+        elif hasattr(delays, "__getitem__"):
+            return numpy.min(delays)
+        raise Exception("Unrecognised delay format: {:s}".format(
+            type(delays)))
+
     def _get_delay_maximum(self, delays, n_connections):
         """ Get the maximum delay given a float, RandomDistribution or list of\
             delays.
@@ -158,6 +183,15 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
     @abstractmethod
     def get_delay_maximum(self, synapse_info):
         """ Get the maximum delay specified by the user in ms, or None if\
+            unbounded.
+
+        :param SynapseInformation synapse_info:
+        :rtype: int or None
+        """
+
+    @abstractmethod
+    def get_delay_minimum(self, synapse_info):
+        """Get the minimum delay specified by the user in ms, or None if\
             unbounded.
 
         :param SynapseInformation synapse_info:

@@ -105,12 +105,3 @@ class AbstractNeuronRecordable(object):
         :param variable: the variable being recorded
         :return: the number of rows expected.
         """
-
-    @abstractmethod
-    def get_recording_slice(self, vertex):
-        """ returns the slice of vertex for this machine vertex in recording \
-        space.
-
-        :param vertex: the machine vertex
-        :return: the slice of recorded atoms.
-        """

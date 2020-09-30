@@ -29,11 +29,7 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spynnaker.pyNN.models.abstract_models import (
     AbstractReadParametersBeforeSet, AbstractContainsUnits,
-    AbstractPopulationInitializable, AbstractPopulationSettable,
-    AbstractAcceptsIncomingSynapses)
-from spynnaker.pyNN.models.abstract_models.\
-    abstract_sends_outgoing_synapses import \
-    AbstractSendsOutgoingSynapses
+    AbstractPopulationInitializable, AbstractPopulationSettable)
 from .abstract_pynn_model import AbstractPyNNModel
 
 logger = FormatAdapter(logging.getLogger(__file__))
@@ -187,18 +183,6 @@ class PyNNPopulationCommon(object):
         if initial_values is not None:
             for variable, value in iteritems(initial_values):
                 self._initialize(variable, value)
-
-    def outgoing_neurons(self):
-        if isinstance(self.__vertex, AbstractSendsOutgoingSynapses):
-            return self.__vertex.get_out_going_size()
-        else:
-            return self._size
-
-    def incoming_neurons(self):
-        if isinstance(self.__vertex, AbstractAcceptsIncomingSynapses):
-            return self.__vertex.get_in_coming_size()
-        else:
-            return self._size
 
     # TODO DEAD?
     @staticmethod

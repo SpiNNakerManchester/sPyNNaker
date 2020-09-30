@@ -91,6 +91,11 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
         return self._get_delay_maximum(
             synapse_info.delays, self.__num_synapses)
 
+    @overrides(AbstractConnector.get_delay_minimum)
+    def get_delay_minimum(self, synapse_info):
+        return self._get_delay_minimum(
+            synapse_info.delays, self.__num_synapses)
+
     def _update_synapses_per_post_vertex(self, pre_slices, post_slices):
         """
         :param list(~pacman.model.graphs.common.Slice) pre_slices:

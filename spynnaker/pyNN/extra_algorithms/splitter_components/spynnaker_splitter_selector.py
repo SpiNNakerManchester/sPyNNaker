@@ -14,7 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from pacman.model.graphs.application import (
     ApplicationSpiNNakerLinkVertex, ApplicationFPGAVertex)
-from spinn_front_end_common.interface.partitioner_splitters.splitter_one_to_one_legacy import SplitterOneToOneLegacy
+from spinn_front_end_common.interface.partitioner_splitters.\
+    splitter_one_to_one_legacy import SplitterOneToOneLegacy
 from spinn_front_end_common.interface.partitioner_splitters.\
     splitter_slice_legacy import SplitterSliceLegacy
 from spinn_front_end_common.interface.splitter_selectors import (
@@ -65,21 +66,46 @@ class SpynnakerSplitterSelector(SplitterSelector):
 
         @staticmethod
         def abstract_pop_heuristic(app_vertex):
+            """ allows future overrides
+
+            :param ApplicationGraph app_vertex: app vertex
+            :rtype: None
+            """
             app_vertex.splitter_object = (
                 SplitterAbstractPopulationVertexSlice())
 
         @staticmethod
         def external_spinnaker_link_heuristic(app_vertex):
+            """ allows future overrides
+
+            :param ApplicationGraph app_vertex: app vertex
+            :rtype: None
+            """
             app_vertex.splitter_object = SplitterOneToOneLegacy()
 
         @staticmethod
         def external_fpga_link_heuristic(app_vertex):
+            """ allows future overrides
+
+            :param ApplicationGraph app_vertex: app vertex
+            :rtype: None
+            """
             app_vertex.splitter_object = SplitterOneToOneLegacy()
 
         @staticmethod
         def spike_source_array_heuristic(app_vertex):
+            """ allows future overrides
+
+            :param ApplicationGraph app_vertex: app vertex
+            :rtype: None
+            """
             app_vertex.splitter_object = SplitterSliceLegacy()
 
         @staticmethod
         def spike_source_poisson_heuristic(app_vertex):
+            """ allows future overrides
+
+            :param ApplicationGraph app_vertex: app vertex
+            :rtype: None
+            """
             app_vertex.splitter_object = SplitterSliceLegacy()
