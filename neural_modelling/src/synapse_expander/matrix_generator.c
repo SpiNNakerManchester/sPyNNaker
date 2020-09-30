@@ -175,15 +175,15 @@ static inline uint16_t rescale_delay(accum delay, accum timestep_per_delay) {
 //! \param[in] weight: the weight to rescale
 //! \param[in] weight_scale: The weight scaling factor
 //! \return the rescaled weight
-static inline uint16_t rescale_weight(accum weight, accum weight_scale) {
+static inline uint16_t rescale_weight(accum weight, unsigned long accum weight_scale) {
     if (weight < 0) {
         weight = -weight;
     }
-    weight = weight * weight_scale;
-    uint16_t weight_int = (uint16_t) weight;
-    if (weight != weight_int) {
+    accum weight_scaled = weight * weight_scale;
+    uint16_t weight_int = (uint16_t) weight_scaled;
+    if (weight_scaled != weight_int) {
         log_debug("Rounded weight %k to %u (scale is %k)",
-                weight, weight_int, weight_scale);
+                weight_scaled, weight_int, weight_scale);
     }
     return weight_int;
 }
@@ -194,7 +194,7 @@ bool matrix_generator_generate(
         uint32_t max_row_n_words, uint32_t max_delayed_row_n_words,
         uint32_t max_row_n_synapses, uint32_t max_delayed_row_n_synapses,
         uint32_t n_synapse_type_bits, uint32_t n_synapse_index_bits,
-        uint32_t synapse_type, accum *weight_scales,
+        uint32_t synapse_type, unsigned long accum *weight_scales,
         uint32_t post_slice_start, uint32_t post_slice_count,
         uint32_t pre_slice_start, uint32_t pre_slice_count,
         connection_generator_t connection_generator,

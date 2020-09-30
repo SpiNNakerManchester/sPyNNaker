@@ -18,9 +18,6 @@ import math
 import numpy
 import scipy.stats
 import struct
-
-from spinn_front_end_common.abstract_models.impl.\
-    tdma_aware_application_vertex import TDMAAwareApplicationVertex
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
@@ -34,7 +31,7 @@ from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification,
     AbstractRewritesDataSpecification)
 from spinn_front_end_common.abstract_models.impl import (
-    ProvidesKeyToAtomMappingImpl)
+    ProvidesKeyToAtomMappingImpl, TDMAAwareApplicationVertex)
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.interface.buffer_management import (
     recording_utilities)
