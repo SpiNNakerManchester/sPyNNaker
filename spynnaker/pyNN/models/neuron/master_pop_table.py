@@ -172,10 +172,13 @@ class MasterPopTableAsBinarySearch(object):
             if isinstance(in_edge, ProjectionMachineEdge))
 
         # Multiply by each specific constant
+        # TODO removing the fudge factor should be safe. but currently
+        #      causes dse memory leave errors. needs reviewing
         return (
-            (n_vertices * _MASTER_POP_ENTRY_SIZE_BYTES) +
-            (n_entries * _ADDRESS_LIST_ENTRY_SIZE_BYTES) +
-            SARK_PER_MALLOC_SDRAM_USAGE)
+            (n_vertices * self.UPPER_BOUND_FUDGE *
+             _MASTER_POP_ENTRY_SIZE_BYTES) +
+            (n_entries * self.UPPER_BOUND_FUDGE *
+             _ADDRESS_LIST_ENTRY_SIZE_BYTES) + SARK_PER_MALLOC_SDRAM_USAGE)
 
     def get_allowed_row_length(self, row_length):
         """
