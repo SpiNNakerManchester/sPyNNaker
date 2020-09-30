@@ -15,11 +15,15 @@
 import os
 
 from pacman.executor.injection_decorator import inject_items
+from pacman.model.constraints.partitioner_constraints import (
+    MaxVertexAtomsConstraint, FixedVertexAtomsConstraint,
+    SameAtomsAsVertexConstraint, AbstractPartitionerConstraint)
 from pacman.model.graphs.machine import MachineEdge
 from pacman.model.resources import (ResourceContainer, ConstantSDRAM,
     DTCMResource, CPUCyclesPerTickResource)
 from pacman.model.partitioner_splitters.abstract_splitters.\
     abstract_splitter_slice import AbstractSplitterSlice
+from pacman.utilities import utility_calls
 from spinn_front_end_common.interface.profiling import profile_utils
 from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT)
@@ -198,3 +202,12 @@ class SplitterAbstractPopulationVertexSlice(
             binary_title +
             self._governed_app_vertex.synapse_manager.
             vertex_executable_suffix + binary_extension)
+
+    @overrides(AbstractSplitterSlice.check_supported_constraints)
+    def check_supported_constraints(self):
+        utility_calls.check_algorithm_can_support_constraints(
+            constrained_vertices=[self._governed_app_vertex],
+            supported_constraints=[
+                MaxVertexAtomsConstraint, FixedVertexAtomsConstraint,
+                SameAtomsAsVertexConstraint],
+            abstract_constraint_type=AbstractPartitionerConstraint)
