@@ -27,7 +27,6 @@ from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
 from pacman.model.routing_info import (
     RoutingInfo, PartitionRoutingInfo, BaseKeyAndMask)
 from pacman.model.graphs.application import ApplicationVertex
-from spinn_storage_handlers import FileDataWriter, FileDataReader
 from data_specification import (
     DataSpecificationGenerator, DataSpecificationExecutor)
 from spynnaker.pyNN.models.neuron import SynapticManager
@@ -273,8 +272,7 @@ class TestSynapticManager(unittest.TestCase):
                 pre_vertex, partition_name)))
 
         temp_spec = tempfile.mktemp()
-        spec_writer = FileDataWriter(temp_spec)
-        spec = DataSpecificationGenerator(spec_writer, None)
+        spec = DataSpecificationGenerator(open(temp_spec, "wb"), None)
         master_pop_sz = 1000
         all_syn_block_sz = 2000
         master_pop_region = 0
@@ -296,12 +294,11 @@ class TestSynapticManager(unittest.TestCase):
             post_vertex_slice, all_syn_block_sz, weight_scales,
             routing_info, graph, machine_time_step)
         spec.end_specification()
-        spec_writer.close()
 
-        spec_reader = FileDataReader(temp_spec)
-        executor = DataSpecificationExecutor(
-            spec_reader, master_pop_sz + all_syn_block_sz)
-        executor.execute()
+        with open(temp_spec, "rb") as spec_reader:
+            executor = DataSpecificationExecutor(
+                spec_reader, master_pop_sz + all_syn_block_sz)
+            executor.execute()
 
         master_pop_table = executor.get_region(0)
         synaptic_matrix = executor.get_region(1)
