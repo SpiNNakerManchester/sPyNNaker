@@ -21,16 +21,8 @@ class AbstractSpynnakerSplitterDelay(object):
 
     __slots__ = []
 
-    STR_MESSAGE = "AbstractSpynnakerSplitter governing app vertex {}"
-
     # max delays supported by a slice split machine vertex
     MAX_SUPPORTED_DELAY_TICS = 16
-
-    def __str__(self):
-        return self.STR_MESSAGE.format(self._governed_app_vertex)
-
-    def __repr__(self):
-        return self.__str__()
 
     def max_support_delay(self):
         """ returns the max amount of delay this post vertex can support.
