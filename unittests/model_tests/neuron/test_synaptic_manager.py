@@ -53,8 +53,9 @@ from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
     .elimination import RandomByWeightElimination
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from unittests.mocks import MockSimulator, MockPopulation
+from pacman.model.partitioner_splitters import SplitterSliceLegacy
 from spynnaker.pyNN.extra_algorithms.splitter_components import \
-    SplitterAbstractPopulationVertexSlice
+    AbstractSpynnakerSplitterDelay
 
 
 class MockSynapseIO(object):
@@ -80,6 +81,13 @@ class MockTransceiverRawData(object):
 
     def read_memory(self, x, y, base_address, length):
         return self._data_to_read[base_address:base_address + length]
+
+
+class MockSplitter(SplitterSliceLegacy, AbstractSpynnakerSplitterDelay):
+
+    def __init__(self):
+        SplitterSliceLegacy.__init__(self, "mock splitter")
+        AbstractSpynnakerSplitterDelay.__init__(self)
 
 
 class SimpleApplicationVertex(ApplicationVertex, LegacyPartitionerAPI):
@@ -226,16 +234,14 @@ class TestSynapticManager(unittest.TestCase):
 
         pre_app_population = MockPopulation(10, "mock pop pre")
         pre_app_vertex = SimpleApplicationVertex(10)
-        pre_app_vertex.splitter_object = (
-            SplitterAbstractPopulationVertexSlice())
+        pre_app_vertex.splitter_object = MockSplitter()
         pre_app_vertex.splitter_object._called = True
         pre_vertex_slice = Slice(0, 9)
         post_app_population = MockPopulation(10, "mock pop post")
         pre_vertex = pre_app_vertex.create_machine_vertex(
             pre_vertex_slice, None)
         post_app_vertex = SimpleApplicationVertex(10)
-        post_app_vertex.splitter_object = (
-            SplitterAbstractPopulationVertexSlice())
+        post_app_vertex.splitter_object = MockSplitter()
         post_app_vertex.splitter_object._called = True
         post_vertex_slice = Slice(0, 9)
         post_vertex = post_app_vertex.create_machine_vertex(
