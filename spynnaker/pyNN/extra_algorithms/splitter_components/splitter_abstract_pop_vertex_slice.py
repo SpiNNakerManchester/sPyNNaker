@@ -19,8 +19,8 @@ from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint, FixedVertexAtomsConstraint,
     SameAtomsAsVertexConstraint, AbstractPartitionerConstraint)
 from pacman.model.graphs.machine import MachineEdge
-from pacman.model.resources import (ResourceContainer, ConstantSDRAM,
-    DTCMResource, CPUCyclesPerTickResource)
+from pacman.model.resources import (
+    ResourceContainer, ConstantSDRAM, DTCMResource, CPUCyclesPerTickResource)
 from pacman.model.partitioner_splitters.abstract_splitters.\
     abstract_splitter_slice import AbstractSplitterSlice
 from pacman.utilities import utility_calls
