@@ -31,6 +31,8 @@ from pacman.model.graphs.application import ApplicationVertex
 from spinn_storage_handlers import FileDataWriter, FileDataReader
 from data_specification import (
     DataSpecificationGenerator, DataSpecificationExecutor)
+from spynnaker.pyNN.extra_algorithms.splitter_components import \
+    SplitterAbstractPopulationVertexSlice
 from spynnaker.pyNN.models.neuron import SynapticManager
 from spynnaker.pyNN.abstract_spinnaker_common import AbstractSpiNNakerCommon
 import spynnaker.pyNN.abstract_spinnaker_common as abstract_spinnaker_common
@@ -224,11 +226,17 @@ class TestSynapticManager(unittest.TestCase):
 
         pre_app_population = MockPopulation(10, "mock pop pre")
         pre_app_vertex = SimpleApplicationVertex(10)
+        pre_app_vertex.splitter_object = (
+            SplitterAbstractPopulationVertexSlice())
+        pre_app_vertex.splitter_object._called = True
         pre_vertex_slice = Slice(0, 9)
         post_app_population = MockPopulation(10, "mock pop post")
         pre_vertex = pre_app_vertex.create_machine_vertex(
             pre_vertex_slice, None)
         post_app_vertex = SimpleApplicationVertex(10)
+        post_app_vertex.splitter_object = (
+            SplitterAbstractPopulationVertexSlice())
+        post_app_vertex.splitter_object._called = True
         post_vertex_slice = Slice(0, 9)
         post_vertex = post_app_vertex.create_machine_vertex(
             post_vertex_slice, None)
