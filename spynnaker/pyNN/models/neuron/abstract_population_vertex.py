@@ -192,9 +192,11 @@ class AbstractPopulationVertex(
     @property
     def neuron_recorder(self):
         return self.__neuron_recorder
+
     @property
     def synapse_manager(self):
         return self.__synapse_manager
+
     @property
     def neuron_impl(self):
         return self.__neuron_impl

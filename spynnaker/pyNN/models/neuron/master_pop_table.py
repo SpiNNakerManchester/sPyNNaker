@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-import math
 import struct
 import numpy
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD, \
