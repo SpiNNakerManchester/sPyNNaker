@@ -31,8 +31,6 @@ from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.exceptions import SpynnakerSplitterConfigurationException
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
     AbstractSpynnakerSplitterDelay)
-from spynnaker.pyNN.models.neural_projections import (
-    DelayAfferentMachineEdge, DelayedMachineEdge)
 from spynnaker.pyNN.models.neuron import (
     AbstractPopulationVertex, PopulationMachineVertex)
 from spynnaker.pyNN.utilities import bit_field_utilities

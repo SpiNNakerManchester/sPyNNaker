@@ -14,8 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase
-from spynnaker.pyNN.models.neural_projections import DelayAfferentMachineEdge, \
-    DelayedMachineEdge
+from spynnaker.pyNN.models.neural_projections import (
+    DelayAfferentMachineEdge, DelayedMachineEdge)
 
 
 @add_metaclass(AbstractBase)
