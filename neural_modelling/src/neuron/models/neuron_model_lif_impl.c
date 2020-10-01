@@ -21,11 +21,11 @@
 #include <debug.h>
 
 // simple Leaky I&F ODE
-static inline void lif_neuron_closed_form(
+void lif_neuron_closed_form(
         neuron_pointer_t neuron, REAL V_prev, input_t input_this_timestep) {
     // accum = accum * accum + accum
     // RD
-    REAL alpha = input_this_timestep * neuron->R_membrane + neuron->V_rest;
+    REAL alpha = input_this_timestep + neuron->V_rest;
     // SR
 //    REAL alpha = MULT_ROUND_STOCHASTIC_ACCUM (
 //        input_this_timestep, neuron->R_membrane) + neuron->V_rest;
@@ -62,7 +62,7 @@ state_t neuron_model_state_update(
 		}
         // Get the input in nA
         input_t input_this_timestep =
-                total_exc - total_inh + external_bias + neuron->I_offset;
+                (total_exc - total_inh + external_bias + neuron->I_offset) * neuron->R_membrane;
 
         lif_neuron_closed_form(
                 neuron, neuron->V_membrane, input_this_timestep);
