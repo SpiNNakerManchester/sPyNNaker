@@ -31,81 +31,80 @@ from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex import (
 
 
 class SpynnakerSplitterSelector(SplitterSelector):
-        """
-        splitter object selector that allocates splitters to app vertices
+    """ splitter object selector that allocates splitters to app vertices
         that have not yet been given a splitter object.
         default for APV is the SplitterAbstractPopulationVertexSlice
         default for external device splitters are SplitterOneToOneLegacy
         default for the rest is the SpynnakerSplitterSliceLegacy.
 
+    :param ApplicationGraph app_graph: app graph
+    :rtype: None
+    """
+
+    def __call__(self, app_graph):
+        """ basic selector which puts the legacy splitter object on
+        everything without a splitter object
+
         :param ApplicationGraph app_graph: app graph
         :rtype: None
         """
+        for app_vertex in app_graph.vertices:
+            if app_vertex.splitter_object is None:
+                if isinstance(app_vertex, AbstractPopulationVertex):
+                    self.abstract_pop_heuristic(app_vertex)
+                elif isinstance(app_vertex, ApplicationSpiNNakerLinkVertex):
+                    self.external_spinnaker_link_heuristic(app_vertex)
+                elif isinstance(app_vertex, ApplicationFPGAVertex):
+                    self.external_fpga_link_heuristic(app_vertex)
+                elif isinstance(app_vertex, SpikeSourceArrayVertex):
+                    self.spike_source_array_heuristic(app_vertex)
+                elif isinstance(app_vertex, SpikeSourcePoissonVertex):
+                    self.spike_source_poisson_heuristic(app_vertex)
+                else:  # go to basic selector. it might know what to do
+                    self.vertex_selector(app_vertex)
 
-        def __call__(self, app_graph):
-            """ basic selector which puts the legacy splitter object on
-            everything without a splitter object
+    @staticmethod
+    def abstract_pop_heuristic(app_vertex):
+        """ allows future overrides
 
-            :param ApplicationGraph app_graph: app graph
-            :rtype: None
-            """
-            for app_vertex in app_graph.vertices:
-                if app_vertex.splitter_object is None:
-                    if isinstance(app_vertex, AbstractPopulationVertex):
-                        self.abstract_pop_heuristic(app_vertex)
-                    elif isinstance(app_vertex, ApplicationSpiNNakerLinkVertex):
-                        self.external_spinnaker_link_heuristic(app_vertex)
-                    elif isinstance(app_vertex, ApplicationFPGAVertex):
-                        self.external_fpga_link_heuristic(app_vertex)
-                    elif isinstance(app_vertex, SpikeSourceArrayVertex):
-                        self.spike_source_array_heuristic(app_vertex)
-                    elif isinstance(app_vertex, SpikeSourcePoissonVertex):
-                        self.spike_source_poisson_heuristic(app_vertex)
-                    else:  # go to basic selector. it might know what to do
-                        self.vertex_selector(app_vertex)
+        :param ApplicationGraph app_vertex: app vertex
+        :rtype: None
+        """
+        app_vertex.splitter_object = (
+            SplitterAbstractPopulationVertexSlice())
 
-        @staticmethod
-        def abstract_pop_heuristic(app_vertex):
-            """ allows future overrides
+    @staticmethod
+    def external_spinnaker_link_heuristic(app_vertex):
+        """ allows future overrides
 
-            :param ApplicationGraph app_vertex: app vertex
-            :rtype: None
-            """
-            app_vertex.splitter_object = (
-                SplitterAbstractPopulationVertexSlice())
+        :param ApplicationGraph app_vertex: app vertex
+        :rtype: None
+        """
+        app_vertex.splitter_object = SplitterOneToOneLegacy()
 
-        @staticmethod
-        def external_spinnaker_link_heuristic(app_vertex):
-            """ allows future overrides
+    @staticmethod
+    def external_fpga_link_heuristic(app_vertex):
+        """ allows future overrides
 
-            :param ApplicationGraph app_vertex: app vertex
-            :rtype: None
-            """
-            app_vertex.splitter_object = SplitterOneToOneLegacy()
+        :param ApplicationGraph app_vertex: app vertex
+        :rtype: None
+        """
+        app_vertex.splitter_object = SplitterOneToOneLegacy()
 
-        @staticmethod
-        def external_fpga_link_heuristic(app_vertex):
-            """ allows future overrides
+    @staticmethod
+    def spike_source_array_heuristic(app_vertex):
+        """ allows future overrides
 
-            :param ApplicationGraph app_vertex: app vertex
-            :rtype: None
-            """
-            app_vertex.splitter_object = SplitterOneToOneLegacy()
+        :param ApplicationGraph app_vertex: app vertex
+        :rtype: None
+        """
+        app_vertex.splitter_object = SplitterSliceLegacy()
 
-        @staticmethod
-        def spike_source_array_heuristic(app_vertex):
-            """ allows future overrides
+    @staticmethod
+    def spike_source_poisson_heuristic(app_vertex):
+        """ allows future overrides
 
-            :param ApplicationGraph app_vertex: app vertex
-            :rtype: None
-            """
-            app_vertex.splitter_object = SplitterSliceLegacy()
-
-        @staticmethod
-        def spike_source_poisson_heuristic(app_vertex):
-            """ allows future overrides
-
-            :param ApplicationGraph app_vertex: app vertex
-            :rtype: None
-            """
-            app_vertex.splitter_object = SplitterSliceLegacy()
+        :param ApplicationGraph app_vertex: app vertex
+        :rtype: None
+        """
+        app_vertex.splitter_object = SplitterSliceLegacy()
