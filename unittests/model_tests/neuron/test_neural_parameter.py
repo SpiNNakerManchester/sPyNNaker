@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import io
 import os
 import platform
 import struct
@@ -43,7 +44,7 @@ def _iterate_parameter_values(iterator, data_type):
 def run_spec_check(method):
     MockSimulator.setup()
     if platform.system() == "Windows":
-        spec_writer = open("test.dat", "wb")
+        spec_writer = io.FileIO("test.dat", "wb")
         spec = DataSpecificationGenerator(spec_writer, None)
         try:
             method(spec)
@@ -52,7 +53,7 @@ def run_spec_check(method):
             os.remove("test.dat")
     else:
         with tempfile.NamedTemporaryFile() as temp:
-            spec = DataSpecificationGenerator(open(temp.name, "wb"), None)
+            spec = DataSpecificationGenerator(io.FileIO(temp.name, "wb"), None)
             try:
                 method(spec)
             finally:

@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import io
 import os
 import struct
 import tempfile
@@ -272,7 +273,7 @@ class TestSynapticManager(unittest.TestCase):
                 pre_vertex, partition_name)))
 
         temp_spec = tempfile.mktemp()
-        spec = DataSpecificationGenerator(open(temp_spec, "wb"), None)
+        spec = DataSpecificationGenerator(io.FileIO(temp_spec, "wb"), None)
         master_pop_sz = 1000
         all_syn_block_sz = 2000
         master_pop_region = 0
@@ -295,7 +296,7 @@ class TestSynapticManager(unittest.TestCase):
             routing_info, graph, machine_time_step)
         spec.end_specification()
 
-        with open(temp_spec, "rb") as spec_reader:
+        with io.FileIO(temp_spec, "rb") as spec_reader:
             executor = DataSpecificationExecutor(
                 spec_reader, master_pop_sz + all_syn_block_sz)
             executor.execute()
