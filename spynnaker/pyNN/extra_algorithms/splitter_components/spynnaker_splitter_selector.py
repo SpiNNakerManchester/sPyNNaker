@@ -16,13 +16,13 @@ from pacman.model.graphs.application import (
     ApplicationSpiNNakerLinkVertex, ApplicationFPGAVertex)
 from pacman.model.partitioner_splitters.splitter_one_to_one_legacy import (
     SplitterOneToOneLegacy)
-from pacman.model.partitioner_splitters.splitter_slice_legacy import (
-    SplitterSliceLegacy)
 from spinn_front_end_common.interface.splitter_selectors import (
     SplitterSelector)
 from spynnaker.pyNN.extra_algorithms.splitter_components.\
     splitter_abstract_pop_vertex_slice import (
         SplitterAbstractPopulationVertexSlice)
+from spynnaker.pyNN.extra_algorithms.splitter_components.\
+    spynnaker_splitter_slice_legacy import SpynnakerSplitterSliceLegacy
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 from spynnaker.pyNN.models.spike_source.spike_source_array_vertex import (
     SpikeSourceArrayVertex)
@@ -98,7 +98,7 @@ class SpynnakerSplitterSelector(SplitterSelector):
         :param ApplicationGraph app_vertex: app vertex
         :rtype: None
         """
-        app_vertex.splitter_object = SplitterSliceLegacy()
+        app_vertex.splitter_object = SpynnakerSplitterSliceLegacy()
 
     @staticmethod
     def spike_source_poisson_heuristic(app_vertex):
@@ -107,4 +107,4 @@ class SpynnakerSplitterSelector(SplitterSelector):
         :param ApplicationGraph app_vertex: app vertex
         :rtype: None
         """
-        app_vertex.splitter_object = SplitterSliceLegacy()
+        app_vertex.splitter_object = SpynnakerSplitterSliceLegacy()

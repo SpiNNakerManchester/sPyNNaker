@@ -71,12 +71,16 @@ class SplitterAbstractPopulationVertexSlice(
 
     @overrides(AbstractSplitterSlice.get_pre_vertices)
     def get_pre_vertices(self, edge, outgoing_edge_partition):
-        return self._get_map([MachineEdge, DelayAfferentMachineEdge])
+        extra_pre_edge_types = [MachineEdge]
+        extra_pre_edge_types.extend(self.extra_pre_edge_type())
+        return self._get_map(extra_pre_edge_types)
 
     @overrides(AbstractSplitterSlice.get_post_vertices)
     def get_post_vertices(
             self, edge, outgoing_edge_partition, src_machine_vertex):
-        return self._get_map([MachineEdge, DelayedMachineEdge])
+        extra_pre_edge_types = [MachineEdge]
+        extra_pre_edge_types.extend(self.extra_post_edge_type())
+        return self._get_map(extra_pre_edge_types)
 
     @overrides(AbstractSplitterSlice.create_machine_vertex)
     def create_machine_vertex(
