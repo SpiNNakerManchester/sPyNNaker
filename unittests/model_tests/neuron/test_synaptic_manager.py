@@ -31,8 +31,6 @@ from pacman.model.graphs.application import ApplicationVertex
 from spinn_storage_handlers import FileDataWriter, FileDataReader
 from data_specification import (
     DataSpecificationGenerator, DataSpecificationExecutor)
-from spynnaker.pyNN.extra_algorithms.splitter_components import \
-    SplitterAbstractPopulationVertexSlice
 from spynnaker.pyNN.models.neuron import SynapticManager
 from spynnaker.pyNN.abstract_spinnaker_common import AbstractSpiNNakerCommon
 import spynnaker.pyNN.abstract_spinnaker_common as abstract_spinnaker_common
@@ -55,6 +53,8 @@ from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
     .elimination import RandomByWeightElimination
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from unittests.mocks import MockSimulator, MockPopulation
+from spynnaker.pyNN.extra_algorithms.splitter_components import \
+    SplitterAbstractPopulationVertexSlice
 
 
 class MockSynapseIO(object):
