@@ -17,8 +17,6 @@ import math
 
 from pacman.utilities.constants import FULL_MASK
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from pacman.utilities.algorithm_utilities. \
-    partition_algorithm_utilities import determine_max_atoms_for_vertex
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 
