@@ -13,11 +13,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import division
+
+import logging
 import math
 from pacman.model.partitioner_interfaces import AbstractSlicesConnect
 from pacman.operations.partition_algorithms import SplitterPartitioner
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION)
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinn_utilities.progress_bar import ProgressBar
 from spynnaker.pyNN.exceptions import DelayExtensionException
@@ -29,6 +32,8 @@ from spynnaker.pyNN.models.neural_projections import (
     DelayAfferentApplicationEdge, DelayedApplicationEdge)
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 from spynnaker.pyNN.utilities import constants
+
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class SpynnakerSplitterPartitioner(SplitterPartitioner):
@@ -238,8 +243,7 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
 
         # check max delay works
         if max_delay_needed > user_max_delay:
-            raise DelayExtensionException(
-                self.END_USER_MAX_DELAY_DEFILING_ERROR_MESSAGE)
+            logger.warning(self.END_USER_MAX_DELAY_DEFILING_ERROR_MESSAGE)
 
         # get if the post vertex needs a delay extension
         post_splitter_object = app_edge.post_vertex.splitter_object
