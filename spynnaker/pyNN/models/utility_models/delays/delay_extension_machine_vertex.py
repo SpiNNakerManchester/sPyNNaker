@@ -30,7 +30,6 @@ from spinn_front_end_common.utilities.utility_objs import ExecutableType
 
 #  1. has_key 2. key 3. incoming_key 4. incoming_mask 5. n_atoms
 #  6. n_delay_stages, 7. the number of delay supported by each delay stage
-from spynnaker.pyNN.models.utility_models.delays import DelayBlock
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
 _DELAY_PARAM_HEADER_WORDS = 7
