@@ -231,7 +231,6 @@ class DelayExtensionMachineVertex(
         provenance_items.append(
             self._app_vertex.get_tdma_provenance_item(
                 names, x, y, p, n_times_tdma_fell_behind))
-
         return provenance_items
 
     @overrides(MachineVertex.get_n_keys_for_partition)
