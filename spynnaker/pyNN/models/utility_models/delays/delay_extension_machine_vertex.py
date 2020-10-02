@@ -246,15 +246,22 @@ class DelayExtensionMachineVertex(
 
     @inject_items({
         "machine_graph": "MemoryMachineGraph",
-        "routing_infos": "MemoryRoutingInfos"})
+        "routing_infos": "MemoryRoutingInfos",
+        "machine_time_step": "MachineTimeStep",
+        "time_scale_factor": "TimeScaleFactor"})
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
-        additional_arguments={"machine_graph", "routing_infos"})
+        additional_arguments={
+            "machine_graph", "routing_infos", "machine_time_step",
+            "time_scale_factor"})
     def generate_data_specification(
-            self, spec, placement, machine_graph, routing_infos):
+            self, spec, placement, machine_graph, routing_infos,
+            machine_time_step, time_scale_factor):
         """
         :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
         :param ~pacman.model.routing_info.RoutingInfo routing_infos:
+        :param int machine_time_step: machine time step of the sim.
+        :param int time_scale_factor: the time scale factor of the sim.
         """
         # pylint: disable=arguments-differ
 
@@ -269,7 +276,7 @@ class DelayExtensionMachineVertex(
             math.ceil(self._vertex_slice.n_atoms / BITS_PER_WORD))
         delay_params_sz = BYTES_PER_WORD * (
             _DELAY_PARAM_HEADER_WORDS +
-            (self.__n_delay_stages * n_words_per_stage))
+            (self._app_vertex.n_delay_stages * n_words_per_stage))
 
         spec.reserve_memory_region(
             region=self._DELAY_EXTENSION_REGIONS.SYSTEM.value,
@@ -281,13 +288,13 @@ class DelayExtensionMachineVertex(
 
         spec.reserve_memory_region(
             region=self._DELAY_EXTENSION_REGIONS.TDMA_REGION.value,
-            size=self.tdma_sdram_size_in_bytes, label="tdma data")
+            size=self._app_vertex.tdma_sdram_size_in_bytes, label="tdma data")
 
         # reserve region for provenance
         self.reserve_provenance_data_region(spec)
 
         self._write_setup_info(
-            spec, self.__machine_time_step, self.__time_scale_factor,
+            spec, machine_time_step, time_scale_factor,
             vertex.get_binary_file_name())
 
         spec.comment("\n*** Spec for Delay Extension Instance ***\n\n")
@@ -385,10 +392,10 @@ class DelayExtensionMachineVertex(
         spec.write_value(data=vertex_slice.n_atoms)
 
         # Write the number of blocks of delays:
-        spec.write_value(data=self.__n_delay_stages)
+        spec.write_value(data=self._app_vertex.n_delay_stages)
 
         # write the delay per delay stage
-        spec.write_value(data=self.__delay_per_stage)
+        spec.write_value(data=self._app_vertex.delay_per_stage)
 
         # Write the actual delay blocks (create a new one if it doesn't exist)
         spec.write_array(array_values=self._app_vertex.delay_blocks_for(

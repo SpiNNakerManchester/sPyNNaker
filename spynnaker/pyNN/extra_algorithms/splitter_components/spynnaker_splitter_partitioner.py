@@ -257,7 +257,8 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
                 self.INVALID_SPLITTER_FOR_DELAYS_ERROR_MSG.format(
                     app_edge.post_vertex, post_splitter_object, app_edge))
         post_vertex_max_delay = (
-            app_edge.post_vertex.splitter_object.max_support_delay())
+            app_edge.post_vertex.splitter_object.max_support_delay() *
+            (machine_time_step / MICRO_TO_MILLISECOND_CONVERSION))
 
         # if does not need a delay extension, run away
         if post_vertex_max_delay >= max_delay_needed:
