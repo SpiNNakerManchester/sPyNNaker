@@ -72,7 +72,7 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
 
     def __call__(
             self, app_graph, machine, plan_n_time_steps, machine_time_step,
-            user_max_delay, time_scale_factor, pre_allocated_resources=None):
+            user_max_delay, pre_allocated_resources=None):
         """
         :param ApplicationGraph app_graph: app graph
         :param ~spinn_machine.Machine machine: machine
@@ -86,7 +86,7 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
 
         # add the delay extensions now that the splitter objects are all set.
         self._add_delay_app_graph_components(
-            app_graph, machine_time_step, user_max_delay, time_scale_factor)
+            app_graph, machine_time_step, user_max_delay)
 
         # do partitioning in same way
         machine_graph, chips_used = SplitterPartitioner.__call__(
@@ -97,15 +97,13 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
         return machine_graph, chips_used
 
     def _add_delay_app_graph_components(
-            self, app_graph, machine_time_step, user_max_delay,
-            time_scale_factor):
+            self, app_graph, machine_time_step, user_max_delay):
         """ adds the delay extensions to the app graph, now that all the
         splitter objects have been set.
 
         :param ApplicationGraph app_graph: the app graph
         :param int machine_time_step: the machine time step
         :param int user_max_delay: the user defined max delay
-        :param int time_scale_factor: the time scale factor of the sim.
         :rtype: None
         """
 
@@ -130,13 +128,14 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
                     delay_app_vertex = (
                         self._create_delay_app_vertex_and_pre_edge(
                             app_outgoing_edge_partition, app_edge,
-                            post_vertex_max_delay, machine_time_step,
-                            time_scale_factor, app_graph, max_delay_needed))
+                            post_vertex_max_delay, app_graph,
+                            max_delay_needed))
 
                     # update the delay extension for the max delay slots.
                     # NOTE do it accumulately. coz else more loops.
-                    delay_app_vertex.set_new_n_delay_stages_and_delay_per_stage(
-                        post_vertex_max_delay, max_delay_needed)
+                    delay_app_vertex.\
+                        set_new_n_delay_stages_and_delay_per_stage(
+                            post_vertex_max_delay, max_delay_needed)
 
                     # add the edge from the delay extension to the dest vertex
                     self._create_post_delay_edge(delay_app_vertex, app_edge)
@@ -180,7 +179,7 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
 
     def _create_delay_app_vertex_and_pre_edge(
             self, app_outgoing_edge_partition, app_edge, post_vertex_max_delay,
-            machine_time_step, time_scale_factor, app_graph, max_delay_needed):
+            app_graph, max_delay_needed):
         """ creates the delay extension app vertex and the edge from the src
         vertex to this delay extension. Adds to the graph, as safe to do so.
 
@@ -189,8 +188,6 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
         :param AppEdge app_edge: the undelayed app edge.
         :param int post_vertex_max_delay: delay supported by post vertex.
         :param int max_delay_needed: the max delay needed by this app edge.
-        :param int machine_time_step: the machine time step of the sim.
-        :param int time_scale_factor: the time scale factor of the sim.
         :param ApplicationGraph app_graph: the app graph.
         :return: the DelayExtensionAppVertex
         """
@@ -204,7 +201,7 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
             delay_app_vertex = DelayExtensionVertex(
                 app_edge.pre_vertex.n_atoms, post_vertex_max_delay,
                 max_delay_needed - post_vertex_max_delay, app_edge.pre_vertex,
-                machine_time_step, time_scale_factor, label=delay_name)
+                label=delay_name)
 
             # set trackers
             delay_app_vertex.splitter_object = SplitterDelayVertexSlice()

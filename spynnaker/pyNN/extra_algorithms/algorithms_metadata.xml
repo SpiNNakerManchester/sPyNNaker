@@ -539,10 +539,6 @@
                 <param_name>user_max_delay</param_name>
                 <param_type>UserDefinedMaxDelay</param_type>
             </parameter>
-            <parameter>
-                <param_name>time_scale_factor</param_name>
-                <param_type>TimeScaleFactor</param_type>
-            </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>app_graph</param_name>
@@ -550,7 +546,6 @@
             <param_name>plan_n_time_steps</param_name>
             <param_name>machine_time_step</param_name>
             <param_name>user_max_delay</param_name>
-            <param_name>time_scale_factor</param_name>
             <token>SplitterObjectsAllocated</token>
         </required_inputs>
         <optional_inputs>

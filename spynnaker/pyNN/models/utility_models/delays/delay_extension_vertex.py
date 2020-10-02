@@ -42,11 +42,9 @@ class DelayExtensionVertex(
         "__delay_blocks",
         "__delay_per_stage",
         "__max_delay_needed_to_support",
-        "__machine_time_step",
         "__n_atoms",
         "__n_delay_stages",
         "__source_vertex",
-        "__time_scale_factor",
         "__delay_generator_data",
         "__n_data_specs"]
 
@@ -61,16 +59,14 @@ class DelayExtensionVertex(
 
     def __init__(
             self, n_neurons, delay_per_stage, max_delay_to_support,
-            source_vertex, machine_time_step, time_scale_factor,
-            constraints=None, label="DelayExtension"):
+            source_vertex, constraints=None, label="DelayExtension"):
         """
         :param int n_neurons: the number of neurons
         :param int delay_per_stage: the delay per stage
         :param ~pacman.model.graphs.application.ApplicationVertex \
                 source_vertex:
             where messages are coming from
-        :param int machine_time_step: how long is the machine time step
-        :param int time_scale_factor: what slowdown factor has been applied
+
         :param iterable(~pacman.model.constraints.AbstractConstraint) \
                 constraints:
             the vertex constraints
@@ -84,8 +80,6 @@ class DelayExtensionVertex(
         self.__max_delay_needed_to_support = max_delay_to_support
         self.__delay_per_stage = delay_per_stage
         self.__delay_generator_data = defaultdict(list)
-        self.__machine_time_step = machine_time_step
-        self.__time_scale_factor = time_scale_factor
         self.__n_data_specs = 0
 
         # atom store
