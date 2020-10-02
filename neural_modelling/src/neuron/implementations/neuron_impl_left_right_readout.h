@@ -368,14 +368,14 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
                 // pick broadcast if just entered
                 if ((time - current_time) % (wait_between_cues + duration_of_cue) == wait_between_cues){
                     // pick new value and broadcast
-//                    REAL random_value = (REAL)(mars_kiss64_seed(global_parameters->kiss_seed) / (REAL)0xffffffff); // 0-1
-//                    if (random_value < 0.5k){
-//                        current_cue_direction = 0;
-//                    }
-//                    else{
-//                        current_cue_direction = 1;
-//                    }
-                    current_cue_direction = (current_cue_direction + 1) % 2;
+                    REAL random_value = (REAL)(mars_kiss64_seed(global_parameters->kiss_seed) / (REAL)0xffffffff); // 0-1
+                    if (random_value < 0.5k){
+                        current_cue_direction = 0;
+                    }
+                    else{
+                        current_cue_direction = 1;
+                    }
+//                    current_cue_direction = (current_cue_direction + 1) % 2;
                     accumulative_direction += current_cue_direction;
                     REAL payload;
                     payload = global_parameters->rate_on;
