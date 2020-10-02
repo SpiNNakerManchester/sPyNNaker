@@ -30,6 +30,7 @@ from spinn_front_end_common.abstract_models.impl import (
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.constants import (
     SIMULATION_N_BYTES, BITS_PER_WORD, BYTES_PER_WORD)
+from spynnaker.pyNN.exceptions import DelayExtensionException
 from .delay_block import DelayBlock
 from .delay_extension_machine_vertex import DelayExtensionMachineVertex
 from .delay_generator_data import DelayGeneratorData
@@ -38,8 +39,8 @@ from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 logger = logging.getLogger(__name__)
 
 #  1. has_key 2. key 3. incoming_key 4. incoming_mask 5. n_atoms
-#  6. n_delay_stages
-_DELAY_PARAM_HEADER_WORDS = 6
+#  6. n_delay_stages, 7. the number of delay supported by each delay stage
+_DELAY_PARAM_HEADER_WORDS = 7
 # pylint: disable=protected-access
 _DELEXT_REGIONS = DelayExtensionMachineVertex._DELAY_EXTENSION_REGIONS
 _EXPANDER_BASE_PARAMS_SIZE = 3 * BYTES_PER_WORD
@@ -57,6 +58,7 @@ class DelayExtensionVertex(
     __slots__ = [
         "__delay_blocks",
         "__delay_per_stage",
+        "__max_delay_needed_to_support",
         "__machine_time_step",
         "__n_atoms",
         "__n_delay_stages",
@@ -65,17 +67,19 @@ class DelayExtensionVertex(
         "__delay_generator_data",
         "__n_data_specs"]
 
-    MAX_DELAY_BLOCKS = 8
-    MAX_TIMER_TICS_SUPPORTED_PER_BLOCK = 16
+    # this maps to what master assumes
+    MAX_TICKS_POSSIBLE_TO_SUPPORT = 8 * 16
+    SAFETY_FACTOR = 5000
+    MAX_DTCM_AVAILABLE = 59756 - SAFETY_FACTOR
 
-    MAX_SUPPORTED_DELAY_IN_TICKS = (
-        MAX_DELAY_BLOCKS * MAX_TIMER_TICS_SUPPORTED_PER_BLOCK)
+    MISMATCHED_DELAY_PER_STAGE_ERROR_MESSAGE = (
+        "The delay per stage is already set to {}, and therefore {} is not "
+        "yet feasible. Please report it to Spinnaker user mail list.")
 
-    # The maximum delay supported by the Delay extension, in ticks.
-
-    def __init__(self, n_neurons, delay_per_stage, source_vertex,
-                 machine_time_step, time_scale_factor, constraints=None,
-                 label="DelayExtension"):
+    def __init__(
+            self, n_neurons, delay_per_stage, max_delay_to_support,
+            source_vertex, machine_time_step, time_scale_factor,
+            constraints=None, label="DelayExtension"):
         """
         :param int n_neurons: the number of neurons
         :param int delay_per_stage: the delay per stage
@@ -94,6 +98,7 @@ class DelayExtensionVertex(
 
         self.__source_vertex = source_vertex
         self.__n_delay_stages = 0
+        self.__max_delay_needed_to_support = max_delay_to_support
         self.__delay_per_stage = delay_per_stage
         self.__delay_generator_data = defaultdict(list)
         self.__machine_time_step = machine_time_step
@@ -113,6 +118,13 @@ class DelayExtensionVertex(
     def n_atoms(self):
         return self.__n_atoms
 
+    @staticmethod
+    def get_max_delay_ticks_supported(delay_ticks_at_post_vertex):
+        max_slots = math.floor(
+            DelayExtensionVertex.MAX_TICKS_POSSIBLE_TO_SUPPORT /
+            delay_ticks_at_post_vertex)
+        return max_slots * delay_ticks_at_post_vertex
+
     @property
     def n_delay_stages(self):
         """ The maximum number of delay stages required by any connection\
@@ -122,9 +134,23 @@ class DelayExtensionVertex(
         """
         return self.__n_delay_stages
 
-    @n_delay_stages.setter
-    def n_delay_stages(self, n_delay_stages):
-        self.__n_delay_stages = n_delay_stages
+    def set_new_n_delay_stages_and_delay_per_stage(
+            self, new_post_vertex_n_delay, new_max_delay):
+        if new_post_vertex_n_delay != self.__delay_per_stage:
+            raise DelayExtensionException(
+                self.MISMATCHED_DELAY_PER_STAGE_ERROR_MESSAGE.format(
+                    self.__delay_per_stage, new_post_vertex_n_delay))
+
+        new_n_stages = int(math.ceil(
+            (new_max_delay - self.__delay_per_stage) /
+            self.__delay_per_stage))
+
+        if new_n_stages > self.__n_delay_stages:
+            self.__n_delay_stages = new_n_stages
+
+    @property
+    def delay_per_stage(self):
+        return self.__delay_per_stage
 
     @property
     def source_vertex(self):
@@ -150,7 +176,7 @@ class DelayExtensionVertex(
             self, max_row_n_synapses, max_delayed_row_n_synapses,
             pre_slices, pre_slice_index, post_slices, post_slice_index,
             pre_vertex_slice, post_vertex_slice, synapse_information,
-            max_stage, machine_time_step):
+            max_stage, max_delay_per_stage, machine_time_step):
         """ Add delays for a connection to be generated
 
         :param int max_row_n_synapses:
@@ -165,13 +191,15 @@ class DelayExtensionVertex(
                 synapse_information:
         :param int max_stage:
         :param int machine_time_step:
+        :param int max_delay_per_stage:
         """
         self.__delay_generator_data[pre_vertex_slice].append(
             DelayGeneratorData(
                 max_row_n_synapses, max_delayed_row_n_synapses,
                 pre_slices, pre_slice_index, post_slices, post_slice_index,
                 pre_vertex_slice, post_vertex_slice,
-                synapse_information, max_stage, machine_time_step))
+                synapse_information, max_stage, max_delay_per_stage,
+                machine_time_step))
 
     @inject_items({
         "machine_graph": "MemoryMachineGraph",
@@ -311,6 +339,9 @@ class DelayExtensionVertex(
 
         # Write the number of blocks of delays:
         spec.write_value(data=self.__n_delay_stages)
+
+        # write the delay per delay stage
+        spec.write_value(data=self.__delay_per_stage)
 
         # Write the actual delay blocks (create a new one if it doesn't exist)
         if vertex_slice in self.__delay_blocks:

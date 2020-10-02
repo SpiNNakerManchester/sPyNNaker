@@ -43,6 +43,7 @@ struct connection_builder_config {
     uint32_t pre_slice_start;
     uint32_t pre_slice_count;
     uint32_t max_stage;
+    uint32_t max_delay_per_stage;
     accum timestep_per_delay;
     uint32_t synapse_type;
     // The types of the various components
@@ -131,7 +132,8 @@ static bool read_connection_builder_region(address_t *in_region,
             post_slice_start, post_slice_count,
             config.pre_slice_start, config.pre_slice_count,
             connection_generator, delay_generator, weight_generator,
-            config.max_stage, config.timestep_per_delay);
+            config.max_stage, config.max_delay_per_stage,
+            config.timestep_per_delay);
 
     // Free the neuron four!
     matrix_generator_free(matrix_generator);

@@ -119,6 +119,6 @@ typedef void (generate_row_func)(
         uint32_t synapse_type_bits, uint32_t synapse_index_bits,
         uint32_t synapse_type, uint32_t n_synapses,
         uint16_t *indices, uint16_t *delays, uint16_t *weights,
-        uint32_t max_stage);
+        uint32_t max_stage, uint32_t max_delay_in_a_stage);
 
 #endif //INCLUDED_GENERATOR_TYPES_H

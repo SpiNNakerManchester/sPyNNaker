@@ -96,8 +96,10 @@ static uint8_t **spike_counters = NULL;
 //! \brief Array of bitfields describing which neurons to deliver spikes to,
 //! from which bucket
 static bit_field_t *neuron_delay_stage_config = NULL;
-//! The number of delay stages. A power of 2.
+//! The number of delay stages.
 static uint32_t num_delay_stages = 0;
+//! The number of delays within a delay stage
+static uint32_t n_delay_in_a_stage = 0;
 //! Mask for converting time into the current delay slot
 static uint32_t num_delay_slots_mask = 0;
 //! Size of each bitfield in ::neuron_delay_stage_config
@@ -169,9 +171,10 @@ static bool read_parameters(struct delay_parameters *params) {
     neuron_bit_field_words = get_bit_field_size(num_neurons);
 
     num_delay_stages = params->n_delay_stages;
+    n_delay_in_a_stage = params->n_delay_in_a_stage;
     max_keys = num_neurons * num_delay_stages;
 
-    uint32_t num_delay_slots = num_delay_stages * DELAY_STAGE_LENGTH;
+    uint32_t num_delay_slots = num_delay_stages * n_delay_in_a_stage;
     uint32_t num_delay_slots_pot = round_to_next_pot(num_delay_slots);
     num_delay_slots_mask = num_delay_slots_pot - 1;
 
@@ -406,7 +409,7 @@ static void timer_callback(uint timer_count, UNUSED uint unused1) {
         bit_field_t delay_stage_config = neuron_delay_stage_config[d];
         if (nonempty_bit_field(delay_stage_config, neuron_bit_field_words)) {
             // Get key mask for this delay stage and it's time slot
-            uint32_t delay_stage_delay = (d + 1) * DELAY_STAGE_LENGTH;
+            uint32_t delay_stage_delay = (d + 1) * n_delay_in_a_stage;
             uint32_t delay_stage_time_slot =
                     (time - delay_stage_delay) & num_delay_slots_mask;
             uint8_t *delay_stage_spike_counters =
@@ -468,6 +471,7 @@ static void timer_callback(uint timer_count, UNUSED uint unused1) {
 
 //! Entry point
 void c_main(void) {
+    log_info("max dtcm supply %d", sark_heap_max(sark.heap, 0));
     if (!initialize()) {
         log_error("Error in initialisation - exiting!");
         rt_error(RTE_SWERR);

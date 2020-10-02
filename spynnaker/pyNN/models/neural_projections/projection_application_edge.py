@@ -99,6 +99,15 @@ class ProjectionApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
             return 0
         return self.__delay_edge.pre_vertex.n_delay_stages
 
+    @property
+    def n_delay_per_stage(self):
+        """
+        :rtype: int
+        """
+        if self.__delay_edge is None:
+            return 0
+        return self.__delay_edge.pre_vertex.delay_per_stage
+
     @overrides(ApplicationEdge._create_machine_edge)
     def _create_machine_edge(
             self, pre_vertex, post_vertex, label):

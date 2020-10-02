@@ -950,7 +950,8 @@ class SynapticManager(object):
                 max_row_info.delayed_max_n_synapses, gen.pre_slices,
                 gen.pre_index, post_slices, post_slice_index, gen.pre_slice,
                 post_vertex_slice, gen.synapse_info,
-                gen.app_edge.n_delay_stages + 1, machine_time_step)
+                gen.app_edge.n_delay_stages + 1,
+                gen.app_edge.n_delay_per_stage, machine_time_step)
         elif max_row_info.delayed_max_n_synapses != 0:
             raise Exception(
                 "Found delayed items but no delay machine edge for {}".format(

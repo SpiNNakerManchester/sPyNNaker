@@ -43,6 +43,7 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
     __slots__ = [
         "_app_to_delay_map",
         "_delay_post_edge_map",
+        "_delay_pre_edges",
         "_app_edge_min_delay"]
 
     INVALID_SPLITTER_FOR_DELAYS_ERROR_MSG = (
@@ -66,6 +67,7 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
     def __init__(self):
         self._app_to_delay_map = dict()
         self._delay_post_edge_map = dict()
+        self._delay_pre_edges = list()
         self._app_edge_min_delay = dict()
 
     def __call__(
@@ -128,14 +130,13 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
                     delay_app_vertex = (
                         self._create_delay_app_vertex_and_pre_edge(
                             app_outgoing_edge_partition, app_edge,
-                            max_delay_needed, machine_time_step,
-                            time_scale_factor, app_graph))
+                            post_vertex_max_delay, machine_time_step,
+                            time_scale_factor, app_graph, max_delay_needed))
 
                     # update the delay extension for the max delay slots.
                     # NOTE do it accumulately. coz else more loops.
-                    self._update_n_stages(
-                        delay_app_vertex, post_vertex_max_delay,
-                        max_delay_needed)
+                    delay_app_vertex.set_new_n_delay_stages_and_delay_per_stage(
+                        post_vertex_max_delay, max_delay_needed)
 
                     # add the edge from the delay extension to the dest vertex
                     self._create_post_delay_edge(delay_app_vertex, app_edge)
@@ -153,6 +154,8 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
         for key in self._delay_post_edge_map:
             delay_edge = self._delay_post_edge_map[key]
             app_graph.add_edge(delay_edge, constants.SPIKE_PARTITION_ID)
+        for edge in self._delay_pre_edges:
+            app_graph.add_edge(edge, constants.SPIKE_PARTITION_ID)
 
     def _create_post_delay_edge(self, delay_app_vertex, app_edge):
         """ creates the edge between delay extension and post vertex. stores
@@ -176,14 +179,15 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
             app_edge.delay_edge = delay_edge
 
     def _create_delay_app_vertex_and_pre_edge(
-            self, app_outgoing_edge_partition, app_edge, max_delay_needed,
-            machine_time_step, time_scale_factor, app_graph):
+            self, app_outgoing_edge_partition, app_edge, post_vertex_max_delay,
+            machine_time_step, time_scale_factor, app_graph, max_delay_needed):
         """ creates the delay extension app vertex and the edge from the src
         vertex to this delay extension. Adds to the graph, as safe to do so.
 
         :param OutgoingEdgePartition app_outgoing_edge_partition: \
             the original outgoing edge partition.
         :param AppEdge app_edge: the undelayed app edge.
+        :param int post_vertex_max_delay: delay supported by post vertex.
         :param int max_delay_needed: the max delay needed by this app edge.
         :param int machine_time_step: the machine time step of the sim.
         :param int time_scale_factor: the time scale factor of the sim.
@@ -198,9 +202,9 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
             # build delay app vertex
             delay_name = "{}_delayed".format(app_edge.pre_vertex.label)
             delay_app_vertex = DelayExtensionVertex(
-                app_edge.pre_vertex.n_atoms, max_delay_needed,
-                app_edge.pre_vertex, machine_time_step,
-                time_scale_factor, label=delay_name)
+                app_edge.pre_vertex.n_atoms, post_vertex_max_delay,
+                max_delay_needed - post_vertex_max_delay, app_edge.pre_vertex,
+                machine_time_step, time_scale_factor, label=delay_name)
 
             # set trackers
             delay_app_vertex.splitter_object = SplitterDelayVertexSlice()
@@ -213,7 +217,7 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
                 app_edge.pre_vertex, delay_app_vertex,
                 label="{}_to_DelayExtension".format(
                     app_edge.pre_vertex.label))
-            app_graph.add_edge(delay_pre_edge, constants.SPIKE_PARTITION_ID)
+            self._delay_pre_edges.append(delay_pre_edge)
         return delay_app_vertex
 
     def _check_delay_values(
@@ -263,7 +267,8 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
         # extension. coz we dont do more than 1 at the moment
         total_supported_delay = (
             post_vertex_max_delay +
-            (DelayExtensionVertex.MAX_SUPPORTED_DELAY_IN_TICKS *
+            (DelayExtensionVertex.get_max_delay_ticks_supported(
+                post_vertex_max_delay) *
              (machine_time_step / MICRO_TO_MILLISECOND_CONVERSION)))
         if total_supported_delay < max_delay_needed:
             raise DelayExtensionException(
@@ -275,23 +280,6 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
 
         # return data for building delay extensions
         return max_delay_needed, post_vertex_max_delay, True
-
-    @staticmethod
-    def _update_n_stages(
-            delay_app_vertex, post_vertex_max_delay, max_delay_needed):
-        """ updates a delay extension app vertex delay stages as it needs to.
-
-        :param DelayApplicationVertex delay_app_vertex: the delay vertex
-        :param int post_vertex_max_delay: the max delay supported by the \
-            destination splitter.
-        :param int max_delay_needed: the max delay needed.
-        :rtype: None
-        """
-        n_stages = int(math.ceil(
-            (max_delay_needed - post_vertex_max_delay) /
-            post_vertex_max_delay))
-        if n_stages > delay_app_vertex.n_delay_stages:
-            delay_app_vertex.n_delay_stages = n_stages
 
     @overrides(SplitterPartitioner.create_machine_edge)
     def create_machine_edge(

@@ -139,6 +139,7 @@ static uint16_t build_fixed_plastic_half_word(
  * \param[in] delays: Pointer to table of delays
  * \param[in] weights: Pointer to table of weights
  * \param[in] max_stage: The maximum delay stage to support
+ * \param[in] max_delay_per_stage: the max delay per delay stage
  */
 void matrix_generator_stdp_write_row(
         void *generator,
@@ -148,7 +149,7 @@ void matrix_generator_stdp_write_row(
         uint32_t synapse_type_bits, uint32_t synapse_index_bits,
         uint32_t synapse_type, uint32_t n_synapses,
         uint16_t *indices, uint16_t *delays, uint16_t *weights,
-        uint32_t max_stage) {
+        uint32_t max_stage, uint32_t max_delay_per_stage) {
     struct matrix_generator_stdp *obj = generator;
 
     // Row address for each possible delay stage (including no delay stage)
@@ -219,7 +220,8 @@ void matrix_generator_stdp_write_row(
         // Weight
         uint16_t weight = weights[synapse];
         // Delay (mostly to get the stage)
-        struct delay_value delay = get_delay(delays[synapse], max_stage);
+        struct delay_value delay = get_delay(
+            delays[synapse], max_stage, max_delay_per_stage);
 
         // Check that the position is valid
         if (pp_address[delay.stage] == NULL) {
@@ -283,7 +285,8 @@ void matrix_generator_stdp_write_row(
         // Post-neuron index
         uint32_t post_index = indices[synapse];
 
-        struct delay_value delay = get_delay(delays[synapse], max_stage);
+        struct delay_value delay = get_delay(
+            delays[synapse], max_stage, max_delay_per_stage);
 
         // Build synaptic word
         uint16_t fp_half_word = build_fixed_plastic_half_word(
