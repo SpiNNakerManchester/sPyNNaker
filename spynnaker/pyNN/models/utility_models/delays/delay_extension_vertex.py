@@ -23,7 +23,6 @@ from pacman.model.constraints.key_allocator_constraints import (
 from pacman.model.constraints.partitioner_constraints import (
     SameAtomsAsVertexConstraint)
 from spinn_front_end_common.abstract_models import (
-    AbstractGeneratesDataSpecification,
     AbstractProvidesOutgoingPartitionConstraints)
 from spinn_front_end_common.abstract_models.impl import (
     TDMAAwareApplicationVertex)
@@ -35,7 +34,7 @@ logger = logging.getLogger(__name__)
 
 
 class DelayExtensionVertex(
-        TDMAAwareApplicationVertex, AbstractGeneratesDataSpecification,
+        TDMAAwareApplicationVertex,
         AbstractProvidesOutgoingPartitionConstraints):
     """ Provide delays to incoming spikes in multiples of the maximum delays\
         of a neuron (typically 16 or 32)
@@ -192,22 +191,6 @@ class DelayExtensionVertex(
                 pre_vertex_slice, post_vertex_slice,
                 synapse_information, max_stage, max_delay_per_stage,
                 machine_time_step))
-
-    @inject_items({
-        "machine_graph": "MemoryMachineGraph",
-        "routing_infos": "MemoryRoutingInfos"})
-    @overrides(
-        AbstractGeneratesDataSpecification.generate_data_specification,
-        additional_arguments={"machine_graph", "routing_infos"})
-    def generate_data_specification(
-            self, spec, placement, machine_graph, routing_infos):
-        """
-        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
-        :param ~pacman.model.routing_info.RoutingInfo routing_infos:
-        """
-        # pylint: disable=arguments-differ
-        placement.vertex.generate_data_specification(
-            spec, placement, machine_graph, routing_infos)
 
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
                get_outgoing_partition_constraints)
