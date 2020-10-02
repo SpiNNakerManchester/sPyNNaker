@@ -32,6 +32,9 @@
 //! the size of the circular queue for packets.
 #define IN_BUFFER_SIZE 256
 
+//! the point where the count has saturated.
+#define COUNTER_SATURATION_VALUE 255
+
 //! values for the priority for each callback
 enum delay_extension_callback_priorities {
     MC_PACKET = -1, //!< multicast packet reception uses FIQ
@@ -57,6 +60,12 @@ struct delay_extension_provenance {
     uint32_t n_delays;
     //! number of times the tdma fell behind its slot
     uint32_t times_tdma_fell_behind;
+    //! number of packets lost due to count saturation of uint8
+    uint32_t n_packets_lost_due_to_count_saturation;
+    //! number of packets dropped due to invalid neuron value
+    uint32_t n_packets_dropped_due_to_invalid_neuron_value;
+    //! number of packets dropped due to invalid key
+    uint32_t n_packets_dropped_due_to_invalid_key;
 };
 
 // Globals
@@ -116,6 +125,15 @@ static uint32_t n_spikes_added = 0;
 
 //! Number of times we had to back off because the comms hardware was busy
 static uint32_t n_delays = 0;
+
+//! Number of packets dropped due to count saturation
+static uint32_t saturation_count = 0;
+
+//! number of packets dropped due to invalid neuron id
+static uint32_t n_packets_dropped_due_to_invalid_neuron_value = 0;
+
+//! number of packets dropped due to invalid key
+static uint32_t n_packets_dropped_due_to_invalid_key = 0;
 
 //! Spin1 API ticks - to know when the timer wraps
 extern uint ticks;
@@ -257,6 +275,11 @@ static void store_provenance_data(address_t provenance_region) {
     prov->n_buffer_overflows = in_spikes_get_n_buffer_overflows();
     prov->n_delays = n_delays;
     prov->times_tdma_fell_behind = tdma_processing_times_behind();
+    prov->n_packets_lost_due_to_count_saturation = saturation_count;
+    prov->n_packets_dropped_due_to_invalid_neuron_value =
+        n_packets_dropped_due_to_invalid_neuron_value;
+    prov->n_packets_dropped_due_to_invalid_key =
+        n_packets_dropped_due_to_invalid_key;
     log_debug("finished other provenance data");
 }
 
@@ -352,15 +375,22 @@ static inline void spike_process(void) {
             uint32_t neuron_id = key_n(s);
             if (neuron_id < num_neurons) {
                 // Increment counter
-                current_time_slot_spike_counters[neuron_id]++;
+                if (current_time_slot_spike_counters[neuron_id] ==
+                        COUNTER_SATURATION_VALUE){
+                    saturation_count += 1;
+                }else{
+                    current_time_slot_spike_counters[neuron_id]++;
+                }
                 log_debug("Incrementing counter %u = %u\n",
                         neuron_id,
                         current_time_slot_spike_counters[neuron_id]);
                 n_spikes_added++;
             } else {
+                n_packets_dropped_due_to_invalid_neuron_value += 1;
                 log_debug("Invalid neuron ID %u", neuron_id);
             }
         } else {
+            n_packets_dropped_due_to_invalid_key += 1;
             log_debug("Invalid spike key 0x%08x", s);
         }
     }

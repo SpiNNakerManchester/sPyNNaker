@@ -45,8 +45,62 @@ class DelayExtensionMachineVertex(
         N_BUFFER_OVERFLOWS = 4
         N_DELAYS = 5
         N_TIMES_TDMA_FELL_BEHIND = 6
+        N_PACKETS_LOST_DUE_TO_COUNT_SATURATION = 7
+        N_PACKETS_WITH_INVALID_NEURON_IDS = 8
+        N_PACKETS_DROPPED_DUE_TO_INVALID_KEY = 9
 
     N_EXTRA_PROVENANCE_DATA_ENTRIES = len(EXTRA_PROVENANCE_DATA_ENTRIES)
+
+    COUNT_SATURATION_ERROR_MESSAGE = (
+        "The delay extension {} has dropped {} packets because during "
+        "certain time steps a neuron was asked to spike more than 256 times. "
+        "This causes a saturation on the count tracker which is a uint8. "
+        "Reduce the packet rates, or modify the delay extension to have "
+        "larger counters.")
+
+    COUNT_SATURATION_NAME = "saturation_count"
+
+    INVALID_NEURON_IDS_ERROR_MESSAGE = (
+        "The delay extension {} has dropped {} packets because their "
+        "neuron id was not valid. This is likely a routing issue. "
+        "Please fix and try again")
+
+    INVALID_NEURON_ID_COUNT_NAME = "invalid_neuron_count"
+
+    PACKETS_DROPPED_FROM_INVALID_KEY_ERROR_MESSAGE = (
+        "The delay extension {} has dropped {} packets due to the packet "
+        "key being invalid. This is likely a routing issue. "
+        "Please fix and try again")
+
+    INVALID_KEY_COUNT_NAME = "invalid_key_count"
+
+    N_PACKETS_RECEIVED_NAME = "Number_of_packets_received"
+
+    N_PACKETS_PROCESSED_NAME = "Number_of_packets_processed"
+
+    MISMATCH_PROCESSED_FROM_RECEIVED_ERROR_MESSAGE = (
+        "The delay extension {} on {}, {}, {} only processed {} of {}"
+        " received packets.  This could indicate a fault.")
+
+    MISMATCH_ADDED_FROM_PROCESSED_NAME = (
+        "Number_of_packets_added_to_delay_slot")
+
+    MISMATCH_ADDED_FROM_PROCESSED_ERROR_MESSAGE = (
+        "The delay extension {} on {}, {}, {} only added {} of {} processed "
+        "packets.  This could indicate a routing or filtering fault")
+
+    N_PACKETS_SENT_NAME = "Number_of_packets_sent"
+
+    INPUT_BUFFER_LOST_NAME = "Times_the_input_buffer_lost_packets"
+
+    INPUT_BUFFER_LOST_ERROR_MESSAGE = (
+        "The input buffer for {} on {}, {}, {} lost packets on {} "
+        "occasions. This is often a sign that the system is running "
+        "too quickly for the number of neurons per core.  Please "
+        "increase the timer_tic or time_scale_factor or decrease the "
+        "number of neurons per core.")
+
+    DELAYED_FOR_TRAFFIC_NAME = "Number_of_times_delayed_to_spread_traffic"
 
     def __init__(self, resources_required, label, constraints=None,
                  app_vertex=None, vertex_slice=None):
@@ -108,47 +162,57 @@ class DelayExtensionMachineVertex(
             self.EXTRA_PROVENANCE_DATA_ENTRIES.N_DELAYS.value]
         n_times_tdma_fell_behind = provenance_data[
             self.EXTRA_PROVENANCE_DATA_ENTRIES.N_TIMES_TDMA_FELL_BEHIND.value]
+        n_saturation = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.
+            N_PACKETS_LOST_DUE_TO_COUNT_SATURATION]
+        n_packets_invalid_neuron = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.
+            N_PACKETS_WITH_INVALID_NEURON_IDS]
+        n_packets_invalid_keys = self.EXTRA_PROVENANCE_DATA_ENTRIES[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.
+            N_PACKETS_DROPPED_DUE_TO_INVALID_KEY]
 
         label, x, y, p, names = self._get_placement_details(placement)
 
         # translate into provenance data items
         provenance_items.append(ProvenanceDataItem(
-            self._add_name(names, "Number_of_packets_received"),
+            self._add_name(names, self.COUNT_SATURATION_NAME),
+            n_saturation, report=n_saturation != 0,
+            message=self.COUNT_SATURATION_ERROR_MESSAGE.format(
+                label, n_saturation)))
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names, self.INVALID_NEURON_ID_COUNT_NAME),
+            n_packets_invalid_neuron, report=n_packets_invalid_neuron != 0,
+            message=self.INVALID_NEURON_IDS_ERROR_MESSAGE.format(
+                label, n_packets_invalid_neuron)))
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names, self.INVALID_NEURON_ID_COUNT_NAME),
+            n_packets_invalid_keys, n_packets_invalid_keys != 0,
+            self.PACKETS_DROPPED_FROM_INVALID_KEY_ERROR_MESSAGE.format(
+                label, n_packets_invalid_keys)))
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names, self.N_PACKETS_RECEIVED_NAME),
             n_packets_received))
         provenance_items.append(ProvenanceDataItem(
-            self._add_name(names, "Number_of_packets_processed"),
-            n_packets_processed,
-            report=n_packets_received != n_packets_processed,
-            message=(
-                "The delay extension {} on {}, {}, {} only processed {} of {}"
-                " received packets.  This could indicate a fault.".format(
-                    label, x, y, p, n_packets_processed, n_packets_received))))
+            self._add_name(names, self.N_PACKETS_PROCESSED_NAME),
+            n_packets_processed, n_packets_received != n_packets_processed,
+            self.MISMATCH_PROCESSED_FROM_RECEIVED_ERROR_MESSAGE.format(
+                label, x, y, p, n_packets_processed, n_packets_received)))
         provenance_items.append(ProvenanceDataItem(
-            self._add_name(names, "Number_of_packets_added_to_delay_slot"),
-            n_packets_added,
-            report=n_packets_added != n_packets_processed,
-            message=(
-                "The delay extension {} on {}, {}, {} only added {} of {}"
-                " processed packets.  This could indicate a routing or"
-                " filtering fault".format(
-                    label, x, y, p, n_packets_added, n_packets_processed))))
+            self._add_name(names, self.MISMATCH_ADDED_FROM_PROCESSED_NAME),
+            n_packets_added, n_packets_added != n_packets_processed,
+            self.MISMATCH_ADDED_FROM_PROCESSED_ERROR_MESSAGE.format(
+                label, x, y, p, n_packets_added, n_packets_processed)))
         provenance_items.append(ProvenanceDataItem(
-            self._add_name(names, "Number_of_packets_sent"),
-            n_packets_sent))
+            self._add_name(names, self.N_PACKETS_SENT_NAME), n_packets_sent))
         provenance_items.append(ProvenanceDataItem(
-            self._add_name(names, "Times_the_input_buffer_lost_packets"),
+            self._add_name(names, self.INPUT_BUFFER_LOST_NAME),
             n_buffer_overflows,
             report=n_buffer_overflows > 0,
-            message=(
-                "The input buffer for {} on {}, {}, {} lost packets on {} "
-                "occasions. This is often a sign that the system is running "
-                "too quickly for the number of neurons per core.  Please "
-                "increase the timer_tic or time_scale_factor or decrease the "
-                "number of neurons per core.".format(
-                    label, x, y, p, n_buffer_overflows))))
+            message=self.INPUT_BUFFER_LOST_ERROR_MESSAGE.format(
+                label, x, y, p, n_buffer_overflows)))
         provenance_items.append(ProvenanceDataItem(
-            self._add_name(names, "Number_of_times_delayed_to_spread_traffic"),
-            n_delays))
+            self._add_name(names, self.DELAYED_FOR_TRAFFIC_NAME), n_delays))
         provenance_items.append(
             self._app_vertex.get_tdma_provenance_item(
                 names, x, y, p, n_times_tdma_fell_behind))
