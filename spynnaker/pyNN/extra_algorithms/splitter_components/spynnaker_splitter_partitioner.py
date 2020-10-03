@@ -29,7 +29,8 @@ from spynnaker.pyNN.extra_algorithms.splitter_components import (
 from spynnaker.pyNN.extra_algorithms.splitter_components.\
     splitter_delay_vertex_slice import SplitterDelayVertexSlice
 from spynnaker.pyNN.models.neural_projections import (
-    DelayAfferentApplicationEdge, DelayedApplicationEdge)
+    DelayAfferentApplicationEdge, DelayedApplicationEdge,
+    ProjectionApplicationEdge)
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 from spynnaker.pyNN.utilities import constants
 
@@ -116,29 +117,32 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
         for app_outgoing_edge_partition in progress.over(
                 app_graph.outgoing_edge_partitions):
             for app_edge in app_outgoing_edge_partition.edges:
-                # figure the max delay and if we need a delay extension
-                synapse_infos = app_edge.synapse_information
-                (max_delay_needed, post_vertex_max_delay,
-                 need_delay_extension) = self._check_delay_values(
-                        app_edge, user_max_delay, machine_time_step,
-                        synapse_infos)
+                if isinstance(app_edge, ProjectionApplicationEdge):
+                    # figure the max delay and if we need a delay extension
+                    synapse_infos = app_edge.synapse_information
+                    (max_delay_needed, post_vertex_max_delay,
+                     need_delay_extension) = self._check_delay_values(
+                            app_edge, user_max_delay, machine_time_step,
+                            synapse_infos)
 
-                # if we need a delay, add it to the app graph.
-                if need_delay_extension:
-                    delay_app_vertex = (
-                        self._create_delay_app_vertex_and_pre_edge(
-                            app_outgoing_edge_partition, app_edge,
-                            post_vertex_max_delay, app_graph,
-                            max_delay_needed))
+                    # if we need a delay, add it to the app graph.
+                    if need_delay_extension:
+                        delay_app_vertex = (
+                            self._create_delay_app_vertex_and_pre_edge(
+                                app_outgoing_edge_partition, app_edge,
+                                post_vertex_max_delay, app_graph,
+                                max_delay_needed))
 
-                    # update the delay extension for the max delay slots.
-                    # NOTE do it accumulately. coz else more loops.
-                    delay_app_vertex.\
-                        set_new_n_delay_stages_and_delay_per_stage(
-                            post_vertex_max_delay, max_delay_needed)
+                        # update the delay extension for the max delay slots.
+                        # NOTE do it accumulately. coz else more loops.
+                        delay_app_vertex.\
+                            set_new_n_delay_stages_and_delay_per_stage(
+                                post_vertex_max_delay, max_delay_needed)
 
-                    # add the edge from the delay extension to the dest vertex
-                    self._create_post_delay_edge(delay_app_vertex, app_edge)
+                        # add the edge from the delay extension to the
+                        # dest vertex
+                        self._create_post_delay_edge(
+                            delay_app_vertex, app_edge)
 
         # avoids mutating the list of outgoing partitions. add them afterwards
         self._add_new_app_edges(app_graph)
