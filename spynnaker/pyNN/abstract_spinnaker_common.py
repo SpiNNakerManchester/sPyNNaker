@@ -144,7 +144,8 @@ class AbstractSpiNNakerCommon(with_metaclass(
                              self.CONFIG_FILE_NAME)],
             front_end_versions=versions)
 
-        self._extra_inputs['UserDefinedMaxDelay'] = self.__max_delay
+        # update inputs needed by the machine level calls.
+        self.update_extra_inputs({'UserDefinedMaxDelay': self.__max_delay})
 
         extra_mapping_inputs = dict()
         extra_mapping_inputs['RouterBitfieldCompressionReport'] = \
