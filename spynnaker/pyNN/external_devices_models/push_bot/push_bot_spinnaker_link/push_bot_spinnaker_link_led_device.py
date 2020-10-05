@@ -47,7 +47,7 @@ class PushBotSpiNNakerLinkLEDDevice(
         :param int spinnaker_link_id: The SpiNNakerLink connected to
         :param int n_neurons: The number of neurons in the device
         :param str label: The label of the device
-        :param str board_address:
+        :param str or None board_address:
             The IP address of the board that the device is connected to
         :param start_active_time_front:
             The "active time" to set for the front LED at the start
