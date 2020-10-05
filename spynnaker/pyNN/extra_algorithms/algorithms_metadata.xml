@@ -520,8 +520,8 @@
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
-                <param_type>MemoryExtendedVirtualMachine</param_type>
-                <param_type>MemoryExtendedMachine</param_type>
+                <param_type>MemoryVirtualMachine</param_type>
+                <param_type>MemoryMachine</param_type>
             </parameter>
             <parameter>
                 <param_name>plan_n_time_steps</param_name>
