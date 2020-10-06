@@ -15,7 +15,6 @@
 from __future__ import division
 
 import logging
-import math
 from pacman.model.partitioner_interfaces import AbstractSlicesConnect
 from pacman.operations.partition_algorithms import SplitterPartitioner
 from spinn_front_end_common.utilities.constants import (
@@ -208,7 +207,8 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
                 label=delay_name)
 
             # set trackers
-            delay_app_vertex.splitter_object = SplitterDelayVertexSlice()
+            delay_app_vertex.splitter_object = (
+                SplitterDelayVertexSlice(app_edge.pre_vertex.splitter_object))
             app_graph.add_vertex(delay_app_vertex)
             self._app_to_delay_map[app_outgoing_edge_partition] = (
                 delay_app_vertex)
