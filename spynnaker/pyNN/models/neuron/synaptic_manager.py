@@ -1036,7 +1036,8 @@ class SynapticManager(object):
                     connector = synapse_info.connector
                     weight_min = connector.get_weight_minimum(
                         synapse_info.weights, self.__weight_random_sigma)
-                    weight_min = self.__get_closest_weight(weight_min)
+                    if weight_min != 0:
+                        weight_min = self.__get_closest_weight(weight_min)
                     weight_min *= weight_scale
                     if weight_min != 0:
                         min_weights[synapse_type] = min(
