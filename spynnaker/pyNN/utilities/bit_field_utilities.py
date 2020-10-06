@@ -25,8 +25,8 @@ from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 # number of elements
 ELEMENTS_USED_IN_EACH_BIT_FIELD = 3  # n words, key, pointer to bitfield
 
-# n_merged_filters, n_redunanct_filters,n_filters pointer for array
-ELEMENTS_USED_IN_BIT_FIELD_HEADER = 4
+# n_filters, pointer for array
+ELEMENTS_USED_IN_BIT_FIELD_HEADER = 2
 
 # n elements in each key to n atoms map for bitfield (key, n atoms)
 N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP = 2
@@ -235,6 +235,4 @@ def write_bitfield_init_data(
 
     # ensure if nothing else that n bitfields in bitfield region set to 0
     spec.switch_write_focus(bit_field_region_id)
-    spec.write_value(0)
-    spec.write_value(0)
     spec.write_value(0)

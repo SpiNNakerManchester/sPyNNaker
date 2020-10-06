@@ -21,7 +21,6 @@
 #include <neuron/synapse_row.h>
 #include <debug.h>
 #include <stdbool.h>
-#include <bit_field.h>
 
 //! bits in a word
 #define BITS_PER_WORD 32
@@ -59,7 +58,9 @@ typedef struct master_population_table_entry {
 //! \brief A packed extra info (note: same size as address and row length)
 typedef struct extra_info {
     //! The mask to apply to the key once shifted get the core index
-    uint32_t core_mask: 16;
+    uint32_t core_mask: 10;
+    //! The number of words required for n_neurons
+    uint32_t n_words: 6;
     //! The shift to apply to the key to get the core part (0-31)
     uint32_t mask_shift: 5;
     //! The number of neurons per core (up to 2048)
@@ -102,12 +103,6 @@ static uint32_t synaptic_rows_base_address;
 //! Base address for the synaptic matrix's direct rows
 static uint32_t direct_rows_base_address;
 
-//! \brief the number of times a DMA resulted in 0 entries
-static uint32_t ghost_pop_table_searches = 0;
-
-//! \brief the number of times packet isnt in the master pop table at all!
-static uint32_t invalid_master_pop_hits = 0;
-
 //! \brief The last spike received
 static spike_t last_spike = 0;
 
@@ -120,12 +115,22 @@ static uint16_t next_item = 0;
 //! The number of relevant items remaining in the ::address_list
 static uint16_t items_to_go = 0;
 
+//! The bitfield map
+static bit_field_t *connectivity_bit_field = NULL;
+
+//! \brief the number of times a DMA resulted in 0 entries
+uint32_t ghost_pop_table_searches = 0;
+
+//! \brief the number of times packet isnt in the master pop table at all!
+uint32_t invalid_master_pop_hits = 0;
+
+//! \brief The number of bit fields which were not able to be read in due to
+//!     DTCM limits.
+uint32_t failed_bit_field_reads = 0;
+
 //! \brief The number of packets dropped because the bitfield filter says
 //!     they don't hit anything
-static uint32_t bit_field_filtered_packets = 0;
-
-//! The bitfield map
-bit_field_t *connectivity_bit_field = NULL;
+uint32_t bit_field_filtered_packets = 0;
 
 //! \name Support functions
 //! \{
@@ -164,13 +169,20 @@ static inline uint32_t get_row_length(address_and_row_length entry) {
     return entry.row_length + 1;
 }
 
+//! \brief Get the source core index from a spike
+//! \param[in] extra: The extra info entry
+//! \param[in] spike: The spike received
+//! \return the source core index in the list of source cores
+static inline uint32_t get_core_index(extra_info extra, spike_t spike) {
+    return (spike >> extra.mask_shift) & extra.core_mask;
+}
+
 //! \brief Get the total number of neurons on cores which come before this core
 //! \param[in] extra: The extra info entry
 //! \param[in] spike: The spike received
 //! \return the base neuron number of this core
 static inline uint32_t get_core_sum(extra_info extra, spike_t spike) {
-    return ((spike >> extra.mask_shift) & extra.core_mask) *
-            extra.n_neurons;
+    return get_core_index(extra, spike) * extra.n_neurons;
 }
 
 //! \brief Get the source neuron ID for a spike given its table entry (without extra info)
@@ -244,6 +256,144 @@ static inline void print_master_population_table(void) {
     }
     log_info("Population table has %u entries", master_population_table_length);
 }
+
+//! \brief Check if the entry is a match for the given key
+static inline bool matches(uint32_t mp_i, uint32_t key) {
+    return (key & master_population_table[mp_i].mask) ==
+            master_population_table[mp_i].key;
+}
+
+static inline void print_bitfields(uint32_t mp_i, uint32_t start,
+        uint32_t end, filter_info_t *filters) {
+#if LOG_LEVEL >= LOG_DEBUG
+    // print out the bit field for debug purposes
+    log_info("bit field(s) for key 0x%08x:", master_population_table[mp_i].key);
+    uint32_t offset = 0;
+    for (uint32_t bf_i = start; bf_i < end; bf_i++) {
+        uint32_t n_words = get_bit_field_size(filters[bf_i].n_atoms);
+        for (uint32_t i = 0; i < n_words; i++) {
+            log_info("0x%08x", connectivity_bit_field[mp_i][offset + i]);
+        }
+        offset += n_words;
+    }
+#else
+    use(mp_i);
+    use(start);
+    use(end);
+    use(filters);
+#endif
+}
+
+//! \brief Initialise the bitfield filtering system.
+//! \param[in] filter_region: Where the bitfield configuration is
+//! \return True on success
+static inline bool bit_field_filter_initialise(filter_region_t *filter_region) {
+
+    // try allocating DTCM for starting array for bitfields
+    connectivity_bit_field =
+            spin1_malloc(sizeof(bit_field_t) * master_population_table_length);
+    if (connectivity_bit_field == NULL) {
+        log_warning(
+                "couldn't initialise basic bit field holder. Will end up doing"
+                " possibly more DMA's during the execution than required."
+                " We required %d bytes where %d are available",
+                sizeof(bit_field_t) * master_population_table_length,
+                sark_heap_max(sark.heap, 0));
+        return true;
+    }
+
+    // Go through the population table, and the relevant bitfield list, both
+    // of which are ordered by key...
+    uint32_t bf_i = 0;
+    uint32_t n_filters = filter_region->n_filters;
+    filter_info_t* filters = filter_region->filters;
+    for (uint32_t mp_i = 0; mp_i < master_population_table_length; mp_i++) {
+         connectivity_bit_field[mp_i] = NULL;
+
+         log_debug("Master pop key: 0x%08x, mask: 0x%08x",
+                 master_population_table[mp_i].key, master_population_table[mp_i].mask);
+
+         // With both things being in key order, this should never happen...
+         while (bf_i < n_filters &&
+                 filters[bf_i].key < master_population_table[mp_i].key) {
+             log_debug("Skipping bitfield %d for key 0x%08x", bf_i, filters[bf_i].key);
+             bf_i++;
+         }
+
+         // While there is a match, keep track of the start and end; note this
+         // may recheck the first entry, but there might not be a first entry if
+         // we have already gone off the end of the bitfield array
+         uint32_t start = bf_i;
+         uint32_t n_words_total = 0;
+         uint32_t useful = 0;
+         log_debug("Starting with bit field %d with key 0x%08x", bf_i, filters[bf_i].key);
+         while (bf_i < n_filters && matches(mp_i, filters[bf_i].key)) {
+             log_debug("Using bit field %d with key 0x%08x, merged %d, redundant %d",
+                     bf_i, filters[bf_i].key, filters[bf_i].merged, filters[bf_i].redundant);
+             n_words_total += get_bit_field_size(filters[bf_i].n_atoms);
+             useful += !(filters[bf_i].merged || filters[bf_i].redundant);
+             bf_i++;
+         }
+
+         // If there is something to copy, copy them in now
+         log_debug("Ended with bit field %d with key 0x%08x, n_words %d, useful %d",
+                 bf_i, filters[bf_i].key, n_words_total, useful);
+         if (bf_i != start && useful) {
+             // Try to allocate all the bitfields for this entry
+             connectivity_bit_field[mp_i] = spin1_malloc(
+                     sizeof(bit_field_t) * n_words_total);
+             if (connectivity_bit_field[mp_i] == NULL) {
+                 // If allocation fails, we can still continue
+                 log_info(
+                         "could not initialise bit field for key %d, packets with "
+                         "that key will use a DMA to check if the packet targets "
+                         "anything within this core. Potentially slowing down the "
+                         "execution of neurons on this core.",
+                         master_population_table[mp_i].key);
+                 // There might be more than one that has failed
+                 failed_bit_field_reads += bf_i - start;
+             } else {
+                 // If allocation succeeds, copy the bitfields in
+                 bit_field_t bf_p = &connectivity_bit_field[mp_i][0];
+                 for (uint32_t i = start; i < bf_i; i++) {
+                     uint32_t n_words = get_bit_field_size(filters[i].n_atoms);
+                     spin1_memcpy(bf_p, filters[i].data, n_words * sizeof(uint32_t));
+                     bf_p = &bf_p[n_words];
+                 }
+
+                 print_bitfields(mp_i, start, bf_i, filters);
+             }
+         }
+    }
+    return true;
+}
+
+//! \brief Get the position in the master population table.
+//! \param[in] spike: The spike received
+//! \param[out] position: The position found (only if returns true)
+//! \return True if there is a matching entry, False otherwise
+static inline bool population_table_position_in_the_master_pop_array(
+        spike_t spike, uint32_t *position) {
+    uint32_t imin = 0;
+    uint32_t imax = master_population_table_length;
+
+    while (imin < imax) {
+        int imid = (imax + imin) >> 1;
+        master_population_table_entry entry = master_population_table[imid];
+        if ((spike & entry.mask) == entry.key) {
+            *position = imid;
+            return true;
+        } else if (entry.key < spike) {
+
+            // Entry must be in upper part of the table
+            imin = imid + 1;
+        } else {
+            // Entry must be in lower part of the table
+            imax = imid;
+        }
+    }
+    return false;
+}
 //! \}
 
 //! \name API functions
@@ -251,7 +401,8 @@ static inline void print_master_population_table(void) {
 
 bool population_table_initialise(
         address_t table_address, address_t synapse_rows_address,
-        address_t direct_rows_address, uint32_t *row_max_n_words) {
+        address_t direct_rows_address, filter_region_t *bitfield_address,
+        uint32_t *row_max_n_words) {
     log_debug("population_table_initialise: starting");
 
     master_population_table_length = table_address[0];
@@ -306,6 +457,11 @@ bool population_table_initialise(
 
     *row_max_n_words = 0xFF + N_SYNAPSE_ROW_HEADER_WORDS;
 
+    // Initialise bitfields
+    if (!bit_field_filter_initialise(bitfield_address)) {
+        return false;
+    }
+
     print_master_population_table();
     return true;
 }
@@ -336,8 +492,10 @@ bool population_table_get_first_address(
     last_spike = spike;
     next_item = entry.start;
     items_to_go = entry.count;
+    uint32_t bits_offset = 0;
     if (entry.extra_info_flag) {
         extra_info extra = address_list[next_item++].extra;
+        bits_offset = get_core_index(extra, spike) * extra.n_words;
         last_neuron_id = get_extended_neuron_id(entry, extra, spike);
     } else {
         last_neuron_id = get_neuron_id(entry, spike);
@@ -352,7 +510,7 @@ bool population_table_get_first_address(
         // check that the bit flagged for this neuron id does hit a
         // neuron here. If not return false and avoid the DMA check.
         if (!bit_field_test(
-                connectivity_bit_field[position], last_neuron_id)) {
+                &connectivity_bit_field[position][bits_offset], last_neuron_id)) {
             log_debug("tested and was not set");
             bit_field_filtered_packets += 1;
             return false;
@@ -379,29 +537,6 @@ bool population_table_get_first_address(
         ghost_pop_table_searches++;
     }
     return get_next;
-}
-
-bool population_table_position_in_the_master_pop_array(
-        spike_t spike, uint32_t *position) {
-    uint32_t imin = 0;
-    uint32_t imax = master_population_table_length;
-
-    while (imin < imax) {
-        int imid = (imax + imin) >> 1;
-        master_population_table_entry entry = master_population_table[imid];
-        if ((spike & entry.mask) == entry.key) {
-            *position = imid;
-            return true;
-        } else if (entry.key < spike) {
-
-            // Entry must be in upper part of the table
-            imin = imid + 1;
-        } else {
-            // Entry must be in lower part of the table
-            imax = imid;
-        }
-    }
-    return false;
 }
 
 bool population_table_get_next_address(
@@ -449,32 +584,4 @@ bool population_table_get_next_address(
     return is_valid;
 }
 
-uint32_t population_table_get_ghost_pop_table_searches(void) {
-    return ghost_pop_table_searches;
-}
-
-uint32_t population_table_get_invalid_master_pop_hits(void) {
-    return invalid_master_pop_hits;
-}
-
-void population_table_set_connectivity_bit_field(
-        bit_field_t* connectivity_bit_fields){
-    connectivity_bit_field = connectivity_bit_fields;
-}
-
-uint32_t population_table_length(void) {
-    return master_population_table_length;
-}
-
-spike_t population_table_get_spike_for_index(uint32_t index) {
-    return master_population_table[index].key;
-}
-
-uint32_t population_table_get_mask_for_entry(uint32_t index) {
-    return master_population_table[index].mask;
-}
-
-uint32_t population_table_get_filtered_packet_count(void) {
-    return bit_field_filtered_packets;
-}
 //! \}

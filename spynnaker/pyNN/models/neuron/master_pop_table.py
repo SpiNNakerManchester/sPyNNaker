@@ -23,6 +23,7 @@ from spynnaker.pyNN.exceptions import (
     SynapseRowTooBigException, SynapticConfigurationException)
 from spynnaker.pyNN.utilities.constants import (
     POPULATION_BASED_REGIONS, POP_TABLE_MAX_ROW_LENGTH)
+from spynnaker.pyNN.utilities.bit_field_utilities import BIT_IN_A_WORD
 
 logger = logging.getLogger(__name__)
 
@@ -99,7 +100,9 @@ class _ExtraInfoCType(ctypes.LittleEndianStructure):
     """
     _fields_ = [
         # The mask to apply to the key once shifted get the core index
-        ("core_mask", ctypes.c_uint32, 16),
+        ("core_mask", ctypes.c_uint32, 10),
+        # The number of words required for n_neurons
+        ("n_words", ctypes.c_uint32, 6),
         # The shift to apply to the key to get the core part (0-31)
         ("mask_shift", ctypes.c_uint32, 5),
         # The number of neurons per core (up to 2048)
@@ -109,7 +112,7 @@ class _ExtraInfoCType(ctypes.LittleEndianStructure):
 
 # The maximum n_neurons value
 _MAX_N_NEURONS = (1 << _n_bits(_ExtraInfoCType.n_neurons)) - 1
-# Maximum core mask (i.e. number of cores) (=16-bits of mask)
+# Maximum core mask (i.e. number of cores)
 _MAX_CORE_MASK = (1 << _n_bits(_ExtraInfoCType.core_mask)) - 1
 
 
@@ -287,6 +290,8 @@ class _MasterPopEntry(object):
             entry.extra_info_flag = True
             extra_info = address_list[next_addr].extra
             extra_info.core_mask = self.__core_mask
+            extra_info.n_words = int(math.ceil(
+                self.__n_neurons / BIT_IN_A_WORD))
             extra_info.n_neurons = self.__n_neurons
             extra_info.mask_shift = self.__core_shift
             next_addr += 1

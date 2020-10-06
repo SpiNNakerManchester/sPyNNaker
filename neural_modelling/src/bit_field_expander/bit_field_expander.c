@@ -22,9 +22,9 @@
 #include <spin1_api.h>
 #include <data_specification.h>
 #include <debug.h>
-#include <neuron/population_table/population_table.h>
-#include <neuron/direct_synapses.h>
 #include <neuron/synapse_row.h>
+#include <neuron/direct_synapses.h>
+#include <neuron/population_table/population_table.h>
 
 // stuff needed for the structural stuff to work
 #include <neuron/structural_plasticity/synaptogenesis/sp_structs.h>
@@ -130,8 +130,6 @@ static inline vcpu_t *vcpu(void) {
 //! \brief Mark this process as failed.
 static inline void fail_shut_down(void) {
     vcpu()->user2 = 1;
-    bit_field_base_address->n_merged_filters = 0;
-    bit_field_base_address->n_redundancy_filters = 0;
     bit_field_base_address->n_filters = 0;
 }
 
@@ -156,8 +154,6 @@ void read_in_addresses(void) {
             builder_data->bit_field_region_id, dsg_metadata);
 
     // fill in size zero in case population table never read in
-    bit_field_base_address->n_merged_filters = 0;
-    bit_field_base_address->n_redundancy_filters = 0;
     bit_field_base_address->n_filters = 0;
     direct_matrix_region_base_address = data_specification_get_region(
             builder_data->direct_matrix_region_id, dsg_metadata);
@@ -168,8 +164,16 @@ void read_in_addresses(void) {
         structural_matrix_region_base_address = data_specification_get_region(
                 builder_data->structural_matrix_region_id, dsg_metadata);
     }
-    keys_to_max_atoms = data_specification_get_region(
+    key_atom_data_t *keys_to_max_atoms_sdram = data_specification_get_region(
             builder_data->bit_field_key_map_region_id, dsg_metadata);
+    uint32_t pair_size = sizeof(key_atom_data_t) +
+            (keys_to_max_atoms_sdram->n_pairs * sizeof(key_atom_pair_t));
+    keys_to_max_atoms = spin1_malloc(pair_size);
+    if (keys_to_max_atoms == NULL) {
+        log_error("Couldn't allocate memory for key_to_max_atoms");
+        rt_error(RTE_SWERR);
+    }
+    spin1_memcpy(keys_to_max_atoms, keys_to_max_atoms_sdram, pair_size);
 
     // printer
     log_debug("master_pop_table_base_address = %0x", master_pop_base_address);
@@ -201,51 +205,6 @@ static void print_key_to_max_atom_map(void) {
 }
 #endif
 
-//! \brief Deduce the number of neurons from the key.
-//! \param[in] key: the key to convert to n_neurons
-//! \return the number of neurons from the key map based off this key
-static uint32_t n_neurons_from_key(uint32_t key) {
-    int key_index = 0;
-    log_debug("n pairs is %d", keys_to_max_atoms->n_pairs);
-    while (key_index < keys_to_max_atoms->n_pairs) {
-        key_atom_pair_t entry = keys_to_max_atoms->pairs[key_index];
-        if (entry.key == key) {
-            return entry.n_atoms;
-        }
-        key_index++;
-    }
-
-    log_error("did not find the key %x in the map. WTF!", key);
-    log_error("n pairs is %d", keys_to_max_atoms->n_pairs);
-    for (int pair_id = 0; pair_id < keys_to_max_atoms->n_pairs; pair_id++) {
-        key_atom_pair_t entry = keys_to_max_atoms->pairs[key_index];
-        log_error("key at index %d is %x and equal = %d",
-                pair_id, entry.key, entry.key == key);
-    }
-    rt_error(RTE_SWERR);
-    return NULL;
-}
-
-//! \brief Create a fake bitfield where every bit is set to 1.
-//! \return whether the creation of the fake bitfield was successful.
-static bool create_fake_bit_field(void) {
-    fake_bit_fields = spin1_malloc(
-            population_table_length() * sizeof(bit_field_t));
-    if (fake_bit_fields == NULL) {
-        log_error("failed to alloc dtcm for the fake bitfield holders");
-        return false;
-    }
-
-    // iterate through the master pop entries
-    for (uint32_t master_pop_entry = 0;
-            master_pop_entry < population_table_length();
-            master_pop_entry++) {
-        fake_bit_fields[master_pop_entry] = NULL;
-    }
-    log_info("finished fake bit field");
-    return true;
-}
-
 //! \brief Set up the master pop table and synaptic matrix for the bit field
 //!        processing.
 //! \return whether the init was successful.
@@ -262,7 +221,8 @@ bool initialise(void) {
     log_info("pop table init");
     if (!population_table_initialise(
             master_pop_base_address, synaptic_matrix_base_address,
-            direct_synapses_address, &row_max_n_words)) {
+            direct_synapses_address, bit_field_base_address,
+            &row_max_n_words)) {
         log_error("failed to init the master pop table. failing");
         return false;
     }
@@ -277,10 +237,7 @@ bool initialise(void) {
         }
     }
 
-    log_info(" elements in master pop table is %d \n and max rows is %d",
-             population_table_length(), row_max_n_words);
-
-    if (population_table_length() == 0) {
+    if (keys_to_max_atoms->n_pairs == 0) {
          success_shut_down();
          log_info("successfully processed the bitfields as there wasn't any");
          can_run = false;
@@ -292,24 +249,14 @@ bool initialise(void) {
     print_key_to_max_atom_map();
 #endif
 
-    // set up a fake bitfield so that it always says there's something to read
-    if (!create_fake_bit_field()) {
-        log_error("failed to create fake bit field");
-        return false;
-    }
-
     // set up a sdram read for a row
-    log_info("allocating dtcm for row data");
+    log_debug("allocating dtcm for row data");
     row_data = spin1_malloc(row_max_n_words * sizeof(uint32_t));
     if (row_data == NULL) {
         log_error("could not allocate dtcm for the row data");
         return false;
     }
-    log_debug("finished dtcm for row data");
-    // set up the fake connectivity lookup into the master pop table
-
-    population_table_set_connectivity_bit_field(fake_bit_fields);
-    log_info("finished pop table set connectivity lookup");
+    log_debug("finished pop table set connectivity lookup");
 
     return true;
 }
@@ -349,51 +296,39 @@ static bool do_sdram_read_and_test(
     return process_synaptic_row(row_data);
 }
 
-//! Sort the bitfield filters to remove redundancy.
-static void sort_by_redunancy(void) {
+//! \brief Sort filters by key
+static inline void sort_by_key(void) {
+    filter_info_t *filters = bit_field_base_address->filters;
+    for (uint32_t i = 1; i < bit_field_base_address->n_filters; i++) {
+        const filter_info_t temp = filters[i];
+
+        uint32_t j;
+        for (j = i; j > 0 && filters[j - 1].key > temp.key; j--) {
+            filters[j] = filters[j - 1];
+        }
+        filters[j] = temp;
+    }
+}
+
+//! Determine which bit fields are redundant
+static void determine_redundancy(void) {
     // Semantic sugar to keep the code a little shorter
     filter_info_t *filters = bit_field_base_address->filters;
-
-    // no filters merged of course
-    bit_field_base_address->n_merged_filters = 0;
-
-    int n_redundancy_filters = bit_field_base_address->n_filters;
-    int i = 0;
-    // move packets without redundancy to the end
-    while (i < n_redundancy_filters) {
+    for (uint32_t i = 0; i < bit_field_base_address->n_filters; i++) {
+        filters[i].merged = 0;
+        filters[i].redundant = 0;
         int i_atoms = filters[i].n_atoms;
         int i_words = get_bit_field_size(i_atoms);
-        if (i_atoms > count_bit_field(filters[i].data, i_words)) {
-            // Found redundancy so leave at top
-            i++;
-        } else {
-            // reduce the number of redundant so it point at last to check
-            n_redundancy_filters--;
-
-            // Swap; OK to do a self swap if i was the last to check
-            filter_info_t bit_field_temp = filters[i];
-            filters[i] = filters[n_redundancy_filters];
-            filters[n_redundancy_filters] = bit_field_temp;
+        if (i_atoms == count_bit_field(filters[i].data, i_words)) {
+            filters[i].redundant = 1;
         }
     }
-    bit_field_base_address->n_redundancy_filters = n_redundancy_filters;
 
-    // bubble sort just the packets with redundancy
-    for (int i = 0; i < n_redundancy_filters -1; i++) {
-        int i_atoms = filters[i].n_atoms;
-        int i_words = get_bit_field_size(i_atoms);
-        int i_redunant = i_atoms - count_bit_field(filters[i].data, i_words);
-        for (int j = i + 1; j < n_redundancy_filters; j++) {
-            int j_atoms = filters[j].n_atoms;
-            int j_words = get_bit_field_size(j_atoms);
-            int j_redunant =
-                    j_atoms - count_bit_field(filters[j].data, j_words);
-            if (i_redunant < j_redunant) {
-                filter_info_t bit_field_temp = filters[i];
-                filters[i] = filters[j];
-                filters[j] = bit_field_temp;
-                i_redunant = j_redunant;
-            }
+    for (uint32_t i = 0; i < bit_field_base_address->n_filters; i++) {
+        log_info("    Key: 0x%08x, Filter:", filters[i].key);
+        uint32_t n_words = get_bit_field_size(filters[i].n_atoms);
+        for (uint32_t j = 0; j < n_words; j++) {
+            log_info("        0x%08x", filters[i].data[j]);
         }
     }
 }
@@ -403,30 +338,27 @@ static void sort_by_redunancy(void) {
 bool generate_bit_field(void) {
     // write how many entries (thus bitfields) are to be generated into sdram
     log_debug("update by pop length");
-    bit_field_base_address->n_filters = population_table_length();
+    bit_field_base_address->n_filters = keys_to_max_atoms->n_pairs;
 
     // location where to dump the bitfields into (right after the filter structs
     address_t bit_field_words_location = (address_t)
-            &bit_field_base_address->filters[population_table_length()];
+            &bit_field_base_address->filters[bit_field_base_address->n_filters];
     log_info("words location is %x", bit_field_words_location);
     int position = 0;
 
      // iterate through the master pop entries
     log_debug("starting master pop entry bit field generation");
-    for (uint32_t master_pop_entry=0;
-            master_pop_entry < population_table_length();
-            master_pop_entry++) {
+    for (uint32_t i = 0; i < keys_to_max_atoms->n_pairs; i++) {
 
         // determine keys masks and n_neurons
-        spike_t key = population_table_get_spike_for_index(master_pop_entry);
-        uint32_t mask = population_table_get_mask_for_entry(master_pop_entry);
-        uint32_t n_neurons = n_neurons_from_key(key);
+        spike_t key = keys_to_max_atoms->pairs[i].key;
+        uint32_t n_neurons = keys_to_max_atoms->pairs[i].n_atoms;
 
         // generate the bitfield for this master pop entry
         uint32_t n_words = get_bit_field_size(n_neurons);
 
-        log_debug("pop entry %d, key = %d, mask = %0x, n_neurons = %d",
-                master_pop_entry, (uint32_t) key, mask, n_neurons);
+        log_debug("Bitfield %d, key = %d, n_neurons = %d",
+                i, (uint32_t) key, n_neurons);
         bit_field_t bit_field = bit_field_alloc(n_neurons);
         if (bit_field == NULL) {
             log_error("could not allocate dtcm for bit field");
@@ -503,17 +435,17 @@ bool generate_bit_field(void) {
         }
 
         log_debug("writing bitfield to sdram for core use");
-        bit_field_base_address->filters[master_pop_entry].key = key;
-        log_debug("putting master pop key %d in entry %d", key, master_pop_entry);
-        bit_field_base_address->filters[master_pop_entry].n_atoms = n_neurons;
-        log_debug("putting n_atom %d in entry %d", n_neurons, master_pop_entry);
+        bit_field_base_address->filters[i].key = key;
+        log_debug("putting master pop key %d in entry %d", key, i);
+        bit_field_base_address->filters[i].n_atoms = n_neurons;
+        log_debug("putting n_atom %d in entry %d", n_neurons, i);
         // write bitfield to sdram.
         log_debug("writing to address %0x, %d words to write",
                 &bit_field_words_location[position], n_words);
         spin1_memcpy(&bit_field_words_location[position], bit_field,
                 n_words * BYTE_TO_WORD_CONVERSION);
         // update pointer to correct place
-        bit_field_base_address->filters[master_pop_entry].data =
+        bit_field_base_address->filters[i].data =
                 (bit_field_t) &bit_field_words_location[position];
 
         // update tracker
@@ -523,7 +455,8 @@ bool generate_bit_field(void) {
         log_debug("freeing the bitfield dtcm");
         sark_free(bit_field);
     }
-    sort_by_redunancy();
+    determine_redundancy();
+    sort_by_key();
     return true;
 }
 
