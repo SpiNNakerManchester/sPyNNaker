@@ -23,8 +23,6 @@ from pacman.model.partitioner_splitters.abstract_splitters.\
     abstract_dependent_splitter import AbstractDependentSplitter
 from pacman.model.resources import (
     ResourceContainer, ConstantSDRAM, DTCMResource, CPUCyclesPerTickResource)
-from pacman.model.partitioner_splitters.abstract_splitters.\
-    abstract_splitter_slice import AbstractSplitterSlice
 from pacman.utilities import utility_calls
 from pacman.utilities.algorithm_utilities.\
     partition_algorithm_utilities import get_remaining_constraints
@@ -131,7 +129,7 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
 
     @overrides(AbstractDependentSplitter.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
-        AbstractSplitterSlice.set_governed_app_vertex(self, app_vertex)
+        AbstractDependentSplitter.set_governed_app_vertex(self, app_vertex)
         if not isinstance(app_vertex, DelayExtensionVertex):
             raise SpynnakerSplitterConfigurationException(
                 self.INVALID_POP_ERROR_MESSAGE.format(app_vertex))
