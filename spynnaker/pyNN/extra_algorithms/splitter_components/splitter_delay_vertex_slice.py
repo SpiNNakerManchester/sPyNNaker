@@ -97,7 +97,6 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
         additional_arguments=["app_graph"])
     def create_machine_vertices(
             self, resource_tracker, machine_graph, app_graph):
-        self._machine_vertex_by_slice = dict()
         pre_slices, is_exact = self._other_splitter.get_out_going_slices()
 
         # check for exacts.
@@ -275,3 +274,8 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
     def machine_vertices_for_recording(self, variable_to_record):
         raise PacmanInvalidParameterException(
             variable_to_record, variable_to_record, self.DELAY_RECORDING_ERROR)
+
+    @overrides(AbstractDependentSplitter.reset_called)
+    def reset_called(self):
+        AbstractDependentSplitter.reset_called(self)
+        self._machine_vertex_by_slice = dict()

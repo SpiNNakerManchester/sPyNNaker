@@ -88,8 +88,7 @@ class DelayExtensionVertex(
         # Dictionary of vertex_slice -> delay block for data specification
         self.__delay_blocks = dict()
 
-        self.add_constraint(
-            SameAtomsAsVertexConstraint(source_vertex))
+        self.add_constraint(SameAtomsAsVertexConstraint(source_vertex))
 
     @property
     def n_atoms(self):
