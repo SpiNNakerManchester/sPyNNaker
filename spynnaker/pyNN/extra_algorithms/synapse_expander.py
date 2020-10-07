@@ -54,27 +54,30 @@ def synapse_expander(
     synapse_bin = executable_finder.get_executable_path(SYNAPSE_EXPANDER)
     delay_bin = executable_finder.get_executable_path(DELAY_EXPANDER)
 
-    progress = ProgressBar(len(app_graph.vertices) + 2, "Expanding Synapses")
-
     # Find the places where the synapse expander and delay receivers should run
     expander_cores, expanded_pop_vertices = _plan_expansion(
-        app_graph, placements, synapse_bin, delay_bin, progress)
+        app_graph, placements, synapse_bin, delay_bin)
 
+    progress = ProgressBar(expander_cores.total_processors,
+                           "Expanding Synapses")
     expander_app_id = transceiver.app_id_tracker.get_new_id()
     run_system_application(
         expander_cores, expander_app_id, transceiver, provenance_file_path,
         executable_finder, extract_iobuf, None,
-        [CPUState.FINISHED], False, "synapse_expander_on_{}_{}_{}.txt")
+        [CPUState.FINISHED], False, "synapse_expander_on_{}_{}_{}.txt",
+        progress_bar=progress, logger=logger)
     progress.end()
     _fill_in_connection_data(expanded_pop_vertices, transceiver)
 
 
 def _plan_expansion(app_graph, placements, synapse_expander_bin,
-                    delay_expander_bin, progress):
+                    delay_expander_bin):
     expander_cores = ExecutableTargets()
     expanded_pop_vertices = list()
 
-    for vertex in progress.over(app_graph.vertices, finish_at_end=False):
+    progress = ProgressBar(len(app_graph.vertices),
+                           "Preparing to Expand Synapses")
+    for vertex in progress.over(app_graph.vertices):
         # Add all machine vertices of the population vertex to ones
         # that need synapse expansion
         if isinstance(vertex, AbstractPopulationVertex):
