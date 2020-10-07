@@ -278,7 +278,8 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
                     max_delay_needed, app_edge,
                     app_edge.post_vertex.splitter_object,
                     post_vertex_max_delay,
-                    DelayExtensionVertex.MAX_SUPPORTED_DELAY_IN_TICKS))
+                    DelayExtensionVertex.get_max_delay_ticks_supported(
+                        post_vertex_max_delay)))
 
         # return data for building delay extensions
         return max_delay_needed, post_vertex_max_delay, True
