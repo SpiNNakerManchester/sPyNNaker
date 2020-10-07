@@ -40,6 +40,8 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
     """ a splitter partitioner that's bespoke for spynnaker vertices.
     """
 
+    MACHINE_EDGE_LABEL = "machine_edge_for_{}"
+
     __slots__ = [
         "_app_to_delay_map",
         "_delay_post_edge_map",
@@ -328,6 +330,7 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
 
         # build edge and add to machine graph
         machine_edge = common_edge_type(
-            src_machine_vertex, dest_machine_vertex, app_edge=app_edge)
+            src_machine_vertex, dest_machine_vertex, app_edge=app_edge,
+            label=self.MACHINE_EDGE_LABEL.format(app_edge.label))
         machine_graph.add_edge(
             machine_edge, app_outgoing_edge_partition.identifier)
