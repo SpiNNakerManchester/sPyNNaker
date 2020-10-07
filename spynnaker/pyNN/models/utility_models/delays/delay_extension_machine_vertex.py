@@ -178,13 +178,13 @@ class DelayExtensionMachineVertex(
             self.EXTRA_PROVENANCE_DATA_ENTRIES.N_TIMES_TDMA_FELL_BEHIND.value]
         n_saturation = provenance_data[
             self.EXTRA_PROVENANCE_DATA_ENTRIES.
-            N_PACKETS_LOST_DUE_TO_COUNT_SATURATION]
+            N_PACKETS_LOST_DUE_TO_COUNT_SATURATION.value]
         n_packets_invalid_neuron = provenance_data[
             self.EXTRA_PROVENANCE_DATA_ENTRIES.
-            N_PACKETS_WITH_INVALID_NEURON_IDS]
-        n_packets_invalid_keys = self.EXTRA_PROVENANCE_DATA_ENTRIES[
+            N_PACKETS_WITH_INVALID_NEURON_IDS.value]
+        n_packets_invalid_keys = provenance_data[
             self.EXTRA_PROVENANCE_DATA_ENTRIES.
-            N_PACKETS_DROPPED_DUE_TO_INVALID_KEY]
+            N_PACKETS_DROPPED_DUE_TO_INVALID_KEY.value]
 
         label, x, y, p, names = self._get_placement_details(placement)
 
