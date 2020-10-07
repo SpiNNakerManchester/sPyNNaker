@@ -665,7 +665,7 @@ class SynapticManager(object):
 
         n_bytes = (
             SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES +
-            (self.__n_synapse_types * 2 * BYTES_PER_WORD))
+            (self.__n_synapse_types * DataType.U3232.size))
         for data in generator_data:
             n_bytes += data.size
 
