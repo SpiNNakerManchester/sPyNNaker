@@ -40,8 +40,6 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
     """ a splitter partitioner that's bespoke for spynnaker vertices.
     """
 
-    MACHINE_EDGE_LABEL = "machine_edge_for_{}"
-
     __slots__ = [
         "_app_to_delay_map",
         "_delay_post_edge_map",
