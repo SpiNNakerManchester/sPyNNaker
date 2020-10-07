@@ -1016,7 +1016,8 @@ class SynapticManager(object):
             max_row_info.undelayed_max_n_synapses,
             max_row_info.delayed_max_n_synapses, gen.pre_slices, gen.pre_index,
             post_slices, post_slice_index, gen.pre_slice, post_vertex_slice,
-            gen.synapse_info, n_delay_stages + 1, machine_time_step))
+            gen.synapse_info, n_delay_stages + 1,
+            gen.app_edge.n_delay_per_stage, machine_time_step))
         self.__gen_on_machine[post_vertex_slice] = True
 
         if index is not None and d_index is not None and index != d_index:

@@ -105,7 +105,7 @@ class ProjectionApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
         :rtype: int
         """
         if self.__delay_edge is None:
-            return 0
+            return self._post_vertex.splitter_object.max_support_delay()
         return self.__delay_edge.pre_vertex.delay_per_stage
 
     @overrides(ApplicationEdge._create_machine_edge)
