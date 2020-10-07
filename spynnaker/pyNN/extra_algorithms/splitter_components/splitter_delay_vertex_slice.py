@@ -91,8 +91,12 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
     def source_of_delay_vertex(self):
         return self._other_splitter.governed_app_vertex
 
-    @overrides(AbstractDependentSplitter.create_machine_vertices)
-    def create_machine_vertices(self, resource_tracker, machine_graph):
+    @inject_items({"app_graph": "MemoryApplicationGraph"})
+    @overrides(
+        AbstractDependentSplitter.create_machine_vertices,
+        additional_arguments=["app_graph"])
+    def create_machine_vertices(
+            self, resource_tracker, machine_graph, app_graph):
         self._machine_vertex_by_slice = dict()
         pre_slices, is_exact = self._other_splitter.get_out_going_slices()
 
@@ -107,7 +111,8 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
                 vertex_slice, resource_tracker,
                 self.DELAY_EXTENSION_SLICE_LABEL.format(
                     self._other_splitter.governed_app_vertex, vertex_slice),
-                get_remaining_constraints(self._governed_app_vertex))
+                get_remaining_constraints(self._governed_app_vertex),
+                app_graph)
             machine_graph.add_vertex(vertex)
 
     @overrides(AbstractDependentSplitter.get_in_coming_slices)
@@ -134,18 +139,19 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
 
     def create_machine_vertex(
             self, vertex_slice, resource_tracker, label,
-            remaining_constraints):
+            remaining_constraints, graph):
         """ creates a delay extension machine vertex and adds to the tracker.
 
         :param Slice vertex_slice: vertex slice
         :param ResourceTracker resource_tracker: resources
         :param str label:  human readable label for machine vertex.
         :param remaining_constraints: none partitioner constraints.
+        :param ApplicationGraph graph: the app graph
         :type remaining_constraints: iterable [Constraint]
         :return: machine vertex
         :rtype: DelayExtensionMachineVertex
         """
-        resources = self.get_resources_used_by_atoms(vertex_slice)
+        resources = self.get_resources_used_by_atoms(vertex_slice, graph)
         resource_tracker.allocate_constrained_resources(
             resources, self._governed_app_vertex.constraints)
 
@@ -156,7 +162,6 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
         self._machine_vertex_by_slice[vertex_slice] = machine_vertex
         return machine_vertex
 
-    @inject_items({"graph": "MemoryApplicationGraph"})
     def get_resources_used_by_atoms(self, vertex_slice, graph):
         """ ger res for a APV
 
