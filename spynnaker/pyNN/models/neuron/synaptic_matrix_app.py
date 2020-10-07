@@ -385,7 +385,7 @@ class SynapticMatrixApp(object):
         # If we have routing info but no synapses, write an invalid entry
         if self.__max_row_info.delayed_max_n_synapses == 0:
             self.__delay_index = self.__poptable.add_invalid_entry(
-                self.__delay_app_key.key_and_mask)
+                self.__delay_app_key_info.key_and_mask)
             return block_addr
 
         # Write a matrix for the whole application vertex
