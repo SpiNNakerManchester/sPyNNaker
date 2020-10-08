@@ -283,15 +283,12 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         """
 
     def gen_connector_params(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
+            self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
             synapse_type, synapse_info):
         """ Get the parameters of the on machine generation.
 
         :param list(~pacman.model.graphs.common.Slice) pre_slices:
-        :param int pre_slice_index:
         :param list(~pacman.model.graphs.common.Slice) post_slices:
-        :param int post_slice_index:
         :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         :param AbstractSynapseType synapse_type:

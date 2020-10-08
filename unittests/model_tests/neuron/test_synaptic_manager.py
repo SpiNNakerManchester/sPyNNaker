@@ -229,7 +229,6 @@ class TestSynapticManager(unittest.TestCase):
         post_vertex_slice = Slice(0, 9)
         post_vertex = post_app_vertex.create_machine_vertex(
             post_vertex_slice, None)
-        post_slice_index = 0
 
         one_to_one_connector_1 = OneToOneConnector(None)
         direct_synapse_information_1 = SynapseInformation(
@@ -292,7 +291,7 @@ class TestSynapticManager(unittest.TestCase):
         synaptic_manager._direct_matrix_region = direct_region
 
         synaptic_manager._write_synaptic_matrix_and_master_population_table(
-            spec, [post_vertex_slice], post_slice_index, post_vertex,
+            spec, [post_vertex_slice], post_vertex,
             post_vertex_slice, all_syn_block_sz, weight_scales,
             routing_info, graph, machine_time_step)
         spec.end_specification()

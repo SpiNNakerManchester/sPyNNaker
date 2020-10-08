@@ -464,8 +464,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
 
     @abstractmethod
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
+            self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
             synapse_type, synapse_info):
         """ Create a synaptic block from the data.
 
@@ -476,9 +475,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float
             or list(int) or list(float)
         :param list(~pacman.model.graphs.common.Slice) pre_slices:
-        :param int pre_slice_index:
         :param list(~pacman.model.graphs.common.Slice) post_slices:
-        :param int post_slice_index:
         :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         :param AbstractSynapseType synapse_type:
