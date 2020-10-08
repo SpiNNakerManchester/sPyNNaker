@@ -88,24 +88,25 @@
 
     <span class="nd">@abstractmethod</span>
 <div class="viewcode-block" id="AbstractSynapseDynamicsStructural.get_structural_parameters_sdram_usage_in_bytes"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamicsStructural.get_structural_parameters_sdram_usage_in_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">get_structural_parameters_sdram_usage_in_bytes</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">application_graph</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span> <span class="n">vertex</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the size of the structural parameters</span>
 
-<span class="sd">        :param ~pacman.model.graphs.application.ApplicationGraph \</span>
-<span class="sd">                application_graph:</span>
-<span class="sd">        :param ~spynnaker.pyNN.models.neuron.AbstractPopulationVertex \</span>
-<span class="sd">                app_vertex:</span>
+<span class="sd">        Note: At the Application level this will be an estimate.</span>
+
+<span class="sd">        :param graph: Graph at same level as vertex.</span>
+<span class="sd">        :type graph: ApplicationGraph or MachineGraph</span>
+<span class="sd">        :param vertex: Vertex at the same level as the graph</span>
+<span class="sd">        :type vertex: ApplicationVertex or MachineVertex</span>
 <span class="sd">        :param int n_neurons:</span>
-<span class="sd">        :param int n_synapse_types:</span>
 <span class="sd">        :return: the size of the parameters, in bytes</span>
 <span class="sd">        :rtype: int</span>
+<span class="sd">        :raises PacmanInvalidParameterException</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
     <span class="nd">@abstractmethod</span>
 <div class="viewcode-block" id="AbstractSynapseDynamicsStructural.write_structural_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamicsStructural.write_structural_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">write_structural_parameters</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span>
-            <span class="n">application_graph</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span> <span class="n">post_slice</span><span class="p">,</span>
-            <span class="n">routing_info</span><span class="p">,</span> <span class="n">synapse_indices</span><span class="p">):</span>
+            <span class="n">machine_graph</span><span class="p">,</span> <span class="n">machine_vertex</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span> <span class="n">synapse_indices</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Write structural plasticity parameters</span>
 
 <span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
@@ -113,10 +114,8 @@
 <span class="sd">        :param int machine_time_step:</span>
 <span class="sd">        :param weight_scales:</span>
 <span class="sd">        :type weight_scales: ~numpy.ndarray or list(float)</span>
-<span class="sd">        :param ~pacman.model.graphs.application.ApplicationGraph\</span>
-<span class="sd">                application_graph:</span>
-<span class="sd">        :param AbstractPopulationVertex app_vertex:</span>
-<span class="sd">        :param ~pacman.model.graphs.common.Slice post_slice:</span>
+<span class="sd">        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:</span>
+<span class="sd">        :param MachineVertex machine_vertex:</span>
 <span class="sd">        :param ~pacman.model.routing_info.RoutingInfo routing_info:</span>
 <span class="sd">        :param dict(tuple(SynapseInformation,int),int) synapse_indices:</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>

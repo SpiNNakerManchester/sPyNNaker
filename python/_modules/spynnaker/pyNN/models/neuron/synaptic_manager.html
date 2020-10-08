@@ -517,8 +517,7 @@
                       <span class="n">AbstractSynapseDynamicsStructural</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_dynamics</span>\
                 <span class="o">.</span><span class="n">get_structural_parameters_sdram_usage_in_bytes</span><span class="p">(</span>
-                     <span class="n">app_graph</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">,</span>
-                     <span class="bp">self</span><span class="o">.</span><span class="n">__n_synapse_types</span><span class="p">)</span>
+                     <span class="n">app_graph</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_dynamics</span><span class="o">.</span><span class="n">get_parameters_sdram_usage_in_bytes</span><span class="p">(</span>
                 <span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_synapse_types</span><span class="p">)</span>
@@ -546,15 +545,13 @@
 
     <span class="k">def</span> <span class="nf">_reserve_memory_regions</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">machine_vertex</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span>
-            <span class="n">all_syn_block_sz</span><span class="p">,</span> <span class="n">application_graph</span><span class="p">,</span> <span class="n">application_vertex</span><span class="p">):</span>
+            <span class="n">all_syn_block_sz</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param ~.DataSpecificationGenerator spec:</span>
 <span class="sd">        :param ~.MachineVertex machine_vertex:</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
 <span class="sd">        :param ~.MachineGraph machine_graph:</span>
 <span class="sd">        :param int all_syn_block_sz:</span>
-<span class="sd">        :param ~.ApplicationGraph application_graph:</span>
-<span class="sd">        :param ~.ApplicationVertex application_vertex:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
             <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_synapse_params_region</span><span class="p">,</span>
@@ -592,8 +589,7 @@
             <span class="n">synapse_structural_dynamics_sz</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_dynamics</span><span class="o">.</span>
                 <span class="n">get_structural_parameters_sdram_usage_in_bytes</span><span class="p">(</span>
-                    <span class="n">application_graph</span><span class="p">,</span> <span class="n">application_vertex</span><span class="p">,</span>
-                    <span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_synapse_types</span><span class="p">))</span>
+                    <span class="n">machine_graph</span><span class="p">,</span> <span class="n">machine_vertex</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">))</span>
 
             <span class="k">if</span> <span class="n">synapse_structural_dynamics_sz</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
@@ -1295,7 +1291,7 @@
             <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">in_edges</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_reserve_memory_regions</span><span class="p">(</span>
             <span class="n">spec</span><span class="p">,</span> <span class="n">machine_vertex</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span>
-            <span class="n">all_syn_block_sz</span><span class="p">,</span> <span class="n">application_graph</span><span class="p">,</span> <span class="n">application_vertex</span><span class="p">)</span>
+            <span class="n">all_syn_block_sz</span><span class="p">)</span>
 
         <span class="n">ring_buffer_shifts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_ring_buffer_shifts</span><span class="p">(</span>
             <span class="n">application_vertex</span><span class="p">,</span> <span class="n">application_graph</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span>
@@ -1317,8 +1313,8 @@
                           <span class="n">AbstractSynapseDynamicsStructural</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_dynamics</span><span class="o">.</span><span class="n">write_structural_parameters</span><span class="p">(</span>
                     <span class="n">spec</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_struct_dynamics_region</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span>
-                    <span class="n">weight_scales</span><span class="p">,</span> <span class="n">application_graph</span><span class="p">,</span> <span class="n">application_vertex</span><span class="p">,</span>
-                    <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_indices</span><span class="p">)</span>
+                    <span class="n">weight_scales</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span> <span class="n">machine_vertex</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_indices</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__weight_scales</span><span class="p">[</span><span class="n">placement</span><span class="p">]</span> <span class="o">=</span> <span class="n">weight_scales</span>
 
