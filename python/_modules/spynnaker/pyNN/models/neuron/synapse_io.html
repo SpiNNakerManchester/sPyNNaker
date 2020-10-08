@@ -363,8 +363,7 @@
         <span class="k">return</span> <span class="n">max_row_length</span><span class="p">,</span> <span class="n">row_data</span>
 
 <div class="viewcode-block" id="SynapseIORowBased.get_synapses"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synapse_io.SynapseIORowBased.get_synapses">[docs]</a>    <span class="k">def</span> <span class="nf">get_synapses</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">pre_slices</span><span class="p">,</span> <span class="n">pre_slice_index</span><span class="p">,</span>
-            <span class="n">post_slices</span><span class="p">,</span> <span class="n">post_slice_index</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">pre_slices</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span>
             <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_delay_stages</span><span class="p">,</span> <span class="n">population_table</span><span class="p">,</span>
             <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span>
             <span class="n">app_edge</span><span class="p">,</span> <span class="n">machine_edge</span><span class="p">):</span>
@@ -374,9 +373,7 @@
 
 <span class="sd">        :param SynapseInformation synapse_info:</span>
 <span class="sd">        :param list(~pacman.model.graphs.common.Slice) pre_slices:</span>
-<span class="sd">        :param int pre_slice_index:</span>
 <span class="sd">        :param list(~pacman.model.graphs.common.Slice) post_slices:</span>
-<span class="sd">        :param int post_slice_index:</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice post_vertex_slice:</span>
 <span class="sd">        :param int n_delay_stages:</span>
@@ -401,9 +398,8 @@
 
         <span class="c1"># Get the actual connections</span>
         <span class="n">connections</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">connector</span><span class="o">.</span><span class="n">create_synaptic_block</span><span class="p">(</span>
-            <span class="n">pre_slices</span><span class="p">,</span> <span class="n">pre_slice_index</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">,</span> <span class="n">post_slice_index</span><span class="p">,</span>
-            <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">synapse_type</span><span class="p">,</span>
-            <span class="n">synapse_info</span><span class="p">)</span>
+            <span class="n">pre_slices</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
+            <span class="n">synapse_info</span><span class="o">.</span><span class="n">synapse_type</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span>
 
         <span class="c1"># Convert delays to timesteps</span>
         <span class="n">connections</span><span class="p">[</span><span class="s2">&quot;delay&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">rint</span><span class="p">(</span>
