@@ -16,9 +16,6 @@
 from collections import defaultdict
 import logging
 import math
-
-from spinn_front_end_common.abstract_models.impl.\
-    tdma_aware_application_vertex import TDMAAwareApplicationVertex
 from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.key_allocator_constraints import (
@@ -30,6 +27,8 @@ from pacman.model.resources import (
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification,
     AbstractProvidesOutgoingPartitionConstraints)
+from spinn_front_end_common.abstract_models.impl import (
+    TDMAAwareApplicationVertex)
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES, BITS_PER_WORD,
@@ -178,18 +177,15 @@ class DelayExtensionVertex(
             self.__delay_blocks[vertex_slice].add_delay(source_id, stage)
 
     def add_generator_data(
-            self, max_row_n_synapses, max_delayed_row_n_synapses,
-            pre_slices, pre_slice_index, post_slices, post_slice_index,
-            pre_vertex_slice, post_vertex_slice, synapse_information,
-            max_stage, machine_time_step):
+            self, max_row_n_synapses, max_delayed_row_n_synapses, pre_slices,
+            post_slices, pre_vertex_slice, post_vertex_slice,
+            synapse_information, max_stage, machine_time_step):
         """ Add delays for a connection to be generated
 
         :param int max_row_n_synapses:
         :param int max_delayed_row_n_synapses:
         :param list(~pacman.model.graphs.common.Slice) pre_slices:
-        :param int pre_slice_index:
         :param list(~pacman.model.graphs.common.Slice) post_slices:
-        :param int post_slice_index:
         :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         :param ~spynnaker.pyNN.models.neural_projections.SynapseInformation \
@@ -200,8 +196,7 @@ class DelayExtensionVertex(
         self.__delay_generator_data[pre_vertex_slice].append(
             DelayGeneratorData(
                 max_row_n_synapses, max_delayed_row_n_synapses,
-                pre_slices, pre_slice_index, post_slices, post_slice_index,
-                pre_vertex_slice, post_vertex_slice,
+                pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
                 synapse_information, max_stage, machine_time_step))
 
     @inject_items({
