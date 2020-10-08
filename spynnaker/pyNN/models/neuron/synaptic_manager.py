@@ -458,8 +458,7 @@ class SynapticManager(object):
                       AbstractSynapseDynamicsStructural):
             return self.__synapse_dynamics\
                 .get_structural_parameters_sdram_usage_in_bytes(
-                     app_graph, app_vertex, vertex_slice.n_atoms,
-                     self.__n_synapse_types)
+                     app_graph, app_vertex, vertex_slice.n_atoms)
         else:
             return self.__synapse_dynamics.get_parameters_sdram_usage_in_bytes(
                 vertex_slice.n_atoms, self.__n_synapse_types)
@@ -487,15 +486,13 @@ class SynapticManager(object):
 
     def _reserve_memory_regions(
             self, spec, machine_vertex, vertex_slice, machine_graph,
-            all_syn_block_sz, application_graph, application_vertex):
+            all_syn_block_sz):
         """
         :param ~.DataSpecificationGenerator spec:
         :param ~.MachineVertex machine_vertex:
         :param ~pacman.model.graphs.common.Slice vertex_slice:
         :param ~.MachineGraph machine_graph:
         :param int all_syn_block_sz:
-        :param ~.ApplicationGraph application_graph:
-        :param ~.ApplicationVertex application_vertex:
         """
         spec.reserve_memory_region(
             region=self._synapse_params_region,
@@ -533,8 +530,7 @@ class SynapticManager(object):
             synapse_structural_dynamics_sz = (
                 self.__synapse_dynamics.
                 get_structural_parameters_sdram_usage_in_bytes(
-                    application_graph, application_vertex,
-                    vertex_slice.n_atoms, self.__n_synapse_types))
+                    machine_graph, machine_vertex, vertex_slice.n_atoms))
 
             if synapse_structural_dynamics_sz != 0:
                 spec.reserve_memory_region(
@@ -1241,7 +1237,7 @@ class SynapticManager(object):
             post_vertex_slice, in_edges, machine_time_step)
         self._reserve_memory_regions(
             spec, machine_vertex, post_vertex_slice, machine_graph,
-            all_syn_block_sz, application_graph, application_vertex)
+            all_syn_block_sz)
 
         ring_buffer_shifts = self._get_ring_buffer_shifts(
             application_vertex, application_graph, machine_time_step,
@@ -1263,8 +1259,8 @@ class SynapticManager(object):
                           AbstractSynapseDynamicsStructural):
                 self.__synapse_dynamics.write_structural_parameters(
                     spec, self._struct_dynamics_region, machine_time_step,
-                    weight_scales, application_graph, application_vertex,
-                    post_vertex_slice, routing_info, self.__synapse_indices)
+                    weight_scales, machine_graph, machine_vertex, routing_info,
+                    self.__synapse_indices)
 
         self.__weight_scales[placement] = weight_scales
 
