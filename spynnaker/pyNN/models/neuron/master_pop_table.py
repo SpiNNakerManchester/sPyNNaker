@@ -19,7 +19,7 @@ import numpy
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD, \
     SARK_PER_MALLOC_SDRAM_USAGE
 from spynnaker.pyNN.models.neural_projections import (
-    ProjectionApplicationEdge, ProjectionMachineEdge)
+    ProjectionApplicationEdge)
 from spynnaker.pyNN.exceptions import (
     SynapseRowTooBigException, SynapticConfigurationException)
 
@@ -168,7 +168,7 @@ class MasterPopTableAsBinarySearch(object):
         n_entries = sum(
             len(in_edge.app_edge.synapse_information)
             for in_edge in in_edges
-            if isinstance(in_edge, ProjectionMachineEdge))
+            if isinstance(in_edge.app_edge, ProjectionApplicationEdge))
 
         # Multiply by each specific constant
         # TODO removing the fudge factor should be safe. but currently
