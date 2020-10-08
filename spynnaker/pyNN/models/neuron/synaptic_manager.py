@@ -17,9 +17,7 @@ from collections import defaultdict, namedtuple
 import math
 import struct
 import numpy
-import scipy.stats  # @UnresolvedImport
 from scipy import special  # @UnresolvedImport
-from pyNN.random import RandomDistribution
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
@@ -39,8 +37,7 @@ from spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex \
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 from spynnaker.pyNN.utilities.constants import (
     POPULATION_BASED_REGIONS, POSSION_SIGMA_SUMMATION_LIMIT)
-from spynnaker.pyNN.utilities.utility_calls import (
-    get_maximum_probable_value, get_n_bits)
+from spynnaker.pyNN.utilities.utility_calls import (get_n_bits)
 from spynnaker.pyNN.utilities.running_stats import RunningStats
 from spynnaker.pyNN.models.neuron.master_pop_table import (
     MasterPopTableAsBinarySearch)
@@ -49,7 +46,9 @@ TIME_STAMP_BYTES = BYTES_PER_WORD
 
 # TODO: Make sure these values are correct (particularly CPU cycles)
 _SYNAPSES_BASE_DTCM_USAGE_IN_BYTES = 7 * BYTES_PER_WORD
-_SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES = 0
+
+# 1 for drop late packets.
+_SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES = 1 * BYTES_PER_WORD
 _SYNAPSES_BASE_N_CPU_CYCLES_PER_NEURON = 10
 _SYNAPSES_BASE_N_CPU_CYCLES = 8
 
@@ -91,6 +90,7 @@ class SynapticManager(object):
         "__gen_on_machine",
         "__max_row_info",
         "__synapse_indices",
+        "__drop_late_spikes",
         "_host_generated_block_addr",
         "_on_chip_generated_block_addr",
         # Overridable (for testing only) region IDs
@@ -105,8 +105,12 @@ class SynapticManager(object):
     # TODO make this right
     FUDGE = 0
 
+    # 1. address of direct addresses, 2. size of direct addresses matrix size
+    STATIC_SYNAPSE_MATRIX_SDRAM_IN_BYTES = 2 * BYTES_PER_WORD
+
     def __init__(self, n_synapse_types, ring_buffer_sigma, spikes_per_second,
-                 config, population_table_type=None, synapse_io=None):
+                 config, drop_late_spikes, population_table_type=None,
+                 synapse_io=None):
         """
         :param int n_synapse_types:
             number of synapse types on a neuron (e.g., 2 for excitatory and
@@ -124,10 +128,12 @@ class SynapticManager(object):
         :type population_table_type: MasterPopTableAsBinarySearch or None
         :param synapse_io: How IO for synapses is performed
         :type synapse_io: SynapseIORowBased or None
+        :param bool drop_late_spikes: control flag for dropping late packets.
         """
         self.__n_synapse_types = n_synapse_types
         self.__ring_buffer_sigma = ring_buffer_sigma
         self.__spikes_per_second = spikes_per_second
+        self.__drop_late_spikes = drop_late_spikes
         self._synapse_params_region = \
             POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value
         self._pop_table_region = \
@@ -160,6 +166,10 @@ class SynapticManager(object):
         if self.__spikes_per_second is None:
             self.__spikes_per_second = config.getfloat(
                 "Simulation", "spikes_per_second")
+
+        if self.__drop_late_spikes is None:
+            self.__drop_late_spikes = config.getboolean(
+                "Simulation", "drop_late_spikes")
 
         # Prepare for dealing with STDP - there can only be one (non-static)
         # synapse dynamics per vertex at present
@@ -209,6 +219,10 @@ class SynapticManager(object):
         :rtype: AbstractSynapseDynamics or None
         """
         return self.__synapse_dynamics
+
+    @property
+    def drop_late_spikes(self):
+        return self.__drop_late_spikes
 
     @staticmethod
     def __combine_structural_stdp_dynamics(structural, stdp):
@@ -320,7 +334,7 @@ class SynapticManager(object):
         """
         # 4 for address of direct addresses, and
         # 4 for the size of the direct addresses matrix in bytes
-        return 2 * BYTES_PER_WORD
+        return self.STATIC_SYNAPSE_MATRIX_SDRAM_IN_BYTES
 
     def __get_max_row_info(
             self, synapse_info, post_vertex_slice, app_edge,
@@ -439,8 +453,7 @@ class SynapticManager(object):
                       AbstractSynapseDynamicsStructural):
             return self.__synapse_dynamics\
                 .get_structural_parameters_sdram_usage_in_bytes(
-                     app_graph, app_vertex, vertex_slice.n_atoms,
-                     self.__n_synapse_types)
+                     app_graph, app_vertex, vertex_slice.n_atoms)
         else:
             return self.__synapse_dynamics.get_parameters_sdram_usage_in_bytes(
                 vertex_slice.n_atoms, self.__n_synapse_types)
@@ -468,15 +481,13 @@ class SynapticManager(object):
 
     def _reserve_memory_regions(
             self, spec, machine_vertex, vertex_slice, machine_graph,
-            all_syn_block_sz, application_graph, application_vertex):
+            all_syn_block_sz):
         """
         :param ~.DataSpecificationGenerator spec:
         :param ~.MachineVertex machine_vertex:
         :param ~pacman.model.graphs.common.Slice vertex_slice:
         :param ~.MachineGraph machine_graph:
         :param int all_syn_block_sz:
-        :param ~.ApplicationGraph application_graph:
-        :param ~.ApplicationVertex application_vertex:
         """
         spec.reserve_memory_region(
             region=self._synapse_params_region,
@@ -514,8 +525,7 @@ class SynapticManager(object):
             synapse_structural_dynamics_sz = (
                 self.__synapse_dynamics.
                 get_structural_parameters_sdram_usage_in_bytes(
-                    application_graph, application_vertex,
-                    vertex_slice.n_atoms, self.__n_synapse_types))
+                    machine_graph, machine_vertex, vertex_slice.n_atoms))
 
             if synapse_structural_dynamics_sz != 0:
                 spec.reserve_memory_region(
@@ -655,17 +665,9 @@ class SynapticManager(object):
                         # If non-zero rate then use it; otherwise keep default
                         if rate != 0:
                             spikes_per_second = rate
-                        if hasattr(spikes_per_second, "__getitem__"):
-                            spikes_per_second = numpy.max(spikes_per_second)
-                        elif isinstance(spikes_per_second, RandomDistribution):
-                            spikes_per_second = get_maximum_probable_value(
-                                spikes_per_second,
-                                pre_vertex.application_n_atoms)
-                        prob = 1.0 - (
-                            (1.0 / 100.0) / pre_vertex.application_n_atoms)
-                        spikes_per_tick = spikes_per_second / steps_per_second
-                        spikes_per_tick = scipy.stats.poisson.ppf(
-                            prob, spikes_per_tick)
+                        spikes_per_tick = (
+                            pre_vertex.app_vertex.max_spikes_per_ts(
+                                machine_timestep))
                     rate_stats[synapse_type].add_items(
                         spikes_per_second, 0, n_connections)
                     total_weights[synapse_type] += spikes_per_tick * (
@@ -733,6 +735,11 @@ class SynapticManager(object):
         """
         # Write the ring buffer shifts
         spec.switch_write_focus(self._synapse_params_region)
+
+        # write the bool for deleting packets that were too late for a timer
+        spec.write_value(int(self.__drop_late_spikes))
+
+        # Write the ring buffer shifts
         spec.write_array(ring_buffer_shifts)
 
         # Return the weight scaling factors
@@ -824,6 +831,7 @@ class SynapticManager(object):
                         generate_on_machine.append(_Gen(
                             synapse_info, pre_slices, pre_vertex_slice,
                             pre_vertex.index, edge.app_edge, rinfo))
+                        spec.comment("Will generate on machine")
                         continue
 
                     block_addr, single_addr, index = self.__write_block(
@@ -1154,20 +1162,20 @@ class SynapticManager(object):
         return block_addr, single_addr, index
 
     def _get_ring_buffer_shifts(
-            self, machine_vertex, machine_graph, machine_timestep,
+            self, machine_vertex, machine_graph, machine_time_step,
             weight_scale):
         """ Get the ring buffer shifts for this vertex
 
         :param .MachineVertex machine_vertex:
         :param .MachineGraph machine_graph:
-        :param int machine_timestep:
+        :param int machine_time_step:
         :param float weight_scale:
         :rtype: list(int)
         """
         if self.__ring_buffer_shifts is None:
             self.__ring_buffer_shifts = \
                 self._get_ring_buffer_to_input_left_shifts(
-                    machine_vertex, machine_graph, machine_timestep,
+                    machine_vertex, machine_graph, machine_time_step,
                     weight_scale)
         return self.__ring_buffer_shifts
 
@@ -1178,6 +1186,8 @@ class SynapticManager(object):
         """
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to
+        :param ~pacman.model.graphs.application_graph.ApplicationGraph \
+        application_graph: the app graph
         :param AbstractPopulationVertex application_vertex:
             The vertex owning the synapses
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
@@ -1217,7 +1227,7 @@ class SynapticManager(object):
             post_vertex_slice, in_edges, machine_time_step)
         self._reserve_memory_regions(
             spec, machine_vertex, post_vertex_slice, machine_graph,
-            all_syn_block_sz, application_graph, application_vertex)
+            all_syn_block_sz)
 
         ring_buffer_shifts = self._get_ring_buffer_shifts(
             machine_vertex, machine_graph, machine_time_step,
@@ -1239,8 +1249,8 @@ class SynapticManager(object):
                           AbstractSynapseDynamicsStructural):
                 self.__synapse_dynamics.write_structural_parameters(
                     spec, self._struct_dynamics_region, machine_time_step,
-                    weight_scales, application_graph, application_vertex,
-                    post_vertex_slice, routing_info, self.__synapse_indices)
+                    weight_scales, machine_graph, machine_vertex, routing_info,
+                    self.__synapse_indices)
 
         self.__weight_scales[placement] = weight_scales
 
@@ -1535,7 +1545,7 @@ class SynapticManager(object):
 
         n_bytes = (
             _SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES +
-            (self.__n_synapse_types * BYTES_PER_WORD))
+            (self.__n_synapse_types * 2 * BYTES_PER_WORD))
         for data in generator_data:
             n_bytes += data.size
 
@@ -1554,8 +1564,9 @@ class SynapticManager(object):
         for w in weight_scales:
             # if the weights are high enough and the population size large
             # enough, then weight_scales < 1 will result in a zero scale
-            # if converted to an int, so this needs to be an S1615
-            dtype = DataType.S1615
+            # if converted to an int, so we use U3232 here instead (as there
+            # can be scales larger than U1616.max in conductance-based models)
+            dtype = DataType.U3232
             spec.write_value(data=min(w, dtype.max), data_type=dtype)
 
         for data in generator_data:

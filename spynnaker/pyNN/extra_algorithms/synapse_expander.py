@@ -12,7 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import functools
 import logging
 from six import iteritems
 
@@ -66,10 +65,10 @@ def synapse_expander(
     expander_app_id = transceiver.app_id_tracker.get_new_id()
     run_system_application(
         expander_cores, expander_app_id, transceiver, provenance_file_path,
-        executable_finder, extract_iobuf, functools.partial(
-            _fill_in_connection_data, placements=placements,
-            expanded_pop_vertices=expanded_pop_vertices),
+        executable_finder, extract_iobuf, None,
         [CPUState.FINISHED], False, "synapse_expander_on_{}_{}_{}.txt")
+    progress.end()
+    _fill_in_connection_data(transceiver, expanded_pop_vertices, placements)
 
 
 def _plan_expansion(app_graph, placements, synapse_expander_bin,
@@ -105,7 +104,7 @@ def _plan_expansion(app_graph, placements, synapse_expander_bin,
 
 
 def _fill_in_connection_data(
-        _expander_cores, transceiver, expanded_pop_vertices, placements):
+        transceiver, expanded_pop_vertices, placements):
     """ Once expander has run, fill in the connection data
 
     :rtype: None
@@ -113,7 +112,11 @@ def _fill_in_connection_data(
     ctl = globals_variables.get_simulator()
     use_extra_monitors = False
 
-    for vertex in expanded_pop_vertices:
+    progress_bar = ProgressBar(
+        len(expanded_pop_vertices),
+        "reading back synaptic data required for connection holders")
+
+    for vertex in progress_bar.over(expanded_pop_vertices):
         conn_holders = vertex.get_connection_holders()
         for (app_edge, synapse_info), conn_holder_list in iteritems(
                 conn_holders):
@@ -130,3 +133,5 @@ def _fill_in_connection_data(
                         use_extra_monitors)
                     for conn_holder in conn_holder_list:
                         conn_holder.add_connections(conns)
+                for conn_holder in conn_holder_list:
+                    conn_holder.finish()
