@@ -842,7 +842,7 @@ class SynapticManager(object):
                         # We will process this a little later
                         generate_on_machine.append(_Gen(
                             synapse_info, pre_slices, pre_vertex_slice,
-                            machine_edge.pre_vertex.index, app_edge, rinfo))
+                            app_edge, rinfo))
                         spec.comment("Will generate on machine")
                         continue
 
