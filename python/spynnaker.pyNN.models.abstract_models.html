@@ -229,6 +229,41 @@
 </dd></dl>
 
 <dl class="class">
+<dt id="spynnaker.pyNN.models.abstract_models.AbstractMaxSpikes">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.abstract_models.</code><code class="descname">AbstractMaxSpikes</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_max_spikes.html#AbstractMaxSpikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractMaxSpikes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Indicates a class (most likely a MachineVertex) that can describe the
+maximun rate that it sends spikes.</p>
+<p>The SynapticManager assumes that all machine vertexes share the same
+synapse_information will have the same rates</p>
+<dl class="method">
+<dt id="spynnaker.pyNN.models.abstract_models.AbstractMaxSpikes.max_spikes_per_second">
+<code class="descname">max_spikes_per_second</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_max_spikes.html#AbstractMaxSpikes.max_spikes_per_second"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractMaxSpikes.max_spikes_per_second" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get maximum expected number of spikes per second</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; the variable to find units from</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the units as a string.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.abstract_models.AbstractMaxSpikes.max_spikes_per_ts">
+<code class="descname">max_spikes_per_ts</code><span class="sig-paren">(</span><em>machine_time_step</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_max_spikes.html#AbstractMaxSpikes.max_spikes_per_ts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractMaxSpikes.max_spikes_per_ts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get maximum expected number of spikes per timestep
+:param int machine_time_step: The timestime used in ms</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable">
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.abstract_models.</code><code class="descname">AbstractPopulationInitializable</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_population_initializable.html#AbstractPopulationInitializable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
