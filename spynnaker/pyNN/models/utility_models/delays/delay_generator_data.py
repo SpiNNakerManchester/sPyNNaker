@@ -39,7 +39,8 @@ class DelayGeneratorData(object):
     def __init__(
             self, max_row_n_synapses, max_delayed_row_n_synapses,
             pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
-            synapse_information, max_stage, delay_per_stage, machine_time_step):
+            synapse_information, max_stage, delay_per_stage,
+            machine_time_step):
         """
         :param int max_row_n_synapses:
         :param int max_delayed_row_n_synapses:
