@@ -883,7 +883,8 @@
 
                 <span class="n">pre_vertex</span> <span class="o">=</span> <span class="n">edge</span><span class="o">.</span><span class="n">pre_vertex</span>
                 <span class="n">pre_vertex_slice</span> <span class="o">=</span> <span class="n">pre_vertex</span><span class="o">.</span><span class="n">vertex_slice</span>
-                <span class="n">pre_slices</span> <span class="o">=</span> <span class="n">edge</span><span class="o">.</span><span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">vertex_slices</span>
+                <span class="n">post_slices</span> <span class="o">=</span> <span class="n">edge</span><span class="o">.</span><span class="n">app_edge</span><span class="o">.</span><span class="n">post_slices</span>
+                <span class="n">pre_slices</span> <span class="o">=</span> <span class="n">edge</span><span class="o">.</span><span class="n">app_edge</span><span class="o">.</span><span class="n">pre_slices</span>
 
                 <span class="k">for</span> <span class="n">synapse_info</span> <span class="ow">in</span> <span class="n">edge</span><span class="o">.</span><span class="n">app_edge</span><span class="o">.</span><span class="n">synapse_information</span><span class="p">:</span>
                     <span class="n">rinfo</span> <span class="o">=</span> <span class="n">routing_info</span><span class="o">.</span><span class="n">get_routing_info_for_edge</span><span class="p">(</span><span class="n">edge</span><span class="p">)</span>

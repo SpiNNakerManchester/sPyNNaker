@@ -353,6 +353,13 @@ but may return a false positives</p>
 </table>
 </dd></dl>
 
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.forget_machine_edges">
+<code class="descname">forget_machine_edges</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/projection_application_edge.html#ProjectionApplicationEdge.forget_machine_edges"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.forget_machine_edges" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clear the collection of machine edges created by this application
+edge.</p>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.n_delay_stages">
 <code class="descname">n_delay_stages</code><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.n_delay_stages" title="Permalink to this definition">¶</a></dt>
@@ -361,6 +368,59 @@ but may return a false positives</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.post_slices">
+<code class="descname">post_slices</code><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.post_slices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the slices for the post_vertexes of the MachineEdges</p>
+<p>While the remember machine_edges remain unchanged this will return a
+list with a consitent id. If the edges change a new list is created</p>
+<p>The List will be sorted by lo_atom.
+No checking is done for overlaps or gaps</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Ordered list of post slices</td>
+</tr>
+</tbody>
+</table>
+<p>:rtype list(Slice)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.pre_slices">
+<code class="descname">pre_slices</code><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.pre_slices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the slices for the pre_vertexes of the MachineEdges</p>
+<p>While the remember machine_edges remain unchanged this will return a
+list with a consitent id. If the edges change a new list is created</p>
+<p>The List will be sorted by lo_atom.
+No checking is done for overlaps or gaps</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Ordered list of pre slices</td>
+</tr>
+</tbody>
+</table>
+<p>:rtype list(Slice)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.remember_associated_machine_edge">
+<code class="descname">remember_associated_machine_edge</code><span class="sig-paren">(</span><em>machine_edge</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/projection_application_edge.html#ProjectionApplicationEdge.remember_associated_machine_edge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.remember_associated_machine_edge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds the Machine Edge to the iterable returned by machine_edges</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>machine_edge</strong> (<em>MachineEdge</em>) &#8211; A pointer to a machine_edge.
+This edge may not be fully initialized</td>
 </tr>
 </tbody>
 </table>

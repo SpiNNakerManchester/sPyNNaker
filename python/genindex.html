@@ -938,10 +938,10 @@
 </li>
       <li><a href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.first_id">first_id (spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.RetinaKey.FIXED_KEY">FIXED_KEY (spynnaker.pyNN.protocols.RetinaKey attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.FixedNumberPostConnector">FixedNumberPostConnector (class in spynnaker.pyNN.models.neural_projections.connectors)</a>
 </li>
       <li><a href="spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.FixedNumberPreConnector">FixedNumberPreConnector (class in spynnaker.pyNN.models.neural_projections.connectors)</a>
@@ -949,6 +949,8 @@
       <li><a href="spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.FixedProbabilityConnector">FixedProbabilityConnector (class in spynnaker.pyNN.models.neural_projections.connectors)</a>
 </li>
       <li><a href="spynnaker.pyNN.models.neuron.plasticity.stdp.html#spynnaker.pyNN.models.neuron.plasticity.stdp.common.float_to_fixed">float_to_fixed() (in module spynnaker.pyNN.models.neuron.plasticity.stdp.common)</a>
+</li>
+      <li><a href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.forget_machine_edges">forget_machine_edges() (spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge method)</a>
 </li>
       <li><a href="spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamicsStructural.formation">formation (spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamicsStructural attribute)</a>
 
@@ -2992,6 +2994,8 @@
 </li>
       <li><a href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation.post_population">post_population (spynnaker.pyNN.models.neural_projections.SynapseInformation attribute)</a>
 </li>
+      <li><a href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.post_slices">post_slices (spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge attribute)</a>
+</li>
       <li><a href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation.postpop_is_view">postpop_is_view (spynnaker.pyNN.models.neural_projections.SynapseInformation attribute)</a>
 </li>
       <li><a href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.ppf">ppf() (spynnaker.pyNN.utilities.random_stats.AbstractRandomStats method)</a>
@@ -3021,6 +3025,8 @@
 </li>
       </ul></li>
       <li><a href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation.pre_population">pre_population (spynnaker.pyNN.models.neural_projections.SynapseInformation attribute)</a>
+</li>
+      <li><a href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.pre_slices">pre_slices (spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge attribute)</a>
 </li>
       <li><a href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.PRE_SYNAPTIC_EVENT_COUNT">PRE_SYNAPTIC_EVENT_COUNT (spynnaker.pyNN.models.neuron.PopulationMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES attribute)</a>
 </li>
@@ -3082,10 +3088,10 @@
         <li><a href="spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.recording_utils.pull_off_cached_lists">(in module spynnaker.pyNN.models.common.recording_utils)</a>
 </li>
       </ul></li>
-      <li><a href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES.PUSH_BOT">PUSH_BOT (spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES attribute)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES.PUSH_BOT">PUSH_BOT (spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES attribute)</a>
+</li>
       <li><a href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_laser_config_active_time">push_bot_laser_config_active_time() (spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol method)</a>
 </li>
       <li><a href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_laser_config_active_time_key">push_bot_laser_config_active_time_key (spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol attribute)</a>
@@ -3348,14 +3354,16 @@
 </li>
       <li><a href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.regeneratable_sdram_blocks_and_sizes">regeneratable_sdram_blocks_and_sizes() (spynnaker.pyNN.models.neuron.PopulationMachineVertex method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.regenerate_data_specification">regenerate_data_specification() (spynnaker.pyNN.models.neuron.AbstractPopulationVertex method)</a>
 
       <ul>
         <li><a href="spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.regenerate_data_specification">(spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.remember_associated_machine_edge">remember_associated_machine_edge() (spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge method)</a>
+</li>
       <li><a href="spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.html#spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.PushBotWIFIConnection.remote_ip_address">remote_ip_address (spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.PushBotWIFIConnection attribute)</a>
 </li>
       <li><a href="spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.html#spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.PushBotWIFIConnection.remote_port">remote_port (spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.PushBotWIFIConnection attribute)</a>
