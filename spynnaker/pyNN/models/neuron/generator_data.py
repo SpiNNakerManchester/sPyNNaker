@@ -31,10 +31,8 @@ class GeneratorData(object):
         "__max_row_n_words",
         "__max_stage",
         "__max_delay_per_stage",
-        "__post_slice_index",
         "__post_slices",
         "__post_vertex_slice",
-        "__pre_slice_index",
         "__pre_slices",
         "__pre_vertex_slice",
         "__synapse_information",
@@ -45,10 +43,9 @@ class GeneratorData(object):
     def __init__(
             self, synaptic_matrix_offset, delayed_synaptic_matrix_offset,
             max_row_n_words, max_delayed_row_n_words, max_row_n_synapses,
-            max_delayed_row_n_synapses, pre_slices, pre_slice_index,
-            post_slices, post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_information, max_stage, max_delay_per_stage,
-            machine_time_step):
+            max_delayed_row_n_synapses, pre_slices, post_slices,
+            pre_vertex_slice, post_vertex_slice, synapse_information,
+            max_stage,  max_delay_per_stage, machine_time_step):
         self.__synaptic_matrix_offset = synaptic_matrix_offset
         self.__delayed_synaptic_matrix_offset = delayed_synaptic_matrix_offset
         self.__max_row_n_words = max_row_n_words
@@ -56,9 +53,7 @@ class GeneratorData(object):
         self.__max_row_n_synapses = max_row_n_synapses
         self.__max_delayed_row_n_synapses = max_delayed_row_n_synapses
         self.__pre_slices = pre_slices
-        self.__pre_slice_index = pre_slice_index
         self.__post_slices = post_slices
-        self.__post_slice_index = post_slice_index
         self.__pre_vertex_slice = pre_vertex_slice
         self.__post_vertex_slice = post_vertex_slice
         self.__synapse_information = synapse_information
@@ -113,8 +108,7 @@ class GeneratorData(object):
             dtype="uint32"))
         items.append(synapse_dynamics.gen_matrix_params)
         items.append(connector.gen_connector_params(
-            self.__pre_slices, self.__pre_slice_index, self.__post_slices,
-            self.__post_slice_index, self.__pre_vertex_slice,
+            self.__pre_slices, self.__post_slices, self.__pre_vertex_slice,
             self.__post_vertex_slice, self.__synapse_information.synapse_type,
             self.__synapse_information))
         items.append(connector.gen_weights_params(

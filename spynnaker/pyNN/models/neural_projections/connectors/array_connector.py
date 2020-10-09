@@ -93,8 +93,8 @@ class ArrayConnector(AbstractConnector):
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices, post_slice_index,
-            pre_vertex_slice, post_vertex_slice, synapse_type, synapse_info):
+            self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
+            synapse_type, synapse_info):
         pre_neurons = []
         post_neurons = []
         n_connections = 0

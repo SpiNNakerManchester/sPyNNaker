@@ -167,8 +167,8 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices, post_slice_index,
-            pre_vertex_slice, post_vertex_slice, synapse_type, synapse_info):
+            self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
+            synapse_type, synapse_info):
         probs = self.__probs[
             pre_vertex_slice.as_slice, post_vertex_slice.as_slice].reshape(-1)
         n_items = pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms

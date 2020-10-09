@@ -236,8 +236,8 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices, post_slice_index,
-            pre_vertex_slice, post_vertex_slice, synapse_type, synapse_info):
+            self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
+            synapse_type, synapse_info):
         # pylint: disable=too-many-arguments
         # Get lo and hi for the pre vertex
         lo = pre_vertex_slice.lo_atom
@@ -292,8 +292,8 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractGenerateConnectorOnMachine.
                gen_connector_params)
     def gen_connector_params(
-            self, pre_slices, pre_slice_index, post_slices, post_slice_index,
-            pre_vertex_slice, post_vertex_slice, synapse_type, synapse_info):
+            self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
+            synapse_type, synapse_info):
         params = self._basic_connector_params(synapse_info)
 
         # The same seed needs to be sent to each of the slices
