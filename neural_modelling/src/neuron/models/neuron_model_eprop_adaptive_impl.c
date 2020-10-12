@@ -156,7 +156,7 @@ state_t neuron_model_state_update(
     }
     if (time % neuron->window_size == 0){
 //        new_learning_signal = 0.k;
-        global_parameters->core_pop_rate = 0.k;
+//        global_parameters->core_pop_rate = 0.k;
         printed_value = false;
     }
 //    neuron->L = learning_signal * neuron->w_fb;
