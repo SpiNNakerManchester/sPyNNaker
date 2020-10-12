@@ -78,10 +78,6 @@ class ConnectionHolder(object):
             This should accept a single parameter, which will contain the
             data requested
         :type notify: callable(ConnectionHolder, None) or None
-        :param app_edge:
-            The application edge the connection holder is filling from.  If\
-            specified, when all the machine edges of the application edge\
-            have been filled in, the holder will automatically close.
         """
         # pylint: disable=too-many-arguments
         self.__data_items_to_return = data_items_to_return
