@@ -172,6 +172,9 @@ state_t neuron_model_state_update(
 //    neuron->L = learning_signal;
 
     uint32_t test_length = (150*neuron->number_of_cues)+1000+150;
+    if(neuron->number_of_cues == 0){
+        test_length = neuron->window_size;
+    }
 
     if (time % neuron->window_size > test_length * 2){ //todo make this relative to number of cues
         neuron->L = new_learning_signal + (reg_learning_signal);// * 0.1k);
@@ -184,7 +187,7 @@ state_t neuron_model_state_update(
 //    if (time % 99 == 0){
 //        io_printf(IO_BUF, "during B = %k, b = %k, time = %u\n", neuron->B, neuron->b, time);
 //    }
-    if (time % test_length == 0 || time % test_length == 1){
+    if ((time % test_length == 0 || time % test_length == 1) && neuron->number_of_cues){
 //        io_printf(IO_BUF, "before B = %k, b = %k\n", neuron->B, neuron->b);
         neuron->B = neuron->b_0;
         neuron->b = 0.k;
@@ -196,7 +199,7 @@ state_t neuron_model_state_update(
 //    io_printf(IO_BUF, "check B = %k, b = %k, time = %u\n", neuron->B, neuron->b, time);
     // All operations now need doing once per eprop synapse
     for (uint32_t syn_ind=0; syn_ind < total_input_synapses_per_neuron; syn_ind++){
-        if (time % test_length == 0 || time % test_length == 1){
+        if ((time % test_length == 0 || time % test_length == 1) && neuron->number_of_cues){
             neuron->syn_state[syn_ind].z_bar_inp = 0.k;
             neuron->syn_state[syn_ind].z_bar = 0.k;
             neuron->syn_state[syn_ind].el_a = 0.k;
@@ -275,7 +278,7 @@ state_t neuron_model_state_update(
 
     // All operations now need doing once per recurrent eprop synapse
     for (uint32_t syn_ind=recurrent_offset; syn_ind < total_recurrent_synapses_per_neuron+recurrent_offset; syn_ind++){
-        if (time % test_length == 0 || time % test_length == 1){
+        if ((time % test_length == 0 || time % test_length == 1) && neuron->number_of_cues){
             neuron->syn_state[syn_ind].z_bar_inp = 0.k;
             neuron->syn_state[syn_ind].z_bar = 0.k;
             neuron->syn_state[syn_ind].el_a = 0.k;
