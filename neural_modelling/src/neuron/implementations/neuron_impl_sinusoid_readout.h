@@ -307,7 +307,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 //        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
 //                - global_parameters->target_V[target_ind];
     }
-    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[syn_ind].z_bar
+    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[syn_ind].z_bar;
     // Record target
     recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] =
 //        			global_parameters->target_V[target_ind];
