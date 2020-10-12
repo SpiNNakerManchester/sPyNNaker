@@ -33,7 +33,6 @@ from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
 from pacman.model.routing_info import (
     RoutingInfo, PartitionRoutingInfo, BaseKeyAndMask)
 from pacman.model.graphs.application import ApplicationVertex
-from spinn_storage_handlers import FileDataWriter, FileDataReader
 from data_specification import (
     DataSpecificationGenerator, DataSpecificationExecutor)
 from spynnaker.pyNN.models.neuron import SynapticManager
@@ -64,6 +63,7 @@ from pacman.model.placements.placements import Placements
 from pacman.model.graphs.application.application_graph import ApplicationGraph
 from data_specification.constants import MAX_MEM_REGIONS
 from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
+import io
 
 
 class MockSynapseIO(object):
@@ -244,8 +244,7 @@ def test_write_data_spec():
     routing_info.add_partition_info(delay_routing_info)
 
     temp_spec = tempfile.mktemp()
-    spec_writer = FileDataWriter(temp_spec)
-    spec = DataSpecificationGenerator(spec_writer, None)
+    spec = DataSpecificationGenerator(io.FileIO(temp_spec, "wb"), None)
 
     synaptic_manager = SynapticManager(
         n_synapse_types=2, ring_buffer_sigma=5.0,
@@ -254,11 +253,10 @@ def test_write_data_spec():
         spec, post_app_vertex, post_vertex_slice, post_vertex,
         graph, app_graph, routing_info, 1.0, machine_time_step)
     spec.end_specification()
-    spec_writer.close()
 
-    spec_reader = FileDataReader(temp_spec)
-    executor = DataSpecificationExecutor(spec_reader, 20000)
-    executor.execute()
+    with io.FileIO(temp_spec, "rb") as spec_reader:
+        executor = DataSpecificationExecutor(spec_reader, 20000)
+        executor.execute()
 
     all_data = bytearray()
     all_data.extend(bytearray(executor.get_header()))
@@ -600,8 +598,7 @@ def test_pop_based_master_pop_table_standard(
 
     # Generate the data
     temp_spec = tempfile.mktemp()
-    spec_writer = FileDataWriter(temp_spec)
-    spec = DataSpecificationGenerator(spec_writer, None)
+    spec = DataSpecificationGenerator(io.FileIO(temp_spec, "wb"), None)
     synaptic_manager = SynapticManager(
         n_synapse_types=2, ring_buffer_sigma=5.0,
         spikes_per_second=100.0, config=config, drop_late_spikes=True)
@@ -609,11 +606,10 @@ def test_pop_based_master_pop_table_standard(
         spec, post_app_vertex, post_vertex_slice, post_mac_vertex,
         mac_graph, app_graph, routing_info, 1.0, 1.0)
     spec.end_specification()
-    spec_writer.close()
-    spec_reader = FileDataReader(temp_spec)
-    executor = DataSpecificationExecutor(
-        spec_reader, SDRAM.max_sdram_found)
-    executor.execute()
+    with io.FileIO(temp_spec, "rb") as spec_reader:
+        executor = DataSpecificationExecutor(
+            spec_reader, SDRAM.max_sdram_found)
+        executor.execute()
 
     # Read the population table and check entries
     region = executor.get_region(
