@@ -49,7 +49,7 @@ class EPropAdaptive(AbstractPyNNNeuronModelStandard):
             B=10, small_b=0, small_b_0=10, tau_a=500, beta=1.8,
 
             # Learning signal and weight update constants
-            l=0, w_fb=0.5, eta=1.0, window_size=13000, number_of_cues=1
+            l=0, w_fb=0.5, eta=1.0, window_size=13000, number_of_cues=0
 
             ):
         # pylint: disable=too-many-arguments, too-many-locals
