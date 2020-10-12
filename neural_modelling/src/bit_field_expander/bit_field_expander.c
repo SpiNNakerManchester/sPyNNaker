@@ -316,11 +316,11 @@ static void determine_redundancy(void) {
     filter_info_t *filters = bit_field_base_address->filters;
     for (uint32_t i = 0; i < bit_field_base_address->n_filters; i++) {
         filters[i].merged = 0;
-        filters[i].redundant = 0;
+        filters[i].all_ones = 0;
         int i_atoms = filters[i].n_atoms;
         int i_words = get_bit_field_size(i_atoms);
         if (i_atoms == count_bit_field(filters[i].data, i_words)) {
-            filters[i].redundant = 1;
+            filters[i].all_ones = 1;
         }
     }
 

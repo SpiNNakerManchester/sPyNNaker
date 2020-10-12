@@ -329,9 +329,9 @@ static inline bool bit_field_filter_initialise(filter_region_t *filter_region) {
          log_debug("Starting with bit field %d with key 0x%08x", bf_i, filters[bf_i].key);
          while (bf_i < n_filters && matches(mp_i, filters[bf_i].key)) {
              log_debug("Using bit field %d with key 0x%08x, merged %d, redundant %d",
-                     bf_i, filters[bf_i].key, filters[bf_i].merged, filters[bf_i].redundant);
+                     bf_i, filters[bf_i].key, filters[bf_i].merged, filters[bf_i].all_ones);
              n_words_total += get_bit_field_size(filters[bf_i].n_atoms);
-             useful += !(filters[bf_i].merged || filters[bf_i].redundant);
+             useful += !(filters[bf_i].merged || filters[bf_i].all_ones);
              bf_i++;
          }
 
