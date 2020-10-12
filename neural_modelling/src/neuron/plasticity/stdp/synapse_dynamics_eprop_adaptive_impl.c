@@ -315,7 +315,7 @@ static inline final_state_t eprop_plasticity_update(update_state_t current_state
 	}
 
 	// Calculate regularisation error
-	REAL reg_error = 0.k;//(global_parameters->core_target_rate - global_parameters->core_pop_rate) / syn_dynamics_neurons_in_partition; // this needs swapping for an inverse multiply - too expensive to do divide on every spike
+	REAL reg_error = (global_parameters->core_target_rate - global_parameters->core_pop_rate) / syn_dynamics_neurons_in_partition; // this needs swapping for an inverse multiply - too expensive to do divide on every spike
 //	REAL reg_error = ((global_parameters->core_target_rate + ((neuron_array->w_fb - 0.5) * 20)) - global_parameters->core_pop_rate) / syn_dynamics_neurons_in_partition; // this needs swapping for an inverse multiply - too expensive to do divide on every spike
 //    io_printf(IO_BUF, "core_pop_rate = %k, target = %k, error = %k\n", global_parameters->core_pop_rate, global_parameters->core_target_rate, reg_error);
 
