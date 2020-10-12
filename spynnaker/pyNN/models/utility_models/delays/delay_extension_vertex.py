@@ -36,8 +36,8 @@ from spinn_front_end_common.utilities.constants import (
 from .delay_block import DelayBlock
 from .delay_extension_machine_vertex import DelayExtensionMachineVertex
 from .delay_generator_data import DelayGeneratorData
-from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID,\
-    POP_TABLE_MAX_ROW_LENGTH
+from spynnaker.pyNN.utilities.constants import (
+    SPIKE_PARTITION_ID, POP_TABLE_MAX_ROW_LENGTH)
 from spynnaker.pyNN.models.neural_projections import DelayedApplicationEdge
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnMachine)
