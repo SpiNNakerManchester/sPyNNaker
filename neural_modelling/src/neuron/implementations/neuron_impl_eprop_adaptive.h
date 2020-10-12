@@ -377,7 +377,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 //                                    / (accum_time
 //                                    * (accum)syn_dynamics_neurons_in_partition))
 //                                    - global_parameters->core_target_rate;
-    REAL reg_learning_signal = (global_parameters->core_target_rate - global_parameters->core_pop_rate) / syn_dynamics_neurons_in_partition;
+    REAL reg_learning_signal = global_parameters->core_target_rate - (global_parameters->core_pop_rate / syn_dynamics_neurons_in_partition);
     recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = reg_learning_signal;//global_parameters->core_pop_rate;
 
 
