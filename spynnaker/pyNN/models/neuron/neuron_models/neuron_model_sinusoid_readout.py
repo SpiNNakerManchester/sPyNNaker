@@ -59,7 +59,8 @@ class NeuronModelLeakyIntegrateAndFireSinusoidReadout(AbstractNeuronModel):
         # learning signal
         "_l",
         "_w_fb",
-        "_eta"
+        "_eta",
+        "_update_ready"
         ]
 
     def __init__(
@@ -68,7 +69,8 @@ class NeuronModelLeakyIntegrateAndFireSinusoidReadout(AbstractNeuronModel):
             target_data,
             l,
             w_fb,
-            eta):
+            eta,
+            update_ready):
 
         data_types = [
             DataType.S1615,  # v
@@ -124,6 +126,8 @@ class NeuronModelLeakyIntegrateAndFireSinusoidReadout(AbstractNeuronModel):
         self._w_fb = w_fb
 
         self._eta = eta
+
+        self._update_ready = update_ready
 
     @overrides(AbstractNeuronModel.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
@@ -186,7 +190,7 @@ class NeuronModelLeakyIntegrateAndFireSinusoidReadout(AbstractNeuronModel):
                           0,#,    # z_bar
                           # 0,    # el_a
                           # 0]    # e_bar
-                          0, #int(numpy.random.rand()*1024)      # update_ready
+                          self._update_ready, #int(numpy.random.rand()*1024)      # update_ready
                           ]
         # extend to appropriate fan-in
         values.extend(eprop_syn_init * SYNAPSES_PER_NEURON)

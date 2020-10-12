@@ -344,23 +344,23 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     else if(neuron_index == 1){
 //        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[20+neuron_index].el_a;
         recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[10+neuron_index].delta_w;
-//        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[20+neuron_index].e_bar;
+        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[10+neuron_index].e_bar;
 //        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = *exc_value;
     }
     else if(neuron_index == 2){
 //        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[20+neuron_index].el_a;
         recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[10+neuron_index].delta_w;
-//        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[20+neuron_index].e_bar;
+        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[10+neuron_index].e_bar;
 //        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = *exc_value;
     }
     else{
 //        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[10+neuron_index].el_a;
         recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[0+neuron_index].delta_w;
-//        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[10+neuron_index].e_bar;
+        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[0+neuron_index].e_bar;
 //        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = *exc_input_values;
     }
 //    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[neuron_index].el_a;
-    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->B;
+//    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->B;
     // update neuron parameters
     state_t result = neuron_model_state_update(
             NUM_EXCITATORY_RECEPTORS, exc_input_values,

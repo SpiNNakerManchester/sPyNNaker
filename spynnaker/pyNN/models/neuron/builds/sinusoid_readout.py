@@ -26,13 +26,13 @@ class SinusoidReadout(AbstractPyNNNeuronModelStandard):
             target_data =[],
 
             # Learning signal and weight update constants
-            l=0, w_fb=0.5, eta=1.0):
+            l=0, w_fb=0.5, eta=1.0, update_ready=1024):
 
         # pylint: disable=too-many-arguments, too-many-locals
         neuron_model = NeuronModelLeakyIntegrateAndFireSinusoidReadout(
             v, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac, target_data,
             # Learning signal params
-            l, w_fb, eta)
+            l, w_fb, eta, update_ready)
 
         synapse_type = SynapseTypeEPropAdaptive(
             tau_syn_E, tau_syn_E2, tau_syn_I, tau_syn_I2,
