@@ -390,14 +390,11 @@ class SynapseIORowBased(object):
         app_edge = machine_edge.app_edge
         pre_slices = app_edge.pre_vertex.vertex_slices
         post_slices = app_edge.post_vertex.vertex_slices
-        pre_slice_idx = machine_edge.pre_vertex.index
-        post_slice_idx = machine_edge.post_vertex.index
         pre_vertex_slice = machine_edge.pre_vertex.vertex_slice
         post_vertex_slice = machine_edge.post_vertex.vertex_slice
         connections = synapse_info.connector.create_synaptic_block(
-            pre_slices, pre_slice_idx, post_slices, post_slice_idx,
-            pre_vertex_slice, post_vertex_slice, synapse_info.synapse_type,
-            synapse_info)
+            pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
+            synapse_info.synapse_type, synapse_info)
 
         # Convert delays to timesteps
         connections["delay"] = numpy.rint(

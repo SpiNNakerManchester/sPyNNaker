@@ -26,10 +26,9 @@ from data_specification.enums import DataType
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, MICRO_TO_SECOND_CONVERSION)
 
-from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
+from spynnaker.pyNN.models.neural_projections import ProjectionMachineEdge
+from spynnaker.pyNN.models.abstract_models import AbstractMaxSpikes
 from spynnaker.pyNN.models.neuron.synapse_io import SynapseIORowBased
-from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex import (
-    SpikeSourcePoissonVertex)
 from spynnaker.pyNN.utilities.constants import (
     POPULATION_BASED_REGIONS, POSSION_SIGMA_SUMMATION_LIMIT)
 from spynnaker.pyNN.utilities.utility_calls import (get_n_bits)
@@ -325,16 +324,16 @@ class SynapticManager(object):
             matrices.size(in_edges))
 
     def _reserve_memory_regions(
-            self, spec, vertex_slice, all_syn_block_sz, application_graph,
-            application_vertex):
+            self, spec, vertex_slice, all_syn_block_sz, machine_graph,
+            machine_vertex):
         """ Reserve memory regions for a core
 
         :param ~.DataSpecificationGenerator spec: The data spec to reserve in
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of the vertex to allocate for
         :param int all_syn_block_sz: The memory to reserve for synapses
-        :param ~.ApplicationGraph application_graph: The application graph
-        :param ~.ApplicationVertex application_vertex: The application vertex
+        :param ~.MachineGraph machine_graph: The machine graph
+        :param ~.MachineVertex machine_vertex: The machine vertex
         """
         spec.reserve_memory_region(
             region=self._synapse_params_region,
@@ -365,8 +364,7 @@ class SynapticManager(object):
             synapse_structural_dynamics_sz = (
                 self.__synapse_dynamics.
                 get_structural_parameters_sdram_usage_in_bytes(
-                    application_graph, application_vertex,
-                    vertex_slice.n_atoms, self.__n_synapse_types))
+                    machine_graph, machine_vertex, vertex_slice.n_atoms))
 
             if synapse_structural_dynamics_sz != 0:
                 spec.reserve_memory_region(
@@ -447,13 +445,13 @@ class SynapticManager(object):
                 (sigma * math.sqrt(poisson_variance + weight_variance)))
 
     def _get_ring_buffer_to_input_left_shifts(
-            self, application_vertex, application_graph, machine_timestep,
+            self, machine_vertex, machine_graph, machine_timestep,
             weight_scale):
         """ Get the scaling of the ring buffer to provide as much accuracy as\
             possible without too much overflow
 
-        :param .ApplicationVertex application_vertex:
-        :param .ApplicationGraph application_graph:
+        :param .MachineVertex machine_vertex:
+        :param .MachineGraph machine_graph:
         :param int machine_timestep:
         :param float weight_scale:
         :rtype: list(int)
@@ -468,54 +466,57 @@ class SynapticManager(object):
         rate_stats = [RunningStats() for _ in range(n_synapse_types)]
         steps_per_second = MICRO_TO_SECOND_CONVERSION / machine_timestep
 
-        for app_edge in application_graph.get_edges_ending_at_vertex(
-                application_vertex):
-            if isinstance(app_edge, ProjectionApplicationEdge):
-                for synapse_info in app_edge.synapse_information:
-                    synapse_type = synapse_info.synapse_type
-                    synapse_dynamics = synapse_info.synapse_dynamics
-                    connector = synapse_info.connector
+        synapse_map = dict()
+        for machine_edge in machine_graph.get_edges_ending_at_vertex(
+                machine_vertex):
+            if isinstance(machine_edge, ProjectionMachineEdge):
+                for synapse_info in machine_edge.synapse_information:
+                    # Per synapse info we need any one of the edges
+                    synapse_map[synapse_info] = machine_edge
 
-                    weight_mean = (
-                        synapse_dynamics.get_weight_mean(
-                            connector, synapse_info) * weight_scale)
-                    n_connections = \
-                        connector.get_n_connections_to_post_vertex_maximum(
-                            synapse_info)
-                    weight_variance = synapse_dynamics.get_weight_variance(
-                        connector, synapse_info.weights) * weight_scale_squared
-                    running_totals[synapse_type].add_items(
-                        weight_mean, weight_variance, n_connections)
+        for synapse_info in synapse_map:
+            synapse_type = synapse_info.synapse_type
+            synapse_dynamics = synapse_info.synapse_dynamics
+            connector = synapse_info.connector
 
-                    delay_variance = synapse_dynamics.get_delay_variance(
-                        connector, synapse_info.delays)
-                    delay_running_totals[synapse_type].add_items(
-                        0.0, delay_variance, n_connections)
+            weight_mean = (
+                synapse_dynamics.get_weight_mean(
+                    connector, synapse_info) * weight_scale)
+            n_connections = \
+                connector.get_n_connections_to_post_vertex_maximum(
+                    synapse_info)
+            weight_variance = synapse_dynamics.get_weight_variance(
+                connector, synapse_info.weights) * weight_scale_squared
+            running_totals[synapse_type].add_items(
+                weight_mean, weight_variance, n_connections)
 
-                    weight_max = (synapse_dynamics.get_weight_maximum(
-                        connector, synapse_info) * weight_scale)
-                    biggest_weight[synapse_type] = max(
-                        biggest_weight[synapse_type], weight_max)
+            delay_variance = synapse_dynamics.get_delay_variance(
+                connector, synapse_info.delays)
+            delay_running_totals[synapse_type].add_items(
+                0.0, delay_variance, n_connections)
 
-                    spikes_per_tick = max(
-                        1.0, self.__spikes_per_second / steps_per_second)
-                    spikes_per_second = self.__spikes_per_second
-                    if isinstance(app_edge.pre_vertex,
-                                  SpikeSourcePoissonVertex):
-                        rate = app_edge.pre_vertex.max_rate
-                        # If non-zero rate then use it; otherwise keep default
-                        if rate != 0:
-                            spikes_per_second = rate
-                        spikes_per_tick = \
-                            app_edge.pre_vertex.max_spikes_per_ts(
-                                machine_timestep)
-                    rate_stats[synapse_type].add_items(
-                        spikes_per_second, 0, n_connections)
-                    total_weights[synapse_type] += spikes_per_tick * (
-                        weight_max * n_connections)
+            weight_max = (synapse_dynamics.get_weight_maximum(
+                connector, synapse_info) * weight_scale)
+            biggest_weight[synapse_type] = max(
+                biggest_weight[synapse_type], weight_max)
 
-                    if synapse_dynamics.are_weights_signed():
-                        weights_signed = True
+            spikes_per_tick = max(
+                1.0, self.__spikes_per_second / steps_per_second)
+            spikes_per_second = self.__spikes_per_second
+            pre_vertex = synapse_map[synapse_info].pre_vertex
+            if isinstance(pre_vertex, AbstractMaxSpikes):
+                rate = pre_vertex.max_spikes_per_second()
+                if rate != 0:
+                    spikes_per_second = rate
+                spikes_per_tick = \
+                    pre_vertex.max_spikes_per_ts(machine_timestep)
+            rate_stats[synapse_type].add_items(
+                spikes_per_second, 0, n_connections)
+            total_weights[synapse_type] += spikes_per_tick * (
+                weight_max * n_connections)
+
+            if synapse_dynamics.are_weights_signed():
+                weights_signed = True
 
         max_weights = numpy.zeros(n_synapse_types)
         for synapse_type in range(n_synapse_types):
@@ -566,19 +567,19 @@ class SynapticManager(object):
         return float(math.pow(2, 16 - (ring_buffer_to_input_left_shift + 1)))
 
     def __update_ring_buffer_shifts_and_weight_scales(
-            self, application_vertex, application_graph, machine_time_step,
+            self, machine_vertex, machine_graph, machine_time_step,
             weight_scale):
         """ Update the ring buffer shifts and weight scales for this vertex
 
-        :param .ApplicationVertex application_vertex:
-        :param .ApplicationGraph application_graph:
+        :param .MachineVertex machine_vertex:
+        :param .MachineGraph machine_graph:
         :param int machine_time_step:
         :param float weight_scale:
         """
         if self.__ring_buffer_shifts is None:
             self.__ring_buffer_shifts = \
                 self._get_ring_buffer_to_input_left_shifts(
-                    application_vertex, application_graph, machine_time_step,
+                    machine_vertex, machine_graph, machine_time_step,
                     weight_scale)
             self.__weight_scales = numpy.array([
                 self.__get_weight_scale(r) * weight_scale
@@ -617,11 +618,11 @@ class SynapticManager(object):
         matrices = self.__get_synaptic_matrices(post_vertex_slice)
         all_syn_block_sz = matrices.synapses_size(in_edges)
         self._reserve_memory_regions(
-            spec, post_vertex_slice, all_syn_block_sz, application_graph,
-            application_vertex)
+            spec, post_vertex_slice, all_syn_block_sz, machine_graph,
+            machine_vertex)
 
         self.__update_ring_buffer_shifts_and_weight_scales(
-            application_vertex, application_graph, machine_time_step,
+            machine_vertex, machine_graph, machine_time_step,
             weight_scale)
         spec.switch_write_focus(self._synapse_params_region)
         # write the bool for deleting packets that were too late for a timer
@@ -642,9 +643,8 @@ class SynapticManager(object):
                           AbstractSynapseDynamicsStructural):
                 self.__synapse_dynamics.write_structural_parameters(
                     spec, self._struct_dynamics_region, machine_time_step,
-                    self.__weight_scales, application_graph,
-                    application_vertex, post_vertex_slice, routing_info,
-                    matrices)
+                    self.__weight_scales, machine_graph, machine_vertex,
+                    routing_info, matrices)
 
         self._write_on_machine_data_spec(spec, post_vertex_slice, gen_data)
 

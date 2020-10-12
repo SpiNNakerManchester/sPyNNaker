@@ -179,10 +179,9 @@ class DelayExtensionVertex(
             self.__delay_blocks[vertex_slice].add_delay(source_id, stage)
 
     def add_generator_data(
-            self, max_row_n_synapses, max_delayed_row_n_synapses,
-            pre_slices, pre_slice_index, post_slices, post_slice_index,
-            pre_vertex_slice, post_vertex_slice, synapse_information,
-            max_stage):
+            self, max_row_n_synapses, max_delayed_row_n_synapses, pre_slices,
+            post_slices, pre_vertex_slice, post_vertex_slice,
+            synapse_information, max_stage):
         """ Add delays for a connection to be generated
 
         :param int max_row_n_synapses:
@@ -191,14 +190,8 @@ class DelayExtensionVertex(
             The maximum number of synapses in a delay row
         :param list(~pacman.model.graphs.common.Slice) pre_slices:
             The list of slices of the pre application vertex
-        :param int pre_slice_index:
-            The index of the slice of the pre applcation vertex
-            currently being considered
         :param list(~pacman.model.graphs.common.Slice) post_slices:
             The list of slices of the post application vertex
-        :param int post_slice_index:
-            The index of the slice of the post application vertex
-            currently being considered
         :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
             The slice of the pre applcation vertex currently being
             considered
@@ -214,8 +207,7 @@ class DelayExtensionVertex(
         self.__delay_generator_data[pre_vertex_slice].append(
             DelayGeneratorData(
                 max_row_n_synapses, max_delayed_row_n_synapses,
-                pre_slices, pre_slice_index, post_slices, post_slice_index,
-                pre_vertex_slice, post_vertex_slice,
+                pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
                 synapse_information, max_stage, self.__machine_time_step))
 
     @inject_items({

@@ -23,24 +23,25 @@ class AbstractSynapseDynamicsStructural(object):
 
     @abstractmethod
     def get_structural_parameters_sdram_usage_in_bytes(
-            self, application_graph, app_vertex, n_neurons, n_synapse_types):
+            self, graph, vertex, n_neurons):
         """ Get the size of the structural parameters
 
-        :param ~pacman.model.graphs.application.ApplicationGraph \
-                application_graph:
-        :param ~spynnaker.pyNN.models.neuron.AbstractPopulationVertex \
-                app_vertex:
+        Note: At the Application level this will be an estimate.
+
+        :param graph: Graph at same level as vertex.
+        :type graph: ApplicationGraph or MachineGraph
+        :param vertex: Vertex at the same level as the graph
+        :type vertex: ApplicationVertex or MachineVertex
         :param int n_neurons:
-        :param int n_synapse_types:
         :return: the size of the parameters, in bytes
         :rtype: int
+        :raises PacmanInvalidParameterException
         """
 
     @abstractmethod
     def write_structural_parameters(
             self, spec, region, machine_time_step, weight_scales,
-            application_graph, app_vertex, post_slice,
-            routing_info, synaptic_matrices):
+            machine_graph, machine_vertex, routing_info, synaptic_matrices):
         """ Write structural plasticity parameters
 
         :param ~data_specification.DataSpecificationGenerator spec:
@@ -48,12 +49,10 @@ class AbstractSynapseDynamicsStructural(object):
         :param int region: region ID
         :param int machine_time_step: The simulation time step
         :param list(float) weight_scales: Weight scaling for each synapse type
-        :param ~pacman.model.graphs.application.ApplicationGraph\
-                application_graph: The application graph
-        :param AbstractPopulationVertex app_vertex:
-            The application vertex
-        :param ~pacman.model.graphs.common.Slice post_slice:
-            The slice of the vertex to generate for
+        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
+            The machine graph
+        :param AbstractPopulationVertex machine_vertex:
+            The machine vertex
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
             Routing information for all edges
         :param SynapticMatrices synaptic_matrices:
