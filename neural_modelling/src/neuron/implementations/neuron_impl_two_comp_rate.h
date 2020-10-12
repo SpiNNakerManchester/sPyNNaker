@@ -293,6 +293,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     // Get the voltage
     //state_t voltage = neuron_model_get_membrane_voltage(neuron);
     state_t voltage = neuron->U_membrane;
+    state_t g_som = neuron->g_som;
 
     // Get the exc and inh values from the synapses
     input_t* exc_value = synapse_types_get_excitatory_input(synapse_type);
@@ -318,9 +319,9 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
     // Call functions to convert exc_input and inh_input to current
     input_type_convert_excitatory_input_to_current(
-            exc_input_values, input_type, voltage);
+            exc_input_values, input_type, g_som);
     input_type_convert_inhibitory_input_to_current(
-            inh_input_values, input_type, voltage);
+            inh_input_values, input_type, g_som);
 
     external_bias += additional_input_get_input_value_as_current(
             additional_input, voltage);

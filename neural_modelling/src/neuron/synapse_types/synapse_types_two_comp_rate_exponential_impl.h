@@ -46,8 +46,8 @@
 //---------------------------------------
 // Synapse parameters
 //---------------------------------------
-input_t excitatory_response[NUM_EXCITATORY_RECEPTORS + 1];
-input_t inhibitory_response[NUM_INHIBITORY_RECEPTORS + 1];
+input_t excitatory_response[NUM_EXCITATORY_RECEPTORS];
+input_t inhibitory_response[NUM_INHIBITORY_RECEPTORS];
 
 typedef struct exp_params_t {
 	decay_t decay;
@@ -137,8 +137,6 @@ static inline input_t* synapse_types_get_excitatory_input(
     excitatory_response[0] = parameter->exc.synaptic_input_value;
     excitatory_response[1] = parameter->exc2.synaptic_input_value;
 
-    // For the conductance to the state update (this will be just g_E to calculate g_tot)
-    excitatory_response[2] = parameter->exc.synaptic_input_value;
     return &excitatory_response[0];
 }
 
@@ -151,8 +149,6 @@ static inline input_t* synapse_types_get_inhibitory_input(
     inhibitory_response[0] = parameter->inh.synaptic_input_value;
     inhibitory_response[1] = parameter->inh2.synaptic_input_value;
 
-    // For the conductance to the state update (just g_I to calculate g_tot)
-    inhibitory_response[2] = parameter->inh.synaptic_input_value;
     return &inhibitory_response[0];
 }
 

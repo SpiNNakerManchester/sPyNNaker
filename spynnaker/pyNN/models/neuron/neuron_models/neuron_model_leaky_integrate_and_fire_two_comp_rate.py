@@ -40,6 +40,7 @@ V_STAR = "v_star"
 TAU_L = "tau_L"
 G_D = "g_D"
 G_L = "g_L"
+G_SOM = "g_som"
 
 
 SEED1 = "seed1"
@@ -73,6 +74,7 @@ class NeuronModelLeakyIntegrateAndFireTwoCompRate(AbstractNeuronModel, AbstractI
 
         "__g_L",
         "__g_D",
+        "__g_som",
         "__tau_L",
         "__v",
         "__v_star",
@@ -84,8 +86,8 @@ class NeuronModelLeakyIntegrateAndFireTwoCompRate(AbstractNeuronModel, AbstractI
         ]
 
     def __init__(
-            self, u_init, u_rest, cm, i_offset, v_reset,
-            g_D, g_L, tau_L, v_init, rate_update_threshold, starting_rate):
+            self, u_init, u_rest, cm, i_offset, v_reset, g_D,
+            g_L, g_som, tau_L, v_init, rate_update_threshold, starting_rate):
 
         global_data_types=[
                     DataType.UINT32,  # MARS KISS seed
@@ -109,6 +111,7 @@ class NeuronModelLeakyIntegrateAndFireTwoCompRate(AbstractNeuronModel, AbstractI
                 DataType.S1615,   # g_L
                 DataType.S1615,   # tau_L
                 DataType.S1615,   # g_D
+                DataType.S1615,   # g_som
 
                 DataType.S1615,   # REAL rate_at_last_setting; s
                 DataType.S1615,   # REAL rate_update_threshold; p
@@ -128,6 +131,7 @@ class NeuronModelLeakyIntegrateAndFireTwoCompRate(AbstractNeuronModel, AbstractI
         self.__g_L = g_L
         self.__g_D = g_D
         self.__tau_L = tau_L
+        self.__g_som = g_som
 
         self.__rate_at_last_setting = starting_rate
         self.__rate_update_threshold = rate_update_threshold
@@ -149,6 +153,7 @@ class NeuronModelLeakyIntegrateAndFireTwoCompRate(AbstractNeuronModel, AbstractI
         parameters[TAU_L] = self.__tau_L
         parameters[G_D] = self.__g_D
         parameters[G_L] = self.__g_L
+        parameters[G_SOM] = self.__g_som
 
         parameters[TICKS_PER_SECOND] = 0 # set in get_valuers()
         parameters[RATE_UPDATE_THRESHOLD] = self.__rate_update_threshold
@@ -190,6 +195,7 @@ class NeuronModelLeakyIntegrateAndFireTwoCompRate(AbstractNeuronModel, AbstractI
                 parameters[G_L],
                 parameters[TAU_L],
                 parameters[G_D],
+                parameters[G_SOM],
 
                 state_variables[RATE_AT_LAST_SETTING],
                 parameters[RATE_UPDATE_THRESHOLD],

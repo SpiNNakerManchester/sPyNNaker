@@ -161,7 +161,8 @@ static inline void print_inputs(void) {
 
 // Converts a rate to an input
 static inline input_t convert_rate_to_input(uint32_t rate) {
-    union {
+
+	union {
         uint32_t input_type;
         s1615 output_type;
     } converter;
@@ -176,13 +177,18 @@ static inline input_t convert_rate_to_input(uint32_t rate) {
 // Every spike event could cause up to 256 different weights to
 // be put into the ring buffer.
 static inline void process_fixed_synapses(
-        address_t fixed_region_address, uint32_t time, uint32_t rate) {
+        address_t fixed_region_address, uint32_t time, uint32_t somatic_voltage) {
     register uint32_t *synaptic_words =
             synapse_row_fixed_weight_controls(fixed_region_address);
     register uint32_t fixed_synapse =
             synapse_row_num_fixed_synapses(fixed_region_address);
 
     num_fixed_pre_synaptic_events += fixed_synapse;
+
+    //volatile uint32_t t = tc[T1_COUNT];
+
+    s1615 r = convert_rate_to_input(somatic_voltage);
+    r = r > 0.0k ? r : 0.0k;
 
     for (; fixed_synapse > 0; fixed_synapse--) {
         // Get the next 32 bit word from the synaptic_row
@@ -205,7 +211,7 @@ static inline void process_fixed_synapses(
                             ring_buffer_to_input_left_shifts[combined_synapse_neuron_index >> synapse_index_bits]);
 
         // Add weight to current ring buffer value
-        REAL accumulation = ring_buffers[ring_buffer_index] + MULT_ROUND_STOCHASTIC_ACCUM(convert_rate_to_input(rate), weight);
+        REAL accumulation = ring_buffers[ring_buffer_index] + MULT_ROUND_STOCHASTIC_ACCUM(r, weight);
 
         // Saturation check, MAYBE WE SHOULD CAP THE MAX INCOMING VALUES?
 //        s3231 sat_test = accumulation & 0x100000000;
@@ -218,6 +224,9 @@ static inline void process_fixed_synapses(
 
         //io_printf(IO_BUF, "added %k * %k = %k sh %k\n", weight, rate, ring_buffers[ring_buffer_index], (rate * weight));
     }
+
+    //t -= tc[T1_COUNT];
+    //io_printf(IO_BUF, "cnt %d\n", t);
 }
 
 //! private method for doing output debug data on the synapses

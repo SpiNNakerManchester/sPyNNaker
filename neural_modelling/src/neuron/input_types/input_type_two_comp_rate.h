@@ -60,7 +60,7 @@ static inline input_t* input_type_get_input_value(
 
 static inline void input_type_convert_excitatory_input_to_current(
         input_t* exc_input, input_type_pointer_t input_type,
-        state_t membrane_voltage) {
+        REAL somatic_conductance) {
 
 //    for (int i=0; i < NUM_EXCITATORY_RECEPTORS; i++) {
 //        exc_input[i] = exc_input[i] *
@@ -68,14 +68,14 @@ static inline void input_type_convert_excitatory_input_to_current(
 //    }
 
 	// Convert conductance based (teacher) input
-	exc_input[0] = exc_input[0] * (input_type->Teach_rev_E);
+	exc_input[0] = exc_input[0] * somatic_conductance;
 
 
 }
 
 static inline void input_type_convert_inhibitory_input_to_current(
         input_t* inh_input, input_type_pointer_t input_type,
-        state_t membrane_voltage) {
+        REAL somatic_conductance) {
 
 //    for (int i=0; i < NUM_INHIBITORY_RECEPTORS; i++) {
 //        inh_input[i] = -inh_input[i] *
@@ -84,7 +84,7 @@ static inline void input_type_convert_inhibitory_input_to_current(
 
 
 	// Convert conductance based (teacher) input
-	inh_input[0] = inh_input[0] * (input_type->Teach_rev_I);
+	inh_input[0] = inh_input[0] * somatic_conductance;
 
 }
 

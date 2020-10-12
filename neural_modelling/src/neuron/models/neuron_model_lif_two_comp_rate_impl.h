@@ -40,8 +40,8 @@ typedef struct neuron_t {
     REAL     U_reset;
 
     // Dendritic compartment parameters
-    REAL	V; // dendritic potential
-    REAL	V_star; // dendritic prediction of U
+    REAL		V; // dendritic potential
+    REAL		V_star; // dendritic prediction of U
     REAL    plasticity_rate_multiplier; // precalculated multiplier to convert rate for plasticity
 
     // Leaky conductance
@@ -50,6 +50,8 @@ typedef struct neuron_t {
 
     // Coupling conductance
     REAL g_D;
+
+    REAL g_som;
 
 
     REAL rate_at_last_setting;

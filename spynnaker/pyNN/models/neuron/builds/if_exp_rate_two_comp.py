@@ -35,7 +35,7 @@ class IFExpRateTwoComp(AbstractPyNNNeuronModelStandard):
             self, cm=1.0, u_rest=0, v_reset=-50.0,
             v_thresh=10.0, i_offset=0.0, u=0.0,
 
-            e_rev_E=4.667, e_rev_I=-0.333,
+            g_som=0.8,
 
             tau_syn_E_soma=5.0, tau_syn_I_soma=5.0,
             isyn_exc_soma =0.0, isyn_inh_soma=0.0,
@@ -51,7 +51,7 @@ class IFExpRateTwoComp(AbstractPyNNNeuronModelStandard):
             ):
         # pylint: disable=too-many-arguments, too-many-locals
         neuron_model = NeuronModelLeakyIntegrateAndFireTwoCompRate(
-            u, u_rest, cm, i_offset, v_reset, g_D, g_L,
+            u, u_rest, cm, i_offset, v_reset, g_D, g_L, g_som,
             tau_L, v, rate_update_threshold, starting_rate)
         synapse_type = SynapseTypeExponentialTwoComp(
             tau_syn_E_soma, tau_syn_E_dendrite, tau_syn_I_soma, tau_syn_I_dendrite,
