@@ -739,6 +739,7 @@ class SynapticManager(object):
             between runs
         """
         self.__ring_buffer_shifts = None
+        self.__weight_scales = None
 
     def clear_connection_cache(self):
         """ Flush the cache of connection information; needed for a second run
@@ -765,3 +766,14 @@ class SynapticManager(object):
         """
         matrices = self.__get_synaptic_matrices(placement.vertex.vertex_slice)
         matrices.read_generated_connection_holders(transceiver, placement)
+
+    def clear_all_caches(self):
+        """ Clears all cached data in the case that a reset requires remapping
+            which might change things
+        """
+        # Clear the local caches
+        self.clear_connection_cache()
+        self.reset_ring_buffer_shifts()
+
+        # We can simply reset this dict to reset everything downstream
+        self.__synaptic_matrices = dict()

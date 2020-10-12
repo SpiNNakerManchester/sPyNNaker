@@ -229,6 +229,9 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractChangableAfterRun.mark_no_changes)
     def mark_no_changes(self):
+        # If mapping will happen, reset things that need this
+        if self.__change_requires_mapping:
+            self.__synapse_manager.clear_all_caches()
         self.__change_requires_mapping = False
         self.__change_requires_data_generation = False
 
@@ -769,6 +772,9 @@ class AbstractPopulationVertex(
         :param AbstractSynapseDynamics synapse_dynamics:
         """
         self.__synapse_manager.synapse_dynamics = synapse_dynamics
+        # If we are setting a synapse dynamics, we must remap even if the
+        # change above means we don't have to
+        self.__change_requires_mapping = True
 
     @overrides(AbstractAcceptsIncomingSynapses.get_connections_from_machine)
     def get_connections_from_machine(
