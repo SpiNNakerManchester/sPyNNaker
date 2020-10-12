@@ -307,11 +307,11 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 //        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
 //                - global_parameters->target_V[target_ind];
     }
-    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[neuron_index].z_bar;
+    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[neuron_index*20].z_bar;
     // Record target
     recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] =
 //        			global_parameters->target_V[target_ind];
-        			neuron->syn_state[neuron_index].delta_w;
+        			neuron->syn_state[neuron_index*20].delta_w;
 //        			exc_input_values[0];
 
 
