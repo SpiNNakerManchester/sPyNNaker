@@ -27,7 +27,7 @@ from spynnaker.pyNN.models.neuron.generator_data import GeneratorData
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnMachine)
 from spynnaker.pyNN.models.neural_projections import (
-    ProjectionApplicationEdge, ProjectionMachineEdge)
+    ProjectionApplicationEdge)
 from .synapse_dynamics import (
     AbstractSynapseDynamicsStructural,
     AbstractGenerateOnMachine, SynapseDynamicsStructuralSTDP)
@@ -635,8 +635,8 @@ class SynapticManager(object):
         synapse_map = dict()
         for machine_edge in machine_graph.get_edges_ending_at_vertex(
                 machine_vertex):
-            if isinstance(machine_edge, ProjectionMachineEdge):
-                for synapse_info in machine_edge.synapse_information:
+            if isinstance(machine_edge.app_edge, ProjectionApplicationEdge):
+                for synapse_info in machine_edge.app_edge.synapse_information:
                     # Per synapse info we need any one of the edges
                     synapse_map[synapse_info] = machine_edge
 
@@ -1041,7 +1041,7 @@ class SynapticManager(object):
         :param int all_syn_block_sz:
         :param int block_addr:
         :param int single_addr:
-        :param ProjectionMachineEdge machine_edge:
+        :param MachineEdge machine_edge:
         :rtype: tuple(int,int,int)
         """
         (row_data, row_length, delayed_row_data, delayed_row_length,
@@ -1276,7 +1276,7 @@ class SynapticManager(object):
             How to talk to the machine
         :param ~pacman.model.placements.Placement placement:
             Where on the machine are we talking to?
-        :param ProjectionMachineEdge machine_edge:
+        :param MachineEdge machine_edge:
             What edge's connections are we talking about?
         :param ~pacman.model.routing_info.RoutingInfo routing_infos:
             Where did the edge go?
