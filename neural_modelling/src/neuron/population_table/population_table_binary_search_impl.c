@@ -258,11 +258,19 @@ static inline void print_master_population_table(void) {
 }
 
 //! \brief Check if the entry is a match for the given key
+//! \param[in] mp_i: The master population table entry index
+//! \param[in] key: The key to check
+//! \return: Whether the key matches the entry
 static inline bool matches(uint32_t mp_i, uint32_t key) {
     return (key & master_population_table[mp_i].mask) ==
             master_population_table[mp_i].key;
 }
 
+//! \brief Print bitfields for debugging
+//! \param[in] mp_i: The master population table entry index
+//! \param[in] start: The first index of the bitfield to print
+//! \param[in] end: The index after the last bitfield to print
+//! \param[in] filters: The bitfields to print
 static inline void print_bitfields(uint32_t mp_i, uint32_t start,
         uint32_t end, filter_info_t *filters) {
 #if LOG_LEVEL >= LOG_DEBUG
@@ -313,12 +321,15 @@ static inline bool bit_field_filter_initialise(filter_region_t *filter_region) {
          log_debug("Master pop key: 0x%08x, mask: 0x%08x",
                  master_population_table[mp_i].key, master_population_table[mp_i].mask);
 
+#ifdef LOG_DEBUG
+         // Sanity checking code; not needed in normal operation, and costs ITCM
          // With both things being in key order, this should never happen...
-         while (bf_i < n_filters &&
+         if (bf_i < n_filters &&
                  filters[bf_i].key < master_population_table[mp_i].key) {
-             log_debug("Skipping bitfield %d for key 0x%08x", bf_i, filters[bf_i].key);
-             bf_i++;
+             log_error("Skipping bitfield %d for key 0x%08x", bf_i, filters[bf_i].key);
+             rt_error(RTE_SWERR);
          }
+#endif
 
          // While there is a match, keep track of the start and end; note this
          // may recheck the first entry, but there might not be a first entry if
