@@ -145,9 +145,9 @@ state_t neuron_model_state_update(
                                     - global_parameters->core_target_rate;
 //    io_printf(IO_BUF, "rls: %k\n", reg_learning_signal);
     if (time % neuron->window_size == neuron->window_size - 1 & !printed_value){ //hardcoded time of reset
-        io_printf(IO_BUF, "1 %u, rate err:%k, spikes:%k, target:%k\tL:%k, v_mem:%k\n",
-        time, reg_learning_signal, global_parameters->core_pop_rate, global_parameters->core_target_rate,
-        learning_signal-v_mem_error, v_mem_error);
+//        io_printf(IO_BUF, "1 %u, rate err:%k, spikes:%k, target:%k\tL:%k, v_mem:%k\n",
+//        time, reg_learning_signal, global_parameters->core_pop_rate, global_parameters->core_target_rate,
+//        learning_signal-v_mem_error, v_mem_error);
 //        global_parameters->core_pop_rate = 0.k;
 //        REAL reg_learning_signal = ((global_parameters->core_pop_rate / 1.225k)//(accum)(time%1300))
 //                                / (accum)syn_dynamics_neurons_in_partition) - global_parameters->core_target_rate;

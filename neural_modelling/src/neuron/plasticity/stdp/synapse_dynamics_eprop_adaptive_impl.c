@@ -321,6 +321,7 @@ static inline final_state_t eprop_plasticity_update(update_state_t current_state
 //    REAL reg_error = (global_parameters->core_pop_rate / syn_dynamics_neurons_in_partition) - global_parameters->core_target_rate;
 //    io_printf(IO_BUF, "core_pop_rate = %k, target = %k, error = %k\n", global_parameters->core_pop_rate, global_parameters->core_target_rate, reg_error);
 
+//    io_printf(IO_BUF, "reg_error before: %k\n", reg_error);
 
     // Return final synaptic word and weight
     return synapse_structure_get_final_state(current_state, reg_error);
