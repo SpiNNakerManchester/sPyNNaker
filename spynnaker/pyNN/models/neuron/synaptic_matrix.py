@@ -435,9 +435,7 @@ class SynapticMatrix(object):
                 self.__max_row_info.undelayed_max_n_synapses,
                 self.__max_row_info.delayed_max_n_synapses,
                 self.__app_edge.pre_vertex.vertex_slices,
-                self.__machine_edge.pre_vertex.index,
                 self.__app_edge.post_vertex.vertex_slices,
-                self.__machine_edge.post_vertex.index,
                 self.__machine_edge.pre_vertex.vertex_slice,
                 self.__machine_edge.post_vertex.vertex_slice,
                 self.__synapse_info, self.__app_edge.n_delay_stages + 1)
