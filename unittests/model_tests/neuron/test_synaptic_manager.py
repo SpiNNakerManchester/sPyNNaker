@@ -23,6 +23,7 @@ from spinn_utilities.overrides import overrides
 from spinn_machine import SDRAM
 from pacman.model.placements import Placement
 from pacman.model.resources import ResourceContainer
+from pacman.model.graphs.application import ApplicationGraph
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
 from pacman.model.routing_info import (
@@ -221,11 +222,14 @@ class TestSynapticManager(unittest.TestCase):
 
         machine_time_step = 1000
 
+        app_graph = ApplicationGraph("App")
         pre_app_vertex = SimpleApplicationVertex(10)
+        app_graph.add_vertex(pre_app_vertex)
         pre_vertex_slice = Slice(0, 9)
         pre_vertex = pre_app_vertex.create_machine_vertex(
             pre_vertex_slice, None)
         post_app_vertex = SimpleApplicationVertex(10)
+        app_graph.add_vertex(post_app_vertex)
         post_vertex_slice = Slice(0, 9)
         post_vertex = post_app_vertex.create_machine_vertex(
             post_vertex_slice, None)
@@ -257,7 +261,7 @@ class TestSynapticManager(unittest.TestCase):
             pre_vertex, post_vertex, label=None)
         partition_name = "TestPartition"
 
-        graph = MachineGraph("Test")
+        graph = MachineGraph("Test", app_graph)
         graph.add_vertex(pre_vertex)
         graph.add_vertex(post_vertex)
         graph.add_edge(machine_edge, partition_name)
