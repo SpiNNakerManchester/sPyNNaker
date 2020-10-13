@@ -29,37 +29,67 @@ from .generator_data import GeneratorData, SYN_REGION_UNUSED
 
 
 class SynapticMatrixApp(object):
-    """ The synaptic matrix/matrices for an incoming app edge
+    """ The synaptic matrix (and delay matrix if applicable) for an incoming
+        app edge
     """
 
     __slots__ = [
+        # The reader and writer of the synapses
         "__synapse_io",
+        # The master population table
         "__poptable",
+        # The synaptic info that these matrices are for
         "__synapse_info",
+        # The application edge that these matrices are for
         "__app_edge",
+        # The number of synapse types incoming
         "__n_synapse_types",
+        # The maximum summed size of the "direct" or "single" matrices
         "__all_single_syn_sz",
+        # The slice of the post vertex these matrices are for
         "__post_vertex_slice",
+        # The ID of the synaptic matrix region
         "__synaptic_matrix_region",
+        # The ID of the "direct" or "single" matrix region
         "__direct_matrix_region",
+        # Any machine-level matrices for this application matrix
         "__matrices",
+        # The maximum row length of delayed and undelayed matrices
         "__max_row_info",
+        # The maximum summed size of the synaptic matrices
         "__all_syn_block_sz",
+        # The application-level key information for the incoming edge
         "__app_key_info",
+        # The application-level key information for the incoming delay edge
         "__delay_app_key_info",
+        # All routing information
         "__routing_info",
+        # The weight scaling used by each synapse type
         "__weight_scales",
+        # The machine edges of the incoming application edges
         "__m_edges",
+        # True if the application-level keys are safe to be used
         "__use_app_keys",
+        # The expected size in bytes of a synaptic matrix
         "__matrix_size",
+        # The expected size in bytes of a delayed synaptic matrix
         "__delay_matrix_size",
-        "__n_subatoms",
-        "__n_subedges",
+        # The number of atoms in the machine-level pre-vertices
+        "__n_sub_atoms",
+        # The number of machine edges expected for this application edge
+        "__n_sub_edges",
+        # The offset of the undelayed synaptic matrix in the region
         "__syn_mat_offset",
+        # The offset of the delayed synaptic matrix in the region
         "__delay_syn_mat_offset",
+        # The index of the synaptic matrix within the master population table
         "__index",
+        # The index of the delayed synaptic matrix within the master population
+        # table
         "__delay_index",
+        # A cache of the received synaptic matrix
         "__received_block",
+        # A cache of the received delayed synaptic matrix
         "__delay_received_block"
     ]
 
@@ -122,9 +152,10 @@ class SynapticMatrixApp(object):
             self.__app_edge.n_delay_stages *
             self.__max_row_info.delayed_max_bytes)
         vertex = self.__app_edge.pre_vertex
-        self.__n_subatoms = int(min(
+        self.__n_sub_atoms = int(min(
             vertex.get_max_atoms_per_core(), vertex.n_atoms))
-        self.__n_subedges = int(math.ceil(vertex.n_atoms / self.__n_subatoms))
+        self.__n_sub_edges = int(
+            math.ceil(vertex.n_atoms / self.__n_sub_atoms))
 
         # These are computed during synaptic generation
         self.__syn_mat_offset = None
@@ -148,10 +179,9 @@ class SynapticMatrixApp(object):
 
         r_info = self.__routing_info.get_routing_info_for_edge(machine_edge)
         delayed_r_info = None
-        delayed_edge = machine_edge.delay_edge
-        if delayed_edge is not None:
+        if machine_edge.delay_edge is not None:
             delayed_r_info = self.__routing_info.get_routing_info_for_edge(
-                delayed_edge)
+                machine_edge.delay_edge)
         matrix = SynapticMatrix(
             self.__synapse_io, self.__poptable, self.__synapse_info,
             machine_edge, self.__app_edge, self.__n_synapse_types,
@@ -168,8 +198,8 @@ class SynapticMatrixApp(object):
         :rtype: int
         """
         if self.__max_row_info.undelayed_max_n_synapses > 0:
-            size = self.__n_subatoms * self.__max_row_info.undelayed_max_bytes
-            for _ in range(self.__n_subedges):
+            size = self.__n_sub_atoms * self.__max_row_info.undelayed_max_bytes
+            for _ in range(self.__n_sub_edges):
                 addr = self.__poptable.get_next_allowed_address(addr)
                 addr += size
         return addr
@@ -182,9 +212,10 @@ class SynapticMatrixApp(object):
         :rtype: int
         """
         if self.__max_row_info.delayed_max_n_synapses > 0:
-            size = (self.__n_subatoms * self.__max_row_info.delayed_max_bytes *
+            size = (self.__n_sub_atoms *
+                    self.__max_row_info.delayed_max_bytes *
                     self.__app_edge.n_delay_stages)
-            for _ in range(self.__n_subedges):
+            for _ in range(self.__n_sub_edges):
                 addr = self.__poptable.get_next_allowed_address(addr)
                 addr += size
         return addr
@@ -209,7 +240,7 @@ class SynapticMatrixApp(object):
             connector.gen_connector_params_size_in_bytes,
             dynamics.gen_matrix_params_size_in_bytes
         ))
-        return gen_size * self.__n_subedges
+        return gen_size * self.__n_sub_edges
 
     def can_generate_on_machine(self, single_addr):
         """ Determine if an app edge can be generated on the machine
@@ -534,6 +565,8 @@ class SynapticMatrixApp(object):
 
         :param ~numpy.ndarray data: The row data created
         :param ~numpy.ndarray delayed_data: The delayed row data created
+        :param MachineEdge machine_edge:
+            The machine edge the connections are for
         """
         for conn_holder in self.__synapse_info.pre_run_connection_holders:
             conn_holder.add_connections(

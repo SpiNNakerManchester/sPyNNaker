@@ -30,27 +30,49 @@ class SynapticMatrix(object):
     """
 
     __slots__ = [
+        # The reader and writer of synaptic matrices
         "__synapse_io",
+        # The master population table
         "__poptable",
+        # The synapse info used to generate the matrices
         "__synapse_info",
+        # The machine edge these matrices are for
         "__machine_edge",
+        # The app edge of the machine edge
         "__app_edge",
+        # The number of synapse types
         "__n_synapse_types",
+        # The maximum row lengths of the matrices
         "__max_row_info",
+        # The routing information for the undelayed edge
         "__routing_info",
+        # The routing information for the delayed edge
         "__delay_routing_info",
+        # The scale of the weights of each synapse type
         "__weight_scales",
+        # The maximum summed size of the synaptic matrices
         "__all_syn_block_sz",
+        # The maximum summed size of the "direct" or "single" matrices
         "__all_single_syn_sz",
+        # The expected size of a synaptic matrix
         "__matrix_size",
+        # The expected size of a delayed synaptic matrix
         "__delay_matrix_size",
+        # The expected size of a "direct" or "single" matrix
         "__single_matrix_size",
+        # The index of the matrix in the master population table
         "__index",
+        # The index of the delayed matrix in the master population table
         "__delay_index",
+        # The offset of the matrix within the synaptic region
         "__syn_mat_offset",
+        # The offset of the delayed matrix within the synaptic region
         "__delay_syn_mat_offset",
+        # Indicates if the matrix is a "direct" or "single" matrix
         "__is_single",
+        # A cached version of a received synaptic matrix
         "__received_block",
+        # A cached version of a received delayed synaptic matrix
         "__delay_received_block"
     ]
 

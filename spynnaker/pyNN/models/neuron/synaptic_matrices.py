@@ -50,18 +50,31 @@ class SynapticMatrices(object):
     """
 
     __slots__ = [
-        "__post_slice_index",
+        # The slice of the post-vertex that these matrices are for
         "__post_vertex_slice",
+        # The number of synapse types received
         "__n_synapse_types",
+        # The maximum summed size of the "direct" or "single" matrices
         "__all_single_syn_sz",
+        # The synapse reader and writer to convert between SpiNNaker and host
         "__synapse_io",
+        # The ID of the synaptic matrix region
         "__synaptic_matrix_region",
+        # The ID of the "direct" or "single" matrix region
         "__direct_matrix_region",
+        # The ID of the master population table region
         "__poptable_region",
+        # The master population table data structure
         "__poptable",
+        # The sub-matrices for each incoming edge
         "__matrices",
+        # The address within the synaptic matrix region after the last matrix
+        # was written
         "__host_generated_block_addr",
+        # The address within the synaptic matrix region after the last
+        # generated matrix will be written
         "__on_chip_generated_block_addr",
+        # Determine if any of the matrices can be generated on the machine
         "__gen_on_machine"
     ]
 

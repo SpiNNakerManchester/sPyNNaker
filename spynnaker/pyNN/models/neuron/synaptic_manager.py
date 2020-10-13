@@ -58,15 +58,30 @@ class SynapticManager(object):
     """
     # pylint: disable=too-many-arguments, too-many-locals
     __slots__ = [
+        # The number of synapse types
         "__n_synapse_types",
+        # The maximum size of the direct or single synaptic matrix
         "__all_single_syn_sz",
+        # The number of sigmas to use when calculating the ring buffer upper
+        # bound
         "__ring_buffer_sigma",
+        # The spikes-per-second to use for an incoming population that doesn't
+        # specify this
         "__spikes_per_second",
+        # The dynamics used by the synapses e.g. STDP, static etc.
         "__synapse_dynamics",
+        # The reader and writer of synapses to and from SpiNNaker
         "__synapse_io",
+        # A list of scale factors for the weights for each synapse type
         "__weight_scales",
+        # A list of ring buffer shift values corresponding to the weight
+        # scales; a left shift by this amount will do the multiplication by
+        # the weight scale
         "__ring_buffer_shifts",
+        # The actual synaptic matrix handling code, split for simplicity
         "__synaptic_matrices",
+        # Determine whether spikes should be dropped if they arrive after the
+        # end of a timestep
         "__drop_late_spikes",
         # Overridable (for testing only) region IDs
         "_synapse_params_region",
