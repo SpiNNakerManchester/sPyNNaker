@@ -182,22 +182,22 @@ void read_in_addresses(void) {
     log_debug("bit_field_base_address = %0x", bit_field_base_address);
     log_debug("direct_matrix_region_base_address = %0x",
             direct_matrix_region_base_address);
-    log_info("structural matrix region base address = %0x",
+    log_debug("Structural matrix region base address = %0x",
             structural_matrix_region_base_address);
-    log_info("finished reading in vertex data region addresses");
+    log_info("Finished reading in vertex data region addresses");
 }
 
 #ifdef __PRINT_KEY_ATOM_MAP__
 //! Debugging: print the map
 static void print_key_to_max_atom_map(void) {
-    log_info("n items is %d", keys_to_max_atoms->n_pairs);
+    log_info("Number of items is %d", keys_to_max_atoms->n_pairs);
 
     // put map into dtcm
     for (int key_to_max_atom_index = 0;
             key_to_max_atom_index < keys_to_max_atoms->n_pairs;
             key_to_max_atom_index++) {
         // print
-        log_info("entry %d has key %x and n_atoms of %d",
+        log_info("Entry %d has key %x and n_atoms of %d",
                 key_to_max_atom_index,
                 keys_to_max_atoms->pairs[key_to_max_atom_index].key,
                 keys_to_max_atoms->pairs[key_to_max_atom_index].n_atoms);
@@ -210,36 +210,36 @@ static void print_key_to_max_atom_map(void) {
 //! \return whether the init was successful.
 bool initialise(void) {
     // init the synapses to get direct synapse address
-    log_info("direct synapse init");
+    log_info("Direct synapse init");
     if (!direct_synapses_initialise(
             direct_matrix_region_base_address, &direct_synapses_address)) {
-        log_error("failed to init the synapses. failing");
+        log_error("Failed to init the synapses. failing");
         return false;
     }
 
     // init the master pop table
-    log_info("pop table init");
+    log_info("Pop table init");
     if (!population_table_initialise(
             master_pop_base_address, synaptic_matrix_base_address,
             direct_synapses_address, bit_field_base_address,
             &row_max_n_words)) {
-        log_error("failed to init the master pop table. failing");
+        log_error("Failed to init the master pop table. failing");
         return false;
     }
 
-    log_info("structural plastic if needed");
+    log_info("Structural plastic if needed");
     if (structural_matrix_region_base_address != NULL) {
         if (! sp_structs_read_in_common(
                 structural_matrix_region_base_address, &rewiring_data,
                 &pre_info, &post_to_pre_table)) {
-            log_error("failed to init the synaptogenesis");
+            log_error("Failed to init the synaptogenesis");
             return false;
         }
     }
 
     if (keys_to_max_atoms->n_pairs == 0) {
          success_shut_down();
-         log_info("successfully processed the bitfields as there wasn't any");
+         log_info("There were no bitfields to process.");
          can_run = false;
          return true;
     }
@@ -250,13 +250,13 @@ bool initialise(void) {
 #endif
 
     // set up a sdram read for a row
-    log_debug("allocating dtcm for row data");
+    log_debug("Allocating dtcm for row data");
     row_data = spin1_malloc(row_max_n_words * sizeof(uint32_t));
     if (row_data == NULL) {
-        log_error("could not allocate dtcm for the row data");
+        log_error("Could not allocate dtcm for the row data");
         return false;
     }
-    log_debug("finished pop table set connectivity lookup");
+    log_debug("Finished pop table set connectivity lookup");
 
     return true;
 }
@@ -267,7 +267,7 @@ bool initialise(void) {
 bool process_synaptic_row(synaptic_row_t row) {
     // get address of plastic region from row
     if (synapse_row_plastic_size(row) > 0) {
-        log_debug("plastic row had entries, so cant be pruned");
+        log_debug("Plastic row had entries, so cant be pruned");
         return true;
     }
 
@@ -276,10 +276,10 @@ bool process_synaptic_row(synaptic_row_t row) {
     uint32_t fixed_synapse =
             synapse_row_num_fixed_synapses(fixed_region_address);
     if (fixed_synapse == 0) {
-        log_debug("plastic and fixed do not have entries, so can be pruned");
+        log_debug("Plastic and fixed do not have entries, so can be pruned");
         return false;
     } else {
-        log_debug("fixed row has entries, so cant be pruned");
+        log_debug("Fixed row has entries, so cant be pruned");
         return true;
     }
 }
@@ -292,7 +292,7 @@ bool process_synaptic_row(synaptic_row_t row) {
 static bool do_sdram_read_and_test(
         address_t row_address, uint32_t n_bytes_to_transfer) {
     spin1_memcpy(row_data, row_address, n_bytes_to_transfer);
-    log_debug("process synaptic row");
+    log_debug("Process synaptic row");
     return process_synaptic_row(row_data);
 }
 
@@ -337,17 +337,17 @@ static void determine_redundancy(void) {
 //! \return Whether it was successful at generating the bitfield
 bool generate_bit_field(void) {
     // write how many entries (thus bitfields) are to be generated into sdram
-    log_debug("update by pop length");
+    log_debug("Update by pop length");
     bit_field_base_address->n_filters = keys_to_max_atoms->n_pairs;
 
     // location where to dump the bitfields into (right after the filter structs
     address_t bit_field_words_location = (address_t)
             &bit_field_base_address->filters[bit_field_base_address->n_filters];
-    log_info("words location is %x", bit_field_words_location);
+    log_debug("bit_field_words_location is %x", bit_field_words_location);
     int position = 0;
 
      // iterate through the master pop entries
-    log_debug("starting master pop entry bit field generation");
+    log_debug("Starting master pop entry bit field generation");
     for (uint32_t i = 0; i < keys_to_max_atoms->n_pairs; i++) {
 
         // determine keys masks and n_neurons
@@ -361,7 +361,7 @@ bool generate_bit_field(void) {
                 i, (uint32_t) key, n_neurons);
         bit_field_t bit_field = bit_field_alloc(n_neurons);
         if (bit_field == NULL) {
-            log_error("could not allocate dtcm for bit field");
+            log_error("Could not allocate dtcm for bit field");
             return false;
         }
 
@@ -369,11 +369,11 @@ bool generate_bit_field(void) {
         clear_bit_field(bit_field, n_words);
 
         // iterate through neurons and ask for rows from master pop table
-        log_debug("searching neuron ids");
+        log_debug("Searching neuron ids");
         for (uint32_t neuron_id=0; neuron_id < n_neurons; neuron_id++) {
             // update key with neuron id
             spike_t new_key = (spike_t) (key + neuron_id);
-            log_debug("new key for neurons %d is %0x", neuron_id, new_key);
+            log_debug("New key for neurons %d is %0x", neuron_id, new_key);
 
             // check if this is governed by the structural stuff. if so,
             // avoid filtering as it could change over time
@@ -398,11 +398,11 @@ bool generate_bit_field(void) {
                     // This is a direct row to process, so will have 1 target,
                     // so no need to go further
                     if (n_bytes_to_transfer == 0) {
-                        log_debug("direct synapse");
+                        log_debug("Direct synapse");
                         bit_found = true;
                     } else {
                         // sdram read (faking dma transfer)
-                        log_debug("dma read synapse");
+                        log_debug("DMA read synapse");
                         bit_found = do_sdram_read_and_test(
                                 row_address, n_bytes_to_transfer);
                     }
@@ -414,11 +414,11 @@ bool generate_bit_field(void) {
                         // This is a direct row to process, so will have 1
                         // target, so no need to go further
                         if (n_bytes_to_transfer == 0) {
-                            log_debug("direct synapse");
+                            log_debug("Direct synapse");
                             bit_found = true;
                         } else {
                             // sdram read (faking dma transfer)
-                            log_debug("dma read synapse");
+                            log_debug("DMA read synapse");
                             bit_found = do_sdram_read_and_test(
                                     row_address, n_bytes_to_transfer);
                         }
@@ -434,13 +434,13 @@ bool generate_bit_field(void) {
             }
         }
 
-        log_debug("writing bitfield to sdram for core use");
+        log_debug("Writing bitfield to sdram for core use");
         bit_field_base_address->filters[i].key = key;
-        log_debug("putting master pop key %d in entry %d", key, i);
+        log_debug("Putting master pop key %d in entry %d", key, i);
         bit_field_base_address->filters[i].n_atoms = n_neurons;
-        log_debug("putting n_atom %d in entry %d", n_neurons, i);
+        log_debug("Putting n_atom %d in entry %d", n_neurons, i);
         // write bitfield to sdram.
-        log_debug("writing to address %0x, %d words to write",
+        log_debug("Writing to address %0x, %d words to write",
                 &bit_field_words_location[position], n_words);
         spin1_memcpy(&bit_field_words_location[position], bit_field,
                 n_words * BYTE_TO_WORD_CONVERSION);
@@ -452,7 +452,7 @@ bool generate_bit_field(void) {
         position += n_words;
 
         // free dtcm of bitfield.
-        log_debug("freeing the bitfield dtcm");
+        log_debug("Freeing the bitfield dtcm");
         sark_free(bit_field);
     }
     determine_redundancy();
@@ -465,25 +465,25 @@ void c_main(void) {
     // set to running state
     sark_cpu_state(CPU_STATE_RUN);
 
-    log_info("starting the bit field expander");
+    log_info("Starting the bit field expander");
 
     // read in sdram data
     read_in_addresses();
 
     // generate bit field for each vertex regions
     if (!initialise()) {
-        log_error("failed to init the master pop and synaptic matrix");
+        log_error("Failed to init the master pop and synaptic matrix");
         fail_shut_down();
     }
 
     if (can_run) {
-        log_info("generating bit field");
+        log_info("Generating bit field");
         if (!generate_bit_field()) {
-            log_error("failed to generate bitfield");
+            log_error("Failed to generate bitfield");
             fail_shut_down();
         } else {
             success_shut_down();
-            log_info("successfully processed the bitfield");
+            log_info("Successfully processed the bitfield");
         }
     }
 }
