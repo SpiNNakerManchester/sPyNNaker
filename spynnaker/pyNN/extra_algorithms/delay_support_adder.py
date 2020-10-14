@@ -65,6 +65,12 @@ class DelaySupportAdder(object):
 
     APP_DELAY_PROGRESS_BAR_TEXT = "Adding delay extensions as required"
 
+    def __init__(self):
+        self._app_to_delay_map = dict()
+        self._delay_post_edge_map = dict()
+        self._delay_pre_edges = list()
+        self._app_edge_min_delay = dict()
+
     def __call__(self, app_graph, machine_time_step, user_max_delay):
         """ adds the delay extensions to the app graph, now that all the
         splitter objects have been set.
