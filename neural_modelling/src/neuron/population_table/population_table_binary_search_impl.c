@@ -229,7 +229,7 @@ static inline uint32_t get_extended_neuron_id(
 //!
 //! For debugging
 static inline void print_master_population_table(void) {
-    log_info("master_population\n");
+    log_info("Master_population\n");
     for (uint32_t i = 0; i < master_population_table_length; i++) {
         master_population_table_entry entry = master_population_table[i];
         log_info("key: 0x%08x, mask: 0x%08x", entry.key, entry.mask);
@@ -275,7 +275,7 @@ static inline void print_bitfields(uint32_t mp_i, uint32_t start,
         uint32_t end, filter_info_t *filters) {
 #if LOG_LEVEL >= LOG_DEBUG
     // print out the bit field for debug purposes
-    log_info("bit field(s) for key 0x%08x:", master_population_table[mp_i].key);
+    log_info("Bit field(s) for key 0x%08x:", master_population_table[mp_i].key);
     uint32_t offset = 0;
     for (uint32_t bf_i = start; bf_i < end; bf_i++) {
         uint32_t n_words = get_bit_field_size(filters[bf_i].n_atoms);
@@ -302,7 +302,7 @@ static inline bool bit_field_filter_initialise(filter_region_t *filter_region) {
             spin1_malloc(sizeof(bit_field_t) * master_population_table_length);
     if (connectivity_bit_field == NULL) {
         log_warning(
-                "couldn't initialise basic bit field holder. Will end up doing"
+                "Couldn't initialise basic bit field holder. Will end up doing"
                 " possibly more DMA's during the execution than required."
                 " We required %d bytes where %d are available",
                 sizeof(bit_field_t) * master_population_table_length,
@@ -356,7 +356,7 @@ static inline bool bit_field_filter_initialise(filter_region_t *filter_region) {
              if (connectivity_bit_field[mp_i] == NULL) {
                  // If allocation fails, we can still continue
                  log_info(
-                         "could not initialise bit field for key %d, packets with "
+                         "Could not initialise bit field for key %d, packets with "
                          "that key will use a DMA to check if the packet targets "
                          "anything within this core. Potentially slowing down the "
                          "execution of neurons on this core.",
@@ -365,11 +365,11 @@ static inline bool bit_field_filter_initialise(filter_region_t *filter_region) {
                  failed_bit_field_reads += bf_i - start;
              } else {
                  // If allocation succeeds, copy the bitfields in
-                 bit_field_t bf_p = &connectivity_bit_field[mp_i][0];
+                 bit_field_t bf_pointer = &connectivity_bit_field[mp_i][0];
                  for (uint32_t i = start; i < bf_i; i++) {
                      uint32_t n_words = get_bit_field_size(filters[i].n_atoms);
-                     spin1_memcpy(bf_p, filters[i].data, n_words * sizeof(uint32_t));
-                     bf_p = &bf_p[n_words];
+                     spin1_memcpy(bf_pointer, filters[i].data, n_words * sizeof(uint32_t));
+                     bf_pointer = &bf_pointer[n_words];
                  }
 
                  print_bitfields(mp_i, start, bf_i, filters);
@@ -389,7 +389,7 @@ static inline bool population_table_position_in_the_master_pop_array(
     uint32_t imax = master_population_table_length;
 
     while (imin < imax) {
-        int imid = (imax + imin) >> 1;
+        uint32_t imid = (imax + imin) >> 1;
         master_population_table_entry entry = master_population_table[imid];
         if ((spike & entry.mask) == entry.key) {
             *position = imid;
@@ -414,16 +414,16 @@ bool population_table_initialise(
         address_t table_address, address_t synapse_rows_address,
         address_t direct_rows_address, filter_region_t *bitfield_address,
         uint32_t *row_max_n_words) {
-    log_debug("population_table_initialise: starting");
+    log_debug("Population_table_initialise: starting");
 
     master_population_table_length = table_address[0];
-    log_debug("master pop table length is %d\n", master_population_table_length);
-    log_debug("master pop table entry size is %d\n",
+    log_debug("Master pop table length is %d\n", master_population_table_length);
+    log_debug("Master pop table entry size is %d\n",
             sizeof(master_population_table_entry));
     uint32_t n_master_pop_bytes =
             master_population_table_length * sizeof(master_population_table_entry);
     uint32_t n_master_pop_words = n_master_pop_bytes >> 2;
-    log_debug("pop table size is %d\n", n_master_pop_bytes);
+    log_debug("Pop table size is %d\n", n_master_pop_bytes);
 
     // only try to malloc if there's stuff to malloc.
     if (n_master_pop_bytes != 0) {
@@ -447,9 +447,9 @@ bool population_table_initialise(
         }
     }
 
-    log_debug("pop table size: %u (%u bytes)",
+    log_debug("Pop table size: %u (%u bytes)",
             master_population_table_length, n_master_pop_bytes);
-    log_debug("address list size: %u (%u bytes)",
+    log_debug("Address list size: %u (%u bytes)",
             address_list_length, n_address_list_bytes);
 
     // Copy the master population table
@@ -459,9 +459,9 @@ bool population_table_initialise(
             n_address_list_bytes);
 
     // Store the base address
-    log_info("the stored synaptic matrix base address is located at: 0x%08x",
+    log_info("The stored synaptic matrix base address is located at: 0x%08x",
             synapse_rows_address);
-    log_info("the direct synaptic matrix base address is located at: 0x%08x",
+    log_info("The direct synaptic matrix base address is located at: 0x%08x",
             direct_rows_address);
     synaptic_rows_base_address = (uint32_t) synapse_rows_address;
     direct_rows_base_address = (uint32_t) direct_rows_address;
@@ -480,15 +480,15 @@ bool population_table_initialise(
 bool population_table_get_first_address(
         spike_t spike, address_t* row_address, size_t* n_bytes_to_transfer) {
     // locate the position in the binary search / array
-    log_debug("searching for key %d", spike);
+    log_debug("Searching for key %d", spike);
 
     // check we don't have a complete miss
     uint32_t position;
     if (!population_table_position_in_the_master_pop_array(spike, &position)) {
         invalid_master_pop_hits++;
         log_debug("Ghost searches: %u\n", ghost_pop_table_searches);
-        log_debug("spike %u (= %x): "
-                "population not found in master population table",
+        log_debug("Spike %u (= %x): "
+                "Population not found in master population table",
                 spike, spike);
         return false;
     }
@@ -496,7 +496,7 @@ bool population_table_get_first_address(
 
     master_population_table_entry entry = master_population_table[position];
     if (entry.count == 0) {
-        log_debug("spike %u (= %x): population found in master population"
+        log_debug("Spike %u (= %x): Population found in master population"
                 "table but count is 0", spike, spike);
     }
 
@@ -514,23 +514,23 @@ bool population_table_get_first_address(
 
     // check we have a entry in the bit field for this (possible not to due to
     // DTCM limitations or router table compression). If not, go to DMA check.
-    log_debug("checking bit field");
+    log_debug("Checking bit field");
     if (connectivity_bit_field != NULL &&
             connectivity_bit_field[position] != NULL) {
-        log_debug("can be checked, bitfield is allocated");
+        log_debug("Can be checked, bitfield is allocated");
         // check that the bit flagged for this neuron id does hit a
         // neuron here. If not return false and avoid the DMA check.
         if (!bit_field_test(
                 &connectivity_bit_field[position][bits_offset], last_neuron_id)) {
-            log_debug("tested and was not set");
+            log_debug("Tested and was not set");
             bit_field_filtered_packets += 1;
             return false;
         }
-        log_debug("was set, carrying on");
+        log_debug("Was set, carrying on");
     } else {
-        log_debug("bit_field was not set up. "
-                "either its due to a lack of dtcm, or because the "
-                "bitfield was merged into the routing table");
+        log_debug("Bit field was not set up. "
+                "either its due to a lack of DTCM, or because the "
+                "bit field was merged into the routing table");
     }
 
     log_debug("spike = %08x, entry_index = %u, start = %u, count = %u",
@@ -544,7 +544,7 @@ bool population_table_get_first_address(
 
     // tracks surplus DMAs
     if (!get_next) {
-        log_debug("found a entry which has a ghost entry for key %d", spike);
+        log_debug("Found a entry which has a ghost entry for key %d", spike);
         ghost_pop_table_searches++;
     }
     return get_next;
