@@ -473,27 +473,12 @@ uint32_t spike_processing_get_buffer_overflows(void) { // EXPORTED
     return in_spikes_get_n_buffer_overflows();
 }
 
-uint32_t spike_processing_get_ghost_pop_table_searches(void) {
-    return population_table_get_ghost_pop_table_searches();
-}
-
-uint32_t spike_processing_get_invalid_master_pop_table_hits(void) {
-    return population_table_get_invalid_master_pop_hits();
-}
-
 uint32_t spike_processing_get_dma_complete_count(void) {
     return dma_complete_count;
 }
 
 uint32_t spike_processing_get_spike_processing_count(void) {
     return spike_processing_count;
-}
-
-//! \brief get the address of the circular buffer used for buffering received
-//!     spikes before processing them
-//! \return address of circular buffer
-circular_buffer get_circular_buffer(void) { // EXPORTED
-    return buffer;
 }
 
 uint32_t spike_processing_get_successful_rewires(void) { // EXPORTED

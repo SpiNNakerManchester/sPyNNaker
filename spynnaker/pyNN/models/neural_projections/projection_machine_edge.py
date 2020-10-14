@@ -27,7 +27,8 @@ class ProjectionMachineEdge(
         AbstractProvidesLocalProvenanceData):
 
     __slots__ = [
-        "__synapse_information"]
+        "__synapse_information",
+        "__delay_edge"]
 
     def __init__(
             self, synapse_information, pre_vertex, post_vertex, app_edge,
@@ -45,6 +46,23 @@ class ProjectionMachineEdge(
             traffic_weight=traffic_weight)
 
         self.__synapse_information = synapse_information
+        self.__delay_edge = None
+
+    @property
+    def delay_edge(self):
+        """ Get the matching delay edge of this edge
+
+        :rtype: DelayedMachineEdge or None
+        """
+        return self.__delay_edge
+
+    @delay_edge.setter
+    def delay_edge(self, delay_edge):
+        """ Set the matching delay edge of this edge
+
+        :param DelayMachineEdge delay_edge: The edge to set
+        """
+        self.__delay_edge = delay_edge
 
     @property
     def synapse_information(self):

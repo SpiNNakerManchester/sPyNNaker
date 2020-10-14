@@ -91,8 +91,8 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
     @overrides(AbstractSynapseDynamicsStructural.write_structural_parameters)
     def write_structural_parameters(
             self, spec, region, machine_time_step, weight_scales,
-            machine_graph, machine_vertex, routing_info, synapse_indices):
-        """ Write the synapse parameters to the spec.
+            machine_graph, machine_vertex, routing_info, synaptic_matrices):
+        """ Write structural plasticity parameters
 
         :param ~data_specification.DataSpecificationGenerator spec:
             the data spec
@@ -106,7 +106,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
             the vertex for which data specs are being prepared
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
             All of the routing information on the network
-        :param dict(tuple(SynapseInformation,int),int) synapse_indices:
+        :param SynapticMatrices synaptic_matrices:
         """
         spec.comment("Writing structural plasticity parameters")
         spec.switch_write_focus(region)
@@ -123,7 +123,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         # Write the pre-population info
         pop_index = self.__write_prepopulation_info(
             spec, machine_vertex, structural_edges, machine_edges_by_app,
-            routing_info, weight_scales, synapse_indices, machine_time_step)
+            routing_info, weight_scales, synaptic_matrices, machine_time_step)
 
         # Write the post-to-pre table
         self.__write_post_to_pre_table(spec, pop_index, machine_vertex)
@@ -229,7 +229,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
 
     def __write_prepopulation_info(
             self, spec, machine_vertex, structural_edges, machine_edges_by_app,
-            routing_info, weight_scales, synapse_indices,
+            routing_info, weight_scales, synaptic_matrices,
             machine_time_step):
         """
         :param ~data_specification.DataSpecificationGenerator spec:
@@ -241,7 +241,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                 map of app edge to associated machine edges
         :param RoutingInfo routing_info:
         :param dict(AbstractSynapseType,float) weight_scales:
-        :param dict(tuple(SynapseInformation,int),int) synapse_indices:
+        :param SynapticMatrices synaptic_matrices:
         :param int machine_time_step:
         :rtype: dict(tuple(AbstractPopulationVertex,SynapseInformation),int)
         """
@@ -285,8 +285,8 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                 spec.write_value(r_info.first_mask)
                 spec.write_value(vertex_slice.n_atoms)
                 spec.write_value(vertex_slice.lo_atom)
-                spec.write_value(
-                    synapse_indices[synapse_info, vertex_slice.lo_atom])
+                spec.write_value(synaptic_matrices.get_index(
+                    app_edge, synapse_info, machine_edge))
         return pop_index
 
     def __write_post_to_pre_table(self, spec, pop_index, machine_vertex):
@@ -440,3 +440,24 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         :type app_vertex: ApplicationVertex or None
         :return: list of random seed (4 words), generated randomly
         """
+
+    def check_initial_delay(self, max_delay_ms):
+        """ Check that delays can be done without delay extensions
+
+        :param int max_delay_ms: The maximum delay supported, in milliseconds
+        :raises Exception: if the delay is out of range
+        """
+        if isinstance(self.initial_delay, collections.Iterable):
+            # pylint: disable=unsubscriptable-object
+            init_del = self.initial_delay
+            if init_del[0] > max_delay_ms or init_del[1] > max_delay_ms:
+                raise Exception(
+                    "The initial delay {} has one or more values that are"
+                    " bigger than {}.  This is not supported in the current"
+                    " implementation.".format(
+                        self.initial_delay, max_delay_ms))
+        elif self.initial_delay > max_delay_ms:
+            raise Exception(
+                "The initial delay {} is bigger than {}.  This is not"
+                " supported in the current implementation".format(
+                    self.initial_delay, max_delay_ms))

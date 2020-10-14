@@ -261,3 +261,8 @@ class SynapseDynamicsStructuralSTDP(
             return self.__seeds[app_vertex]
         else:
             return create_mars_kiss_seeds(self.__rng, self.__seed)
+
+    @overrides(SynapseDynamicsSTDP.generate_on_machine)
+    def generate_on_machine(self):
+        # Never generate structural connections on the machine
+        return False

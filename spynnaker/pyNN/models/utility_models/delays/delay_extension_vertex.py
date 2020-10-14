@@ -28,6 +28,8 @@ from spinn_front_end_common.abstract_models.impl import (
 from spynnaker.pyNN.exceptions import DelayExtensionException
 from .delay_block import DelayBlock
 from .delay_generator_data import DelayGeneratorData
+from spynnaker.pyNN.utilities.constants import (
+    POP_TABLE_MAX_ROW_LENGTH)
 
 logger = logging.getLogger(__name__)
 
@@ -73,7 +75,8 @@ class DelayExtensionVertex(
         :param str label: the vertex label
         """
         # pylint: disable=too-many-arguments
-        TDMAAwareApplicationVertex.__init__(self, label, constraints, 256)
+        super(DelayExtensionVertex, self).__init__(
+            label, constraints, POP_TABLE_MAX_ROW_LENGTH)
 
         self.__source_vertex = source_vertex
         self.__n_delay_stages = 0
@@ -156,24 +159,36 @@ class DelayExtensionVertex(
                 self.__n_delay_stages, self.__delay_per_stage, vertex_slice)
 
     def add_generator_data(
-            self, max_row_n_synapses, max_delayed_row_n_synapses,
-            pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
+            self, max_row_n_synapses, max_delayed_row_n_synapses, pre_slices,
+            post_slices, pre_vertex_slice, post_vertex_slice,
             synapse_information, max_stage, max_delay_per_stage,
             machine_time_step):
         """ Add delays for a connection to be generated
 
         :param int max_row_n_synapses:
+            The maximum number of synapses in a row
         :param int max_delayed_row_n_synapses:
+            The maximum number of synapses in a delay row
         :param list(~pacman.model.graphs.common.Slice) pre_slices:
+            The list of slices of the pre application vertex
         :param list(~pacman.model.graphs.common.Slice) post_slices:
+            The list of slices of the post application vertex
         :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+            The slice of the pre applcation vertex currently being
+            considered
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+            The slice of the post application vertex currently being
+            considered
+        :param ~spynnaker.pyNN.models.neural_projections.SynapseInformation \
+                synapse_information:
+            The synapse information of the connection
         :param synapse_information:
         :type synapse_information: \
             ~spynnaker.pyNN.models.neural_projections.SynapseInformation
         :param int max_stage:
-        :param int machine_time_step:
-        :param int max_delay_per_stage:
+            The maximum delay stage
+        :param int machine_time_step: sim machine time step
+        :param int max_delay_per_stage: max delay per stage
         """
         self.__delay_generator_data[pre_vertex_slice].append(
             DelayGeneratorData(

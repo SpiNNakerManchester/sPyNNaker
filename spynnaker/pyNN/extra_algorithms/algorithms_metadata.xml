@@ -591,4 +591,18 @@
             <token part="MAIN">SplitterObjectsAllocated</token>
         </outputs>
     </algorithm>
+    <algorithm name="FinishConnectionHolders">
+        <python_module>spynnaker.pyNN.extra_algorithms.connection_holder_finisher</python_module>
+        <python_function>finish_connection_holders</python_function>
+        <input_definitions>
+            <parameter>
+                <param_name>application_graph</param_name>
+                <param_type>MemoryApplicationGraph</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <token>DataLoaded</token>
+            <param_name>application_graph</param_name>
+        </required_inputs>
+    </algorithm>
 </algorithms>

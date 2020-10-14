@@ -43,11 +43,6 @@ bool spike_processing_initialise(
 //! \return the number of times the input buffer has overflowed
 uint32_t spike_processing_get_buffer_overflows(void);
 
-//! \brief Gets the number of ghost searches of the master population table
-//!     that occurred
-//! \return the number of times a ghost search occurred.
-uint32_t spike_processing_get_ghost_pop_table_searches(void);
-
 //! \brief Gets the number of DMA's that were completed
 //! \return the number of DMA's that were completed.
 uint32_t spike_processing_get_dma_complete_count(void);
@@ -55,11 +50,6 @@ uint32_t spike_processing_get_dma_complete_count(void);
 //! \brief Gets the number of spikes that were processed
 //! \return the number of spikes that were processed
 uint32_t spike_processing_get_spike_processing_count(void);
-
-//! \brief Gets the number of master population table searches that failed to
-//!     find a hit.
-//! \return the number of times a spike did not have a master pop table entry
-uint32_t spike_processing_get_invalid_master_pop_table_hits(void);
 
 //! \brief Gets the number of successful rewires performed
 //! \return the number of successful rewires
