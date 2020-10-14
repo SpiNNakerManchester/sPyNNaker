@@ -19,7 +19,7 @@
 		xsi:schemaLocation="https://github.com/SpiNNakerManchester/PACMAN
 			https://raw.githubusercontent.com/SpiNNakerManchester/PACMAN/master/pacman/operations/algorithms_metadata_schema.xsd">
     <algorithm name="DelaySupportAdder">
-        <python_module>spynnaker.pyNN.extra_algorithms.delay_suport_adder</python_module>
+        <python_module>spynnaker.pyNN.extra_algorithms.delay_support_adder</python_module>
         <python_class>DelaySupportAdder</python_class>
         <input_definitions>
             <parameter>
