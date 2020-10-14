@@ -18,6 +18,7 @@ from pacman.model.partitioner_splitters.splitter_one_to_one_legacy import (
     SplitterOneToOneLegacy)
 from spinn_front_end_common.interface.splitter_selectors import (
     SplitterSelector)
+from spinn_utilities.progress_bar import ProgressBar
 from spynnaker.pyNN.extra_algorithms.splitter_components.\
     splitter_abstract_pop_vertex_slice import (
         SplitterAbstractPopulationVertexSlice)
@@ -41,6 +42,8 @@ class SpynnakerSplitterSelector(SplitterSelector):
     :rtype: None
     """
 
+    PROGRESS_BAR_NAME = "Adding Splitter selectors where appropriate"
+
     def __call__(self, app_graph):
         """ basic selector which puts the legacy splitter object on
         everything without a splitter object
@@ -48,7 +51,12 @@ class SpynnakerSplitterSelector(SplitterSelector):
         :param ApplicationGraph app_graph: app graph
         :rtype: None
         """
-        for app_vertex in app_graph.vertices:
+
+        progress_bar = ProgressBar(
+            string_describing_what_being_progressed=self.PROGRESS_BAR_NAME,
+            total_number_of_things_to_do=len(app_graph.vertices))
+
+        for app_vertex in progress_bar.over(app_graph.vertices):
             if app_vertex.splitter_object is None:
                 if isinstance(app_vertex, AbstractPopulationVertex):
                     self.abstract_pop_heuristic(app_vertex)
