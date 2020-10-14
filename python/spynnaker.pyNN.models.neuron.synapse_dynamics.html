@@ -232,7 +232,7 @@
 
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractPlasticSynapseDynamics.get_plastic_synaptic_data">
-<code class="descname">get_plastic_synaptic_data</code><span class="sig-paren">(</span><em>connections</em>, <em>connection_row_indices</em>, <em>n_rows</em>, <em>post_vertex_slice</em>, <em>n_synapse_types</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/abstract_plastic_synapse_dynamics.html#AbstractPlasticSynapseDynamics.get_plastic_synaptic_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractPlasticSynapseDynamics.get_plastic_synaptic_data" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_plastic_synaptic_data</code><span class="sig-paren">(</span><em>connections</em>, <em>connection_row_indices</em>, <em>n_rows</em>, <em>post_vertex_slice</em>, <em>n_synapse_types</em>, <em>max_n_synapses</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/abstract_plastic_synapse_dynamics.html#AbstractPlasticSynapseDynamics.get_plastic_synaptic_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractPlasticSynapseDynamics.get_plastic_synaptic_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the fixed-plastic data, and plastic-plastic data for each row,            and lengths for the fixed_plastic and plastic-plastic parts of            each row.</p>
 <p>Data is returned as an array made up of an array of 32-bit words for        each row, for each of the fixed-plastic and plastic-plastic data        regions.  The row into which connection should go is given by        <cite>connection_row_indices</cite>, and the total number of rows is given by        <cite>n_rows</cite>.</p>
 <p>Lengths are returned as an array made up of an integer for each row,        for each of the fixed-plastic and plastic-plastic regions.</p>
@@ -241,11 +241,12 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>connections</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a>) &#8211; </li>
-<li><strong>connection_row_indices</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a>) &#8211; </li>
-<li><strong>n_rows</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
-<li><strong>post_vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; </li>
-<li><strong>n_synapse_types</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
+<li><strong>connections</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a>) &#8211; The connections to get data for</li>
+<li><strong>connection_row_indices</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a>) &#8211; The row into which each connection should go</li>
+<li><strong>n_rows</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The total number of rows</li>
+<li><strong>post_vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of the post vertex to get the connections for</li>
+<li><strong>n_synapse_types</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The number of synapse types</li>
+<li><strong>max_n_synapses</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The maximum number of synapses to generate</li>
 </ul>
 </td>
 </tr>
@@ -345,7 +346,7 @@
 
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractStaticSynapseDynamics.get_static_synaptic_data">
-<code class="descname">get_static_synaptic_data</code><span class="sig-paren">(</span><em>connections</em>, <em>connection_row_indices</em>, <em>n_rows</em>, <em>post_vertex_slice</em>, <em>n_synapse_types</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/abstract_static_synapse_dynamics.html#AbstractStaticSynapseDynamics.get_static_synaptic_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractStaticSynapseDynamics.get_static_synaptic_data" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_static_synaptic_data</code><span class="sig-paren">(</span><em>connections</em>, <em>connection_row_indices</em>, <em>n_rows</em>, <em>post_vertex_slice</em>, <em>n_synapse_types</em>, <em>max_n_synapses</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/abstract_static_synapse_dynamics.html#AbstractStaticSynapseDynamics.get_static_synaptic_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractStaticSynapseDynamics.get_static_synaptic_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the fixed-fixed data for each row, and lengths for the            fixed-fixed parts of each row.</p>
 <p>Data is returned as an array made up of an array of 32-bit words for        each row for the fixed-fixed region. The row into which connection        should go is given by <cite>connection_row_indices</cite>, and the total number        of rows is given by <cite>n_rows</cite>.</p>
 <p>Lengths are returned as an array made up of an integer for each row,        for the fixed-fixed region.</p>
@@ -354,11 +355,12 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>connections</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a>) &#8211; </li>
-<li><strong>connection_row_indices</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a>) &#8211; </li>
-<li><strong>n_rows</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
-<li><strong>post_vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; </li>
-<li><strong>n_synapse_types</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
+<li><strong>connections</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a>) &#8211; The connections to get data for</li>
+<li><strong>connection_row_indices</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a>) &#8211; The row into which each connection should go</li>
+<li><strong>n_rows</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The number of rows to write</li>
+<li><strong>post_vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of the post vertex to generate for</li>
+<li><strong>n_synapse_types</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The number of synapse types</li>
+<li><strong>max_n_synapses</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The maximum number of synapses to generate</li>
 </ul>
 </td>
 </tr>
@@ -434,16 +436,17 @@
 
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.convert_per_connection_data_to_rows">
-<code class="descname">convert_per_connection_data_to_rows</code><span class="sig-paren">(</span><em>connection_row_indices</em>, <em>n_rows</em>, <em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/abstract_synapse_dynamics.html#AbstractSynapseDynamics.convert_per_connection_data_to_rows"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.convert_per_connection_data_to_rows" title="Permalink to this definition">¶</a></dt>
+<code class="descname">convert_per_connection_data_to_rows</code><span class="sig-paren">(</span><em>connection_row_indices</em>, <em>n_rows</em>, <em>data</em>, <em>max_n_synapses</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/abstract_synapse_dynamics.html#AbstractSynapseDynamics.convert_per_connection_data_to_rows"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.convert_per_connection_data_to_rows" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts per-connection data generated from connections into            row-based data to be returned from get_synaptic_data</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>connection_row_indices</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a>) &#8211; </li>
-<li><strong>n_rows</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
-<li><strong>data</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a>) &#8211; </li>
+<li><strong>connection_row_indices</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a>) &#8211; The index of the row that each item should go into</li>
+<li><strong>n_rows</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The number of rows</li>
+<li><strong>data</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a>) &#8211; The non-row-based data</li>
+<li><strong>max_n_synapses</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The maximum number of synapses to generate in each row</li>
 </ul>
 </td>
 </tr>
@@ -702,6 +705,12 @@
 </table>
 </dd></dl>
 
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.pad_to_length">
+<code class="descname">pad_to_length</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.pad_to_length" title="Permalink to this definition">¶</a></dt>
+<dd><p>The amount each row should pad to, or None if not specified</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.set_delay">
 <code class="descname">set_delay</code><span class="sig-paren">(</span><em>delay</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/abstract_synapse_dynamics.html#AbstractSynapseDynamics.set_delay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.set_delay" title="Permalink to this definition">¶</a></dt>
@@ -740,6 +749,22 @@
 <dt id="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamicsStructural">
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.synapse_dynamics.</code><code class="descname">AbstractSynapseDynamicsStructural</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/abstract_synapse_dynamics_structural.html#AbstractSynapseDynamicsStructural"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamicsStructural" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamicsStructural.check_initial_delay">
+<code class="descname">check_initial_delay</code><span class="sig-paren">(</span><em>max_delay_ms</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/abstract_synapse_dynamics_structural.html#AbstractSynapseDynamicsStructural.check_initial_delay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamicsStructural.check_initial_delay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that delays can be done without delay extensions</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>max_delay_ms</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The maximum delay supported, in milliseconds</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#Exception" title="(in Python v3.6)"><strong>Exception</strong></a> &#8211; if the delay is out of range</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamicsStructural.elimination">
 <code class="descname">elimination</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamicsStructural.elimination" title="Permalink to this definition">¶</a></dt>
@@ -894,21 +919,21 @@
 
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamicsStructural.write_structural_parameters">
-<code class="descname">write_structural_parameters</code><span class="sig-paren">(</span><em>spec</em>, <em>region</em>, <em>machine_time_step</em>, <em>weight_scales</em>, <em>machine_graph</em>, <em>machine_vertex</em>, <em>routing_info</em>, <em>synapse_indices</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/abstract_synapse_dynamics_structural.html#AbstractSynapseDynamicsStructural.write_structural_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamicsStructural.write_structural_parameters" title="Permalink to this definition">¶</a></dt>
+<code class="descname">write_structural_parameters</code><span class="sig-paren">(</span><em>spec</em>, <em>region</em>, <em>machine_time_step</em>, <em>weight_scales</em>, <em>machine_graph</em>, <em>machine_vertex</em>, <em>routing_info</em>, <em>synaptic_matrices</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/abstract_synapse_dynamics_structural.html#AbstractSynapseDynamicsStructural.write_structural_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamicsStructural.write_structural_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write structural plasticity parameters</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v)"><em>DataSpecificationGenerator</em></a>) &#8211; </li>
+<li><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v)"><em>DataSpecificationGenerator</em></a>) &#8211; The data specification to write to</li>
 <li><strong>region</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; region ID</li>
-<li><strong>machine_time_step</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
-<li><strong>weight_scales</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em></em>) &#8211; </li>
-<li><strong>machine_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineGraph" title="(in PACMAN v)"><em>MachineGraph</em></a>) &#8211; </li>
-<li><strong>machine_vertex</strong> (<em>MachineVertex</em>) &#8211; </li>
-<li><strong>routing_info</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.routing_info/#pacman.model.routing_info.RoutingInfo" title="(in PACMAN v)"><em>RoutingInfo</em></a>) &#8211; </li>
-<li><strong>synapse_indices</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#tuple" title="(in Python v3.6)"><em>tuple</em></a><em>(</em><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em><em></em><em>,</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em><em></em>) &#8211; </li>
+<li><strong>machine_time_step</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The simulation time step</li>
+<li><strong>weight_scales</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em></em>) &#8211; Weight scaling for each synapse type</li>
+<li><strong>machine_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineGraph" title="(in PACMAN v)"><em>MachineGraph</em></a>) &#8211; The machine graph</li>
+<li><strong>machine_vertex</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex" title="spynnaker.pyNN.models.neuron.AbstractPopulationVertex"><em>AbstractPopulationVertex</em></a>) &#8211; The machine vertex</li>
+<li><strong>routing_info</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.routing_info/#pacman.model.routing_info.RoutingInfo" title="(in PACMAN v)"><em>RoutingInfo</em></a>) &#8211; Routing information for all edges</li>
+<li><strong>synaptic_matrices</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrices.SynapticMatrices" title="spynnaker.pyNN.models.neuron.synaptic_matrices.SynapticMatrices"><em>SynapticMatrices</em></a>) &#8211; The synaptic matrices for this vertex</li>
 </ul>
 </td>
 </tr>
@@ -1096,7 +1121,7 @@
 
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.get_static_synaptic_data">
-<code class="descname">get_static_synaptic_data</code><span class="sig-paren">(</span><em>connections</em>, <em>connection_row_indices</em>, <em>n_rows</em>, <em>post_vertex_slice</em>, <em>n_synapse_types</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_static.html#SynapseDynamicsStatic.get_static_synaptic_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.get_static_synaptic_data" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_static_synaptic_data</code><span class="sig-paren">(</span><em>connections</em>, <em>connection_row_indices</em>, <em>n_rows</em>, <em>post_vertex_slice</em>, <em>n_synapse_types</em>, <em>max_n_synapses</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_static.html#SynapseDynamicsStatic.get_static_synaptic_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.get_static_synaptic_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the fixed-fixed data for each row, and lengths for the            fixed-fixed parts of each row.</p>
 <p>Data is returned as an array made up of an array of 32-bit words for        each row for the fixed-fixed region. The row into which connection        should go is given by <cite>connection_row_indices</cite>, and the total number        of rows is given by <cite>n_rows</cite>.</p>
 <p>Lengths are returned as an array made up of an integer for each row,        for the fixed-fixed region.</p>
@@ -1105,11 +1130,12 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>connections</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a>) &#8211; </li>
-<li><strong>connection_row_indices</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a>) &#8211; </li>
-<li><strong>n_rows</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
-<li><strong>post_vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; </li>
-<li><strong>n_synapse_types</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
+<li><strong>connections</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a>) &#8211; The connections to get data for</li>
+<li><strong>connection_row_indices</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a>) &#8211; The row into which each connection should go</li>
+<li><strong>n_rows</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The number of rows to write</li>
+<li><strong>post_vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of the post vertex to generate for</li>
+<li><strong>n_synapse_types</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The number of synapse types</li>
+<li><strong>max_n_synapses</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The maximum number of synapses to generate</li>
 </ul>
 </td>
 </tr>
@@ -1189,6 +1215,12 @@
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.pad_to_length">
+<code class="descname">pad_to_length</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.pad_to_length" title="Permalink to this definition">¶</a></dt>
+<dd><p>The amount each row should pad to, or None if not specified</p>
 </dd></dl>
 
 <dl class="method">
@@ -1508,7 +1540,7 @@
 
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.get_plastic_synaptic_data">
-<code class="descname">get_plastic_synaptic_data</code><span class="sig-paren">(</span><em>connections</em>, <em>connection_row_indices</em>, <em>n_rows</em>, <em>post_vertex_slice</em>, <em>n_synapse_types</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_stdp.html#SynapseDynamicsSTDP.get_plastic_synaptic_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.get_plastic_synaptic_data" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_plastic_synaptic_data</code><span class="sig-paren">(</span><em>connections</em>, <em>connection_row_indices</em>, <em>n_rows</em>, <em>post_vertex_slice</em>, <em>n_synapse_types</em>, <em>max_n_synapses</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_stdp.html#SynapseDynamicsSTDP.get_plastic_synaptic_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.get_plastic_synaptic_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the fixed-plastic data, and plastic-plastic data for each row,            and lengths for the fixed_plastic and plastic-plastic parts of            each row.</p>
 <p>Data is returned as an array made up of an array of 32-bit words for        each row, for each of the fixed-plastic and plastic-plastic data        regions.  The row into which connection should go is given by        <cite>connection_row_indices</cite>, and the total number of rows is given by        <cite>n_rows</cite>.</p>
 <p>Lengths are returned as an array made up of an integer for each row,        for each of the fixed-plastic and plastic-plastic regions.</p>
@@ -1517,11 +1549,12 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>connections</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a>) &#8211; </li>
-<li><strong>connection_row_indices</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a>) &#8211; </li>
-<li><strong>n_rows</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
-<li><strong>post_vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; </li>
-<li><strong>n_synapse_types</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
+<li><strong>connections</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a>) &#8211; The connections to get data for</li>
+<li><strong>connection_row_indices</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a>) &#8211; The row into which each connection should go</li>
+<li><strong>n_rows</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The total number of rows</li>
+<li><strong>post_vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of the post vertex to get the connections for</li>
+<li><strong>n_synapse_types</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The number of synapse types</li>
+<li><strong>max_n_synapses</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The maximum number of synapses to generate</li>
 </ul>
 </td>
 </tr>
@@ -1676,6 +1709,12 @@
 </table>
 </dd></dl>
 
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.pad_to_length">
+<code class="descname">pad_to_length</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.pad_to_length" title="Permalink to this definition">¶</a></dt>
+<dd><p>The amount each row should pad to, or None if not specified</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.read_plastic_synaptic_data">
 <code class="descname">read_plastic_synaptic_data</code><span class="sig-paren">(</span><em>post_vertex_slice</em>, <em>n_synapse_types</em>, <em>pp_size</em>, <em>pp_data</em>, <em>fp_size</em>, <em>fp_data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_stdp.html#SynapseDynamicsSTDP.read_plastic_synaptic_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.read_plastic_synaptic_data" title="Permalink to this definition">¶</a></dt>
@@ -1796,6 +1835,22 @@
 <code class="descname">PAIR_ERROR</code><em class="property"> = 'Only one Projection between each pair of Populations can use structural plasticity'</em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.PAIR_ERROR" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.check_initial_delay">
+<code class="descname">check_initial_delay</code><span class="sig-paren">(</span><em>max_delay_ms</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_structural_common.html#SynapseDynamicsStructuralCommon.check_initial_delay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.check_initial_delay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that delays can be done without delay extensions</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>max_delay_ms</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The maximum delay supported, in milliseconds</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#Exception" title="(in Python v3.6)"><strong>Exception</strong></a> &#8211; if the delay is out of range</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.connections">
 <code class="descname">connections</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.connections" title="Permalink to this definition">¶</a></dt>
@@ -1911,21 +1966,24 @@ of the cores that have perform structural updates.</p>
 
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.write_structural_parameters">
-<code class="descname">write_structural_parameters</code><span class="sig-paren">(</span><em>spec</em>, <em>region</em>, <em>machine_time_step</em>, <em>weight_scales</em>, <em>machine_graph</em>, <em>machine_vertex</em>, <em>routing_info</em>, <em>synapse_indices</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_structural_common.html#SynapseDynamicsStructuralCommon.write_structural_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.write_structural_parameters" title="Permalink to this definition">¶</a></dt>
+<code class="descname">write_structural_parameters</code><span class="sig-paren">(</span><em>spec</em>, <em>region</em>, <em>machine_time_step</em>, <em>weight_scales</em>, <em>machine_graph</em>, <em>machine_vertex</em>, <em>routing_info</em>, <em>synaptic_matrices</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_structural_common.html#SynapseDynamicsStructuralCommon.write_structural_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.write_structural_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write structural plasticity parameters</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v)"><em>DataSpecificationGenerator</em></a>) &#8211; </li>
+<li><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v)"><em>DataSpecificationGenerator</em></a>) &#8211; The data specification to write to</li>
 <li><strong>region</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; region ID</li>
-<li><strong>machine_time_step</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
-<li><strong>weight_scales</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em></em>) &#8211; </li>
-<li><strong>machine_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineGraph" title="(in PACMAN v)"><em>MachineGraph</em></a>) &#8211; </li>
-<li><strong>machine_vertex</strong> (<em>MachineVertex</em>) &#8211; </li>
-<li><strong>routing_info</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.routing_info/#pacman.model.routing_info.RoutingInfo" title="(in PACMAN v)"><em>RoutingInfo</em></a>) &#8211; </li>
-<li><strong>synapse_indices</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#tuple" title="(in Python v3.6)"><em>tuple</em></a><em>(</em><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em><em></em><em>,</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em><em></em>) &#8211; Write the synapse parameters to the spec.</li>
+<li><strong>machine_time_step</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The simulation time step</li>
+<li><strong>weight_scales</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em></em>) &#8211; Weight scaling for each synapse type</li>
+<li><strong>machine_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineGraph" title="(in PACMAN v)"><em>MachineGraph</em></a>) &#8211; The machine graph</li>
+<li><strong>machine_vertex</strong> (<em>MachineVertex</em>) &#8211; The machine vertex</li>
+<li><strong>routing_info</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.routing_info/#pacman.model.routing_info.RoutingInfo" title="(in PACMAN v)"><em>RoutingInfo</em></a>) &#8211; Routing information for all edges</li>
+<li><strong>synaptic_matrices</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrices.SynapticMatrices" title="spynnaker.pyNN.models.neuron.synaptic_matrices.SynapticMatrices"><em>SynapticMatrices</em></a>) &#8211; <blockquote>
+<div>The synaptic matrices for this vertex</div></blockquote>
+<p>Write structural plasticity parameters</p>
+</li>
 <li><strong>spec</strong> &#8211; the data spec</li>
 <li><strong>region</strong> &#8211; region ID</li>
 <li><strong>machine_time_step</strong> &#8211; the duration of a machine time step (ms)</li>
@@ -1933,7 +1991,7 @@ of the cores that have perform structural updates.</p>
 <li><strong>machine_graph</strong> &#8211; Full machine level network</li>
 <li><strong>machine_vertex</strong> &#8211; the vertex for which data specs are being prepared</li>
 <li><strong>routing_info</strong> &#8211; All of the routing information on the network</li>
-<li><strong>synapse_indices</strong> &#8211; </li>
+<li><strong>synaptic_matrices</strong> &#8211; </li>
 </ul>
 </td>
 </tr>
@@ -2031,6 +2089,21 @@ values</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation.html#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation.AbstractFormation" title="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation.AbstractFormation">AbstractFormation</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralStatic.generate_on_machine">
+<code class="descname">generate_on_machine</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_structural_static.html#SynapseDynamicsStructuralStatic.generate_on_machine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralStatic.generate_on_machine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines if this instance should be generated on the machine.</p>
+<p>Default implementation returns True</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></td>
 </tr>
 </tbody>
 </table>
@@ -2368,6 +2441,21 @@ values</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation.html#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation.AbstractFormation" title="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation.AbstractFormation">AbstractFormation</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralSTDP.generate_on_machine">
+<code class="descname">generate_on_machine</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_structural_stdp.html#SynapseDynamicsStructuralSTDP.generate_on_machine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralSTDP.generate_on_machine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines if this instance should be generated on the machine.</p>
+<p>Default implementation returns True</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></td>
 </tr>
 </tbody>
 </table>

@@ -106,18 +106,22 @@
     <span class="nd">@abstractmethod</span>
 <div class="viewcode-block" id="AbstractSynapseDynamicsStructural.write_structural_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamicsStructural.write_structural_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">write_structural_parameters</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span>
-            <span class="n">machine_graph</span><span class="p">,</span> <span class="n">machine_vertex</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span> <span class="n">synapse_indices</span><span class="p">):</span>
+            <span class="n">machine_graph</span><span class="p">,</span> <span class="n">machine_vertex</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span> <span class="n">synaptic_matrices</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Write structural plasticity parameters</span>
 
 <span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
+<span class="sd">            The data specification to write to</span>
 <span class="sd">        :param int region: region ID</span>
-<span class="sd">        :param int machine_time_step:</span>
-<span class="sd">        :param weight_scales:</span>
-<span class="sd">        :type weight_scales: ~numpy.ndarray or list(float)</span>
+<span class="sd">        :param int machine_time_step: The simulation time step</span>
+<span class="sd">        :param list(float) weight_scales: Weight scaling for each synapse type</span>
 <span class="sd">        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:</span>
-<span class="sd">        :param MachineVertex machine_vertex:</span>
+<span class="sd">            The machine graph</span>
+<span class="sd">        :param AbstractPopulationVertex machine_vertex:</span>
+<span class="sd">            The machine vertex</span>
 <span class="sd">        :param ~pacman.model.routing_info.RoutingInfo routing_info:</span>
-<span class="sd">        :param dict(tuple(SynapseInformation,int),int) synapse_indices:</span>
+<span class="sd">            Routing information for all edges</span>
+<span class="sd">        :param SynapticMatrices synaptic_matrices:</span>
+<span class="sd">            The synaptic matrices for this vertex</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
     <span class="nd">@abstractmethod</span>
@@ -185,7 +189,15 @@
         <span class="sd">&quot;&quot;&quot; The elimination rule</span>
 
 <span class="sd">        :rtype: AbstractElimination</span>
-<span class="sd">        &quot;&quot;&quot;</span></div>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="nd">@abstractmethod</span>
+<div class="viewcode-block" id="AbstractSynapseDynamicsStructural.check_initial_delay"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamicsStructural.check_initial_delay">[docs]</a>    <span class="k">def</span> <span class="nf">check_initial_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_delay_ms</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Check that delays can be done without delay extensions</span>
+
+<span class="sd">        :param int max_delay_ms: The maximum delay supported, in milliseconds</span>
+<span class="sd">        :raises Exception: if the delay is out of range</span>
+<span class="sd">        &quot;&quot;&quot;</span></div></div>
 </pre></div>
 
           </div>

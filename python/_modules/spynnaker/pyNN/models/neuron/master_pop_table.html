@@ -77,40 +77,169 @@
 <span class="c1">#</span>
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
-
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">import</span> <span class="nn">struct</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span><span class="p">,</span> \
-    <span class="n">SARK_PER_MALLOC_SDRAM_USAGE</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neural_projections</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">ProjectionApplicationEdge</span><span class="p">,</span> <span class="n">ProjectionMachineEdge</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">ctypes</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neural_projections</span> <span class="kn">import</span> <span class="n">ProjectionApplicationEdge</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">SynapseRowTooBigException</span><span class="p">,</span> <span class="n">SynapticConfigurationException</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">POPULATION_BASED_REGIONS</span><span class="p">,</span> <span class="n">POP_TABLE_MAX_ROW_LENGTH</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.bit_field_utilities</span> <span class="kn">import</span> <span class="n">BIT_IN_A_WORD</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
-<span class="n">_TWO_WORDS</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">Struct</span><span class="p">(</span><span class="s2">&quot;&lt;II&quot;</span><span class="p">)</span>
-<span class="c1">#: Number of words in a master population table entry</span>
-<span class="n">_MASTER_POP_ENTRY_SIZE_WORDS</span> <span class="o">=</span> <span class="mi">3</span>
-<span class="n">_MASTER_POP_ENTRY_SIZE_BYTES</span> <span class="o">=</span> <span class="n">_MASTER_POP_ENTRY_SIZE_WORDS</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
-<span class="c1">#: Number of words in the address list</span>
-<span class="n">_ADDRESS_LIST_ENTRY_SIZE_WORDS</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="n">_ADDRESS_LIST_ENTRY_SIZE_BYTES</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">_ADDRESS_LIST_ENTRY_SIZE_WORDS</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span>
-<span class="c1"># Switched ordering of count and start as numpy will switch them back</span>
-<span class="c1"># when asked for view(&quot;&lt;4&quot;)</span>
-<span class="n">_MASTER_POP_ENTRY_DTYPE</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">(</span><span class="s2">&quot;key&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;u4&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;mask&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;u4&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;u2&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;count&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;u2&quot;</span><span class="p">)]</span>
 
-<span class="n">_ADDRESS_LIST_DTYPE</span> <span class="o">=</span> <span class="s2">&quot;&lt;u4&quot;</span>
-
-<span class="c1"># top bit of the 32 bit number</span>
-<span class="n">_SINGLE_BIT_FLAG_BIT</span> <span class="o">=</span> <span class="mh">0x80000000</span>
-<span class="n">_ROW_LENGTH_MASK</span> <span class="o">=</span> <span class="mh">0xFF</span>
-<span class="n">_ADDRESS_MASK</span> <span class="o">=</span> <span class="mh">0x7FFFFF00</span>
+<span class="c1"># Scale factor for an address; allows more addresses to be represented, but</span>
+<span class="c1"># means addresses have to be aligned to these offsets</span>
 <span class="n">_ADDRESS_SCALE</span> <span class="o">=</span> <span class="mi">16</span>
-<span class="n">_ADDRESS_SCALED_SHIFT</span> <span class="o">=</span> <span class="mi">8</span> <span class="o">-</span> <span class="mi">4</span>
+
+<span class="c1"># A padding byte</span>
+<span class="n">_PADDING_BYTE</span> <span class="o">=</span> <span class="mh">0xDD</span>
+
+<span class="c1"># Bits in a byte</span>
+<span class="n">_BITS_PER_BYTES</span> <span class="o">=</span> <span class="mi">8</span>
+
+<span class="c1"># ctypes stores the number of bits in a bitfield in the top 16 bits</span>
+<span class="n">_CTYPES_N_BITS_SHIFT</span> <span class="o">=</span> <span class="mi">16</span>
+
+
+<span class="k">def</span> <span class="nf">_n_bits</span><span class="p">(</span><span class="n">field</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Get the number of bits in a field (ctypes doesn&#39;t do this)</span>
+
+<span class="sd">    :param _ctypes.CField field: a ctype field from a structure</span>
+<span class="sd">    :return: the number of bits</span>
+<span class="sd">    :rtype: int</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># ctypes stores the number of bits in a bitfield in the top 16 bits;</span>
+    <span class="c1"># if it isn&#39;t a bitfield, this is 0</span>
+    <span class="n">n_bits</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;&gt;</span> <span class="n">_CTYPES_N_BITS_SHIFT</span>
+    <span class="k">if</span> <span class="n">n_bits</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">n_bits</span>
+
+    <span class="c1"># If it isn&#39;t a bitfield, the number of bits is the field size (which is</span>
+    <span class="c1"># then in bytes) multiplied by 8 (bits in a byte)</span>
+    <span class="k">return</span> <span class="n">_BITS_PER_BYTES</span> <span class="o">*</span> <span class="n">field</span><span class="o">.</span><span class="n">size</span>
+
+
+<span class="k">def</span> <span class="nf">_make_array</span><span class="p">(</span><span class="n">ctype</span><span class="p">,</span> <span class="n">n_items</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Make an array of ctype items; done separately as the syntax is a</span>
+<span class="sd">        little odd!</span>
+
+<span class="sd">    :param _ctypes.PyCSimpleType ctype: A ctype</span>
+<span class="sd">    :param int n_items: The number of items in the array</span>
+<span class="sd">    :return: a ctype array</span>
+<span class="sd">    :rtype: _ctypes.PyCArrayType</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">array_type</span> <span class="o">=</span> <span class="n">ctype</span> <span class="o">*</span> <span class="n">n_items</span>
+    <span class="k">return</span> <span class="n">array_type</span><span class="p">()</span>
+
+
+<span class="k">class</span> <span class="nc">_MasterPopEntryCType</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">LittleEndianStructure</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A Master Population Table Entry; matches the C struct</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="c1"># The key to match against the incoming message</span>
+        <span class="p">(</span><span class="s2">&quot;key&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint32</span><span class="p">),</span>
+        <span class="c1"># The mask to select the relevant bits of key for matching</span>
+        <span class="p">(</span><span class="s2">&quot;mask&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint32</span><span class="p">),</span>
+        <span class="c1"># The index into address_list for this entry</span>
+        <span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint32</span><span class="p">,</span> <span class="mi">15</span><span class="p">),</span>
+        <span class="c1"># Flag to indicate if an extra_info struct is present</span>
+        <span class="p">(</span><span class="s2">&quot;extra_info_flag&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint32</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+        <span class="c1"># The number of entries in ::address_list for this entry</span>
+        <span class="p">(</span><span class="s2">&quot;count&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint32</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
+    <span class="p">]</span>
+
+
+<span class="c1"># Maximum start position in the address list</span>
+<span class="n">_MAX_ADDRESS_START</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">_n_bits</span><span class="p">(</span><span class="n">_MasterPopEntryCType</span><span class="o">.</span><span class="n">start</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span>
+<span class="c1"># Maximum count of address list entries for a single pop table entry</span>
+<span class="n">_MAX_ADDRESS_COUNT</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">_n_bits</span><span class="p">(</span><span class="n">_MasterPopEntryCType</span><span class="o">.</span><span class="n">count</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span>
+
+
+<span class="k">class</span> <span class="nc">_ExtraInfoCType</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">LittleEndianStructure</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; An Extra Info structure; matches the C struct</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="c1"># The mask to apply to the key once shifted get the core index</span>
+        <span class="p">(</span><span class="s2">&quot;core_mask&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint32</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+        <span class="c1"># The number of words required for n_neurons</span>
+        <span class="p">(</span><span class="s2">&quot;n_words&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint32</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
+        <span class="c1"># The shift to apply to the key to get the core part (0-31)</span>
+        <span class="p">(</span><span class="s2">&quot;mask_shift&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint32</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+        <span class="c1"># The number of neurons per core (up to 2048)</span>
+        <span class="p">(</span><span class="s2">&quot;n_neurons&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint32</span><span class="p">,</span> <span class="mi">11</span><span class="p">)</span>
+    <span class="p">]</span>
+
+
+<span class="c1"># The maximum n_neurons value</span>
+<span class="n">_MAX_N_NEURONS</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">_n_bits</span><span class="p">(</span><span class="n">_ExtraInfoCType</span><span class="o">.</span><span class="n">n_neurons</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span>
+<span class="c1"># Maximum core mask (i.e. number of cores)</span>
+<span class="n">_MAX_CORE_MASK</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">_n_bits</span><span class="p">(</span><span class="n">_ExtraInfoCType</span><span class="o">.</span><span class="n">core_mask</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span>
+
+
+<span class="k">class</span> <span class="nc">_AddressAndRowLengthCType</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">LittleEndianStructure</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; An Address and Row Length structure; matches the C struct</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="c1"># the length of the row</span>
+        <span class="p">(</span><span class="s2">&quot;row_length&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint32</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
+        <span class="c1"># the address</span>
+        <span class="p">(</span><span class="s2">&quot;address&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint32</span><span class="p">,</span> <span class="mi">23</span><span class="p">),</span>
+        <span class="c1"># whether this is a direct/single address</span>
+        <span class="p">(</span><span class="s2">&quot;is_single&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint32</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="p">]</span>
+
+
+<span class="c1"># An invalid address in the address and row length list</span>
+<span class="n">_INVALID_ADDDRESS</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">_n_bits</span><span class="p">(</span><span class="n">_AddressAndRowLengthCType</span><span class="o">.</span><span class="n">address</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span>
+<span class="c1"># Address is 23 bits, but maximum value means invalid</span>
+<span class="n">_MAX_ADDRESS</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">_n_bits</span><span class="p">(</span><span class="n">_AddressAndRowLengthCType</span><span class="o">.</span><span class="n">address</span><span class="p">))</span> <span class="o">-</span> <span class="mi">2</span>
+
+
+<span class="k">class</span> <span class="nc">_AddressListEntryCType</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">Union</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; An Address List entry; one of two things</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s2">&quot;addr&quot;</span><span class="p">,</span> <span class="n">_AddressAndRowLengthCType</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="n">_ExtraInfoCType</span><span class="p">)</span>
+    <span class="p">]</span>
+
+
+<span class="c1"># Sizes of structs</span>
+<span class="n">_MASTER_POP_ENTRY_SIZE_BYTES</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">_MasterPopEntryCType</span><span class="p">)</span>
+<span class="n">_ADDRESS_LIST_ENTRY_SIZE_BYTES</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">_AddressListEntryCType</span><span class="p">)</span>
+<span class="n">_EXTRA_INFO_ENTRY_SIZE_BYTES</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">_ExtraInfoCType</span><span class="p">)</span>
+
+<span class="c1"># Base size - 2 words for size of table and address list</span>
+<span class="n">_BASE_SIZE_BYTES</span> <span class="o">=</span> <span class="mi">8</span>
+
+<span class="c1"># Over-scale of estimate for safety</span>
+<span class="n">_OVERSCALE</span> <span class="o">=</span> <span class="mi">2</span>
+
+<span class="c1"># A ctypes pointer to a uint32</span>
+<span class="n">_UINT32_PTR</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">POINTER</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint32</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_to_numpy</span><span class="p">(</span><span class="n">array</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Convert a ctypes array to a numpy array of uint32</span>
+
+<span class="sd">    Note: no data copying is done; it is pure type conversion.  Editing</span>
+<span class="sd">    the returned array will result in changes to the original.</span>
+
+<span class="sd">    :param _ctypes.PyCArrayType array: The array to convert</span>
+<span class="sd">    :rtype: numpy.ndarray</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Nothing to do if the array is 0 sized</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">array</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint32&quot;</span><span class="p">)</span>
+
+    <span class="n">uint32_array</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">_UINT32_PTR</span><span class="p">)</span>
+    <span class="n">n_words</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">array</span><span class="p">)</span> <span class="o">*</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">array</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span> <span class="o">//</span> <span class="n">BYTES_PER_WORD</span>
+    <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ctypeslib</span><span class="o">.</span><span class="n">as_array</span><span class="p">(</span><span class="n">uint32_array</span><span class="p">,</span> <span class="p">(</span><span class="n">n_words</span><span class="p">,))</span>
 
 
 <span class="k">class</span> <span class="nc">_MasterPopEntry</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -118,22 +247,61 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;__addresses_and_row_lengths&quot;</span><span class="p">,</span>
+        <span class="c1"># The mask to match this entry on</span>
         <span class="s2">&quot;__mask&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__routing_key&quot;</span><span class="p">]</span>
+        <span class="c1"># The routing key to match this entry on</span>
+        <span class="s2">&quot;__routing_key&quot;</span><span class="p">,</span>
+        <span class="c1"># The part of the key where the core id is held after shifting (below)</span>
+        <span class="s2">&quot;__core_mask&quot;</span><span class="p">,</span>
+        <span class="c1"># Where in the key that the core id is held</span>
+        <span class="s2">&quot;__core_shift&quot;</span><span class="p">,</span>
+        <span class="c1"># The number of neurons on every core except the last</span>
+        <span class="s2">&quot;__n_neurons&quot;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">routing_key</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">routing_key</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">core_mask</span><span class="p">,</span> <span class="n">core_shift</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param int routing_key:</span>
-<span class="sd">        :param int mask:</span>
+<span class="sd">        :param int routing_key: The key to match for this entry</span>
+<span class="sd">        :param int mask: The mask to match for this entry</span>
+<span class="sd">        :param int core_mask:</span>
+<span class="sd">            The part of the routing_key where the core id is held</span>
+<span class="sd">        :param int core_shift: Where in the routing_key the core_id is held</span>
+<span class="sd">        :param int n_neurons:</span>
+<span class="sd">            The number of neurons on each core, except the last</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__routing_key</span> <span class="o">=</span> <span class="n">routing_key</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__mask</span> <span class="o">=</span> <span class="n">mask</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__core_mask</span> <span class="o">=</span> <span class="n">core_mask</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__core_shift</span> <span class="o">=</span> <span class="n">core_shift</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__n_neurons</span> <span class="o">=</span> <span class="n">n_neurons</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__addresses_and_row_lengths</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">row_length</span><span class="p">,</span> <span class="n">is_single</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Add a synaptic matrix pointer to the entry</span>
+
+<span class="sd">        :param address: The address of the synaptic matrix</span>
+<span class="sd">        :param row_length: The length of each row in the matrix</span>
+<span class="sd">        :param is_single: True if the address is to the direct matrix</span>
+<span class="sd">        :return: The index of the pointer within the entry</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">index</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__addresses_and_row_lengths</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">&gt;</span> <span class="n">_MAX_ADDRESS_COUNT</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SynapticConfigurationException</span><span class="p">(</span>
+                <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> connections for the same source key (maximum </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">index</span><span class="p">,</span> <span class="n">_MAX_ADDRESS_COUNT</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__addresses_and_row_lengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="p">(</span><span class="n">address</span><span class="p">,</span> <span class="n">row_length</span><span class="p">,</span> <span class="n">is_single</span><span class="p">))</span>
+            <span class="p">(</span><span class="n">address</span><span class="p">,</span> <span class="n">row_length</span><span class="p">,</span> <span class="n">is_single</span><span class="p">,</span> <span class="kc">True</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">index</span>
+
+    <span class="k">def</span> <span class="nf">append_invalid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Add an invalid marker to the entry; used to ensure index alignment</span>
+<span class="sd">            between multiple entries when necessary</span>
+
+<span class="sd">        :return: The index of the marker within the entry</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__addresses_and_row_lengths</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__addresses_and_row_lengths</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">index</span>
 
     <span class="nd">@property</span>
@@ -155,11 +323,55 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">addresses_and_row_lengths</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :return: the memory address that this master pop entry points at\</span>
+<span class="sd">        :return: the memory address that this master pop entry points at</span>
 <span class="sd">            (synaptic matrix)</span>
-<span class="sd">        :rtype: list(tuple(int,int,bool))</span>
+<span class="sd">        :rtype: list(tuple(int,int,bool,bool))</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__addresses_and_row_lengths</span>
+
+    <span class="k">def</span> <span class="nf">write_to_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry</span><span class="p">,</span> <span class="n">address_list</span><span class="p">,</span> <span class="n">start</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Write entries to the master population table</span>
+
+<span class="sd">        :param _MasterPopEntryCType entry: The entry to write to</span>
+<span class="sd">        :param _AddressListEntryCType_Array address_list:</span>
+<span class="sd">            The address_list to write to</span>
+<span class="sd">        :param start: The index of the entry of the address list to start at</span>
+<span class="sd">        :return: The number of entries written to the address list</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">entry</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__routing_key</span>
+        <span class="n">entry</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mask</span>
+        <span class="n">entry</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="n">start</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__addresses_and_row_lengths</span><span class="p">)</span>
+        <span class="n">entry</span><span class="o">.</span><span class="n">count</span> <span class="o">=</span> <span class="n">count</span>
+
+        <span class="c1"># Mark where the next entry starts and the number added; this might</span>
+        <span class="c1"># change if there is extra info</span>
+        <span class="n">next_addr</span> <span class="o">=</span> <span class="n">start</span>
+        <span class="n">n_entries</span> <span class="o">=</span> <span class="n">count</span>
+
+        <span class="c1"># If there is a core mask, add a special entry for it</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__core_mask</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">entry</span><span class="o">.</span><span class="n">extra_info_flag</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">extra_info</span> <span class="o">=</span> <span class="n">address_list</span><span class="p">[</span><span class="n">next_addr</span><span class="p">]</span><span class="o">.</span><span class="n">extra</span>
+            <span class="n">extra_info</span><span class="o">.</span><span class="n">core_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__core_mask</span>
+            <span class="n">extra_info</span><span class="o">.</span><span class="n">n_words</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__n_neurons</span> <span class="o">/</span> <span class="n">BIT_IN_A_WORD</span><span class="p">))</span>
+            <span class="n">extra_info</span><span class="o">.</span><span class="n">n_neurons</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_neurons</span>
+            <span class="n">extra_info</span><span class="o">.</span><span class="n">mask_shift</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__core_shift</span>
+            <span class="n">next_addr</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">n_entries</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="p">(</span><span class="n">address</span><span class="p">,</span> <span class="n">row_length</span><span class="p">,</span> <span class="n">is_single</span><span class="p">,</span> <span class="n">is_valid</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__addresses_and_row_lengths</span><span class="p">):</span>
+            <span class="n">address_entry</span> <span class="o">=</span> <span class="n">address_list</span><span class="p">[</span><span class="n">next_addr</span> <span class="o">+</span> <span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">addr</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">is_valid</span><span class="p">:</span>
+                <span class="n">address_entry</span><span class="o">.</span><span class="n">address</span> <span class="o">=</span> <span class="n">_INVALID_ADDDRESS</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">address_entry</span><span class="o">.</span><span class="n">is_single</span> <span class="o">=</span> <span class="n">is_single</span>
+                <span class="n">address_entry</span><span class="o">.</span><span class="n">row_length</span> <span class="o">=</span> <span class="n">row_length</span>
+                <span class="n">address_entry</span><span class="o">.</span><span class="n">address</span> <span class="o">=</span> <span class="n">address</span>
+        <span class="k">return</span> <span class="n">n_entries</span>
 
 
 <div class="viewcode-block" id="MasterPopTableAsBinarySearch"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch">[docs]</a><span class="k">class</span> <span class="nc">MasterPopTableAsBinarySearch</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -167,24 +379,17 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;__entries&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__n_addresses&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__n_single_entries&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__edge_constraints&quot;</span><span class="p">]</span>
-
-    <span class="n">MAX_ROW_LENGTH</span> <span class="o">=</span> <span class="mi">255</span>
-    <span class="n">UPPER_BOUND_FUDGE</span> <span class="o">=</span> <span class="mi">2</span>
-    <span class="n">TOP_MEMORY_POINT</span> <span class="o">=</span> <span class="mh">0x7FFFFF</span>
+        <span class="s2">&quot;__n_addresses&quot;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__n_addresses</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__n_single_entries</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__edge_constraints</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
 
-<div class="viewcode-block" id="MasterPopTableAsBinarySearch.get_master_population_table_size"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.get_master_population_table_size">[docs]</a>    <span class="k">def</span> <span class="nf">get_master_population_table_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_edges</span><span class="p">):</span>
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="MasterPopTableAsBinarySearch.get_master_population_table_size"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.get_master_population_table_size">[docs]</a>    <span class="k">def</span> <span class="nf">get_master_population_table_size</span><span class="p">(</span><span class="n">in_edges</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the size of the master population table in SDRAM</span>
 
-<span class="sd">        :param iterable(~pacman.model.graphs.application.ApplicationEdge)\</span>
+<span class="sd">        :param iterable(~pacman.model.graphs.application.ApplicationEdge)</span>
 <span class="sd">                in_edges:</span>
 <span class="sd">            The edges arriving at the vertex that are to be handled by this</span>
 <span class="sd">            table</span>
@@ -201,111 +406,194 @@
                 <span class="c1"># TODO: Fix this to be more accurate!</span>
                 <span class="c1"># May require modification to the master population table</span>
                 <span class="c1"># Get the number of atoms per core incoming</span>
-                <span class="n">max_atoms</span> <span class="o">=</span> <span class="n">in_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">get_max_atoms_per_core</span><span class="p">()</span>
-                <span class="k">if</span> <span class="n">in_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">&lt;</span> <span class="n">max_atoms</span><span class="p">:</span>
-                    <span class="n">max_atoms</span> <span class="o">=</span> <span class="n">in_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_atoms</span>
+                <span class="n">vertex</span> <span class="o">=</span> <span class="n">in_edge</span><span class="o">.</span><span class="n">pre_vertex</span>
+                <span class="n">max_atoms</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">vertex</span><span class="o">.</span><span class="n">get_max_atoms_per_core</span><span class="p">(),</span>
+                                      <span class="n">vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">))</span>
 
                 <span class="c1"># Get the number of likely vertices</span>
-                <span class="n">n_edge_vertices</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span>
-                    <span class="nb">float</span><span class="p">(</span><span class="n">in_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">max_atoms</span><span class="p">)))</span>
+                <span class="n">n_edge_vertices</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">vertex</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">/</span> <span class="n">max_atoms</span><span class="p">))</span>
                 <span class="n">n_vertices</span> <span class="o">+=</span> <span class="n">n_edge_vertices</span>
                 <span class="n">n_entries</span> <span class="o">+=</span> <span class="p">(</span>
                     <span class="n">n_edge_vertices</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">in_edge</span><span class="o">.</span><span class="n">synapse_information</span><span class="p">))</span>
 
         <span class="c1"># Multiply by 2 to get an upper bound</span>
         <span class="k">return</span> <span class="p">(</span>
-            <span class="p">(</span><span class="n">n_vertices</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">UPPER_BOUND_FUDGE</span> <span class="o">*</span>
-             <span class="n">_MASTER_POP_ENTRY_SIZE_BYTES</span><span class="p">)</span> <span class="o">+</span>
-            <span class="p">(</span><span class="n">n_entries</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">UPPER_BOUND_FUDGE</span> <span class="o">*</span>
-             <span class="n">_ADDRESS_LIST_ENTRY_SIZE_BYTES</span><span class="p">)</span> <span class="o">+</span> <span class="n">SARK_PER_MALLOC_SDRAM_USAGE</span><span class="p">)</span></div>
+            <span class="n">_BASE_SIZE_BYTES</span> <span class="o">+</span>
+            <span class="p">(</span><span class="n">n_vertices</span> <span class="o">*</span> <span class="n">_OVERSCALE</span> <span class="o">*</span> <span class="n">_MASTER_POP_ENTRY_SIZE_BYTES</span><span class="p">)</span> <span class="o">+</span>
+            <span class="p">(</span><span class="n">n_vertices</span> <span class="o">*</span> <span class="n">_OVERSCALE</span> <span class="o">*</span> <span class="n">_EXTRA_INFO_ENTRY_SIZE_BYTES</span><span class="p">)</span> <span class="o">+</span>
+            <span class="p">(</span><span class="n">n_entries</span> <span class="o">*</span> <span class="n">_OVERSCALE</span> <span class="o">*</span> <span class="n">_ADDRESS_LIST_ENTRY_SIZE_BYTES</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="MasterPopTableAsBinarySearch.get_exact_master_population_table_size"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.get_exact_master_population_table_size">[docs]</a>    <span class="k">def</span> <span class="nf">get_exact_master_population_table_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param PopulationMachineVertex vertex:</span>
-<span class="sd">        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:</span>
-<span class="sd">        :return: the size the master pop table will take in SDRAM (in bytes)</span>
-<span class="sd">        :rtype: int</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">in_edges</span> <span class="o">=</span> <span class="n">machine_graph</span><span class="o">.</span><span class="n">get_edges_ending_at_vertex</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span>
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="MasterPopTableAsBinarySearch.get_allowed_row_length"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.get_allowed_row_length">[docs]</a>    <span class="k">def</span> <span class="nf">get_allowed_row_length</span><span class="p">(</span><span class="n">row_length</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the next allowed row length</span>
 
-        <span class="n">n_vertices</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">in_edges</span><span class="p">)</span>
-        <span class="n">n_entries</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
-            <span class="nb">len</span><span class="p">(</span><span class="n">in_edge</span><span class="o">.</span><span class="n">app_edge</span><span class="o">.</span><span class="n">synapse_information</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">in_edge</span> <span class="ow">in</span> <span class="n">in_edges</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">in_edge</span><span class="p">,</span> <span class="n">ProjectionMachineEdge</span><span class="p">))</span>
-
-        <span class="c1"># Multiply by 2 to get an upper bound</span>
-        <span class="k">return</span> <span class="p">(</span>
-            <span class="p">(</span><span class="n">n_vertices</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">UPPER_BOUND_FUDGE</span> <span class="o">*</span>
-             <span class="n">_MASTER_POP_ENTRY_SIZE_BYTES</span><span class="p">)</span> <span class="o">+</span>
-            <span class="p">(</span><span class="n">n_entries</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">UPPER_BOUND_FUDGE</span> <span class="o">*</span>
-             <span class="n">_ADDRESS_LIST_ENTRY_SIZE_BYTES</span><span class="p">)</span> <span class="o">+</span> <span class="n">SARK_PER_MALLOC_SDRAM_USAGE</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="MasterPopTableAsBinarySearch.get_allowed_row_length"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.get_allowed_row_length">[docs]</a>    <span class="k">def</span> <span class="nf">get_allowed_row_length</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row_length</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param int row_length: the row length being considered</span>
 <span class="sd">        :return: the row length available</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        :raises SynapseRowTooBigException: If the row won&#39;t fit</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">row_length</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">MAX_ROW_LENGTH</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">row_length</span> <span class="o">&gt;</span> <span class="n">POP_TABLE_MAX_ROW_LENGTH</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">SynapseRowTooBigException</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">MAX_ROW_LENGTH</span><span class="p">,</span>
-                <span class="s2">&quot;Only rows of up to 255 entries are allowed&quot;</span><span class="p">)</span>
+                <span class="n">POP_TABLE_MAX_ROW_LENGTH</span><span class="p">,</span>
+                <span class="s2">&quot;Only rows of up to </span><span class="si">{}</span><span class="s2"> entries are allowed&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">POP_TABLE_MAX_ROW_LENGTH</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">row_length</span></div>
 
-<div class="viewcode-block" id="MasterPopTableAsBinarySearch.get_next_allowed_address"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.get_next_allowed_address">[docs]</a>    <span class="k">def</span> <span class="nf">get_next_allowed_address</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">next_address</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="MasterPopTableAsBinarySearch.get_next_allowed_address"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.get_next_allowed_address">[docs]</a>    <span class="k">def</span> <span class="nf">get_next_allowed_address</span><span class="p">(</span><span class="n">next_address</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the next allowed address</span>
+
 <span class="sd">        :param int next_address: The next address that would be used</span>
 <span class="sd">        :return: The next address that can be used following next_address</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        :raises SynapticConfigurationException: if the address is out of range</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># How far is the address past an acceptable boundary?</span>
-        <span class="n">over</span> <span class="o">=</span> <span class="n">next_address</span> <span class="o">%</span> <span class="n">_ADDRESS_SCALE</span>
-        <span class="k">if</span> <span class="n">over</span><span class="p">:</span>
-            <span class="n">next_address</span> <span class="o">+=</span> <span class="n">_ADDRESS_SCALE</span> <span class="o">-</span> <span class="n">over</span>
-        <span class="k">if</span> <span class="n">next_address</span> <span class="o">//</span> <span class="n">_ADDRESS_SCALE</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">TOP_MEMORY_POINT</span><span class="p">:</span>
+        <span class="n">addr_scaled</span> <span class="o">=</span> <span class="p">(</span><span class="n">next_address</span> <span class="o">+</span> <span class="p">(</span><span class="n">_ADDRESS_SCALE</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span> <span class="o">//</span> <span class="n">_ADDRESS_SCALE</span>
+        <span class="k">if</span> <span class="n">addr_scaled</span> <span class="o">&gt;</span> <span class="n">_MAX_ADDRESS</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">SynapticConfigurationException</span><span class="p">(</span>
                 <span class="s2">&quot;Address </span><span class="si">{}</span><span class="s2"> is out of range for this population table!&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="nb">hex</span><span class="p">(</span><span class="n">next_address</span><span class="p">)))</span>
-        <span class="k">return</span> <span class="n">next_address</span></div>
+                    <span class="nb">hex</span><span class="p">(</span><span class="n">addr_scaled</span> <span class="o">*</span> <span class="n">_ADDRESS_SCALE</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">addr_scaled</span> <span class="o">*</span> <span class="n">_ADDRESS_SCALE</span></div>
 
 <div class="viewcode-block" id="MasterPopTableAsBinarySearch.initialise_table"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.initialise_table">[docs]</a>    <span class="k">def</span> <span class="nf">initialise_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Initialise the master pop data structure.</span>
-
-<span class="sd">        :rtype: None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__n_addresses</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__n_single_entries</span> <span class="o">=</span> <span class="mi">0</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__n_addresses</span> <span class="o">=</span> <span class="mi">0</span></div>
 
-<div class="viewcode-block" id="MasterPopTableAsBinarySearch.update_master_population_table"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.update_master_population_table">[docs]</a>    <span class="k">def</span> <span class="nf">update_master_population_table</span><span class="p">(</span>
+<div class="viewcode-block" id="MasterPopTableAsBinarySearch.add_machine_entry"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.add_machine_entry">[docs]</a>    <span class="k">def</span> <span class="nf">add_machine_entry</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">block_start_addr</span><span class="p">,</span> <span class="n">row_length</span><span class="p">,</span> <span class="n">key_and_mask</span><span class="p">,</span> <span class="n">is_single</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Add an entry in the binary search to deal with the synaptic matrix</span>
+        <span class="sd">&quot;&quot;&quot; Add an entry for a machine-edge to the population table</span>
 
 <span class="sd">        :param int block_start_addr: where the synaptic matrix block starts</span>
-<span class="sd">        :param int row_length: how long in bytes each synaptic entry is</span>
+<span class="sd">        :param int row_length: how long in words each row is</span>
 <span class="sd">        :param ~pacman.model.routing_info.BaseKeyAndMask key_and_mask:</span>
-<span class="sd">            a key_and_mask object used as part of describing an edge that will</span>
-<span class="sd">            require being received to be stored in the master pop table; the</span>
-<span class="sd">            whole edge will become multiple calls to this function</span>
+<span class="sd">            the key and mask for this master pop entry</span>
 <span class="sd">        :param bool is_single:</span>
 <span class="sd">            Flag that states if the entry is a direct entry for a single row.</span>
 <span class="sd">        :return: The index of the entry, to be used to retrieve it</span>
 <span class="sd">        :rtype: int</span>
+<span class="sd">        :raises SynapticConfigurationException: If a bad address is used.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__update_master_population_table</span><span class="p">(</span>
+            <span class="n">block_start_addr</span><span class="p">,</span> <span class="n">row_length</span><span class="p">,</span> <span class="n">key_and_mask</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">is_single</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MasterPopTableAsBinarySearch.add_application_entry"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.add_application_entry">[docs]</a>    <span class="k">def</span> <span class="nf">add_application_entry</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">block_start_addr</span><span class="p">,</span> <span class="n">row_length</span><span class="p">,</span> <span class="n">key_and_mask</span><span class="p">,</span> <span class="n">core_mask</span><span class="p">,</span>
+            <span class="n">core_shift</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Add an entry for an application-edge to the population table</span>
+
+<span class="sd">        :param int block_start_addr: where the synaptic matrix block starts</span>
+<span class="sd">        :param int row_length: how long in words each row is</span>
+<span class="sd">        :param ~pacman.model.routing_info.BaseKeyAndMask key_and_mask:</span>
+<span class="sd">            the key and mask for this master pop entry</span>
+<span class="sd">        :param int core_mask:</span>
+<span class="sd">            Mask for the part of the key that identifies the core</span>
+<span class="sd">        :param int core_shift: The shift of the mask to get to the core_mask</span>
+<span class="sd">        :param int n_neurons:</span>
+<span class="sd">            The number of neurons in each machine vertex (bar the last)</span>
+<span class="sd">        :param bool is_single:</span>
+<span class="sd">            Flag that states if the entry is a direct entry for a single row.</span>
+<span class="sd">        :return: The index of the entry, to be used to retrieve it</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        :raises SynapticConfigurationException: If a bad address is used.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># If there are too many neurons per core, fail</span>
+        <span class="k">if</span> <span class="n">n_neurons</span> <span class="o">&gt;</span> <span class="n">_MAX_N_NEURONS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SynapticConfigurationException</span><span class="p">(</span>
+                <span class="s2">&quot;The parameter n_neurons of </span><span class="si">{}</span><span class="s2"> is too big (maximum </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">n_neurons</span><span class="p">,</span> <span class="n">_MAX_N_NEURONS</span><span class="p">))</span>
+
+        <span class="c1"># If the core mask is too big, fail</span>
+        <span class="k">if</span> <span class="n">core_mask</span> <span class="o">&gt;</span> <span class="n">_MAX_CORE_MASK</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SynapticConfigurationException</span><span class="p">(</span>
+                <span class="s2">&quot;The core mask of </span><span class="si">{}</span><span class="s2"> is too big (maximum </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">core_mask</span><span class="p">,</span> <span class="n">_MAX_CORE_MASK</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__update_master_population_table</span><span class="p">(</span>
+            <span class="n">block_start_addr</span><span class="p">,</span> <span class="n">row_length</span><span class="p">,</span> <span class="n">key_and_mask</span><span class="p">,</span> <span class="n">core_mask</span><span class="p">,</span> <span class="n">core_shift</span><span class="p">,</span>
+            <span class="n">n_neurons</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__update_master_population_table</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">block_start_addr</span><span class="p">,</span> <span class="n">row_length</span><span class="p">,</span> <span class="n">key_and_mask</span><span class="p">,</span> <span class="n">core_mask</span><span class="p">,</span>
+            <span class="n">core_shift</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">is_single</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Add an entry in the binary search to deal with the synaptic matrix</span>
+
+<span class="sd">        :param int block_start_addr: where the synaptic matrix block starts</span>
+<span class="sd">        :param int row_length: how long in words each row is</span>
+<span class="sd">        :param ~pacman.model.routing_info.BaseKeyAndMask key_and_mask:</span>
+<span class="sd">            the key and mask for this master pop entry</span>
+<span class="sd">        :param int core_mask:</span>
+<span class="sd">            Mask for the part of the key that identifies the core</span>
+<span class="sd">        :param int core_shift: The shift of the mask to get to the core_mask</span>
+<span class="sd">        :param int n_neurons:</span>
+<span class="sd">            The number of neurons in each machine vertex (bar the last)</span>
+<span class="sd">        :param bool is_single:</span>
+<span class="sd">            Flag that states if the entry is a direct entry for a single row.</span>
+<span class="sd">        :return: The index of the entry, to be used to retrieve it</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        :raises SynapticConfigurationException: If a bad address is used.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="c1"># pylint: disable=too-many-arguments, arguments-differ</span>
         <span class="k">if</span> <span class="n">key_and_mask</span><span class="o">.</span><span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_addresses</span> <span class="o">&gt;</span> <span class="n">_MAX_ADDRESS_START</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">SynapticConfigurationException</span><span class="p">(</span>
+                    <span class="s2">&quot;The table already contains </span><span class="si">{}</span><span class="s2"> entries;&quot;</span>
+                    <span class="s2">&quot; adding another is too many&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__n_addresses</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span><span class="p">[</span><span class="n">key_and_mask</span><span class="o">.</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">_MasterPopEntry</span><span class="p">(</span>
-                <span class="n">key_and_mask</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="n">key_and_mask</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
-        <span class="n">start_addr</span> <span class="o">=</span> <span class="n">block_start_addr</span>
+                <span class="n">key_and_mask</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="n">key_and_mask</span><span class="o">.</span><span class="n">mask</span><span class="p">,</span> <span class="n">core_mask</span><span class="p">,</span> <span class="n">core_shift</span><span class="p">,</span>
+                <span class="n">n_neurons</span><span class="p">)</span>
+            <span class="c1"># Need to add an extra &quot;address&quot; for the extra_info if needed</span>
+            <span class="k">if</span> <span class="n">core_mask</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__n_addresses</span> <span class="o">+=</span> <span class="mi">1</span>
 
-        <span class="c1"># if single, don&#39; t add to start address as its going in its own block</span>
+        <span class="c1"># if not single, scale the address</span>
+        <span class="n">start_addr</span> <span class="o">=</span> <span class="n">block_start_addr</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">is_single</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">block_start_addr</span> <span class="o">%</span> <span class="n">_ADDRESS_SCALE</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">SynapticConfigurationException</span><span class="p">(</span>
+                    <span class="s2">&quot;Address </span><span class="si">{}</span><span class="s2"> is not compatible with this table&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">block_start_addr</span><span class="p">))</span>
             <span class="n">start_addr</span> <span class="o">=</span> <span class="n">block_start_addr</span> <span class="o">//</span> <span class="n">_ADDRESS_SCALE</span>
+            <span class="k">if</span> <span class="n">start_addr</span> <span class="o">&gt;</span> <span class="n">_MAX_ADDRESS</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">SynapticConfigurationException</span><span class="p">(</span>
+                    <span class="s2">&quot;Address </span><span class="si">{}</span><span class="s2"> is too big for this table&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">block_start_addr</span><span class="p">))</span>
+        <span class="n">row_length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_allowed_row_length</span><span class="p">(</span><span class="n">row_length</span><span class="p">)</span>
         <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span><span class="p">[</span><span class="n">key_and_mask</span><span class="o">.</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="n">start_addr</span><span class="p">,</span> <span class="n">row_length</span><span class="p">,</span> <span class="n">is_single</span><span class="p">)</span>
+            <span class="n">start_addr</span><span class="p">,</span> <span class="n">row_length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">is_single</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__n_addresses</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">index</span>
+
+<div class="viewcode-block" id="MasterPopTableAsBinarySearch.add_invalid_entry"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.add_invalid_entry">[docs]</a>    <span class="k">def</span> <span class="nf">add_invalid_entry</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">key_and_mask</span><span class="p">,</span> <span class="n">core_mask</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">core_shift</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_neurons</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Add an entry to the table that doesn&#39;t point to anywhere.  Used</span>
+<span class="sd">            to keep indices in synchronisation between e.g. normal and delay</span>
+<span class="sd">            entries and between entries on different cores</span>
+
+<span class="sd">        :param ~pacman.model.routing_info.BaseKeyAndMask key_and_mask:</span>
+<span class="sd">            a key_and_mask object used as part of describing</span>
+<span class="sd">            an edge that will require being received to be stored in the</span>
+<span class="sd">            master pop table; the whole edge will become multiple calls to</span>
+<span class="sd">            this function</span>
+<span class="sd">        :param int core_mask:</span>
+<span class="sd">            Mask for the part of the key that identifies the core</span>
+<span class="sd">        :param int core_shift: The shift of the mask to get to the core_mask</span>
+<span class="sd">        :param int n_neurons:</span>
+<span class="sd">            The number of neurons in each machine vertex (bar the last)</span>
+<span class="sd">        :return: The index of the added entry</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">key_and_mask</span><span class="o">.</span><span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span><span class="p">[</span><span class="n">key_and_mask</span><span class="o">.</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">_MasterPopEntry</span><span class="p">(</span>
+                <span class="n">key_and_mask</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="n">key_and_mask</span><span class="o">.</span><span class="n">mask</span><span class="p">,</span> <span class="n">core_mask</span><span class="p">,</span> <span class="n">core_shift</span><span class="p">,</span>
+                <span class="n">n_neurons</span><span class="p">)</span>
+            <span class="c1"># Need to add an extra &quot;address&quot; for the extra_info if needed</span>
+            <span class="k">if</span> <span class="n">core_mask</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__n_addresses</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span><span class="p">[</span><span class="n">key_and_mask</span><span class="o">.</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append_invalid</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__n_addresses</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">return</span> <span class="n">index</span></div>
 
@@ -317,145 +605,89 @@
 <span class="sd">        :param int master_pop_table_region:</span>
 <span class="sd">            the region to which the master pop table is being stored</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span><span class="n">region</span><span class="o">=</span><span class="n">master_pop_table_region</span><span class="p">)</span>
-
         <span class="c1"># sort entries by key</span>
         <span class="n">entries</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
             <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">a_entry</span><span class="p">:</span> <span class="n">a_entry</span><span class="o">.</span><span class="n">routing_key</span><span class="p">)</span>
+        <span class="n">n_entries</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">entries</span><span class="p">)</span>
+
+        <span class="c1"># reserve space and switch</span>
+        <span class="n">master_pop_table_sz</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">_BASE_SIZE_BYTES</span> <span class="o">+</span>
+            <span class="n">n_entries</span> <span class="o">*</span> <span class="n">_MASTER_POP_ENTRY_SIZE_BYTES</span> <span class="o">+</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__n_addresses</span> <span class="o">*</span> <span class="n">_ADDRESS_LIST_ENTRY_SIZE_BYTES</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
+            <span class="n">region</span><span class="o">=</span><span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">POPULATION_TABLE</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">size</span><span class="o">=</span><span class="n">master_pop_table_sz</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;PopTable&#39;</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span><span class="n">region</span><span class="o">=</span><span class="n">master_pop_table_region</span><span class="p">)</span>
 
         <span class="c1"># write no master pop entries and the address list size</span>
-        <span class="n">n_entries</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">entries</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">n_entries</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__n_addresses</span><span class="p">)</span>
 
         <span class="c1"># Generate the table and list as arrays</span>
-        <span class="n">pop_table</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_entries</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">_MASTER_POP_ENTRY_DTYPE</span><span class="p">)</span>
-        <span class="n">address_list</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__n_addresses</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">_ADDRESS_LIST_DTYPE</span><span class="p">)</span>
+        <span class="n">pop_table</span> <span class="o">=</span> <span class="n">_make_array</span><span class="p">(</span><span class="n">_MasterPopEntryCType</span><span class="p">,</span> <span class="n">n_entries</span><span class="p">)</span>
+        <span class="n">address_list</span> <span class="o">=</span> <span class="n">_make_array</span><span class="p">(</span><span class="n">_AddressListEntryCType</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_addresses</span><span class="p">)</span>
         <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">entry</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">entries</span><span class="p">):</span>
-            <span class="n">start</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_pop_table_entry</span><span class="p">(</span>
-                <span class="n">entry</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">pop_table</span><span class="p">,</span> <span class="n">address_list</span><span class="p">)</span>
+            <span class="n">start</span> <span class="o">+=</span> <span class="n">entry</span><span class="o">.</span><span class="n">write_to_table</span><span class="p">(</span><span class="n">pop_table</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">address_list</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span>
 
         <span class="c1"># Write the arrays</span>
-        <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">pop_table</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="s2">&quot;&lt;u4&quot;</span><span class="p">))</span>
-        <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">address_list</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">_to_numpy</span><span class="p">(</span><span class="n">pop_table</span><span class="p">))</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">_to_numpy</span><span class="p">(</span><span class="n">address_list</span><span class="p">))</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
         <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__n_addresses</span> <span class="o">=</span> <span class="mi">0</span></div>
 
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_make_pop_table_entry</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">pop_table</span><span class="p">,</span> <span class="n">address_list</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param _MasterPopEntry entry:</span>
-<span class="sd">        :param int i:</span>
-<span class="sd">        :param int start:</span>
-<span class="sd">        :param ~numpy.ndarray pop_table:</span>
-<span class="sd">        :param ~numpy.ndarray address_list:</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">max_n_neurons_per_core</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The maximum number of neurons per core supported when a core-mask</span>
+<span class="sd">            is &gt; 0.</span>
+
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># pylint: disable=too-many-arguments</span>
-        <span class="n">pop_table</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;key&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">routing_key</span>
-        <span class="n">pop_table</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;mask&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">mask</span>
-        <span class="n">pop_table</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;start&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">start</span>
-        <span class="n">count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">addresses_and_row_lengths</span><span class="p">)</span>
-        <span class="n">pop_table</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;count&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">count</span>
-        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="p">(</span><span class="n">address</span><span class="p">,</span> <span class="n">row_length</span><span class="p">,</span> <span class="n">is_single</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
-                <span class="n">entry</span><span class="o">.</span><span class="n">addresses_and_row_lengths</span><span class="p">):</span>
-            <span class="n">single_bit</span> <span class="o">=</span> <span class="n">_SINGLE_BIT_FLAG_BIT</span> <span class="k">if</span> <span class="n">is_single</span> <span class="k">else</span> <span class="mi">0</span>
-            <span class="n">address_list</span><span class="p">[</span><span class="n">start</span> <span class="o">+</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="p">(</span><span class="n">single_bit</span> <span class="o">|</span> <span class="p">(</span><span class="n">address</span> <span class="o">&amp;</span> <span class="mh">0x7FFFFF</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span><span class="p">)</span> <span class="o">|</span>
-                <span class="p">(</span><span class="n">row_length</span> <span class="o">&amp;</span> <span class="n">_ROW_LENGTH_MASK</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">count</span>
+        <span class="k">return</span> <span class="n">_MAX_N_NEURONS</span>
 
-<div class="viewcode-block" id="MasterPopTableAsBinarySearch.extract_synaptic_matrix_data_location"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.extract_synaptic_matrix_data_location">[docs]</a>    <span class="k">def</span> <span class="nf">extract_synaptic_matrix_data_location</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">incoming_key</span><span class="p">,</span> <span class="n">master_pop_base_mem_address</span><span class="p">,</span> <span class="n">txrx</span><span class="p">,</span>
-            <span class="n">chip_x</span><span class="p">,</span> <span class="n">chip_y</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param int incoming_key:</span>
-<span class="sd">            the source key which the synaptic matrix needs to be mapped to</span>
-<span class="sd">        :param int master_pop_base_mem_address:</span>
-<span class="sd">            the base address of the master pop</span>
-<span class="sd">        :param ~spinnman.transceiver.Transceiver txrx: the transceiver object</span>
-<span class="sd">        :param int chip_y: the y coordinate of the chip of this master pop</span>
-<span class="sd">        :param int chip_x: the x coordinate of the chip of this master pop</span>
-<span class="sd">        :return: the synaptic matrix memory position information;</span>
-<span class="sd">            (row_length, location, is_single).</span>
-<span class="sd">        :rtype: list(tuple(int, int, bool))</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">max_core_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The maximum core mask supported when n_neurons is &gt; 0; this is the</span>
+<span class="sd">            maximum number of cores that can be supported in a joined mask</span>
+
+<span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># pylint: disable=too-many-arguments, too-many-locals, arguments-differ</span>
+        <span class="k">return</span> <span class="n">_MAX_CORE_MASK</span>
 
-        <span class="c1"># get entries in master pop</span>
-        <span class="n">n_entries</span><span class="p">,</span> <span class="n">n_addresses</span> <span class="o">=</span> <span class="n">_TWO_WORDS</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">txrx</span><span class="o">.</span><span class="n">read_memory</span><span class="p">(</span>
-            <span class="n">chip_x</span><span class="p">,</span> <span class="n">chip_y</span><span class="p">,</span> <span class="n">master_pop_base_mem_address</span><span class="p">,</span> <span class="n">_TWO_WORDS</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>
-        <span class="n">n_entry_bytes</span> <span class="o">=</span> <span class="n">n_entries</span> <span class="o">*</span> <span class="n">_MASTER_POP_ENTRY_SIZE_BYTES</span>
-        <span class="n">n_address_bytes</span> <span class="o">=</span> <span class="n">n_addresses</span> <span class="o">*</span> <span class="n">_ADDRESS_LIST_ENTRY_SIZE_BYTES</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">max_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The maximum index of a synaptic connection</span>
 
-        <span class="c1"># read in master pop structure</span>
-        <span class="n">full_data</span> <span class="o">=</span> <span class="n">txrx</span><span class="o">.</span><span class="n">read_memory</span><span class="p">(</span>
-            <span class="n">chip_x</span><span class="p">,</span> <span class="n">chip_y</span><span class="p">,</span> <span class="n">master_pop_base_mem_address</span> <span class="o">+</span> <span class="n">_TWO_WORDS</span><span class="o">.</span><span class="n">size</span><span class="p">,</span>
-            <span class="n">n_entry_bytes</span> <span class="o">+</span> <span class="n">n_address_bytes</span><span class="p">)</span>
-
-        <span class="c1"># convert into a numpy arrays</span>
-        <span class="n">entry_list</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span>
-            <span class="n">full_data</span><span class="p">,</span> <span class="s1">&#39;uint8&#39;</span><span class="p">,</span> <span class="n">n_entry_bytes</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span>
-                <span class="n">dtype</span><span class="o">=</span><span class="n">_MASTER_POP_ENTRY_DTYPE</span><span class="p">)</span>
-        <span class="n">address_list</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span>
-            <span class="n">full_data</span><span class="p">,</span> <span class="s1">&#39;uint8&#39;</span><span class="p">,</span> <span class="n">n_address_bytes</span><span class="p">,</span> <span class="n">n_entry_bytes</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span>
-                <span class="n">dtype</span><span class="o">=</span><span class="n">_ADDRESS_LIST_DTYPE</span><span class="p">)</span>
-
-        <span class="n">entry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_locate_entry</span><span class="p">(</span><span class="n">entry_list</span><span class="p">,</span> <span class="n">incoming_key</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">entry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">[]</span>
-        <span class="n">addresses</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="s2">&quot;start&quot;</span><span class="p">],</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;start&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;count&quot;</span><span class="p">]):</span>
-            <span class="n">address_and_row_length</span> <span class="o">=</span> <span class="n">address_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-            <span class="n">is_single</span> <span class="o">=</span> <span class="p">(</span><span class="n">address_and_row_length</span> <span class="o">&amp;</span> <span class="n">_SINGLE_BIT_FLAG_BIT</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
-            <span class="n">address</span> <span class="o">=</span> <span class="n">address_and_row_length</span> <span class="o">&amp;</span> <span class="n">_ADDRESS_MASK</span>
-            <span class="n">row_length</span> <span class="o">=</span> <span class="n">address_and_row_length</span> <span class="o">&amp;</span> <span class="n">_ROW_LENGTH_MASK</span>
-            <span class="k">if</span> <span class="n">is_single</span><span class="p">:</span>
-                <span class="n">address</span> <span class="o">=</span> <span class="n">address</span> <span class="o">&gt;&gt;</span> <span class="mi">8</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">address</span> <span class="o">=</span> <span class="n">address</span> <span class="o">&gt;&gt;</span> <span class="n">_ADDRESS_SCALED_SHIFT</span>
-
-            <span class="n">addresses</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">row_length</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">is_single</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">addresses</span></div>
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_locate_entry</span><span class="p">(</span><span class="n">entries</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Search the binary tree structure for the correct entry.</span>
-
-<span class="sd">        :param ~numpy.ndarray entries:</span>
-<span class="sd">        :param int key:</span>
-<span class="sd">            the key to search the master pop table for a given entry</span>
-<span class="sd">        :return: the entry for this given key;</span>
-<span class="sd">            dtype has keys: ``key``, ``mask``, ``start``, ``count``</span>
-<span class="sd">        :rtype: ~numpy.ndarray</span>
+<span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">imin</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">imax</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">entries</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_MAX_ADDRESS_COUNT</span>
 
-        <span class="k">while</span> <span class="n">imin</span> <span class="o">&lt;</span> <span class="n">imax</span><span class="p">:</span>
-            <span class="n">imid</span> <span class="o">=</span> <span class="p">(</span><span class="n">imax</span> <span class="o">+</span> <span class="n">imin</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
-            <span class="n">entry</span> <span class="o">=</span> <span class="n">entries</span><span class="p">[</span><span class="n">imid</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">key</span> <span class="o">&amp;</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;mask&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">]:</span>
-                <span class="k">return</span> <span class="n">entry</span>
-            <span class="k">if</span> <span class="n">key</span> <span class="o">&gt;</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">]:</span>
-                <span class="n">imin</span> <span class="o">=</span> <span class="n">imid</span> <span class="o">+</span> <span class="mi">1</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">imax</span> <span class="o">=</span> <span class="n">imid</span>
-        <span class="k">return</span> <span class="kc">None</span>
+<div class="viewcode-block" id="MasterPopTableAsBinarySearch.write_padding"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.write_padding">[docs]</a>    <span class="k">def</span> <span class="nf">write_padding</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">next_block_start_address</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Write padding to the data spec needed between blocks to align</span>
+<span class="sd">            addresses correctly</span>
 
-<div class="viewcode-block" id="MasterPopTableAsBinarySearch.get_edge_constraints"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.get_edge_constraints">[docs]</a>    <span class="k">def</span> <span class="nf">get_edge_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Gets the constraints for this table on edges coming in to a vertex.</span>
-
-<span class="sd">        :return: a list of constraints</span>
-<span class="sd">        :rtype: list(~pacman.model.constraints.AbstractConstraint)</span>
+<span class="sd">        :param ~.DataSpecificationGenerator spec:</span>
+<span class="sd">            The spec to write to</span>
+<span class="sd">        :param int next_block_start_address:</span>
+<span class="sd">            The address we are starting at</span>
+<span class="sd">        :return: The address we finish at after the padding</span>
+<span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__edge_constraints</span></div></div>
+        <span class="n">next_allowed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_next_allowed_address</span><span class="p">(</span><span class="n">next_block_start_address</span><span class="p">)</span>
+        <span class="n">padding</span> <span class="o">=</span> <span class="n">next_allowed</span> <span class="o">-</span> <span class="n">next_block_start_address</span>
+        <span class="k">if</span> <span class="n">padding</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+
+            <span class="c1"># Pad out data file with the added alignment bytes:</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Writing population table required padding</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span>
+                <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">_PADDING_BYTE</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint8&quot;</span><span class="p">),</span> <span class="n">padding</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span>
+                    <span class="s2">&quot;uint32&quot;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">next_allowed</span></div></div>
 </pre></div>
 
           </div>

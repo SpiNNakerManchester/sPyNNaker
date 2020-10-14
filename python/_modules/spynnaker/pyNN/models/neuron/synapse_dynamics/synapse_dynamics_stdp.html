@@ -382,7 +382,7 @@
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractPlasticSynapseDynamics</span><span class="o">.</span><span class="n">get_plastic_synaptic_data</span><span class="p">)</span>
 <div class="viewcode-block" id="SynapseDynamicsSTDP.get_plastic_synaptic_data"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.get_plastic_synaptic_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_plastic_synaptic_data</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">connections</span><span class="p">,</span> <span class="n">connection_row_indices</span><span class="p">,</span> <span class="n">n_rows</span><span class="p">,</span>
-            <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">):</span>
+            <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">max_n_synapses</span><span class="p">):</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="n">n_synapse_type_bits</span> <span class="o">=</span> <span class="n">get_n_bits</span><span class="p">(</span><span class="n">n_synapse_types</span><span class="p">)</span>
         <span class="n">n_neuron_id_bits</span> <span class="o">=</span> <span class="n">get_n_bits</span><span class="p">(</span><span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
@@ -405,7 +405,8 @@
               <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">neuron_id_mask</span><span class="p">))</span>
         <span class="n">fixed_plastic_rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">convert_per_connection_data_to_rows</span><span class="p">(</span>
             <span class="n">connection_row_indices</span><span class="p">,</span> <span class="n">n_rows</span><span class="p">,</span>
-            <span class="n">fixed_plastic</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint8&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
+            <span class="n">fixed_plastic</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint8&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)),</span>
+            <span class="n">max_n_synapses</span><span class="p">)</span>
         <span class="n">fp_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_n_items</span><span class="p">(</span><span class="n">fixed_plastic_rows</span><span class="p">,</span> <span class="n">BYTES_PER_SHORT</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pad_to_length</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># Pad the data</span>
@@ -428,7 +429,7 @@
         <span class="n">plastic_plastic</span> <span class="o">=</span> <span class="n">plastic_plastic</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint8&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
             <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_half_words</span> <span class="o">*</span> <span class="n">BYTES_PER_SHORT</span><span class="p">))</span>
         <span class="n">plastic_plastic_row_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">convert_per_connection_data_to_rows</span><span class="p">(</span>
-            <span class="n">connection_row_indices</span><span class="p">,</span> <span class="n">n_rows</span><span class="p">,</span> <span class="n">plastic_plastic</span><span class="p">)</span>
+            <span class="n">connection_row_indices</span><span class="p">,</span> <span class="n">n_rows</span><span class="p">,</span> <span class="n">plastic_plastic</span><span class="p">,</span> <span class="n">max_n_synapses</span><span class="p">)</span>
 
         <span class="c1"># pp_size = fp_size in words =&gt; fp_size * no_bytes / 4 (bytes)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pad_to_length</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -628,7 +629,12 @@
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractPlasticSynapseDynamics</span><span class="o">.</span><span class="n">set_delay</span><span class="p">)</span>
 <div class="viewcode-block" id="SynapseDynamicsSTDP.set_delay"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.set_delay">[docs]</a>    <span class="k">def</span> <span class="nf">set_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delay</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__delay</span> <span class="o">=</span> <span class="n">delay</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__delay</span> <span class="o">=</span> <span class="n">delay</span></div>
+
+    <span class="nd">@property</span>
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractPlasticSynapseDynamics</span><span class="o">.</span><span class="n">pad_to_length</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">pad_to_length</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pad_to_length</span></div>
 </pre></div>
 
           </div>

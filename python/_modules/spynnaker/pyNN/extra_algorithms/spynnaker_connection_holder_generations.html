@@ -122,8 +122,8 @@
             <span class="kc">None</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">,</span> <span class="n">edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">synapse_information</span> <span class="ow">in</span> <span class="n">edge</span><span class="o">.</span><span class="n">synapse_information</span><span class="p">:</span>
-            <span class="n">edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">add_pre_run_connection_holder</span><span class="p">(</span>
-                <span class="n">connection_holder</span><span class="p">,</span> <span class="n">edge</span><span class="p">,</span> <span class="n">synapse_information</span><span class="p">)</span>
+            <span class="n">synapse_information</span><span class="o">.</span><span class="n">add_pre_run_connection_holder</span><span class="p">(</span>
+                <span class="n">connection_holder</span><span class="p">)</span>
             <span class="c1"># store for the report generations</span>
             <span class="n">data_holders</span><span class="p">[</span><span class="n">edge</span><span class="p">,</span> <span class="n">synapse_information</span><span class="p">]</span> <span class="o">=</span> <span class="n">connection_holder</span></div>
 </pre></div>

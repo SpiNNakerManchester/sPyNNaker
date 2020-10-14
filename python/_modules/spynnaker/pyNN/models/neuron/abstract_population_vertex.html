@@ -87,8 +87,7 @@
 <span class="kn">from</span> <span class="nn">pacman.model.resources</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ConstantSDRAM</span><span class="p">,</span> <span class="n">CPUCyclesPerTickResource</span><span class="p">,</span> <span class="n">DTCMResource</span><span class="p">,</span> <span class="n">ResourceContainer</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">AbstractChangableAfterRun</span><span class="p">,</span> <span class="n">AbstractProvidesIncomingPartitionConstraints</span><span class="p">,</span>
-    <span class="n">AbstractProvidesOutgoingPartitionConstraints</span><span class="p">,</span>
+    <span class="n">AbstractChangableAfterRun</span><span class="p">,</span> <span class="n">AbstractProvidesOutgoingPartitionConstraints</span><span class="p">,</span>
     <span class="n">AbstractGeneratesDataSpecification</span><span class="p">,</span> <span class="n">AbstractRewritesDataSpecification</span><span class="p">,</span>
     <span class="n">AbstractCanReset</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models.impl</span> <span class="kn">import</span> <span class="p">(</span>
@@ -127,7 +126,6 @@
         <span class="n">AbstractContainsUnits</span><span class="p">,</span> <span class="n">AbstractSpikeRecordable</span><span class="p">,</span>
         <span class="n">AbstractNeuronRecordable</span><span class="p">,</span>
         <span class="n">AbstractProvidesOutgoingPartitionConstraints</span><span class="p">,</span>
-        <span class="n">AbstractProvidesIncomingPartitionConstraints</span><span class="p">,</span>
         <span class="n">AbstractPopulationInitializable</span><span class="p">,</span> <span class="n">AbstractPopulationSettable</span><span class="p">,</span>
         <span class="n">AbstractChangableAfterRun</span><span class="p">,</span> <span class="n">AbstractRewritesDataSpecification</span><span class="p">,</span>
         <span class="n">AbstractReadParametersBeforeSet</span><span class="p">,</span> <span class="n">AbstractAcceptsIncomingSynapses</span><span class="p">,</span>
@@ -260,24 +258,19 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_recorder</span>
 
     <span class="nd">@inject_items</span><span class="p">({</span>
-        <span class="s2">&quot;graph&quot;</span><span class="p">:</span> <span class="s2">&quot;MemoryApplicationGraph&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;machine_time_step&quot;</span><span class="p">:</span> <span class="s2">&quot;MachineTimeStep&quot;</span>
+        <span class="s2">&quot;graph&quot;</span><span class="p">:</span> <span class="s2">&quot;MemoryApplicationGraph&quot;</span>
     <span class="p">})</span>
     <span class="nd">@overrides</span><span class="p">(</span>
         <span class="n">TDMAAwareApplicationVertex</span><span class="o">.</span><span class="n">get_resources_used_by_atoms</span><span class="p">,</span>
-        <span class="n">additional_arguments</span><span class="o">=</span><span class="p">{</span>
-            <span class="s2">&quot;graph&quot;</span><span class="p">,</span> <span class="s2">&quot;machine_time_step&quot;</span>
-        <span class="p">}</span>
+        <span class="n">additional_arguments</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;graph&quot;</span><span class="p">}</span>
     <span class="p">)</span>
-<div class="viewcode-block" id="AbstractPopulationVertex.get_resources_used_by_atoms"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_resources_used_by_atoms">[docs]</a>    <span class="k">def</span> <span class="nf">get_resources_used_by_atoms</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractPopulationVertex.get_resources_used_by_atoms"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_resources_used_by_atoms">[docs]</a>    <span class="k">def</span> <span class="nf">get_resources_used_by_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">graph</span><span class="p">):</span>
         <span class="c1"># pylint: disable=arguments-differ</span>
 
         <span class="n">variableSDRAM</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_recorder</span><span class="o">.</span><span class="n">get_variable_sdram_usage</span><span class="p">(</span>
             <span class="n">vertex_slice</span><span class="p">)</span>
         <span class="n">constantSDRAM</span> <span class="o">=</span> <span class="n">ConstantSDRAM</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_get_sdram_usage_for_atoms</span><span class="p">(</span>
-                    <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_get_sdram_usage_for_atoms</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">,</span> <span class="n">graph</span><span class="p">))</span>
 
         <span class="c1"># set resources required from this object</span>
         <span class="n">container</span> <span class="o">=</span> <span class="n">ResourceContainer</span><span class="p">(</span>
@@ -301,6 +294,9 @@
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractChangableAfterRun</span><span class="o">.</span><span class="n">mark_no_changes</span><span class="p">)</span>
 <div class="viewcode-block" id="AbstractPopulationVertex.mark_no_changes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.mark_no_changes">[docs]</a>    <span class="k">def</span> <span class="nf">mark_no_changes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># If mapping will happen, reset things that need this</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_mapping</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_manager</span><span class="o">.</span><span class="n">clear_all_caches</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_mapping</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_data_generation</span> <span class="o">=</span> <span class="kc">False</span></div>
 
@@ -349,8 +345,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">tdma_sdram_size_in_bytes</span> <span class="o">+</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_impl</span><span class="o">.</span><span class="n">get_sdram_usage_in_bytes</span><span class="p">(</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">_get_sdram_usage_for_atoms</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_get_sdram_usage_for_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">graph</span><span class="p">):</span>
         <span class="n">sdram_requirement</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">SYSTEM_BYTES_REQUIREMENT</span> <span class="o">+</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_get_sdram_usage_for_neuron_params</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">)</span> <span class="o">+</span>
@@ -358,7 +353,7 @@
             <span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">get_provenance_data_size</span><span class="p">(</span>
                 <span class="nb">len</span><span class="p">(</span><span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="p">))</span> <span class="o">+</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_manager</span><span class="o">.</span><span class="n">get_sdram_usage_in_bytes</span><span class="p">(</span>
-                <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span> <span class="o">+</span>
+                <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span> <span class="o">+</span>
             <span class="n">profile_utils</span><span class="o">.</span><span class="n">get_profile_region_size</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__n_profile_samples</span><span class="p">)</span> <span class="o">+</span>
             <span class="n">bit_field_utilities</span><span class="o">.</span><span class="n">get_estimated_sdram_for_bit_field_region</span><span class="p">(</span>
@@ -596,12 +591,11 @@
 
         <span class="c1"># allow the synaptic matrix to write its data spec-able data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_manager</span><span class="o">.</span><span class="n">write_data_spec</span><span class="p">(</span>
-            <span class="n">spec</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">vertex</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span>
-            <span class="n">application_graph</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span>
-            <span class="n">weight_scale</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">)</span>
+            <span class="n">spec</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">vertex</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span> <span class="n">application_graph</span><span class="p">,</span>
+            <span class="n">routing_info</span><span class="p">,</span> <span class="n">weight_scale</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">)</span>
         <span class="n">vertex</span><span class="o">.</span><span class="n">set_on_chip_generatable_area</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_manager</span><span class="o">.</span><span class="n">host_written_matrix_size</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_manager</span><span class="o">.</span><span class="n">on_chip_written_matrix_size</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_manager</span><span class="o">.</span><span class="n">host_written_matrix_size</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_manager</span><span class="o">.</span><span class="n">on_chip_written_matrix_size</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">))</span>
 
         <span class="c1"># write up the bitfield builder data</span>
         <span class="n">bit_field_utilities</span><span class="o">.</span><span class="n">write_bitfield_init_data</span><span class="p">(</span>
@@ -842,32 +836,17 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param AbstractSynapseDynamics synapse_dynamics:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_manager</span><span class="o">.</span><span class="n">synapse_dynamics</span> <span class="o">=</span> <span class="n">synapse_dynamics</span></div>
-
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractAcceptsIncomingSynapses</span><span class="o">.</span><span class="n">add_pre_run_connection_holder</span><span class="p">)</span>
-<div class="viewcode-block" id="AbstractPopulationVertex.add_pre_run_connection_holder"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.add_pre_run_connection_holder">[docs]</a>    <span class="k">def</span> <span class="nf">add_pre_run_connection_holder</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">connection_holder</span><span class="p">,</span> <span class="n">projection_edge</span><span class="p">,</span> <span class="n">synapse_information</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_manager</span><span class="o">.</span><span class="n">add_pre_run_connection_holder</span><span class="p">(</span>
-            <span class="n">connection_holder</span><span class="p">,</span> <span class="n">projection_edge</span><span class="p">,</span> <span class="n">synapse_information</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="AbstractPopulationVertex.get_connection_holders"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_connection_holders">[docs]</a>    <span class="k">def</span> <span class="nf">get_connection_holders</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :rtype: dict(tuple(ProjectionApplicationEdge,SynapseInformation),\</span>
-<span class="sd">            ConnectionHolder)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_manager</span><span class="o">.</span><span class="n">get_connection_holders</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_manager</span><span class="o">.</span><span class="n">synapse_dynamics</span> <span class="o">=</span> <span class="n">synapse_dynamics</span>
+        <span class="c1"># If we are setting a synapse dynamics, we must remap even if the</span>
+        <span class="c1"># change above means we don&#39;t have to</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_mapping</span> <span class="o">=</span> <span class="kc">True</span></div>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractAcceptsIncomingSynapses</span><span class="o">.</span><span class="n">get_connections_from_machine</span><span class="p">)</span>
 <div class="viewcode-block" id="AbstractPopulationVertex.get_connections_from_machine"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_connections_from_machine">[docs]</a>    <span class="k">def</span> <span class="nf">get_connections_from_machine</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">edge</span><span class="p">,</span> <span class="n">routing_infos</span><span class="p">,</span>
-            <span class="n">synapse_information</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">using_extra_monitor_cores</span><span class="p">,</span>
-            <span class="n">placements</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">monitor_api</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fixed_routes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">extra_monitor</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_manager</span><span class="o">.</span><span class="n">get_connections_from_machine</span><span class="p">(</span>
-            <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">edge</span><span class="p">,</span> <span class="n">routing_infos</span><span class="p">,</span>
-            <span class="n">synapse_information</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">using_extra_monitor_cores</span><span class="p">,</span>
-            <span class="n">placements</span><span class="p">,</span> <span class="n">monitor_api</span><span class="p">,</span> <span class="n">fixed_routes</span><span class="p">,</span> <span class="n">extra_monitor</span><span class="p">)</span></div>
+            <span class="n">transceiver</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.clear_connection_cache"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.clear_connection_cache">[docs]</a>    <span class="k">def</span> <span class="nf">clear_connection_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_manager</span><span class="o">.</span><span class="n">clear_connection_cache</span><span class="p">()</span></div>
@@ -875,16 +854,6 @@
 <div class="viewcode-block" id="AbstractPopulationVertex.get_maximum_delay_supported_in_ms"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_maximum_delay_supported_in_ms">[docs]</a>    <span class="k">def</span> <span class="nf">get_maximum_delay_supported_in_ms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_manager</span><span class="o">.</span><span class="n">get_maximum_delay_supported_in_ms</span><span class="p">(</span>
             <span class="n">machine_time_step</span><span class="p">)</span></div>
-
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractProvidesIncomingPartitionConstraints</span><span class="o">.</span>
-               <span class="n">get_incoming_partition_constraints</span><span class="p">)</span>
-<div class="viewcode-block" id="AbstractPopulationVertex.get_incoming_partition_constraints"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_incoming_partition_constraints">[docs]</a>    <span class="k">def</span> <span class="nf">get_incoming_partition_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">partition</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Gets the constraints for partitions going into this vertex.</span>
-
-<span class="sd">        :param partition: partition that goes into this vertex</span>
-<span class="sd">        :return: list of constraints</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_manager</span><span class="o">.</span><span class="n">get_incoming_partition_constraints</span><span class="p">()</span></div>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractProvidesOutgoingPartitionConstraints</span><span class="o">.</span>
                <span class="n">get_outgoing_partition_constraints</span><span class="p">)</span>
@@ -989,7 +958,16 @@
         <span class="c1"># If synapses change during the run,</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_manager</span><span class="o">.</span><span class="n">changes_during_run</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_data_generation</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_neuron_parameters_reload</span> <span class="o">=</span> <span class="kc">False</span></div></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_neuron_parameters_reload</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="AbstractPopulationVertex.read_generated_connection_holders"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.read_generated_connection_holders">[docs]</a>    <span class="k">def</span> <span class="nf">read_generated_connection_holders</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Fill in the connection holders</span>
+
+<span class="sd">        :param Transceiver transceiver: How the data is to be read</span>
+<span class="sd">        :param Placement placement: Where the data is on the machine</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_manager</span><span class="o">.</span><span class="n">read_generated_connection_holders</span><span class="p">(</span>
+            <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">)</span></div></div>
 </pre></div>
 
           </div>

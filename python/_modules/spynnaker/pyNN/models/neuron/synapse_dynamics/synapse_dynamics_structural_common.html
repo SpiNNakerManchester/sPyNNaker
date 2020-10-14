@@ -157,8 +157,8 @@
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseDynamicsStructural</span><span class="o">.</span><span class="n">write_structural_parameters</span><span class="p">)</span>
 <div class="viewcode-block" id="SynapseDynamicsStructuralCommon.write_structural_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.write_structural_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">write_structural_parameters</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span>
-            <span class="n">machine_graph</span><span class="p">,</span> <span class="n">machine_vertex</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span> <span class="n">synapse_indices</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Write the synapse parameters to the spec.</span>
+            <span class="n">machine_graph</span><span class="p">,</span> <span class="n">machine_vertex</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span> <span class="n">synaptic_matrices</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Write structural plasticity parameters</span>
 
 <span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
 <span class="sd">            the data spec</span>
@@ -172,7 +172,7 @@
 <span class="sd">            the vertex for which data specs are being prepared</span>
 <span class="sd">        :param ~pacman.model.routing_info.RoutingInfo routing_info:</span>
 <span class="sd">            All of the routing information on the network</span>
-<span class="sd">        :param dict(tuple(SynapseInformation,int),int) synapse_indices:</span>
+<span class="sd">        :param SynapticMatrices synaptic_matrices:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="s2">&quot;Writing structural plasticity parameters&quot;</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span><span class="n">region</span><span class="p">)</span>
@@ -189,7 +189,7 @@
         <span class="c1"># Write the pre-population info</span>
         <span class="n">pop_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__write_prepopulation_info</span><span class="p">(</span>
             <span class="n">spec</span><span class="p">,</span> <span class="n">machine_vertex</span><span class="p">,</span> <span class="n">structural_edges</span><span class="p">,</span> <span class="n">machine_edges_by_app</span><span class="p">,</span>
-            <span class="n">routing_info</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span> <span class="n">synapse_indices</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">)</span>
+            <span class="n">routing_info</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span> <span class="n">synaptic_matrices</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">)</span>
 
         <span class="c1"># Write the post-to-pre table</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__write_post_to_pre_table</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">pop_index</span><span class="p">,</span> <span class="n">machine_vertex</span><span class="p">)</span>
@@ -295,7 +295,7 @@
 
     <span class="k">def</span> <span class="nf">__write_prepopulation_info</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">machine_vertex</span><span class="p">,</span> <span class="n">structural_edges</span><span class="p">,</span> <span class="n">machine_edges_by_app</span><span class="p">,</span>
-            <span class="n">routing_info</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span> <span class="n">synapse_indices</span><span class="p">,</span>
+            <span class="n">routing_info</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span> <span class="n">synaptic_matrices</span><span class="p">,</span>
             <span class="n">machine_time_step</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
@@ -307,7 +307,7 @@
 <span class="sd">                map of app edge to associated machine edges</span>
 <span class="sd">        :param RoutingInfo routing_info:</span>
 <span class="sd">        :param dict(AbstractSynapseType,float) weight_scales:</span>
-<span class="sd">        :param dict(tuple(SynapseInformation,int),int) synapse_indices:</span>
+<span class="sd">        :param SynapticMatrices synaptic_matrices:</span>
 <span class="sd">        :param int machine_time_step:</span>
 <span class="sd">        :rtype: dict(tuple(AbstractPopulationVertex,SynapseInformation),int)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -351,8 +351,8 @@
                 <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">r_info</span><span class="o">.</span><span class="n">first_mask</span><span class="p">)</span>
                 <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
                 <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">)</span>
-                <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span>
-                    <span class="n">synapse_indices</span><span class="p">[</span><span class="n">synapse_info</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">])</span>
+                <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">synaptic_matrices</span><span class="o">.</span><span class="n">get_index</span><span class="p">(</span>
+                    <span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">machine_edge</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">pop_index</span>
 
     <span class="k">def</span> <span class="nf">__write_post_to_pre_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">pop_index</span><span class="p">,</span> <span class="n">machine_vertex</span><span class="p">):</span>
@@ -507,7 +507,28 @@
 <span class="sd">        :param app_vertex:</span>
 <span class="sd">        :type app_vertex: ApplicationVertex or None</span>
 <span class="sd">        :return: list of random seed (4 words), generated randomly</span>
-<span class="sd">        &quot;&quot;&quot;</span></div></div>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="SynapseDynamicsStructuralCommon.check_initial_delay"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.check_initial_delay">[docs]</a>    <span class="k">def</span> <span class="nf">check_initial_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_delay_ms</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Check that delays can be done without delay extensions</span>
+
+<span class="sd">        :param int max_delay_ms: The maximum delay supported, in milliseconds</span>
+<span class="sd">        :raises Exception: if the delay is out of range</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">initial_delay</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">Iterable</span><span class="p">):</span>
+            <span class="c1"># pylint: disable=unsubscriptable-object</span>
+            <span class="n">init_del</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial_delay</span>
+            <span class="k">if</span> <span class="n">init_del</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">max_delay_ms</span> <span class="ow">or</span> <span class="n">init_del</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">max_delay_ms</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                    <span class="s2">&quot;The initial delay </span><span class="si">{}</span><span class="s2"> has one or more values that are&quot;</span>
+                    <span class="s2">&quot; bigger than </span><span class="si">{}</span><span class="s2">.  This is not supported in the current&quot;</span>
+                    <span class="s2">&quot; implementation.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">initial_delay</span><span class="p">,</span> <span class="n">max_delay_ms</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial_delay</span> <span class="o">&gt;</span> <span class="n">max_delay_ms</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="s2">&quot;The initial delay </span><span class="si">{}</span><span class="s2"> is bigger than </span><span class="si">{}</span><span class="s2">.  This is not&quot;</span>
+                <span class="s2">&quot; supported in the current implementation&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">initial_delay</span><span class="p">,</span> <span class="n">max_delay_ms</span><span class="p">))</span></div></div>
 </pre></div>
 
           </div>

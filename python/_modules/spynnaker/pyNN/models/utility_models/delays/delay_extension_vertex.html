@@ -101,7 +101,8 @@
 <span class="kn">from</span> <span class="nn">.delay_block</span> <span class="kn">import</span> <span class="n">DelayBlock</span>
 <span class="kn">from</span> <span class="nn">.delay_extension_machine_vertex</span> <span class="kn">import</span> <span class="n">DelayExtensionMachineVertex</span>
 <span class="kn">from</span> <span class="nn">.delay_generator_data</span> <span class="kn">import</span> <span class="n">DelayGeneratorData</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="n">SPIKE_PARTITION_ID</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">SPIKE_PARTITION_ID</span><span class="p">,</span> <span class="n">POP_TABLE_MAX_ROW_LENGTH</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neural_projections</span> <span class="kn">import</span> <span class="n">DelayedApplicationEdge</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neural_projections.connectors</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractGenerateConnectorOnMachine</span><span class="p">)</span>
@@ -158,7 +159,8 @@
 <span class="sd">        :param str label: the vertex label</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
-        <span class="n">TDMAAwareApplicationVertex</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="mi">256</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">DelayExtensionVertex</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">POP_TABLE_MAX_ROW_LENGTH</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__source_vertex</span> <span class="o">=</span> <span class="n">source_vertex</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__n_delay_stages</span> <span class="o">=</span> <span class="mi">0</span>
@@ -244,25 +246,34 @@
 <div class="viewcode-block" id="DelayExtensionVertex.add_generator_data"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.add_generator_data">[docs]</a>    <span class="k">def</span> <span class="nf">add_generator_data</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">max_row_n_synapses</span><span class="p">,</span> <span class="n">max_delayed_row_n_synapses</span><span class="p">,</span> <span class="n">pre_slices</span><span class="p">,</span>
             <span class="n">post_slices</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
-            <span class="n">synapse_information</span><span class="p">,</span> <span class="n">max_stage</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">):</span>
+            <span class="n">synapse_information</span><span class="p">,</span> <span class="n">max_stage</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Add delays for a connection to be generated</span>
 
 <span class="sd">        :param int max_row_n_synapses:</span>
+<span class="sd">            The maximum number of synapses in a row</span>
 <span class="sd">        :param int max_delayed_row_n_synapses:</span>
+<span class="sd">            The maximum number of synapses in a delay row</span>
 <span class="sd">        :param list(~pacman.model.graphs.common.Slice) pre_slices:</span>
+<span class="sd">            The list of slices of the pre application vertex</span>
 <span class="sd">        :param list(~pacman.model.graphs.common.Slice) post_slices:</span>
+<span class="sd">            The list of slices of the post application vertex</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:</span>
+<span class="sd">            The slice of the pre applcation vertex currently being</span>
+<span class="sd">            considered</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice post_vertex_slice:</span>
+<span class="sd">            The slice of the post application vertex currently being</span>
+<span class="sd">            considered</span>
 <span class="sd">        :param ~spynnaker.pyNN.models.neural_projections.SynapseInformation \</span>
 <span class="sd">                synapse_information:</span>
+<span class="sd">            The synapse information of the connection</span>
 <span class="sd">        :param int max_stage:</span>
-<span class="sd">        :param int machine_time_step:</span>
+<span class="sd">            The maximum delay stage</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__delay_generator_data</span><span class="p">[</span><span class="n">pre_vertex_slice</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
             <span class="n">DelayGeneratorData</span><span class="p">(</span>
                 <span class="n">max_row_n_synapses</span><span class="p">,</span> <span class="n">max_delayed_row_n_synapses</span><span class="p">,</span>
                 <span class="n">pre_slices</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
-                <span class="n">synapse_information</span><span class="p">,</span> <span class="n">max_stage</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">))</span></div>
+                <span class="n">synapse_information</span><span class="p">,</span> <span class="n">max_stage</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__machine_time_step</span><span class="p">))</span></div>
 
     <span class="nd">@inject_items</span><span class="p">({</span>
         <span class="s2">&quot;machine_graph&quot;</span><span class="p">:</span> <span class="s2">&quot;MemoryMachineGraph&quot;</span><span class="p">,</span>

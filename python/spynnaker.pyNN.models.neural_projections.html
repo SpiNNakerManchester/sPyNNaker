@@ -186,17 +186,18 @@ but may return a false positives</p>
 
 <dl class="class">
 <dt id="spynnaker.pyNN.models.neural_projections.DelayedApplicationEdge">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neural_projections.</code><code class="descname">DelayedApplicationEdge</code><span class="sig-paren">(</span><em>pre_vertex</em>, <em>post_vertex</em>, <em>synapse_information</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/delayed_application_edge.html#DelayedApplicationEdge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.DelayedApplicationEdge" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neural_projections.</code><code class="descname">DelayedApplicationEdge</code><span class="sig-paren">(</span><em>pre_vertex</em>, <em>post_vertex</em>, <em>synapse_information</em>, <em>undelayed_edge</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/delayed_application_edge.html#DelayedApplicationEdge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.DelayedApplicationEdge" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pacman.model.graphs.application.application_edge.ApplicationEdge</span></code>, <a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.partitioner_interfaces/#pacman.model.partitioner_interfaces.abstract_slices_connect.AbstractSlicesConnect" title="(in PACMAN v)"><code class="xref py py-class docutils literal"><span class="pre">pacman.model.partitioner_interfaces.abstract_slices_connect.AbstractSlicesConnect</span></code></a></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>pre_vertex</strong> (<a class="reference internal" href="spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex" title="spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex"><em>DelayExtensionVertex</em></a>) &#8211; </li>
-<li><strong>post_vertex</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex" title="spynnaker.pyNN.models.neuron.AbstractPopulationVertex"><em>AbstractPopulationVertex</em></a>) &#8211; </li>
-<li><strong>synapse_information</strong> (<a class="reference internal" href="#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) &#8211; </li>
-<li><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; </li>
+<li><strong>pre_vertex</strong> (<a class="reference internal" href="spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex" title="spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex"><em>DelayExtensionVertex</em></a>) &#8211; The delay extension at the start of the edge</li>
+<li><strong>post_vertex</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex" title="spynnaker.pyNN.models.neuron.AbstractPopulationVertex"><em>AbstractPopulationVertex</em></a>) &#8211; The target of the synapses</li>
+<li><strong>synapse_information</strong> (<a class="reference internal" href="#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) &#8211; The synapse information on this edge</li>
+<li><strong>undelayed_edge</strong> (<a class="reference internal" href="#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge" title="spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge"><em>ProjectionApplicationEdge</em></a>) &#8211; The edge that is used for projections without extended delays</li>
+<li><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The edge label</li>
 </ul>
 </td>
 </tr>
@@ -256,6 +257,20 @@ but may return a false positives</p>
 </table>
 </dd></dl>
 
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.neural_projections.DelayedApplicationEdge.undelayed_edge">
+<code class="descname">undelayed_edge</code><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.DelayedApplicationEdge.undelayed_edge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the edge that for projections without extended delays</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge" title="spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge">ProjectionApplicationEdge</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -277,6 +292,20 @@ but may return a false positives</p>
 </tr>
 </tbody>
 </table>
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.neural_projections.DelayedMachineEdge.undelayed_edge">
+<code class="descname">undelayed_edge</code><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.DelayedMachineEdge.undelayed_edge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the edge used for Projections without extended delays</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#spynnaker.pyNN.models.neural_projections.ProjectionMachineEdge" title="spynnaker.pyNN.models.neural_projections.ProjectionMachineEdge">ProjectionMachineEdge</a> or <a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -460,6 +489,20 @@ This edge may not be fully initialized</td>
 </tr>
 </tbody>
 </table>
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.neural_projections.ProjectionMachineEdge.delay_edge">
+<code class="descname">delay_edge</code><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.ProjectionMachineEdge.delay_edge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the matching delay edge of this edge</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#spynnaker.pyNN.models.neural_projections.DelayedMachineEdge" title="spynnaker.pyNN.models.neural_projections.DelayedMachineEdge">DelayedMachineEdge</a> or <a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neural_projections.ProjectionMachineEdge.get_local_provenance_data">
 <code class="descname">get_local_provenance_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/projection_machine_edge.html#ProjectionMachineEdge.get_local_provenance_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.ProjectionMachineEdge.get_local_provenance_data" title="Permalink to this definition">¶</a></dt>
@@ -499,7 +542,7 @@ This edge may not be fully initialized</td>
 
 <dl class="class">
 <dt id="spynnaker.pyNN.models.neural_projections.SynapseInformation">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neural_projections.</code><code class="descname">SynapseInformation</code><span class="sig-paren">(</span><em>connector</em>, <em>pre_population</em>, <em>post_population</em>, <em>prepop_is_view</em>, <em>postpop_is_view</em>, <em>rng</em>, <em>synapse_dynamics</em>, <em>synapse_type</em>, <em>weights=None</em>, <em>delays=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/synapse_information.html#SynapseInformation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neural_projections.</code><code class="descname">SynapseInformation</code><span class="sig-paren">(</span><em>connector</em>, <em>pre_population</em>, <em>post_population</em>, <em>prepop_is_view</em>, <em>postpop_is_view</em>, <em>rng</em>, <em>synapse_dynamics</em>, <em>synapse_type</em>, <em>is_virtual_machine</em>, <em>weights=None</em>, <em>delays=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/synapse_information.html#SynapseInformation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
 <p>Contains the synapse information including the connector, synapse type        and synapse dynamics</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -515,6 +558,7 @@ This edge may not be fully initialized</td>
 <li><strong>rng</strong> (<a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.NumpyRNG" title="(in PyNN v0.9)"><em>NumpyRNG</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; Seeded random number generator</li>
 <li><strong>synapse_dynamics</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics" title="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics"><em>AbstractSynapseDynamics</em></a>) &#8211; The dynamic behaviour of the synapse</li>
 <li><strong>synapse_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType" title="spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType"><em>AbstractSynapseType</em></a>) &#8211; The type of the synapse</li>
+<li><strong>is_virtual_machine</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; Whether the machine is virtual</li>
 <li><strong>weights</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>) or </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; The synaptic weights</li>
 <li><strong>delays</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>) or </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; The total synaptic delays</li>
 </ul>
@@ -522,6 +566,20 @@ This edge may not be fully initialized</td>
 </tr>
 </tbody>
 </table>
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neural_projections.SynapseInformation.add_pre_run_connection_holder">
+<code class="descname">add_pre_run_connection_holder</code><span class="sig-paren">(</span><em>pre_run_connection_holder</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/synapse_information.html#SynapseInformation.add_pre_run_connection_holder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.SynapseInformation.add_pre_run_connection_holder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a connection holder that will be filled in before run</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pre_run_connection_holder</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.ConnectionHolder" title="spynnaker.pyNN.models.neuron.ConnectionHolder"><em>ConnectionHolder</em></a>) &#8211; The connection holder to be added</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.neural_projections.SynapseInformation.connector">
 <code class="descname">connector</code><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.SynapseInformation.connector" title="Permalink to this definition">¶</a></dt>
@@ -548,6 +606,13 @@ This edge may not be fully initialized</td>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neural_projections.SynapseInformation.finish_connection_holders">
+<code class="descname">finish_connection_holders</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/synapse_information.html#SynapseInformation.finish_connection_holders"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.SynapseInformation.finish_connection_holders" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finish all the connection holders, and clear the list so that they
+are not generated again later</p>
 </dd></dl>
 
 <dl class="method">
@@ -638,6 +703,20 @@ may have already been so done)</td>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon" title="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon">PyNNPopulationCommon</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.neural_projections.SynapseInformation.pre_run_connection_holders">
+<code class="descname">pre_run_connection_holders</code><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.SynapseInformation.pre_run_connection_holders" title="Permalink to this definition">¶</a></dt>
+<dd><p>The list of connection holders to be filled in before run</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.ConnectionHolder" title="spynnaker.pyNN.models.neuron.ConnectionHolder">ConnectionHolder</a>)</td>
 </tr>
 </tbody>
 </table>

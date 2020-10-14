@@ -81,8 +81,11 @@
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron</span> <span class="kn">import</span> <span class="n">AbstractPopulationVertex</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_pynn_model</span> <span class="kn">import</span> <span class="n">AbstractPyNNModel</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="n">POP_TABLE_MAX_ROW_LENGTH</span>
 
-<span class="n">DEFAULT_MAX_ATOMS_PER_CORE</span> <span class="o">=</span> <span class="mi">255</span>
+<span class="c1"># The maximum atoms per core is the master population table row length to</span>
+<span class="c1"># make it easier when all-to-all-connector is used</span>
+<span class="n">DEFAULT_MAX_ATOMS_PER_CORE</span> <span class="o">=</span> <span class="n">POP_TABLE_MAX_ROW_LENGTH</span>
 
 <span class="n">_population_parameters</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;spikes_per_second&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;ring_buffer_sigma&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>

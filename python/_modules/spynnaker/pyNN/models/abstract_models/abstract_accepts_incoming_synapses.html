@@ -112,41 +112,19 @@
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
     <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractAcceptsIncomingSynapses.add_pre_run_connection_holder"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.add_pre_run_connection_holder">[docs]</a>    <span class="k">def</span> <span class="nf">add_pre_run_connection_holder</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">connection_holder</span><span class="p">,</span> <span class="n">projection_edge</span><span class="p">,</span> <span class="n">synapse_information</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Add a connection holder to the vertex to be filled in when the\</span>
-<span class="sd">            connections are actually generated.</span>
-
-<span class="sd">        :param ConnectionHolder connection_holder:</span>
-<span class="sd">        :param ProjectionApplicationEdge projection_edge:</span>
-<span class="sd">        :param SynapseInformation synapse_information:</span>
-<span class="sd">        &quot;&quot;&quot;</span></div>
-
-    <span class="nd">@abstractmethod</span>
 <div class="viewcode-block" id="AbstractAcceptsIncomingSynapses.get_connections_from_machine"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.get_connections_from_machine">[docs]</a>    <span class="k">def</span> <span class="nf">get_connections_from_machine</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">edge</span><span class="p">,</span> <span class="n">routing_infos</span><span class="p">,</span>
-            <span class="n">synapse_information</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">using_extra_monitor_cores</span><span class="p">,</span>
-            <span class="n">placements</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">monitor_api</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fixed_routes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">extra_monitor</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="sd">&quot;&quot;&quot; Get the connections from the machine post-run.</span>
 
 <span class="sd">        :param ~spinnman.Transceiver transceiver:</span>
-<span class="sd">        :param ~pacman.model.placements.Placement placement:</span>
-<span class="sd">        :param ProjectionMachineEdge edge:</span>
-<span class="sd">        :param ~pacman.model.routing_info.RoutingInfo routing_infos:</span>
-<span class="sd">        :param SynapseInformation synapse_information:</span>
-<span class="sd">        :param int machine_time_step: microseconds</span>
-<span class="sd">        :param bool using_extra_monitor_cores:</span>
-<span class="sd">        :param placements:</span>
-<span class="sd">        :type placements: None or ~pacman.model.placements.Placements</span>
-<span class="sd">        :param monitor_api:</span>
-<span class="sd">        :type monitor_api: None or \</span>
-<span class="sd">            ~spinn_front_end_common.utility_models.DataSpeedUpPacketGatherMachineVertex</span>
-<span class="sd">        :param fixed_routes:</span>
-<span class="sd">        :param extra_monitor: the extra monitor for this</span>
-<span class="sd">        :type fixed_routes: None or \</span>
-<span class="sd">            dict(tuple(int,int),~spinn_machine.FixedRouteEntry)</span>
+<span class="sd">            How to read the connection data</span>
+<span class="sd">        :param ~pacman.model.placements.Placements placements:</span>
+<span class="sd">            Where the connection data is on the machine</span>
+<span class="sd">        :param ProjectionApplicationEdge app_edge:</span>
+<span class="sd">            The edge for which the data is being read</span>
+<span class="sd">        :param SynapseInformation synapse_info:</span>
+<span class="sd">            The specific projection within the edge</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
     <span class="nd">@abstractmethod</span>

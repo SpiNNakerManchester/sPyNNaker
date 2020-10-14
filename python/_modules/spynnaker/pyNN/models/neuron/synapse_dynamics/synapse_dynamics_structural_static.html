@@ -332,7 +332,12 @@
                     <span class="n">create_mars_kiss_seeds</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__rng</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__seed</span><span class="p">))</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__seeds</span><span class="p">[</span><span class="n">app_vertex</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">create_mars_kiss_seeds</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__rng</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__seed</span><span class="p">)</span></div></div>
+            <span class="k">return</span> <span class="n">create_mars_kiss_seeds</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__rng</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__seed</span><span class="p">)</span></div>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">SynapseDynamicsStatic</span><span class="o">.</span><span class="n">generate_on_machine</span><span class="p">)</span>
+<div class="viewcode-block" id="SynapseDynamicsStructuralStatic.generate_on_machine"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralStatic.generate_on_machine">[docs]</a>    <span class="k">def</span> <span class="nf">generate_on_machine</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Never generate structural connections on the machine</span>
+        <span class="k">return</span> <span class="kc">False</span></div></div>
 </pre></div>
 
           </div>

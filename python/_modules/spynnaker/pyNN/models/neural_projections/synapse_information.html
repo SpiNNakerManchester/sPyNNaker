@@ -98,12 +98,14 @@
         <span class="s2">&quot;__rng&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__synapse_dynamics&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__synapse_type&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__is_virtual_machine&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__weights&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__delays&quot;</span><span class="p">]</span>
+        <span class="s2">&quot;__delays&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__pre_run_connection_holders&quot;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connector</span><span class="p">,</span> <span class="n">pre_population</span><span class="p">,</span> <span class="n">post_population</span><span class="p">,</span>
                  <span class="n">prepop_is_view</span><span class="p">,</span> <span class="n">postpop_is_view</span><span class="p">,</span> <span class="n">rng</span><span class="p">,</span>
-                 <span class="n">synapse_dynamics</span><span class="p">,</span> <span class="n">synapse_type</span><span class="p">,</span>
+                 <span class="n">synapse_dynamics</span><span class="p">,</span> <span class="n">synapse_type</span><span class="p">,</span> <span class="n">is_virtual_machine</span><span class="p">,</span>
                  <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">delays</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param AbstractConnector connector:</span>
@@ -119,6 +121,7 @@
 <span class="sd">        :param AbstractSynapseDynamics synapse_dynamics:</span>
 <span class="sd">            The dynamic behaviour of the synapse</span>
 <span class="sd">        :param AbstractSynapseType synapse_type: The type of the synapse</span>
+<span class="sd">        :param bool is_virtual_machine: Whether the machine is virtual</span>
 <span class="sd">        :param weights: The synaptic weights</span>
 <span class="sd">        :type weights: float or list(float) or ~numpy.ndarray(float) or None</span>
 <span class="sd">        :param delays: The total synaptic delays</span>
@@ -134,6 +137,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_type</span> <span class="o">=</span> <span class="n">synapse_type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__weights</span> <span class="o">=</span> <span class="n">weights</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__delays</span> <span class="o">=</span> <span class="n">delays</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__is_virtual_machine</span> <span class="o">=</span> <span class="n">is_virtual_machine</span>
+
+        <span class="c1"># Make a list of holders to be updated</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__pre_run_connection_holders</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">connector</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -242,12 +249,40 @@
 <span class="sd">            may have already been so done)</span>
 <span class="sd">        :rtype: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># If we are using a virtual machine, we can&#39;t generate on the machine</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__is_virtual_machine</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
         <span class="n">connector_gen</span> <span class="o">=</span> <span class="p">(</span>
             <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">connector</span><span class="p">,</span> <span class="n">AbstractGenerateConnectorOnMachine</span><span class="p">)</span> <span class="ow">and</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">connector</span><span class="o">.</span><span class="n">generate_on_machine</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">delays</span><span class="p">))</span>
-        <span class="n">synapse_gen</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">synapse_dynamics</span><span class="p">,</span> <span class="n">AbstractGenerateOnMachine</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">connector_gen</span> <span class="ow">and</span> <span class="n">synapse_gen</span></div></div>
+        <span class="n">synapse_gen</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">synapse_dynamics</span><span class="p">,</span> <span class="n">AbstractGenerateOnMachine</span><span class="p">)</span> <span class="ow">and</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">generate_on_machine</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">connector_gen</span> <span class="ow">and</span> <span class="n">synapse_gen</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">pre_run_connection_holders</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The list of connection holders to be filled in before run</span>
+
+<span class="sd">        :rtype: list(ConnectionHolder)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pre_run_connection_holders</span>
+
+<div class="viewcode-block" id="SynapseInformation.add_pre_run_connection_holder"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation.add_pre_run_connection_holder">[docs]</a>    <span class="k">def</span> <span class="nf">add_pre_run_connection_holder</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_run_connection_holder</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Add a connection holder that will be filled in before run</span>
+
+<span class="sd">        :param ConnectionHolder pre_run_connection_holder:</span>
+<span class="sd">            The connection holder to be added</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__pre_run_connection_holders</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pre_run_connection_holder</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SynapseInformation.finish_connection_holders"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation.finish_connection_holders">[docs]</a>    <span class="k">def</span> <span class="nf">finish_connection_holders</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Finish all the connection holders, and clear the list so that they</span>
+<span class="sd">            are not generated again later</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">holder</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pre_run_connection_holders</span><span class="p">:</span>
+            <span class="n">holder</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pre_run_connection_holders</span><span class="p">[:]</span></div></div>
 </pre></div>
 
           </div>

@@ -102,7 +102,7 @@
     <span class="nd">@abstractmethod</span>
 <div class="viewcode-block" id="AbstractPlasticSynapseDynamics.get_plastic_synaptic_data"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractPlasticSynapseDynamics.get_plastic_synaptic_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_plastic_synaptic_data</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">connections</span><span class="p">,</span> <span class="n">connection_row_indices</span><span class="p">,</span> <span class="n">n_rows</span><span class="p">,</span>
-            <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">):</span>
+            <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">max_n_synapses</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the fixed-plastic data, and plastic-plastic data for each row,\</span>
 <span class="sd">            and lengths for the fixed_plastic and plastic-plastic parts of\</span>
 <span class="sd">            each row.</span>
@@ -116,11 +116,14 @@
 <span class="sd">        Lengths are returned as an array made up of an integer for each row,\</span>
 <span class="sd">        for each of the fixed-plastic and plastic-plastic regions.</span>
 
-<span class="sd">        :param ~numpy.ndarray connections:</span>
+<span class="sd">        :param ~numpy.ndarray connections: The connections to get data for</span>
 <span class="sd">        :param ~numpy.ndarray connection_row_indices:</span>
-<span class="sd">        :param int n_rows:</span>
+<span class="sd">            The row into which each connection should go</span>
+<span class="sd">        :param int n_rows: The total number of rows</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice post_vertex_slice:</span>
-<span class="sd">        :param int n_synapse_types:</span>
+<span class="sd">            The slice of the post vertex to get the connections for</span>
+<span class="sd">        :param int n_synapse_types: The number of synapse types</span>
+<span class="sd">        :param int max_n_synapses: The maximum number of synapses to generate</span>
 <span class="sd">        :return: (fp_data, pp_data, fp_size, pp_size)</span>
 <span class="sd">        :rtype:</span>
 <span class="sd">            tuple(~numpy.ndarray, ~numpy.ndarray, ~numpy.ndarray,</span>

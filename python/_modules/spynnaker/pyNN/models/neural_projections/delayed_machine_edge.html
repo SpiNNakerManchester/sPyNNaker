@@ -83,7 +83,8 @@
 
 <div class="viewcode-block" id="DelayedMachineEdge"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.DelayedMachineEdge">[docs]</a><span class="k">class</span> <span class="nc">DelayedMachineEdge</span><span class="p">(</span><span class="n">MachineEdge</span><span class="p">):</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;__synapse_information&quot;</span><span class="p">]</span>
+        <span class="s2">&quot;__synapse_information&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__undelayed_edge&quot;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">synapse_information</span><span class="p">,</span> <span class="n">pre_vertex</span><span class="p">,</span> <span class="n">post_vertex</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span>
@@ -99,7 +100,25 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">DelayedMachineEdge</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">pre_vertex</span><span class="p">,</span> <span class="n">post_vertex</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">traffic_weight</span><span class="o">=</span><span class="n">weight</span><span class="p">,</span>
             <span class="n">app_edge</span><span class="o">=</span><span class="n">app_edge</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span> <span class="o">=</span> <span class="n">synapse_information</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span> <span class="o">=</span> <span class="n">synapse_information</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__undelayed_edge</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">undelayed_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the edge used for Projections without extended delays</span>
+
+<span class="sd">        :rtype: ProjectionMachineEdge or None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__undelayed_edge</span>
+
+    <span class="nd">@undelayed_edge</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">undelayed_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">undelayed_edge</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Set the edge used for Projections without extended delays</span>
+
+<span class="sd">        :param ProjectionMachineEdge undelayed_edge:</span>
+<span class="sd">            The edge to set</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__undelayed_edge</span> <span class="o">=</span> <span class="n">undelayed_edge</span></div>
 </pre></div>
 
           </div>

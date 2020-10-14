@@ -86,19 +86,32 @@
 
 <div class="viewcode-block" id="DelayedApplicationEdge"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.DelayedApplicationEdge">[docs]</a><span class="k">class</span> <span class="nc">DelayedApplicationEdge</span><span class="p">(</span><span class="n">ApplicationEdge</span><span class="p">,</span> <span class="n">AbstractSlicesConnect</span><span class="p">):</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;__synapse_information&quot;</span><span class="p">]</span>
+        <span class="s2">&quot;__synapse_information&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__machine_edges_by_slices&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__undelayed_edge&quot;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">pre_vertex</span><span class="p">,</span> <span class="n">post_vertex</span><span class="p">,</span> <span class="n">synapse_information</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">pre_vertex</span><span class="p">,</span> <span class="n">post_vertex</span><span class="p">,</span> <span class="n">synapse_information</span><span class="p">,</span> <span class="n">undelayed_edge</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param DelayExtensionVertex pre_vertex:</span>
+<span class="sd">            The delay extension at the start of the edge</span>
 <span class="sd">        :param AbstractPopulationVertex post_vertex:</span>
+<span class="sd">            The target of the synapses</span>
 <span class="sd">        :param SynapseInformation synapse_information:</span>
+<span class="sd">            The synapse information on this edge</span>
+<span class="sd">        :param ProjectionApplicationEdge undelayed_edge:</span>
+<span class="sd">            The edge that is used for projections without extended delays</span>
 <span class="sd">        :param str label:</span>
+<span class="sd">            The edge label</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">DelayedApplicationEdge</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">pre_vertex</span><span class="p">,</span> <span class="n">post_vertex</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span> <span class="o">=</span> <span class="p">[</span><span class="n">synapse_information</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__undelayed_edge</span> <span class="o">=</span> <span class="n">undelayed_edge</span>
+
+        <span class="c1"># Keep the machine edges by pre- and post-slice</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__machine_edges_by_slices</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">synapse_information</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -113,10 +126,39 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">synapse_information</span><span class="p">)</span></div>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">undelayed_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the edge that for projections without extended delays</span>
+
+<span class="sd">        :rtype: ProjectionApplicationEdge</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__undelayed_edge</span>
+
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">ApplicationEdge</span><span class="o">.</span><span class="n">_create_machine_edge</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">_create_machine_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_vertex</span><span class="p">,</span> <span class="n">post_vertex</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">DelayedMachineEdge</span><span class="p">(</span>
+        <span class="n">edge</span> <span class="o">=</span> <span class="n">DelayedMachineEdge</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span><span class="p">,</span> <span class="n">pre_vertex</span><span class="p">,</span> <span class="n">post_vertex</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__machine_edges_by_slices</span><span class="p">[</span>
+            <span class="n">pre_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">,</span> <span class="n">post_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">]</span> <span class="o">=</span> <span class="n">edge</span>
+        <span class="c1"># Set the undelayed machine vertex if it already exists</span>
+        <span class="n">undelayed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__undelayed_edge</span><span class="o">.</span><span class="n">_get_machine_edge</span><span class="p">(</span>
+            <span class="n">pre_vertex</span><span class="p">,</span> <span class="n">post_vertex</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">undelayed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">undelayed</span><span class="o">.</span><span class="n">delay_edge</span> <span class="o">=</span> <span class="n">edge</span>
+            <span class="n">edge</span><span class="o">.</span><span class="n">undelayed_edge</span> <span class="o">=</span> <span class="n">undelayed</span>
+        <span class="k">return</span> <span class="n">edge</span>
+
+    <span class="k">def</span> <span class="nf">_get_machine_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_vertex</span><span class="p">,</span> <span class="n">post_vertex</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get a specific machine edge from this edge</span>
+
+<span class="sd">        :param DelayExtensionMachineVertex pre_vertex:</span>
+<span class="sd">            The vertex at the start of the machine edge</span>
+<span class="sd">        :param PopulationMachineVertex post_vertes:</span>
+<span class="sd">            The vertex at the end of the machine edge</span>
+<span class="sd">        :rtype: DelayedMachineEdge or None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__machine_edges_by_slices</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">,</span> <span class="n">post_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">))</span>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSlicesConnect</span><span class="o">.</span><span class="n">could_connect</span><span class="p">)</span>
 <div class="viewcode-block" id="DelayedApplicationEdge.could_connect"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.DelayedApplicationEdge.could_connect">[docs]</a>    <span class="k">def</span> <span class="nf">could_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_slice</span><span class="p">,</span> <span class="n">post_slice</span><span class="p">):</span>

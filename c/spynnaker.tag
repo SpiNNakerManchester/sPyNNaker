@@ -4,9 +4,9 @@
     <name>bit_field_expander.c</name>
     <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/bit_field_expander/</path>
     <filename>bit__field__expander_8c.html</filename>
-    <includes id="population__table_8h" name="population_table.h" local="no" imported="no">neuron/population_table/population_table.h</includes>
-    <includes id="direct__synapses_8h" name="direct_synapses.h" local="no" imported="no">neuron/direct_synapses.h</includes>
     <includes id="synapse__row_8h" name="synapse_row.h" local="no" imported="no">neuron/synapse_row.h</includes>
+    <includes id="direct__synapses_8h" name="direct_synapses.h" local="no" imported="no">neuron/direct_synapses.h</includes>
+    <includes id="population__table_8h" name="population_table.h" local="no" imported="no">neuron/population_table/population_table.h</includes>
     <includes id="sp__structs_8h" name="sp_structs.h" local="no" imported="no">neuron/structural_plasticity/synaptogenesis/sp_structs.h</includes>
     <class kind="struct">builder_region_struct</class>
     <member kind="define">
@@ -58,20 +58,6 @@
       <anchor>a4a87539383a9998fa1063e982f63e0a3</anchor>
       <arglist>(void)</arglist>
     </member>
-    <member kind="function" static="yes">
-      <type>static uint32_t</type>
-      <name>n_neurons_from_key</name>
-      <anchorfile>bit__field__expander_8c.html</anchorfile>
-      <anchor>a0d718b635c4c5ed82e91c088a8621770</anchor>
-      <arglist>(uint32_t key)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static bool</type>
-      <name>create_fake_bit_field</name>
-      <anchorfile>bit__field__expander_8c.html</anchorfile>
-      <anchor>a7b753734bcf4c9b9325d0e128fe7fd4f</anchor>
-      <arglist>(void)</arglist>
-    </member>
     <member kind="function">
       <type>bool</type>
       <name>initialise</name>
@@ -95,9 +81,16 @@
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
-      <name>sort_by_redunancy</name>
+      <name>sort_by_key</name>
       <anchorfile>bit__field__expander_8c.html</anchorfile>
-      <anchor>adea012901ce452aebbfc9dd88abaa69a</anchor>
+      <anchor>af9ca4dbc2f71c68e5140742c020f8380</anchor>
+      <arglist>(void)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>determine_redundancy</name>
+      <anchorfile>bit__field__expander_8c.html</anchorfile>
+      <anchor>a73a98b51cca3f71b0eee0817f2d6eab8</anchor>
       <arglist>(void)</arglist>
     </member>
     <member kind="function">
@@ -1824,33 +1817,6 @@
     </member>
   </compound>
   <compound kind="file">
-    <name>bit_field_filter.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/</path>
-    <filename>bit__field__filter_8h.html</filename>
-    <includes id="population__table_8h" name="population_table.h" local="yes" imported="no">population_table/population_table.h</includes>
-    <member kind="function" static="yes">
-      <type>static bool</type>
-      <name>bit_field_filter_initialise</name>
-      <anchorfile>bit__field__filter_8h.html</anchorfile>
-      <anchor>a11fea8414f04f6999b37610b982a9850</anchor>
-      <arglist>(address_t bitfield_region_address)</arglist>
-    </member>
-    <member kind="variable">
-      <type>bit_field_t *</type>
-      <name>connectivity_bit_field</name>
-      <anchorfile>bit__field__filter_8h.html</anchorfile>
-      <anchor>af5132d7f50c964c1994dcefe0a008a88</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint32_t</type>
-      <name>failed_bit_field_reads</name>
-      <anchorfile>bit__field__filter_8h.html</anchorfile>
-      <anchor>a3fe8cdf904112ab379545b0d8f7a5d20</anchor>
-      <arglist></arglist>
-    </member>
-  </compound>
-  <compound kind="file">
     <name>c_main.c</name>
     <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/</path>
     <filename>c__main_8c.html</filename>
@@ -1864,7 +1830,6 @@
     <includes id="synaptogenesis__dynamics_8h" name="synaptogenesis_dynamics.h" local="yes" imported="no">structural_plasticity/synaptogenesis_dynamics.h</includes>
     <includes id="neuron_2profile__tags_8h" name="profile_tags.h" local="yes" imported="no">profile_tags.h</includes>
     <includes id="direct__synapses_8h" name="direct_synapses.h" local="yes" imported="no">direct_synapses.h</includes>
-    <includes id="bit__field__filter_8h" name="bit_field_filter.h" local="yes" imported="no">bit_field_filter.h</includes>
     <class kind="struct">neuron_provenance</class>
     <member kind="define">
       <type>#define</type>
@@ -5270,8 +5235,8 @@
       <type>bool</type>
       <name>population_table_initialise</name>
       <anchorfile>population__table_8h.html</anchorfile>
-      <anchor>a5f92af4dd47e65504cbbbcb265083196</anchor>
-      <arglist>(address_t table_address, address_t synapse_rows_address, address_t direct_rows_address, uint32_t *row_max_n_words)</arglist>
+      <anchor>a21613340771ef9ddc391d6bc3914755d</anchor>
+      <arglist>(address_t table_address, address_t synapse_rows_address, address_t direct_rows_address, filter_region_t *bitfield_address, uint32_t *row_max_n_words)</arglist>
     </member>
     <member kind="function">
       <type>bool</type>
@@ -5281,74 +5246,39 @@
       <arglist>(spike_t spike, address_t *row_address, size_t *n_bytes_to_transfer)</arglist>
     </member>
     <member kind="function">
-      <type>int</type>
-      <name>population_table_position_in_the_master_pop_array</name>
-      <anchorfile>population__table_8h.html</anchorfile>
-      <anchor>a1d265f6b135058a82e5b5806b35c6539</anchor>
-      <arglist>(spike_t spike)</arglist>
-    </member>
-    <member kind="function">
       <type>bool</type>
       <name>population_table_get_next_address</name>
       <anchorfile>population__table_8h.html</anchorfile>
       <anchor>a6ab19e2b1b4c0ed25d126d7cd7763ccf</anchor>
       <arglist>(spike_t *spike, address_t *row_address, size_t *n_bytes_to_transfer)</arglist>
     </member>
-    <member kind="function">
+    <member kind="variable">
       <type>uint32_t</type>
-      <name>population_table_get_ghost_pop_table_searches</name>
+      <name>ghost_pop_table_searches</name>
       <anchorfile>population__table_8h.html</anchorfile>
-      <anchor>a3d02d2b908f0d3115192eb6010038b54</anchor>
-      <arglist>(void)</arglist>
+      <anchor>ac69edc9d8d10785e6775d3805c8e7037</anchor>
+      <arglist></arglist>
     </member>
-    <member kind="function">
-      <type>void</type>
-      <name>population_table_set_connectivity_bit_field</name>
-      <anchorfile>population__table_8h.html</anchorfile>
-      <anchor>ac70a245279c010501448e8bf7d985bd6</anchor>
-      <arglist>(bit_field_t *connectivity_bit_fields)</arglist>
-    </member>
-    <member kind="function">
+    <member kind="variable">
       <type>uint32_t</type>
-      <name>population_table_get_invalid_master_pop_hits</name>
+      <name>invalid_master_pop_hits</name>
       <anchorfile>population__table_8h.html</anchorfile>
-      <anchor>a7bbffa9367a5934939379717554169b9</anchor>
-      <arglist>(void)</arglist>
+      <anchor>a40086bc81cde7081da9ed9b52b6bfaff</anchor>
+      <arglist></arglist>
     </member>
-    <member kind="function">
-      <type>bool</type>
-      <name>population_table_shut_down</name>
-      <anchorfile>population__table_8h.html</anchorfile>
-      <anchor>afcbeec022a055055de66ed0e4d9dfb54</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function">
+    <member kind="variable">
       <type>uint32_t</type>
-      <name>population_table_length</name>
+      <name>failed_bit_field_reads</name>
       <anchorfile>population__table_8h.html</anchorfile>
-      <anchor>a1fbc6889b4753930ba5be91449308c35</anchor>
-      <arglist>(void)</arglist>
+      <anchor>a3fe8cdf904112ab379545b0d8f7a5d20</anchor>
+      <arglist></arglist>
     </member>
-    <member kind="function">
-      <type>spike_t</type>
-      <name>population_table_get_spike_for_index</name>
-      <anchorfile>population__table_8h.html</anchorfile>
-      <anchor>af6cde3f3fba19558d03381d2b9bc2456</anchor>
-      <arglist>(uint32_t index)</arglist>
-    </member>
-    <member kind="function">
+    <member kind="variable">
       <type>uint32_t</type>
-      <name>population_table_get_mask_for_entry</name>
+      <name>bit_field_filtered_packets</name>
       <anchorfile>population__table_8h.html</anchorfile>
-      <anchor>a2f82195b320a1d9ce7e00129ac59af7e</anchor>
-      <arglist>(uint32_t index)</arglist>
-    </member>
-    <member kind="function">
-      <type>uint32_t</type>
-      <name>population_table_get_filtered_packet_count</name>
-      <anchorfile>population__table_8h.html</anchorfile>
-      <anchor>ac569b455d9ea27c712612bb97c72c7bd</anchor>
-      <arglist>(void)</arglist>
+      <anchor>a442bf46f572f3fc97a52421b7e1a0f87</anchor>
+      <arglist></arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -5358,7 +5288,9 @@
     <includes id="population__table_8h" name="population_table.h" local="yes" imported="no">population_table.h</includes>
     <includes id="synapse__row_8h" name="synapse_row.h" local="no" imported="no">neuron/synapse_row.h</includes>
     <class kind="struct">master_population_table_entry</class>
+    <class kind="struct">extra_info</class>
     <class kind="struct">address_and_row_length</class>
+    <class kind="union">address_list_entry</class>
     <member kind="define">
       <type>#define</type>
       <name>BITS_PER_WORD</name>
@@ -5380,11 +5312,32 @@
       <anchor>a5f369817d958cb4c367752b5558957b1</anchor>
       <arglist></arglist>
     </member>
+    <member kind="define">
+      <type>#define</type>
+      <name>N_ADDRESS_BITS</name>
+      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
+      <anchor>a2233d5046582aeea3564c6ec3e72c553</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="define">
+      <type>#define</type>
+      <name>INDIRECT_ADDRESS_SHIFT</name>
+      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
+      <anchor>a36896ff3554f8b8ee7fe1599ec6c26f5</anchor>
+      <arglist></arglist>
+    </member>
     <member kind="function" static="yes">
       <type>static uint32_t</type>
       <name>get_direct_address</name>
       <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
       <anchor>a0f6729803ce65a621db8be58bfa1d972</anchor>
+      <arglist>(address_and_row_length entry)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static uint32_t</type>
+      <name>get_offset</name>
+      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
+      <anchor>a30c2c744e7524091a4a2b64d231fdf4f</anchor>
       <arglist>(address_and_row_length entry)</arglist>
     </member>
     <member kind="function" static="yes">
@@ -5402,11 +5355,18 @@
       <arglist>(address_and_row_length entry)</arglist>
     </member>
     <member kind="function" static="yes">
-      <type>static bool</type>
-      <name>is_single</name>
+      <type>static uint32_t</type>
+      <name>get_core_index</name>
       <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>af72324465b75c90f99a16bd9ac82599a</anchor>
-      <arglist>(address_and_row_length entry)</arglist>
+      <anchor>abbbbe3092321f99b294c4143a2438c5e</anchor>
+      <arglist>(extra_info extra, spike_t spike)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static uint32_t</type>
+      <name>get_core_sum</name>
+      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
+      <anchor>a5d4827066ef5e80065b7008054bd7686</anchor>
+      <arglist>(extra_info extra, spike_t spike)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static uint32_t</type>
@@ -5416,18 +5376,60 @@
       <arglist>(master_population_table_entry entry, spike_t spike)</arglist>
     </member>
     <member kind="function" static="yes">
+      <type>static uint32_t</type>
+      <name>get_local_neuron_id</name>
+      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
+      <anchor>a0e1b8eb97598151a700431dc6226d089</anchor>
+      <arglist>(master_population_table_entry entry, extra_info extra, spike_t spike)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static uint32_t</type>
+      <name>get_extended_neuron_id</name>
+      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
+      <anchor>ade00099bbb9f871ad526b30d6446d03c</anchor>
+      <arglist>(master_population_table_entry entry, extra_info extra, spike_t spike)</arglist>
+    </member>
+    <member kind="function" static="yes">
       <type>static void</type>
       <name>print_master_population_table</name>
       <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
       <anchor>a3c2c10dcc54c9ec95a730e4c1324a2c5</anchor>
       <arglist>(void)</arglist>
     </member>
+    <member kind="function" static="yes">
+      <type>static bool</type>
+      <name>matches</name>
+      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
+      <anchor>a84c16f8e8fdf9909791cbca87e983dde</anchor>
+      <arglist>(uint32_t mp_i, uint32_t key)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>print_bitfields</name>
+      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
+      <anchor>ab9711943341e2f63e48945e4dfee5099</anchor>
+      <arglist>(uint32_t mp_i, uint32_t start, uint32_t end, filter_info_t *filters)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static bool</type>
+      <name>bit_field_filter_initialise</name>
+      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
+      <anchor>a6f869ab6bee8e54b3a6d8efb0c8fbc3c</anchor>
+      <arglist>(filter_region_t *filter_region)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static bool</type>
+      <name>population_table_position_in_the_master_pop_array</name>
+      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
+      <anchor>ab4759e505b101d5eb919685e2bfb55b0</anchor>
+      <arglist>(spike_t spike, uint32_t *position)</arglist>
+    </member>
     <member kind="function">
       <type>bool</type>
       <name>population_table_initialise</name>
       <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a5f92af4dd47e65504cbbbcb265083196</anchor>
-      <arglist>(address_t table_address, address_t synapse_rows_address, address_t direct_rows_address, uint32_t *row_max_n_words)</arglist>
+      <anchor>a21613340771ef9ddc391d6bc3914755d</anchor>
+      <arglist>(address_t table_address, address_t synapse_rows_address, address_t direct_rows_address, filter_region_t *bitfield_address, uint32_t *row_max_n_words)</arglist>
     </member>
     <member kind="function">
       <type>bool</type>
@@ -5437,74 +5439,11 @@
       <arglist>(spike_t spike, address_t *row_address, size_t *n_bytes_to_transfer)</arglist>
     </member>
     <member kind="function">
-      <type>int</type>
-      <name>population_table_position_in_the_master_pop_array</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a1d265f6b135058a82e5b5806b35c6539</anchor>
-      <arglist>(spike_t spike)</arglist>
-    </member>
-    <member kind="function">
       <type>bool</type>
       <name>population_table_get_next_address</name>
       <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
       <anchor>a6ab19e2b1b4c0ed25d126d7cd7763ccf</anchor>
       <arglist>(spike_t *spike, address_t *row_address, size_t *n_bytes_to_transfer)</arglist>
-    </member>
-    <member kind="function">
-      <type>uint32_t</type>
-      <name>population_table_get_ghost_pop_table_searches</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a3d02d2b908f0d3115192eb6010038b54</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function">
-      <type>uint32_t</type>
-      <name>population_table_get_invalid_master_pop_hits</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a7bbffa9367a5934939379717554169b9</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
-      <name>population_table_set_connectivity_bit_field</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>ac70a245279c010501448e8bf7d985bd6</anchor>
-      <arglist>(bit_field_t *connectivity_bit_fields)</arglist>
-    </member>
-    <member kind="function">
-      <type>bool</type>
-      <name>population_table_shut_down</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>afcbeec022a055055de66ed0e4d9dfb54</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function">
-      <type>uint32_t</type>
-      <name>population_table_length</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a1fbc6889b4753930ba5be91449308c35</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function">
-      <type>spike_t</type>
-      <name>population_table_get_spike_for_index</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>af6cde3f3fba19558d03381d2b9bc2456</anchor>
-      <arglist>(uint32_t index)</arglist>
-    </member>
-    <member kind="function">
-      <type>uint32_t</type>
-      <name>population_table_get_mask_for_entry</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a2f82195b320a1d9ce7e00129ac59af7e</anchor>
-      <arglist>(uint32_t index)</arglist>
-    </member>
-    <member kind="function">
-      <type>uint32_t</type>
-      <name>population_table_get_filtered_packet_count</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>ac569b455d9ea27c712612bb97c72c7bd</anchor>
-      <arglist>(void)</arglist>
     </member>
     <member kind="variable" static="yes">
       <type>static master_population_table_entry *</type>
@@ -5521,17 +5460,17 @@
       <arglist></arglist>
     </member>
     <member kind="variable" static="yes">
-      <type>static address_and_row_length *</type>
+      <type>static address_list_entry *</type>
       <name>address_list</name>
       <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>ab790496cf8bf2823f3da09aa7bb6e40f</anchor>
+      <anchor>a7dca3eb9efb99180a67a18d70e3e7e0d</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable" static="yes">
-      <type>static address_t</type>
+      <type>static uint32_t</type>
       <name>synaptic_rows_base_address</name>
       <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>ad2ce101a5edabbd6b4f3d3e0f61d4592</anchor>
+      <anchor>a3808a62ff90d026b89ca198c9a503295</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable" static="yes">
@@ -5539,20 +5478,6 @@
       <name>direct_rows_base_address</name>
       <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
       <anchor>a53f683b47d1883d1fe9dc988c1b6a101</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" static="yes">
-      <type>static uint32_t</type>
-      <name>ghost_pop_table_searches</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>ac69edc9d8d10785e6775d3805c8e7037</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" static="yes">
-      <type>static uint32_t</type>
-      <name>invalid_master_pop_hits</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a40086bc81cde7081da9ed9b52b6bfaff</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable" static="yes">
@@ -5584,17 +5509,38 @@
       <arglist></arglist>
     </member>
     <member kind="variable" static="yes">
-      <type>static uint32_t</type>
-      <name>bit_field_filtered_packets</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a442bf46f572f3fc97a52421b7e1a0f87</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>bit_field_t *</type>
+      <type>static bit_field_t *</type>
       <name>connectivity_bit_field</name>
       <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
       <anchor>af5132d7f50c964c1994dcefe0a008a88</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>ghost_pop_table_searches</name>
+      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
+      <anchor>ac69edc9d8d10785e6775d3805c8e7037</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>invalid_master_pop_hits</name>
+      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
+      <anchor>a40086bc81cde7081da9ed9b52b6bfaff</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>failed_bit_field_reads</name>
+      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
+      <anchor>a3fe8cdf904112ab379545b0d8f7a5d20</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>bit_field_filtered_packets</name>
+      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
+      <anchor>a442bf46f572f3fc97a52421b7e1a0f87</anchor>
       <arglist></arglist>
     </member>
     <member kind="function" static="yes">
@@ -5602,6 +5548,13 @@
       <name>get_direct_address</name>
       <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
       <anchor>a0f6729803ce65a621db8be58bfa1d972</anchor>
+      <arglist>(address_and_row_length entry)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static uint32_t</type>
+      <name>get_offset</name>
+      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
+      <anchor>a30c2c744e7524091a4a2b64d231fdf4f</anchor>
       <arglist>(address_and_row_length entry)</arglist>
     </member>
     <member kind="function" static="yes">
@@ -5619,11 +5572,18 @@
       <arglist>(address_and_row_length entry)</arglist>
     </member>
     <member kind="function" static="yes">
-      <type>static bool</type>
-      <name>is_single</name>
+      <type>static uint32_t</type>
+      <name>get_core_index</name>
       <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>af72324465b75c90f99a16bd9ac82599a</anchor>
-      <arglist>(address_and_row_length entry)</arglist>
+      <anchor>abbbbe3092321f99b294c4143a2438c5e</anchor>
+      <arglist>(extra_info extra, spike_t spike)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static uint32_t</type>
+      <name>get_core_sum</name>
+      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
+      <anchor>a5d4827066ef5e80065b7008054bd7686</anchor>
+      <arglist>(extra_info extra, spike_t spike)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static uint32_t</type>
@@ -5633,18 +5593,60 @@
       <arglist>(master_population_table_entry entry, spike_t spike)</arglist>
     </member>
     <member kind="function" static="yes">
+      <type>static uint32_t</type>
+      <name>get_local_neuron_id</name>
+      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
+      <anchor>a0e1b8eb97598151a700431dc6226d089</anchor>
+      <arglist>(master_population_table_entry entry, extra_info extra, spike_t spike)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static uint32_t</type>
+      <name>get_extended_neuron_id</name>
+      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
+      <anchor>ade00099bbb9f871ad526b30d6446d03c</anchor>
+      <arglist>(master_population_table_entry entry, extra_info extra, spike_t spike)</arglist>
+    </member>
+    <member kind="function" static="yes">
       <type>static void</type>
       <name>print_master_population_table</name>
       <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
       <anchor>a3c2c10dcc54c9ec95a730e4c1324a2c5</anchor>
       <arglist>(void)</arglist>
     </member>
+    <member kind="function" static="yes">
+      <type>static bool</type>
+      <name>matches</name>
+      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
+      <anchor>a84c16f8e8fdf9909791cbca87e983dde</anchor>
+      <arglist>(uint32_t mp_i, uint32_t key)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>print_bitfields</name>
+      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
+      <anchor>ab9711943341e2f63e48945e4dfee5099</anchor>
+      <arglist>(uint32_t mp_i, uint32_t start, uint32_t end, filter_info_t *filters)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static bool</type>
+      <name>bit_field_filter_initialise</name>
+      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
+      <anchor>a6f869ab6bee8e54b3a6d8efb0c8fbc3c</anchor>
+      <arglist>(filter_region_t *filter_region)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static bool</type>
+      <name>population_table_position_in_the_master_pop_array</name>
+      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
+      <anchor>ab4759e505b101d5eb919685e2bfb55b0</anchor>
+      <arglist>(spike_t spike, uint32_t *position)</arglist>
+    </member>
     <member kind="function">
       <type>bool</type>
       <name>population_table_initialise</name>
       <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a5f92af4dd47e65504cbbbcb265083196</anchor>
-      <arglist>(address_t table_address, address_t synapse_rows_address, address_t direct_rows_address, uint32_t *row_max_n_words)</arglist>
+      <anchor>a21613340771ef9ddc391d6bc3914755d</anchor>
+      <arglist>(address_t table_address, address_t synapse_rows_address, address_t direct_rows_address, filter_region_t *bitfield_address, uint32_t *row_max_n_words)</arglist>
     </member>
     <member kind="function">
       <type>bool</type>
@@ -5654,74 +5656,11 @@
       <arglist>(spike_t spike, address_t *row_address, size_t *n_bytes_to_transfer)</arglist>
     </member>
     <member kind="function">
-      <type>int</type>
-      <name>population_table_position_in_the_master_pop_array</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a1d265f6b135058a82e5b5806b35c6539</anchor>
-      <arglist>(spike_t spike)</arglist>
-    </member>
-    <member kind="function">
       <type>bool</type>
       <name>population_table_get_next_address</name>
       <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
       <anchor>a6ab19e2b1b4c0ed25d126d7cd7763ccf</anchor>
       <arglist>(spike_t *spike, address_t *row_address, size_t *n_bytes_to_transfer)</arglist>
-    </member>
-    <member kind="function">
-      <type>uint32_t</type>
-      <name>population_table_get_ghost_pop_table_searches</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a3d02d2b908f0d3115192eb6010038b54</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function">
-      <type>uint32_t</type>
-      <name>population_table_get_invalid_master_pop_hits</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a7bbffa9367a5934939379717554169b9</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
-      <name>population_table_set_connectivity_bit_field</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>ac70a245279c010501448e8bf7d985bd6</anchor>
-      <arglist>(bit_field_t *connectivity_bit_fields)</arglist>
-    </member>
-    <member kind="function">
-      <type>bool</type>
-      <name>population_table_shut_down</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>afcbeec022a055055de66ed0e4d9dfb54</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function">
-      <type>uint32_t</type>
-      <name>population_table_length</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a1fbc6889b4753930ba5be91449308c35</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function">
-      <type>spike_t</type>
-      <name>population_table_get_spike_for_index</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>af6cde3f3fba19558d03381d2b9bc2456</anchor>
-      <arglist>(uint32_t index)</arglist>
-    </member>
-    <member kind="function">
-      <type>uint32_t</type>
-      <name>population_table_get_mask_for_entry</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a2f82195b320a1d9ce7e00129ac59af7e</anchor>
-      <arglist>(uint32_t index)</arglist>
-    </member>
-    <member kind="function">
-      <type>uint32_t</type>
-      <name>population_table_get_filtered_packet_count</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>ac569b455d9ea27c712612bb97c72c7bd</anchor>
-      <arglist>(void)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -5990,20 +5929,6 @@
     </member>
     <member kind="function">
       <type>uint32_t</type>
-      <name>spike_processing_get_ghost_pop_table_searches</name>
-      <anchorfile>spike__processing_8c.html</anchorfile>
-      <anchor>ac269ceb770c41478bd019449cb2543b1</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function">
-      <type>uint32_t</type>
-      <name>spike_processing_get_invalid_master_pop_table_hits</name>
-      <anchorfile>spike__processing_8c.html</anchorfile>
-      <anchor>a880beb84401c17c4f8e65f5502e080f2</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function">
-      <type>uint32_t</type>
       <name>spike_processing_get_dma_complete_count</name>
       <anchorfile>spike__processing_8c.html</anchorfile>
       <anchor>ab28afe0154629d9ab4edf637ea0c2d7c</anchor>
@@ -6014,13 +5939,6 @@
       <name>spike_processing_get_spike_processing_count</name>
       <anchorfile>spike__processing_8c.html</anchorfile>
       <anchor>a7bb0724cd581cb5a97d52fe55957fcc7</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function">
-      <type>circular_buffer</type>
-      <name>get_circular_buffer</name>
-      <anchorfile>spike__processing_8c.html</anchorfile>
-      <anchor>a8968e90552f7093d74a377ea01cf64a0</anchor>
       <arglist>(void)</arglist>
     </member>
     <member kind="function">
@@ -6186,13 +6104,6 @@
     </member>
     <member kind="function">
       <type>uint32_t</type>
-      <name>spike_processing_get_ghost_pop_table_searches</name>
-      <anchorfile>spike__processing_8h.html</anchorfile>
-      <anchor>ac269ceb770c41478bd019449cb2543b1</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function">
-      <type>uint32_t</type>
       <name>spike_processing_get_dma_complete_count</name>
       <anchorfile>spike__processing_8h.html</anchorfile>
       <anchor>ab28afe0154629d9ab4edf637ea0c2d7c</anchor>
@@ -6203,13 +6114,6 @@
       <name>spike_processing_get_spike_processing_count</name>
       <anchorfile>spike__processing_8h.html</anchorfile>
       <anchor>a7bb0724cd581cb5a97d52fe55957fcc7</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function">
-      <type>uint32_t</type>
-      <name>spike_processing_get_invalid_master_pop_table_hits</name>
-      <anchorfile>spike__processing_8h.html</anchorfile>
-      <anchor>a880beb84401c17c4f8e65f5502e080f2</anchor>
       <arglist>(void)</arglist>
     </member>
     <member kind="function">
@@ -9961,6 +9865,11 @@
       <arglist></arglist>
     </member>
   </compound>
+  <compound kind="union">
+    <name>address_list_entry</name>
+    <filename>population__table__binary__search__impl_8c.html</filename>
+    <anchor>unionaddress__list__entry</anchor>
+  </compound>
   <compound kind="struct">
     <name>all_kernel_params</name>
     <filename>param__generator__kernel_8h.html</filename>
@@ -10428,6 +10337,39 @@
     <anchor>structexpander__config</anchor>
   </compound>
   <compound kind="struct">
+    <name>extra_info</name>
+    <filename>population__table__binary__search__impl_8c.html</filename>
+    <anchor>structextra__info</anchor>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>core_mask</name>
+      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
+      <anchor>ac028589ad82b326aa64c8f71d8650c6a</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_words</name>
+      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
+      <anchor>a30fce9306ac45fadef4dd737d177d467</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>mask_shift</name>
+      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
+      <anchor>ad3098b05fff6bb47f13fe6f9cf975414</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_neurons</name>
+      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
+      <anchor>aa4dfc64a68bcb1cf34110d310f67530c</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
     <name>fixed_post</name>
     <filename>connection__generator__fixed__post_8h.html</filename>
     <anchor>structfixed__post</anchor>
@@ -10869,17 +10811,24 @@
       <arglist></arglist>
     </member>
     <member kind="variable">
-      <type>uint16_t</type>
+      <type>uint32_t</type>
       <name>start</name>
       <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>acbf633d5b9a24380b536ef418c9e2a8f</anchor>
+      <anchor>afb309e71903c16b95d149973e753b490</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
-      <type>uint16_t</type>
+      <type>uint32_t</type>
+      <name>extra_info_flag</name>
+      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
+      <anchor>a12b8d8e12253bc56e1bbd8581ad3da81</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
       <name>count</name>
       <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a87e093d6173e3a92b7780801e9f98806</anchor>
+      <anchor>a1b52e9a32daa7fddff954e66cbd3bd4e</anchor>
       <arglist></arglist>
     </member>
   </compound>

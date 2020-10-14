@@ -91,7 +91,8 @@
         <span class="n">MachineEdge</span><span class="p">,</span> <span class="n">AbstractWeightUpdatable</span><span class="p">,</span>
         <span class="n">AbstractProvidesLocalProvenanceData</span><span class="p">):</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;__synapse_information&quot;</span><span class="p">]</span>
+        <span class="s2">&quot;__synapse_information&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__delay_edge&quot;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">synapse_information</span><span class="p">,</span> <span class="n">pre_vertex</span><span class="p">,</span> <span class="n">post_vertex</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span>
@@ -109,6 +110,23 @@
             <span class="n">traffic_weight</span><span class="o">=</span><span class="n">traffic_weight</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span> <span class="o">=</span> <span class="n">synapse_information</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__delay_edge</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">delay_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the matching delay edge of this edge</span>
+
+<span class="sd">        :rtype: DelayedMachineEdge or None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delay_edge</span>
+
+    <span class="nd">@delay_edge</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">delay_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delay_edge</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Set the matching delay edge of this edge</span>
+
+<span class="sd">        :param DelayMachineEdge delay_edge: The edge to set</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__delay_edge</span> <span class="o">=</span> <span class="n">delay_edge</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">synapse_information</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

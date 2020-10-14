@@ -84,9 +84,9 @@ $(function() {
 <code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html">spin1_api.h</a>&gt;</code><br />
 <code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/data__specification_8h.html">data_specification.h</a>&gt;</code><br />
 <code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html">debug.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="population__table_8h_source.html">neuron/population_table/population_table.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="direct__synapses_8h_source.html">neuron/direct_synapses.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="synapse__row_8h_source.html">neuron/synapse_row.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="direct__synapses_8h_source.html">neuron/direct_synapses.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="population__table_8h_source.html">neuron/population_table/population_table.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="sp__structs_8h_source.html">neuron/structural_plasticity/synaptogenesis/sp_structs.h</a>&gt;</code><br />
 <code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/filter__info_8h.html">filter_info.h</a>&gt;</code><br />
 <code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/key__atom__map_8h.html">key_atom_map.h</a>&gt;</code><br />
@@ -131,12 +131,6 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bit__field__expander_8c.html#a4a87539383a9998fa1063e982f63e0a3">read_in_addresses</a> (void)</td></tr>
 <tr class="memdesc:a4a87539383a9998fa1063e982f63e0a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read in the vertex region addresses. <br /></td></tr>
 <tr class="separator:a4a87539383a9998fa1063e982f63e0a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0d718b635c4c5ed82e91c088a8621770"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bit__field__expander_8c.html#a0d718b635c4c5ed82e91c088a8621770">n_neurons_from_key</a> (uint32_t <a class="el" href="robot__motor__control_8c.html#a6d4ec8e4f3148d51041635da9986c3fa">key</a>)</td></tr>
-<tr class="memdesc:a0d718b635c4c5ed82e91c088a8621770"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deduce the number of neurons from the key.  <a href="bit__field__expander_8c.html#a0d718b635c4c5ed82e91c088a8621770">More...</a><br /></td></tr>
-<tr class="separator:a0d718b635c4c5ed82e91c088a8621770"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7b753734bcf4c9b9325d0e128fe7fd4f"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bit__field__expander_8c.html#a7b753734bcf4c9b9325d0e128fe7fd4f">create_fake_bit_field</a> (void)</td></tr>
-<tr class="memdesc:a7b753734bcf4c9b9325d0e128fe7fd4f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a fake bitfield where every bit is set to 1.  <a href="bit__field__expander_8c.html#a7b753734bcf4c9b9325d0e128fe7fd4f">More...</a><br /></td></tr>
-<tr class="separator:a7b753734bcf4c9b9325d0e128fe7fd4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a08e046aae605f0fc1ba5dc96b1d2f09a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bit__field__expander_8c.html#a08e046aae605f0fc1ba5dc96b1d2f09a">initialise</a> (void)</td></tr>
 <tr class="memdesc:a08e046aae605f0fc1ba5dc96b1d2f09a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up the master pop table and synaptic matrix for the bit field processing.  <a href="bit__field__expander_8c.html#a08e046aae605f0fc1ba5dc96b1d2f09a">More...</a><br /></td></tr>
 <tr class="separator:a08e046aae605f0fc1ba5dc96b1d2f09a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -146,10 +140,14 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bit_
 <tr class="memitem:a21dbad8aad4a6f1e8ceaa3fa74e8a988"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bit__field__expander_8c.html#a21dbad8aad4a6f1e8ceaa3fa74e8a988">do_sdram_read_and_test</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> row_address, uint32_t n_bytes_to_transfer)</td></tr>
 <tr class="memdesc:a21dbad8aad4a6f1e8ceaa3fa74e8a988"><td class="mdescLeft">&#160;</td><td class="mdescRight">Do an SDRAM read to get synaptic row.  <a href="bit__field__expander_8c.html#a21dbad8aad4a6f1e8ceaa3fa74e8a988">More...</a><br /></td></tr>
 <tr class="separator:a21dbad8aad4a6f1e8ceaa3fa74e8a988"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adea012901ce452aebbfc9dd88abaa69a"><td class="memItemLeft" align="right" valign="top"><a id="adea012901ce452aebbfc9dd88abaa69a"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bit__field__expander_8c.html#adea012901ce452aebbfc9dd88abaa69a">sort_by_redunancy</a> (void)</td></tr>
-<tr class="memdesc:adea012901ce452aebbfc9dd88abaa69a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sort the bitfield filters to remove redundancy. <br /></td></tr>
-<tr class="separator:adea012901ce452aebbfc9dd88abaa69a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af9ca4dbc2f71c68e5140742c020f8380"><td class="memItemLeft" align="right" valign="top"><a id="af9ca4dbc2f71c68e5140742c020f8380"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bit__field__expander_8c.html#af9ca4dbc2f71c68e5140742c020f8380">sort_by_key</a> (void)</td></tr>
+<tr class="memdesc:af9ca4dbc2f71c68e5140742c020f8380"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sort filters by key. <br /></td></tr>
+<tr class="separator:af9ca4dbc2f71c68e5140742c020f8380"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a73a98b51cca3f71b0eee0817f2d6eab8"><td class="memItemLeft" align="right" valign="top"><a id="a73a98b51cca3f71b0eee0817f2d6eab8"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bit__field__expander_8c.html#a73a98b51cca3f71b0eee0817f2d6eab8">determine_redundancy</a> (void)</td></tr>
+<tr class="memdesc:a73a98b51cca3f71b0eee0817f2d6eab8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine which bit fields are redundant. <br /></td></tr>
+<tr class="separator:a73a98b51cca3f71b0eee0817f2d6eab8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a05cd52c8292c3bab8005816a1b7d5645"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bit__field__expander_8c.html#a05cd52c8292c3bab8005816a1b7d5645">generate_bit_field</a> (void)</td></tr>
 <tr class="memdesc:a05cd52c8292c3bab8005816a1b7d5645"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create the bitfield for this master pop table and synaptic matrix.  <a href="bit__field__expander_8c.html#a05cd52c8292c3bab8005816a1b7d5645">More...</a><br /></td></tr>
 <tr class="separator:a05cd52c8292c3bab8005816a1b7d5645"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -320,74 +318,6 @@ What region to find structural plasticity information in. </td></tr>
 
 </div>
 </div>
-<a id="a0d718b635c4c5ed82e91c088a8621770"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0d718b635c4c5ed82e91c088a8621770">&#9670;&nbsp;</a></span>n_neurons_from_key()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static uint32_t n_neurons_from_key </td>
-          <td>(</td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>key</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Deduce the number of neurons from the key. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">key</td><td>the key to convert to n_neurons </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>the number of neurons from the key map based off this key </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="bit__field__expander_8c_source.html#l00207">207</a> of file <a class="el" href="bit__field__expander_8c_source.html">bit_field_expander.c</a>.</p>
-
-</div>
-</div>
-<a id="a7b753734bcf4c9b9325d0e128fe7fd4f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7b753734bcf4c9b9325d0e128fe7fd4f">&#9670;&nbsp;</a></span>create_fake_bit_field()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static bool create_fake_bit_field </td>
-          <td>(</td>
-          <td class="paramtype">void&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Create a fake bitfield where every bit is set to 1. </p>
-<dl class="section return"><dt>Returns</dt><dd>whether the creation of the fake bitfield was successful. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="bit__field__expander_8c_source.html#l00231">231</a> of file <a class="el" href="bit__field__expander_8c_source.html">bit_field_expander.c</a>.</p>
-
-</div>
-</div>
 <a id="a08e046aae605f0fc1ba5dc96b1d2f09a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a08e046aae605f0fc1ba5dc96b1d2f09a">&#9670;&nbsp;</a></span>initialise()</h2>
 
@@ -407,7 +337,7 @@ What region to find structural plasticity information in. </td></tr>
 <p>Set up the master pop table and synaptic matrix for the bit field processing. </p>
 <dl class="section return"><dt>Returns</dt><dd>whether the init was successful. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="bit__field__expander_8c_source.html#l00252">252</a> of file <a class="el" href="bit__field__expander_8c_source.html">bit_field_expander.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="bit__field__expander_8c_source.html#l00211">211</a> of file <a class="el" href="bit__field__expander_8c_source.html">bit_field_expander.c</a>.</p>
 
 </div>
 </div>
@@ -436,7 +366,7 @@ What region to find structural plasticity information in. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Whether there is target. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="bit__field__expander_8c_source.html#l00320">320</a> of file <a class="el" href="bit__field__expander_8c_source.html">bit_field_expander.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="bit__field__expander_8c_source.html#l00267">267</a> of file <a class="el" href="bit__field__expander_8c_source.html">bit_field_expander.c</a>.</p>
 
 </div>
 </div>
@@ -484,7 +414,7 @@ What region to find structural plasticity information in. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Whether there is target </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="bit__field__expander_8c_source.html#l00345">345</a> of file <a class="el" href="bit__field__expander_8c_source.html">bit_field_expander.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="bit__field__expander_8c_source.html#l00292">292</a> of file <a class="el" href="bit__field__expander_8c_source.html">bit_field_expander.c</a>.</p>
 
 </div>
 </div>
@@ -507,7 +437,7 @@ What region to find structural plasticity information in. </td></tr>
 <p>Create the bitfield for this master pop table and synaptic matrix. </p>
 <dl class="section return"><dt>Returns</dt><dd>Whether it was successful at generating the bitfield </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="bit__field__expander_8c_source.html#l00403">403</a> of file <a class="el" href="bit__field__expander_8c_source.html">bit_field_expander.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="bit__field__expander_8c_source.html#l00338">338</a> of file <a class="el" href="bit__field__expander_8c_source.html">bit_field_expander.c</a>.</p>
 
 </div>
 </div>
@@ -553,7 +483,7 @@ What region to find structural plasticity information in. </td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Oct 13 2020 23:58:48 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Oct 14 2020 11:07:52 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.17
 </small></address>
