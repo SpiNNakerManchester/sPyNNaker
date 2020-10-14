@@ -168,8 +168,9 @@ class DelayExtensionVertex(
         :param list(~pacman.model.graphs.common.Slice) post_slices:
         :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
-        :param ~spynnaker.pyNN.models.neural_projections.SynapseInformation \
-                synapse_information:
+        :param synapse_information:
+        :type synapse_information: \
+            ~spynnaker.pyNN.models.neural_projections.SynapseInformation
         :param int max_stage:
         :param int machine_time_step:
         :param int max_delay_per_stage:
