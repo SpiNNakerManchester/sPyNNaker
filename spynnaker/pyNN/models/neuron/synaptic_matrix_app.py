@@ -672,7 +672,7 @@ class SynapticMatrixApp(object):
 
         if self.__syn_mat_offset is not None:
             block = self.__get_block(transceiver, placement, synapses_address)
-            connections.append(self.__synapse_io.read_some_synapses(
+            connections.append(self.__synapse_io.convert_to_connections(
                 self.__synapse_info, pre_slice, self.__post_vertex_slice,
                 self.__max_row_info.undelayed_max_words,
                 self.__n_synapse_types, self.__weight_scales, block,
@@ -681,7 +681,7 @@ class SynapticMatrixApp(object):
         if self.__delay_syn_mat_offset is not None:
             block = self.__get_delayed_block(
                 transceiver, placement, synapses_address)
-            connections.append(self.__synapse_io.read_some_synapses(
+            connections.append(self.__synapse_io.convert_to_connections(
                 self.__synapse_info, pre_slice, self.__post_vertex_slice,
                 self.__max_row_info.delayed_max_words, self.__n_synapse_types,
                 self.__weight_scales, block,

@@ -489,12 +489,12 @@ class SynapseIORowBased(object):
         connections["weight"] /= weight_scales[synapse_info.synapse_type]
         return connections
 
-    def read_some_synapses(
+    def convert_to_connections(
             self, synapse_info, pre_vertex_slice, post_vertex_slice,
             max_row_length, n_synapse_types, weight_scales, data,
             machine_time_step, delayed):
         """ Read the synapses for a given projection synapse information\
-            object out of the given data.
+            object out of the given data and convert to connection data
 
         :param SynapseInformation synapse_info:
             The synapse information of the synapses
@@ -577,11 +577,11 @@ class SynapseIORowBased(object):
         post_vertex_slice = machine_edge.post_vertex.vertex_slice
         max_row_length = max_row_info.undelayed_max_words
         delayed_max_row_length = max_row_info.delayed_max_words
-        connections.append(self.read_some_synapses(
+        connections.append(self.convert_to_connections(
             synapse_info, pre_vertex_slice, post_vertex_slice, max_row_length,
             n_synapse_types, weight_scales, data, machine_time_step,
             delayed=False))
-        connections.append(self.read_some_synapses(
+        connections.append(self.convert_to_connections(
             synapse_info, pre_vertex_slice, post_vertex_slice,
             delayed_max_row_length, n_synapse_types, weight_scales,
             delayed_data, machine_time_step, delayed=True))
