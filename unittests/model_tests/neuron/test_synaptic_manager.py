@@ -215,7 +215,8 @@ def test_write_data_spec():
         delay_vertex, post_vertex, label=None)
     partition_name = "TestPartition"
 
-    graph = MachineGraph("Test")
+    app_graph = ApplicationGraph("Test")
+    graph = MachineGraph("Test", app_graph)
     graph.add_vertex(pre_vertex)
     graph.add_vertex(post_vertex)
     graph.add_vertex(delay_vertex)
