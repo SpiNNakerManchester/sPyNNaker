@@ -37,7 +37,6 @@ class ProjectionApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
     """
     __slots__ = [
         "__delay_edge",
-        "__stored_synaptic_data_from_machine",
         "__synapse_information",
         # Slices of the pre_vertexes of the machine_edges
         "__pre_slices",
@@ -45,7 +44,8 @@ class ProjectionApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
         # Slices of the post_vertexes of the machine_edges
         "__post_slices",
         # True if slices have been convered to sorted lists
-        "__slices_list_mode"
+        "__slices_list_mode",
+        "__machine_edges_by_slices"
     ]
 
     def __init__(
@@ -67,7 +67,8 @@ class ProjectionApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
         # post_vertex - this might be None if no long delays are present
         self.__delay_edge = None
 
-        self.__stored_synaptic_data_from_machine = None
+        # Keep the machine edges by pre- and post-vertex
+        self.__machine_edges_by_slices = dict()
 
         self.__pre_slices = set()
         self.__post_slices = set()
@@ -110,8 +111,30 @@ class ProjectionApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
     @overrides(ApplicationEdge._create_machine_edge)
     def _create_machine_edge(
             self, pre_vertex, post_vertex, label):
-        return ProjectionMachineEdge(
+        edge = ProjectionMachineEdge(
             self.__synapse_information, pre_vertex, post_vertex, self, label)
+        self.__machine_edges_by_slices[
+            pre_vertex.vertex_slice, post_vertex.vertex_slice] = edge
+        if self.__delay_edge is not None:
+            # Set the information if the delay machine edge exists
+            delayed = self.__delay_edge._get_machine_edge(
+                pre_vertex, post_vertex)
+            if delayed is not None:
+                edge.delay_edge = delayed
+                delayed.undelayed_edge = edge
+        return edge
+
+    def _get_machine_edge(self, pre_vertex, post_vertex):
+        """ Get a specific machine edge of this edge
+
+        :param PopulationMachineVertex pre_vertex:
+            The vertex at the start of the machine edge
+        :param PopulationMachineVertex post_vertex:
+            The vertex at the end of the machine edge
+        :rtype: ProjectionMachineEdge or None
+        """
+        return self.__machine_edges_by_slices.get(
+            (pre_vertex.vertex_slice, post_vertex.vertex_slice))
 
     @overrides(AbstractSlicesConnect.could_connect)
     def could_connect(self, pre_slice, post_slice):

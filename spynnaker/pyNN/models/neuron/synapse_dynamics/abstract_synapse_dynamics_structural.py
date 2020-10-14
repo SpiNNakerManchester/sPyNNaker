@@ -41,18 +41,22 @@ class AbstractSynapseDynamicsStructural(object):
     @abstractmethod
     def write_structural_parameters(
             self, spec, region, machine_time_step, weight_scales,
-            machine_graph, machine_vertex, routing_info, synapse_indices):
+            machine_graph, machine_vertex, routing_info, synaptic_matrices):
         """ Write structural plasticity parameters
 
         :param ~data_specification.DataSpecificationGenerator spec:
+            The data specification to write to
         :param int region: region ID
-        :param int machine_time_step:
-        :param weight_scales:
-        :type weight_scales: ~numpy.ndarray or list(float)
+        :param int machine_time_step: The simulation time step
+        :param list(float) weight_scales: Weight scaling for each synapse type
         :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
-        :param MachineVertex machine_vertex:
+            The machine graph
+        :param AbstractPopulationVertex machine_vertex:
+            The machine vertex
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
-        :param dict(tuple(SynapseInformation,int),int) synapse_indices:
+            Routing information for all edges
+        :param SynapticMatrices synaptic_matrices:
+            The synaptic matrices for this vertex
         """
 
     @abstractmethod
@@ -120,4 +124,12 @@ class AbstractSynapseDynamicsStructural(object):
         """ The elimination rule
 
         :rtype: AbstractElimination
+        """
+
+    @abstractmethod
+    def check_initial_delay(self, max_delay_ms):
+        """ Check that delays can be done without delay extensions
+
+        :param int max_delay_ms: The maximum delay supported, in milliseconds
+        :raises Exception: if the delay is out of range
         """
