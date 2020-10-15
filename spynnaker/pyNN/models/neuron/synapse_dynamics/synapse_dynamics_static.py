@@ -22,6 +22,7 @@ from .abstract_generate_on_machine import (
     AbstractGenerateOnMachine, MatrixGeneratorID)
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 
 class SynapseDynamicsStatic(
@@ -90,7 +91,7 @@ class SynapseDynamicsStatic(
     @overrides(AbstractStaticSynapseDynamics.get_static_synaptic_data)
     def get_static_synaptic_data(
             self, connections, connection_row_indices, n_rows,
-            post_vertex_slice, n_synapse_types):
+            post_vertex_slice, n_synapse_types, max_n_synapses):
         # pylint: disable=too-many-arguments
         n_neuron_id_bits = get_n_bits(post_vertex_slice.n_atoms)
         neuron_id_mask = (1 << n_neuron_id_bits) - 1
@@ -107,11 +108,12 @@ class SynapseDynamicsStatic(
              neuron_id_mask))
         fixed_fixed_rows = self.convert_per_connection_data_to_rows(
             connection_row_indices, n_rows,
-            fixed_fixed.view(dtype="uint8").reshape((-1, 4)))
-        ff_size = self.get_n_items(fixed_fixed_rows, 4)
+            fixed_fixed.view(dtype="uint8").reshape((-1, BYTES_PER_WORD)),
+            max_n_synapses)
+        ff_size = self.get_n_items(fixed_fixed_rows, BYTES_PER_WORD)
         if self.__pad_to_length is not None:
             # Pad the data
-            fixed_fixed_rows = self._pad_row(fixed_fixed_rows, 4)
+            fixed_fixed_rows = self._pad_row(fixed_fixed_rows, BYTES_PER_WORD)
         ff_data = [fixed_row.view("uint32") for fixed_row in fixed_fixed_rows]
 
         return ff_data, ff_size
@@ -229,3 +231,8 @@ class SynapseDynamicsStatic(
     @overrides(AbstractStaticSynapseDynamics.set_delay)
     def set_delay(self, delay):
         self.__delay = delay
+
+    @property
+    @overrides(AbstractStaticSynapseDynamics.pad_to_length)
+    def pad_to_length(self):
+        return self.__pad_to_length

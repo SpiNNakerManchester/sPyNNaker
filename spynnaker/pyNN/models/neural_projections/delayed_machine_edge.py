@@ -18,7 +18,8 @@ from pacman.model.graphs.machine import MachineEdge
 
 class DelayedMachineEdge(MachineEdge):
     __slots__ = [
-        "__synapse_information"]
+        "__synapse_information",
+        "__undelayed_edge"]
 
     def __init__(
             self, synapse_information, pre_vertex, post_vertex, app_edge,
@@ -35,3 +36,21 @@ class DelayedMachineEdge(MachineEdge):
             pre_vertex, post_vertex, label=label, traffic_weight=weight,
             app_edge=app_edge)
         self.__synapse_information = synapse_information
+        self.__undelayed_edge = None
+
+    @property
+    def undelayed_edge(self):
+        """ Get the edge used for Projections without extended delays
+
+        :rtype: ProjectionMachineEdge or None
+        """
+        return self.__undelayed_edge
+
+    @undelayed_edge.setter
+    def undelayed_edge(self, undelayed_edge):
+        """ Set the edge used for Projections without extended delays
+
+        :param ProjectionMachineEdge undelayed_edge:
+            The edge to set
+        """
+        self.__undelayed_edge = undelayed_edge

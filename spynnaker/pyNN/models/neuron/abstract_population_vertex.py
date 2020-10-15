@@ -22,8 +22,7 @@ from pacman.executor.injection_decorator import inject_items
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
 from spinn_front_end_common.abstract_models import (
-    AbstractChangableAfterRun, AbstractProvidesIncomingPartitionConstraints,
-    AbstractProvidesOutgoingPartitionConstraints,
+    AbstractChangableAfterRun, AbstractProvidesOutgoingPartitionConstraints,
     AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification,
     AbstractCanReset)
 from spinn_front_end_common.abstract_models.impl import (
@@ -64,7 +63,6 @@ class AbstractPopulationVertex(
         AbstractContainsUnits, AbstractSpikeRecordable,
         AbstractNeuronRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
-        AbstractProvidesIncomingPartitionConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
         AbstractChangableAfterRun, AbstractRewritesDataSpecification,
         AbstractReadParametersBeforeSet, AbstractAcceptsIncomingSynapses,
@@ -207,24 +205,19 @@ class AbstractPopulationVertex(
         return self.__neuron_recorder
 
     @inject_items({
-        "graph": "MemoryApplicationGraph",
-        "machine_time_step": "MachineTimeStep"
+        "graph": "MemoryApplicationGraph"
     })
     @overrides(
         TDMAAwareApplicationVertex.get_resources_used_by_atoms,
-        additional_arguments={
-            "graph", "machine_time_step"
-        }
+        additional_arguments={"graph"}
     )
-    def get_resources_used_by_atoms(
-            self, vertex_slice, graph, machine_time_step):
+    def get_resources_used_by_atoms(self, vertex_slice, graph):
         # pylint: disable=arguments-differ
 
         variableSDRAM = self.__neuron_recorder.get_variable_sdram_usage(
             vertex_slice)
         constantSDRAM = ConstantSDRAM(
-                self._get_sdram_usage_for_atoms(
-                    vertex_slice, graph, machine_time_step))
+            self._get_sdram_usage_for_atoms(vertex_slice, graph))
 
         # set resources required from this object
         container = ResourceContainer(
@@ -248,6 +241,9 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractChangableAfterRun.mark_no_changes)
     def mark_no_changes(self):
+        # If mapping will happen, reset things that need this
+        if self.__change_requires_mapping:
+            self.__synapse_manager.clear_all_caches()
         self.__change_requires_mapping = False
         self.__change_requires_data_generation = False
 
@@ -296,8 +292,7 @@ class AbstractPopulationVertex(
             self.tdma_sdram_size_in_bytes +
             self.__neuron_impl.get_sdram_usage_in_bytes(vertex_slice.n_atoms))
 
-    def _get_sdram_usage_for_atoms(
-            self, vertex_slice, graph, machine_time_step):
+    def _get_sdram_usage_for_atoms(self, vertex_slice, graph):
         sdram_requirement = (
             SYSTEM_BYTES_REQUIREMENT +
             self._get_sdram_usage_for_neuron_params(vertex_slice) +
@@ -305,7 +300,7 @@ class AbstractPopulationVertex(
             PopulationMachineVertex.get_provenance_data_size(
                 len(PopulationMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES)) +
             self.__synapse_manager.get_sdram_usage_in_bytes(
-                vertex_slice, machine_time_step, graph, self) +
+                vertex_slice, graph, self) +
             profile_utils.get_profile_region_size(
                 self.__n_profile_samples) +
             bit_field_utilities.get_estimated_sdram_for_bit_field_region(
@@ -543,12 +538,11 @@ class AbstractPopulationVertex(
 
         # allow the synaptic matrix to write its data spec-able data
         self.__synapse_manager.write_data_spec(
-            spec, self, vertex_slice, vertex, placement, machine_graph,
-            application_graph, routing_info,
-            weight_scale, machine_time_step)
+            spec, self, vertex_slice, vertex, machine_graph, application_graph,
+            routing_info, weight_scale, machine_time_step)
         vertex.set_on_chip_generatable_area(
-            self.__synapse_manager.host_written_matrix_size,
-            self.__synapse_manager.on_chip_written_matrix_size)
+            self.__synapse_manager.host_written_matrix_size(vertex_slice),
+            self.__synapse_manager.on_chip_written_matrix_size(vertex_slice))
 
         # write up the bitfield builder data
         bit_field_utilities.write_bitfield_init_data(
@@ -790,31 +784,16 @@ class AbstractPopulationVertex(
         :param AbstractSynapseDynamics synapse_dynamics:
         """
         self.__synapse_manager.synapse_dynamics = synapse_dynamics
-
-    @overrides(AbstractAcceptsIncomingSynapses.add_pre_run_connection_holder)
-    def add_pre_run_connection_holder(
-            self, connection_holder, projection_edge, synapse_information):
-        self.__synapse_manager.add_pre_run_connection_holder(
-            connection_holder, projection_edge, synapse_information)
-
-    def get_connection_holders(self):
-        """
-        :rtype: dict(tuple(ProjectionApplicationEdge,SynapseInformation),\
-            ConnectionHolder)
-        """
-        return self.__synapse_manager.get_connection_holders()
+        # If we are setting a synapse dynamics, we must remap even if the
+        # change above means we don't have to
+        self.__change_requires_mapping = True
 
     @overrides(AbstractAcceptsIncomingSynapses.get_connections_from_machine)
     def get_connections_from_machine(
-            self, transceiver, placement, edge, routing_infos,
-            synapse_information, machine_time_step, using_extra_monitor_cores,
-            placements=None, monitor_api=None, fixed_routes=None,
-            extra_monitor=None):
+            self, transceiver, placements, app_edge, synapse_info):
         # pylint: disable=too-many-arguments
         return self.__synapse_manager.get_connections_from_machine(
-            transceiver, placement, edge, routing_infos,
-            synapse_information, machine_time_step, using_extra_monitor_cores,
-            placements, monitor_api, fixed_routes, extra_monitor)
+            transceiver, placements, app_edge, synapse_info)
 
     def clear_connection_cache(self):
         self.__synapse_manager.clear_connection_cache()
@@ -822,16 +801,6 @@ class AbstractPopulationVertex(
     def get_maximum_delay_supported_in_ms(self, machine_time_step):
         return self.__synapse_manager.get_maximum_delay_supported_in_ms(
             machine_time_step)
-
-    @overrides(AbstractProvidesIncomingPartitionConstraints.
-               get_incoming_partition_constraints)
-    def get_incoming_partition_constraints(self, partition):
-        """ Gets the constraints for partitions going into this vertex.
-
-        :param partition: partition that goes into this vertex
-        :return: list of constraints
-        """
-        return self.__synapse_manager.get_incoming_partition_constraints()
 
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
                get_outgoing_partition_constraints)
@@ -937,6 +906,15 @@ class AbstractPopulationVertex(
         if self.__synapse_manager.changes_during_run:
             self.__change_requires_data_generation = True
             self.__change_requires_neuron_parameters_reload = False
+
+    def read_generated_connection_holders(self, transceiver, placement):
+        """ Fill in the connection holders
+
+        :param Transceiver transceiver: How the data is to be read
+        :param Placement placement: Where the data is on the machine
+        """
+        self.__synapse_manager.read_generated_connection_holders(
+            transceiver, placement)
 
     @overrides(AbstractProvidesLocalProvenanceData.get_local_provenance_data)
     def get_local_provenance_data(self):
