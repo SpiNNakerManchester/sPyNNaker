@@ -17,7 +17,7 @@ import struct
 import numpy
 import sys
 
-from collections import defaultdict, namedtuple
+from collections import defaultdict
 from six import itervalues
 
 from spinn_utilities.progress_bar import ProgressBar
@@ -30,14 +30,12 @@ from spinn_front_end_common.utilities.utility_objs\
     .provenance_data_item import ProvenanceDataItem
 
 from spynnaker.pyNN.models.neural_projections import ProjectionMachineEdge
-from spynnaker.pyNN.models.abstract_models import AbstractMaxSpikes
 from spynnaker.pyNN.models.neuron.synapse_io import SynapseIORowBased
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsSTDP, SynapseDynamicsStructuralStatic)
-from spynnaker.pyNN.utilities.constants import (
-    POPULATION_BASED_REGIONS, POSSION_SIGMA_SUMMATION_LIMIT)
+from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits, float_gcd
-from spynnaker.pyNN.utilities.running_stats import RunningStats
+from spynnaker.pyNN.exceptions import SynapticConfigurationException
 
 from .synapse_dynamics import (
     AbstractSynapseDynamics, AbstractSynapseDynamicsStructural)
@@ -545,7 +543,7 @@ class SynapticManager(object):
         :param ~.MachineVertex machine_vertex: The machine vertex
         """
         for machine_edge in machine_graph.get_edges_ending_at_vertex(
-            machine_vertex):
+                machine_vertex):
             if isinstance(machine_edge, ProjectionMachineEdge):
                 for synapse_info in machine_edge.synapse_information:
                     weights = synapse_info.weights
