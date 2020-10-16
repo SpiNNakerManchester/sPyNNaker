@@ -300,6 +300,8 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
             # across the array of weights that we need
             non_zero_weights = numpy.abs(weights)[
                 numpy.nonzero(numpy.abs(weights))]
+            if len(non_zero_weights) == 0:
+                return 0.0
             return utility_calls.float_gcd_of_array(non_zero_weights)
         raise Exception("Unrecognised weight format")
 

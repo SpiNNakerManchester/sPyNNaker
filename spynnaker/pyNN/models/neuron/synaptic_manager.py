@@ -29,7 +29,7 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.utility_objs\
     .provenance_data_item import ProvenanceDataItem
 
-from spynnaker.pyNN.models.neural_projections import ProjectionMachineEdge
+from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.neuron.synapse_io import SynapseIORowBased
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsSTDP, SynapseDynamicsStructuralStatic)
@@ -436,27 +436,6 @@ class SynapticManager(object):
                     size=synapse_structural_dynamics_sz,
                     label='synapseDynamicsStructuralParams')
 
-#     def _write_synapse_parameters(
-#             self, spec, min_weights, weight_scale):
-#         """Get the ring buffer shifts and scaling factors.
-#         :param ~.DataSpecificationGenerator spec: The data spec to reserve in
-#         :param ~numpy.ndarray min_weights: Minimum weights per synapse type
-#         :param float weight_scale: The weight scale value to use when writing
-#         :rtype: ~numpy.ndarray
-#         """
-#         spec.switch_write_focus(self._synapse_params_region)
-#
-#         # write the bool for deleting packets that were too late for a timer
-#         spec.write_value(int(self.__drop_late_spikes))
-#
-#         # Write the minimum weights
-#         for w in min_weights:
-#             spec.write_value(w, data_type=DataType.S1615)
-#
-#         # Return the weight scaling factors
-#         return numpy.array([(1 / w) * weight_scale if w != 0 else 0
-#                             for w in min_weights])
-
     def __get_closest_weight(self, value):
         """ Get the best representation of the weight so that both weight and
             1 / w work
@@ -482,10 +461,11 @@ class SynapticManager(object):
         synapse_map = dict()
         for machine_edge in machine_graph.get_edges_ending_at_vertex(
                 machine_vertex):
-            if isinstance(machine_edge, ProjectionMachineEdge):
-                for synapse_info in machine_edge.synapse_information:
+            app_edge = machine_edge.app_edge
+            if isinstance(app_edge, ProjectionApplicationEdge):
+                for synapse_info in app_edge.synapse_information:
                     # Per synapse info we need any one of the edges
-                    synapse_map[synapse_info] = machine_edge
+                    synapse_map[synapse_info] = app_edge
 
         for synapse_info in synapse_map:
             synapse_type = synapse_info.synapse_type
@@ -498,6 +478,7 @@ class SynapticManager(object):
                 weight_min = self.__get_closest_weight(weight_min)
             weight_min *= weight_scale
             if weight_min != 0:
+                weight_min = float_gcd(min_weights[synapse_type], weight_min)
                 min_weights[synapse_type] = min(
                     min_weights[synapse_type], weight_min)
 
@@ -515,6 +496,8 @@ class SynapticManager(object):
                 weight_min = synapse_dynamics.initial_weight
                 weight_min *= weight_scale
                 if weight_min != 0:
+                    weight_min = float_gcd(min_weights[synapse_type],
+                                           weight_min)
                     min_weights[synapse_type] = min(
                         min_weights[synapse_type], weight_min)
 
@@ -531,6 +514,7 @@ class SynapticManager(object):
 
         self.__check_weights(
             min_weights, weight_scale, machine_graph, machine_vertex)
+
         return min_weights
 
     def __check_weights(
@@ -544,23 +528,24 @@ class SynapticManager(object):
         """
         for machine_edge in machine_graph.get_edges_ending_at_vertex(
                 machine_vertex):
-            if isinstance(machine_edge, ProjectionMachineEdge):
-                for synapse_info in machine_edge.synapse_information:
+            app_edge = machine_edge.app_edge
+            if isinstance(app_edge, ProjectionApplicationEdge):
+                for synapse_info in app_edge.synapse_information:
                     weights = synapse_info.weights
                     synapse_type = synapse_info.synapse_type
                     min_weight = min_weights[synapse_type]
                     if numpy.isscalar(weights):
                         self.__check_weight(
-                            min_weight, weights, weight_scale, machine_edge,
-                            synapse_info)
+                            min_weight, weights, weight_scale,
+                            app_edge, synapse_info)
                     elif hasattr(weights, "__getitem__"):
                         for w in weights:
                             self.__check_weight(
-                                min_weight, w, weight_scale, machine_edge,
-                                synapse_info)
+                                min_weight, w, weight_scale,
+                                app_edge, synapse_info)
 
     def __check_weight(
-            self, min_weight, weight, weight_scale, machine_edge,
+            self, min_weight, weight, weight_scale, app_edge,
             synapse_info):
         """ Warn the user about a weight that can't be represented properly
             where possible
@@ -575,10 +560,9 @@ class SynapticManager(object):
             r_weight) * min_weight) / weight_scale
         if weight != r_weight:
             self.__weight_provenance[weight, r_weight].append(
-                (machine_edge, synapse_info))
+                (app_edge, synapse_info))
 
-    def _get_min_weights(
-            self, machine_vertex, machine_graph, weight_scale):
+    def _get_min_weights(self, machine_vertex, machine_graph, weight_scale):
         if self.__min_weights is None:
             self.__min_weights = self._calculate_min_weights(
                 machine_vertex, machine_graph, weight_scale)
