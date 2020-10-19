@@ -187,7 +187,7 @@ def test_write_data_spec():
     post_vertex_placement = Placement(post_vertex, 0, 0, 2)
     placements.add_placement(post_vertex_placement)
     delay_app_vertex = DelayExtensionVertex(
-        10, 16, pre_app_vertex, 1000, 1, label="delay")
+        10, 16, 51-16, pre_app_vertex, label="delay")
     delay_app_vertex.splitter_object = SplitterDelayVertexSlice(
         pre_app_vertex.splitter_object)
     delay_vertex = DelayExtensionMachineVertex(

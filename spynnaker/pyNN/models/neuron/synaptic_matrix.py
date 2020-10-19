@@ -424,6 +424,7 @@ class SynapticMatrix(object):
             self.__machine_edge.pre_vertex.vertex_slice,
             self.__machine_edge.post_vertex.vertex_slice,
             self.__synapse_info, self.__app_edge.n_delay_stages + 1,
+
             globals_variables.get_simulator().machine_time_step)
 
     def __write_on_chip_delay_data(self):
