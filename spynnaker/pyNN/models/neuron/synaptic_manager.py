@@ -629,7 +629,7 @@ class SynapticManager(object):
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
             How messages are routed
         :param float weight_scale: How to scale the weights of the synapses
-        :param int machine_time_step:
+        :param float machine_time_step:
         """
 
         # Reserve the memory

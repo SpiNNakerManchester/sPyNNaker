@@ -65,6 +65,7 @@ class DelayExtensionVertex(
         """
         :param int n_neurons: the number of neurons
         :param int delay_per_stage: the delay per stage
+        :param int max_delay_to_support: the max delay this will cover
         :param ~pacman.model.graphs.application.ApplicationVertex \
                 source_vertex:
             where messages are coming from

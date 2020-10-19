@@ -36,6 +36,8 @@ from pacman.model.routing_info import (
 from pacman.model.graphs.application import ApplicationVertex
 from data_specification import (
     DataSpecificationGenerator, DataSpecificationExecutor)
+from spynnaker.pyNN.extra_algorithms.splitter_components.splitter_delay_vertex_slice import \
+    SplitterDelayVertexSlice
 from spynnaker.pyNN.models.neuron import SynapticManager
 from spynnaker.pyNN.abstract_spinnaker_common import AbstractSpiNNakerCommon
 import spynnaker.pyNN.abstract_spinnaker_common as abstract_spinnaker_common
@@ -59,7 +61,8 @@ from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
 from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
     .elimination import RandomByWeightElimination
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
-from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
+from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex, \
+    DelayExtensionMachineVertex
 from unittests.mocks import MockSimulator
 from pacman.model.placements.placements import Placements
 from pacman.model.graphs.application.application_graph import ApplicationGraph
@@ -186,8 +189,11 @@ def test_write_data_spec():
     placements.add_placement(post_vertex_placement)
     delay_app_vertex = DelayExtensionVertex(
         10, 16, pre_app_vertex, 1000, 1, label="delay")
-    delay_vertex = delay_app_vertex.create_machine_vertex(
-        post_vertex_slice, resources_required=None)
+    delay_app_vertex.splitter_object = SplitterDelayVertexSlice(
+        pre_app_vertex.splitter_object)
+    delay_vertex = DelayExtensionMachineVertex(
+        resources_required=None, label="", constraints=[],
+        app_vertex=delay_app_vertex, vertex_slice=post_vertex_slice)
     placements.add_placement(Placement(delay_vertex, 0, 0, 3))
     one_to_one_connector_1 = OneToOneConnector(None)
     direct_synapse_information_1 = SynapseInformation(
