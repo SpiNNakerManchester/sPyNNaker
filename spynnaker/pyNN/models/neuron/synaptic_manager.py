@@ -592,7 +592,7 @@ class SynapticManager(object):
 
         :param .MachineVertex machine_vertex:
         :param .MachineGraph machine_graph:
-        :param int machine_time_step:
+        :param float machine_time_step:
         :param float weight_scale:
         """
         if self.__ring_buffer_shifts is None:

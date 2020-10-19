@@ -24,8 +24,9 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
 
-from .synaptic_matrix import SynapticMatrix
-from .generator_data import GeneratorData, SYN_REGION_UNUSED
+from spynnaker.pyNN.models.neuron.synaptic_matrix import SynapticMatrix
+from spynnaker.pyNN.models.neuron.generator_data import (
+    GeneratorData, SYN_REGION_UNUSED)
 
 
 class SynapticMatrixApp(object):

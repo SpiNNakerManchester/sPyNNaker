@@ -218,7 +218,7 @@ class SynapticMatrices(object):
         :param .RoutingInfo routing_info:
             The routing information for all edges
         :param .MachineGraph machine_graph: The machine graph
-        :param int machine_time_step: sim machine time step
+        :param float machine_time_step: sim machine time step
         :return: A list of generator data to be written elsewhere
         :rtype: list(GeneratorData)
         """
