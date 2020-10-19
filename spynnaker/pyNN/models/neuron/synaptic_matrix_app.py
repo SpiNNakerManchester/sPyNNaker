@@ -475,6 +475,9 @@ class SynapticMatrixApp(object):
         # overloading the generator, even if an application matrix is generated
         for m_edge in self.__m_edges:
             matrix = self.__get_matrix(m_edge)
+            max_delay_per_stage = (
+                m_edge.post_vertex.app_vertex.splitter_object.
+                max_support_delay)
 
             if self.__use_app_keys:
                 syn_addr, syn_mat_offset = matrix.next_app_on_chip_address(
@@ -494,7 +497,7 @@ class SynapticMatrixApp(object):
             # generate since it is still doing it in chunks, so less local
             # memory is needed.
             generator_data.append(matrix.get_generator_data(
-                syn_mat_offset, d_mat_offset))
+                syn_mat_offset, d_mat_offset, max_delay_per_stage))
         return block_addr
 
     def __reserve_app_blocks(self, block_addr):

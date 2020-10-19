@@ -403,13 +403,16 @@ class SynapticMatrix(object):
         block_addr = self.__next_addr(block_addr, self.__delay_matrix_size)
         return block_addr, self.__delay_syn_mat_offset
 
-    def get_generator_data(self, syn_mat_offset, d_mat_offset):
+    def get_generator_data(
+            self, syn_mat_offset, d_mat_offset, max_delay_per_stage):
         """ Get the generator data for this matrix
 
         :param int syn_mat_offset:
             The synaptic matrix offset to write the data to
         :param int d_mat_offset:
             The synaptic matrix offset to write the delayed data to
+        :param int max_delay_per_stage: around of timer ticks each delay stage\
+            holds.
         :rtype: GeneratorData
         """
         self.__write_on_chip_delay_data()
@@ -424,7 +427,7 @@ class SynapticMatrix(object):
             self.__machine_edge.pre_vertex.vertex_slice,
             self.__machine_edge.post_vertex.vertex_slice,
             self.__synapse_info, self.__app_edge.n_delay_stages + 1,
-
+            max_delay_per_stage,
             globals_variables.get_simulator().machine_time_step)
 
     def __write_on_chip_delay_data(self):
