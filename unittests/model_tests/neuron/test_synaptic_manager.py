@@ -223,7 +223,6 @@ def test_write_data_spec():
     graph.add_edge(machine_edge, partition_name)
     graph.add_edge(delay_machine_edge, partition_name)
 
-    app_graph = ApplicationGraph("Test")
     app_graph.add_vertex(pre_app_vertex)
     app_graph.add_vertex(post_app_vertex)
     app_graph.add_vertex(delay_app_vertex)
