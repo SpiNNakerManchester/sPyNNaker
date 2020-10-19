@@ -219,14 +219,11 @@ def test_write_data_spec():
         False, False, None, SynapseDynamicsStatic(), 0, True)
     from_list_connector.set_projection_information(
         machine_time_step, from_list_synapse_information)
-    n_delay_stages = int(math.ceil(
-        max([values[3] for values in from_list_list]) / 16.0))
     app_edge = ProjectionApplicationEdge(
         pre_app_vertex, post_app_vertex, direct_synapse_information_1)
     app_edge.add_synapse_information(direct_synapse_information_2)
     app_edge.add_synapse_information(all_to_all_synapse_information)
     app_edge.add_synapse_information(from_list_synapse_information)
-    delay_app_vertex.n_delay_stages = n_delay_stages
     delay_edge = DelayedApplicationEdge(
         delay_app_vertex, post_app_vertex, direct_synapse_information_1,
         app_edge)
