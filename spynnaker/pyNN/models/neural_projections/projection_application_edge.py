@@ -17,7 +17,6 @@ import logging
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationEdge
 from pacman.model.partitioner_interfaces import AbstractSlicesConnect
-from .projection_machine_edge import ProjectionMachineEdge
 
 logger = logging.getLogger(__name__)
 _DynamicsStructural = None

@@ -59,8 +59,8 @@ from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
 from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
     .elimination import RandomByWeightElimination
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
-from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex, \
-    DelayExtensionMachineVertex
+from spynnaker.pyNN.models.utility_models.delays import (
+    DelayExtensionVertex, DelayExtensionMachineVertex)
 from spynnaker.pyNN.extra_algorithms.splitter_components.\
     splitter_delay_vertex_slice import SplitterDelayVertexSlice
 from pacman.model.placements.placements import Placements
@@ -70,8 +70,8 @@ from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
 import io
 from unittests.mocks import MockSimulator, MockPopulation
 from pacman.model.partitioner_splitters import SplitterSliceLegacy
-from spynnaker.pyNN.extra_algorithms.splitter_components import \
-    AbstractSpynnakerSplitterDelay
+from spynnaker.pyNN.extra_algorithms.splitter_components import (
+    AbstractSpynnakerSplitterDelay)
 
 
 class MockSynapseIO(object):

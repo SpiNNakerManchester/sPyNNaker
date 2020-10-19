@@ -16,7 +16,6 @@
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationEdge
 from pacman.model.partitioner_interfaces import AbstractSlicesConnect
-from .delayed_machine_edge import DelayedMachineEdge
 
 
 class DelayedApplicationEdge(ApplicationEdge, AbstractSlicesConnect):

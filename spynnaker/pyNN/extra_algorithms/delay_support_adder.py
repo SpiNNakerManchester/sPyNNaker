@@ -90,7 +90,7 @@ class DelaySupportAdder(object):
 
         # go through all partitions.
         for app_outgoing_edge_partition in progress.over(
-            app_graph.outgoing_edge_partitions):
+                app_graph.outgoing_edge_partitions):
             for app_edge in app_outgoing_edge_partition.edges:
                 if isinstance(app_edge, ProjectionApplicationEdge):
                     # figure the max delay and if we need a delay extension
@@ -112,7 +112,7 @@ class DelaySupportAdder(object):
                         # NOTE do it accumulately. coz else more loops.
                         delay_app_vertex. \
                             set_new_n_delay_stages_and_delay_per_stage(
-                            post_vertex_max_delay, max_delay_needed)
+                                post_vertex_max_delay, max_delay_needed)
 
                         # add the edge from the delay extension to the
                         # dest vertex

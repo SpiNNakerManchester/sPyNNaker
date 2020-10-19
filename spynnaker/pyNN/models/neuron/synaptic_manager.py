@@ -26,8 +26,7 @@ from data_specification.enums import DataType
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, MICRO_TO_SECOND_CONVERSION)
 
-from spynnaker.pyNN.models.neural_projections import ProjectionMachineEdge, \
-    ProjectionApplicationEdge
+from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.abstract_models import AbstractMaxSpikes
 from spynnaker.pyNN.models.neuron.synapse_io import SynapseIORowBased
 from spynnaker.pyNN.utilities.constants import (
