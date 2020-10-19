@@ -36,8 +36,6 @@ from pacman.model.routing_info import (
 from pacman.model.graphs.application import ApplicationVertex
 from data_specification import (
     DataSpecificationGenerator, DataSpecificationExecutor)
-from spynnaker.pyNN.extra_algorithms.splitter_components.splitter_delay_vertex_slice import \
-    SplitterDelayVertexSlice
 from spynnaker.pyNN.models.neuron import SynapticManager
 from spynnaker.pyNN.abstract_spinnaker_common import AbstractSpiNNakerCommon
 import spynnaker.pyNN.abstract_spinnaker_common as abstract_spinnaker_common
@@ -63,7 +61,8 @@ from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex, \
     DelayExtensionMachineVertex
-from unittests.mocks import MockSimulator
+from spynnaker.pyNN.extra_algorithms.splitter_components.\
+    splitter_delay_vertex_slice import SplitterDelayVertexSlice
 from pacman.model.placements.placements import Placements
 from pacman.model.graphs.application.application_graph import ApplicationGraph
 from data_specification.constants import MAX_MEM_REGIONS
