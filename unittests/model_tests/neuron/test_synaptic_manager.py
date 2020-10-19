@@ -551,14 +551,13 @@ def test_pop_based_master_pop_table_standard(
     # Add delays if needed
     if delayed_indices_connected:
         pre_app_delay_vertex = DelayExtensionVertex(
-            1000, 16.0, pre_app_vertex, 1.0, 1.0)
-        pre_app_delay_vertex.n_delay_stages = 1
+            1000, 16.0, 4, pre_app_vertex)
         app_graph.add_vertex(pre_app_delay_vertex)
 
         for i in range(10):
             pre_mac_slice = Slice(i * 100, ((i + 1) * 100) - 1)
-            pre_mac_vertex = pre_app_delay_vertex.create_machine_vertex(
-                pre_mac_slice, None)
+            pre_mac_vertex = DelayExtensionMachineVertex(
+                None, "", [], pre_app_delay_vertex, pre_mac_slice)
             mac_graph.add_vertex(pre_mac_vertex)
 
     # Make the routing info line up to force an app key in the pop table if
