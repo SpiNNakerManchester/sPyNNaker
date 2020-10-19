@@ -179,9 +179,14 @@ class SynapticMatrixApp(object):
 
         r_info = self.__routing_info.get_routing_info_for_edge(machine_edge)
         delayed_r_info = None
-        if machine_edge.delay_edge is not None:
-            delayed_r_info = self.__routing_info.get_routing_info_for_edge(
-                machine_edge.delay_edge)
+        delayed_app_edge = machine_edge.app_edge.delay_edge
+        if delayed_app_edge is not None:
+            delayed_machine_edge = delayed_app_edge.get_machine_edge(
+                machine_edge.pre_vertex, machine_edge.post_vertex)
+            if delayed_machine_edge is not None:
+                delayed_r_info = (
+                    self.__routing_info.get_routing_info_for_edge(
+                        delayed_machine_edge))
         matrix = SynapticMatrix(
             self.__synapse_io, self.__poptable, self.__synapse_info,
             machine_edge, self.__app_edge, self.__n_synapse_types,
@@ -306,7 +311,9 @@ class SynapticMatrixApp(object):
         self.__use_app_keys = (
             is_app_key and is_delay_app_key and len(m_edges) > 1)
 
-    def write_matrix(self, spec, block_addr, single_addr, single_synapses):
+    def write_matrix(
+            self, spec, block_addr, single_addr, single_synapses,
+            machine_time_step):
         """ Write a synaptic matrix from host
 
         :param DataSpecificationGenerator spec:
@@ -317,6 +324,7 @@ class SynapticMatrixApp(object):
             The address in the "direct" or "single" matrix to start at
         :param list(int) single_synapses:
             A list of "direct" or "single" synapses to write to
+        :param int machine_time_step: the simulation machine time step
         :return: The updated block_addr and single_addr
         :rtype: tuple(int, int)
         """
@@ -326,7 +334,7 @@ class SynapticMatrixApp(object):
 
             # Get a synaptic matrix for each machine edge
             matrix = self.__get_matrix(m_edge)
-            row_data, delay_row_data = matrix.get_row_data()
+            row_data, delay_row_data = matrix.get_row_data(machine_time_step)
             self.__update_connection_holders(row_data, delay_row_data, m_edge)
 
             if self.__use_app_keys:
@@ -573,7 +581,7 @@ class SynapticMatrixApp(object):
                 self.__synapse_io.read_all_synapses(
                     data, delayed_data, self.__synapse_info,
                     self.__n_synapse_types, self.__weight_scales,
-                    machine_edge, self.__max_row_info))
+                    machine_edge, self.__max_row_info, ))
 
     def __next_addr(self, block_addr, size):
         """ Get the next address after a block, checking it is in range

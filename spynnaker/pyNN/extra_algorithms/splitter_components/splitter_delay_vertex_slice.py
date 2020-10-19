@@ -46,7 +46,10 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
     """ handles the splitting of the DelayExtensionVertex via slice logic.
     """
 
-    __slots__ = ["_machine_vertex_by_slice"]
+    __slots__ = [
+        "_machine_vertex_by_slice",
+        "_delayed_mac_edge_to_undelayed_map",
+        "_delayed_vertex_to_un_delayed_edge"]
 
     ESTIMATED_CPU_CYCLES = 128
     WORDS_PER_ATOM = 11 + 16
@@ -80,6 +83,8 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
         AbstractDependentSplitter.__init__(
             self, other_splitter, self.SPLITTER_NAME)
         self._machine_vertex_by_slice = None
+        self._delayed_mac_edge_to_undelayed_map = dict()
+        self._delayed_vertex_to_un_delayed_edge = dict()
 
     @overrides(AbstractDependentSplitter.get_pre_vertices)
     def get_pre_vertices(self, edge, outgoing_edge_partition):

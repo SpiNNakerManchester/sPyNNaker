@@ -148,8 +148,7 @@ class SplitterAbstractPopulationVertexSlice(
             PopulationMachineVertex.get_provenance_data_size(
                 len(PopulationMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES)) +
             self._governed_app_vertex.synapse_manager.get_sdram_usage_in_bytes(
-                vertex_slice, machine_time_step, graph,
-                self._governed_app_vertex) +
+                vertex_slice, graph, self._governed_app_vertex) +
             profile_utils.get_profile_region_size(
                 self._governed_app_vertex.n_profile_samples) +
             bit_field_utilities.get_estimated_sdram_for_bit_field_region(

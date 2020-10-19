@@ -168,9 +168,10 @@ class SynapticMatrix(object):
             not self.__synapse_info.postpop_is_view)
         return is_direct, next_addr
 
-    def get_row_data(self):
+    def get_row_data(self, machine_time_step):
         """ Generate the row data for a synaptic matrix from the description
 
+        :param int machine_time_step: the sim machine time step.
         :return: The data and the delayed data
         :rtype: tuple(~numpy.ndarray or None, ~numpy.ndarray or None)
         """
@@ -184,7 +185,8 @@ class SynapticMatrix(object):
             self.__n_synapse_types, self.__weight_scales,
             self.__machine_edge, self.__max_row_info,
             self.__routing_info is not None,
-            self.__delay_routing_info is not None)
+            self.__delay_routing_info is not None,
+            machine_time_step, self.__app_edge)
 
         if self.__app_edge.delay_edge is not None:
             pre_vertex_slice = self.__machine_edge.pre_vertex.vertex_slice

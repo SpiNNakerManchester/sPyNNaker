@@ -27,14 +27,12 @@ class ProjectionMachineEdge(
         AbstractProvidesLocalProvenanceData):
 
     __slots__ = [
-        "__synapse_information",
         "__delay_edge"]
 
     def __init__(
-            self, synapse_information, pre_vertex, post_vertex, app_edge,
-            label=None, traffic_weight=1):
+            self, pre_vertex, post_vertex, app_edge, label=None,
+            traffic_weight=1):
         """
-        :param list(SynapseInformation) synapse_information:
         :param PopulationMachineVertex pre_vertex:
         :param PopulationMachineVertex post_vertex:
         :param str label:
@@ -45,7 +43,6 @@ class ProjectionMachineEdge(
             pre_vertex, post_vertex, label=label, app_edge=app_edge,
             traffic_weight=traffic_weight)
 
-        self.__synapse_information = synapse_information
         self.__delay_edge = None
 
     @property
@@ -54,6 +51,7 @@ class ProjectionMachineEdge(
 
         :rtype: DelayedMachineEdge or None
         """
+        raise Exception()
         return self.__delay_edge
 
     @delay_edge.setter
@@ -64,20 +62,13 @@ class ProjectionMachineEdge(
         """
         self.__delay_edge = delay_edge
 
-    @property
-    def synapse_information(self):
-        """
-        :rtype: list(SynapseInformation)
-        """
-        return self.__synapse_information
-
     @overrides(AbstractWeightUpdatable.update_weight)
     def update_weight(self):
         pre_vertex = self.pre_vertex.app_vertex
         pre_vertex_slice = self.pre_vertex.vertex_slice
 
         weight = 0
-        for synapse_info in self.__synapse_information:
+        for synapse_info in self._app_edge.synapse_information:
             new_weight = synapse_info.connector.\
                 get_n_connections_to_post_vertex_maximum(synapse_info)
             new_weight *= pre_vertex_slice.n_atoms
@@ -98,7 +89,7 @@ class ProjectionMachineEdge(
     @overrides(AbstractProvidesLocalProvenanceData.get_local_provenance_data)
     def get_local_provenance_data(self):
         prov_items = list()
-        for synapse_info in self.__synapse_information:
+        for synapse_info in self._app_edge.synapse_information:
             prov_items.extend(
                 synapse_info.connector.get_provenance_data(synapse_info))
             prov_items.extend(

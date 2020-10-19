@@ -31,10 +31,6 @@ class DelayAfferentApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
         super(DelayAfferentApplicationEdge, self).__init__(
             pre_vertex, delay_vertex, label=label)
 
-    @overrides(ApplicationEdge._create_machine_edge)
-    def _create_machine_edge(self, pre_vertex, post_vertex, label):
-        return DelayAfferentMachineEdge(pre_vertex, post_vertex, label, self)
-
     @overrides(AbstractSlicesConnect.could_connect)
     def could_connect(self, pre_slice, post_slice):
         return ((pre_slice.lo_atom == post_slice.lo_atom) and

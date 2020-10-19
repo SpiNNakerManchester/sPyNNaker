@@ -269,15 +269,6 @@ class SynapticManager(object):
     def spikes_per_second(self, spikes_per_second):
         self.__spikes_per_second = spikes_per_second
 
-    def get_maximum_delay_supported_in_ms(self, machine_time_step):
-        """ The maximum delay supported by this vertex, before delay extensions
-            are needed
-
-        :rtype: int
-        """
-        return self.__synapse_io.get_maximum_delay_supported_in_ms(
-            machine_time_step)
-
     @property
     def vertex_executable_suffix(self):
         """ The suffix of the executable name due to the type of synapses \
@@ -661,7 +652,7 @@ class SynapticManager(object):
 
         gen_data = matrices.write_synaptic_matrix_and_master_population_table(
             spec, machine_vertex, all_syn_block_sz, self.__weight_scales,
-            routing_info, machine_graph)
+            routing_info, machine_graph, machine_time_step)
 
         if self.__synapse_dynamics is not None:
             self.__synapse_dynamics.write_parameters(

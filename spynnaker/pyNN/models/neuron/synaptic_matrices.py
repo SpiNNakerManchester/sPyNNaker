@@ -206,7 +206,7 @@ class SynapticMatrices(object):
 
     def write_synaptic_matrix_and_master_population_table(
             self, spec, machine_vertex, all_syn_block_sz, weight_scales,
-            routing_info, machine_graph):
+            routing_info, machine_graph, machine_time_step):
         """ Simultaneously generates both the master population table and
             the synaptic matrix.
 
@@ -218,6 +218,7 @@ class SynapticMatrices(object):
         :param .RoutingInfo routing_info:
             The routing information for all edges
         :param .MachineGraph machine_graph: The machine graph
+        :param int machine_time_step: sim machine time step
         :return: A list of generator data to be written elsewhere
         :rtype: list(GeneratorData)
         """
@@ -267,7 +268,8 @@ class SynapticMatrices(object):
                     generate_on_machine.append(app_matrix)
                 else:
                     block_addr, single_addr = app_matrix.write_matrix(
-                        spec, block_addr, single_addr, single_synapses)
+                        spec, block_addr, single_addr, single_synapses,
+                        machine_time_step)
 
         self.__host_generated_block_addr = block_addr
 
@@ -309,17 +311,20 @@ class SynapticMatrices(object):
         """
         in_edges_by_app_edge = defaultdict(OrderedSet)
         key_space_tracker = KeySpaceTracker()
-        for edge in in_machine_edges:
-            rinfo = routing_info.get_routing_info_for_edge(edge)
+        for machine_edge in in_machine_edges:
+            rinfo = routing_info.get_routing_info_for_edge(machine_edge)
             key_space_tracker.allocate_keys(rinfo)
-            app_edge = edge.app_edge
+            app_edge = machine_edge.app_edge
             if isinstance(app_edge, ProjectionApplicationEdge):
-                in_edges_by_app_edge[app_edge].add(edge)
+                in_edges_by_app_edge[app_edge].add(machine_edge)
             elif isinstance(app_edge, DelayedApplicationEdge):
                 # We need to make sure that if an undelayed edge is filtered
                 # but a delayed one is not, we still pick it up
+                undelayed_machine_edge = (
+                    machine_edge.app_edge.undelayed_edge.get_machine_edge(
+                        machine_edge.pre_vertex, machine_edge.post_vertex))
                 in_edges_by_app_edge[app_edge.undelayed_edge].add(
-                    edge.undelayed_edge)
+                    undelayed_machine_edge)
         return in_edges_by_app_edge, key_space_tracker
 
     @staticmethod
@@ -499,9 +504,15 @@ class SynapticMatrices(object):
         pre_slices = list()
         for m_edge in m_edges:
             # If the edge doesn't have a delay edge, give up
-            if m_edge.delay_edge is None:
+            delayed_app_edge = m_edge.app_edge.delay_edge
+            if delayed_app_edge is None:
                 return None
-            rinfo = routing_info.get_routing_info_for_edge(m_edge.delay_edge)
+            delayed_machine_edge = delayed_app_edge.get_machine_edge(
+                m_edge.pre_vertex, m_edge.post_vertex)
+            if delayed_machine_edge is None:
+                return None
+            rinfo = routing_info.get_routing_info_for_edge(
+                delayed_machine_edge)
             vertex_slice = m_edge.pre_vertex.vertex_slice
             pre_slices.append(vertex_slice)
             # No routing info at all? Must have been filtered, so doesn't work
@@ -517,8 +528,8 @@ class SynapticMatrices(object):
                 app_edge.pre_vertex.n_atoms, pre_slices):
             return None
 
-        return self.__get_app_key_and_mask(keys, mask, app_edge.n_delay_stages,
-                                           key_space_tracker)
+        return self.__get_app_key_and_mask(
+            keys, mask, app_edge.n_delay_stages, key_space_tracker)
 
     def get_connections_from_machine(
             self, transceiver, placement, app_edge, synapse_info):

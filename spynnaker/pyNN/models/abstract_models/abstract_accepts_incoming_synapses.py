@@ -39,14 +39,6 @@ class AbstractAcceptsIncomingSynapses(object):
         """
 
     @abstractmethod
-    def get_maximum_delay_supported_in_ms(self, machine_time_step):
-        """ Get the maximum delay supported by this vertex.
-
-        :param int machine_time_step: microseconds
-        :rtype: int
-        """
-
-    @abstractmethod
     def get_connections_from_machine(
             self, transceiver, placements, app_edge, synapse_info):
         # pylint: disable=too-many-arguments

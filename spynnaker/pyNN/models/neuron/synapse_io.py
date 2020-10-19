@@ -145,7 +145,6 @@ class SynapseIORowBased(object):
         :param int post_vertex_max_delay_ticks: post vertex max delay
         :rtype: int or None
         """
-        # There are 16 slots, one per time step
         return post_vertex_max_delay_ticks * (
             machine_time_step / MICRO_TO_MILLISECOND_CONVERSION)
 
@@ -557,8 +556,7 @@ class SynapseIORowBased(object):
 
     def read_all_synapses(
             self, data, delayed_data, synapse_info, n_synapse_types,
-            weight_scales, machine_edge, max_row_info,
-            post_vertex_max_delay_ticks):
+            weight_scales, machine_edge, max_row_info):
         """ Read the synapses for a given projection synapse information\
             object out of the given delayed and undelayed data.
 
@@ -576,8 +574,6 @@ class SynapseIORowBased(object):
             The incoming machine edge that the synapses were generated from
         :param MaxRowInfo max_row_info:
             The maximum information for each of the rows
-        :param int post_vertex_max_delay_ticks: \
-            The max delay ticks from post vertex
         :return: The connections read from the data; the dtype is
             AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
         :rtype: ~numpy.ndarray
@@ -586,6 +582,8 @@ class SynapseIORowBased(object):
         machine_time_step = globals_variables.get_simulator().machine_time_step
         pre_vertex_slice = machine_edge.pre_vertex.vertex_slice
         post_vertex_slice = machine_edge.post_vertex.vertex_slice
+        post_splitter = machine_edge.post_vertex.app_vertex.splitter_object
+        post_vertex_max_delay_ticks = post_splitter.max_support_delay
         max_row_length = max_row_info.undelayed_max_words
         delayed_max_row_length = max_row_info.delayed_max_words
         connections.append(self.convert_to_connections(
