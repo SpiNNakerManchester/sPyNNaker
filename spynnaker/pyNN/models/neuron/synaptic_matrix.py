@@ -515,7 +515,8 @@ class SynapticMatrix(object):
                 self.__synapse_info, pre_slice, post_slice,
                 self.__max_row_info.undelayed_max_words,
                 self.__n_synapse_types, self.__weight_scales, block,
-                machine_time_step, delayed=False))
+                machine_time_step, False,
+                self.__app_edge.post_vertex.splitter_object.max_support_delay))
 
         if self.__delay_syn_mat_offset is not None:
             block = self.__get_delayed_block(
@@ -524,7 +525,8 @@ class SynapticMatrix(object):
                 self.__synapse_info, pre_slice, post_slice,
                 self.__max_row_info.delayed_max_words, self.__n_synapse_types,
                 self.__weight_scales, block,
-                machine_time_step, delayed=True))
+                machine_time_step, True,
+                self.__app_edge.post_vertex.splitter_object.max_support_delay))
 
         return connections
 
