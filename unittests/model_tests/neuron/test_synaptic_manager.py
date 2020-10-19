@@ -531,9 +531,11 @@ def test_pop_based_master_pop_table_standard(
     app_graph = ApplicationGraph("Test")
     mac_graph = MachineGraph("Test", app_graph)
     pre_app_vertex = SimpleApplicationVertex(1000)
+    pre_app_vertex.splitter_object = MockSplitter()
     app_graph.add_vertex(pre_app_vertex)
     post_vertex_slice = Slice(0, 99)
     post_app_vertex = SimpleApplicationVertex(100)
+    post_app_vertex.splitter_object = MockSplitter()
     app_graph.add_vertex(post_app_vertex)
     post_mac_vertex = post_app_vertex.create_machine_vertex(
         post_vertex_slice, None)
