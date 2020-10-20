@@ -17,6 +17,8 @@ import struct
 import numpy
 import sys
 
+from __future__ import division
+
 from collections import defaultdict
 from six import itervalues
 
@@ -474,8 +476,6 @@ class SynapticManager(object):
 
             weight_min = connector.get_weight_minimum(
                 synapse_info.weights, self.__weight_random_sigma)
-            if weight_min != 0:
-                weight_min = self.__get_closest_weight(weight_min)
             weight_min *= weight_scale
             if weight_min != 0:
                 weight_min = float_gcd(min_weights[synapse_type], weight_min)
@@ -485,7 +485,6 @@ class SynapticManager(object):
             if isinstance(synapse_dynamics, SynapseDynamicsSTDP):
                 min_delta = synapse_dynamics.get_weight_min_delta(
                     self.__max_stdp_spike_delta)
-                min_delta = self.__get_closest_weight(min_delta)
                 min_delta *= weight_scale
                 # This also depends on the earlier calculated minimum
                 min_delta = float_gcd(min_delta, weight_min)
