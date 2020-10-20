@@ -92,7 +92,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         """ sets a connectors projection info
         :param int machine_time_step:
         :param SynapseInformation synapse_info:
-                """
+        """
         # pylint: disable=unused-argument
         self._rng = (self._rng or NumpyRNG())
         self.__min_delay = machine_time_step / MICRO_TO_MILLISECOND_CONVERSION
