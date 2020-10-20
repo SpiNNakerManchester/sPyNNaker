@@ -16,6 +16,8 @@
 """
 utility class containing simple helper methods
 """
+from __future__ import division
+
 import os
 import logging
 import math
