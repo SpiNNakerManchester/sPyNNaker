@@ -184,10 +184,18 @@ class PyNNPopulationCommon(object):
             for variable, value in iteritems(initial_values):
                 self._initialize(variable, value)
 
-    # TODO DEAD?
     @staticmethod
     def _process_additional_params(
             additional_parameters, population_parameters):
+        """ essential method for allowing things like splitter objects at
+        pop level
+
+        :param additional_parameters: the additional params handed down from \
+            user
+        :param population_parameters: the additional params the vertex can \
+            support.
+        :return: the list of params that are accepted.
+        """
         for key in additional_parameters.keys():
             if key in population_parameters:
                 population_parameters[key] = additional_parameters[key]
