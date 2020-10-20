@@ -31,6 +31,7 @@ from spinn_front_end_common.interface.profiling import AbstractHasProfileData
 from spinn_front_end_common.interface.profiling.profile_utils import (
     get_profiling_data)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
+from spynnaker.pyNN.models.abstract_models import AbstractSynapseExpandable
 from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
 
 
@@ -39,7 +40,7 @@ class PopulationMachineVertex(
         AbstractHasAssociatedBinary, ProvidesProvenanceDataFromMachineImpl,
         AbstractRecordable, AbstractHasProfileData,
         AbstractSupportsBitFieldGeneration,
-        AbstractSupportsBitFieldRoutingCompression):
+        AbstractSupportsBitFieldRoutingCompression, AbstractSynapseExpandable):
 
     __slots__ = [
         "__binary_file_name",
@@ -382,3 +383,13 @@ class PopulationMachineVertex(
     @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
     def get_binary_start_type(self):
         return ExecutableType.USES_SIMULATION_INTERFACE
+
+    @overrides(AbstractSynapseExpandable.gen_on_machine)
+    def gen_on_machine(self):
+        return self.app_vertex.synapse_manager.gen_on_machine(
+            self.vertex_slice)
+
+    @overrides(AbstractSynapseExpandable.read_generated_connection_holders)
+    def read_generated_connection_holders(self, transceiver, placement):
+         self._app_vertex.synapse_manager.read_generated_connection_holders(
+            transceiver, placement)

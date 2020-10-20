@@ -23,6 +23,8 @@ from spinn_front_end_common.abstract_models import (
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 
+DELAY_EXPANDER_APLX = "delay_expander.aplx"
+
 
 class DelayExtensionMachineVertex(
         MachineVertex, ProvidesProvenanceDataFromMachineImpl,
@@ -166,3 +168,14 @@ class DelayExtensionMachineVertex(
     @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
     def get_binary_start_type(self):
         return ExecutableType.USES_SIMULATION_INTERFACE
+
+    def gen_on_machine(self):
+        """ Determine if the given slice needs to be generated on the machine
+
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :rtype: bool
+        """
+        if self.app_vertex.delay_generator_data(self.vertex_slice):
+            return True
+        else:
+            return False
