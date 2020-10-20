@@ -57,16 +57,20 @@ static inline index_t synapses_get_ring_buffer_index_combined(
 
 //! \brief Converts a weight stored in a synapse row to an input
 //! \param[in] weight: the weight to convert in synapse-row form
-//! \param[in] left_shift: the shift to use when decoding
+//! \param[in] min_weight: the minimum weight to use in the conversion
 //! \return the actual input weight for the model
 static inline input_t synapses_convert_weight_to_input(
         weight_t weight, REAL min_weight) {
-    return weight * min_weight;
+    // Simply doing weight * min_weight adds unnecessary compiler instructions
+    uint64_t mw = (uint64_t) bitsk(min_weight);
+    uint64_t w = (uint64_t) (weight);
+
+    return kbits((int_k_t) (mw * w));
 }
 
 //! \brief Print the weight of a synapse
 //! \param[in] weight: the weight to print in synapse-row form
-//! \param[in] left_shift: the shift to use when decoding
+//! \param[in] min_weight: the minimum weight to use in the conversion
 static inline void synapses_print_weight(
         weight_t weight, REAL min_weight) {
     if (weight != 0) {
