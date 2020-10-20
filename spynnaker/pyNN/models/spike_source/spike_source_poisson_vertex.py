@@ -147,7 +147,7 @@ class SpikeSourcePoissonVertex(
             self, n_neurons, constraints, label, seed,
             max_atoms_per_core, model, rate=None, start=None,
             duration=None, rates=None, starts=None, durations=None,
-            max_rate=None):
+            max_rate=None, splitter_object=None):
         """
         :param int n_neurons:
         :param constraints:
@@ -158,10 +158,14 @@ class SpikeSourcePoissonVertex(
         :param iterable of float rate:
         :param iterable of int start:
         :param iterable of int duration:
+        :param splitter_object:
         """
         # pylint: disable=too-many-arguments
         TDMAAwareApplicationVertex.__init__(
             self, label, constraints, max_atoms_per_core)
+
+        # update splitter object
+        self.splitter_object = splitter_object
 
         # atoms params
         self.__n_atoms = n_neurons

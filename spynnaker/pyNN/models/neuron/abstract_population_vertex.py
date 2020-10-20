@@ -101,7 +101,7 @@ class AbstractPopulationVertex(
     def __init__(
             self, n_neurons, label, constraints, max_atoms_per_core,
             spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
-            neuron_impl, pynn_model, drop_late_spikes):
+            neuron_impl, pynn_model, drop_late_spikes, splitter_object):
         """
         :param int n_neurons: The number of neurons in the population
         :param str label: The label on the population
@@ -123,11 +123,15 @@ class AbstractPopulationVertex(
             The (Python side of the) implementation of the neurons themselves.
         :param AbstractPyNNNeuronModel pynn_model:
             The PyNN neuron model that this vertex is working on behalf of.
+        :param splitter_object: splitter object
         """
 
         # pylint: disable=too-many-arguments, too-many-locals
         TDMAAwareApplicationVertex.__init__(
             self, label, constraints, max_atoms_per_core)
+
+        # set the splitter object
+        self.splitter_object = splitter_object
 
         self.__n_atoms = n_neurons
         self.__n_data_specs = 0
