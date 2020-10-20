@@ -16,12 +16,16 @@
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
+from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
 
-DEFAULT_MAX_ATOMS_PER_CORE = 255
+# The maximum atoms per core is the master population table row length to
+# make it easier when all-to-all-connector is used
+DEFAULT_MAX_ATOMS_PER_CORE = POP_TABLE_MAX_ROW_LENGTH
 
 _population_parameters = {
     "spikes_per_second": None, "ring_buffer_sigma": None,
-    "incoming_spike_buffer_size": None, "splitter_object": None
+    "incoming_spike_buffer_size": None, "drop_late_spikes": None,
+"splitter_object": None
 }
 
 
@@ -55,9 +59,11 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
                additional_arguments=_population_parameters.keys())
     def create_vertex(
             self, n_neurons, label, constraints, spikes_per_second,
-            ring_buffer_sigma, incoming_spike_buffer_size, splitter_object):
+            ring_buffer_sigma, incoming_spike_buffer_size, drop_late_spikes,
+            splitter_object):
         # pylint: disable=arguments-differ
         max_atoms = self.get_max_atoms_per_core()
         return AbstractPopulationVertex(
             n_neurons, label, constraints, max_atoms, spikes_per_second,
-            ring_buffer_sigma, incoming_spike_buffer_size, self.__model, self)
+            ring_buffer_sigma, incoming_spike_buffer_size, self.__model,
+            self, drop_late_spikes)

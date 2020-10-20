@@ -222,8 +222,8 @@ class FromListConnector(AbstractConnector):
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices, post_slice_index,
-            pre_vertex_slice, post_vertex_slice, synapse_type, synapse_info):
+            self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
+            synapse_type, synapse_info):
         # pylint: disable=too-many-arguments
         if not len(self.__sources):
             return numpy.zeros(0, dtype=self.NUMPY_SYNAPSES_DTYPE)
@@ -402,8 +402,8 @@ class FromListConnector(AbstractConnector):
         return self.__extra_parameter_names
 
     @overrides(AbstractConnector.could_connect)
-    def could_connect(self, synapse_info, pre_slice, post_slice):
-        return any((pre_slice.lo_atom <= self.__sources) &
-                   (self.__sources <= pre_slice.hi_atom) &
-                   (post_slice.lo_atom <= self.__targets) &
-                   (self.__targets <= post_slice.hi_atom))
+    def could_connect(self, _synapse_info, _pre_slice, _post_slice):
+        return any((_pre_slice.lo_atom <= self.__sources) &
+                   (self.__sources <= _pre_slice.hi_atom) &
+                   (_post_slice.lo_atom <= self.__targets) &
+                   (self.__targets <= _post_slice.hi_atom))

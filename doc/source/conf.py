@@ -61,8 +61,6 @@ intersphinx_mapping = {
     'pynn': ("http://neuralensemble.org/docs/PyNN/", None),
     'spinn_utilities': ('https://spinnutils.readthedocs.io/en/latest/', None),
     'spinn_machine': ('https://spinnmachine.readthedocs.io/en/latest/', None),
-    'spinn_storage_handlers': (
-        'https://spinnstoragehandlers.readthedocs.io/en/latest/', None),
     'spinnman': ('https://spinnman.readthedocs.io/en/latest/', None),
     'pacman': ('https://pacman.readthedocs.io/en/latest/', None),
     'data_specification': (

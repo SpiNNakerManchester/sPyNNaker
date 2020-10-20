@@ -15,9 +15,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
  -->
 <algorithms xmlns="https://github.com/SpiNNakerManchester/PACMAN"
-		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xsi:schemaLocation="https://github.com/SpiNNakerManchester/PACMAN
-			https://raw.githubusercontent.com/SpiNNakerManchester/PACMAN/master/pacman/operations/algorithms_metadata_schema.xsd">
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="https://github.com/SpiNNakerManchester/PACMAN
+            https://raw.githubusercontent.com/SpiNNakerManchester/PACMAN/master/pacman/operations/algorithms_metadata_schema.xsd">
     <algorithm name="SynapseExpander">
         <python_module>spynnaker.pyNN.extra_algorithms.synapse_expander</python_module>
         <python_function>synapse_expander</python_function>
@@ -101,8 +101,8 @@
                 <param_type>ExecutableFinder</param_type>
             </parameter>
             <parameter>
-                <param_name>read_algorithm_iobuf</param_name>
-                <param_type>RouterCompressorWithBitFieldReadIOBuf</param_type>
+                <param_name>write_compressor_iobuf</param_name>
+                <param_type>WriteCompressorIobuf</param_type>
             </parameter>
             <parameter>
                 <param_name>machine_graph</param_name>
@@ -156,7 +156,7 @@
         <required_inputs>
             <param_name>read_expander_iobuf</param_name>
             <param_name>executable_finder</param_name>
-            <param_name>read_algorithm_iobuf</param_name>
+            <param_name>write_compressor_iobuf</param_name>
             <param_name>routing_tables</param_name>
             <param_name>transceiver</param_name>
             <param_name>machine</param_name>
@@ -230,8 +230,8 @@
                 <param_type>ExecutableFinder</param_type>
             </parameter>
             <parameter>
-                <param_name>read_algorithm_iobuf</param_name>
-                <param_type>RouterCompressorWithBitFieldReadIOBuf</param_type>
+                <param_name>write_compressor_iobuf</param_name>
+                <param_type>WriteCompressorIobuf</param_type>
             </parameter>
             <parameter>
                 <param_name>machine_graph</param_name>
@@ -280,7 +280,7 @@
         </input_definitions>
         <required_inputs>
             <param_name>executable_finder</param_name>
-            <param_name>read_algorithm_iobuf</param_name>
+            <param_name>write_compressor_iobuf</param_name>
             <param_name>routing_tables</param_name>
             <param_name>transceiver</param_name>
             <param_name>machine</param_name>
@@ -335,8 +335,8 @@
                 <param_type>MemoryPlacements</param_type>
             </parameter>
             <parameter>
-                <param_name>read_bit_field_generator_iobuf</param_name>
-                <param_type>ReadBitFieldGeneratorIOBUF</param_type>
+                <param_name>write_bit_field_generator_iobuf</param_name>
+                <param_type>WriteBitFieldGeneratorIOBUF</param_type>
             </parameter>
             <parameter>
                 <param_name>generating_bitfield_report</param_name>
@@ -365,7 +365,7 @@
             <param_name>executable_finder</param_name>
             <param_name>provenance_file_path</param_name>
             <param_name>transceiver</param_name>
-            <param_name>read_bit_field_generator_iobuf</param_name>
+            <param_name>write_bit_field_generator_iobuf</param_name>
             <param_name>generating_bitfield_report</param_name>
             <param_name>generating_bit_field_summary_report</param_name>
             <param_name>default_report_folder</param_name>
@@ -507,6 +507,20 @@
         </input_definitions>
         <required_inputs>
             <param_name>report_folder</param_name>
+            <param_name>application_graph</param_name>
+        </required_inputs>
+    </algorithm>
+    <algorithm name="FinishConnectionHolders">
+        <python_module>spynnaker.pyNN.extra_algorithms.connection_holder_finisher</python_module>
+        <python_function>finish_connection_holders</python_function>
+        <input_definitions>
+            <parameter>
+                <param_name>application_graph</param_name>
+                <param_type>MemoryApplicationGraph</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <token>DataLoaded</token>
             <param_name>application_graph</param_name>
         </required_inputs>
     </algorithm>

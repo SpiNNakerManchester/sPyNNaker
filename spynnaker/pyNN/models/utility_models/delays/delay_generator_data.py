@@ -28,10 +28,8 @@ class DelayGeneratorData(object):
         "__max_row_n_synapses",
         "__max_stage",
         "__post_slices",
-        "__post_slice_index",
         "__post_vertex_slice",
         "__pre_slices",
-        "__pre_slice_index",
         "__pre_vertex_slice",
         "__synapse_information")
 
@@ -39,16 +37,13 @@ class DelayGeneratorData(object):
 
     def __init__(
             self, max_row_n_synapses, max_delayed_row_n_synapses,
-            pre_slices, pre_slice_index, post_slices, post_slice_index,
-            pre_vertex_slice, post_vertex_slice, synapse_information,
-            max_stage, machine_time_step):
+            pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
+            synapse_information, max_stage, machine_time_step):
         """
         :param int max_row_n_synapses:
         :param int max_delayed_row_n_synapses:
         :param list(~pacman.model.graphs.common.Slice) pre_slices:
-        :param int pre_slice_index:
         :param list(~pacman.model.graphs.common.Slice) post_slices:
-        :param int post_slice_index:
         :param ~pacman.model.graphs.common.Slicepre_vertex_slice:
         :param ~pacman.model.graphs.common.Slicepost_vertex_slice:
         :param SynapseInformation synapse_information:
@@ -58,9 +53,7 @@ class DelayGeneratorData(object):
         self.__max_row_n_synapses = max_row_n_synapses
         self.__max_delayed_row_n_synapses = max_delayed_row_n_synapses
         self.__pre_slices = pre_slices
-        self.__pre_slice_index = pre_slice_index
         self.__post_slices = post_slices
-        self.__post_slice_index = post_slice_index
         self.__pre_vertex_slice = pre_vertex_slice
         self.__post_vertex_slice = post_vertex_slice
         self.__synapse_information = synapse_information
@@ -91,8 +84,8 @@ class DelayGeneratorData(object):
         items.append(numpy.array([
             self.__max_row_n_synapses,
             self.__max_delayed_row_n_synapses,
-            self.__pre_vertex_slice.lo_atom,
-            self.__pre_vertex_slice.n_atoms,
+            self.__post_vertex_slice.lo_atom,
+            self.__post_vertex_slice.n_atoms,
             self.__max_stage,
             DataType.S1615.encode_as_int(
                 MICRO_TO_MILLISECOND_CONVERSION / self.__machine_time_step),
@@ -100,8 +93,7 @@ class DelayGeneratorData(object):
             connector.gen_delays_id(self.__synapse_information.delays)],
             dtype="uint32"))
         items.append(connector.gen_connector_params(
-            self.__pre_slices, self.__pre_slice_index, self.__post_slices,
-            self.__post_slice_index, self.__pre_vertex_slice,
+            self.__pre_slices, self.__post_slices, self.__pre_vertex_slice,
             self.__post_vertex_slice, self.__synapse_information.synapse_type,
             self.__synapse_information))
         items.append(connector.gen_delay_params(
