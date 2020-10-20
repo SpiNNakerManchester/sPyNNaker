@@ -99,9 +99,9 @@ class AbstractNeuronRecordable(object):
             self, n_machine_time_steps, sampling_rate, vertex, variable):
         """ Returns the number of expected rows for a given runtime
 
-        :param n_machine_time_steps: map of vertex to steps.
-        :param sampling_rate: the sampling rate for this vertex
-        :param vertex: the machine vertex
-        :param variable: the variable being recorded
-        :return: the number of rows expected.
+        :param int n_machine_time_steps: map of vertex to steps.
+        :param int sampling_rate: the sampling rate for this vertex
+        :param MachineVertex vertex: the machine vertex
+        :param str variable: the variable being recorded
+        :return: int the number of rows expected.
         """
