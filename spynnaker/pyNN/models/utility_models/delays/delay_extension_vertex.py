@@ -85,6 +85,8 @@ class DelayExtensionVertex(
         self.__delay_per_stage = delay_per_stage
         self.__delay_generator_data = defaultdict(list)
         self.__n_data_specs = 0
+        self.set_new_n_delay_stages_and_delay_per_stage(
+            self.__delay_per_stage, self.__max_delay_needed_to_support)
 
         # atom store
         self.__n_atoms = n_neurons

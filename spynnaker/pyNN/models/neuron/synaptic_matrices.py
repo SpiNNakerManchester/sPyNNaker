@@ -536,7 +536,7 @@ class SynapticMatrices(object):
         """ Get the synaptic connections from the machine
 
         :param Transceiver transceiver: Used to read the data from the machine
-        :param Placements placements: Where the vertices are on the machine
+        :param Placements placement: Where the vertices are on the machine
         :param ProjectionApplicationEdge app_edge:
             The application edge of the projection
         :param SynapseInformation synapse_info:

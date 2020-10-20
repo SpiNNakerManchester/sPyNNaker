@@ -583,7 +583,7 @@ class SynapseIORowBased(object):
         pre_vertex_slice = machine_edge.pre_vertex.vertex_slice
         post_vertex_slice = machine_edge.post_vertex.vertex_slice
         post_splitter = machine_edge.post_vertex.app_vertex.splitter_object
-        post_vertex_max_delay_ticks = post_splitter.max_support_delay
+        post_vertex_max_delay_ticks = post_splitter.max_support_delay()
         max_row_length = max_row_info.undelayed_max_words
         delayed_max_row_length = max_row_info.delayed_max_words
         connections.append(self.convert_to_connections(

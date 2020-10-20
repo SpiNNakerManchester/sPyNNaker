@@ -187,7 +187,9 @@ def test_write_data_spec():
     post_vertex_placement = Placement(post_vertex, 0, 0, 2)
     placements.add_placement(post_vertex_placement)
     delay_app_vertex = DelayExtensionVertex(
-        10, 16, 51-16, pre_app_vertex, label="delay")
+        10, 16, 51, pre_app_vertex, label="delay")
+    delay_app_vertex.set_new_n_delay_stages_and_delay_per_stage(
+        16, 51)
     delay_app_vertex.splitter_object = SplitterDelayVertexSlice(
         pre_app_vertex.splitter_object)
     delay_vertex = DelayExtensionMachineVertex(
@@ -552,6 +554,8 @@ def test_pop_based_master_pop_table_standard(
     if delayed_indices_connected:
         pre_app_delay_vertex = DelayExtensionVertex(
             1000, 16.0, 4, pre_app_vertex)
+        pre_app_delay_vertex.set_new_n_delay_stages_and_delay_per_stage(
+            16, 20)
         app_graph.add_vertex(pre_app_delay_vertex)
 
         for i in range(10):
@@ -627,7 +631,7 @@ def test_pop_based_master_pop_table_standard(
         spikes_per_second=100.0, config=config, drop_late_spikes=True)
     synaptic_manager.write_data_spec(
         spec, post_app_vertex, post_vertex_slice, post_mac_vertex,
-        mac_graph, app_graph, routing_info, 1.0, 1.0)
+        mac_graph, app_graph, routing_info, 1.0, 1000.0)
     spec.end_specification()
     with io.FileIO(temp_spec, "rb") as spec_reader:
         executor = DataSpecificationExecutor(
