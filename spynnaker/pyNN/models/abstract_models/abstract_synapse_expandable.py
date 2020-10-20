@@ -55,5 +55,3 @@ class AbstractSynapseExpandable(object):
         :param Transceiver transceiver: How the data is to be read
         :param Placement placement: Where the data is on the machine
         """
-        self.__synapse_manager.read_generated_connection_holders(
-            transceiver, placement)

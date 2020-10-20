@@ -29,4 +29,4 @@ __all__ = ["AbstractAcceptsIncomingSynapses", "AbstractContainsUnits",
            "AbstractMaxSpikes", "AbstractPopulationInitializable",
            "AbstractPopulationSettable", "AbstractReadParametersBeforeSet",
            "AbstractSettable", "AbstractSynapseExpandable",
-           "AbstractWeightUpdatable", SYNAPSE_EXPANDER_APLX]
+           "AbstractWeightUpdatable", "SYNAPSE_EXPANDER_APLX"]
