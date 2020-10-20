@@ -18,6 +18,7 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 SYNAPSE_EXPANDER_APLX = "synapse_expander.aplx"
 
+
 @add_metaclass(AbstractBase)
 class AbstractSynapseExpandable(object):
     """ Indicates a class (most likely a MachineVertex) that has may need to

@@ -391,5 +391,5 @@ class PopulationMachineVertex(
 
     @overrides(AbstractSynapseExpandable.read_generated_connection_holders)
     def read_generated_connection_holders(self, transceiver, placement):
-         self._app_vertex.synapse_manager.read_generated_connection_holders(
+        self._app_vertex.synapse_manager.read_generated_connection_holders(
             transceiver, placement)
