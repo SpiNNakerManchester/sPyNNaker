@@ -19,6 +19,7 @@
 #include "spike_processing.h"
 #include "neuron.h"
 #include "plasticity/synapse_dynamics.h"
+#include "compartment_type/compartment_type.h"
 #include <profiler.h>
 #include <debug.h>
 #include <spin1_api.h>
@@ -159,19 +160,6 @@ static inline void print_inputs(void) {
 #endif // LOG_LEVEL >= LOG_DEBUG
 }
 
-// Converts a rate to an input
-static inline input_t convert_rate_to_input(uint32_t rate) {
-
-	union {
-        uint32_t input_type;
-        s1615 output_type;
-    } converter;
-
-    converter.input_type = (rate);
-
-    return converter.output_type;
-}
-
 
 // This is the "inner loop" of the neural simulation.
 // Every spike event could cause up to 256 different weights to
@@ -187,8 +175,9 @@ static inline void process_fixed_synapses(
 
     //volatile uint32_t t = tc[T1_COUNT];
 
-    s1615 r = convert_rate_to_input(somatic_voltage);
-    r = r > 0.0k ? r : 0.0k;
+    //s1615 r = convert_rate_to_input(somatic_voltage);
+    //r = r > 0.0k ? r : 0.0k;
+    REAL rate = compute_input_rate(somatic_voltage);
 
     for (; fixed_synapse > 0; fixed_synapse--) {
         // Get the next 32 bit word from the synaptic_row
@@ -211,7 +200,7 @@ static inline void process_fixed_synapses(
                             ring_buffer_to_input_left_shifts[combined_synapse_neuron_index >> synapse_index_bits]);
 
         // Add weight to current ring buffer value
-        REAL accumulation = ring_buffers[ring_buffer_index] + MULT_ROUND_STOCHASTIC_ACCUM(r, weight);
+        REAL accumulation = ring_buffers[ring_buffer_index] + get_input_current(rate, weight);
 
         // Saturation check, MAYBE WE SHOULD CAP THE MAX INCOMING VALUES?
 //        s3231 sat_test = accumulation & 0x100000000;

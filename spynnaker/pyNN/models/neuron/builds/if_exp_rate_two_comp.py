@@ -56,7 +56,7 @@ class IFExpRateTwoComp(AbstractPyNNNeuronModelStandard):
         synapse_type = SynapseTypeExponentialTwoComp(
             tau_syn_E_soma, tau_syn_E_dendrite, tau_syn_I_soma, tau_syn_I_dendrite,
             isyn_exc_soma, isyn_exc_dendrite, isyn_inh_soma, isyn_inh_dendrite)
-        input_type = InputTypeTwoComp(e_rev_E, e_rev_I)
+        input_type = InputTypeTwoComp()
         threshold_type = ThresholdTypeStatic(v_thresh)
 
         self._rate_based = True

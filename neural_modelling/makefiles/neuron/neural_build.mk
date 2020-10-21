@@ -182,6 +182,12 @@ ifdef TIMING_DEPENDENCE
     TIMING_DEPENDENCE_O := $(BUILD_DIR)$(TIMING_DEPENDENCE:%.c=%.o)
 endif
 
+ifdef COMPARTMENT_TYPE_H
+	COMPARTMENT_TYPE := $(call strip_source_dirs,$(COMPARTMENT_TYPE_H))
+	COMPARTMENT_TYPE_H := $(call replace_source_dirs, $(COMPARTMENT_TYPE_H))
+    SYNAPSE_INCLUDES := -include $(COMPARTMENT_TYPE_H)
+endif
+
 SYNGEN_ENABLED = 1
 ifndef SYNAPTOGENESIS_DYNAMICS
     SYNAPTOGENESIS_DYNAMICS := neuron/structural_plasticity/synaptogenesis_dynamics_static_impl.c
@@ -221,7 +227,7 @@ $(BUILD_DIR)neuron/c_main.o: $(MODIFIED_DIR)neuron/c_main.c
 $(BUILD_DIR)neuron/synapses.o: $(MODIFIED_DIR)neuron/synapses.c
 	#synapses.c
 	-@mkdir -p $(dir $@)
-	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
+	$(SYNAPSE_TYPE_COMPILE) $(SYNAPSE_INCLUDES) -o $@ $<
 
 $(BUILD_DIR)neuron/spike_processing.o: $(MODIFIED_DIR)neuron/spike_processing.c
 	#spike_processing.c

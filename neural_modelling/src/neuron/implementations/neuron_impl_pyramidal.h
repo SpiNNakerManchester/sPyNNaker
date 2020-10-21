@@ -181,6 +181,7 @@ static void neuron_impl_load_neuron_parameters(
 
     //io_printf(IO_BUF, "copied neuron params\n");
 
+    // THIS COPIES 0 BYTES, REMOVE?
     if (sizeof(input_type_t)) {
         log_debug("reading input type parameters");
         spin1_memcpy(input_type_array, &address[next],
@@ -391,14 +392,14 @@ static void neuron_impl_store_neuron_parameters(
 
 //! \brief Returns the difference between the last updated value of rate and the previous one
 //! \param[in] neuron_index: the index of the neuron
-static inline uint neuron_impl_get_rate(index_t neuron_index) {
+static inline uint neuron_impl_get_v(index_t neuron_index) {
 
     union {
         REAL input;
         uint output;
     } converter;
 
-    converter.input = neuron_array[neuron_index].rate_at_last_setting;
+    converter.input = neuron_array[neuron_index].U_membrane;
 
     //io_printf(IO_BUF, "returning %k conv %k\n", neuron_array[neuron_index].rate_at_last_setting, converter.output);
 

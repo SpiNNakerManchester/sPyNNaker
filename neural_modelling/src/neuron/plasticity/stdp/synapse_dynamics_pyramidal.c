@@ -289,6 +289,7 @@ bool synapse_dynamics_process_plastic_synapses(
     //io_printf(IO_BUF, "t %d prev %k\n", time, last_pre_rate);
 
     REAL real_rate = convert_rate_to_input(rate);
+    real_rate = real_rate > 0.0k ? real_rate : 0.0k;
 
     // Update pre-synaptic trace
     log_debug("Adding pre-synaptic event to trace at time:%u", time);

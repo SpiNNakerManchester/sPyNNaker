@@ -25,5 +25,7 @@ TIMING_DEPENDENCE_H = $(NEURON_DIR)/neuron/plasticity/stdp/timing_dependence/tim
 WEIGHT_DEPENDENCE = $(NEURON_DIR)/neuron/plasticity/stdp/weight_dependence/weight_multiplicative_multicomp_Bern.c
 WEIGHT_DEPENDENCE_H = $(NEURON_DIR)/neuron/plasticity/stdp/weight_dependence/weight_multiplicative_multicomp_Bern.h
 
+COMPARTMENT_TYPE_H = $(NEURON_DIR)/neuron/compartment_type/compartment_type_US_model.h
+
 include ../neural_build.mk
 
