@@ -106,7 +106,7 @@ class ExternalDeviceLifControlVertex(
         super(ExternalDeviceLifControlVertex, self).__init__(
             len(devices), label, constraints, max_atoms_per_core,
             spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
-            neuron_impl, pynn_model, drop_late_spikes)
+            neuron_impl, pynn_model, drop_late_spikes, splitter_object)
         self.splitter_object = splitter_object
 
     def routing_key_partition_atom_mapping(self, routing_info, partition):
