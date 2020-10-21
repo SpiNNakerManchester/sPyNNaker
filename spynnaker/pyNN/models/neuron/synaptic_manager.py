@@ -486,9 +486,9 @@ class SynapticManager(object):
                 min_delta = synapse_dynamics.get_weight_min_delta(
                     self.__max_stdp_spike_delta)
                 min_delta *= weight_scale
-                # This also depends on the earlier calculated minimum
-                min_delta = float_gcd(min_delta, weight_min)
                 if min_delta is not None and min_delta != 0:
+                    # This also depends on the earlier calculated minimum
+                    min_delta = float_gcd(min_delta, weight_min)
                     min_weights[synapse_type] = min(
                         min_weights[synapse_type], min_delta)
             elif isinstance(synapse_dynamics, SynapseDynamicsStructuralStatic):
