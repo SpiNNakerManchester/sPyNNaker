@@ -19,8 +19,6 @@ import math
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
-from pacman.model.constraints.partitioner_constraints import (
-    SameAtomsAsVertexConstraint)
 from spinn_front_end_common.abstract_models import (
     AbstractProvidesOutgoingPartitionConstraints)
 from spinn_front_end_common.abstract_models.impl import (
@@ -93,8 +91,6 @@ class DelayExtensionVertex(
 
         # Dictionary of vertex_slice -> delay block for data specification
         self.__delay_blocks = dict()
-
-        self.add_constraint(SameAtomsAsVertexConstraint(source_vertex))
 
     @property
     def n_atoms(self):

@@ -14,8 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase
-from spynnaker.pyNN.models.neural_projections import (
-    DelayAfferentMachineEdge, DelayedMachineEdge)
 
 
 @add_metaclass(AbstractBase)
@@ -34,8 +32,8 @@ class AbstractSpynnakerSplitterDelay(object):
 
     @staticmethod
     def extra_pre_edge_type():
-        return [DelayAfferentMachineEdge]
+        return []
 
     @staticmethod
     def extra_post_edge_type():
-        return [DelayedMachineEdge]
+        return []
