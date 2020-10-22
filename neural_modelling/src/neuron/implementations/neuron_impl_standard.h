@@ -261,12 +261,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
             recorded_variable_values[V_RECORDING_INDEX] = voltage;
             recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = total_exc;
             recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = total_inh;
-            // Record the voltage
-            recorded_variable_values[V_RECORDING_INDEX] = voltage;
         }
-
-        // Call functions to convert exc_input and inh_input to current
-        voltage = neuron_model_get_membrane_voltage(neuron);
 
         input_type_convert_excitatory_input_to_current(
                 exc_input_values, input_type, voltage);

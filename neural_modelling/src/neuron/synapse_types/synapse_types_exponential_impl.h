@@ -101,8 +101,8 @@ static inline void add_input_exp(exp_params_t* exp_params, input_t input) {
 //	exp_params->synaptic_input_value = exp_params->synaptic_input_value +
 //			decay_s1615(input, exp_params->init);
 	exp_params->synaptic_input_value = exp_params->synaptic_input_value +
-			input;
-//			decay_s1615(input, exp_params->init);
+//			input;
+			decay_s1615(input, exp_params->init);
 //			MULT_ROUND_NEAREST_ACCUM(input, exp_params->init);
 }
 
