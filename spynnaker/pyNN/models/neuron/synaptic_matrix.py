@@ -87,7 +87,7 @@ class SynapticMatrix(object):
             The master population table
         :param SynapseInformation synapse_info:
             The projection synapse information
-        :param ProjectionMachineEdge machine_edge:
+        :param MachineEdge machine_edge:
             The projection machine edge
         :param ProjectionApplicationEdge app_edge:
             The projection application edge

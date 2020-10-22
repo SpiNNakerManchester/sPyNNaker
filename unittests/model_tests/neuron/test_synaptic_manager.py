@@ -30,7 +30,8 @@ from spinn_machine import SDRAM
 from pacman.model.placements import Placement
 from pacman.model.resources import ResourceContainer
 from pacman.model.graphs.common import Slice
-from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
+from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex, \
+    MachineEdge
 from pacman.model.routing_info import (
     RoutingInfo, PartitionRoutingInfo, BaseKeyAndMask)
 from pacman.model.graphs.application import ApplicationVertex
@@ -40,8 +41,7 @@ from spynnaker.pyNN.models.neuron import SynapticManager
 from spynnaker.pyNN.abstract_spinnaker_common import AbstractSpiNNakerCommon
 import spynnaker.pyNN.abstract_spinnaker_common as abstract_spinnaker_common
 from spynnaker.pyNN.models.neural_projections import (
-    ProjectionApplicationEdge, SynapseInformation, DelayedApplicationEdge,
-    ProjectionMachineEdge, DelayedMachineEdge)
+    ProjectionApplicationEdge, SynapseInformation, DelayedApplicationEdge)
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnMachine, OneToOneConnector, AllToAllConnector,
     FromListConnector)
@@ -233,9 +233,9 @@ def test_write_data_spec():
     delay_edge.add_synapse_information(all_to_all_synapse_information)
     delay_edge.add_synapse_information(from_list_synapse_information)
     app_edge.delay_edge = delay_edge
-    machine_edge = ProjectionMachineEdge(
+    machine_edge = MachineEdge(
         pre_vertex, post_vertex, app_edge=app_edge)
-    delay_machine_edge = DelayedMachineEdge(
+    delay_machine_edge = MachineEdge(
         delay_vertex, post_vertex, app_edge=delay_edge)
     partition_name = "TestPartition"
 
@@ -594,7 +594,7 @@ def test_pop_based_master_pop_table_standard(
     # Create the machine edges
     for pre_mac_vertex in pre_app_vertex.machine_vertices:
         i = pre_mac_vertex.index
-        mac_edge = ProjectionMachineEdge(
+        mac_edge = MachineEdge(
             pre_mac_vertex, post_mac_vertex, app_edge=app_edge)
         if undelayed_indices_connected and i in undelayed_indices_connected:
             mac_graph.add_edge(mac_edge, "Test")
@@ -613,7 +613,7 @@ def test_pop_based_master_pop_table_standard(
         base_d_key = 16 * n_keys
         for pre_mac_vertex in pre_app_delay_vertex.machine_vertices:
             i = pre_mac_vertex.index
-            mac_edge = DelayedMachineEdge(
+            mac_edge = MachineEdge(
                 pre_mac_vertex, post_mac_vertex, app_edge=delay_app_edge)
             if i in delayed_indices_connected:
                 mac_graph.add_edge(mac_edge, "Test")

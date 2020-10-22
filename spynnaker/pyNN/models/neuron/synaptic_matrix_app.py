@@ -293,7 +293,7 @@ class SynapticMatrixApp(object):
             Routing key information for all incoming edges
         :param list(float) weight_scales:
             Weight scale for each synapse edge
-        :param list(ProjectionMachineEdge) m_edges:
+        :param list(MachineEdge) m_edges:
             The machine edges incoming to this vertex
         """
         self.__all_syn_block_sz = all_syn_block_sz
@@ -369,7 +369,7 @@ class SynapticMatrixApp(object):
             The specification to write to
         :param int block_addr:
             The address in the synaptic matrix region to start writing at
-        :param list(ProjectionMachineEdge, ~numpy.ndarray) matrix_data:
+        :param list(MachineEdge, ~numpy.ndarray) matrix_data:
             The data for each machine edge to be combined into a single matrix
         :return: The updated block address
         :rtype: int
@@ -416,7 +416,7 @@ class SynapticMatrixApp(object):
             The specification to write to
         :param int block_addr:
             The address in the synaptic matrix region to start writing at
-        :param list(ProjectionMachineEdge, ~numpy.ndarray) matrix_data:
+        :param list(MachineEdge, ~numpy.ndarray) matrix_data:
             The data for each machine edge to be combined into a single matrix
         :return: The updated block address
         :rtype: int
