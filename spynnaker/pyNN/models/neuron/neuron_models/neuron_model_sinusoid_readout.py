@@ -185,7 +185,8 @@ class NeuronModelLeakyIntegrateAndFireSinusoidReadout(AbstractNeuronModel):
                 ]
 
         # create synaptic state - init all state to zero
-        eprop_syn_init = [0,    # delta w
+        for n in range(SYNAPSES_PER_NEURON):
+            eprop_syn_init = [0,    # delta w
                           0,    # z_bar_inp
                           0,#,    # z_bar
                           # 0,    # el_a
@@ -193,7 +194,7 @@ class NeuronModelLeakyIntegrateAndFireSinusoidReadout(AbstractNeuronModel):
                           self._update_ready, #int(numpy.random.rand()*1024)      # update_ready
                           ]
         # extend to appropriate fan-in
-        values.extend(eprop_syn_init * SYNAPSES_PER_NEURON)
+        values.extend(eprop_syn_init) # * SYNAPSES_PER_NEURON)
 
         return values
 

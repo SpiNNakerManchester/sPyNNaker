@@ -102,11 +102,11 @@ state_t neuron_model_state_update(
 //	}
     neuron->psi *= neuron->A;
 
-//  This parameter is OK to update, as the actual size of the array is set in the header file, which matches the Python code. This should make it possible to do a pause and resume cycle and have reliable unloading of data.
+//  This parameter is OK to update, as the actual size of the array is set in the header file, which matches the Python code. 
+//  This should make it possible to do a pause and resume cycle and have reliable unloading of data.
     uint32_t total_input_synapses_per_neuron = 40; //todo should this be fixed?
     uint32_t total_recurrent_synapses_per_neuron = 0; //todo should this be fixed?
     uint32_t recurrent_offset = 100;
-
 
 //    neuron->psi = neuron->psi << 10;
 
@@ -143,6 +143,7 @@ state_t neuron_model_state_update(
                                     / (accum_time
                                     * (accum)syn_dynamics_neurons_in_partition))
                                     - global_parameters->core_target_rate;
+    
 //    io_printf(IO_BUF, "rls: %k\n", reg_learning_signal);
     if (time % neuron->window_size == neuron->window_size - 1 & !printed_value){ //hardcoded time of reset
 //        io_printf(IO_BUF, "1 %u, rate err:%k, spikes:%k, target:%k\tL:%k, v_mem:%k\n",
@@ -210,8 +211,8 @@ state_t neuron_model_state_update(
 		// ******************************************************************
     	neuron->syn_state[syn_ind].z_bar =
     			neuron->syn_state[syn_ind].z_bar * neuron->exp_TC
-//    			+ (1 - neuron->exp_TC) *
-    			+
+    			+ 
+    			(1 - neuron->exp_TC) *
     			neuron->syn_state[syn_ind].z_bar_inp; // updating z_bar is problematic, if spike could come and interrupt neuron update
 
 
