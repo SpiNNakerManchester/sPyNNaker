@@ -19,6 +19,7 @@ from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint, FixedVertexAtomsConstraint,
     SameAtomsAsVertexConstraint, AbstractPartitionerConstraint)
+from pacman.model.graphs.machine import MachineEdge
 from pacman.model.partitioner_splitters.abstract_splitters.\
     abstract_dependent_splitter import AbstractDependentSplitter
 from pacman.model.resources import (
@@ -30,8 +31,7 @@ from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT, BYTES_PER_WORD)
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.exceptions import SpynnakerSplitterConfigurationException
-from spynnaker.pyNN.models.neural_projections import (
-    DelayedApplicationEdge, DelayAfferentMachineEdge, DelayedMachineEdge)
+from spynnaker.pyNN.models.neural_projections import DelayedApplicationEdge
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnMachine)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
@@ -88,7 +88,7 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
 
     @overrides(AbstractDependentSplitter.get_pre_vertices)
     def get_pre_vertices(self, edge, outgoing_edge_partition):
-        return self._get_map([DelayedMachineEdge])
+        return self._get_map([MachineEdge])
 
     @property
     def source_of_delay_vertex(self):
@@ -130,7 +130,7 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
             self, edge, outgoing_edge_partition, src_machine_vertex):
         return {
             self._machine_vertex_by_slice[
-                src_machine_vertex.vertex_slice]: [DelayAfferentMachineEdge]}
+                src_machine_vertex.vertex_slice]: [MachineEdge]}
 
     @overrides(AbstractDependentSplitter.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):

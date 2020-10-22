@@ -26,8 +26,7 @@ class ProjectionMachineEdge(
         MachineEdge, AbstractWeightUpdatable,
         AbstractProvidesLocalProvenanceData):
 
-    __slots__ = [
-        "__delay_edge"]
+    __slots__ = []
 
     def __init__(
             self, pre_vertex, post_vertex, app_edge, label=None,
@@ -42,25 +41,6 @@ class ProjectionMachineEdge(
         super(ProjectionMachineEdge, self).__init__(
             pre_vertex, post_vertex, label=label, app_edge=app_edge,
             traffic_weight=traffic_weight)
-
-        self.__delay_edge = None
-
-    @property
-    def delay_edge(self):
-        """ Get the matching delay edge of this edge
-
-        :rtype: DelayedMachineEdge or None
-        """
-        raise Exception()
-        return self.__delay_edge
-
-    @delay_edge.setter
-    def delay_edge(self, delay_edge):
-        """ Set the matching delay edge of this edge
-
-        :param DelayMachineEdge delay_edge: The edge to set
-        """
-        self.__delay_edge = delay_edge
 
     @overrides(AbstractWeightUpdatable.update_weight)
     def update_weight(self):
