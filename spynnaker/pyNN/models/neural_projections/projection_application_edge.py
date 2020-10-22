@@ -14,6 +14,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
+
+from spinn_front_end_common.interface.provenance import \
+    AbstractProvidesLocalProvenanceData
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationEdge
 from pacman.model.partitioner_interfaces import AbstractSlicesConnect
@@ -32,7 +35,9 @@ def _are_dynamics_structural(synapse_dynamics):
     return isinstance(synapse_dynamics, _DynamicsStructural)
 
 
-class ProjectionApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
+class ProjectionApplicationEdge(
+        ApplicationEdge, AbstractSlicesConnect,
+        AbstractProvidesLocalProvenanceData):
     """ An edge which terminates on an :py:class:`AbstractPopulationVertex`.
     """
     __slots__ = [
@@ -208,3 +213,16 @@ class ProjectionApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
         """
         self.__check_list_mode()
         return self.__post_slices
+
+    @overrides(AbstractProvidesLocalProvenanceData.get_local_provenance_data)
+    def get_local_provenance_data(self):
+        prov_items = list()
+        for synapse_info in self.synapse_information:
+            for machine_edge in self.machine_edges:
+                prov_items.extend(
+                    synapse_info.connector.get_provenance_data(synapse_info))
+                prov_items.extend(
+                    synapse_info.synapse_dynamics.get_provenance_data(
+                        machine_edge.pre_vertex.label,
+                        machine_edge.post_vertex.label))
+        return prov_items

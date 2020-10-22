@@ -29,11 +29,3 @@ class AbstractSpynnakerSplitterDelay(object):
         :return: int saying max delay supported in ticks
         """
         return self.MAX_SUPPORTED_DELAY_TICS
-
-    @staticmethod
-    def extra_pre_edge_type():
-        return []
-
-    @staticmethod
-    def extra_post_edge_type():
-        return []
