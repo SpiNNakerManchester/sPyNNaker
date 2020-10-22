@@ -322,6 +322,8 @@ static void neuron_impl_store_neuron_parameters(
     //   rt_error(RTE_SWERR);
     //   return;
     //}
+    // Skip over the steps per timestep
+    next += 1;
 
     if (sizeof(global_neuron_params_t)) {
         log_debug("writing neuron global parameters");

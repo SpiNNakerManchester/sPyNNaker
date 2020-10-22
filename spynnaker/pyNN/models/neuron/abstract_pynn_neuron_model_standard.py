@@ -17,7 +17,7 @@ from .abstract_pynn_neuron_model import AbstractPyNNNeuronModel
 from spynnaker.pyNN.models.neuron.implementations import NeuronImplStandard
 from spinn_utilities.overrides import overrides
 
-_population_parameters = AbstractPyNNNeuronModel.default_population_parameters
+_population_parameters = dict(AbstractPyNNNeuronModel.default_population_parameters)
 _population_parameters["n_steps_per_timestep"] = 1
 
 class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
