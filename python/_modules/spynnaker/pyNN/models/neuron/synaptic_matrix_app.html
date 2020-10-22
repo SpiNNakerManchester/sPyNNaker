@@ -592,6 +592,12 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__app_key_info</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">block_addr</span><span class="p">,</span> <span class="n">SYN_REGION_UNUSED</span><span class="p">,</span> <span class="kc">None</span>
 
+        <span class="c1"># If we have routing info but no synapses, write an invalid entry</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_row_info</span><span class="o">.</span><span class="n">undelayed_max_n_synapses</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__poptable</span><span class="o">.</span><span class="n">add_invalid_entry</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__app_key_info</span><span class="o">.</span><span class="n">key_and_mask</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">block_addr</span><span class="p">,</span> <span class="n">SYN_REGION_UNUSED</span><span class="p">,</span> <span class="kc">None</span>
+
         <span class="n">block_addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__poptable</span><span class="o">.</span><span class="n">get_next_allowed_address</span><span class="p">(</span><span class="n">block_addr</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__poptable</span><span class="o">.</span><span class="n">add_application_entry</span><span class="p">(</span>
             <span class="n">block_addr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_row_info</span><span class="o">.</span><span class="n">undelayed_max_words</span><span class="p">,</span>
@@ -612,6 +618,12 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># If there is no routing information don&#39;t reserve anything</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delay_app_key_info</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">block_addr</span><span class="p">,</span> <span class="n">SYN_REGION_UNUSED</span><span class="p">,</span> <span class="kc">None</span>
+
+        <span class="c1"># If we have routing info but no synapses, write an invalid entry</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_row_info</span><span class="o">.</span><span class="n">delayed_max_n_synapses</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__delay_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__poptable</span><span class="o">.</span><span class="n">add_invalid_entry</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__delay_app_key_info</span><span class="o">.</span><span class="n">key_and_mask</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">block_addr</span><span class="p">,</span> <span class="n">SYN_REGION_UNUSED</span><span class="p">,</span> <span class="kc">None</span>
 
         <span class="n">block_addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__poptable</span><span class="o">.</span><span class="n">get_next_allowed_address</span><span class="p">(</span><span class="n">block_addr</span><span class="p">)</span>
