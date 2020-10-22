@@ -579,7 +579,7 @@ class SynapticMatrices(object):
             The application edge of the projection
         :param SynapseInformation synapse_info:
             The synapse information of the projection
-        :param ProjectionMachineEdge machine_edge:
+        :param MachineEdge machine_edge:
             The machine edge to get the index of
         """
         matrix = self.__app_matrix(app_edge, synapse_info)

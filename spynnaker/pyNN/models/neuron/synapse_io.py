@@ -360,7 +360,7 @@ class SynapseIORowBased(object):
             The number of synapse types in total to be represented
         :param list(float) weight_scales:
             The scaling of the weights for each synapse type
-        :param ProjectionMachineEdge machine_edge:
+        :param MachineEdge machine_edge:
             The incoming machine edge that the synapses are on
         :param int machine_time_step: Ther machine time step of the sim.
         :param ProjectionApplicationEdge app_edge:

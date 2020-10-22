@@ -293,7 +293,7 @@ class SynapticMatrixApp(object):
             Routing key information for all incoming edges
         :param list(float) weight_scales:
             Weight scale for each synapse edge
-        :param list(ProjectionMachineEdge) m_edges:
+        :param list(MachineEdge) m_edges:
             The machine edges incoming to this vertex
         """
         self.__all_syn_block_sz = all_syn_block_sz
@@ -369,7 +369,7 @@ class SynapticMatrixApp(object):
             The specification to write to
         :param int block_addr:
             The address in the synaptic matrix region to start writing at
-        :param list(ProjectionMachineEdge, ~numpy.ndarray) matrix_data:
+        :param list(MachineEdge, ~numpy.ndarray) matrix_data:
             The data for each machine edge to be combined into a single matrix
         :return: The updated block address
         :rtype: int
@@ -416,7 +416,7 @@ class SynapticMatrixApp(object):
             The specification to write to
         :param int block_addr:
             The address in the synaptic matrix region to start writing at
-        :param list(ProjectionMachineEdge, ~numpy.ndarray) matrix_data:
+        :param list(MachineEdge, ~numpy.ndarray) matrix_data:
             The data for each machine edge to be combined into a single matrix
         :return: The updated block address
         :rtype: int
@@ -545,6 +545,12 @@ class SynapticMatrixApp(object):
         if self.__app_key_info is None:
             return block_addr, SYN_REGION_UNUSED, None
 
+        # If we have routing info but no synapses, write an invalid entry
+        if self.__max_row_info.undelayed_max_n_synapses == 0:
+            self.__index = self.__poptable.add_invalid_entry(
+                self.__app_key_info.key_and_mask)
+            return block_addr, SYN_REGION_UNUSED, None
+
         block_addr = self.__poptable.get_next_allowed_address(block_addr)
         self.__index = self.__poptable.add_application_entry(
             block_addr, self.__max_row_info.undelayed_max_words,
@@ -565,6 +571,12 @@ class SynapticMatrixApp(object):
         """
         # If there is no routing information don't reserve anything
         if self.__delay_app_key_info is None:
+            return block_addr, SYN_REGION_UNUSED, None
+
+        # If we have routing info but no synapses, write an invalid entry
+        if self.__max_row_info.delayed_max_n_synapses == 0:
+            self.__delay_index = self.__poptable.add_invalid_entry(
+                self.__delay_app_key_info.key_and_mask)
             return block_addr, SYN_REGION_UNUSED, None
 
         block_addr = self.__poptable.get_next_allowed_address(block_addr)

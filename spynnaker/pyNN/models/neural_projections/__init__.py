@@ -16,10 +16,8 @@
 from .delay_afferent_application_edge import DelayAfferentApplicationEdge
 from .delayed_application_edge import DelayedApplicationEdge
 from .projection_application_edge import ProjectionApplicationEdge
-from .projection_machine_edge import ProjectionMachineEdge
 from .synapse_information import SynapseInformation
 
 __all__ = [
     "DelayAfferentApplicationEdge", "DelayedApplicationEdge",
-    "ProjectionApplicationEdge", "ProjectionMachineEdge",
-    "SynapseInformation", ]
+    "ProjectionApplicationEdge", "SynapseInformation", ]
