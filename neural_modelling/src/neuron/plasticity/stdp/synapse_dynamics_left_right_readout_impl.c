@@ -379,13 +379,13 @@ bool synapse_dynamics_process_plastic_synapses(
         	syn_ind_from_delay += RECURRENT_SYNAPSE_OFFSET;
         }
 
-        neuron_pointer_t neuron = &neuron_array[neuron_ind];
-        neuron->syn_state[syn_ind_from_delay].z_bar_inp = 1024; // !!!! Check what units this is in - same as weight? !!!!
-
-
         // Create update state from the plastic synaptic word
         update_state_t current_state =
                 synapse_structure_get_update_state(*plastic_words, type);
+
+        neuron_pointer_t neuron = &neuron_array[neuron_ind];
+        neuron->syn_state[syn_ind_from_delay].z_bar_inp = 1024; // !!!! Check what units this is in - same as weight? !!!!
+
 
     	if (PRINT_PLASTICITY){
 //            io_printf(IO_BUF, "neuron ind: %u, synapse ind: %u, type: %u, zbar: %k\n",
@@ -400,7 +400,7 @@ bool synapse_dynamics_process_plastic_synapses(
         // Perform weight update: only if batch time has elapsed
     	final_state_t final_state;
 
-    	if (neuron->syn_state[syn_ind_from_delay].update_ready == 0){
+    	if (neuron->syn_state[syn_ind_from_delay].update_ready <= 0){
 
     		// enough time has elapsed - perform weight update
     		if (PRINT_PLASTICITY){
@@ -415,7 +415,7 @@ bool synapse_dynamics_process_plastic_synapses(
     		neuron->syn_state[syn_ind_from_delay].delta_w = 0.0k;
 
     		// reset update_ready counter based on pattern cycle time
-    		neuron->syn_state[syn_ind_from_delay].update_ready += 13000;
+    		neuron->syn_state[syn_ind_from_delay].update_ready += neuron->window_size;
 
     	} else {
     		if (PRINT_PLASTICITY){
@@ -439,10 +439,25 @@ bool synapse_dynamics_process_plastic_synapses(
         // Check for ring buffer saturation
         int16_t accumulation = ring_buffers[ring_buffer_index] +
                 synapse_structure_get_final_weight(final_state);
+//        io_printf(IO_BUF, "d acc:%d, rb:%d, syn:%d\n", accumulation, ring_buffers[ring_buffer_index], synapse_structure_get_final_weight(final_state));
+//        io_printf(IO_BUF, "u acc:%u, rb:%u, syn:%u\n", accumulation, ring_buffers[ring_buffer_index], synapse_structure_get_final_weight(final_state));
+//        io_printf(IO_BUF, "k acc:%k, rb:%k, syn:%k\n", accumulation, ring_buffers[ring_buffer_index], synapse_structure_get_final_weight(final_state));
+        // overflow check
+        if (accumulation < ring_buffers[ring_buffer_index] + synapse_structure_get_final_weight(final_state)
+            && ring_buffers[ring_buffer_index] > 0 && synapse_structure_get_final_weight(final_state) > 0){
+            accumulation = ring_buffers[ring_buffer_index];
+            plastic_saturation_count++;
+        }
+        // underflow check
+        if (accumulation > ring_buffers[ring_buffer_index] + synapse_structure_get_final_weight(final_state)
+            && ring_buffers[ring_buffer_index] < 0 && synapse_structure_get_final_weight(final_state) < 0){
+            accumulation = ring_buffers[ring_buffer_index];
+            plastic_saturation_count++;
+        }
 
-//        uint32_t sat_test = accumulation & 0x10000;
+//        uint32_t sat_test = accumulation & 0x20000;
 //        if (sat_test) {
-//            accumulation = sat_test - 1;
+//            accumulation = 0x10000 - 1;
 //            plastic_saturation_count++;
 //        }
 

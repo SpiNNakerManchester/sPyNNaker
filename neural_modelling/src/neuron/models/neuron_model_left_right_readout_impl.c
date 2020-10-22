@@ -5,6 +5,7 @@
 extern uint32_t time;
 extern REAL learning_signal;
 REAL local_eta;
+REAL v_mem_error;
 
 // simple Leaky I&F ODE
 static inline void _lif_neuron_closed_form(
@@ -22,18 +23,18 @@ void neuron_model_set_global_neuron_params(
 
     local_eta = params->eta;
 
-    io_printf(IO_BUF, "local eta = %k\n", local_eta);
-    io_printf(IO_BUF, "readout_V_0 = %k\n", params->readout_V_0);
-    io_printf(IO_BUF, "readout_V_1 = %k\n", params->readout_V_1);
-    io_printf(IO_BUF, "rate_on = %k\n", params->rate_on);
-    io_printf(IO_BUF, "rate_off = %k\n", params->rate_off);
-    io_printf(IO_BUF, "mean_0 = %k\n", params->mean_0);
-    io_printf(IO_BUF, "mean_1 = %k\n", params->mean_1);
-    io_printf(IO_BUF, "cross_entropy = %k\n", params->cross_entropy);
-    io_printf(IO_BUF, "p_key = %u\n", params->p_key);
-    io_printf(IO_BUF, "p_pop_size = %u\n", params->p_pop_size);
-    io_printf(IO_BUF, "readout_V_1 = %k\n", params->readout_V_1);
-    io_printf(IO_BUF, "readout_V_1 = %k\n", params->readout_V_1);
+//    io_printf(IO_BUF, "local eta = %k\n", local_eta);
+//    io_printf(IO_BUF, "readout_V_0 = %k\n", params->readout_V_0);
+//    io_printf(IO_BUF, "readout_V_1 = %k\n", params->readout_V_1);
+//    io_printf(IO_BUF, "rate_on = %k\n", params->rate_on);
+//    io_printf(IO_BUF, "rate_off = %k\n", params->rate_off);
+//    io_printf(IO_BUF, "mean_0 = %k\n", params->mean_0);
+//    io_printf(IO_BUF, "mean_1 = %k\n", params->mean_1);
+//    io_printf(IO_BUF, "cross_entropy = %k\n", params->cross_entropy);
+//    io_printf(IO_BUF, "p_key = %u\n", params->p_key);
+//    io_printf(IO_BUF, "p_pop_size = %u\n", params->p_pop_size);
+//    io_printf(IO_BUF, "readout_V_1 = %k\n", params->readout_V_1);
+//    io_printf(IO_BUF, "readout_V_1 = %k\n", params->readout_V_1);
 //    io_printf(IO_BUF, "local eta = %k\n", params->);
 
     // Does Nothing - no params
@@ -46,6 +47,8 @@ state_t neuron_model_state_update(
 
 	log_debug("Exc 1: %12.6k, Exc 2: %12.6k", exc_input[0], exc_input[1]);
 	log_debug("Inh 1: %12.6k, Inh 2: %12.6k", inh_input[0], inh_input[1]);
+//	io_printf(IO_BUF, "Exc 1: %12.6k, Exc 2: %12.6k - ", exc_input[0], exc_input[1]);
+//	io_printf(IO_BUF, "Inh 1: %12.6k, Inh 2: %12.6k - %u\n", inh_input[0], inh_input[1], time);
 	use(dummy);
 
     // If outside of the refractory period
@@ -78,6 +81,18 @@ state_t neuron_model_state_update(
 //    if(learning_signal){
 //        io_printf(IO_BUF, "learning signal = %k\n", learning_signal);
 //    }
+//    if (neuron->V_membrane > 10.k){
+//        v_mem_error = neuron->V_membrane - 10.k;
+////        io_printf(IO_BUF, "> %k = %k - %k\n", v_mem_error, neuron->V_membrane, neuron->B);
+//    }
+//    else if (neuron->V_membrane < -10.k){
+//        v_mem_error = neuron->V_membrane + 10.k;
+////        io_printf(IO_BUF, "< %k = %k - %k\n", v_mem_error, -neuron->V_membrane, neuron->B);
+//    }
+//    else{
+//        v_mem_error = 0.k;
+//    }
+//    learning_signal += v_mem_error * 0.1;
 
     neuron->L = learning_signal * neuron->w_fb; //* ((accum)syn_ind * -1.k);
 //    REAL tau_decay = expk(-1.k / 1500.k);
@@ -116,9 +131,9 @@ state_t neuron_model_state_update(
 
     	REAL this_dt_weight_change =
 //    			-local_eta * neuron->L * neuron->syn_state[syn_ind].e_bar;
-    			-local_eta * neuron->L * neuron->syn_state[syn_ind].z_bar;
+    			local_eta * neuron->L * neuron->syn_state[syn_ind].z_bar;
 
-    	neuron->syn_state[syn_ind].delta_w += this_dt_weight_change;
+    	neuron->syn_state[syn_ind].delta_w -= this_dt_weight_change;
 //    	if (!syn_ind || neuron->syn_state[syn_ind].z_bar){// || neuron->syn_state[syn_ind].z_bar_inp){
 //            io_printf(IO_BUF, "total synapses = %u \t syn_ind = %u \t "
 //                              "z_bar_inp = %k \t z_bar = %k \t time:%u\n"
@@ -138,10 +153,10 @@ state_t neuron_model_state_update(
         neuron->syn_state[syn_ind].z_bar_inp = 0;
 
     	// decrease timestep counter preventing rapid updates
-    	if (neuron->syn_state[syn_ind].update_ready > 0){
+//    	if (neuron->syn_state[syn_ind].update_ready > 0){
 //    	    io_printf(IO_BUF, "lr reducing %u -- update:%u\n", syn_ind, neuron->syn_state[syn_ind].update_ready - 1);
-    		neuron->syn_state[syn_ind].update_ready -= 1;
-    	}
+        neuron->syn_state[syn_ind].update_ready -= 1;
+//    	}
 //    	else{
 //    	    io_printf(IO_BUF, "lr not reducing %u\n", syn_ind);
 //    	}
@@ -169,19 +184,21 @@ void neuron_model_print_state_variables(restrict neuron_pointer_t neuron) {
 }
 
 void neuron_model_print_parameters(restrict neuron_pointer_t neuron) {
-    io_printf(IO_BUF, "V reset       = %11.4k mv\n", neuron->V_reset);
-    io_printf(IO_BUF, "V rest        = %11.4k mv\n", neuron->V_rest);
-
-    io_printf(IO_BUF, "I offset      = %11.4k nA\n", neuron->I_offset);
-    io_printf(IO_BUF, "R membrane    = %11.4k Mohm\n", neuron->R_membrane);
-
-    io_printf(IO_BUF, "exp(-ms/(RC)) = %11.4k [.]\n", neuron->exp_TC);
-
-    io_printf(IO_BUF, "T refract     = %u timesteps\n", neuron->T_refract);
-
-    io_printf(IO_BUF, "learning      = %k n/a\n", neuron->L);
-
-    io_printf(IO_BUF, "feedback w    = %k n/a\n", neuron->w_fb);
+//    io_printf(IO_BUF, "V reset       = %11.4k mv\n", neuron->V_reset);
+//    io_printf(IO_BUF, "V rest        = %11.4k mv\n", neuron->V_rest);
+//
+//    io_printf(IO_BUF, "I offset      = %11.4k nA\n", neuron->I_offset);
+//    io_printf(IO_BUF, "R membrane    = %11.4k Mohm\n", neuron->R_membrane);
+//
+//    io_printf(IO_BUF, "exp(-ms/(RC)) = %11.4k [.]\n", neuron->exp_TC);
+//
+//    io_printf(IO_BUF, "T refract     = %u timesteps\n", neuron->T_refract);
+//
+//    io_printf(IO_BUF, "learning      = %k n/a\n", neuron->L);
+//
+//    io_printf(IO_BUF, "feedback w    = %k n/a\n", neuron->w_fb);
+//
+//    io_printf(IO_BUF, "window size   = %u n/a\n", neuron->window_size);
 
 //    io_printf(IO_BUF, "T refract     = %u timesteps\n", neuron->T_refract);
 //    io_printf(IO_BUF, "mean_isi_ticks  = %k\n", neuron->mean_isi_ticks);

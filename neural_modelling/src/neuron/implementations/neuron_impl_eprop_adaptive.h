@@ -235,11 +235,11 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
         input_t external_bias, state_t *recorded_variable_values) {
 
 
-//	if (neuron_index == 0) {
-//		// Decay global rate trace (only done once per core per timestep)
-//		global_parameters->core_pop_rate = global_parameters->core_pop_rate
-//				* global_parameters->rate_exp_TC;
-//	}
+	if (neuron_index == 0) {
+		// Decay global rate trace (only done once per core per timestep)
+		global_parameters->core_pop_rate = global_parameters->core_pop_rate
+				* global_parameters->rate_exp_TC;
+	}
 
 
     // Get the neuron itself
@@ -319,17 +319,48 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 //    //    		exc_input_values[0]; // record input input (signed)
 //    //    		learning_signal * neuron->w_fb;
 //    }
-    if(neuron_index > 3){
-        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[15].el_a;
-        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[15].delta_w;
+//    if(neuron_index % 2 == 0){
+//        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[10+neuron_index].el_a;
+////        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[10+neuron_index].delta_w;
+//        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[10+neuron_index].e_bar;
+////        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = *exc_value;
+//    }
+////    else if (neuron_index == 0){
+////    }
+//    else{
+//        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[0+neuron_index].el_a;
+////        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[0+neuron_index].delta_w;
+//        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[0+neuron_index].e_bar;
+////        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = *exc_input_values;
+//    }
+    if(neuron_index == 0){
+//        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[0+neuron_index].el_a;
+        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[10+neuron_index].delta_w;
+//        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[0+neuron_index].e_bar;
+//        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = *exc_value;
     }
 //    else if (neuron_index == 0){
 //    }
-    else{
-        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[0].el_a;
-        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[0].delta_w;
+    else if(neuron_index == 1){
+//        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[20+neuron_index].el_a;
+        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[10+neuron_index].delta_w;
+//        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[10+neuron_index].e_bar;
+//        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = *exc_value;
     }
-//    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[neuron_index].el_a;
+    else if(neuron_index == 2){
+//        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[20+neuron_index].el_a;
+        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[10+neuron_index].delta_w;
+//        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[10+neuron_index].e_bar;
+//        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = *exc_value;
+    }
+    else{
+//        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[10+neuron_index].el_a;
+        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[0+neuron_index].delta_w;
+//        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[0+neuron_index].e_bar;
+//        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = *exc_input_values;
+    }
+//    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[neuron_index].el_a;
+//    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->B;
     // update neuron parameters
     state_t result = neuron_model_state_update(
             NUM_EXCITATORY_RECEPTORS, exc_input_values,
@@ -346,7 +377,9 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 //                                    / (accum_time
 //                                    * (accum)syn_dynamics_neurons_in_partition))
 //                                    - global_parameters->core_target_rate;
-//    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = reg_learning_signal;//global_parameters->core_pop_rate;
+//    REAL reg_learning_signal = global_parameters->core_target_rate - (global_parameters->core_pop_rate / syn_dynamics_neurons_in_partition);
+    REAL reg_learning_signal = (global_parameters->core_pop_rate / syn_dynamics_neurons_in_partition) - global_parameters->core_target_rate;
+    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = reg_learning_signal;//global_parameters->core_pop_rate;
 
 
 

@@ -19,6 +19,7 @@ COUNT_REFRAC = "count_refrac"
 # Learning signal
 L = "learning_signal"
 W_FB = "feedback_weight"
+WINDOW_SIZE = "window_size"
 
 MEAN_ISI_TICKS = "mean_isi_ticks"
 TIME_TO_SPIKE_TICKS = "time_to_spike_ticks"
@@ -72,13 +73,15 @@ class NeuronModelLeftRightReadout(AbstractNeuronModel):
         "_rate_on",
         "_l",
         "_w_fb",
+        "_window_size",
         "_eta",
         "_mean_l",
         "_mean_r",
         "_cross_entropy",
         "_poisson_key",
         "_poisson_pop_size",
-        "_n_keys_in_target"
+        "_n_keys_in_target",
+        "_number_of_cues"
         ]
 
     def __init__(
@@ -86,7 +89,7 @@ class NeuronModelLeftRightReadout(AbstractNeuronModel):
             # mean_isi_ticks, time_to_spike_ticks,
             # rate_update_threshold,
             # prob_command,
-            rate_on, rate_off, poisson_pop_size, l, w_fb, eta):
+            rate_on, rate_off, poisson_pop_size, l, w_fb, eta, window_size, number_of_cues):
 
         global_data_types = [
                     DataType.UINT32,  # MARS KISS seed
@@ -104,6 +107,7 @@ class NeuronModelLeftRightReadout(AbstractNeuronModel):
                     DataType.UINT32,   # poisson key
                     DataType.UINT32,   # poisson pop size
                     DataType.S1615,    # eta
+                    DataType.UINT32,   # number of cues
                     ]
         data_types = [
             DataType.S1615,  # v
@@ -116,7 +120,8 @@ class NeuronModelLeftRightReadout(AbstractNeuronModel):
             DataType.INT32,  # tau_refrac
             # Learning signal
             DataType.S1615,  # L
-            DataType.S1615  # w_fb
+            DataType.S1615,  # w_fb
+            DataType.UINT32    # window_size
         ]
 
         # Synapse states - always initialise to zero
@@ -126,7 +131,7 @@ class NeuronModelLeftRightReadout(AbstractNeuronModel):
                 DataType.S1615, # z_bar
                 # DataType.S1615, # ep_a
                 # DataType.S1615, # e_bar
-                DataType.UINT32   # update_ready
+                DataType.INT32   # update_ready
             ]
         # Extend to include fan-in for each neuron
         data_types.extend(eprop_syn_state * SYNAPSES_PER_NEURON)
@@ -163,6 +168,8 @@ class NeuronModelLeftRightReadout(AbstractNeuronModel):
         self._l = l
         self._w_fb = w_fb
         self._eta = eta
+        self._window_size = window_size
+        self._number_of_cues = number_of_cues
 
         self._n_keys_in_target = poisson_pop_size * 4
 
@@ -184,6 +191,7 @@ class NeuronModelLeftRightReadout(AbstractNeuronModel):
         parameters[TAU_REFRAC] = self._tau_refrac
         parameters[L] = self._l
         parameters[W_FB] = self._w_fb
+        parameters[WINDOW_SIZE] = self._window_size
         parameters[SEED1] = 10065
         parameters[SEED2] = 232
         parameters[SEED3] = 3634
@@ -216,7 +224,7 @@ class NeuronModelLeftRightReadout(AbstractNeuronModel):
             state_variables[Z_BAR+str(n)] = 0
             # state_variables[EP_A+str(n)] = 0
             # state_variables[E_BAR+str(n)] = 0
-            state_variables[UPDATE_READY+str(n)] = 13000
+            state_variables[UPDATE_READY+str(n)] = self._window_size
 
 
     @overrides(AbstractNeuronModel.get_units)
@@ -243,7 +251,8 @@ class NeuronModelLeftRightReadout(AbstractNeuronModel):
                     operation=lambda x: int(numpy.ceil(x / (ts / 1000.0)))),
 
                 state_variables[L],
-                parameters[W_FB]
+                parameters[W_FB],
+                parameters[WINDOW_SIZE]
                 ]
 
         # create synaptic state - init all state to zero
@@ -252,7 +261,7 @@ class NeuronModelLeftRightReadout(AbstractNeuronModel):
                           0,#,    # z_bar
                           # 0,    # el_a
                           # 0]    # e_bar
-                          13000, #int(numpy.random.rand()*1024)      # update_ready
+                          self._window_size, #int(numpy.random.rand()*1024)      # update_ready
                           ]
         # extend to appropriate fan-in
         values.extend(eprop_syn_init * SYNAPSES_PER_NEURON)
@@ -265,7 +274,7 @@ class NeuronModelLeftRightReadout(AbstractNeuronModel):
         # Read the data
         (_v, _v_rest, _r_membrane, _exp_tc, _i_offset, _count_refrac,
         _v_reset, _tau_refrac,
-        _l, _w_fb, delta_w, z_bar_old, z_bar, update_ready) = values  # Not sure this will work with the new array of synapse!!!
+        _l, _w_fb, window_size, delta_w, z_bar_old, z_bar, update_ready) = values  # Not sure this will work with the new array of synapse!!!
         # todo check alignment on this
 
         # Copy the changed data only
@@ -301,7 +310,8 @@ class NeuronModelLeftRightReadout(AbstractNeuronModel):
                 self._cross_entropy,
                 self._poisson_key,
                 self._poisson_pop_size,
-                self._eta
+                self._eta,
+                self._number_of_cues
                 ]
         
         return vals
@@ -385,6 +395,22 @@ class NeuronModelLeftRightReadout(AbstractNeuronModel):
     @tau_refrac.setter
     def tau_refrac(self, tau_refrac):
         self._tau_refrac = tau_refrac
+
+    @property
+    def w_fb(self):
+        return self._w_fb
+
+    @w_fb.setter
+    def w_fb(self, new_value):
+        self._w_fb = new_value
+
+    @property
+    def window_size(self):
+        return self._window_size
+
+    @window_size.setter
+    def window_size(self, new_value):
+        self._window_size = new_value
 
     # @property
     # def mean_isi_ticks(self):

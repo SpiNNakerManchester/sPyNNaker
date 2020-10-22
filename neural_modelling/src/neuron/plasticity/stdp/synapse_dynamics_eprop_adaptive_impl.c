@@ -315,10 +315,13 @@ static inline final_state_t eprop_plasticity_update(update_state_t current_state
 	}
 
 	// Calculate regularisation error
-	REAL reg_error = 0.k;//(global_parameters->core_target_rate - global_parameters->core_pop_rate) / syn_dynamics_neurons_in_partition; // this needs swapping for an inverse multiply - too expensive to do divide on every spike
+	REAL reg_error = global_parameters->core_target_rate - (global_parameters->core_pop_rate / syn_dynamics_neurons_in_partition); // this needs swapping for an inverse multiply - too expensive to do divide on every spike
 //	REAL reg_error = ((global_parameters->core_target_rate + ((neuron_array->w_fb - 0.5) * 20)) - global_parameters->core_pop_rate) / syn_dynamics_neurons_in_partition; // this needs swapping for an inverse multiply - too expensive to do divide on every spike
+
+//    REAL reg_error = (global_parameters->core_pop_rate / syn_dynamics_neurons_in_partition) - global_parameters->core_target_rate;
 //    io_printf(IO_BUF, "core_pop_rate = %k, target = %k, error = %k\n", global_parameters->core_pop_rate, global_parameters->core_target_rate, reg_error);
 
+//    io_printf(IO_BUF, "reg_error before: %k\n", reg_error);
 
     // Return final synaptic word and weight
     return synapse_structure_get_final_state(current_state, reg_error);
@@ -377,13 +380,25 @@ bool synapse_dynamics_process_plastic_synapses(
         	syn_ind_from_delay += RECURRENT_SYNAPSE_OFFSET;
         }
 
-        neuron_pointer_t neuron = &neuron_array[neuron_ind];
-        neuron->syn_state[syn_ind_from_delay].z_bar_inp = 1024; // !!!! Check what units this is in - same as weight? !!!!
-
-
         // Create update state from the plastic synaptic word
         update_state_t current_state =
                 synapse_structure_get_update_state(*plastic_words, type);
+
+        neuron_pointer_t neuron = &neuron_array[neuron_ind];
+        neuron->syn_state[syn_ind_from_delay].z_bar_inp = 1024k; // !!!! Check what units this is in - same as weight? !!!!
+
+//        io_printf(IO_BUF, "initial_weight: d%d, k%k, u%u - ", current_state.initial_weight, current_state.initial_weight, current_state.initial_weight);
+//        if (current_state.initial_weight > 0){
+//            io_printf(IO_BUF, "+ve\n");
+//        }
+//        else if(current_state.initial_weight < 0){
+//            io_printf(IO_BUF, "-ve\n");
+//            neuron->syn_state[syn_ind_from_delay].z_bar_inp *= -1k;
+//        }
+//        else{
+//            io_printf(IO_BUF, "0\n");
+//        }
+
 
     	if (PRINT_PLASTICITY){
 //            io_printf(IO_BUF, "neuron ind: %u, synapse ind: %u, type: %u, zbar: %k\n",
@@ -398,7 +413,7 @@ bool synapse_dynamics_process_plastic_synapses(
 
         // Perform weight update: only if batch time has elapsed
     	final_state_t final_state;
-    	if (neuron->syn_state[syn_ind_from_delay].update_ready == 0){
+    	if (neuron->syn_state[syn_ind_from_delay].update_ready <= 0){
     		// enough time has elapsed - perform weight update
     		if (PRINT_PLASTICITY){
     			io_printf(IO_BUF, "update_ready=0\n");
@@ -412,7 +427,7 @@ bool synapse_dynamics_process_plastic_synapses(
     		neuron->syn_state[syn_ind_from_delay].delta_w = 0.0k;
 
     		// reset update_ready counter based on pattern cycle time
-    		neuron->syn_state[syn_ind_from_delay].update_ready += 13000;
+    		neuron->syn_state[syn_ind_from_delay].update_ready += neuron->window_size;
 
     	} else {
     		if (PRINT_PLASTICITY){
@@ -443,6 +458,17 @@ bool synapse_dynamics_process_plastic_synapses(
 //            accumulation = sat_test - 1;
 //            plastic_saturation_count++;
 //        }
+
+        // overflow check
+        if (accumulation < ring_buffers[ring_buffer_index] + synapse_structure_get_final_weight(final_state)
+            && ring_buffers[ring_buffer_index] > 0 && synapse_structure_get_final_weight(final_state) > 0){
+            accumulation = ring_buffers[ring_buffer_index];
+        }
+        // underflow check
+        if (accumulation > ring_buffers[ring_buffer_index] + synapse_structure_get_final_weight(final_state)
+            && ring_buffers[ring_buffer_index] < 0 && synapse_structure_get_final_weight(final_state) < 0){
+            accumulation = ring_buffers[ring_buffer_index];
+        }
 
         ring_buffers[ring_buffer_index] = accumulation;
 

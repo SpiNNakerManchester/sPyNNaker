@@ -73,7 +73,6 @@ typedef enum
 current_state_t current_state = 0;
 uint32_t current_time = 0;
 uint32_t cue_number = 0;
-uint32_t total_cues = 1;
 uint32_t current_cue_direction = 2; // 0 = left, 1 = right
 uint32_t accumulative_direction = 0; // if > total_cues / 2 = right
 uint32_t wait_between_cues = 50; // ms
@@ -208,19 +207,19 @@ static void neuron_impl_load_neuron_parameters(
 
     neuron_model_set_global_neuron_params(global_parameters);
 
-    io_printf(IO_BUF, "\nPrinting global params\n");
-    io_printf(IO_BUF, "seed 1: %u \n", global_parameters->kiss_seed[0]);
-    io_printf(IO_BUF, "seed 2: %u \n", global_parameters->kiss_seed[1]);
-    io_printf(IO_BUF, "seed 3: %u \n", global_parameters->kiss_seed[2]);
-    io_printf(IO_BUF, "seed 4: %u \n", global_parameters->kiss_seed[3]);
-    io_printf(IO_BUF, "ticks_per_second: %k \n\n", global_parameters->ticks_per_second);
-//    io_printf(IO_BUF, "prob_command: %k \n\n", global_parameters->prob_command);
-    io_printf(IO_BUF, "rate on: %k \n\n", global_parameters->rate_on);
-    io_printf(IO_BUF, "rate off: %k \n\n", global_parameters->rate_off);
-    io_printf(IO_BUF, "mean 0: %k \n\n", global_parameters->mean_0);
-    io_printf(IO_BUF, "mean 1: %k \n\n", global_parameters->mean_1);
-    io_printf(IO_BUF, "poisson key: %u \n\n", global_parameters->p_key);
-    io_printf(IO_BUF, "poisson pop size: %u \n\n", global_parameters->p_pop_size);
+//    io_printf(IO_BUF, "\nPrinting global params\n");
+//    io_printf(IO_BUF, "seed 1: %u \n", global_parameters->kiss_seed[0]);
+//    io_printf(IO_BUF, "seed 2: %u \n", global_parameters->kiss_seed[1]);
+//    io_printf(IO_BUF, "seed 3: %u \n", global_parameters->kiss_seed[2]);
+//    io_printf(IO_BUF, "seed 4: %u \n", global_parameters->kiss_seed[3]);
+//    io_printf(IO_BUF, "ticks_per_second: %k \n\n", global_parameters->ticks_per_second);
+////    io_printf(IO_BUF, "prob_command: %k \n\n", global_parameters->prob_command);
+//    io_printf(IO_BUF, "rate on: %k \n\n", global_parameters->rate_on);
+//    io_printf(IO_BUF, "rate off: %k \n\n", global_parameters->rate_off);
+//    io_printf(IO_BUF, "mean 0: %k \n\n", global_parameters->mean_0);
+//    io_printf(IO_BUF, "mean 1: %k \n\n", global_parameters->mean_1);
+//    io_printf(IO_BUF, "poisson key: %u \n\n", global_parameters->p_key);
+//    io_printf(IO_BUF, "poisson pop size: %u \n\n", global_parameters->p_pop_size);
 
 
     for (index_t n = 0; n < n_neurons; n++) {
@@ -308,6 +307,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     		additional_input, voltage);
 
     if (neuron_index == 0){
+//        io_printf(IO_BUF, "n0 - ");
         // update neuron parameters
         state_t result = neuron_model_state_update(
                 NUM_EXCITATORY_RECEPTORS, exc_input_values,
@@ -317,13 +317,14 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
         global_parameters->readout_V_0 = result;
 
     } else if (neuron_index == 1){
+//        io_printf(IO_BUF, "n1 - ");
         // update neuron parameters
-        learning_signal *= -1.k;
+//        learning_signal *= -1.k;
         state_t result = neuron_model_state_update(
                 NUM_EXCITATORY_RECEPTORS, exc_input_values,
                 NUM_INHIBITORY_RECEPTORS, inh_input_values,
                 external_bias, neuron, -50k);
-        learning_signal *= -1.k;
+//        learning_signal *= -1.k;
         // Finally, set global membrane potential to updated value
         global_parameters->readout_V_1 = result;
     }
@@ -335,6 +336,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 //    }
 //    io_printf(IO_BUF, "state = %u - %u\n", current_state, time);
     if (cue_number == 0 && completed_broadcast){ // reset start of new test
+//        io_printf(IO_BUF, "time entering reset %u\n", time);
 //        io_printf(IO_BUF, "Resetting\n");
         completed_broadcast = false;
         current_time = time;
@@ -355,6 +357,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 //    io_printf(IO_BUF, "current_state = %u, cue_number = %u, direction = %u, time = %u\n", current_state, cue_number, current_cue_direction, time);
     // In this state the environment is giving the left/right cues to the agent
     if (current_state == STATE_CUE){
+//        io_printf(IO_BUF, "time entering cue %u\n", time);
         if (neuron_index == 0){
             // if it's current in the waiting time between cues do nothing
 //            if ((time - current_time) % (wait_between_cues + duration_of_cue) < wait_between_cues){
@@ -365,14 +368,14 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
                 // pick broadcast if just entered
                 if ((time - current_time) % (wait_between_cues + duration_of_cue) == wait_between_cues){
                     // pick new value and broadcast
-//                    REAL random_value = (REAL)(mars_kiss64_seed(global_parameters->kiss_seed) / (REAL)0xffffffff); // 0-1
-//                    if (random_value < 0.5k){
-//                        current_cue_direction = 0;
-//                    }
-//                    else{
-//                        current_cue_direction = 1;
-//                    }
-                    current_cue_direction = (current_cue_direction + 1) % 2;
+                    REAL random_value = (REAL)(mars_kiss64_seed(global_parameters->kiss_seed) / (REAL)0xffffffff); // 0-1
+                    if (random_value < 0.5k){
+                        current_cue_direction = 0;
+                    }
+                    else{
+                        current_cue_direction = 1;
+                    }
+//                    current_cue_direction = (current_cue_direction + 1) % 2;
                     accumulative_direction += current_cue_direction;
                     REAL payload;
                     payload = global_parameters->rate_on;
@@ -382,26 +385,27 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
                         spin1_send_mc_packet(global_parameters->p_key | j, bitsk(payload), WITH_PAYLOAD);
                     }
                 }
-                // turn off and reset if finished
-                else if ((time - current_time) % (wait_between_cues + duration_of_cue) == (wait_between_cues + duration_of_cue) - 1){
-                    cue_number += 1;
-                    REAL payload;
-                    payload = global_parameters->rate_off;
+            }
+            // turn off and reset if finished
+            else if ((time - current_time) % (wait_between_cues + duration_of_cue) == 0 && (time - current_time) > 0){//(wait_between_cues + duration_of_cue) - 1){
+                cue_number += 1;
+                REAL payload;
+                payload = global_parameters->rate_off;
 //                    io_printf(IO_BUF, "poisson setting 2, direction = %u\n", current_cue_direction);
-                    for (int j = current_cue_direction*global_parameters->p_pop_size;
-                            j < current_cue_direction*global_parameters->p_pop_size + global_parameters->p_pop_size; j++){
-                        spin1_send_mc_packet(global_parameters->p_key | j, bitsk(payload), WITH_PAYLOAD);
-                    }
-                    if (cue_number >= total_cues){
-                        current_state = (current_state + 1) % 3;
-                    }
+                for (int j = current_cue_direction*global_parameters->p_pop_size;
+                        j < current_cue_direction*global_parameters->p_pop_size + global_parameters->p_pop_size; j++){
+                    spin1_send_mc_packet(global_parameters->p_key | j, bitsk(payload), WITH_PAYLOAD);
+                }
+                if (cue_number >= global_parameters->number_of_cues){
+                    current_state = (current_state + 1) % 3;
                 }
             }
         }
     }
     else if (current_state == STATE_WAITING){
+//        io_printf(IO_BUF, "time entering wait %u\n", time);
         // waiting for prompt, all things ok
-        if (cue_number >= total_cues){
+        if (cue_number >= global_parameters->number_of_cues){
             current_time = time;
             cue_number = 0;
         }
@@ -411,7 +415,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
         }
     }
     else if (current_state == STATE_PROMPT){
-//        io_printf(IO_BUF, "ticks_for_mean = %u, n_idx = %u\n", ticks_for_mean, neuron_index);
+//        io_printf(IO_BUF, "time entering prompt %u\n", time);
         if (start_prompt && neuron_index == 1){
             current_time = time;
             // send packets to the variable poissons with the updated states
@@ -440,17 +444,17 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 //            io_printf(IO_BUF, " umm ");
 //            accum exp_0 = expk(global_parameters->mean_0 / (accum)ticks_for_mean);
 //            accum exp_1 = expk(global_parameters->mean_1 / (accum)ticks_for_mean);
-            accum exp_0 = expk(global_parameters->readout_V_0 * 0.1k);
-            accum exp_1 = expk(global_parameters->readout_V_1 * 0.1k);
+            accum exp_0 = expk(global_parameters->readout_V_0);// * 0.1k);
+            accum exp_1 = expk(global_parameters->readout_V_1);// * 0.1k);
 //            io_printf(IO_BUF, "or here - ");
             if (exp_0 == 0k && exp_1 == 0k){
                 if (global_parameters->readout_V_0 > global_parameters->readout_V_1){
-                    softmax_0 = 10k;
+                    softmax_0 = 1k;
                     softmax_1 = 0k;
                 }
                 else{
                     softmax_0 = 0k;
-                    softmax_1 = 10k;
+                    softmax_1 = 1k;
                 }
             }
             else{
@@ -460,7 +464,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
             }
 //            io_printf(IO_BUF, "soft0 %k - soft1 %k - v0 %k - v1 %k\n", softmax_0, softmax_1, global_parameters->readout_V_0, global_parameters->readout_V_1);
             // What to do if log(0)?
-            if (accumulative_direction > total_cues >> 1){
+            if (accumulative_direction > global_parameters->number_of_cues >> 1){
                 global_parameters->cross_entropy = -logk(softmax_1);
                 learning_signal = softmax_0;
                 is_it_right = 1;
@@ -470,11 +474,14 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
                 learning_signal = softmax_0 - 1.k;
                 is_it_right = 0;
             }
-//            if (softmax_0 > 0.5){
-//                choice = 0;
+//            if (learning_signal > 0.5){
+//                learning_signal = 1k;
+//            }
+//            else if (learning_signal < -0.5){
+//                learning_signal = -1k;
 //            }
 //            else{
-//                choice = 1;
+//                learning_signal = 0k;
 //            }
             while (!spin1_send_mc_packet(
                     key | neuron_index,  bitsk(learning_signal), 1 )) {
@@ -488,6 +495,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 //            io_printf(IO_BUF, "broadcasting error\n");
         }
         if ((time - current_time) >= prompt_duration && neuron_index == 0){
+//            io_printf(IO_BUF, "time entering end of test %u\n", time);
 //            io_printf(IO_BUF, "poisson setting 4, turning off prompt\n");
             current_state = 0;
             completed_broadcast = true;
@@ -504,7 +512,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
 //    learning_signal = global_parameters->cross_entropy;
 
-    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = learning_signal;
+    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = learning_signal;//exc_input_values[0];//neuron->syn_state[1].update_ready;//
     recorded_variable_values[V_RECORDING_INDEX] = voltage;
 //    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = ;
 //    if (neuron_index == 2){
@@ -516,19 +524,19 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     if (neuron_index == 2){ //this neuron does nothing
 //        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[90].z_bar;
 //        recorded_variable_values[V_RECORDING_INDEX] = neuron->syn_state[90].z_bar;
-        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[90].delta_w;
+        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[50].delta_w;
 //        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = is_it_right;
     }
     else if (neuron_index == 1){
-//        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[55].z_bar;
+//        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[40].z_bar;
 //        recorded_variable_values[V_RECORDING_INDEX] = neuron->syn_state[55].z_bar;
-        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[55].delta_w;
+        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[40].delta_w;
 //        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = softmax_0;
     }
     else{
-//        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[1].z_bar;
+//        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[0].z_bar;
 //        recorded_variable_values[V_RECORDING_INDEX] = neuron->syn_state[1].z_bar;
-        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[neuron_index].delta_w;
+        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[0].delta_w;
 //        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = softmax_0;
     }
 

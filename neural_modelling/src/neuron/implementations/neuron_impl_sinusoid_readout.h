@@ -282,8 +282,8 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
         REAL error = result - global_parameters->target_V[target_ind];
         learning_signal = error;
         // Record Error
-        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
-                error;
+//        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
+//                error;
 //                neuron->syn_state[3].delta_w;
 //                neuron->syn_state[0].z_bar;
 
@@ -304,13 +304,14 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
         recorded_variable_values[V_RECORDING_INDEX] =
 //                neuron->syn_state[0].z_bar;
                 global_parameters->target_V[target_ind];
-        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
-                - global_parameters->target_V[target_ind];
+//        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
+//                - global_parameters->target_V[target_ind];
     }
+    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[neuron_index*20].z_bar;
     // Record target
     recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] =
 //        			global_parameters->target_V[target_ind];
-        			neuron->syn_state[neuron_index].delta_w;
+        			neuron->syn_state[neuron_index*20].delta_w;
 //        			exc_input_values[0];
 
 
