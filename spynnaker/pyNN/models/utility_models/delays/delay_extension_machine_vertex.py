@@ -36,6 +36,8 @@ _DELAY_PARAM_HEADER_WORDS = 7
 
 _EXPANDER_BASE_PARAMS_SIZE = 3 * BYTES_PER_WORD
 
+DELAY_EXPANDER_APLX = "delay_expander.aplx"
+
 
 class DelayExtensionMachineVertex(
         MachineVertex, ProvidesProvenanceDataFromMachineImpl,
@@ -400,3 +402,14 @@ class DelayExtensionMachineVertex(
         # Write the actual delay blocks (create a new one if it doesn't exist)
         spec.write_array(array_values=self._app_vertex.delay_blocks_for(
             self._vertex_slice).delay_block)
+
+    def gen_on_machine(self):
+        """ Determine if the given slice needs to be generated on the machine
+
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :rtype: bool
+        """
+        if self.app_vertex.delay_generator_data(self.vertex_slice):
+            return True
+        else:
+            return False

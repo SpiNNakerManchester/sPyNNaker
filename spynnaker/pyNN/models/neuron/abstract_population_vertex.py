@@ -207,6 +207,31 @@ class AbstractPopulationVertex(
     def n_profile_samples(self):
         return self.__n_profile_samples
 
+    @inject_items({
+        "graph": "MemoryApplicationGraph"
+    })
+    @overrides(
+        TDMAAwareApplicationVertex.get_resources_used_by_atoms,
+        additional_arguments={"graph"}
+    )
+    def get_resources_used_by_atoms(self, vertex_slice, graph):
+        # pylint: disable=arguments-differ
+
+        variableSDRAM = self.__neuron_recorder.get_variable_sdram_usage(
+            vertex_slice)
+        constantSDRAM = ConstantSDRAM(
+            self._get_sdram_usage_for_atoms(vertex_slice, graph))
+
+        # set resources required from this object
+        container = ResourceContainer(
+            sdram=variableSDRAM + constantSDRAM,
+            dtcm=DTCMResource(self.get_dtcm_usage_for_atoms(vertex_slice)),
+            cpu_cycles=CPUCyclesPerTickResource(
+                self.get_cpu_usage_for_atoms(vertex_slice)))
+
+        # return the total resources.
+        return container
+
     @property
     @overrides(AbstractChangableAfterRun.requires_mapping)
     def requires_mapping(self):
@@ -800,14 +825,6 @@ class AbstractPopulationVertex(
     def __repr__(self):
         return self.__str__()
 
-    def gen_on_machine(self, vertex_slice):
-        """ True if the synapses of a particular slice of this population \
-            should be generated on the machine.
-
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-        """
-        return self.__synapse_manager.gen_on_machine(vertex_slice)
-
     @overrides(AbstractCanReset.reset_to_first_timestep)
     def reset_to_first_timestep(self):
         # Mark that reset has been done, and reload state variables
@@ -818,12 +835,3 @@ class AbstractPopulationVertex(
         if self.__synapse_manager.changes_during_run:
             self.__change_requires_data_generation = True
             self.__change_requires_neuron_parameters_reload = False
-
-    def read_generated_connection_holders(self, transceiver, placement):
-        """ Fill in the connection holders
-
-        :param Transceiver transceiver: How the data is to be read
-        :param Placement placement: Where the data is on the machine
-        """
-        self.__synapse_manager.read_generated_connection_holders(
-            transceiver, placement)
