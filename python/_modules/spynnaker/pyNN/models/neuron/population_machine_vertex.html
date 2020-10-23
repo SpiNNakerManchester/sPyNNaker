@@ -96,6 +96,7 @@
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.profiling.profile_utils</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">get_profiling_data</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.utility_objs</span> <span class="kn">import</span> <span class="n">ExecutableType</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="n">AbstractSynapseExpandable</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="n">POPULATION_BASED_REGIONS</span>
 
 
@@ -104,7 +105,7 @@
         <span class="n">AbstractHasAssociatedBinary</span><span class="p">,</span> <span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="p">,</span>
         <span class="n">AbstractRecordable</span><span class="p">,</span> <span class="n">AbstractHasProfileData</span><span class="p">,</span>
         <span class="n">AbstractSupportsBitFieldGeneration</span><span class="p">,</span>
-        <span class="n">AbstractSupportsBitFieldRoutingCompression</span><span class="p">):</span>
+        <span class="n">AbstractSupportsBitFieldRoutingCompression</span><span class="p">,</span> <span class="n">AbstractSynapseExpandable</span><span class="p">):</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;__binary_file_name&quot;</span><span class="p">,</span>
@@ -446,7 +447,17 @@
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractHasAssociatedBinary</span><span class="o">.</span><span class="n">get_binary_start_type</span><span class="p">)</span>
 <div class="viewcode-block" id="PopulationMachineVertex.get_binary_start_type"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.get_binary_start_type">[docs]</a>    <span class="k">def</span> <span class="nf">get_binary_start_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">ExecutableType</span><span class="o">.</span><span class="n">USES_SIMULATION_INTERFACE</span></div></div>
+        <span class="k">return</span> <span class="n">ExecutableType</span><span class="o">.</span><span class="n">USES_SIMULATION_INTERFACE</span></div>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseExpandable</span><span class="o">.</span><span class="n">gen_on_machine</span><span class="p">)</span>
+<div class="viewcode-block" id="PopulationMachineVertex.gen_on_machine"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.gen_on_machine">[docs]</a>    <span class="k">def</span> <span class="nf">gen_on_machine</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">app_vertex</span><span class="o">.</span><span class="n">synapse_manager</span><span class="o">.</span><span class="n">gen_on_machine</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">)</span></div>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseExpandable</span><span class="o">.</span><span class="n">read_generated_connection_holders</span><span class="p">)</span>
+<div class="viewcode-block" id="PopulationMachineVertex.read_generated_connection_holders"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.read_generated_connection_holders">[docs]</a>    <span class="k">def</span> <span class="nf">read_generated_connection_holders</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">synapse_manager</span><span class="o">.</span><span class="n">read_generated_connection_holders</span><span class="p">(</span>
+            <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">)</span></div></div>
 </pre></div>
 
           </div>

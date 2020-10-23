@@ -93,7 +93,8 @@
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.utility_objs</span> <span class="kn">import</span> <span class="n">ExecutableType</span>
 <span class="kn">from</span> <span class="nn">spinnman.model</span> <span class="kn">import</span> <span class="n">ExecutableTargets</span>
 <span class="kn">from</span> <span class="nn">spinnman.model.enums</span> <span class="kn">import</span> <span class="n">CPUState</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.extra_algorithms.synapse_expander</span> <span class="kn">import</span> <span class="n">SYNAPSE_EXPANDER</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AbstractSynapseExpandable</span><span class="p">,</span> <span class="n">SYNAPSE_EXPANDER_APLX</span><span class="p">)</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -180,7 +181,7 @@
 
         <span class="c1"># locate expander executable path</span>
         <span class="n">expander_executable_path</span> <span class="o">=</span> <span class="n">executable_finder</span><span class="o">.</span><span class="n">get_executable_path</span><span class="p">(</span>
-            <span class="n">SYNAPSE_EXPANDER</span><span class="p">)</span>
+            <span class="n">SYNAPSE_EXPANDER_APLX</span><span class="p">)</span>
 
         <span class="c1"># if any ones are going to be ran on host, ignore them from the new</span>
         <span class="c1"># core setup</span>
@@ -191,13 +192,13 @@
                         <span class="n">core_subset</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">core_subset</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">processor_id</span><span class="p">):</span>
                     <span class="n">vertex</span> <span class="o">=</span> <span class="n">placements</span><span class="o">.</span><span class="n">get_vertex_on_processor</span><span class="p">(</span>
                         <span class="n">core_subset</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">core_subset</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">processor_id</span><span class="p">)</span>
-                    <span class="n">app_vertex</span> <span class="o">=</span> <span class="n">vertex</span><span class="o">.</span><span class="n">app_vertex</span>
-                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vertex</span><span class="p">,</span> <span class="n">AbstractSupportsBitFieldGeneration</span><span class="p">):</span>
-                        <span class="k">if</span> <span class="n">app_vertex</span><span class="o">.</span><span class="n">gen_on_machine</span><span class="p">(</span><span class="n">vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">):</span>
-                            <span class="n">new_cores</span><span class="o">.</span><span class="n">add_processor</span><span class="p">(</span>
-                                <span class="n">expander_executable_path</span><span class="p">,</span>
-                                <span class="n">core_subset</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">core_subset</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">processor_id</span><span class="p">,</span>
-                                <span class="n">executable_type</span><span class="o">=</span><span class="n">ExecutableType</span><span class="o">.</span><span class="n">SYSTEM</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">vertex</span><span class="p">,</span> <span class="n">AbstractSupportsBitFieldGeneration</span><span class="p">)</span>
+                            <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vertex</span><span class="p">,</span> <span class="n">AbstractSynapseExpandable</span><span class="p">)</span>
+                            <span class="ow">and</span> <span class="n">vertex</span><span class="o">.</span><span class="n">gen_on_machine</span><span class="p">()):</span>
+                        <span class="n">new_cores</span><span class="o">.</span><span class="n">add_processor</span><span class="p">(</span>
+                            <span class="n">expander_executable_path</span><span class="p">,</span>
+                            <span class="n">core_subset</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">core_subset</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">processor_id</span><span class="p">,</span>
+                            <span class="n">executable_type</span><span class="o">=</span><span class="n">ExecutableType</span><span class="o">.</span><span class="n">SYSTEM</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">new_cores</span>
 
     <span class="nd">@staticmethod</span>

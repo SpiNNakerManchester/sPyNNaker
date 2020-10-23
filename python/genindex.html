@@ -184,6 +184,8 @@
 </li>
       <li><a href="spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamicsStructural">AbstractSynapseDynamicsStructural (class in spynnaker.pyNN.models.neuron.synapse_dynamics)</a>
 </li>
+      <li><a href="spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractSynapseExpandable">AbstractSynapseExpandable (class in spynnaker.pyNN.models.abstract_models)</a>
+</li>
       <li><a href="spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.html#spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.AbstractSynapseStructure">AbstractSynapseStructure (class in spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure)</a>
 </li>
       <li><a href="spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType">AbstractSynapseType (class in spynnaker.pyNN.models.neuron.synapse_types)</a>
@@ -740,6 +742,8 @@
         <li><a href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionMachineEdge.delay_edge">(spynnaker.pyNN.models.neural_projections.ProjectionMachineEdge attribute)</a>
 </li>
       </ul></li>
+      <li><a href="spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.delay_generator_data">delay_generator_data() (spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex method)</a>
+</li>
       <li><a href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrix.SynapticMatrix.delay_index">delay_index (spynnaker.pyNN.models.neuron.synaptic_matrix.SynapticMatrix attribute)</a>
 </li>
       <li><a href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.DelayAfferentApplicationEdge">DelayAfferentApplicationEdge (class in spynnaker.pyNN.models.neural_projections)</a>
@@ -1102,12 +1106,14 @@
       </ul></li>
       <li><a href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrices.SynapticMatrices.gen_on_machine">gen_on_machine (spynnaker.pyNN.models.neuron.synaptic_matrices.SynapticMatrices attribute)</a>
 </li>
-      <li><a href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.gen_on_machine">gen_on_machine() (spynnaker.pyNN.models.neuron.AbstractPopulationVertex method)</a>
+      <li><a href="spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractSynapseExpandable.gen_on_machine">gen_on_machine() (spynnaker.pyNN.models.abstract_models.AbstractSynapseExpandable method)</a>
 
       <ul>
+        <li><a href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.gen_on_machine">(spynnaker.pyNN.models.neuron.PopulationMachineVertex method)</a>
+</li>
         <li><a href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.SynapticManager.gen_on_machine">(spynnaker.pyNN.models.neuron.SynapticManager method)</a>
 </li>
-        <li><a href="spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.gen_on_machine">(spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex method)</a>
+        <li><a href="spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.gen_on_machine">(spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex method)</a>
 </li>
       </ul></li>
       <li><a href="spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractGenerateConnectorOnMachine.gen_weight_params_size_in_bytes">gen_weight_params_size_in_bytes() (spynnaker.pyNN.models.neural_projections.connectors.AbstractGenerateConnectorOnMachine method)</a>
@@ -3392,9 +3398,11 @@
         <li><a href="spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.struct.Struct.read_data">(spynnaker.pyNN.utilities.struct.Struct method)</a>
 </li>
       </ul></li>
-      <li><a href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.read_generated_connection_holders">read_generated_connection_holders() (spynnaker.pyNN.models.neuron.AbstractPopulationVertex method)</a>
+      <li><a href="spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractSynapseExpandable.read_generated_connection_holders">read_generated_connection_holders() (spynnaker.pyNN.models.abstract_models.AbstractSynapseExpandable method)</a>
 
       <ul>
+        <li><a href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.read_generated_connection_holders">(spynnaker.pyNN.models.neuron.PopulationMachineVertex method)</a>
+</li>
         <li><a href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.SynapticManager.read_generated_connection_holders">(spynnaker.pyNN.models.neuron.SynapticManager method)</a>
 </li>
         <li><a href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrices.SynapticMatrices.read_generated_connection_holders">(spynnaker.pyNN.models.neuron.synaptic_matrices.SynapticMatrices method)</a>
@@ -3912,10 +3920,10 @@
 </li>
       <li><a href="spynnaker.pyNN.models.html#module-spynnaker.pyNN.models">spynnaker.pyNN.models (module)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="spynnaker.pyNN.models.abstract_models.html#module-spynnaker.pyNN.models.abstract_models">spynnaker.pyNN.models.abstract_models (module)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="spynnaker.pyNN.models.common.html#module-spynnaker.pyNN.models.common">spynnaker.pyNN.models.common (module)</a>
 </li>
       <li><a href="spynnaker.pyNN.models.common.html#module-spynnaker.pyNN.models.common.recording_utils">spynnaker.pyNN.models.common.recording_utils (module)</a>
@@ -4152,6 +4160,8 @@
         <li><a href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionMachineEdge.synapse_information">(spynnaker.pyNN.models.neural_projections.ProjectionMachineEdge attribute)</a>
 </li>
       </ul></li>
+      <li><a href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.synapse_manager">synapse_manager (spynnaker.pyNN.models.neuron.AbstractPopulationVertex attribute)</a>
+</li>
       <li><a href="spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.SYNAPSE_PARAMS">SYNAPSE_PARAMS (spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS attribute)</a>
 </li>
       <li><a href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation.synapse_type">synapse_type (spynnaker.pyNN.models.neural_projections.SynapseInformation attribute)</a>

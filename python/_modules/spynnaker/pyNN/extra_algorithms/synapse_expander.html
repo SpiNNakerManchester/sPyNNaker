@@ -85,25 +85,22 @@
 <span class="kn">from</span> <span class="nn">spinn_utilities.progress_bar</span> <span class="kn">import</span> <span class="n">ProgressBar</span>
 <span class="kn">from</span> <span class="nn">spinnman.model</span> <span class="kn">import</span> <span class="n">ExecutableTargets</span>
 <span class="kn">from</span> <span class="nn">spinnman.model.enums</span> <span class="kn">import</span> <span class="n">CPUState</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron</span> <span class="kn">import</span> <span class="n">AbstractPopulationVertex</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.utility_models.delays</span> <span class="kn">import</span> <span class="n">DelayExtensionVertex</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AbstractSynapseExpandable</span><span class="p">,</span> <span class="n">SYNAPSE_EXPANDER_APLX</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.utility_models.delays</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DelayExtensionMachineVertex</span><span class="p">,</span> <span class="n">DELAY_EXPANDER_APLX</span><span class="p">)</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
-<span class="n">SYNAPSE_EXPANDER</span> <span class="o">=</span> <span class="s2">&quot;synapse_expander.aplx&quot;</span>
-<span class="n">DELAY_EXPANDER</span> <span class="o">=</span> <span class="s2">&quot;delay_expander.aplx&quot;</span>
-
 
 <div class="viewcode-block" id="synapse_expander"><a class="viewcode-back" href="../../../../spynnaker.pyNN.extra_algorithms.html#spynnaker.pyNN.extra_algorithms.synapse_expander.synapse_expander">[docs]</a><span class="k">def</span> <span class="nf">synapse_expander</span><span class="p">(</span>
-        <span class="n">app_graph</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">provenance_file_path</span><span class="p">,</span>
+        <span class="n">placements</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">provenance_file_path</span><span class="p">,</span>
         <span class="n">executable_finder</span><span class="p">,</span> <span class="n">extract_iobuf</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Run the synapse expander.</span>
 
 <span class="sd">    .. note::</span>
 <span class="sd">        Needs to be done after data has been loaded.</span>
 
-<span class="sd">    :param ~pacman.model.graphs.application.ApplicationGraph app_graph:</span>
-<span class="sd">        The graph containing the vertices that might need expanding.</span>
 <span class="sd">    :param ~pacman.model.placements.Placements placements:</span>
 <span class="sd">        Where all vertices are on the machine.</span>
 <span class="sd">    :param ~spinnman.transceiver.Transceiver transceiver:</span>
@@ -115,13 +112,12 @@
 <span class="sd">    :type executable_finder:</span>
 <span class="sd">        ~spinn_utilities.executable_finder.ExecutableFinder</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">synapse_bin</span> <span class="o">=</span> <span class="n">executable_finder</span><span class="o">.</span><span class="n">get_executable_path</span><span class="p">(</span><span class="n">SYNAPSE_EXPANDER</span><span class="p">)</span>
-    <span class="n">delay_bin</span> <span class="o">=</span> <span class="n">executable_finder</span><span class="o">.</span><span class="n">get_executable_path</span><span class="p">(</span><span class="n">DELAY_EXPANDER</span><span class="p">)</span>
+    <span class="n">synapse_bin</span> <span class="o">=</span> <span class="n">executable_finder</span><span class="o">.</span><span class="n">get_executable_path</span><span class="p">(</span><span class="n">SYNAPSE_EXPANDER_APLX</span><span class="p">)</span>
+    <span class="n">delay_bin</span> <span class="o">=</span> <span class="n">executable_finder</span><span class="o">.</span><span class="n">get_executable_path</span><span class="p">(</span><span class="n">DELAY_EXPANDER_APLX</span><span class="p">)</span>
 
     <span class="c1"># Find the places where the synapse expander and delay receivers should run</span>
     <span class="n">expander_cores</span><span class="p">,</span> <span class="n">expanded_pop_vertices</span> <span class="o">=</span> <span class="n">_plan_expansion</span><span class="p">(</span>
-        <span class="n">app_graph</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">synapse_bin</span><span class="p">,</span> <span class="n">delay_bin</span><span class="p">)</span>
+        <span class="n">placements</span><span class="p">,</span> <span class="n">synapse_bin</span><span class="p">,</span> <span class="n">delay_bin</span><span class="p">)</span>
 
     <span class="n">progress</span> <span class="o">=</span> <span class="n">ProgressBar</span><span class="p">(</span><span class="n">expander_cores</span><span class="o">.</span><span class="n">total_processors</span><span class="p">,</span>
                            <span class="s2">&quot;Expanding Synapses&quot;</span><span class="p">)</span>
@@ -135,33 +131,29 @@
     <span class="n">_fill_in_connection_data</span><span class="p">(</span><span class="n">expanded_pop_vertices</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">_plan_expansion</span><span class="p">(</span><span class="n">app_graph</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">synapse_expander_bin</span><span class="p">,</span>
+<span class="k">def</span> <span class="nf">_plan_expansion</span><span class="p">(</span><span class="n">placements</span><span class="p">,</span> <span class="n">synapse_expander_bin</span><span class="p">,</span>
                     <span class="n">delay_expander_bin</span><span class="p">):</span>
     <span class="n">expander_cores</span> <span class="o">=</span> <span class="n">ExecutableTargets</span><span class="p">()</span>
     <span class="n">expanded_pop_vertices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
 
-    <span class="n">progress</span> <span class="o">=</span> <span class="n">ProgressBar</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">app_graph</span><span class="o">.</span><span class="n">vertices</span><span class="p">),</span>
-                           <span class="s2">&quot;Preparing to Expand Synapses&quot;</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">vertex</span> <span class="ow">in</span> <span class="n">progress</span><span class="o">.</span><span class="n">over</span><span class="p">(</span><span class="n">app_graph</span><span class="o">.</span><span class="n">vertices</span><span class="p">):</span>
+    <span class="n">progress</span> <span class="o">=</span> <span class="n">ProgressBar</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">placements</span><span class="p">),</span> <span class="s2">&quot;Preparing to Expand Synapses&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">placement</span> <span class="ow">in</span> <span class="n">progress</span><span class="o">.</span><span class="n">over</span><span class="p">(</span><span class="n">placements</span><span class="p">):</span>
         <span class="c1"># Add all machine vertices of the population vertex to ones</span>
         <span class="c1"># that need synapse expansion</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vertex</span><span class="p">,</span> <span class="n">AbstractPopulationVertex</span><span class="p">):</span>
-            <span class="k">for</span> <span class="n">m_vertex</span> <span class="ow">in</span> <span class="n">vertex</span><span class="o">.</span><span class="n">machine_vertices</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">vertex</span><span class="o">.</span><span class="n">gen_on_machine</span><span class="p">(</span><span class="n">m_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">):</span>
-                    <span class="n">placement</span> <span class="o">=</span> <span class="n">placements</span><span class="o">.</span><span class="n">get_placement_of_vertex</span><span class="p">(</span><span class="n">m_vertex</span><span class="p">)</span>
-                    <span class="n">expander_cores</span><span class="o">.</span><span class="n">add_processor</span><span class="p">(</span>
-                        <span class="n">synapse_expander_bin</span><span class="p">,</span>
-                        <span class="n">placement</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">p</span><span class="p">,</span>
-                        <span class="n">executable_type</span><span class="o">=</span><span class="n">ExecutableType</span><span class="o">.</span><span class="n">SYSTEM</span><span class="p">)</span>
-                    <span class="n">expanded_pop_vertices</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">vertex</span><span class="p">,</span> <span class="n">placement</span><span class="p">))</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vertex</span><span class="p">,</span> <span class="n">DelayExtensionVertex</span><span class="p">):</span>
-            <span class="k">for</span> <span class="n">m_vertex</span> <span class="ow">in</span> <span class="n">vertex</span><span class="o">.</span><span class="n">machine_vertices</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">vertex</span><span class="o">.</span><span class="n">gen_on_machine</span><span class="p">(</span><span class="n">m_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">):</span>
-                    <span class="n">placement</span> <span class="o">=</span> <span class="n">placements</span><span class="o">.</span><span class="n">get_placement_of_vertex</span><span class="p">(</span><span class="n">m_vertex</span><span class="p">)</span>
-                    <span class="n">expander_cores</span><span class="o">.</span><span class="n">add_processor</span><span class="p">(</span>
-                        <span class="n">delay_expander_bin</span><span class="p">,</span>
-                        <span class="n">placement</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">p</span><span class="p">,</span>
-                        <span class="n">executable_type</span><span class="o">=</span><span class="n">ExecutableType</span><span class="o">.</span><span class="n">SYSTEM</span><span class="p">)</span>
+        <span class="n">vertex</span> <span class="o">=</span> <span class="n">placement</span><span class="o">.</span><span class="n">vertex</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vertex</span><span class="p">,</span> <span class="n">AbstractSynapseExpandable</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">vertex</span><span class="o">.</span><span class="n">gen_on_machine</span><span class="p">():</span>
+                <span class="n">expander_cores</span><span class="o">.</span><span class="n">add_processor</span><span class="p">(</span>
+                    <span class="n">synapse_expander_bin</span><span class="p">,</span>
+                    <span class="n">placement</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">p</span><span class="p">,</span>
+                    <span class="n">executable_type</span><span class="o">=</span><span class="n">ExecutableType</span><span class="o">.</span><span class="n">SYSTEM</span><span class="p">)</span>
+                <span class="n">expanded_pop_vertices</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">vertex</span><span class="p">,</span> <span class="n">placement</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vertex</span><span class="p">,</span> <span class="n">DelayExtensionMachineVertex</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">vertex</span><span class="o">.</span><span class="n">gen_on_machine</span><span class="p">():</span>
+                <span class="n">expander_cores</span><span class="o">.</span><span class="n">add_processor</span><span class="p">(</span>
+                    <span class="n">delay_expander_bin</span><span class="p">,</span>
+                    <span class="n">placement</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">p</span><span class="p">,</span>
+                    <span class="n">executable_type</span><span class="o">=</span><span class="n">ExecutableType</span><span class="o">.</span><span class="n">SYSTEM</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">expander_cores</span><span class="p">,</span> <span class="n">expanded_pop_vertices</span>
 

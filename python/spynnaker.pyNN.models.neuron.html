@@ -1724,20 +1724,6 @@ or None to use the default slice</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.gen_on_machine">
-<code class="descname">gen_on_machine</code><span class="sig-paren">(</span><em>vertex_slice</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.gen_on_machine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.gen_on_machine" title="Permalink to this definition">¶</a></dt>
-<dd><p>True if the synapses of a particular slice of this population             should be generated on the machine.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; </td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.generate_data_specification">
 <code class="descname">generate_data_specification</code><span class="sig-paren">(</span><em>spec</em>, <em>placement</em>, <em>machine_time_step</em>, <em>time_scale_factor</em>, <em>application_graph</em>, <em>machine_graph</em>, <em>routing_info</em>, <em>data_n_time_steps</em>, <em>n_key_map</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.generate_data_specification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.generate_data_specification" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate a data specification.</p>
@@ -2125,24 +2111,6 @@ Get a property of the overall model.</td>
 </dd></dl>
 
 <dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.read_generated_connection_holders">
-<code class="descname">read_generated_connection_holders</code><span class="sig-paren">(</span><em>transceiver</em>, <em>placement</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.read_generated_connection_holders"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.read_generated_connection_holders" title="Permalink to this definition">¶</a></dt>
-<dd><p>Fill in the connection holders</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>transceiver</strong> (<em>Transceiver</em>) &#8211; How the data is to be read</li>
-<li><strong>placement</strong> (<em>Placement</em>) &#8211; Where the data is on the machine</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.read_parameters_from_machine">
 <code class="descname">read_parameters_from_machine</code><span class="sig-paren">(</span><em>transceiver</em>, <em>placement</em>, <em>vertex_slice</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.read_parameters_from_machine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.read_parameters_from_machine" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read the parameters from the machine before any are changed.</p>
@@ -2361,6 +2329,11 @@ If None the assumption is all neurons are recording</li>
 </dd></dl>
 
 <dl class="attribute">
+<dt id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.synapse_manager">
+<code class="descname">synapse_manager</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.synapse_manager" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
 <dt id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.weight_scale">
 <code class="descname">weight_scale</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.weight_scale" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
@@ -2554,7 +2527,7 @@ source, target, weight and delay</td>
 <dl class="class">
 <dt id="spynnaker.pyNN.models.neuron.PopulationMachineVertex">
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.</code><code class="descname">PopulationMachineVertex</code><span class="sig-paren">(</span><em>resources_required</em>, <em>recorded_region_ids</em>, <em>label</em>, <em>constraints</em>, <em>app_vertex</em>, <em>vertex_slice</em>, <em>drop_late_spikes</em>, <em>binary_file_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/population_machine_vertex.html#PopulationMachineVertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pacman.model.graphs.machine.machine_vertex.MachineVertex</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.interface.buffer_management.buffer_models.abstract_receive_buffers_to_host.AbstractReceiveBuffersToHost</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_has_associated_binary.AbstractHasAssociatedBinary</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.interface.provenance.provides_provenance_data_from_machine_impl.ProvidesProvenanceDataFromMachineImpl</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_recordable.AbstractRecordable</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.interface.profiling.abstract_has_profile_data.AbstractHasProfileData</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_supports_bit_field_generation.AbstractSupportsBitFieldGeneration</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_supports_bit_field_routing_compression.AbstractSupportsBitFieldRoutingCompression</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pacman.model.graphs.machine.machine_vertex.MachineVertex</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.interface.buffer_management.buffer_models.abstract_receive_buffers_to_host.AbstractReceiveBuffersToHost</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_has_associated_binary.AbstractHasAssociatedBinary</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.interface.provenance.provides_provenance_data_from_machine_impl.ProvidesProvenanceDataFromMachineImpl</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_recordable.AbstractRecordable</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.interface.profiling.abstract_has_profile_data.AbstractHasProfileData</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_supports_bit_field_generation.AbstractSupportsBitFieldGeneration</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_supports_bit_field_routing_compression.AbstractSupportsBitFieldRoutingCompression</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.abstract_models.abstract_synapse_expandable.AbstractSynapseExpandable</span></code></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -2809,6 +2782,15 @@ source, target, weight and delay</td>
 </dd></dl>
 
 <dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.PopulationMachineVertex.gen_on_machine">
+<code class="descclassname">PopulationMachineVertex.</code><code class="descname">gen_on_machine</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/population_machine_vertex.html#PopulationMachineVertex.gen_on_machine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.gen_on_machine" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if the synapses of a the slice of this vertex should be generated
+on the machine.</p>
+<p>Note: The typical implementation for this method will be to ask the
+app_vertex&#8217;s synapse_manager</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.PopulationMachineVertex.get_binary_file_name">
 <code class="descclassname">PopulationMachineVertex.</code><code class="descname">get_binary_file_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/population_machine_vertex.html#PopulationMachineVertex.get_binary_file_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.get_binary_file_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the binary name to be run for this vertex.</p>
@@ -2950,6 +2932,26 @@ source, target, weight and delay</td>
 </td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.PopulationMachineVertex.read_generated_connection_holders">
+<code class="descclassname">PopulationMachineVertex.</code><code class="descname">read_generated_connection_holders</code><span class="sig-paren">(</span><em>transceiver</em>, <em>placement</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/population_machine_vertex.html#PopulationMachineVertex.read_generated_connection_holders"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.read_generated_connection_holders" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fill in the connection holders</p>
+<p>Note: The typical implementation for this method will be to ask the
+app_vertex&#8217;s synapse_manager</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>transceiver</strong> (<em>Transceiver</em>) &#8211; How the data is to be read</li>
+<li><strong>placement</strong> (<em>Placement</em>) &#8211; Where the data is on the machine</li>
+</ul>
 </td>
 </tr>
 </tbody>
