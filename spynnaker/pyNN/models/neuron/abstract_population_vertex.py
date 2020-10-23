@@ -207,31 +207,6 @@ class AbstractPopulationVertex(
     def n_profile_samples(self):
         return self.__n_profile_samples
 
-    @inject_items({
-        "graph": "MemoryApplicationGraph"
-    })
-    @overrides(
-        TDMAAwareApplicationVertex.get_resources_used_by_atoms,
-        additional_arguments={"graph"}
-    )
-    def get_resources_used_by_atoms(self, vertex_slice, graph):
-        # pylint: disable=arguments-differ
-
-        variableSDRAM = self.__neuron_recorder.get_variable_sdram_usage(
-            vertex_slice)
-        constantSDRAM = ConstantSDRAM(
-            self._get_sdram_usage_for_atoms(vertex_slice, graph))
-
-        # set resources required from this object
-        container = ResourceContainer(
-            sdram=variableSDRAM + constantSDRAM,
-            dtcm=DTCMResource(self.get_dtcm_usage_for_atoms(vertex_slice)),
-            cpu_cycles=CPUCyclesPerTickResource(
-                self.get_cpu_usage_for_atoms(vertex_slice)))
-
-        # return the total resources.
-        return container
-
     @property
     @overrides(AbstractChangableAfterRun.requires_mapping)
     def requires_mapping(self):
