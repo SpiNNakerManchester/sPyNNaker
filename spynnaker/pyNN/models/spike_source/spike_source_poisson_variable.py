@@ -16,7 +16,7 @@ from spinn_utilities.overrides import overrides
 from .spike_source_poisson_vertex import SpikeSourcePoissonVertex
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 
-_population_parameters = {"seed": None, "splitter_object": None}
+_population_parameters = {"seed": None, "splitter": None}
 
 DEFAULT_MAX_ATOMS_PER_CORE = 500
 
@@ -45,10 +45,10 @@ class SpikeSourcePoissonVariable(AbstractPyNNModel):
     @overrides(AbstractPyNNModel.create_vertex,
                additional_arguments=default_population_parameters.keys())
     def create_vertex(
-            self, n_neurons, label, constraints, seed, splitter_object):
+            self, n_neurons, label, constraints, seed, splitter):
         # pylint: disable=arguments-differ
         max_atoms = self.get_max_atoms_per_core()
         return SpikeSourcePoissonVertex(
             n_neurons, constraints, label, seed, max_atoms, self,
             rates=self._rates, starts=self._starts, durations=self._durations,
-            splitter_object=splitter_object)
+            splitter=splitter)

@@ -348,7 +348,7 @@ class MasterPopTableAsBinarySearch(object):
         for in_edge in in_edges:
             if isinstance(in_edge, ProjectionApplicationEdge):
                 slices, is_exact = (
-                    in_edge.pre_vertex.splitter_object.get_out_going_slices())
+                    in_edge.pre_vertex.splitter.get_out_going_slices())
                 if is_exact:
                     n_vertices += len(slices)
                     n_entries += len(in_edge.synapse_information)

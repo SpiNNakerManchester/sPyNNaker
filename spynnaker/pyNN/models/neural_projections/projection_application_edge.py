@@ -121,7 +121,7 @@ class ProjectionApplicationEdge(
         :rtype: int
         """
         if self.__delay_edge is None:
-            return self._post_vertex.splitter_object.max_support_delay()
+            return self._post_vertex.splitter.max_support_delay()
         return self.__delay_edge.pre_vertex.delay_per_stage
 
     def get_machine_edge(self, pre_vertex, post_vertex):
