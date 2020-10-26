@@ -55,10 +55,8 @@ class SpikeInjectorVertex(
             virtual_key=virtual_key,
             reserve_reverse_ip_tag=reserve_reverse_ip_tag,
             constraints=constraints,
-            enable_injection=True)
-
-        # update splitter object
-        self.splitter = splitter
+            enable_injection=True,
+            splitter=splitter)
 
         # Set up for recording
         self.__spike_recorder = EIEIOSpikeRecorder()

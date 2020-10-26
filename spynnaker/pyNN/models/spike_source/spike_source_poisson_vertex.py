@@ -162,10 +162,7 @@ class SpikeSourcePoissonVertex(
         """
         # pylint: disable=too-many-arguments
         TDMAAwareApplicationVertex.__init__(
-            self, label, constraints, max_atoms_per_core)
-
-        # update splitter object
-        self.splitter = splitter
+            self, label, constraints, max_atoms_per_core, splitter)
 
         # atoms params
         self.__n_atoms = n_neurons

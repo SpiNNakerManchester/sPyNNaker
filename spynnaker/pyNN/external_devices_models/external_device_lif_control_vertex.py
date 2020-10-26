@@ -71,7 +71,8 @@ class ExternalDeviceLifControlVertex(
         :param str label:
         :param float ring_buffer_sigma:
         :param int incoming_spike_buffer_size:
-        :param SplitterObject splitter: splitter from app to machine
+        :param splitter: splitter from app to machine
+        :type splitter None or AbstractSplitterCommon
         :param list(~pacman.model.constraints.AbstractConstraint) constraints:
         """
         # pylint: disable=too-many-arguments, too-many-locals
@@ -107,7 +108,6 @@ class ExternalDeviceLifControlVertex(
             len(devices), label, constraints, max_atoms_per_core,
             spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
             neuron_impl, pynn_model, drop_late_spikes, splitter)
-        self.splitter = splitter
 
     def routing_key_partition_atom_mapping(self, routing_info, partition):
         # pylint: disable=arguments-differ

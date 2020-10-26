@@ -124,14 +124,12 @@ class AbstractPopulationVertex(
         :param AbstractPyNNNeuronModel pynn_model:
             The PyNN neuron model that this vertex is working on behalf of.
         :param splitter: splitter object
+        :type splitter None or AbstractSplitterCommon
         """
 
         # pylint: disable=too-many-arguments, too-many-locals
         TDMAAwareApplicationVertex.__init__(
-            self, label, constraints, max_atoms_per_core)
-
-        # set the splitter object
-        self.splitter = splitter
+            self, label, constraints, max_atoms_per_core, splitter)
 
         self.__n_atoms = n_neurons
         self.__n_data_specs = 0
