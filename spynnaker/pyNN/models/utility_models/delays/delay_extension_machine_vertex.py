@@ -409,7 +409,4 @@ class DelayExtensionMachineVertex(
         :param ~pacman.model.graphs.common.Slice vertex_slice:
         :rtype: bool
         """
-        if self.app_vertex.delay_generator_data(self.vertex_slice):
-            return True
-        else:
-            return False
+        return self.app_vertex.gen_on_machine()

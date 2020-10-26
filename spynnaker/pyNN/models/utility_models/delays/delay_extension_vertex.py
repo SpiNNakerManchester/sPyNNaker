@@ -210,7 +210,5 @@ class DelayExtensionVertex(
         """
         return vertex_slice in self.__delay_generator_data
 
-        if vertex_slice in self.__delay_generator_data:
-            return self.__delay_generator_data[vertex_slice]
-        else:
-            return None
+    def delay_generator_data(self, vertex_slice):
+        self.__delay_generator_data.get(vertex_slice, None)
