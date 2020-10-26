@@ -232,6 +232,7 @@ class PopulationMachineVertex(
         provenance_data = self._get_remaining_provenance_data_items(
             provenance_data)
 
+        # This is why we have to override the public method
         times_timer_tic_overran = 0
         for item in provenance_items:
             if item.names[-1] == self._TIMER_TICK_OVERRUN:

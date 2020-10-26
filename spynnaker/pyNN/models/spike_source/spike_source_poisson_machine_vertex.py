@@ -133,24 +133,15 @@ class SpikeSourcePoissonMachineVertex(
             self.PROFILE_TAG_LABELS, transceiver, placement)
 
     @overrides(ProvidesProvenanceDataFromMachineImpl.
-               get_provenance_data_from_machine)
-    def get_provenance_data_from_machine(self, transceiver, placement):
-        # pylint: disable=too-many-locals
-        provenance_data = self._read_provenance_data(transceiver, placement)
-        provenance_items = self._read_basic_provenance_items(
-            provenance_data, placement)
-        provenance_data = self._get_remaining_provenance_data_items(
-            provenance_data)
-
+               _get_extra_provenance_items)
+    def _get_extra_provenance_items(
+            self, label, location, names, provenance_data):
         n_times_tdma_fell_behind = provenance_data[
             self.EXTRA_PROVENANCE_DATA_ENTRIES.TDMA_MISSED_SLOTS.value]
+        x, y, p = location
 
-        label, x, y, p, names = self._get_placement_details(placement)
-
-        provenance_items.append(
-            self._app_vertex.get_tdma_provenance_item(
-                names, x, y, p, n_times_tdma_fell_behind))
-        return provenance_items
+        yield self._app_vertex.get_tdma_provenance_item(
+            names, x, y, p, n_times_tdma_fell_behind)
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
     def get_binary_file_name(self):

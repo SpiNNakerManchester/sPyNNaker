@@ -128,29 +128,18 @@ class MunichMotorDevice(
         return self.PROVENANCE_ELEMENTS
 
     @overrides(ProvidesProvenanceDataFromMachineImpl.
-               get_provenance_data_from_machine)
-    def get_provenance_data_from_machine(self, transceiver, placement):
-        # get prov data
-        provenance_data = self._read_provenance_data(transceiver, placement)
-        # get system level prov
-        provenance_items = self._read_basic_provenance_items(
-            provenance_data, placement)
-        # get left over prov
-        provenance_data = self._get_remaining_provenance_data_items(
-            provenance_data)
-        # stuff for making prov data items
-        label, x, y, p, names = self._get_placement_details(placement)
-
-        # get the only app level prov item
+               _get_extra_provenance_items)
+    def _get_extra_provenance_items(
+            self, label, location, names, provenance_data):
         n_buffer_overflows = provenance_data[0]
+        x, y, p = location
 
         # build it
-        provenance_items.append(ProvenanceDataItem(
+        yield ProvenanceDataItem(
             self._add_name(names, self.INPUT_BUFFER_FULL_NAME),
             n_buffer_overflows, report=n_buffer_overflows > 0,
             message=self.INPUT_BUFFER_FULL_MESSAGE.format(
-                label, x, y, p, n_buffer_overflows)))
-        return provenance_items
+                label, x, y, p, n_buffer_overflows))
 
     @property
     @overrides(ApplicationVertex.n_atoms)
