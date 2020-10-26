@@ -211,4 +211,4 @@ class DelayExtensionVertex(
         return vertex_slice in self.__delay_generator_data
 
     def delay_generator_data(self, vertex_slice):
-        self.__delay_generator_data.get(vertex_slice, None)
+        return self.__delay_generator_data.get(vertex_slice, None)
