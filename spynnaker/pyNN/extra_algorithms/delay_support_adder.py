@@ -85,7 +85,7 @@ class DelaySupportAdder(object):
 
         # progress abr and data holders
         progress = ProgressBar(
-            len(app_graph.outgoing_edge_partitions),
+            len(list(app_graph.outgoing_edge_partitions)),
             self.APP_DELAY_PROGRESS_BAR_TEXT)
 
         # go through all partitions.
