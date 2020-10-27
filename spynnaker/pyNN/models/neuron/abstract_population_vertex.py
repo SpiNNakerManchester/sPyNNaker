@@ -290,7 +290,7 @@ class AbstractPopulationVertex(
             self._get_sdram_usage_for_neuron_params(vertex_slice) +
             self._neuron_recorder.get_static_sdram_usage(vertex_slice) +
             PopulationMachineVertex.get_provenance_data_size(
-                len(PopulationMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES)) +
+                PopulationMachineVertex.N_ADDITIONAL_PROVENANCE_DATA_ITEMS) +
             self.__synapse_manager.get_sdram_usage_in_bytes(
                 vertex_slice, graph, self) +
             profile_utils.get_profile_region_size(
