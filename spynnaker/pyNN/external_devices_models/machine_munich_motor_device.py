@@ -14,8 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.overrides import overrides
-from pacman.model.constraints.key_allocator_constraints import (
-    FixedMaskConstraint)
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import MachineVertex
@@ -24,8 +22,7 @@ from pacman.model.resources import (
 from spinn_front_end_common.abstract_models import (
     AbstractHasAssociatedBinary)
 from spinn_front_end_common.abstract_models import (
-    AbstractGeneratesDataSpecification,
-    AbstractProvidesOutgoingPartitionConstraints)
+    AbstractGeneratesDataSpecification)
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
 from spinn_front_end_common.interface.provenance import \
@@ -40,8 +37,8 @@ from spynnaker.pyNN.exceptions import SpynnakerException
 
 class MachineMunichMotorDevice(
     MachineVertex, AbstractGeneratesDataSpecification,
-    AbstractHasAssociatedBinary, AbstractProvidesOutgoingPartitionConstraints,
-    ProvidesKeyToAtomMappingImpl, ProvidesProvenanceDataFromMachineImpl):
+    AbstractHasAssociatedBinary, ProvidesKeyToAtomMappingImpl,
+    ProvidesProvenanceDataFromMachineImpl):
     """ An Omnibot motor control device. This has a real vertex and an \
         external device vertex.
     """
@@ -148,15 +145,6 @@ class MachineMunichMotorDevice(
             message=self.INPUT_BUFFER_FULL_MESSAGE.format(
                 label, x, y, p, n_buffer_overflows)))
         return provenance_items
-
-    @overrides(AbstractProvidesOutgoingPartitionConstraints.
-               get_outgoing_partition_constraints)
-    def get_outgoing_partition_constraints(self, partition):
-
-        # Any key to the device will work, as long as it doesn't set the
-        # management bit.  We also need enough for the configuration bits
-        # and the management bit anyway
-        return list([FixedMaskConstraint(0xFFFFF800)])
 
     @inject_items({
         "routing_info": "MemoryRoutingInfos",
