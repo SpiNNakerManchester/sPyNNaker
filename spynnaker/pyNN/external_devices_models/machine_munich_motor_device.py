@@ -36,9 +36,9 @@ from spynnaker.pyNN.exceptions import SpynnakerException
 
 
 class MachineMunichMotorDevice(
-    MachineVertex, AbstractGeneratesDataSpecification,
-    AbstractHasAssociatedBinary, ProvidesKeyToAtomMappingImpl,
-    ProvidesProvenanceDataFromMachineImpl):
+        MachineVertex, AbstractGeneratesDataSpecification,
+        AbstractHasAssociatedBinary, ProvidesKeyToAtomMappingImpl,
+        ProvidesProvenanceDataFromMachineImpl):
     """ An Omnibot motor control device. This has a real vertex and an \
         external device vertex.
     """
@@ -69,6 +69,7 @@ class MachineMunichMotorDevice(
         "too quickly for the number of neurons per core.  Please "
         "increase the timer_tic or time_scale_factor or decrease the "
         "number of neurons per core.")
+
     def __init__(
             self, speed, sample_time, update_time, delay_time,
             delta_threshold, continue_if_not_different,

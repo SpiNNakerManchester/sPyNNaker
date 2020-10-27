@@ -79,7 +79,6 @@ class MunichMotorDevice(
         self.__dependent_vertices = [
             _MunichMotorDevice(spinnaker_link_id, board_address)]
 
-
     @overrides(AbstractVertexWithEdgeToDependentVertices.dependent_vertices)
     def dependent_vertices(self):
         """ Return the vertices which this vertex depends upon
@@ -101,4 +100,3 @@ class MunichMotorDevice(
         # management bit.  We also need enough for the configuration bits
         # and the management bit anyway
         return list([FixedMaskConstraint(0xFFFFF800)])
-
