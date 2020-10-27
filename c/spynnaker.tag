@@ -5235,8 +5235,15 @@
       <type>bool</type>
       <name>population_table_initialise</name>
       <anchorfile>population__table_8h.html</anchorfile>
-      <anchor>a21613340771ef9ddc391d6bc3914755d</anchor>
-      <arglist>(address_t table_address, address_t synapse_rows_address, address_t direct_rows_address, filter_region_t *bitfield_address, uint32_t *row_max_n_words)</arglist>
+      <anchor>a5f92af4dd47e65504cbbbcb265083196</anchor>
+      <arglist>(address_t table_address, address_t synapse_rows_address, address_t direct_rows_address, uint32_t *row_max_n_words)</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>population_table_load_bitfields</name>
+      <anchorfile>population__table_8h.html</anchorfile>
+      <anchor>a4e78f94389fe12981acf2cea7e8bfe91</anchor>
+      <arglist>(filter_region_t *filter_region)</arglist>
     </member>
     <member kind="function">
       <type>bool</type>
@@ -5410,11 +5417,11 @@
       <anchor>ab9711943341e2f63e48945e4dfee5099</anchor>
       <arglist>(uint32_t mp_i, uint32_t start, uint32_t end, filter_info_t *filters)</arglist>
     </member>
-    <member kind="function" static="yes">
-      <type>static bool</type>
-      <name>bit_field_filter_initialise</name>
+    <member kind="function">
+      <type>bool</type>
+      <name>population_table_load_bitfields</name>
       <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a6f869ab6bee8e54b3a6d8efb0c8fbc3c</anchor>
+      <anchor>a4e78f94389fe12981acf2cea7e8bfe91</anchor>
       <arglist>(filter_region_t *filter_region)</arglist>
     </member>
     <member kind="function" static="yes">
@@ -5428,8 +5435,8 @@
       <type>bool</type>
       <name>population_table_initialise</name>
       <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a21613340771ef9ddc391d6bc3914755d</anchor>
-      <arglist>(address_t table_address, address_t synapse_rows_address, address_t direct_rows_address, filter_region_t *bitfield_address, uint32_t *row_max_n_words)</arglist>
+      <anchor>a5f92af4dd47e65504cbbbcb265083196</anchor>
+      <arglist>(address_t table_address, address_t synapse_rows_address, address_t direct_rows_address, uint32_t *row_max_n_words)</arglist>
     </member>
     <member kind="function">
       <type>bool</type>
@@ -5627,11 +5634,11 @@
       <anchor>ab9711943341e2f63e48945e4dfee5099</anchor>
       <arglist>(uint32_t mp_i, uint32_t start, uint32_t end, filter_info_t *filters)</arglist>
     </member>
-    <member kind="function" static="yes">
-      <type>static bool</type>
-      <name>bit_field_filter_initialise</name>
+    <member kind="function">
+      <type>bool</type>
+      <name>population_table_load_bitfields</name>
       <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a6f869ab6bee8e54b3a6d8efb0c8fbc3c</anchor>
+      <anchor>a4e78f94389fe12981acf2cea7e8bfe91</anchor>
       <arglist>(filter_region_t *filter_region)</arglist>
     </member>
     <member kind="function" static="yes">
@@ -5645,8 +5652,8 @@
       <type>bool</type>
       <name>population_table_initialise</name>
       <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a21613340771ef9ddc391d6bc3914755d</anchor>
-      <arglist>(address_t table_address, address_t synapse_rows_address, address_t direct_rows_address, filter_region_t *bitfield_address, uint32_t *row_max_n_words)</arglist>
+      <anchor>a5f92af4dd47e65504cbbbcb265083196</anchor>
+      <arglist>(address_t table_address, address_t synapse_rows_address, address_t direct_rows_address, uint32_t *row_max_n_words)</arglist>
     </member>
     <member kind="function">
       <type>bool</type>
