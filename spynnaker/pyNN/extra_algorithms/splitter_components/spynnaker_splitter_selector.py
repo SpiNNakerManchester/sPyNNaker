@@ -57,7 +57,7 @@ class SpynnakerSplitterSelector(SplitterSelector):
             total_number_of_things_to_do=len(app_graph.vertices))
 
         for app_vertex in progress_bar.over(app_graph.vertices):
-            if app_vertex.splitter_object is None:
+            if app_vertex.splitter is None:
                 if isinstance(app_vertex, AbstractPopulationVertex):
                     self.abstract_pop_heuristic(app_vertex)
                 elif isinstance(app_vertex, ApplicationSpiNNakerLinkVertex):
@@ -78,7 +78,7 @@ class SpynnakerSplitterSelector(SplitterSelector):
         :param ApplicationGraph app_vertex: app vertex
         :rtype: None
         """
-        app_vertex.splitter_object = (
+        app_vertex.splitter = (
             SplitterAbstractPopulationVertexSlice())
 
     @staticmethod
@@ -88,7 +88,7 @@ class SpynnakerSplitterSelector(SplitterSelector):
         :param ApplicationGraph app_vertex: app vertex
         :rtype: None
         """
-        app_vertex.splitter_object = SplitterOneToOneLegacy()
+        app_vertex.splitter = SplitterOneToOneLegacy()
 
     @staticmethod
     def external_fpga_link_heuristic(app_vertex):
@@ -97,7 +97,7 @@ class SpynnakerSplitterSelector(SplitterSelector):
         :param ApplicationGraph app_vertex: app vertex
         :rtype: None
         """
-        app_vertex.splitter_object = SplitterOneToOneLegacy()
+        app_vertex.splitter = SplitterOneToOneLegacy()
 
     @staticmethod
     def spike_source_array_heuristic(app_vertex):
@@ -106,7 +106,7 @@ class SpynnakerSplitterSelector(SplitterSelector):
         :param ApplicationGraph app_vertex: app vertex
         :rtype: None
         """
-        app_vertex.splitter_object = SpynnakerSplitterSliceLegacy()
+        app_vertex.splitter = SpynnakerSplitterSliceLegacy()
 
     @staticmethod
     def spike_source_poisson_heuristic(app_vertex):
@@ -115,4 +115,4 @@ class SpynnakerSplitterSelector(SplitterSelector):
         :param ApplicationGraph app_vertex: app vertex
         :rtype: None
         """
-        app_vertex.splitter_object = SpynnakerSplitterSliceLegacy()
+        app_vertex.splitter = SpynnakerSplitterSliceLegacy()

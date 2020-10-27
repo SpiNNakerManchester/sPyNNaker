@@ -75,7 +75,7 @@ class DelayExtensionVertex(
         """
         # pylint: disable=too-many-arguments
         super(DelayExtensionVertex, self).__init__(
-            label, constraints, POP_TABLE_MAX_ROW_LENGTH)
+            label, constraints, POP_TABLE_MAX_ROW_LENGTH, splitter=None)
 
         self.__source_vertex = source_vertex
         self.__n_delay_stages = 0
@@ -211,7 +211,4 @@ class DelayExtensionVertex(
         return vertex_slice in self.__delay_generator_data
 
     def delay_generator_data(self, vertex_slice):
-        if self.gen_on_machine(vertex_slice):
-            return self.__delay_generator_data[vertex_slice]
-        else:
-            return None
+        return self.__delay_generator_data.get(vertex_slice, None)

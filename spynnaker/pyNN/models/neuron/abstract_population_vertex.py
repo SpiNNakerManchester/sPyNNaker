@@ -101,7 +101,7 @@ class AbstractPopulationVertex(
     def __init__(
             self, n_neurons, label, constraints, max_atoms_per_core,
             spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
-            neuron_impl, pynn_model, drop_late_spikes, splitter_object):
+            neuron_impl, pynn_model, drop_late_spikes, splitter):
         """
         :param int n_neurons: The number of neurons in the population
         :param str label: The label on the population
@@ -123,15 +123,13 @@ class AbstractPopulationVertex(
             The (Python side of the) implementation of the neurons themselves.
         :param AbstractPyNNNeuronModel pynn_model:
             The PyNN neuron model that this vertex is working on behalf of.
-        :param splitter_object: splitter object
+        :param splitter: splitter object
+        :type splitter None or AbstractSplitterCommon
         """
 
         # pylint: disable=too-many-arguments, too-many-locals
         TDMAAwareApplicationVertex.__init__(
-            self, label, constraints, max_atoms_per_core)
-
-        # set the splitter object
-        self.splitter_object = splitter_object
+            self, label, constraints, max_atoms_per_core, splitter)
 
         self.__n_atoms = n_neurons
         self.__n_data_specs = 0
@@ -800,14 +798,6 @@ class AbstractPopulationVertex(
     def __repr__(self):
         return self.__str__()
 
-    def gen_on_machine(self, vertex_slice):
-        """ True if the synapses of a particular slice of this population \
-            should be generated on the machine.
-
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-        """
-        return self.__synapse_manager.gen_on_machine(vertex_slice)
-
     @overrides(AbstractCanReset.reset_to_first_timestep)
     def reset_to_first_timestep(self):
         # Mark that reset has been done, and reload state variables
@@ -818,12 +808,3 @@ class AbstractPopulationVertex(
         if self.__synapse_manager.changes_during_run:
             self.__change_requires_data_generation = True
             self.__change_requires_neuron_parameters_reload = False
-
-    def read_generated_connection_holders(self, transceiver, placement):
-        """ Fill in the connection holders
-
-        :param Transceiver transceiver: How the data is to be read
-        :param Placement placement: Where the data is on the machine
-        """
-        self.__synapse_manager.read_generated_connection_holders(
-            transceiver, placement)

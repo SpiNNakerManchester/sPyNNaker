@@ -286,7 +286,7 @@ class NeuronRecorder(object):
             self, label, buffer_manager, placements, application_vertex,
             sampling_rate, data_type, variable, n_machine_time_steps):
         vertices = (
-            application_vertex.splitter_object.machine_vertices_for_recording(
+            application_vertex.splitter.machine_vertices_for_recording(
                 variable))
         region = self.__region_ids[variable]
         missing_str = ""
@@ -395,7 +395,7 @@ class NeuronRecorder(object):
         spike_ids = list()
 
         vertices = (
-            application_vertex.splitter_object.machine_vertices_for_recording(
+            application_vertex.splitter.machine_vertices_for_recording(
                 variable))
         missing_str = ""
         progress = ProgressBar(vertices, "Getting spikes for {}".format(label))
