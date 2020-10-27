@@ -13,10 +13,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from pacman.model.graphs.machine import MachineVertex
 from spinn_utilities.overrides import overrides
+from pacman.model.graphs.common import Slice
+from pacman.model.graphs.machine import MachineVertex
+from pacman.model.resources import (
+    ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
 from spinn_front_end_common.abstract_models import (
     AbstractHasAssociatedBinary)
+from spinn_front_end_common.interface.provenance import \
+    ProvidesProvenanceDataFromMachineImpl
+from spinn_front_end_common.utilities.constants import (
+    SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES, BYTES_PER_WORD)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 
 
@@ -24,17 +31,26 @@ class MachineMunichMotorDevice(MachineVertex, AbstractHasAssociatedBinary):
     """ An Omnibot motor control device. This has a real vertex and an \
         external device vertex.
     """
-    def __init__(self, resources, label=None, constraints=None,
-                 app_vertex=None, vertex_slice=None):
+    _slots__ = []
+
+    PROVENANCE_ELEMENTS = 1
+
+    PARAMS_SIZE = 7 * BYTES_PER_WORD
+
+    def __init__(self, n_atoms, label=None, constraints=None,
+                 app_vertex=None):
         super(MachineMunichMotorDevice, self).__init__(
             label=label, constraints=constraints, app_vertex=app_vertex,
-            vertex_slice=vertex_slice)
-        self._resources = resources
+            vertex_slice=Slice(0, n_atoms-1))
 
     @property
     @overrides(MachineVertex.resources_required)
     def resources_required(self):
-        return self._resources
+        return ResourceContainer(
+            sdram=ConstantSDRAM(
+                SYSTEM_BYTES_REQUIREMENT + self.PARAMS_SIZE +
+                ProvidesProvenanceDataFromMachineImpl.get_provenance_data_size(self.PROVENANCE_ELEMENTS)),
+            dtcm=DTCMResource(0), cpu_cycles=CPUCyclesPerTickResource(0))
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
     def get_binary_file_name(self):

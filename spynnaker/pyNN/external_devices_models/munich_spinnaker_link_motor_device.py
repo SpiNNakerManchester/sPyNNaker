@@ -23,8 +23,6 @@ from pacman.model.constraints.key_allocator_constraints import (
     FixedMaskConstraint)
 from pacman.model.graphs.application import (
     ApplicationSpiNNakerLinkVertex, ApplicationVertex)
-from pacman.model.resources import (
-    ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification,
     AbstractProvidesOutgoingPartitionConstraints,
@@ -35,6 +33,8 @@ from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES, BYTES_PER_WORD)
+from spinn_front_end_common.utility_models.abstract_one_app_one_machine_vertex\
+    import AbstractOneAppOneMachineVertex
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.defaults import defaults
 from .machine_munich_motor_device import MachineMunichMotorDevice
@@ -55,7 +55,8 @@ class _MunichMotorDevice(ApplicationSpiNNakerLinkVertex):
 
 @defaults
 class MunichMotorDevice(
-        ApplicationVertex, AbstractVertexWithEdgeToDependentVertices,
+        AbstractOneAppOneMachineVertex,
+        AbstractVertexWithEdgeToDependentVertices,
         AbstractGeneratesDataSpecification,
         AbstractProvidesOutgoingPartitionConstraints,
         ProvidesKeyToAtomMappingImpl, ProvidesProvenanceDataFromMachineImpl):
@@ -106,7 +107,9 @@ class MunichMotorDevice(
         """
         # pylint: disable=too-many-arguments
 
-        super(MunichMotorDevice, self).__init__(label)
+        super(MunichMotorDevice, self).__init__(
+            MachineMunichMotorDevice(self.n_atoms, label, app_vertex=self),
+                label, None, self.n_atoms)
 
         self.__speed = speed
         self.__sample_time = sample_time
@@ -156,20 +159,6 @@ class MunichMotorDevice(
     @overrides(ApplicationVertex.n_atoms)
     def n_atoms(self):
         return 6
-
-    @overrides(ApplicationVertex.create_machine_vertex)
-    def create_machine_vertex(self, vertex_slice, resources_required,
-                              label=None, constraints=None):
-        return MachineMunichMotorDevice(
-            resources_required, label, constraints, self, vertex_slice)
-
-    @overrides(ApplicationVertex.get_resources_used_by_atoms)
-    def get_resources_used_by_atoms(self, vertex_slice):
-        return ResourceContainer(
-            sdram=ConstantSDRAM(
-                SYSTEM_BYTES_REQUIREMENT + self.PARAMS_SIZE +
-                self.get_provenance_data_size(self.PROVENANCE_ELEMENTS)),
-            dtcm=DTCMResource(0), cpu_cycles=CPUCyclesPerTickResource(0))
 
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
                get_outgoing_partition_constraints)
