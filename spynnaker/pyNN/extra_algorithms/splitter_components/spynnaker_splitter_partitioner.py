@@ -84,7 +84,7 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
         #       not assume the un-delayed edge still exists.
         """
         filter off delay values
-        post_splitter = dest_machine_vertex.app_vertex.splitter_object
+        post_splitter = dest_machine_vertex.app_vertex.splitter
         if ((not isinstance(
                 src_machine_vertex, DelayExtensionMachineVertex)) and
                 isinstance(post_splitter, AbstractSpynnakerSplitterDelay)):

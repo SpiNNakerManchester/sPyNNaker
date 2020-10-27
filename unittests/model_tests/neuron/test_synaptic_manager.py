@@ -170,8 +170,8 @@ def test_write_data_spec():
     placements = Placements()
     pre_app_population = MockPopulation(10, "mock pop pre")
     pre_app_vertex = SimpleApplicationVertex(10, label="pre")
-    pre_app_vertex.splitter_object = MockSplitter()
-    pre_app_vertex.splitter_object._called = True
+    pre_app_vertex.splitter = MockSplitter()
+    pre_app_vertex.splitter._called = True
     pre_vertex_slice = Slice(0, 9)
 
     post_app_population = MockPopulation(10, "mock pop post")
@@ -179,8 +179,8 @@ def test_write_data_spec():
         pre_vertex_slice, None)
     placements.add_placement(Placement(pre_vertex, 0, 0, 1))
     post_app_vertex = SimpleApplicationVertex(10, label="post")
-    post_app_vertex.splitter_object = MockSplitter()
-    post_app_vertex.splitter_object._called = True
+    post_app_vertex.splitter = MockSplitter()
+    post_app_vertex.splitter._called = True
     post_vertex_slice = Slice(0, 9)
     post_vertex = post_app_vertex.create_machine_vertex(
         post_vertex_slice, None)
@@ -190,8 +190,8 @@ def test_write_data_spec():
         10, 16, 51, pre_app_vertex, label="delay")
     delay_app_vertex.set_new_n_delay_stages_and_delay_per_stage(
         16, 51)
-    delay_app_vertex.splitter_object = SplitterDelayVertexSlice(
-        pre_app_vertex.splitter_object)
+    delay_app_vertex.splitter = SplitterDelayVertexSlice(
+        pre_app_vertex.splitter)
     delay_vertex = DelayExtensionMachineVertex(
         resources_required=None, label="", constraints=[],
         app_vertex=delay_app_vertex, vertex_slice=post_vertex_slice)
@@ -533,11 +533,11 @@ def test_pop_based_master_pop_table_standard(
     app_graph = ApplicationGraph("Test")
     mac_graph = MachineGraph("Test", app_graph)
     pre_app_vertex = SimpleApplicationVertex(1000)
-    pre_app_vertex.splitter_object = MockSplitter()
+    pre_app_vertex.splitter = MockSplitter()
     app_graph.add_vertex(pre_app_vertex)
     post_vertex_slice = Slice(0, 99)
     post_app_vertex = SimpleApplicationVertex(100)
-    post_app_vertex.splitter_object = MockSplitter()
+    post_app_vertex.splitter = MockSplitter()
     app_graph.add_vertex(post_app_vertex)
     post_mac_vertex = post_app_vertex.create_machine_vertex(
         post_vertex_slice, None)

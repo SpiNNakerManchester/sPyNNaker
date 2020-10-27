@@ -215,7 +215,7 @@ class SynapseIORowBased(object):
         """
         max_delay_supported = self.get_maximum_delay_supported_in_ms(
             machine_time_step,
-            in_edge.post_vertex.splitter_object.max_support_delay())
+            in_edge.post_vertex.splitter.max_support_delay())
         max_delay = max_delay_supported * (n_delay_stages + 1)
         pad_to_length = synapse_info.synapse_dynamics.pad_to_length
 
@@ -387,7 +387,7 @@ class SynapseIORowBased(object):
         # Get delays in timesteps
         max_delay = self.get_maximum_delay_supported_in_ms(
             machine_time_step,
-            app_edge.post_vertex.splitter_object.max_support_delay())
+            app_edge.post_vertex.splitter.max_support_delay())
         if max_delay is not None:
             max_delay *= (MICRO_TO_MILLISECOND_CONVERSION / machine_time_step)
 
@@ -582,7 +582,7 @@ class SynapseIORowBased(object):
         machine_time_step = globals_variables.get_simulator().machine_time_step
         pre_vertex_slice = machine_edge.pre_vertex.vertex_slice
         post_vertex_slice = machine_edge.post_vertex.vertex_slice
-        post_splitter = machine_edge.post_vertex.app_vertex.splitter_object
+        post_splitter = machine_edge.post_vertex.app_vertex.splitter
         post_vertex_max_delay_ticks = post_splitter.max_support_delay()
         max_row_length = max_row_info.undelayed_max_words
         delayed_max_row_length = max_row_info.delayed_max_words

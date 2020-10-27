@@ -184,8 +184,8 @@ class DelaySupportAdder(object):
                 label=delay_name)
 
             # set trackers
-            delay_app_vertex.splitter_object = (
-                SplitterDelayVertexSlice(app_edge.pre_vertex.splitter_object))
+            delay_app_vertex.splitter = (
+                SplitterDelayVertexSlice(app_edge.pre_vertex.splitter))
             app_graph.add_vertex(delay_app_vertex)
             self._app_to_delay_map[app_outgoing_edge_partition] = (
                 delay_app_vertex)
@@ -228,15 +228,15 @@ class DelaySupportAdder(object):
             logger.warning(self.END_USER_MAX_DELAY_DEFILING_ERROR_MESSAGE)
 
         # get if the post vertex needs a delay extension
-        post_splitter_object = app_edge.post_vertex.splitter_object
+        post_splitter = app_edge.post_vertex.splitter
         if not isinstance(
-                post_splitter_object, AbstractSpynnakerSplitterDelay):
+                post_splitter, AbstractSpynnakerSplitterDelay):
             raise DelayExtensionException(
                 self.INVALID_SPLITTER_FOR_DELAYS_ERROR_MSG.format(
-                    app_edge.post_vertex, post_splitter_object, app_edge))
+                    app_edge.post_vertex, post_splitter, app_edge))
         post_vertex_max_delay = (
-            app_edge.post_vertex.splitter_object.max_support_delay() *
-            (machine_time_step / MICRO_TO_MILLISECOND_CONVERSION))
+                app_edge.post_vertex.splitter.max_support_delay() *
+                (machine_time_step / MICRO_TO_MILLISECOND_CONVERSION))
 
         # if does not need a delay extension, run away
         if post_vertex_max_delay >= max_delay_needed:
@@ -253,7 +253,7 @@ class DelaySupportAdder(object):
             raise DelayExtensionException(
                 self.NOT_SUPPORTED_DELAY_ERROR_MSG.format(
                     max_delay_needed, app_edge,
-                    app_edge.post_vertex.splitter_object,
+                    app_edge.post_vertex.splitter,
                     post_vertex_max_delay,
                     DelayExtensionVertex.get_max_delay_ticks_supported(
                         post_vertex_max_delay)))
