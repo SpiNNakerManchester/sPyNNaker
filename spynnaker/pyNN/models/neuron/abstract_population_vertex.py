@@ -192,6 +192,10 @@ class AbstractPopulationVertex(
     def _neuron_recorder(self):  # for testing only
         return self.__neuron_recorder
 
+    @property
+    def synapse_manager(self):
+        return self.__synapse_manager
+
     @inject_items({
         "graph": "MemoryApplicationGraph"
     })
@@ -876,14 +880,6 @@ class AbstractPopulationVertex(
     def __repr__(self):
         return self.__str__()
 
-    def gen_on_machine(self, vertex_slice):
-        """ True if the synapses of a particular slice of this population \
-            should be generated on the machine.
-
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-        """
-        return self.__synapse_manager.gen_on_machine(vertex_slice)
-
     @overrides(AbstractCanReset.reset_to_first_timestep)
     def reset_to_first_timestep(self):
         # Mark that reset has been done, and reload state variables
@@ -894,12 +890,3 @@ class AbstractPopulationVertex(
         if self.__synapse_manager.changes_during_run:
             self.__change_requires_data_generation = True
             self.__change_requires_neuron_parameters_reload = False
-
-    def read_generated_connection_holders(self, transceiver, placement):
-        """ Fill in the connection holders
-
-        :param Transceiver transceiver: How the data is to be read
-        :param Placement placement: Where the data is on the machine
-        """
-        self.__synapse_manager.read_generated_connection_holders(
-            transceiver, placement)
