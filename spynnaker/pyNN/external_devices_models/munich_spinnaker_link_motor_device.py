@@ -107,9 +107,9 @@ class MunichMotorDevice(
         """
         # pylint: disable=too-many-arguments
 
+        m_vertex = MachineMunichMotorDevice(label, app_vertex=self)
         super(MunichMotorDevice, self).__init__(
-            MachineMunichMotorDevice(self.n_atoms, label, app_vertex=self),
-                label, None, self.n_atoms)
+            m_vertex, label, None, m_vertex.N_ATOMS)
 
         self.__speed = speed
         self.__sample_time = sample_time
@@ -154,11 +154,6 @@ class MunichMotorDevice(
             message=self.INPUT_BUFFER_FULL_MESSAGE.format(
                 label, x, y, p, n_buffer_overflows)))
         return provenance_items
-
-    @property
-    @overrides(ApplicationVertex.n_atoms)
-    def n_atoms(self):
-        return 6
 
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
                get_outgoing_partition_constraints)

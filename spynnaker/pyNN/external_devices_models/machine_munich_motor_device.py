@@ -33,15 +33,16 @@ class MachineMunichMotorDevice(MachineVertex, AbstractHasAssociatedBinary):
     """
     _slots__ = []
 
+    N_ATOMS = 6
+
     PROVENANCE_ELEMENTS = 1
 
     PARAMS_SIZE = 7 * BYTES_PER_WORD
 
-    def __init__(self, n_atoms, label=None, constraints=None,
-                 app_vertex=None):
+    def __init__(self, label=None, constraints=None, app_vertex=None):
         super(MachineMunichMotorDevice, self).__init__(
             label=label, constraints=constraints, app_vertex=app_vertex,
-            vertex_slice=Slice(0, n_atoms-1))
+            vertex_slice=Slice(0, self.N_ATOMS-1))
 
     @property
     @overrides(MachineVertex.resources_required)
