@@ -217,9 +217,7 @@ static bool initialise(void) {
     if (!population_table_initialise(
             data_specification_get_region(POPULATION_TABLE_REGION, ds_regions),
             data_specification_get_region(SYNAPTIC_MATRIX_REGION, ds_regions),
-            direct_synapses_address,
-            data_specification_get_region(BIT_FIELD_FILTER_REGION, ds_regions),
-            &row_max_n_words)) {
+            direct_synapses_address, &row_max_n_words)) {
         return false;
     }
     // Set up the synapse dynamics
@@ -247,6 +245,12 @@ static bool initialise(void) {
 
     // Setup profiler
     profiler_init(data_specification_get_region(PROFILER_REGION, ds_regions));
+
+    // Do bitfield configuration last to only use any unused memory
+    if (!population_table_load_bitfields(
+            data_specification_get_region(BIT_FIELD_FILTER_REGION, ds_regions))) {
+        return false;
+    }
 
     print_post_to_pre_entry();
 
