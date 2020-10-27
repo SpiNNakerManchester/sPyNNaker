@@ -438,10 +438,8 @@ class DelayExtensionVertex(
     def get_outgoing_partition_constraints(self, partition):
         return [ContiguousKeyRangeContraint()]
 
-    def gen_on_machine(self, vertex_slice):
-        """ Determine if the given slice needs to be generated on the machine
-
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-        :rtype: bool
-        """
-        return vertex_slice in self.__delay_generator_data
+    def delay_generator_data(self, vertex_slice):
+        if vertex_slice in self.__delay_generator_data:
+            return self.__delay_generator_data[vertex_slice]
+        else:
+            return None
