@@ -735,7 +735,7 @@
         <span class="c1"># Allow a float which has a near int value</span>
         <span class="n">temp</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">size</span><span class="p">))</span>
         <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">temp</span> <span class="o">-</span> <span class="n">size</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.001</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Size of the population rounded &quot;</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Size of the population </span><span class="si">{}</span><span class="s2"> rounded &quot;</span>
                            <span class="s2">&quot;from </span><span class="si">{}</span><span class="s2"> to </span><span class="si">{}</span><span class="s2">. Please use int values for size&quot;</span><span class="p">,</span>
                            <span class="n">label</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">temp</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">temp</span>
