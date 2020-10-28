@@ -482,7 +482,7 @@ class SynapticMatrixApp(object):
         for m_edge in self.__m_edges:
             matrix = self.__get_matrix(m_edge)
             max_delay_per_stage = (
-                m_edge.post_vertex.app_vertex.splitter_object.
+                m_edge.post_vertex.app_vertex.splitter.
                 max_support_delay())
 
             if self.__use_app_keys:
@@ -702,22 +702,22 @@ class SynapticMatrixApp(object):
 
         if self.__syn_mat_offset is not None:
             block = self.__get_block(transceiver, placement, synapses_address)
-            splitter_object = self.__app_edge.post_vertex.splitter_object
+            splitter = self.__app_edge.post_vertex.splitter
             connections.append(self.__synapse_io.convert_to_connections(
                 self.__synapse_info, pre_slice, self.__post_vertex_slice,
                 self.__max_row_info.undelayed_max_words,
                 self.__n_synapse_types, self.__weight_scales, block,
-                machine_time_step, False, splitter_object.max_support_delay()))
+                machine_time_step, False, splitter.max_support_delay()))
 
         if self.__delay_syn_mat_offset is not None:
             block = self.__get_delayed_block(
                 transceiver, placement, synapses_address)
-            splitter_object = self.__app_edge.post_vertex.splitter_object
+            splitter = self.__app_edge.post_vertex.splitter
             connections.append(self.__synapse_io.convert_to_connections(
                 self.__synapse_info, pre_slice, self.__post_vertex_slice,
                 self.__max_row_info.delayed_max_words, self.__n_synapse_types,
                 self.__weight_scales, block, machine_time_step, True,
-                splitter_object.max_support_delay()))
+                splitter.max_support_delay()))
 
         return connections
 

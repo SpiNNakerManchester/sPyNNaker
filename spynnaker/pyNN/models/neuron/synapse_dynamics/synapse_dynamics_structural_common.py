@@ -376,7 +376,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                 n_sub_edges += len(machine_edges_by_app[app_edge])
             else:
                 slices, _ = (
-                    app_edge.pre_vertex.splitter_object.get_out_going_slices())
+                    app_edge.pre_vertex.splitter.get_out_going_slices())
                 n_sub_edges = len(slices)
             dynamics = synapse_info.synapse_dynamics
             param_sizes += dynamics.formation\

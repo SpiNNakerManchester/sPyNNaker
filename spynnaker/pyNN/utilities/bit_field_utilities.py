@@ -51,8 +51,7 @@ def get_estimated_sdram_for_bit_field_region(app_graph, vertex):
     for incoming_edge in app_graph.get_edges_ending_at_vertex(vertex):
         if isinstance(incoming_edge, ProjectionApplicationEdge):
             slices, _ = (
-                incoming_edge.pre_vertex.splitter_object.
-                get_out_going_slices())
+                incoming_edge.pre_vertex.splitter.get_out_going_slices())
             n_machine_vertices = len(slices)
 
             # TODO im sure this can be merged into the max function. but meh
@@ -86,7 +85,7 @@ def get_estimated_sdram_for_key_region(app_graph, vertex):
     for in_edge in app_graph.get_edges_ending_at_vertex(vertex):
 
         # Get the number of likely vertices
-        slices, _ = in_edge.pre_vertex.splitter_object.get_out_going_slices()
+        slices, _ = in_edge.pre_vertex.splitter.get_out_going_slices()
         sdram += (
             len(slices) * N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP * BYTES_PER_WORD)
     return sdram

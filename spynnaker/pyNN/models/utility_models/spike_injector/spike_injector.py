@@ -21,7 +21,7 @@ _population_parameters = {
     "port": None,
     "virtual_key": None,
     "reserve_reverse_ip_tag": False,
-    "splitter_object": None
+    "splitter": None
 }
 
 
@@ -34,8 +34,8 @@ class SpikeInjector(AbstractPyNNModel):
                additional_arguments=_population_parameters.keys())
     def create_vertex(
             self, n_neurons, label, constraints, port, virtual_key,
-            reserve_reverse_ip_tag, splitter_object):
+            reserve_reverse_ip_tag, splitter):
         # pylint: disable=arguments-differ
         return SpikeInjectorVertex(
             n_neurons, label, constraints, port, virtual_key,
-            reserve_reverse_ip_tag, splitter_object)
+            reserve_reverse_ip_tag, splitter)

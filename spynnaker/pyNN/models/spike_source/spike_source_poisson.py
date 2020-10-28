@@ -18,7 +18,7 @@ from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 from spinn_utilities.overrides import overrides
 
 _population_parameters = {
-    "seed": None,  "max_rate": None, "splitter_object": None}
+    "seed": None,  "max_rate": None, "splitter": None}
 
 # Technically, this is ~2900 in terms of DTCM, but is timescale dependent
 # in terms of CPU (2900 at 10 times slow down is fine, but not at
@@ -50,11 +50,10 @@ class SpikeSourcePoisson(AbstractPyNNModel):
     @overrides(AbstractPyNNModel.create_vertex,
                additional_arguments=default_population_parameters.keys())
     def create_vertex(
-            self, n_neurons, label, constraints, seed, max_rate,
-            splitter_object):
+            self, n_neurons, label, constraints, seed, max_rate, splitter):
         # pylint: disable=arguments-differ
         max_atoms = self.get_max_atoms_per_core()
         return SpikeSourcePoissonVertex(
             n_neurons, constraints, label, seed, max_atoms, self,
             rate=self.__rate, start=self.__start, duration=self.__duration,
-            max_rate=max_rate, splitter_object=splitter_object)
+            max_rate=max_rate, splitter=splitter)
