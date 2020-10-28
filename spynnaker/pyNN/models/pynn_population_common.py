@@ -681,7 +681,7 @@ class PyNNPopulationCommon(object):
         # Allow a float which has a near int value
         temp = int(round(size))
         if abs(temp - size) < 0.001:
-            logger.warning("Size of the population rounded "
+            logger.warning("Size of the population {} rounded "
                            "from {} to {}. Please use int values for size",
                            label, size, temp)
             return temp
