@@ -226,7 +226,8 @@
                 <span class="n">database_ack_port_num</span><span class="p">)</span></div>
 
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="SpynnakerExternalDevicePluginManager.activate_live_output_to"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.spynnaker_external_device_plugin_manager.SpynnakerExternalDevicePluginManager.activate_live_output_to">[docs]</a>    <span class="k">def</span> <span class="nf">activate_live_output_to</span><span class="p">(</span><span class="n">population</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
+<div class="viewcode-block" id="SpynnakerExternalDevicePluginManager.activate_live_output_to"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.spynnaker_external_device_plugin_manager.SpynnakerExternalDevicePluginManager.activate_live_output_to">[docs]</a>    <span class="k">def</span> <span class="nf">activate_live_output_to</span><span class="p">(</span>
+            <span class="n">population</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">partition_id</span><span class="o">=</span><span class="n">SPIKE_PARTITION_ID</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Activate the output of spikes from a population to an external\</span>
 <span class="sd">            device. Note that all spikes will be sent to the device.</span>
 
@@ -238,13 +239,15 @@
 <span class="sd">        :type device:</span>
 <span class="sd">            PyNNPopulationCommon or</span>
 <span class="sd">            ~pacman.model.graphs.application.ApplicationVertex</span>
+<span class="sd">        :param str partition_id:</span>
+<span class="sd">            The partition ID to activate live output to.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">device_vertex</span> <span class="o">=</span> <span class="n">device</span>
         <span class="c1"># pylint: disable=protected-access</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="n">PyNNPopulationCommon</span><span class="p">):</span>
             <span class="n">device_vertex</span> <span class="o">=</span> <span class="n">device</span><span class="o">.</span><span class="n">_get_vertex</span>
         <span class="n">SpynnakerExternalDevicePluginManager</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span>
-            <span class="n">population</span><span class="o">.</span><span class="n">_get_vertex</span><span class="p">,</span> <span class="n">device_vertex</span><span class="p">,</span> <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span></div>
+            <span class="n">population</span><span class="o">.</span><span class="n">_get_vertex</span><span class="p">,</span> <span class="n">device_vertex</span><span class="p">,</span> <span class="n">partition_id</span><span class="p">)</span></div>
 
     <span class="nd">@staticmethod</span>
 <div class="viewcode-block" id="SpynnakerExternalDevicePluginManager.add_socket_address"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.spynnaker_external_device_plugin_manager.SpynnakerExternalDevicePluginManager.add_socket_address">[docs]</a>    <span class="k">def</span> <span class="nf">add_socket_address</span><span class="p">(</span><span class="n">socket_address</span><span class="p">):</span>

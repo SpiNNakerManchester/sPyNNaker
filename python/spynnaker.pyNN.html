@@ -507,7 +507,7 @@ the spikes</li>
 
 <dl class="staticmethod">
 <dt id="spynnaker.pyNN.spynnaker_external_device_plugin_manager.SpynnakerExternalDevicePluginManager.activate_live_output_to">
-<em class="property">static </em><code class="descname">activate_live_output_to</code><span class="sig-paren">(</span><em>population</em>, <em>device</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/spynnaker_external_device_plugin_manager.html#SpynnakerExternalDevicePluginManager.activate_live_output_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.spynnaker_external_device_plugin_manager.SpynnakerExternalDevicePluginManager.activate_live_output_to" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">activate_live_output_to</code><span class="sig-paren">(</span><em>population</em>, <em>device</em>, <em>partition_id='SPIKE'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/spynnaker_external_device_plugin_manager.html#SpynnakerExternalDevicePluginManager.activate_live_output_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.spynnaker_external_device_plugin_manager.SpynnakerExternalDevicePluginManager.activate_live_output_to" title="Permalink to this definition">¶</a></dt>
 <dd><p>Activate the output of spikes from a population to an external            device. Note that all spikes will be sent to the device.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -518,6 +518,7 @@ the spikes</li>
 <li><strong>device</strong> (<a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon" title="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon"><em>PyNNPopulationCommon</em></a><em> or
 </em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v)"><em>ApplicationVertex</em></a>) &#8211; The pyNN population or external device to which the spikes will be
 sent.</li>
+<li><strong>partition_id</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The partition ID to activate live output to.</li>
 </ul>
 </td>
 </tr>
