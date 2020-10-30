@@ -36,6 +36,7 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
         "__tau_minus_data",
         "__tau_plus",
         "__tau_plus_data"]
+    __PARAM_NAMES = ('tau_plus', 'tau_minus')
 
     def __init__(self, tau_plus=20.0, tau_minus=20.0):
         r"""
@@ -124,4 +125,4 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
 
     @overrides(AbstractTimingDependence.get_parameter_names)
     def get_parameter_names(self):
-        return ['tau_plus', 'tau_minus']
+        return self.__PARAM_NAMES

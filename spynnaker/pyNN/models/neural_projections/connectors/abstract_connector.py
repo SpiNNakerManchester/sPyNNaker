@@ -490,14 +490,14 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         """
         :param SynapseInformation synapse_info:
         :rtype:
-            list(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)
+            iterable(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)
         """
         name = "connector_{}_{}_{}".format(
             synapse_info.pre_population.label,
             synapse_info.post_population.label, self.__class__.__name__)
         # Convert to native Python integer; provenance system assumption
         ncd = self.__n_clipped_delays.item()
-        return [ProvenanceDataItem(
+        yield ProvenanceDataItem(
             [name, "Times_synaptic_delays_got_clipped"], ncd, report=ncd > 0,
             message=(
                 "The delays in the connector {} from {} to {} was clipped "
@@ -506,7 +506,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
                 "timestep".format(
                     self.__class__.__name__, synapse_info.pre_population.label,
                     synapse_info.post_population.label, self.__min_delay,
-                    ncd)))]
+                    ncd)))
 
     @property
     def safe(self):

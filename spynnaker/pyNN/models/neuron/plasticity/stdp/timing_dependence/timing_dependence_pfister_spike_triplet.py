@@ -45,6 +45,7 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
         "__tau_x_data",
         "__tau_y",
         "__tau_y_data"]
+    __PARAM_NAMES = ('tau_plus', 'tau_minus', 'tau_x', 'tau_y')
 
     # noinspection PyPep8Naming
     def __init__(self, tau_plus, tau_minus, tau_x, tau_y):
@@ -162,4 +163,4 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
 
     @overrides(AbstractTimingDependence.get_parameter_names)
     def get_parameter_names(self):
-        return ['tau_plus', 'tau_minus', 'tau_x', 'tau_y']
+        return self.__PARAM_NAMES

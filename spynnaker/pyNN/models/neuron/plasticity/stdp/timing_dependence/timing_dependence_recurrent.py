@@ -37,6 +37,9 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
         "__mean_post_window",
         "__mean_pre_window",
         "__synapse_structure"]
+    __PARAM_NAMES = (
+        'accumulator_depression', 'accumulator_potentiation',
+        'mean_pre_window', 'mean_post_window', 'dual_fsm')
 
     default_parameters = {
         'accumulator_depression': -6, 'accumulator_potentiation': 6,
@@ -151,5 +154,4 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
 
     @overrides(AbstractTimingDependence.get_parameter_names)
     def get_parameter_names(self):
-        return ['accumulator_depression', 'accumulator_potentiation',
-                'mean_pre_window', 'mean_post_window', 'dual_fsm']
+        return self.__PARAM_NAMES

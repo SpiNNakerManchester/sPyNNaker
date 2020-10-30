@@ -37,7 +37,7 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
         "__synapse_structure",
         "__tau",
         "__tau_data"]
-
+    __PARAM_NAMES = ('alpha', 'tau')
     default_parameters = {'tau': 20.0}
 
     def __init__(self, alpha, tau=default_parameters['tau']):
@@ -128,4 +128,4 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
 
     @overrides(AbstractTimingDependence.get_parameter_names)
     def get_parameter_names(self):
-        return ['alpha', 'tau']
+        return self.__PARAM_NAMES
