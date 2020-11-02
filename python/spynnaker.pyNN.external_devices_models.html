@@ -579,9 +579,94 @@
 
 <dl class="class">
 <dt id="spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.external_devices_models.</code><code class="descname">MachineMunichMotorDevice</code><span class="sig-paren">(</span><em>resources</em>, <em>label=None</em>, <em>constraints=None</em>, <em>app_vertex=None</em>, <em>vertex_slice=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/machine_munich_motor_device.html#MachineMunichMotorDevice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pacman.model.graphs.machine.machine_vertex.MachineVertex</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_has_associated_binary.AbstractHasAssociatedBinary</span></code></p>
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.external_devices_models.</code><code class="descname">MachineMunichMotorDevice</code><span class="sig-paren">(</span><em>speed</em>, <em>sample_time</em>, <em>update_time</em>, <em>delay_time</em>, <em>delta_threshold</em>, <em>continue_if_not_different</em>, <em>label=None</em>, <em>constraints=None</em>, <em>app_vertex=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/machine_munich_motor_device.html#MachineMunichMotorDevice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pacman.model.graphs.machine.machine_vertex.MachineVertex</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_generates_data_specification.AbstractGeneratesDataSpecification</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_has_associated_binary.AbstractHasAssociatedBinary</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.impl.provides_key_to_atom_mapping_impl.ProvidesKeyToAtomMappingImpl</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.interface.provenance.provides_provenance_data_from_machine_impl.ProvidesProvenanceDataFromMachineImpl</span></code></p>
 <p>An Omnibot motor control device. This has a real vertex and an         external device vertex.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>speed</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
+<li><strong>sample_time</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
+<li><strong>update_time</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
+<li><strong>delay_time</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
+<li><strong>delta_threshold</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
+<li><strong>continue_if_not_different</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; </li>
+<li><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; </li>
+<li><strong>constraints</strong> &#8211; </li>
+<li><strong>app_vertex</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.INPUT_BUFFER_FULL_MESSAGE">
+<code class="descname">INPUT_BUFFER_FULL_MESSAGE</code><em class="property"> = 'The input buffer for {} on {}, {}, {} lost packets on {} occasions. This is often a sign that the system is running too quickly for the number of neurons per core.  Please increase the timer_tic or time_scale_factor or decrease the number of neurons per core.'</em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.INPUT_BUFFER_FULL_MESSAGE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.INPUT_BUFFER_FULL_NAME">
+<code class="descname">INPUT_BUFFER_FULL_NAME</code><em class="property"> = 'Times_the_input_buffer_lost_packets'</em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.INPUT_BUFFER_FULL_NAME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.MOTOR_PARTITION_ID">
+<code class="descname">MOTOR_PARTITION_ID</code><em class="property"> = 'MOTOR'</em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.MOTOR_PARTITION_ID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.N_ATOMS">
+<code class="descname">N_ATOMS</code><em class="property"> = 6</em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.N_ATOMS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.PARAMS_REGION">
+<code class="descname">PARAMS_REGION</code><em class="property"> = 1</em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.PARAMS_REGION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.PARAMS_SIZE">
+<code class="descname">PARAMS_SIZE</code><em class="property"> = 28</em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.PARAMS_SIZE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.PROVENANCE_ELEMENTS">
+<code class="descname">PROVENANCE_ELEMENTS</code><em class="property"> = 1</em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.PROVENANCE_ELEMENTS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.PROVENANCE_REGION">
+<code class="descname">PROVENANCE_REGION</code><em class="property"> = 2</em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.PROVENANCE_REGION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.SYSTEM_REGION">
+<code class="descname">SYSTEM_REGION</code><em class="property"> = 0</em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.SYSTEM_REGION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.generate_data_specification">
+<code class="descname">generate_data_specification</code><span class="sig-paren">(</span><em>spec</em>, <em>placement</em>, <em>routing_info</em>, <em>machine_time_step</em>, <em>time_scale_factor</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/machine_munich_motor_device.html#MachineMunichMotorDevice.generate_data_specification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.generate_data_specification" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a data specification.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v)"><em>DataSpecificationGenerator</em></a>) &#8211; The data specification to write to</li>
+<li><strong>placement</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placement" title="(in PACMAN v)"><em>Placement</em></a>) &#8211; The placement the vertex is located at</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="method">
 <dt id="spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.get_binary_file_name">
 <code class="descname">get_binary_file_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/machine_munich_motor_device.html#MachineMunichMotorDevice.get_binary_file_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.get_binary_file_name" title="Permalink to this definition">¶</a></dt>
@@ -610,6 +695,46 @@
 </table>
 </dd></dl>
 
+<dl class="method">
+<dt id="spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.get_provenance_data_from_machine">
+<code class="descname">get_provenance_data_from_machine</code><span class="sig-paren">(</span><em>transceiver</em>, <em>placement</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/machine_munich_motor_device.html#MachineMunichMotorDevice.get_provenance_data_from_machine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.get_provenance_data_from_machine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the provenance data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan v)"><em>Transceiver</em></a>) &#8211; How to talk to the machine</li>
+<li><strong>placement</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placement" title="(in PACMAN v)"><em>Placement</em></a>) &#8211; Which vertex are we retrieving from, and where was it</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utilities.utility_objs.html#spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem" title="(in SpiNNFrontEndCommon v)">ProvenanceDataItem</a>)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.reserve_memory_regions">
+<code class="descname">reserve_memory_regions</code><span class="sig-paren">(</span><em>spec</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/machine_munich_motor_device.html#MachineMunichMotorDevice.reserve_memory_regions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.reserve_memory_regions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reserve SDRAM space for memory areas:</p>
+<ol class="arabic simple">
+<li>Area for information on what data to record</li>
+<li>area for start commands</li>
+<li>area for end commands</li>
+</ol>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v)"><em>DataSpecificationGenerator</em></a>) &#8211; The data specification to write to</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.resources_required">
 <code class="descname">resources_required</code><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.resources_required" title="Permalink to this definition">¶</a></dt>
@@ -629,7 +754,7 @@
 <dl class="class">
 <dt id="spynnaker.pyNN.external_devices_models.MunichMotorDevice">
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.external_devices_models.</code><code class="descname">MunichMotorDevice</code><span class="sig-paren">(</span><em>spinnaker_link_id</em>, <em>board_address=None</em>, <em>speed=30</em>, <em>sample_time=4096</em>, <em>update_time=512</em>, <em>delay_time=5</em>, <em>delta_threshold=23</em>, <em>continue_if_not_different=True</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/munich_spinnaker_link_motor_device.html#MunichMotorDevice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.MunichMotorDevice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pacman.model.graphs.application.application_vertex.ApplicationVertex</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_vertex_with_dependent_vertices.AbstractVertexWithEdgeToDependentVertices</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_generates_data_specification.AbstractGeneratesDataSpecification</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_provides_outgoing_partition_constraints.AbstractProvidesOutgoingPartitionConstraints</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.impl.provides_key_to_atom_mapping_impl.ProvidesKeyToAtomMappingImpl</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.interface.provenance.provides_provenance_data_from_machine_impl.ProvidesProvenanceDataFromMachineImpl</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.utility_models.abstract_one_app_one_machine_vertex.AbstractOneAppOneMachineVertex</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_provides_outgoing_partition_constraints.AbstractProvidesOutgoingPartitionConstraints</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_vertex_with_dependent_vertices.AbstractVertexWithEdgeToDependentVertices</span></code></p>
 <p>An Omnibot motor control device. This has a real vertex and an         external device vertex.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -650,62 +775,6 @@
 </tr>
 </tbody>
 </table>
-<dl class="attribute">
-<dt id="spynnaker.pyNN.external_devices_models.MunichMotorDevice.INPUT_BUFFER_FULL_MESSAGE">
-<code class="descname">INPUT_BUFFER_FULL_MESSAGE</code><em class="property"> = 'The input buffer for {} on {}, {}, {} lost packets on {} occasions. This is often a sign that the system is running too quickly for the number of neurons per core.  Please increase the timer_tic or time_scale_factor or decrease the number of neurons per core.'</em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.MunichMotorDevice.INPUT_BUFFER_FULL_MESSAGE" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.external_devices_models.MunichMotorDevice.INPUT_BUFFER_FULL_NAME">
-<code class="descname">INPUT_BUFFER_FULL_NAME</code><em class="property"> = 'Times_the_input_buffer_lost_packets'</em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.MunichMotorDevice.INPUT_BUFFER_FULL_NAME" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.external_devices_models.MunichMotorDevice.PARAMS_REGION">
-<code class="descname">PARAMS_REGION</code><em class="property"> = 1</em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.MunichMotorDevice.PARAMS_REGION" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.external_devices_models.MunichMotorDevice.PARAMS_SIZE">
-<code class="descname">PARAMS_SIZE</code><em class="property"> = 28</em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.MunichMotorDevice.PARAMS_SIZE" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.external_devices_models.MunichMotorDevice.PROVENANCE_ELEMENTS">
-<code class="descname">PROVENANCE_ELEMENTS</code><em class="property"> = 1</em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.MunichMotorDevice.PROVENANCE_ELEMENTS" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.external_devices_models.MunichMotorDevice.PROVENANCE_REGION">
-<code class="descname">PROVENANCE_REGION</code><em class="property"> = 2</em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.MunichMotorDevice.PROVENANCE_REGION" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.external_devices_models.MunichMotorDevice.SYSTEM_REGION">
-<code class="descname">SYSTEM_REGION</code><em class="property"> = 0</em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.MunichMotorDevice.SYSTEM_REGION" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.external_devices_models.MunichMotorDevice.create_machine_vertex">
-<code class="descname">create_machine_vertex</code><span class="sig-paren">(</span><em>vertex_slice</em>, <em>resources_required</em>, <em>label=None</em>, <em>constraints=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/munich_spinnaker_link_motor_device.html#MunichMotorDevice.create_machine_vertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.MunichMotorDevice.create_machine_vertex" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a machine vertex from this application vertex</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; The slice of atoms that the machine vertex will cover,
-or None to use the default slice</li>
-<li><strong>resources_required</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.resources/#pacman.model.resources.ResourceContainer" title="(in PACMAN v)"><em>ResourceContainer</em></a>) &#8211; The resources used by the machine vertex.</li>
-<li><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; human readable label for the machine vertex</li>
-<li><strong>constraints</strong> (<em>iterable</em><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v)"><em>AbstractConstraint</em></a><em>)</em><em></em>) &#8211; Constraints to be passed on to the machine vertex.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 <dl class="attribute">
 <dt id="spynnaker.pyNN.external_devices_models.MunichMotorDevice.default_initial_values">
 <code class="descname">default_initial_values</code><em class="property"> = {}</em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.MunichMotorDevice.default_initial_values" title="Permalink to this definition">¶</a></dt>
@@ -749,27 +818,6 @@ Return the dependent edge identifier</td>
 </dd></dl>
 
 <dl class="method">
-<dt id="spynnaker.pyNN.external_devices_models.MunichMotorDevice.generate_data_specification">
-<code class="descname">generate_data_specification</code><span class="sig-paren">(</span><em>spec</em>, <em>placement</em>, <em>routing_info</em>, <em>machine_time_step</em>, <em>time_scale_factor</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/munich_spinnaker_link_motor_device.html#MunichMotorDevice.generate_data_specification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.MunichMotorDevice.generate_data_specification" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate a data specification.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v)"><em>DataSpecificationGenerator</em></a>) &#8211; The data specification to write to</li>
-<li><strong>placement</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placement" title="(in PACMAN v)"><em>Placement</em></a>) &#8211; The placement the vertex is located at</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
 <dt id="spynnaker.pyNN.external_devices_models.MunichMotorDevice.get_outgoing_partition_constraints">
 <code class="descname">get_outgoing_partition_constraints</code><span class="sig-paren">(</span><em>partition</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/munich_spinnaker_link_motor_device.html#MunichMotorDevice.get_outgoing_partition_constraints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.MunichMotorDevice.get_outgoing_partition_constraints" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get constraints to be added to the given edge partition that comes            out of this vertex.</p>
@@ -782,79 +830,6 @@ Return the dependent edge identifier</td>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A list of constraints</td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v)">AbstractConstraint</a>)</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.external_devices_models.MunichMotorDevice.get_provenance_data_from_machine">
-<code class="descname">get_provenance_data_from_machine</code><span class="sig-paren">(</span><em>transceiver</em>, <em>placement</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/munich_spinnaker_link_motor_device.html#MunichMotorDevice.get_provenance_data_from_machine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.MunichMotorDevice.get_provenance_data_from_machine" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieve the provenance data.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan v)"><em>Transceiver</em></a>) &#8211; How to talk to the machine</li>
-<li><strong>placement</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placement" title="(in PACMAN v)"><em>Placement</em></a>) &#8211; Which vertex are we retrieving from, and where was it</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utilities.utility_objs.html#spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem" title="(in SpiNNFrontEndCommon v)">ProvenanceDataItem</a>)</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.external_devices_models.MunichMotorDevice.get_resources_used_by_atoms">
-<code class="descname">get_resources_used_by_atoms</code><span class="sig-paren">(</span><em>vertex_slice</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/munich_spinnaker_link_motor_device.html#MunichMotorDevice.get_resources_used_by_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.MunichMotorDevice.get_resources_used_by_atoms" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the separate resource requirements for a range of atoms</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; the low value of atoms to calculate resources from</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a Resource container that contains a
-CPUCyclesPerTickResource, DTCMResource and SDRAMResource</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.resources/#pacman.model.resources.ResourceContainer" title="(in PACMAN v)">ResourceContainer</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.external_devices_models.MunichMotorDevice.n_atoms">
-<code class="descname">n_atoms</code><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.MunichMotorDevice.n_atoms" title="Permalink to this definition">¶</a></dt>
-<dd><p>The number of atoms in the vertex</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.external_devices_models.MunichMotorDevice.reserve_memory_regions">
-<code class="descname">reserve_memory_regions</code><span class="sig-paren">(</span><em>spec</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/munich_spinnaker_link_motor_device.html#MunichMotorDevice.reserve_memory_regions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.MunichMotorDevice.reserve_memory_regions" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reserve SDRAM space for memory areas:</p>
-<ol class="arabic simple">
-<li>Area for information on what data to record</li>
-<li>area for start commands</li>
-<li>area for end commands</li>
-</ol>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v)"><em>DataSpecificationGenerator</em></a>) &#8211; The data specification to write to</td>
 </tr>
 </tbody>
 </table>

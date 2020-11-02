@@ -78,28 +78,96 @@
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
-<span class="kn">from</span> <span class="nn">pacman.model.graphs.machine</span> <span class="kn">import</span> <span class="n">MachineVertex</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
+<span class="kn">from</span> <span class="nn">pacman.executor.injection_decorator</span> <span class="kn">import</span> <span class="n">inject_items</span>
+<span class="kn">from</span> <span class="nn">pacman.model.graphs.common</span> <span class="kn">import</span> <span class="n">Slice</span>
+<span class="kn">from</span> <span class="nn">pacman.model.graphs.machine</span> <span class="kn">import</span> <span class="n">MachineVertex</span>
+<span class="kn">from</span> <span class="nn">pacman.model.resources</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ConstantSDRAM</span><span class="p">,</span> <span class="n">CPUCyclesPerTickResource</span><span class="p">,</span> <span class="n">DTCMResource</span><span class="p">,</span> <span class="n">ResourceContainer</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractHasAssociatedBinary</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.utility_objs</span> <span class="kn">import</span> <span class="n">ExecutableType</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AbstractGeneratesDataSpecification</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models.impl</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ProvidesKeyToAtomMappingImpl</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.provenance</span> <span class="kn">import</span> \
+    <span class="n">ProvidesProvenanceDataFromMachineImpl</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.simulation</span> <span class="kn">import</span> <span class="n">simulation_utilities</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">SYSTEM_BYTES_REQUIREMENT</span><span class="p">,</span> <span class="n">SIMULATION_N_BYTES</span><span class="p">,</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.utility_objs</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ExecutableType</span><span class="p">,</span> <span class="n">ProvenanceDataItem</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SpynnakerException</span>
 
 
-<div class="viewcode-block" id="MachineMunichMotorDevice"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice">[docs]</a><span class="k">class</span> <span class="nc">MachineMunichMotorDevice</span><span class="p">(</span><span class="n">MachineVertex</span><span class="p">,</span> <span class="n">AbstractHasAssociatedBinary</span><span class="p">):</span>
+<div class="viewcode-block" id="MachineMunichMotorDevice"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice">[docs]</a><span class="k">class</span> <span class="nc">MachineMunichMotorDevice</span><span class="p">(</span>
+        <span class="n">MachineVertex</span><span class="p">,</span> <span class="n">AbstractGeneratesDataSpecification</span><span class="p">,</span>
+        <span class="n">AbstractHasAssociatedBinary</span><span class="p">,</span> <span class="n">ProvidesKeyToAtomMappingImpl</span><span class="p">,</span>
+        <span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; An Omnibot motor control device. This has a real vertex and an \</span>
 <span class="sd">        external device vertex.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">app_vertex</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;__continue_if_not_different&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__delay_time&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__delta_threshold&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__sample_time&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__speed&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__update_time&quot;</span><span class="p">]</span>
+
+    <span class="n">MOTOR_PARTITION_ID</span> <span class="o">=</span> <span class="s2">&quot;MOTOR&quot;</span>
+
+    <span class="n">N_ATOMS</span> <span class="o">=</span> <span class="mi">6</span>
+
+    <span class="n">SYSTEM_REGION</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">PARAMS_REGION</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">PROVENANCE_REGION</span> <span class="o">=</span> <span class="mi">2</span>
+
+    <span class="n">PROVENANCE_ELEMENTS</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="n">PARAMS_SIZE</span> <span class="o">=</span> <span class="mi">7</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
+
+    <span class="n">INPUT_BUFFER_FULL_NAME</span> <span class="o">=</span> <span class="s2">&quot;Times_the_input_buffer_lost_packets&quot;</span>
+    <span class="n">INPUT_BUFFER_FULL_MESSAGE</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;The input buffer for </span><span class="si">{}</span><span class="s2"> on </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2"> lost packets on </span><span class="si">{}</span><span class="s2"> &quot;</span>
+        <span class="s2">&quot;occasions. This is often a sign that the system is running &quot;</span>
+        <span class="s2">&quot;too quickly for the number of neurons per core.  Please &quot;</span>
+        <span class="s2">&quot;increase the timer_tic or time_scale_factor or decrease the &quot;</span>
+        <span class="s2">&quot;number of neurons per core.&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">speed</span><span class="p">,</span> <span class="n">sample_time</span><span class="p">,</span> <span class="n">update_time</span><span class="p">,</span> <span class="n">delay_time</span><span class="p">,</span>
+            <span class="n">delta_threshold</span><span class="p">,</span> <span class="n">continue_if_not_different</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">app_vertex</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param int speed:</span>
+<span class="sd">        :param int sample_time:</span>
+<span class="sd">        :param int update_time:</span>
+<span class="sd">        :param int delay_time:</span>
+<span class="sd">        :param int delta_threshold:</span>
+<span class="sd">        :param bool continue_if_not_different:</span>
+<span class="sd">        :param str label:</span>
+<span class="sd">        :param constraints:</span>
+<span class="sd">        :param app_vertex:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">MachineMunichMotorDevice</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="n">constraints</span><span class="p">,</span> <span class="n">app_vertex</span><span class="o">=</span><span class="n">app_vertex</span><span class="p">,</span>
-            <span class="n">vertex_slice</span><span class="o">=</span><span class="n">vertex_slice</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_resources</span> <span class="o">=</span> <span class="n">resources</span>
+            <span class="n">vertex_slice</span><span class="o">=</span><span class="n">Slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N_ATOMS</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__speed</span> <span class="o">=</span> <span class="n">speed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__sample_time</span> <span class="o">=</span> <span class="n">sample_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__update_time</span> <span class="o">=</span> <span class="n">update_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__delay_time</span> <span class="o">=</span> <span class="n">delay_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__delta_threshold</span> <span class="o">=</span> <span class="n">delta_threshold</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__continue_if_not_different</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">continue_if_not_different</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">MachineVertex</span><span class="o">.</span><span class="n">resources_required</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">resources_required</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resources</span>
+        <span class="k">return</span> <span class="n">ResourceContainer</span><span class="p">(</span>
+            <span class="n">sdram</span><span class="o">=</span><span class="n">ConstantSDRAM</span><span class="p">(</span>
+                <span class="n">SYSTEM_BYTES_REQUIREMENT</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">PARAMS_SIZE</span> <span class="o">+</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_provenance_data_size</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PROVENANCE_ELEMENTS</span><span class="p">)),</span>
+            <span class="n">dtcm</span><span class="o">=</span><span class="n">DTCMResource</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">cpu_cycles</span><span class="o">=</span><span class="n">CPUCyclesPerTickResource</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractHasAssociatedBinary</span><span class="o">.</span><span class="n">get_binary_file_name</span><span class="p">)</span>
 <div class="viewcode-block" id="MachineMunichMotorDevice.get_binary_file_name"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.get_binary_file_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_binary_file_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -107,7 +175,110 @@
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractHasAssociatedBinary</span><span class="o">.</span><span class="n">get_binary_start_type</span><span class="p">)</span>
 <div class="viewcode-block" id="MachineMunichMotorDevice.get_binary_start_type"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.get_binary_start_type">[docs]</a>    <span class="k">def</span> <span class="nf">get_binary_start_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">ExecutableType</span><span class="o">.</span><span class="n">USES_SIMULATION_INTERFACE</span></div></div>
+        <span class="k">return</span> <span class="n">ExecutableType</span><span class="o">.</span><span class="n">USES_SIMULATION_INTERFACE</span></div>
+
+    <span class="nd">@property</span>
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="o">.</span><span class="n">_provenance_region_id</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_provenance_region_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">PROVENANCE_REGION</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="o">.</span><span class="n">_n_additional_data_items</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_n_additional_data_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">PROVENANCE_ELEMENTS</span>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="o">.</span>
+               <span class="n">get_provenance_data_from_machine</span><span class="p">)</span>
+<div class="viewcode-block" id="MachineMunichMotorDevice.get_provenance_data_from_machine"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.get_provenance_data_from_machine">[docs]</a>    <span class="k">def</span> <span class="nf">get_provenance_data_from_machine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
+        <span class="c1"># get prov data</span>
+        <span class="n">provenance_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_provenance_data</span><span class="p">(</span><span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">)</span>
+        <span class="c1"># get system level prov</span>
+        <span class="n">provenance_items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_basic_provenance_items</span><span class="p">(</span>
+            <span class="n">provenance_data</span><span class="p">,</span> <span class="n">placement</span><span class="p">)</span>
+        <span class="c1"># get left over prov</span>
+        <span class="n">provenance_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_remaining_provenance_data_items</span><span class="p">(</span>
+            <span class="n">provenance_data</span><span class="p">)</span>
+        <span class="c1"># stuff for making prov data items</span>
+        <span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_placement_details</span><span class="p">(</span><span class="n">placement</span><span class="p">)</span>
+
+        <span class="c1"># get the only app level prov item</span>
+        <span class="n">n_buffer_overflows</span> <span class="o">=</span> <span class="n">provenance_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># build it</span>
+        <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">INPUT_BUFFER_FULL_NAME</span><span class="p">),</span>
+            <span class="n">n_buffer_overflows</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">n_buffer_overflows</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="n">message</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">INPUT_BUFFER_FULL_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">n_buffer_overflows</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">provenance_items</span></div>
+
+    <span class="nd">@inject_items</span><span class="p">({</span>
+        <span class="s2">&quot;routing_info&quot;</span><span class="p">:</span> <span class="s2">&quot;MemoryRoutingInfos&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;machine_time_step&quot;</span><span class="p">:</span> <span class="s2">&quot;MachineTimeStep&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;time_scale_factor&quot;</span><span class="p">:</span> <span class="s2">&quot;TimeScaleFactor&quot;</span>
+    <span class="p">})</span>
+    <span class="nd">@overrides</span><span class="p">(</span>
+        <span class="n">AbstractGeneratesDataSpecification</span><span class="o">.</span><span class="n">generate_data_specification</span><span class="p">,</span>
+        <span class="n">additional_arguments</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;routing_info&quot;</span><span class="p">,</span> <span class="s2">&quot;machine_time_step&quot;</span><span class="p">,</span> <span class="s2">&quot;time_scale_factor&quot;</span>
+        <span class="p">})</span>
+<div class="viewcode-block" id="MachineMunichMotorDevice.generate_data_specification"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.generate_data_specification">[docs]</a>    <span class="k">def</span> <span class="nf">generate_data_specification</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span>
+            <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="p">):</span>
+        <span class="c1"># pylint: disable=too-many-arguments, arguments-differ</span>
+
+        <span class="c1"># reserve regions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reserve_memory_regions</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+
+        <span class="c1"># Write the setup region</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">*** Spec for robot motor control ***</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># handle simulation data</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SYSTEM_REGION</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">simulation_utilities</span><span class="o">.</span><span class="n">get_simulation_header_array</span><span class="p">(</span>
+            <span class="n">placement</span><span class="o">.</span><span class="n">vertex</span><span class="o">.</span><span class="n">get_binary_file_name</span><span class="p">(),</span> <span class="n">machine_time_step</span><span class="p">,</span>
+            <span class="n">time_scale_factor</span><span class="p">))</span>
+
+        <span class="c1"># Get the key</span>
+        <span class="n">edge_key</span> <span class="o">=</span> <span class="n">routing_info</span><span class="o">.</span><span class="n">get_first_key_from_pre_vertex</span><span class="p">(</span>
+            <span class="n">placement</span><span class="o">.</span><span class="n">vertex</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">MOTOR_PARTITION_ID</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">edge_key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SpynnakerException</span><span class="p">(</span>
+                <span class="s2">&quot;This motor should have one outgoing edge to the robot&quot;</span><span class="p">)</span>
+
+        <span class="c1"># write params to memory</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span><span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">PARAMS_REGION</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">edge_key</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__speed</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__sample_time</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__update_time</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__delay_time</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__delta_threshold</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__continue_if_not_different</span><span class="p">))</span>
+
+        <span class="c1"># End-of-Spec:</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">end_specification</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="MachineMunichMotorDevice.reserve_memory_regions"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.reserve_memory_regions">[docs]</a>    <span class="k">def</span> <span class="nf">reserve_memory_regions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Reserve SDRAM space for memory areas:</span>
+
+<span class="sd">        #. Area for information on what data to record</span>
+<span class="sd">        #. area for start commands</span>
+<span class="sd">        #. area for end commands</span>
+
+<span class="sd">        :param spec: The data specification to write to</span>
+<span class="sd">        :type spec: ~data_specification.DataSpecificationGenerator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Reserving memory space for data regions:</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Reserve memory:</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">SYSTEM_REGION</span><span class="p">,</span> <span class="n">SIMULATION_N_BYTES</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;setup&#39;</span><span class="p">)</span>
+
+        <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">PARAMS_REGION</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">PARAMS_SIZE</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;params&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">reserve_provenance_data_region</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span></div></div>
 </pre></div>
 
           </div>
