@@ -38,6 +38,7 @@ from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.utilities import constants, bit_field_utilities
+from spynnaker.pyNN.models.abstract_models import AbstractSynapseExpandable
 from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
 from spinn_front_end_common.utilities import (
     constants as common_constants, helpful_functions)
@@ -49,7 +50,7 @@ class PopulationMachineVertex(
         AbstractRecordable, AbstractHasProfileData,
         AbstractSupportsBitFieldGeneration,
         AbstractSupportsBitFieldRoutingCompression,
-        AbstractGeneratesDataSpecification,
+        AbstractGeneratesDataSpecification, AbstractSynapseExpandable,
         AbstractRewritesDataSpecification):
 
     __slots__ = [
@@ -625,3 +626,13 @@ class PopulationMachineVertex(
             self._app_vertex.parameters, self._app_vertex.state_variables,
             vertex_slice)
         spec.write_array(neuron_data)
+
+    @overrides(AbstractSynapseExpandable.gen_on_machine)
+    def gen_on_machine(self):
+        return self.app_vertex.synapse_manager.gen_on_machine(
+            self.vertex_slice)
+
+    @overrides(AbstractSynapseExpandable.read_generated_connection_holders)
+    def read_generated_connection_holders(self, transceiver, placement):
+        self._app_vertex.synapse_manager.read_generated_connection_holders(
+            transceiver, placement)

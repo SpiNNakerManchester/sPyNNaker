@@ -28,7 +28,8 @@ from spinn_front_end_common.utilities import system_control_logic
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
-from spynnaker.pyNN.extra_algorithms.synapse_expander import SYNAPSE_EXPANDER
+from spynnaker.pyNN.models.abstract_models import (
+    AbstractSynapseExpandable, SYNAPSE_EXPANDER_APLX)
 
 logger = logging.getLogger(__name__)
 
@@ -115,7 +116,7 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
 
         # locate expander executable path
         expander_executable_path = executable_finder.get_executable_path(
-            SYNAPSE_EXPANDER)
+            SYNAPSE_EXPANDER_APLX)
 
         # if any ones are going to be ran on host, ignore them from the new
         # core setup
@@ -126,13 +127,13 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
                         core_subset.x, core_subset.y, processor_id):
                     vertex = placements.get_vertex_on_processor(
                         core_subset.x, core_subset.y, processor_id)
-                    app_vertex = vertex.app_vertex
-                    if isinstance(vertex, AbstractSupportsBitFieldGeneration):
-                        if app_vertex.gen_on_machine(vertex.vertex_slice):
-                            new_cores.add_processor(
-                                expander_executable_path,
-                                core_subset.x, core_subset.y, processor_id,
-                                executable_type=ExecutableType.SYSTEM)
+                    if (isinstance(vertex, AbstractSupportsBitFieldGeneration)
+                            and isinstance(vertex, AbstractSynapseExpandable)
+                            and vertex.gen_on_machine()):
+                        new_cores.add_processor(
+                            expander_executable_path,
+                            core_subset.x, core_subset.y, processor_id,
+                            executable_type=ExecutableType.SYSTEM)
         return new_cores
 
     @staticmethod

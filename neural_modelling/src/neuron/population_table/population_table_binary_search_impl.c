@@ -292,10 +292,7 @@ static inline void print_bitfields(uint32_t mp_i, uint32_t start,
 #endif
 }
 
-//! \brief Initialise the bitfield filtering system.
-//! \param[in] filter_region: Where the bitfield configuration is
-//! \return True on success
-static inline bool bit_field_filter_initialise(filter_region_t *filter_region) {
+bool population_table_load_bitfields(filter_region_t *filter_region) {
 
     // try allocating DTCM for starting array for bitfields
     connectivity_bit_field =
@@ -412,8 +409,7 @@ static inline bool population_table_position_in_the_master_pop_array(
 
 bool population_table_initialise(
         address_t table_address, address_t synapse_rows_address,
-        address_t direct_rows_address, filter_region_t *bitfield_address,
-        uint32_t *row_max_n_words) {
+        address_t direct_rows_address, uint32_t *row_max_n_words) {
     log_debug("Population_table_initialise: starting");
 
     master_population_table_length = table_address[0];
@@ -467,11 +463,6 @@ bool population_table_initialise(
     direct_rows_base_address = (uint32_t) direct_rows_address;
 
     *row_max_n_words = 0xFF + N_SYNAPSE_ROW_HEADER_WORDS;
-
-    // Initialise bitfields
-    if (!bit_field_filter_initialise(bitfield_address)) {
-        return false;
-    }
 
     print_master_population_table();
     return true;

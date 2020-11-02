@@ -21,9 +21,12 @@ from .abstract_population_settable import AbstractPopulationSettable
 from .abstract_read_parameters_before_set import (
     AbstractReadParametersBeforeSet)
 from .abstract_settable import AbstractSettable
+from .abstract_synapse_expandable import (
+    AbstractSynapseExpandable, SYNAPSE_EXPANDER_APLX)
 from .abstract_weight_updatable import AbstractWeightUpdatable
 
 __all__ = ["AbstractAcceptsIncomingSynapses", "AbstractContainsUnits",
            "AbstractMaxSpikes", "AbstractPopulationInitializable",
            "AbstractPopulationSettable", "AbstractReadParametersBeforeSet",
-           "AbstractSettable", "AbstractWeightUpdatable"]
+           "AbstractSettable", "AbstractSynapseExpandable",
+           "AbstractWeightUpdatable", "SYNAPSE_EXPANDER_APLX"]
