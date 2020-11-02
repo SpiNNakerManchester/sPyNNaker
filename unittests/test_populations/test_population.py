@@ -38,3 +38,12 @@ def test_selector():
     values = pop_1.get_by_selector([1, 3, 4], ["cm", "v_thresh"])
     assert [1.0, 1.0, 1.0] == values['cm']
     assert [-50.0, -50.0, -50.0] == values["v_thresh"]
+
+
+def test_round():
+    simulator = MockSimulator.setup()
+    model = IFCurrExpBase()
+    pop_1 = PyNNPopulationCommon(
+        spinnaker_control=simulator, size=4.999999, label="Test",
+        constraints=None, model=model, structure=None, initial_values=None)
+    assert pop_1.size == 5
