@@ -67,12 +67,12 @@ class SplitterAbstractPopulationVertexSlice(
             raise SpynnakerSplitterConfigurationException(
                 self.INVALID_POP_ERROR_MESSAGE.format(app_vertex))
 
-    @overrides(AbstractSplitterSlice.get_pre_vertices)
-    def get_pre_vertices(self, edge, outgoing_edge_partition):
+    @overrides(AbstractSplitterSlice.get_out_going_vertices)
+    def get_out_going_vertices(self, edge, outgoing_edge_partition):
         return self._get_map([MachineEdge])
 
-    @overrides(AbstractSplitterSlice.get_post_vertices)
-    def get_post_vertices(
+    @overrides(AbstractSplitterSlice.get_in_coming_vertices)
+    def get_in_coming_vertices(
             self, edge, outgoing_edge_partition, src_machine_vertex):
         return self._get_map([MachineEdge])
 
