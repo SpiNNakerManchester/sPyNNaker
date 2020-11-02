@@ -14,6 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
+import os
+
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
@@ -453,6 +455,17 @@ class AbstractPopulationVertex(
         # parameter not found for this variable
         raise KeyError("No variable {} found in {}".format(
             variable, self.__neuron_impl.model_name))
+
+    def _get_binary_file_name(self):
+
+        # Split binary name into title and extension
+        binary_title, binary_extension = os.path.splitext(
+            self.__neuron_impl.binary_name)
+
+        # Reunite title and extension and return
+        return (binary_title +
+                self.__synapse_manager.vertex_executable_suffix +
+                binary_extension)
 
     @overrides(AbstractPopulationInitializable.get_initial_value)
     def get_initial_value(self, variable, selector=None):
