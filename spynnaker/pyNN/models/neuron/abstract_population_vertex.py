@@ -67,7 +67,6 @@ class AbstractPopulationVertex(
 
     __slots__ = [
         "__change_requires_mapping",
-        "__change_requires_neuron_parameters_reload",
         "__change_requires_data_generation",
         "__incoming_spike_buffer_size",
         "__n_atoms",
@@ -171,7 +170,6 @@ class AbstractPopulationVertex(
 
         # bool for if state has changed.
         self.__change_requires_mapping = True
-        self.__change_requires_neuron_parameters_reload = False
         self.__change_requires_data_generation = False
         self.__has_reset_last = True
 
@@ -357,12 +355,6 @@ class AbstractPopulationVertex(
             target[key] = copy_list
         return target
 
-    def requires_memory_regions_to_be_reloaded(self):
-        return self.__change_requires_neuron_parameters_reload
-
-    def mark_regions_reloaded(self):
-        self.__change_requires_neuron_parameters_reload = False
-
     @overrides(AbstractSpikeRecordable.is_recording_spikes)
     def is_recording_spikes(self):
         return self.__neuron_recorder.is_recording(NeuronRecorder.SPIKES)
@@ -423,7 +415,8 @@ class AbstractPopulationVertex(
                 " parameter {}".format(variable))
         self._state_variables.set_value(variable, value)
         self.__updated_state_variables.add(variable)
-        self.__change_requires_neuron_parameters_reload = True
+        for vertex in self.machine_vertices:
+            vertex.mark_regions_as_needing_reload()
 
     @property
     def initialize_parameters(self):
@@ -486,7 +479,8 @@ class AbstractPopulationVertex(
         parameter = self._get_parameter(variable)
         ranged_list = self._state_variables[parameter]
         ranged_list.set_value_by_selector(selector, value)
-        self.__change_requires_neuron_parameters_reload = True
+        for vertex in self.machine_vertices:
+            vertex.mark_regions_as_needing_reload()
 
     @property
     def conductance_based(self):
@@ -514,7 +508,8 @@ class AbstractPopulationVertex(
                 "Population {} does not have parameter {}".format(
                     self.__neuron_impl.model_name, key))
         self._parameters.set_value(key, value)
-        self.__change_requires_neuron_parameters_reload = True
+        for vertex in self.machine_vertices:
+            vertex.mark_regions_as_needing_reload()
 
     @overrides(AbstractReadParametersBeforeSet.read_parameters_from_machine)
     def read_parameters_from_machine(
@@ -693,9 +688,11 @@ class AbstractPopulationVertex(
     def reset_to_first_timestep(self):
         # Mark that reset has been done, and reload state variables
         self.__has_reset_last = True
-        self.__change_requires_neuron_parameters_reload = True
+        for vertex in self.machine_vertices:
+            vertex.mark_regions_as_needing_reload()
 
         # If synapses change during the run,
         if self.__synapse_manager.changes_during_run:
             self.__change_requires_data_generation = True
-            self.__change_requires_neuron_parameters_reload = False
+            for vertex in self.machine_vertices:
+                vertex.mark_regions_reloaded()
