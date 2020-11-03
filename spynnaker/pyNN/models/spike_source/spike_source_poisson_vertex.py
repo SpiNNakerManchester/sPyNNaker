@@ -63,9 +63,9 @@ PARAMS_WORDS_PER_NEURON = 2
 # sqrt_lambda, isi_val, time_to_spike
 PARAMS_WORDS_PER_RATE = 8
 
-_REGIONS = SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS
 SLOW_RATE_PER_TICK_CUTOFF = (
     SpikeSourcePoissonMachineVertex.SLOW_RATE_PER_TICK_CUTOFF)
+
 OVERFLOW_TIMESTEPS_FOR_SDRAM = 5
 
 # The microseconds per timestep will be divided by this to get the max offset
@@ -553,18 +553,17 @@ class SpikeSourcePoissonVertex(
             self, transceiver, placement, vertex_slice, machine_time_step):
 
         # locate SDRAM address where parameters are stored
-        poisson_params = \
-            helpful_functions.locate_memory_region_for_placement(
-                placement, _REGIONS.POISSON_PARAMS_REGION.value, transceiver)
+        poisson_params = placement.vertex.poisson_param_region_address(
+            placement, transceiver)
         seed_array = transceiver.read_memory(
             placement.x, placement.y, poisson_params + SEED_OFFSET_BYTES,
             SEED_SIZE_BYTES)
         self.__kiss_seed[vertex_slice] = struct.unpack_from("<4I", seed_array)
 
         # locate SDRAM address where the rates are stored
-        poisson_rate_region_sdram_address = \
-            helpful_functions.locate_memory_region_for_placement(
-                placement, _REGIONS.RATES_REGION.value, transceiver)
+        poisson_rate_region_sdram_address = (
+            placement.vertex.poisson_rate_region_address(
+                placement, transceiver))
 
         # get size of poisson params
         size_of_region = self.get_rates_bytes(
