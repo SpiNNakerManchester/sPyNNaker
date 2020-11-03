@@ -330,8 +330,6 @@ class SpikeSourcePoissonVertex(
 
     @property
     def start(self):
-        if self.__is_variable_rate:
-            raise Exception("Get variable rate poisson starts with .starts")
         return self.__data["starts"]
 
     @start.setter
