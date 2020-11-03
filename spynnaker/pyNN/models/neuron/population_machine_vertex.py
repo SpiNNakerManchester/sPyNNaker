@@ -511,17 +511,13 @@ class PopulationMachineVertex(
         # close spec
         spec.end_specification()
 
-    @overrides(AbstractRewritesDataSpecification.
-               requires_memory_regions_to_be_reloaded)
-    def requires_memory_regions_to_be_reloaded(self):
+    @overrides(AbstractRewritesDataSpecification.reload_required)
+    def reload_required(self):
         return self.__change_requires_neuron_parameters_reload
 
-    @overrides(AbstractRewritesDataSpecification.mark_regions_reloaded)
-    def mark_regions_reloaded(self):
-        self.__change_requires_neuron_parameters_reload = False
-
-    def mark_regions_as_needing_reload(self):
-        self.__change_requires_neuron_parameters_reload = True
+    @overrides(AbstractRewritesDataSpecification.set_reload_required)
+    def set_reload_required(self, new_value):
+        self.__change_requires_neuron_parameters_reload = new_value
 
     def _reserve_memory_regions(self, spec, machine_graph, n_key_map):
         """ Reserve the DSG data regions.

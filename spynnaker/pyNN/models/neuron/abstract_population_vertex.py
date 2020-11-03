@@ -416,7 +416,7 @@ class AbstractPopulationVertex(
         self._state_variables.set_value(variable, value)
         self.__updated_state_variables.add(variable)
         for vertex in self.machine_vertices:
-            vertex.mark_regions_as_needing_reload()
+            vertex.set_reload_required(True)
 
     @property
     def initialize_parameters(self):
@@ -480,7 +480,7 @@ class AbstractPopulationVertex(
         ranged_list = self._state_variables[parameter]
         ranged_list.set_value_by_selector(selector, value)
         for vertex in self.machine_vertices:
-            vertex.mark_regions_as_needing_reload()
+            vertex.set_reload_required(True)
 
     @property
     def conductance_based(self):
@@ -509,7 +509,7 @@ class AbstractPopulationVertex(
                     self.__neuron_impl.model_name, key))
         self._parameters.set_value(key, value)
         for vertex in self.machine_vertices:
-            vertex.mark_regions_as_needing_reload()
+            vertex.set_reload_required(True)
 
     @overrides(AbstractReadParametersBeforeSet.read_parameters_from_machine)
     def read_parameters_from_machine(
@@ -689,10 +689,10 @@ class AbstractPopulationVertex(
         # Mark that reset has been done, and reload state variables
         self.__has_reset_last = True
         for vertex in self.machine_vertices:
-            vertex.mark_regions_as_needing_reload()
+            vertex.set_reload_required(True)
 
         # If synapses change during the run,
         if self.__synapse_manager.changes_during_run:
             self.__change_requires_data_generation = True
             for vertex in self.machine_vertices:
-                vertex.mark_regions_reloaded()
+                vertex.set_reload_required(False)

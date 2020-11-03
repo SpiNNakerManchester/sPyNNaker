@@ -852,17 +852,16 @@ class SpikeSourcePoissonVertex(
         spec.end_specification()
 
     @inject_items({"first_machine_time_step": "FirstMachineTimeStep"})
-    @overrides(AbstractRewritesDataSpecification
-               .requires_memory_regions_to_be_reloaded,
+    @overrides(AbstractRewritesDataSpecification.reload_required,
                additional_arguments={"first_machine_time_step"})
-    def requires_memory_regions_to_be_reloaded(self, first_machine_time_step):
+    def reload_required(self, first_machine_time_step):
         # pylint: disable=arguments-differ
         return (self.__change_requires_neuron_parameters_reload or
                 first_machine_time_step == 0)
 
-    @overrides(AbstractRewritesDataSpecification.mark_regions_reloaded)
-    def mark_regions_reloaded(self):
-        self.__change_requires_neuron_parameters_reload = False
+    @overrides(AbstractRewritesDataSpecification.reload_required)
+    def set_reload_required(self, new_value):
+        self.__change_requires_neuron_parameters_reload = new_value
 
     @overrides(AbstractReadParametersBeforeSet.read_parameters_from_machine)
     def read_parameters_from_machine(
