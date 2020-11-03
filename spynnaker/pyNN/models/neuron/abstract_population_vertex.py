@@ -201,7 +201,7 @@ class AbstractPopulationVertex(
         return self.__neuron_impl
 
     @property
-    def n_profile_sampling(self):
+    def n_profile_samples(self):
         return self.__n_profile_samples
 
     @property
