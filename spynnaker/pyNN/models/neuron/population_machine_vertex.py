@@ -552,7 +552,7 @@ class PopulationMachineVertex(
 
         profile_utils.reserve_profile_region(
             spec, POPULATION_BASED_REGIONS.PROFILING.value,
-            self._app_vertex.__n_profile_samples)
+            self._app_vertex.n_profile_samples)
 
         # reserve bit field region
         bit_field_utilities.reserve_bit_field_regions(
