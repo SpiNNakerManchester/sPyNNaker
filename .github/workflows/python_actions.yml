@@ -125,6 +125,11 @@ jobs:
         # run flake8
         flake8 spynnaker unittests
 
+    - name: Lint with pylint
+      # Note that there's special conditioning of the return code of pylint
+      run: |
+        pylint --output-format=colorized --disable=R,C spinn_machine || exit $(($? & 35))
+
     - name: Run rat copyright enforcement
       if: matrix.python-version == 3.6
       run: |
