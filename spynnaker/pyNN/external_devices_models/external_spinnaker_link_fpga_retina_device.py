@@ -94,7 +94,7 @@ class ExternalFPGARetinaDevice(
             The SpiNNaker link to which the retina is connected
         :param str polarity: The "polarity" of the retina data
         :param str label:
-        :param sr board_address:
+        :param str board_address:
         """
         # pylint: disable=too-many-arguments
         self.__polarity = polarity
