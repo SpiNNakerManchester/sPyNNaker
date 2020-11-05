@@ -52,7 +52,7 @@ jobs:
         support/gitclone2.sh https://github.com/SpiNNakerManchester/spinnaker_tools.git
         support/gitclone2.sh https://github.com/SpiNNakerManchester/spinn_common.git
         support/gitclone2.sh https://github.com/SpiNNakerManchester/SpiNNFrontEndCommon.git
-        # Note: SpiNNUtilities needed for spinn_utilities.make_tools
+        # Note: SpiNNUtils needed for spinn_utilities.make_tools
         support/gitclone2.sh https://github.com/SpiNNakerManchester/SpiNNUtils.git
         
     - name: Install arm-none-eabi-gcc
@@ -67,7 +67,7 @@ jobs:
       run: |
         make -C $SPINN_DIRS
         make -C spinn_common install
-        make -C SpiNNFrontEndCommon install
+        make -C SpiNNFrontEndCommon/c_common install
         make -C $NEURAL_MODELLING_DIRS doxysetup
         CFLAGS=-fdiagnostics-color make -C neural_modelling
         
