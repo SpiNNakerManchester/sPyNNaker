@@ -106,6 +106,15 @@ jobs:
       run: |
         pytest unittests --cov spynnaker
 
+    -name: Create a spynnaker.cfg
+    run: |
+      echo '[Machine]' > ~/.spynnaker.cfg
+      echo "machineName = $SPINNAKER_BOARD_ADDRESS" >> ~/.spynnaker.cfg
+      echo "version = ${SPINNAKER_BOARD_VERSION:-5}" >> ~/.spynnaker.cfg
+      echo '[Database]' >> ~/.spynnaker.cfg
+      echo '[Simulation]' >> ~/.spynnaker.cfg
+      echo '[Buffers]' >> ~/.spynnaker.cfg
+
     - name: Test with pytest
       if: matrix.python-version != 3.6
       run: |
