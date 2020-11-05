@@ -322,9 +322,9 @@ class MasterPopTableAsBinarySearch(object):
 
     @staticmethod
     def get_master_population_table_size(in_edges):
-        """ Get the size of the master population table in SDRAM
+        """ Get the size of the master population table in SDRAM.
 
-        :param iterable(~pacman.model.graphs.application.ApplicationEdge)
+        :param iterable(~pacman.model.graphs.application.ApplicationEdge) \
                 in_edges:
             The edges arriving at the vertex that are to be handled by this
             table

@@ -366,16 +366,19 @@ class SynapseIORowBased(object):
             Whether to generate undelayed data
         :param bool gen_delayed:
             Whether to generate delayed data
-        :return: (row_data, delayed_row_data, delayed_source_ids, stages) where
-            - row_data is the undelayed connectivity data arranged into a row
-              per source, each row the same length
-            - delayed_row_data is the delayed connectivity data arranged into a
-              row per source per delay stage, each row the same length
-            - delayed_source_ids is the machine-vertex-local source neuron id
-              of each connection of the delayed vertices
-            - stages is the delay stage of each delayed connection
+        :return:
+            (``row_data``, ``delayed_row_data``, ``delayed_source_ids``,
+            ``stages``) where:
+
+            * ``row_data`` is the undelayed connectivity data arranged into a
+                row per source, each row the same length
+            * ``delayed_row_data`` is the delayed connectivity data arranged
+                into a row per source per delay stage, each row the same length
+            * ``delayed_source_ids`` is the machine-vertex-local source neuron
+                id of each connection of the delayed vertices
+            * ``stages`` is the delay stage of each delayed connection
         :rtype:
-            tuple(~numpy.ndarray, ~numpy.ndarray, ~numpy.ndarray,\
+            tuple(~numpy.ndarray, ~numpy.ndarray, ~numpy.ndarray,
             ~numpy.ndarray)
         """
         # pylint: disable=too-many-arguments, too-many-locals
