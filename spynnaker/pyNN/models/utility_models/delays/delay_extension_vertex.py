@@ -33,6 +33,7 @@ from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES, BITS_PER_WORD,
     BYTES_PER_WORD)
+from spynnaker.pyNN.models.abstract_models import AbstractHasDelayStages
 from .delay_block import DelayBlock
 from .delay_extension_machine_vertex import DelayExtensionMachineVertex
 from .delay_generator_data import DelayGeneratorData
@@ -59,7 +60,7 @@ _MAX_OFFSET_DENOMINATOR = 10
 
 class DelayExtensionVertex(
         TDMAAwareApplicationVertex, AbstractGeneratesDataSpecification,
-        AbstractProvidesOutgoingPartitionConstraints):
+        AbstractProvidesOutgoingPartitionConstraints, AbstractHasDelayStages):
     """ Provide delays to incoming spikes in multiples of the maximum delays\
         of a neuron (typically 16 or 32)
     """
@@ -146,12 +147,8 @@ class DelayExtensionVertex(
         return self.__n_atoms
 
     @property
+    @overrides(AbstractHasDelayStages.n_delay_stages)
     def n_delay_stages(self):
-        """ The maximum number of delay stages required by any connection\
-            out of this delay extension vertex
-
-        :rtype: int
-        """
         return self.__n_delay_stages
 
     @n_delay_stages.setter
