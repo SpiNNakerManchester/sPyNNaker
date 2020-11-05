@@ -106,7 +106,7 @@ jobs:
       run: |
         pytest unittests --cov spynnaker
 
-    -name: Create a spynnaker.cfg
+    - name: Create a spynnaker.cfg
     run: |
       echo '[Machine]' > ~/.spynnaker.cfg
       echo "machineName = $SPINNAKER_BOARD_ADDRESS" >> ~/.spynnaker.cfg
