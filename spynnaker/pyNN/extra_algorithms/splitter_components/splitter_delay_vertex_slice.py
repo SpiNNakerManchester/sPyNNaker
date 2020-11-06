@@ -86,8 +86,8 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
         self._delayed_mac_edge_to_undelayed_map = dict()
         self._delayed_vertex_to_un_delayed_edge = dict()
 
-    @overrides(AbstractDependentSplitter.get_pre_vertices)
-    def get_pre_vertices(self, edge, outgoing_edge_partition):
+    @overrides(AbstractDependentSplitter.get_out_going_vertices)
+    def get_out_going_vertices(self, edge, outgoing_edge_partition):
         return self._get_map([MachineEdge])
 
     @property
@@ -125,8 +125,8 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
     def get_out_going_slices(self):
         return self._other_splitter.get_out_going_slices()
 
-    @overrides(AbstractDependentSplitter.get_post_vertices)
-    def get_post_vertices(
+    @overrides(AbstractDependentSplitter.get_in_coming_vertices)
+    def get_in_coming_vertices(
             self, edge, outgoing_edge_partition, src_machine_vertex):
         return {
             self._machine_vertex_by_slice[
