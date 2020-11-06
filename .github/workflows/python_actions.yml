@@ -69,7 +69,8 @@ jobs:
       run: python setup.py install
       working-directory: SpiNNMan
 
-    - name: Install pacman requirements
+    - name: preinstall pacman requirements (2.7 only)
+      if: matrix.python-version == 2.7
       run: pip install -r requirements.txt
       working-directory: PACMAN
 
@@ -85,7 +86,8 @@ jobs:
       run: python setup.py install
       working-directory: spalloc
 
-    - name: Install SpiNNFrontEndCommon requirements
+    - name: preinstall SpiNNFrontEndCommon requirements (2.7 Only)
+      if: matrix.python-version == 2.7
       run: pip install -r requirements.txt
       working-directory: SpiNNFrontEndCommon
 
@@ -93,13 +95,18 @@ jobs:
       run: python setup.py install
       working-directory: SpiNNFrontEndCommon
 
-    - name: Install requirements-test
+    - name: Preinstall requirements (2.7 Only)
+      if: matrix.python-version == 2.7
       run: |
-        pip install -r requirements-test.txt
+        pip install -r requirements.txt
 
     - name: Setup
       run: |
         python setup.py develop
+
+    - name: Install requirements-test
+      run: |
+        pip install -r requirements-test.txt
 
     - name: Create a spynnaker.cfg
       run: |
@@ -121,6 +128,8 @@ jobs:
         pytest unittests
 
     - name: Lint with flake8
+      # Broken in 2.7 as it can not find data_specification.exceptions
+      if: matrix.python-version != 2.7
       run: |
         # run flake8
         flake8 spynnaker unittests
@@ -137,7 +146,7 @@ jobs:
         support/rat.sh run
 
     - name: Build documentation with sphinx
-      if: matrix.python-version == 13.6
+      if: matrix.python-version == 3.6
       run: |
         cd doc/source
         sphinx-build -W -T -E -b html -d _build/doctrees-readthedocsdirhtml -D language=en . _build/html
