@@ -128,13 +128,13 @@ jobs:
         pytest unittests
 
     - name: Lint with flake8
-      # Broken in 2.7 as it can not find data_specification.exceptions
-      if: matrix.python-version != 2.7
       run: |
         # run flake8
         flake8 spynnaker unittests
 
     - name: Lint with pylint
+      # Broken in 2.7 as it can not find data_specification.exceptions
+      if: matrix.python-version != 2.7
       # Note that there's special conditioning of the return code of pylint
       run: |
         pylint --output-format=colorized --disable=R,C spynnaker || exit $(($? & 35))
