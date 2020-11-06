@@ -35,13 +35,13 @@ class PushBotSpiNNakerLinkMotorDevice(
             label=default_parameters['label'],
             board_address=default_parameters['board_address']):
         """
-
-        :param motor: a PushBotMotor value to indicate the motor to control
-        :param protocol: The protocol used to control the device
-        :param spinnaker_link_id: The SpiNNakerLink connected to
-        :param n_neurons: The number of neurons in the device
-        :param label: The label of the device
-        :param board_address:\
+        :param PushBotMotor motor: the motor to control
+        :param MunichIoSpiNNakerLinkProtocol protocol:
+            The protocol used to control the device
+        :param int spinnaker_link_id: The SpiNNakerLink connected to
+        :param int n_neurons: The number of neurons in the device
+        :param str label: The label of the device
+        :param str board_address:
             The IP address of the board that the device is connected to
         """
         # pylint: disable=too-many-arguments

@@ -15,34 +15,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*! \file
- *
- * SUMMARY
- *  \brief This file contains the static impl of synaptogenesis.
- *  No functionality is gained with this class
- *
+/*!
+ * \file
+ * \brief This file contains the static (non-)implementation of synaptogenesis.
+ * \details No functionality is gained with this class.
  */
 #include "synaptogenesis_dynamics.h"
 #include <debug.h>
 
-address_t synaptogenesis_dynamics_initialise(
-    address_t sdram_sp_address) {
-    use(sdram_sp_address);
-    return sdram_sp_address;
+bool synaptogenesis_dynamics_initialise(UNUSED address_t sdram_sp_address) {
+    return true;
 }
 
-bool synaptogenesis_dynamics_rewire(uint32_t time,
-        spike_t *spike, address_t *synaptic_row_address, uint32_t *n_bytes) {
-    use(time);
-    use(spike);
-    use(synaptic_row_address);
-    use(n_bytes);
+bool synaptogenesis_dynamics_rewire(
+        UNUSED uint32_t time, UNUSED spike_t *spike,
+        UNUSED address_t *synaptic_row_address, UNUSED uint32_t *n_bytes) {
     return false;
 }
 
-bool synaptogenesis_row_restructure(uint32_t time, address_t row) {
-    use(time);
-    use(row);
+bool synaptogenesis_row_restructure(
+        UNUSED uint32_t time, UNUSED address_t row) {
     return false;
 }
 
@@ -54,7 +46,9 @@ bool synaptogenesis_is_fast(void) {
     return false;
 }
 
-void synaptogenesis_spike_received(uint32_t time, spike_t spike) {
-    use(time);
-    use(spike);
+void synaptogenesis_spike_received(UNUSED uint32_t time, UNUSED spike_t spike) {
+}
+
+void print_post_to_pre_entry(void) {
+    return;
 }

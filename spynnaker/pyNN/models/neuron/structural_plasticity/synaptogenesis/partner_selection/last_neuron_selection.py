@@ -13,8 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from spinn_utilities.overrides import overrides
 from .abstract_partner_selection import AbstractPartnerSelection
-from pacman.model.decorators.overrides import overrides
 
 
 class LastNeuronSelection(AbstractPartnerSelection):
@@ -26,7 +26,6 @@ class LastNeuronSelection(AbstractPartnerSelection):
 
     def __init__(self, spike_buffer_size=64):
         """
-
         :param spike_buffer_size: The size of the buffer for holding spikes
         """
         self.__spike_buffer_size = spike_buffer_size

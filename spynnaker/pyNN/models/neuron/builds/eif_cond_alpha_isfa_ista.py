@@ -21,6 +21,10 @@ from spynnaker.pyNN.models.defaults import defaults, default_initial_values
 class EIFConductanceAlphaPopulation(object):
     """ Exponential integrate and fire neuron with spike triggered and \
         sub-threshold adaptation currents (isfa, ista reps.)
+
+    .. warning::
+
+        Not currently supported by the tool chain.
     """
 
     # noinspection PyPep8Naming

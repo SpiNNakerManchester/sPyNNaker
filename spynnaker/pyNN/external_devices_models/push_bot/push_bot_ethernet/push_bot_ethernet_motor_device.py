@@ -34,9 +34,11 @@ class PushBotEthernetMotorDevice(
     def __init__(self, motor, protocol, timesteps_between_send=None):
         """
         :param motor: a PushBotMotor value to indicate the motor to control
+        :type motor: PushBotMotor
         :param protocol: The protocol used to control the device
-        :param timesteps_between_send:\
-            The number of timesteps between sending commands to the device,\
+        :type protocol: MunichIoEthernetProtocol
+        :param timesteps_between_send:
+            The number of timesteps between sending commands to the device,
             or None to use the default
         """
 
@@ -48,6 +50,7 @@ class PushBotEthernetMotorDevice(
             protocol, motor, True, timesteps_between_send)
         self.__command_protocol = protocol
 
+    @overrides(PushBotEthernetDevice.set_command_protocol)
     def set_command_protocol(self, command_protocol):
         self.__command_protocol = command_protocol
 

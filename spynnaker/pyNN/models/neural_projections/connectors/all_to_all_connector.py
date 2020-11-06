@@ -20,11 +20,16 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
+from .abstract_connector_supports_views_on_machine import (
+    AbstractConnectorSupportsViewsOnMachine)
+
+N_GEN_PARAMS = 1
 
 logger = logging.getLogger(__file__)
 
 
-class AllToAllConnector(AbstractGenerateConnectorOnMachine):
+class AllToAllConnector(AbstractGenerateConnectorOnMachine,
+                        AbstractConnectorSupportsViewsOnMachine):
     """ Connects all cells in the presynaptic population to all cells in \
         the postsynaptic population.
     """
@@ -35,19 +40,25 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
     def __init__(self, allow_self_connections=True, safe=True, callback=None,
                  verbose=None):
         """
-        :param allow_self_connections:
-            if the connector is used to connect a\
-            Population to itself, this flag determines whether a neuron is\
-            allowed to connect to itself, or only to other neurons in the\
-            Population.
-        :type allow_self_connections: bool
+        :param bool allow_self_connections:
+            if the connector is used to connect a Population to itself, this
+            flag determines whether a neuron is allowed to connect to itself,
+            or only to other neurons in the Population.
+        :param bool safe:
+        :param callable callback: Ignored
+        :param bool verbose:
         """
         super(AllToAllConnector, self).__init__(safe, callback, verbose)
         self.__allow_self_connections = allow_self_connections
 
-    def _connection_slices(self, pre_vertex_slice, post_vertex_slice,
-                           synapse_info):
+    def _connection_slices(
+            self, pre_vertex_slice, post_vertex_slice, synapse_info):
         """ Get a slice of the overall set of connections.
+
+        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param SynapseInformation synapse_info:
+        :rtype: list(slice)
         """
         n_post_neurons = synapse_info.n_post_neurons
         stop_atom = post_vertex_slice.hi_atom + 1
@@ -94,8 +105,7 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
+            self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
             synapse_type, synapse_info):
         # pylint: disable=too-many-arguments
         n_connections = pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms
@@ -138,52 +148,31 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
 
     @property
     def allow_self_connections(self):
+        """
+        :rtype: bool
+        """
         return self.__allow_self_connections
 
     @allow_self_connections.setter
     def allow_self_connections(self, new_value):
         self.__allow_self_connections = new_value
 
-    def _get_view_lo_hi(self, indexes):
-        view_lo = indexes[0]
-        view_hi = indexes[-1]
-        return view_lo, view_hi
-
     @property
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)
     def gen_connector_id(self):
         return ConnectorIDs.ALL_TO_ALL_CONNECTOR.value
 
-    @overrides(AbstractGenerateConnectorOnMachine.
-               gen_connector_params)
+    @overrides(AbstractGenerateConnectorOnMachine.gen_connector_params)
     def gen_connector_params(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
+            self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
             synapse_type, synapse_info):
-        params = []
-        pre_view_lo = 0
-        pre_view_hi = synapse_info.n_pre_neurons - 1
-        if synapse_info.prepop_is_view:
-            pre_view_lo, pre_view_hi = self._get_view_lo_hi(
-                synapse_info.pre_population._indexes)
-
-        params.extend([pre_view_lo, pre_view_hi])
-
-        post_view_lo = 0
-        post_view_hi = synapse_info.n_post_neurons - 1
-        if synapse_info.postpop_is_view:
-            post_view_lo, post_view_hi = self._get_view_lo_hi(
-                synapse_info.post_population._indexes)
-
-        params.extend([post_view_lo, post_view_hi])
-
-        params.extend([self.allow_self_connections])
-
+        params = self._basic_connector_params(synapse_info)
+        params.append(self.__allow_self_connections)
         return numpy.array(params, dtype="uint32")
 
     @property
-    @overrides(AbstractGenerateConnectorOnMachine.
-               gen_connector_params_size_in_bytes)
+    @overrides(
+        AbstractGenerateConnectorOnMachine.gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
         # view parameters + allow_self_connections
-        return (4 + 1) * BYTES_PER_WORD
+        return self._view_params_bytes + (N_GEN_PARAMS * BYTES_PER_WORD)

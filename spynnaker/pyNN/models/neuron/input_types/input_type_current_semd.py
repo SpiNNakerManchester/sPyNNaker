@@ -27,13 +27,17 @@ UNITS = {
 
 
 class InputTypeCurrentSEMD(AbstractInputType):
-    """ The current sEMD input type
+    """ The current sEMD input type.
     """
     __slots__ = [
         "__multiplicator",
         "__inh_input_previous"]
 
     def __init__(self, multiplicator, inh_input_previous):
+        """
+        :param float multiplicator:
+        :param float inh_input_previous:
+        """
         super(InputTypeCurrentSEMD, self).__init__([
             DataType.S1615,   # multiplicator
             DataType.S1615])  # inh_input_previous
@@ -62,7 +66,7 @@ class InputTypeCurrentSEMD(AbstractInputType):
         return variable in UNITS
 
     @overrides(AbstractInputType.get_values)
-    def get_values(self, parameters, state_variables, vertex_slice):
+    def get_values(self, parameters, state_variables, vertex_slice, ts):
 
         # Add the rest of the data
         return [parameters[MULTIPLICATOR], state_variables[INH_INPUT_PREVIOUS]]

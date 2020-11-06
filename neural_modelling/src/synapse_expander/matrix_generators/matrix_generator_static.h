@@ -16,8 +16,8 @@
  */
 
 /**
- *! \file
- *! \brief Static synaptic matrix implementation
+ * \file
+ * \brief Static synaptic matrix implementation
  */
 
 #include <stdbool.h>
@@ -26,63 +26,67 @@
 #include "matrix_generator_common.h"
 #include <synapse_expander/generator_types.h>
 
-static initialize_func matrix_generator_static_initialize;
-static free_func matrix_generator_static_free;
-static generate_row_func matrix_generator_static_write_row;
-
-static void *matrix_generator_static_initialize(address_t *region) {
-    use(region);
+/**
+ * \brief How to initialise the static synaptic matrix generator
+ * \param[in,out] region: Region to read parameters from.  Should be updated
+ *                        to position just after parameters after calling.
+ * \return A data item to be passed in to other functions later on
+ */
+static void *matrix_generator_static_initialize(UNUSED address_t *region) {
     return NULL;
 }
 
-static void matrix_generator_static_free(void *data) {
-    use(data);
+/**
+ * \brief How to free any data for the static synaptic matrix generator
+ * \param[in] generator: The data to free
+ */
+static void matrix_generator_static_free(UNUSED void *generator) {
 }
 
 /**
- *! \brief The shift of the weight within a synaptic word
+ * \brief The shift of the weight within a synaptic word
  */
 #define SYNAPSE_WEIGHT_SHIFT 16
 
 /**
- *! \brief The mask of a weight before shifting
+ * \brief The mask of a weight before shifting
  */
 #define SYNAPSE_WEIGHT_MASK 0xFFFF
 
 /**
- *! \brief The mask of a delay before shifting
+ * \brief The mask of a delay before shifting
  */
 #define SYNAPSE_DELAY_MASK 0xFF
 
 /**
- *! \brief The position of the plastic-plastic size within a row
+ * \brief The position of the plastic-plastic size within a row
  */
 #define STATIC_PLASTIC_PLASTIC_SIZE 0
 
 /**
- *! \brief The position of the fixed-plastic size within a row
+ * \brief The position of the fixed-plastic size within a row
  */
 #define STATIC_FIXED_PLASTIC_SIZE 2
 
 /**
- *! \brief The position of the fixed-fixed size within a row
+ * \brief The position of the fixed-fixed size within a row
  */
 #define STATIC_FIXED_FIXED_SIZE 1
 
 /**
- *! \brief The starting position of the fixed-fixed data within a row
+ * \brief The starting position of the fixed-fixed data within a row
  */
 #define STATIC_FIXED_FIXED_OFFSET 3
 
 /**
- *! \brief Build a static synaptic word from components
- *! \param[in] weight The weight of the synapse
- *! \param[in] delay The delay of the synapse
- *! \param[in] type The synapse type
- *! \param[in] post_index The core-relative index of the target neuron
- *! \param[in] synapse_type_bits The number of bits for the synapse type
- *! \param[in] synapse_index_bits The number of bits for the target neuron id
- *! \return a synaptic word
+ * \brief Build a static synaptic word from components
+ * \param[in] weight: The weight of the synapse
+ * \param[in] delay: The delay of the synapse
+ * \param[in] type: The synapse type
+ * \param[in] post_index: The core-relative index of the target neuron
+ * \param[in] synapse_type_bits: The number of bits for the synapse type
+ * \param[in] synapse_index_bits: The number of bits for the target neuron id
+ * \return a synaptic word
  */
 static uint32_t build_static_word(
         uint16_t weight, uint16_t delay, uint32_t type,
@@ -99,8 +103,29 @@ static uint32_t build_static_word(
     return wrd;
 }
 
+/**
+ * \brief How to generate a row of a static synaptic matrix
+ * \param[in] generator: The data for the matrix generator, returned by the
+ *                       initialise function
+ * \param[out] synaptic_matrix: The address of the synaptic matrix to write to
+ * \param[out] delayed_synaptic_matrix: The address of the synaptic matrix to
+ *                                      write delayed connections to
+ * \param[in] n_pre_neurons: The number of pre neurons to generate for
+ * \param[in] pre_neuron_index: The index of the first pre neuron
+ * \param[in] max_row_n_words: The maximum number of words in a normal row
+ * \param[in] max_delayed_row_n_words: The maximum number of words in a
+ *                                     delayed row
+ * \param[in] synapse_type_bits: The number of bits used for the synapse type
+ * \param[in] synapse_index_bits: The number of bits used for the neuron id
+ * \param[in] synapse_type: The synapse type of each connection
+ * \param[in] n_synapses: The number of synapses
+ * \param[in] indices: Pointer to table of indices
+ * \param[in] delays: Pointer to table of delays
+ * \param[in] weights: Pointer to table of weights
+ * \param[in] max_stage: The maximum delay stage to support
+ */
 static void matrix_generator_static_write_row(
-        void *data,
+        UNUSED void *generator,
         address_t synaptic_matrix, address_t delayed_synaptic_matrix,
         uint32_t n_pre_neurons, uint32_t pre_neuron_index,
         uint32_t max_row_n_words, uint32_t max_delayed_row_n_words,
@@ -108,8 +133,6 @@ static void matrix_generator_static_write_row(
         uint32_t synapse_type, uint32_t n_synapses,
         uint16_t *indices, uint16_t *delays, uint16_t *weights,
         uint32_t max_stage) {
-    use(data);
-
     log_debug("Max stage = %u", max_stage);
 
     // Row address and position for each possible delay stage (including no

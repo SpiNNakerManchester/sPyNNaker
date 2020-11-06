@@ -16,7 +16,6 @@
 import numpy
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
-from pacman.executor.injection_decorator import inject_items
 from .abstract_synapse_type import AbstractSynapseType
 
 TAU_SYN_E = 'tau_syn_E'
@@ -48,6 +47,14 @@ class SynapseTypeDualExponential(AbstractSynapseType):
     def __init__(
             self, tau_syn_E, tau_syn_E2, tau_syn_I, isyn_exc, isyn_exc2,
             isyn_inh):
+        r"""
+        :param float tau_syn_E: :math:`\tau^{syn}_{e_1}`
+        :param float tau_syn_E2: :math:`\tau^{syn}_{e_2}`
+        :param float tau_syn_I: :math:`\tau^{syn}_i`
+        :param float isyn_exc: :math:`I^{syn}_{e_1}`
+        :param float isyn_exc2: :math:`I^{syn}_{e_2}`
+        :param float isyn_inh: :math:`I^{syn}_i`
+        """
         super(SynapseTypeDualExponential, self).__init__(
             [DataType.U032,    # decay_E
              DataType.U032,    # init_E
@@ -89,9 +96,11 @@ class SynapseTypeDualExponential(AbstractSynapseType):
     def has_variable(self, variable):
         return variable in UNITS
 
-    @inject_items({"ts": "MachineTimeStep"})
-    @overrides(AbstractSynapseType.get_values, additional_arguments={'ts'})
+    @overrides(AbstractSynapseType.get_values)
     def get_values(self, parameters, state_variables, vertex_slice, ts):
+        """
+        :param int ts: machine time step
+        """
         # pylint: disable=arguments-differ
 
         tsfloat = float(ts) / 1000.0

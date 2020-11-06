@@ -39,7 +39,7 @@ class EmptyNeuronComponent(AbstractStandardNeuronComponent):
     def add_state_variables(self, state_variables):
         pass
 
-    def get_values(self, parameters, state_variables, vertex_slice):
+    def get_values(self, parameters, state_variables, vertex_slice, ts):
         return numpy.zeros(dtype="uint32")
 
     def update_values(self, values, parameters, state_variables):
@@ -81,7 +81,7 @@ class _MyNeuronModel(AbstractNeuronModel):
         state_variables["foo"] = self._foo
         state_variables["bar"] = self._bar
 
-    def get_values(self, parameters, state_variables, vertex_slice):
+    def get_values(self, parameters, state_variables, vertex_slice, ts):
         return numpy.zeros(dtype="uint32")
 
     def update_values(self, values, parameters, state_variables):
@@ -117,7 +117,8 @@ class MockNeuron(AbstractPopulationVertex):
             n_neurons=5, label="Mock", constraints=None,
             max_atoms_per_core=None, spikes_per_second=None,
             ring_buffer_sigma=None, incoming_spike_buffer_size=None,
-            neuron_impl=foo_bar.model, pynn_model=foo_bar)
+            neuron_impl=foo_bar.model, pynn_model=foo_bar,
+            drop_late_spikes=True)
 
 
 def test_initializable():

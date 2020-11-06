@@ -18,7 +18,7 @@ from .abstract_input_type import AbstractInputType
 
 
 class InputTypeCurrent(AbstractInputType):
-    """ The current input type
+    """ The current input type.
     """
     __slots__ = []
 
@@ -38,7 +38,7 @@ class InputTypeCurrent(AbstractInputType):
         pass
 
     @overrides(AbstractInputType.get_values)
-    def get_values(self, parameters, state_variables, vertex_slice):
+    def get_values(self, parameters, state_variables, vertex_slice, ts):
         return []
 
     @overrides(AbstractInputType.update_values)

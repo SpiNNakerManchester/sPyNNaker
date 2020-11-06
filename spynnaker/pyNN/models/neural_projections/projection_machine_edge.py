@@ -19,69 +19,61 @@ from spynnaker.pyNN.utilities import utility_calls
 from pacman.model.graphs.machine import MachineEdge
 from spinn_front_end_common.interface.provenance import (
     AbstractProvidesLocalProvenanceData)
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    OneToOneConnector, FromListConnector)
-from spynnaker.pyNN.models.abstract_models import (
-    AbstractWeightUpdatable, AbstractFilterableEdge)
+from spynnaker.pyNN.models.abstract_models import AbstractWeightUpdatable
 
 
 class ProjectionMachineEdge(
-        MachineEdge, AbstractFilterableEdge,
-        AbstractWeightUpdatable, AbstractProvidesLocalProvenanceData):
+        MachineEdge, AbstractWeightUpdatable,
+        AbstractProvidesLocalProvenanceData):
     __slots__ = [
-        "__synapse_information"]
+        "__synapse_information",
+        "__delay_edge"]
 
     def __init__(
-            self, synapse_information, pre_vertex, post_vertex,
+            self, synapse_information, pre_vertex, post_vertex, app_edge,
             label=None, traffic_weight=1):
+        """
+        :param list(SynapseInformation) synapse_information:
+        :param PopulationMachineVertex pre_vertex:
+        :param PopulationMachineVertex post_vertex:
+        :param str label:
+        :param int traffic_weight:
+        """
         # pylint: disable=too-many-arguments
         super(ProjectionMachineEdge, self).__init__(
-            pre_vertex, post_vertex, label=label,
+            pre_vertex, post_vertex, label=label, app_edge=app_edge,
             traffic_weight=traffic_weight)
 
         self.__synapse_information = synapse_information
+        self.__delay_edge = None
+
+    @property
+    def delay_edge(self):
+        """ Get the matching delay edge of this edge
+
+        :rtype: DelayedMachineEdge or None
+        """
+        return self.__delay_edge
+
+    @delay_edge.setter
+    def delay_edge(self, delay_edge):
+        """ Set the matching delay edge of this edge
+
+        :param DelayMachineEdge delay_edge: The edge to set
+        """
+        self.__delay_edge = delay_edge
 
     @property
     def synapse_information(self):
+        """
+        :rtype: list(SynapseInformation)
+        """
         return self.__synapse_information
 
-    @overrides(AbstractFilterableEdge.filter_edge)
-    def filter_edge(self, graph_mapper):
-        # Filter one-to-one connections that are out of range
-        # Note: there may be other connectors stored on the same edge!
-        n_filtered = 0
-        for synapse_info in self.__synapse_information:
-            if isinstance(synapse_info.connector, OneToOneConnector):
-                pre_lo = graph_mapper.get_slice(self.pre_vertex).lo_atom
-                pre_hi = graph_mapper.get_slice(self.pre_vertex).hi_atom
-                post_lo = graph_mapper.get_slice(self.post_vertex).lo_atom
-                post_hi = graph_mapper.get_slice(self.post_vertex).hi_atom
-                if pre_hi < post_lo or pre_lo > post_hi:
-                    n_filtered += 1
-            elif isinstance(synapse_info.connector, FromListConnector):
-                pre_hi = graph_mapper.get_slice(self.pre_vertex).hi_atom
-                post_hi = graph_mapper.get_slice(self.post_vertex).hi_atom
-                pre_app_vertex = graph_mapper.get_application_vertex(
-                    self.pre_vertex)
-                post_app_vertex = graph_mapper.get_application_vertex(
-                    self.post_vertex)
-                pre_slices = graph_mapper.get_slices(pre_app_vertex)
-                post_slices = graph_mapper.get_slices(post_app_vertex)
-                # run through connection list and check for any connections
-                # between the pre and post vertices that could be filtered
-                n_connections = synapse_info.connector.get_n_connections(
-                    pre_slices, post_slices, pre_hi, post_hi)
-                if n_connections == 0:
-                    n_filtered += 1
-
-        return n_filtered == len(self.__synapse_information)
-
     @overrides(AbstractWeightUpdatable.update_weight)
-    def update_weight(self, graph_mapper):
-        pre_vertex = graph_mapper.get_application_vertex(
-            self.pre_vertex)
-        pre_vertex_slice = graph_mapper.get_slice(
-            self.pre_vertex)
+    def update_weight(self):
+        pre_vertex = self.pre_vertex.app_vertex
+        pre_vertex_slice = self.pre_vertex.vertex_slice
 
         weight = 0
         for synapse_info in self.__synapse_information:

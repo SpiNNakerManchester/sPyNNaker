@@ -16,38 +16,42 @@
  */
 
 /**
- *! \file
- *! \brief Fixed-Probability Connection generator implementation
+ * \file
+ * \brief Fixed-Probability Connection generator implementation
  */
 
 #include <synapse_expander/rng.h>
 #include <synapse_expander/generator_types.h>
 
-static initialize_func connection_generator_fixed_prob_initialise;
-static free_func connection_generator_fixed_prob_free;
-static generate_connection_func connection_generator_fixed_prob_generate;
+// Eclipse does *NOT* like this type!
+typedef unsigned long fract _probability_t;
 
-/**
- *! \brief The parameters that can be copied in from SDRAM
- */
+//! The parameters that can be copied in from SDRAM
 struct fixed_prob_params {
     uint32_t pre_lo;
     uint32_t pre_hi;
     uint32_t post_lo;
     uint32_t post_hi;
     uint32_t allow_self_connections;
-    unsigned long fract probability;
+    _probability_t probability;
 };
 
 /**
- *! \brief The data structure to be passed around for this connector.  This
- *!        includes the parameters and an RNG.
+ * \brief The data structure to be passed around for this connector.
+ *
+ * This includes the parameters and an RNG.
  */
 struct fixed_prob {
     struct fixed_prob_params params;
     rng_t rng;
 };
 
+/**
+ * \brief Initialise the fixed-probability connection generator
+ * \param[in,out] region: Region to read parameters from.  Should be updated
+ *                        to position just after parameters after calling.
+ * \return A data item to be passed in to other functions later on
+ */
 static void *connection_generator_fixed_prob_initialise(address_t *region) {
     // Allocate memory for the data
     struct fixed_prob *obj = spin1_malloc(sizeof(struct fixed_prob));
@@ -68,20 +72,41 @@ static void *connection_generator_fixed_prob_initialise(address_t *region) {
     return obj;
 }
 
-static void connection_generator_fixed_prob_free(void *data) {
-    struct fixed_prob *params = data;
+/**
+ * \brief Free the fixed-probability connection generator
+ * \param[in] generator: The generator to free
+ */
+static void connection_generator_fixed_prob_free(void *generator) {
+    struct fixed_prob *params = generator;
     rng_free(params->rng);
-    sark_free(data);
+    sark_free(generator);
 }
 
+/**
+ * \brief Generate connections with the fixed-probability connection generator
+ * \param[in] generator: The generator to use to generate connections
+ * \param[in] pre_slice_start: The start of the slice of the pre-population
+ *                             being generated
+ * \param[in] pre_slice_count: The number of neurons in the slice of the
+ *                             pre-population being generated
+ * \param[in] pre_neuron_index: The index of the neuron in the pre-population
+ *                              being generated
+ * \param[in] post_slice_start: The start of the slice of the post-population
+ *                              being generated
+ * \param[in] post_slice_count: The number of neurons in the slice of the
+ *                              post-population being generated
+ * \param[in] max_row_length: The maximum number of connections to generate
+ * \param[in,out] indices: An array into which the core-relative post-indices
+ *                         should be placed.  This will be initialised to be
+ *                         \p max_row_length in size
+ * \return The number of connections generated
+ */
 static uint32_t connection_generator_fixed_prob_generate(
-        void *data, uint32_t pre_slice_start, uint32_t pre_slice_count,
+        void *generator, UNUSED uint32_t pre_slice_start,
+        UNUSED uint32_t pre_slice_count,
         uint32_t pre_neuron_index, uint32_t post_slice_start,
         uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices) {
-    use(pre_slice_start);
-    use(pre_slice_count);
-
-    struct fixed_prob *obj = data;
+    struct fixed_prob *obj = generator;
 
     // If no space, generate nothing
     if (max_row_length < 1) {
@@ -110,7 +135,7 @@ static uint32_t connection_generator_fixed_prob_generate(
         }
 
         // Generate a random number
-        unsigned long fract value = ulrbits(rng_generator(obj->rng));
+        _probability_t value = ulrbits(rng_generator(obj->rng));
 
         // If less than our probability, generate a connection if possible
         if ((value <= obj->params.probability) &&

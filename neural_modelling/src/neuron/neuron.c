@@ -16,9 +16,7 @@
  */
 
 /*! \file
- *
  * \brief implementation of the neuron.h interface.
- *
  */
 
 #include "neuron.h"
@@ -26,9 +24,7 @@
 #include "implementations/neuron_impl.h"
 #include "plasticity/synapse_dynamics.h"
 #include <debug.h>
-
-// Spin1 API ticks - to know when the timer wraps
-extern uint ticks;
+#include <tdma_processing.h>
 
 //! The key to be used for this core (will be ORed with neuron ID)
 static key_t key;
@@ -40,19 +36,11 @@ static bool use_key;
 //! The number of neurons on the core
 static uint32_t n_neurons;
 
-//! The number of clock ticks between sending each spike
-static uint32_t time_between_spikes;
-
-//! The expected current clock tick of timer_1 when the next spike can be sent
-static uint32_t expected_time;
-
 //! The recording flags
 static uint32_t recording_flags = 0;
 
 //! parameters that reside in the neuron_parameter_data_region
 struct neuron_parameters {
-    uint32_t timer_start_offset;
-    uint32_t time_between_spikes;
     uint32_t has_key;
     uint32_t transmission_key;
     uint32_t n_neurons_to_simulate;
@@ -60,12 +48,14 @@ struct neuron_parameters {
     uint32_t incoming_spike_buffer_size;
 };
 
+//! Offset of start of global parameters, in words.
 #define START_OF_GLOBAL_PARAMETERS \
-    (sizeof(struct neuron_parameters) / sizeof(uint32_t))
+    ((sizeof(struct neuron_parameters) + \
+      sizeof(struct tdma_parameters)) / sizeof(uint32_t))
 
 //! \brief does the memory copy for the neuron parameters
 //! \param[in] address: the address where the neuron parameters are stored
-//! in SDRAM
+//!     in SDRAM
 //! \return bool which is true if the mem copy's worked, false otherwise
 static bool neuron_load_neuron_parameters(address_t address) {
     log_debug("loading parameters");
@@ -76,7 +66,6 @@ static bool neuron_load_neuron_parameters(address_t address) {
 }
 
 bool neuron_resume(address_t address) { // EXPORTED
-
     if (!neuron_recording_reset(n_neurons)){
         log_error("failed to reload the neuron recording parameters");
         return false;
@@ -86,23 +75,18 @@ bool neuron_resume(address_t address) { // EXPORTED
     return neuron_load_neuron_parameters(address);
 }
 
-//! \brief Set up the neuron models
-//! \param[in] address the absolute address in SDRAM for the start of the
-//!            NEURON_PARAMS data region in SDRAM
-//! \param[in] recording_flags_param the recordings parameters
-//!            (contains which regions are active and how big they are)
-//! \param[out] n_neurons_value The number of neurons this model is to emulate
-//! \return True is the initialisation was successful, otherwise False
-bool neuron_initialise(address_t address, address_t recording_address, // EXPORTED
+bool neuron_initialise(
+        address_t address, address_t recording_address, // EXPORTED
         uint32_t *n_neurons_value, uint32_t *n_synapse_types_value,
-        uint32_t *incoming_spike_buffer_size, uint32_t *timer_offset) {
+        uint32_t *incoming_spike_buffer_size, uint32_t *n_rec_regions_used) {
     log_debug("neuron_initialise: starting");
-    struct neuron_parameters *params = (void *) address;
 
-    *timer_offset = params->timer_start_offset;
-    time_between_spikes = params->time_between_spikes * sv->cpu_clk;
-    log_debug("\t back off = %u, time between spikes %u",
-            *timer_offset, time_between_spikes);
+    // init the TDMA
+    void *data_addr = address;
+    tdma_processing_initialise(&data_addr);
+
+    // cast left over SDRAM into neuron struct.
+    struct neuron_parameters *params = data_addr;
 
     // Check if there is a key to use
     use_key = params->has_key;
@@ -139,17 +123,15 @@ bool neuron_initialise(address_t address, address_t recording_address, // EXPORT
     }
 
     // setup recording region
-    if (!neuron_recording_initialise(recording_address, &recording_flags, n_neurons)) {
+    if (!neuron_recording_initialise(
+            recording_address, &recording_flags, n_neurons, n_rec_regions_used)) {
         return false;
     }
 
     return true;
 }
 
-//! \brief stores neuron parameter back into SDRAM
-//! \param[in] address: the address in SDRAM to start the store
 void neuron_pause(address_t address) { // EXPORTED
-
     /* Finalise any recordings that are in progress, writing back the final
      * amounts of samples recorded to SDRAM */
     if (recording_flags > 0) {
@@ -159,16 +141,13 @@ void neuron_pause(address_t address) { // EXPORTED
 
     // call neuron implementation function to do the work
     neuron_impl_store_neuron_parameters(
-        address, START_OF_GLOBAL_PARAMETERS, n_neurons);
+            address, START_OF_GLOBAL_PARAMETERS, n_neurons);
 }
 
-//! \executes all the updates to neural parameters when a given timer period
-//! has occurred.
-//! \param[in] time the timer tick  value currently being executed
-void neuron_do_timestep_update( // EXPORTED
-        timer_t time, uint timer_count, uint timer_period) {
-    // Set the next expected time to wait for between spike sending
-    expected_time = sv->cpu_clk * timer_period;
+void neuron_do_timestep_update(timer_t time, uint timer_count) { // EXPORTED
+
+    // the phase in this timer tick im in (not tied to neuron index)
+    tdma_processing_reset_phase();
 
     // Prepare recording for the next timestep
     neuron_recording_setup_for_next_recording();
@@ -181,7 +160,8 @@ void neuron_do_timestep_update( // EXPORTED
                 synapse_dynamics_get_intrinsic_bias(time, neuron_index);
 
         // call the implementation function (boolean for spike)
-        bool spike = neuron_impl_do_timestep_update(neuron_index, external_bias);
+        bool spike = neuron_impl_do_timestep_update(
+            neuron_index, external_bias);
 
         // If the neuron has spiked
         if (spike) {
@@ -191,19 +171,8 @@ void neuron_do_timestep_update( // EXPORTED
             synapse_dynamics_process_post_synaptic_event(time, neuron_index);
 
             if (use_key) {
-
-                // Wait until the expected time to send
-                while ((ticks == timer_count) &&
-                        (tc[T1_COUNT] > expected_time)) {
-                    // Do Nothing
-                }
-                expected_time -= time_between_spikes;
-
-                // Send the spike
-                while (!spin1_send_mc_packet(
-                        key | neuron_index, 0, NO_PAYLOAD)) {
-                    spin1_delay_us(1);
-                }
+                tdma_processing_send_packet(
+                    (key | neuron_index), 0, NO_PAYLOAD, timer_count);
             }
         } else {
             log_debug("the neuron %d has been determined to not spike",
@@ -211,9 +180,10 @@ void neuron_do_timestep_update( // EXPORTED
          }
     }
 
+    log_debug("time left of the timer after tdma is %d", tc[T1_COUNT]);
+
     // Disable interrupts to avoid possible concurrent access
-    uint cpsr = 0;
-    cpsr = spin1_int_disable();
+    uint cpsr = spin1_int_disable();
 
     // Record the recorded variables
     neuron_recording_record(time);

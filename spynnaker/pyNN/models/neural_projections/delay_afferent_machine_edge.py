@@ -16,29 +16,26 @@
 import logging
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.machine import MachineEdge
-from spynnaker.pyNN.models.abstract_models import (
-    AbstractWeightUpdatable, AbstractFilterableEdge)
+from spynnaker.pyNN.models.abstract_models import (AbstractWeightUpdatable)
 
 logger = logging.getLogger(__name__)
 
 
-class DelayAfferentMachineEdge(
-        MachineEdge, AbstractFilterableEdge, AbstractWeightUpdatable):
+class DelayAfferentMachineEdge(MachineEdge, AbstractWeightUpdatable):
     __slots__ = []
 
-    def __init__(self, pre_vertex, post_vertex, label, weight=1):
+    def __init__(self, pre_vertex, post_vertex, label, app_edge, weight=1):
+        """
+        :param PopulationMachineVertex pre_vertex:
+        :param DelayExtensionMachineVertex post_vertex:
+        :param str label:
+        :param DelayAfferentApplicationEdge app_edge:
+        :param int weight:
+        """
         super(DelayAfferentMachineEdge, self).__init__(
-            pre_vertex, post_vertex, label=label, traffic_weight=weight)
-
-    @overrides(AbstractFilterableEdge.filter_edge)
-    def filter_edge(self, graph_mapper):
-        pre_lo = graph_mapper.get_slice(self.pre_vertex).lo_atom
-        pre_hi = graph_mapper.get_slice(self.pre_vertex).hi_atom
-        post_lo = graph_mapper.get_slice(self.post_vertex).lo_atom
-        post_hi = graph_mapper.get_slice(self.post_vertex).hi_atom
-        return (pre_lo != post_lo) or (pre_hi != post_hi)
+            pre_vertex, post_vertex, label=label, app_edge=app_edge,
+            traffic_weight=weight)
 
     @overrides(AbstractWeightUpdatable.update_weight)
-    def update_weight(self, graph_mapper):
-        pre_vertex_slice = graph_mapper.get_slice(self.pre_vertex)
-        self._traffic_weight = pre_vertex_slice.n_atoms
+    def update_weight(self):
+        self._traffic_weight = self.pre_vertex.vertex_slice.n_atoms

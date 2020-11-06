@@ -34,7 +34,11 @@ class ArrayConnector(AbstractConnector):
         :param array:
             An explicit boolean matrix that specifies the connections\
             between the pre- and post-populations\
-            (see PyNN documentation)
+            (see PyNN documentation). Must be 2D in practice.
+        :type array: ~numpy.ndarray(2, ~numpy.uint8)
+        :param bool safe:
+        :param callable callback: Ignored
+        :param bool verbose:
         """
         super(ArrayConnector, self).__init__(safe, callback, verbose)
         self.__array = array
@@ -85,8 +89,7 @@ class ArrayConnector(AbstractConnector):
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
+            self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
             synapse_type, synapse_info):
         pre_neurons = []
         post_neurons = []
@@ -117,5 +120,4 @@ class ArrayConnector(AbstractConnector):
         return block
 
     def __repr__(self):
-        return "ArrayConnector({})".format(
-            self.__array)
+        return "ArrayConnector({})".format(self.__array)

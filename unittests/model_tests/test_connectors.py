@@ -17,6 +17,7 @@ from __future__ import print_function
 import functools
 import numpy
 import pytest
+import random
 from pacman.model.graphs.common import Slice
 from spynnaker.pyNN.models.neural_projections.connectors import (
     FixedNumberPreConnector, FixedNumberPostConnector,
@@ -90,8 +91,8 @@ def test_connectors(
     max_source = 0
     max_row_length = None
     max_col_length = None
-    for seed in range(1000):
-        numpy.random.seed(seed)
+    for seed in range(10):
+        numpy.random.seed(random.randint(0, 1000))
         connector = create_connector()
         mock_synapse_info = MockSynapseInfo(MockPopulation(n_pre, "Pre"),
                                             MockPopulation(n_post, "Post"),
@@ -130,8 +131,7 @@ def test_connectors(
             assert(max_col_length == connector.
                    get_n_connections_to_post_vertex_maximum(mock_synapse_info))
         synaptic_block = connector.create_synaptic_block(
-            pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
+            pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
             synapse_type, mock_synapse_info)
         source_histogram = numpy.histogram(
             synaptic_block["source"], pre_range)[0]
@@ -148,8 +148,7 @@ def test_connectors(
         if len(post_slices) > post_slice_index + 1:
             test_post_slice = post_slices[post_slice_index + 1]
             test_synaptic_block = connector.create_synaptic_block(
-                pre_slices, pre_slice_index, post_slices,
-                post_slice_index + 1, pre_vertex_slice, test_post_slice,
+                pre_slices, post_slices, pre_vertex_slice, test_post_slice,
                 synapse_type, mock_synapse_info)
             if len(test_synaptic_block) > 0:
                 assert not numpy.array_equal(
@@ -157,8 +156,7 @@ def test_connectors(
         if len(pre_slices) > pre_slice_index + 1:
             test_pre_slice = pre_slices[pre_slice_index + 1]
             test_synaptic_block = connector.create_synaptic_block(
-                pre_slices, pre_slice_index + 1, post_slices,
-                post_slice_index, test_pre_slice, post_vertex_slice,
+                pre_slices, post_slices, test_pre_slice, post_vertex_slice,
                 synapse_type, mock_synapse_info)
             if len(test_synaptic_block) > 0:
                 assert not numpy.array_equal(

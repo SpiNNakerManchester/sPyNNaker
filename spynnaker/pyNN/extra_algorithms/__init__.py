@@ -13,15 +13,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
-from spinn_front_end_common.utility_models import LivePacketGather
+from .graph_edge_weight_updater import GraphEdgeWeightUpdater
+from .on_chip_bit_field_generator import OnChipBitFieldGenerator
+from .spynnaker_data_specification_writer import (
+    SpynnakerDataSpecificationWriter)
+from .spynnaker_machine_bit_field_router_compressor import (
+    SpynnakerMachineBitFieldPairRouterCompressor,
+    SpynnakerMachineBitFieldUnorderedRouterCompressor)
 
-
-class TestLiveSpikeRecorder(unittest.TestCase):
-
-    def test_new_live_spike_recorder(self):
-        LivePacketGather(1000, 1, 1, 1, "")
-
-
-if __name__ == '__main__':
-    unittest.main()
+__all__ = ["GraphEdgeWeightUpdater", "OnChipBitFieldGenerator",
+           "SpynnakerDataSpecificationWriter",
+           "SpynnakerMachineBitFieldPairRouterCompressor",
+           "SpynnakerMachineBitFieldUnorderedRouterCompressor"]

@@ -19,7 +19,7 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 @add_metaclass(AbstractBase)
 class AbstractSpikeRecordable(object):
-    """ Indicates that spikes can be recorded from this object
+    """ Indicates that spikes can be recorded from this object.
     """
 
     __slots__ = ()
@@ -36,43 +36,50 @@ class AbstractSpikeRecordable(object):
     def set_recording_spikes(
             self, new_state=True, sampling_interval=None, indexes=None):
         """ Set spikes to being recorded. \
-            If new_state is false all other parameters are ignored.
+            If `new_state` is false all other parameters are ignored.
 
-        :param new_state: Set if the spikes are recording or not
-        :type new_state: bool
-        :param sampling_interval: The interval at which spikes are recorded.\
-            Must be a whole multiple of the timestep
-            None will be taken as the timestep
+        :param bool new_state: Set if the spikes are recording or not
+        :param sampling_interval: The interval at which spikes are recorded.
+            Must be a whole multiple of the timestep.
+            None will be taken as the timestep.
+        :type sampling_interval: int or None
         :param indexes: The indexes of the neurons that will record spikes.
             If None the assumption is all neurons are recording
+        :type indexes: list(int) or None
         """
 
     @abstractmethod
-    def clear_spike_recording(self, buffer_manager, placements, graph_mapper):
+    def clear_spike_recording(self, buffer_manager, placements):
         """ Clear the recorded data from the object
 
         :param buffer_manager: the buffer manager object
-        :param placements: the placements object
-        :param graph_mapper: the graph mapper object
+        :type buffer_manager:
+            ~spinn_front_end_common.interface.buffer_management.BufferManager
+        :param ~pacman.model.placements.Placements placements:
+            the placements object
         :rtype: None
         """
 
     @abstractmethod
-    def get_spikes(
-            self, placements, graph_mapper, buffer_manager, machine_time_step):
+    def get_spikes(self, placements, buffer_manager, machine_time_step):
         """ Get the recorded spikes from the object
 
-        :param placements: the placements object
-        :param graph_mapper: the graph mapper object
+        :param ~pacman.model.placements.Placements placements:
+            the placements object
         :param buffer_manager: the buffer manager object
-        :param machine_time_step: the time step of the simulation
+        :type buffer_manager:
+            ~spinn_front_end_common.interface.buffer_management.BufferManager
+        :param int machine_time_step:
+            the time step of the simulation, in microseconds
         :return: A numpy array of 2-element arrays of (neuron_id, time)\
-            ordered by time
+            ordered by time, one element per event
+        :rtype: ~numpy.ndarray(tuple(int,int))
         """
 
     @abstractmethod
     def get_spikes_sampling_interval(self):
         """ Return the current sampling interval for spikes
 
-        :return: Sampling interval in micro seconds
+        :return: Sampling interval in microseconds
+        :rtype: float
         """

@@ -34,7 +34,7 @@ _index_expr_context = SafeEval(math, numpy, arccos, arcsin, arctan, arctan2,
 
 
 class IndexBasedProbabilityConnector(AbstractConnector):
-    """ Make connections using a probability distribution which varies
+    """ Make connections using a probability distribution which varies\
         dependent upon the indices of the pre- and post-populations.
     """
 
@@ -47,15 +47,20 @@ class IndexBasedProbabilityConnector(AbstractConnector):
             self, index_expression, allow_self_connections=True, rng=None,
             safe=True, callback=None, verbose=False):
         """
-        :param `string` index_expression:
+        :param str index_expression:
             the right-hand side of a valid python expression for
             probability, involving the indices of the pre and post populations,
             that can be parsed by eval(), that computes a probability dist.
-        :param `bool` allow_self_connections:
-            if the connector is used to connect a
-            Population to itself, this flag determines whether a neuron is
-            allowed to connect to itself, or only to other neurons in the
-            Population.
+        :param bool allow_self_connections:
+            if the connector is used to connect a Population to itself, this
+            flag determines whether a neuron is allowed to connect to itself,
+            or only to other neurons in the Population.
+        :param rng:
+            Seeded random number generator, or None to make one when needed
+        :type rng: ~pyNN.random.NumpyRNG or None
+        :param bool safe:
+        :param callable callback: Ignored
+        :param bool verbose:
         """
         super(IndexBasedProbabilityConnector, self).__init__(
             safe, callback, verbose)
@@ -65,6 +70,9 @@ class IndexBasedProbabilityConnector(AbstractConnector):
         self.__probs = None
 
     def _update_probs_from_index_expression(self, synapse_info):
+        """
+        :param SynapseInformation synapse_info:
+        """
         # note: this only needs to be done once
         if self.__probs is None:
             # numpy array of probabilities using the index_expression
@@ -117,10 +125,8 @@ class IndexBasedProbabilityConnector(AbstractConnector):
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
+            self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
             synapse_type, synapse_info):
-
         # setup probs here
         self._update_probs_from_index_expression(synapse_info)
 
@@ -160,6 +166,12 @@ class IndexBasedProbabilityConnector(AbstractConnector):
 
     @property
     def allow_self_connections(self):
+        """ If the connector is used to connect a Population to itself, this\
+            flag determines whether a neuron is allowed to connect to itself,\
+            or only to other neurons in the Population.
+
+        :rtype: bool
+        """
         return self.__allow_self_connections
 
     @allow_self_connections.setter
@@ -168,6 +180,12 @@ class IndexBasedProbabilityConnector(AbstractConnector):
 
     @property
     def index_expression(self):
+        """ The right-hand side of a valid python expression for probability,\
+            involving the indices of the pre and post populations, that can\
+            be parsed by eval(), that computes a probability dist.
+
+        :rtype: str
+        """
         return self.__index_expression
 
     @index_expression.setter

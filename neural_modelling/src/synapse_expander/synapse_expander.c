@@ -16,8 +16,10 @@
  */
 
 /**
- *! \file
- *! \brief The synapse expander for neuron cores
+ * \dir
+ * \brief Implementation of the synapse expander and delay expander
+ * \file
+ * \brief The synapse expander for neuron cores
  */
 #include <neuron/regions.h>
 #include "matrix_generator.h"
@@ -29,6 +31,7 @@
 #include <debug.h>
 #include "common_mem.h"
 
+//! The configuration of the connection builder
 struct connection_builder_config {
     // the per-connector parameters
     uint32_t offset;
@@ -49,6 +52,7 @@ struct connection_builder_config {
     uint32_t delay_type;
 };
 
+//! The configuration of the synapse expander
 struct expander_config {
     uint32_t n_in_edges;
     uint32_t post_slice_start;
@@ -59,23 +63,24 @@ struct expander_config {
 };
 
 /**
- *! \brief Generate the synapses for a single connector
- *! \param[in/out] in_region The address to read the parameters from.  Should be
- *!                          updated to the position just after the parameters
- *!                          after calling.
- *! \param[in] synaptic_matrix_region The address of the synaptic matrices
- *! \param[in] post_slice_start The start of the slice of the post-population to
- *!                             generate for
- *! \param[in] post_slice_count The number of neurons to generate for
- *! \param[in] n_synapse_type_bits The number of bits in the synapse type
- *! \param[in] n_synapse_index_bits The number of bits for the neuron index id
- *! \param[in] weight_scales An array of weight scales, one for each synapse
- *!                          type
+ * \brief Generate the synapses for a single connector
+ * \param[in,out] in_region: The address to read the parameters from. Should be
+ *                           updated to the position just after the parameters
+ *                           after calling.
+ * \param[in] synaptic_matrix_region: The address of the synaptic matrices
+ * \param[in] post_slice_start: The start of the slice of the post-population to
+ *                              generate for
+ * \param[in] post_slice_count: The number of neurons to generate for
+ * \param[in] n_synapse_type_bits: The number of bits in the synapse type
+ * \param[in] n_synapse_index_bits: The number of bits for the neuron index id
+ * \param[in] weight_scales: An array of weight scales, one for each synapse
+ *                           type
+ * \return true on success, false on failure
  */
 static bool read_connection_builder_region(address_t *in_region,
         address_t synaptic_matrix_region, uint32_t post_slice_start,
         uint32_t post_slice_count, uint32_t n_synapse_type_bits,
-        uint32_t n_synapse_index_bits, uint32_t *weight_scales) {
+        uint32_t n_synapse_index_bits, unsigned long accum *weight_scales) {
     address_t region = *in_region;
     struct connection_builder_config config;
     fast_memcpy(&config, region, sizeof(config));
@@ -145,11 +150,11 @@ static bool read_connection_builder_region(address_t *in_region,
 }
 
 /**
- *! \brief Read the data for the expander
- *! \param[in] params_address The address of the expander parameters
- *! \param[in] synaptic_matrix_region The address of the synaptic matrices
- *! \return True if the expander finished correctly, False if there was an
- *!         error
+ * \brief Read the data for the expander
+ * \param[in] params_address: The address of the expander parameters
+ * \param[in] synaptic_matrix_region: The address of the synaptic matrices
+ * \return True if the expander finished correctly, False if there was an
+ *         error
  */
 static bool run_synapse_expander(
         address_t params_address, address_t synaptic_matrix_region) {
@@ -161,10 +166,10 @@ static bool run_synapse_expander(
             config.n_in_edges, config.post_slice_count, config.post_slice_start);
 
     // Read in the weight scales, one per synapse type
-    uint32_t weight_scales[config.n_synapse_types];
+    unsigned long accum weight_scales[config.n_synapse_types];
     fast_memcpy(weight_scales, params_address,
-            sizeof(uint32_t) * config.n_synapse_types);
-    params_address += config.n_synapse_types;
+            sizeof(unsigned long accum) * config.n_synapse_types);
+    params_address += 2 * config.n_synapse_types;
 
     // Go through each connector and generate
     for (uint32_t edge = 0; edge < config.n_in_edges; edge++) {
@@ -180,6 +185,7 @@ static bool run_synapse_expander(
     return true;
 }
 
+//! Entry point
 void c_main(void) {
     sark_cpu_state(CPU_STATE_RUN);
 

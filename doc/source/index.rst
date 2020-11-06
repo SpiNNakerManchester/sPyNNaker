@@ -25,7 +25,7 @@ Contents:
 .. toctree::
    :maxdepth: 4
 
-   spynnaker
+   modules
 
 
 Indices and tables

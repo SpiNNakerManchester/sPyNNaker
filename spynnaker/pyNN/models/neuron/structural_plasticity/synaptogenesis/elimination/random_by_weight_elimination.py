@@ -13,8 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from spinn_utilities.overrides import overrides
 from .abstract_elimination import AbstractElimination
-from pacman.model.decorators.overrides import overrides
 
 
 class RandomByWeightElimination(AbstractElimination):
@@ -31,16 +31,15 @@ class RandomByWeightElimination(AbstractElimination):
             self, threshold, prob_elim_depressed=0.0245,
             prob_elim_potentiated=1.36 * 10 ** -4):
         """
-
-        :param threshold:\
-            Below this weight is considered depression, above or equal to this\
-            weight is considered potentiation (or the static weight of the\
+        :param float threshold:
+            Below this weight is considered depression, above or equal to this
+            weight is considered potentiation (or the static weight of the
             connection on static weight connections)
-        :param prob_elim_depressed:\
-            The probability of elimination if the weight has been depressed\
+        :param float prob_elim_depressed:
+            The probability of elimination if the weight has been depressed
             (ignored on static weight connections)
-        :param prob_elim_potentiated:\
-            The probability of elimination of the weight has been potentiated\
+        :param float prob_elim_potentiated:
+            The probability of elimination of the weight has been potentiated
             or has not changed (and also used on static weight connections)
         """
         self.__prob_elim_depressed = prob_elim_depressed

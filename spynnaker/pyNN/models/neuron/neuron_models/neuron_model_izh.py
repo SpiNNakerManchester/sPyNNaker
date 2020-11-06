@@ -16,8 +16,9 @@ from spinn_front_end_common.utilities.constants import \
     MICRO_TO_MILLISECOND_CONVERSION
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
-from pacman.executor.injection_decorator import inject_items
 from .abstract_neuron_model import AbstractNeuronModel
+from spynnaker.pyNN.models.neuron.implementations import (
+    AbstractStandardNeuronComponent)
 
 A = 'a'
 B = 'b'
@@ -39,11 +40,22 @@ UNITS = {
 
 
 class NeuronModelIzh(AbstractNeuronModel):
+    """ Model of neuron due to Eugene M. Izhikevich et al
+    """
     __slots__ = [
         "__a", "__b", "__c", "__d", "__v_init", "__u_init", "__i_offset"
     ]
 
     def __init__(self, a, b, c, d, v_init, u_init, i_offset):
+        """
+        :param float a: :math:`a`
+        :param float b: :math:`b`
+        :param float c: :math:`c`
+        :param float d: :math:`d`
+        :param float v_init: :math:`v_{init}`
+        :param float u_init: :math:`u_{init}`
+        :param float i_offset: :math:`I_{offset}`
+        """
         super(NeuronModelIzh, self).__init__(
             [DataType.S1615,   # a
              DataType.S1615,   # b
@@ -62,12 +74,12 @@ class NeuronModelIzh(AbstractNeuronModel):
         self.__v_init = v_init
         self.__u_init = u_init
 
-    @overrides(AbstractNeuronModel.get_n_cpu_cycles)
+    @overrides(AbstractStandardNeuronComponent.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
         # A bit of a guess
         return 150 * n_neurons
 
-    @overrides(AbstractNeuronModel.add_parameters)
+    @overrides(AbstractStandardNeuronComponent.add_parameters)
     def add_parameters(self, parameters):
         parameters[A] = self.__a
         parameters[B] = self.__b
@@ -75,29 +87,29 @@ class NeuronModelIzh(AbstractNeuronModel):
         parameters[D] = self.__d
         parameters[I_OFFSET] = self.__i_offset
 
-    @overrides(AbstractNeuronModel.add_state_variables)
+    @overrides(AbstractStandardNeuronComponent.add_state_variables)
     def add_state_variables(self, state_variables):
         state_variables[V] = self.__v_init
         state_variables[U] = self.__u_init
 
-    @overrides(AbstractNeuronModel.get_units)
+    @overrides(AbstractStandardNeuronComponent.get_units)
     def get_units(self, variable):
         return UNITS[variable]
 
-    @overrides(AbstractNeuronModel.has_variable)
+    @overrides(AbstractStandardNeuronComponent.has_variable)
     def has_variable(self, variable):
         return variable in UNITS
 
-    @inject_items({"machine_time_step": "MachineTimeStep"})
-    @overrides(AbstractNeuronModel.get_global_values,
-               additional_arguments={'machine_time_step'})
-    def get_global_values(self, machine_time_step):
+    @overrides(AbstractNeuronModel.get_global_values)
+    def get_global_values(self, ts):
         # pylint: disable=arguments-differ
-        return [float(machine_time_step) / MICRO_TO_MILLISECOND_CONVERSION]
+        return [float(ts) / MICRO_TO_MILLISECOND_CONVERSION]
 
-    @inject_items({"ts": "MachineTimeStep"})
-    @overrides(AbstractNeuronModel.get_values, additional_arguments={'ts'})
+    @overrides(AbstractStandardNeuronComponent.get_values)
     def get_values(self, parameters, state_variables, vertex_slice, ts):
+        """
+        :param ts: machine time step
+        """
         # pylint: disable=arguments-differ
 
         # Add the rest of the data
@@ -107,7 +119,7 @@ class NeuronModelIzh(AbstractNeuronModel):
             float(ts) / MICRO_TO_MILLISECOND_CONVERSION
         ]
 
-    @overrides(AbstractNeuronModel.update_values)
+    @overrides(AbstractStandardNeuronComponent.update_values)
     def update_values(self, values, parameters, state_variables):
 
         # Decode the values
@@ -119,6 +131,10 @@ class NeuronModelIzh(AbstractNeuronModel):
 
     @property
     def a(self):
+        """ Settable model parameter: :math:`a`
+
+        :rtype: float
+        """
         return self.__a
 
     @a.setter
@@ -127,6 +143,10 @@ class NeuronModelIzh(AbstractNeuronModel):
 
     @property
     def b(self):
+        """ Settable model parameter: :math:`b`
+
+        :rtype: float
+        """
         return self.__b
 
     @b.setter
@@ -135,6 +155,10 @@ class NeuronModelIzh(AbstractNeuronModel):
 
     @property
     def c(self):
+        """ Settable model parameter: :math:`c`
+
+        :rtype: float
+        """
         return self.__c
 
     @c.setter
@@ -143,6 +167,10 @@ class NeuronModelIzh(AbstractNeuronModel):
 
     @property
     def d(self):
+        """ Settable model parameter: :math:`d`
+
+        :rtype: float
+        """
         return self.__d
 
     @d.setter
@@ -151,6 +179,10 @@ class NeuronModelIzh(AbstractNeuronModel):
 
     @property
     def i_offset(self):
+        """ Settable model parameter: :math:`I_{offset}`
+
+        :rtype: float
+        """
         return self.__i_offset
 
     @i_offset.setter
@@ -159,6 +191,10 @@ class NeuronModelIzh(AbstractNeuronModel):
 
     @property
     def v_init(self):
+        """ Settable model parameter: :math:`v_{init}`
+
+        :rtype: float
+        """
         return self.__v_init
 
     @v_init.setter
@@ -167,6 +203,10 @@ class NeuronModelIzh(AbstractNeuronModel):
 
     @property
     def u_init(self):
+        """ Settable model parameter: :math:`u_{init}`
+
+        :rtype: float
+        """
         return self.__u_init
 
     @u_init.setter

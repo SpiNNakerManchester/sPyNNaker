@@ -51,26 +51,23 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
     'sphinx.ext.autosummary',
-    'sphinx.ext.intersphinx'
+    'sphinx.ext.intersphinx',
+    'sphinx.ext.mathjax'
 ]
 
-ds_link = 'http://dataspecification.readthedocs.io/en/latest/'
-fe_link = 'http://spinnfrontendcommon.readthedocs.io/en/latest/'
-
-intersphinx_mapping = {'spinn_machine':
-                       ('http://spinnmachine.readthedocs.io/en/latest/',
-                           None),
-                       'spinn_storage_handlers':
-                           ('http://spinnmachine.readthedocs.io/en/latest/',
-                            None),
-                       'spinnman':
-                           ('http://spinnman.readthedocs.io/en/latest/',
-                            None),
-                       'pacman': ('http://pacman.readthedocs.io/en/latest/',
-                                  None),
-                       'data_specification': (ds_link, None),
-                       'spinn_front_end_common': (fe_link, None)
-                       }
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/3.6', None),
+    'numpy': ("https://numpy.org/doc/stable/", None),
+    'pynn': ("http://neuralensemble.org/docs/PyNN/", None),
+    'spinn_utilities': ('https://spinnutils.readthedocs.io/en/latest/', None),
+    'spinn_machine': ('https://spinnmachine.readthedocs.io/en/latest/', None),
+    'spinnman': ('https://spinnman.readthedocs.io/en/latest/', None),
+    'pacman': ('https://pacman.readthedocs.io/en/latest/', None),
+    'data_specification': (
+        'https://dataspecification.readthedocs.io/en/latest/', None),
+    'spinn_front_end_common': (
+        'https://spinnfrontendcommon.readthedocs.io/en/latest/', None)
+}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -220,6 +217,7 @@ html_static_path = ['_static']
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'sPyNNakerdoc'
 
+mathjax_path = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -384,4 +382,36 @@ for f in os.listdir("."):
     if (os.path.isfile(f) and f.endswith(
             ".rst") and f != "index.rst" and f != "modules.rst"):
         os.remove(f)
-apidoc.main([None, '-o', ".", "../../spynnaker"])
+apidoc.main([None, '-o', ".", "../../spynnaker",
+             "../../spynnaker/pyNN/connections/[a-z]*.py",
+             "../../spynnaker/pyNN/external_devices_models/push_bot/*/[a-z]*.py",
+             "../../spynnaker/pyNN/external_devices_models/push_bot/a*.py",
+             "../../spynnaker/pyNN/external_devices_models/[a-oq-z]*.py",
+             "../../spynnaker/pyNN/models/abstract_models/[a-z]*.py",
+             "../../spynnaker/pyNN/models/common/[a-qs-z]*.py",
+             "../../spynnaker/pyNN/models/neural_projections/[abd-z]*.py",
+             "../../spynnaker/pyNN/models/neural_projections/connectors/[a-z]*.py",
+             "../../spynnaker/pyNN/models/neural_properties/[a-z]*.py",
+             "../../spynnaker/pyNN/models/neuron/additional_inputs/[a-z]*.py",
+             "../../spynnaker/pyNN/models/neuron/builds/[a-z]*.py",
+             "../../spynnaker/pyNN/models/neuron/implementations/[a-z]*.py",
+             "../../spynnaker/pyNN/models/neuron/input_types/[a-z]*.py",
+             "../../spynnaker/pyNN/models/neuron/master_pop_table_generators/[a-z]*.py",
+             "../../spynnaker/pyNN/models/neuron/neuron_models/[a-z]*.py",
+             "../../spynnaker/pyNN/models/neuron/plasticity/stdp/*/[a-z]*.py",
+             "../../spynnaker/pyNN/models/neuron/structural_plasticity/synaptogenesis/*/[a-z]*.py",
+             "../../spynnaker/pyNN/models/neuron/synapse_dynamics/[a-z]*.py",
+             "../../spynnaker/pyNN/models/neuron/synapse_io/[a-z]*.py",
+             "../../spynnaker/pyNN/models/neuron/synapse_types/[a-z]*.py",
+             "../../spynnaker/pyNN/models/neuron/threshold_types/[a-z]*.py",
+             "../../spynnaker/pyNN/models/neuron/abstract*.py",
+             "../../spynnaker/pyNN/models/neuron/population_machine*.py",
+             "../../spynnaker/pyNN/models/neuron/synaptic_manager.py",
+             "../../spynnaker/pyNN/models/neuron/[cg]*.py",
+             "../../spynnaker/pyNN/models/spike_source/*[eny].py",
+             "../../spynnaker/pyNN/models/utility_models/*/[a-z]*.py",
+             "../../spynnaker/pyNN/models/abstract_p*.py",
+             "../../spynnaker/pyNN/overridden_*/[a-z]*.py",
+             "../../spynnaker/pyNN/protocols/m*.py",
+             "../../spynnaker/pyNN/utilities/ra*/[a-z]*.py",
+             ])

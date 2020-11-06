@@ -22,11 +22,15 @@ from .abstract_generate_on_machine import (
     AbstractGenerateOnMachine, MatrixGeneratorID)
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 
 class SynapseDynamicsStatic(
         AbstractStaticSynapseDynamics, AbstractSettable,
         AbstractChangableAfterRun, AbstractGenerateOnMachine):
+    """ The dynamics of a synapse that does not change over time.
+    """
+
     __slots__ = [
         # Indicates if a change that has been made requires mapping
         "__change_requires_mapping",
@@ -38,6 +42,11 @@ class SynapseDynamicsStatic(
         "__delay"]
 
     def __init__(self, weight=0.0, delay=1.0, pad_to_length=None):
+        """
+        :param float weight:
+        :param float delay:
+        :param int pad_to_length:
+        """
         self.__change_requires_mapping = True
         self.__weight = weight
         self.__delay = delay
@@ -82,7 +91,7 @@ class SynapseDynamicsStatic(
     @overrides(AbstractStaticSynapseDynamics.get_static_synaptic_data)
     def get_static_synaptic_data(
             self, connections, connection_row_indices, n_rows,
-            post_vertex_slice, n_synapse_types):
+            post_vertex_slice, n_synapse_types, max_n_synapses):
         # pylint: disable=too-many-arguments
         n_neuron_id_bits = get_n_bits(post_vertex_slice.n_atoms)
         neuron_id_mask = (1 << n_neuron_id_bits) - 1
@@ -99,16 +108,22 @@ class SynapseDynamicsStatic(
              neuron_id_mask))
         fixed_fixed_rows = self.convert_per_connection_data_to_rows(
             connection_row_indices, n_rows,
-            fixed_fixed.view(dtype="uint8").reshape((-1, 4)))
-        ff_size = self.get_n_items(fixed_fixed_rows, 4)
+            fixed_fixed.view(dtype="uint8").reshape((-1, BYTES_PER_WORD)),
+            max_n_synapses)
+        ff_size = self.get_n_items(fixed_fixed_rows, BYTES_PER_WORD)
         if self.__pad_to_length is not None:
             # Pad the data
-            fixed_fixed_rows = self._pad_row(fixed_fixed_rows, 4)
+            fixed_fixed_rows = self._pad_row(fixed_fixed_rows, BYTES_PER_WORD)
         ff_data = [fixed_row.view("uint32") for fixed_row in fixed_fixed_rows]
 
         return ff_data, ff_size
 
     def _pad_row(self, rows, no_bytes_per_connection):
+        """
+        :param list(~numpy.ndarray) rows:
+        :param int no_bytes_per_connection:
+        :rtype: list(~numpy.ndarray)
+        """
         padded_rows = []
         for row in rows:  # Row elements are (individual) bytes
             padded_rows.append(
@@ -154,7 +169,7 @@ class SynapseDynamicsStatic(
         return connections
 
     @property
-    @overrides(AbstractChangableAfterRun.requires_mapping)
+    @overrides(AbstractChangableAfterRun.requires_mapping, extend_doc=False)
     def requires_mapping(self):
         """ True if changes that have been made require that mapping be\
             performed.  Note that this should return True the first time it\
@@ -163,7 +178,7 @@ class SynapseDynamicsStatic(
         """
         return self.__change_requires_mapping
 
-    @overrides(AbstractChangableAfterRun.mark_no_changes)
+    @overrides(AbstractChangableAfterRun.mark_no_changes, extend_doc=False)
     def mark_no_changes(self):
         """ Marks the point after which changes are reported.  Immediately\
             after calling this method, requires_mapping should return False.
@@ -172,8 +187,6 @@ class SynapseDynamicsStatic(
 
     @overrides(AbstractSettable.get_value)
     def get_value(self, key):
-        """ Get a property
-        """
         if hasattr(self, key):
             return getattr(self, key)
         raise InvalidParameterType(
@@ -181,11 +194,6 @@ class SynapseDynamicsStatic(
 
     @overrides(AbstractSettable.set_value)
     def set_value(self, key, value):
-        """ Set a property
-
-        :param key: the name of the parameter to change
-        :param value: the new value of the parameter to assign
-        """
         if hasattr(self, key):
             setattr(self, key, value)
             self.__change_requires_mapping = True
@@ -223,3 +231,8 @@ class SynapseDynamicsStatic(
     @overrides(AbstractStaticSynapseDynamics.set_delay)
     def set_delay(self, delay):
         self.__delay = delay
+
+    @property
+    @overrides(AbstractStaticSynapseDynamics.pad_to_length)
+    def pad_to_length(self):
+        return self.__pad_to_length

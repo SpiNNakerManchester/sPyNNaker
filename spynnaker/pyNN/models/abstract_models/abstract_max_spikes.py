@@ -18,17 +18,28 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
 @add_metaclass(AbstractBase)
-class AbstractFilterableEdge(object):
-    """ An edge that can be filtered
+class AbstractMaxSpikes(object):
+    """ Indicates a class (most likely a MachineVertex) that can describe the
+        maximun rate that it sends spikes.
+
+        The SynapticManager assumes that all machine vertexes share the same
+        synapse_information will have the same rates
     """
 
     __slots__ = ()
 
     @abstractmethod
-    def filter_edge(self, graph_mapper):
-        """ Determine if this edge should be filtered out
+    def max_spikes_per_ts(self, machine_time_step):
+        """
+        Get maximum expected number of spikes per timestep
+        :param int machine_time_step: The timestime used in ms
+        """
 
-        :param graph_mapper: the mapper between graphs
-        :return: True if the edge should be filtered
-        :rtype: bool
+    @abstractmethod
+    def max_spikes_per_second(self):
+        """ Get maximum expected number of spikes per second
+
+        :param str variable: the variable to find units from
+        :return: the units as a string.
+        :rtype: str
         """

@@ -52,15 +52,27 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
             tau_syn_I=5.0, tau_refrac=0.1, i_offset=0.0, v=0.0,
             isyn_exc=0.0, isyn_inh=0.0):
         """
-        :param devices:\
-            The AbstractMulticastControllableDevice instances to be controlled\
+        :param list(AbstractMulticastControllableDevice) devices:
+            The AbstractMulticastControllableDevice instances to be controlled
             by the population
-        :param create_edges:\
-            True if edges to the devices should be added by this device (set\
+        :param bool create_edges:
+            True if edges to the devices should be added by this device (set
             to False if using the device over Ethernet using a translator)
-        :param translator:\
-            Translator to be used when used for Ethernet communication.  Must\
+        :param translator:
+            Translator to be used when used for Ethernet communication.  Must
             be provided if the device is to be controlled over Ethernet.
+        :type translator: AbstractEthernetTranslator or None
+        :param float tau_m: (defaulted LIF neuron parameter)
+        :param float cm: (defaulted LIF neuron parameter)
+        :param float v_rest: (defaulted LIF neuron parameter)
+        :param float v_reset: (defaulted LIF neuron parameter)
+        :param float tau_syn_E: (defaulted LIF neuron parameter)
+        :param float tau_syn_I: (defaulted LIF neuron parameter)
+        :param float tau_refrac: (defaulted LIF neuron parameter)
+        :param float i_offset: (defaulted LIF neuron parameter)
+        :param float v: (defaulted LIF neuron state variable init)
+        :param float isyn_exc: (defaulted LIF neuron state variable init)
+        :param float isyn_inh: (defaulted LIF neuron state variable init)
         """
         # pylint: disable=too-many-arguments, too-many-locals
 
@@ -87,13 +99,16 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
     @overrides(AbstractPyNNNeuronModelStandard.create_vertex)
     def create_vertex(
             self, n_neurons, label, constraints, spikes_per_second,
-            ring_buffer_sigma, incoming_spike_buffer_size):
+            ring_buffer_sigma, incoming_spike_buffer_size,
+            n_steps_per_timestep, drop_late_spikes):
         if n_neurons != len(self._devices):
             raise ConfigurationException(
                 "Number of neurons does not match number of devices in {}"
                 .format(label))
+        self._model.n_steps_per_timestep = n_steps_per_timestep
         max_atoms = self.get_max_atoms_per_core()
         return ExternalDeviceLifControlVertex(
             self._devices, self._create_edges, max_atoms, self._model, self,
             self._translator, spikes_per_second, label, ring_buffer_sigma,
-            incoming_spike_buffer_size, constraints)
+            incoming_spike_buffer_size, constraints,
+            drop_late_spikes)

@@ -18,8 +18,9 @@ from six import with_metaclass
 from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.neuron.implementations import (
-    AbstractStandardNeuronComponent, Struct)
+    AbstractStandardNeuronComponent)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spynnaker.pyNN.utilities.struct import Struct
 
 
 # with_metaclass due to https://github.com/benjaminp/six/issues/219
@@ -32,12 +33,14 @@ class AbstractNeuronModel(
 
     def __init__(self, data_types, global_data_types=None):
         """
-        :param data_types:\
-            A list of data types in the neuron structure, in the order that\
+        :param list(~data_specification.enums.DataType) data_types:
+            A list of data types in the neuron structure, in the order that
             they appear
-        :param global_data_types:\
-            A list of data types in the neuron global structure, in the order\
+        :param global_data_types:
+            A list of data types in the neuron global structure, in the order
             that they appear
+        :type global_data_types:
+            list(~data_specification.enums.DataType) or None
         """
         super(AbstractNeuronModel, self).__init__(data_types)
         if global_data_types is None:
@@ -47,6 +50,8 @@ class AbstractNeuronModel(
     @property
     def global_struct(self):
         """ Get the global parameters structure
+
+        :rtype: ~spynnaker.pyNN.utilities.struct.Struct
         """
         return self.__global_struct
 
@@ -64,19 +69,20 @@ class AbstractNeuronModel(
         return usage + (self.__global_struct.get_size_in_whole_words() *
                         BYTES_PER_WORD)
 
-    def get_global_values(self):
+    def get_global_values(self, ts):  # pylint: disable=unused-argument
         """ Get the global values to be written to the machine for this model
 
+        :param float ts: The time to advance the model at each call
         :return: A list with the same length as self.global_struct.field_types
-        :rtype: A list of single values
+        :rtype: list(int or float) or ~numpy.ndarray
         """
         return numpy.zeros(0, dtype="uint32")
 
     @overrides(AbstractStandardNeuronComponent.get_data)
-    def get_data(self, parameters, state_variables, vertex_slice):
+    def get_data(self, parameters, state_variables, vertex_slice, ts):
         super_data = super(AbstractNeuronModel, self).get_data(
-            parameters, state_variables, vertex_slice)
-        values = self.get_global_values()
+            parameters, state_variables, vertex_slice, ts)
+        values = self.get_global_values(ts)
         global_data = self.__global_struct.get_data(values)
         return numpy.concatenate([global_data, super_data])
 

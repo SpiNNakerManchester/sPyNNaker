@@ -20,7 +20,8 @@ from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
 from spinnman.messages.eieio.data_messages import EIEIODataHeader
 from spynnaker.pyNN.models.common import recording_utils
-from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_front_end_common.utilities.constants import (
+    BYTES_PER_WORD, MICRO_TO_MILLISECOND_CONVERSION)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 _ONE_WORD = struct.Struct("<I")
@@ -38,6 +39,9 @@ class EIEIOSpikeRecorder(object):
 
     @property
     def record(self):
+        """
+        :rtype: bool
+        """
         return self.__record
 
     @record.setter
@@ -46,34 +50,64 @@ class EIEIOSpikeRecorder(object):
         self.__record = new_state
 
     def set_recording(self, new_state, sampling_interval=None):
+        """
+        :param new_state: bool
+        :param sampling_interval: not supported functionality
+        """
         if sampling_interval is not None:
             logger.warning("Sampling interval currently not supported for "
                            "SpikeSourceArray so being ignored")
         self.__record = new_state
 
     def get_dtcm_usage_in_bytes(self):
+        """
+        :rtype: int
+        """
         if not self.__record:
             return 0
         return BYTES_PER_WORD
 
     def get_n_cpu_cycles(self, n_neurons):
+        """
+        :rtype: int
+        """
         if not self.__record:
             return 0
         return n_neurons * 4
 
-    def get_spikes(self, label, buffer_manager, region,
-                   placements, graph_mapper, application_vertex,
-                   base_key_function, machine_time_step):
+    def get_spikes(self, label, buffer_manager, region, placements,
+                   application_vertex, base_key_function, machine_time_step):
+        """ Get the recorded spikes from the object
+
+        :param str label:
+        :param buffer_manager: the buffer manager object
+        :type buffer_manager:
+            ~spinn_front_end_common.interface.buffer_management.BufferManager
+        :param int region:
+        :param ~pacman.model.placements.Placements placements:
+            the placements object
+        :param application_vertex:
+        :type application_vertex:
+            ~pacman.model.graphs.application.ApplicationVertex
+        :param int machine_time_step:
+            the time step of the simulation, in microseconds
+        :param base_key_function:
+        :type base_key_function:
+            callable(~pacman.model.graphs.machine.MachineVertex,int)
+        :return: A numpy array of 2-element arrays of (neuron_id, time)
+            ordered by time, one element per event
+        :rtype: ~numpy.ndarray(tuple(int,int))
+        """
         # pylint: disable=too-many-arguments
         results = list()
         missing = []
-        ms_per_tick = machine_time_step / 1000.0
-        vertices = graph_mapper.get_machine_vertices(application_vertex)
+        ms_per_tick = machine_time_step / MICRO_TO_MILLISECOND_CONVERSION
+        vertices = application_vertex.machine_vertices
         progress = ProgressBar(vertices,
                                "Getting spikes for {}".format(label))
         for vertex in progress.over(vertices):
             placement = placements.get_placement_of_vertex(vertex)
-            vertex_slice = graph_mapper.get_slice(vertex)
+            vertex_slice = vertex.vertex_slice
 
             # Read the spikes
             n_buffer_times = 0
@@ -85,7 +119,7 @@ class EIEIOSpikeRecorder(object):
                         # assuming this must be a single integer
                         n_buffer_times += 1
 
-            if (n_buffer_times > 0):
+            if n_buffer_times > 0:
                 raw_spike_data, data_missing = \
                     buffer_manager.get_data_by_placement(placement, region)
                 if data_missing:
@@ -107,6 +141,13 @@ class EIEIOSpikeRecorder(object):
     @staticmethod
     def _process_spike_data(
             vertex_slice, spike_data, ms_per_tick, base_key, results):
+        """
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :param bytearray spike_data:
+        :param int ms_per_tick:
+        :param int base_key:
+        :param list(~numpy.ndarray) results:
+        """
         number_of_bytes_written = len(spike_data)
         offset = 0
         while offset < number_of_bytes_written:

@@ -46,24 +46,27 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
             self, d_expression, allow_self_connections=True, safe=True,
             callback=None, verbose=False, n_connections=None, rng=None):
         """
-        :param d_expression:\
-            the right-hand side of a valid python expression for\
-            probability, involving 'd', e.g. "exp(-abs(d))", or "d<3",\
-            that can be parsed by eval(), that computes the distance\
+        :param str d_expression:
+            the right-hand side of a valid python expression for
+            probability, involving 'd', e.g. "exp(-abs(d))", or "d<3",
+            that can be parsed by eval(), that computes the distance
             dependent distribution.
-        :type d_expression: str
-        :param allow_self_connections:\
-            if the connector is used to connect a Population to itself, this\
-            flag determines whether a neuron is allowed to connect to itself,\
+        :param bool allow_self_connections:
+            if the connector is used to connect a Population to itself, this
+            flag determines whether a neuron is allowed to connect to itself,
             or only to other neurons in the Population.
-        :type d_expression: bool
-        :param space:\
-            a Space object, needed if you wish to specify distance-dependent\
+        :param ~pyNN.space.Space space:
+            a Space object, needed if you wish to specify distance-dependent
             weights or delays.
-        :type space: pyNN.Space
-        :param n_connections:\
+        :param bool safe:
+        :param callable callback: Ignored
+        :param bool verbose:
+        :param n_connections:
             The number of efferent synaptic connections per neuron.
         :type n_connections: int or None
+        :param rng:
+            Seeded random number generator, or None to make one when needed
+        :type rng: ~pyNN.random.NumpyRNG or None
         """
         # pylint: disable=too-many-arguments
         super(DistanceDependentProbabilityConnector, self).__init__(
@@ -83,6 +86,9 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
         self._set_probabilities(synapse_info)
 
     def _set_probabilities(self, synapse_info):
+        """
+        :param SynapseInformation synapse_info:
+        """
         # Set the probabilities up-front for now
         # TODO: Work out how this can be done statistically
         expand_distances = self._expand_distances(self.__d_expression)
@@ -152,10 +158,8 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
+            self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
             synapse_type, synapse_info):
-
         probs = self.__probs[
             pre_vertex_slice.as_slice, post_vertex_slice.as_slice].reshape(-1)
         n_items = pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms
@@ -191,6 +195,9 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
 
     @property
     def allow_self_connections(self):
+        """
+        :rtype: bool
+        """
         return self.__allow_self_connections
 
     @allow_self_connections.setter
@@ -199,6 +206,10 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
 
     @property
     def d_expression(self):
+        """ The distance expression.
+
+        :rtype: str
+        """
         return self.__d_expression
 
     @d_expression.setter

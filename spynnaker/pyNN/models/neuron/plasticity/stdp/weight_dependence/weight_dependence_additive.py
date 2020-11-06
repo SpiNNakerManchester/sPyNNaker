@@ -24,22 +24,37 @@ _SPACE_PER_SYNAPSE_TYPE = 4 * BYTES_PER_WORD
 
 class WeightDependenceAdditive(
         AbstractHasAPlusAMinus, AbstractWeightDependence):
+    """ An additive weight dependence STDP rule.
+    """
+
     __slots__ = [
         "__w_max",
         "__w_min"]
 
     # noinspection PyPep8Naming
     def __init__(self, w_min=0.0, w_max=1.0):
+        """
+        :param float w_min: :math:`w^{min}`
+        :param float w_max: :math:`w^{max}`
+        """
         super(WeightDependenceAdditive, self).__init__()
         self.__w_min = w_min
         self.__w_max = w_max
 
     @property
     def w_min(self):
+        """ :math:`w^{min}`
+
+        :rtype: float
+        """
         return self.__w_min
 
     @property
     def w_max(self):
+        """ :math:`w^{max}`
+
+        :rtype: float
+        """
         return self.__w_max
 
     @overrides(AbstractWeightDependence.is_same_as)
@@ -54,6 +69,10 @@ class WeightDependenceAdditive(
 
     @property
     def vertex_executable_suffix(self):
+        """ The suffix to be appended to the vertex executable for this rule
+
+        :rtype: str
+        """
         return "additive"
 
     @overrides(AbstractWeightDependence.get_parameters_sdram_usage_in_bytes)
@@ -88,6 +107,11 @@ class WeightDependenceAdditive(
 
     @property
     def weight_maximum(self):
+        """ The maximum weight that will ever be set in a synapse as a result\
+            of this rule
+
+        :rtype: float
+        """
         return self.__w_max
 
     @overrides(AbstractWeightDependence.get_parameter_names)
