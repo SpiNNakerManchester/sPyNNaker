@@ -23,7 +23,7 @@ on: [push]
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     # Note: Python is needed for spinn_utilities.make_tools when building
     strategy:
       matrix:
