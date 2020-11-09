@@ -29,7 +29,7 @@ class AbstractPushBotRetinaDevice(
         """
         :param protocol:
         :type protocol:
-            MunichIOEthernetProtocol or MunichIoSpiNNakerLinkProtocol
+            MunichIoEthernetProtocol or MunichIoSpiNNakerLinkProtocol
         :param PushBotRetinaResolution resolution:
         """
         self._protocol = protocol

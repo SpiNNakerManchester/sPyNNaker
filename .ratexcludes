@@ -9,3 +9,10 @@
 **/neural_modelling/builds/**/*.txt
 **/.nojekyll
 **/*.tag
+**/SpiNNUtils/**
+**/SpiNNMachine/**
+**/SpiNNMan/**
+**/PACMAN/**
+**/DataSpecification/**
+**/spalloc/**
+**/SpiNNFrontEndCommon/**

@@ -68,7 +68,7 @@ class SynapseDynamicsSTDP(
         :param AbstractTimingDependence timing_dependence:
         :param AbstractWeightDependence weight_dependence:
         :param None voltage_dependence: not supported
-        :param flooat dendritic_delay_fraction: [0.5, 1.0]
+        :param float dendritic_delay_fraction: [0.5, 1.0]
         :param float weight:
         :param float delay:
         :param pad_to_length:
