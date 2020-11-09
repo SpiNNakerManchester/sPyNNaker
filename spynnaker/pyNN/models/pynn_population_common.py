@@ -79,7 +79,7 @@ class PyNNPopulationCommon(object):
             How do we constrain where to put things on SpiNNaker
         :param model: What neuron model is being run by this population
         :type model:
-            AbstractPyNNModel or
+            ~spynnaker.pyNN.models.AbstractPyNNModel or
             ~pacman.model.graphs.application.ApplicationVertex
         :param structure: How the neurons are arranged in space
         :type structure: ~pyNN.space.BaseStructure or None

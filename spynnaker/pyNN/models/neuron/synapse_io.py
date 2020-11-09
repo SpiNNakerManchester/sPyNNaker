@@ -366,16 +366,19 @@ class SynapseIORowBased(object):
             Whether to generate undelayed data
         :param bool gen_delayed:
             Whether to generate delayed data
-        :return: (row_data, delayed_row_data, delayed_source_ids, stages) where
-            - row_data is the undelayed connectivity data arranged into a row
-              per source, each row the same length
-            - delayed_row_data is the delayed connectivity data arranged into a
-              row per source per delay stage, each row the same length
-            - delayed_source_ids is the machine-vertex-local source neuron id
-              of each connection of the delayed vertices
-            - stages is the delay stage of each delayed connection
+        :return:
+            (``row_data``, ``delayed_row_data``, ``delayed_source_ids``,
+            ``stages``) where:
+
+            * ``row_data`` is the undelayed connectivity data arranged into a
+                row per source, each row the same length
+            * ``delayed_row_data`` is the delayed connectivity data arranged
+                into a row per source per delay stage, each row the same length
+            * ``delayed_source_ids`` is the machine-vertex-local source neuron
+                id of each connection of the delayed vertices
+            * ``stages`` is the delay stage of each delayed connection
         :rtype:
-            tuple(~numpy.ndarray, ~numpy.ndarray, ~numpy.ndarray,\
+            tuple(~numpy.ndarray, ~numpy.ndarray, ~numpy.ndarray,
             ~numpy.ndarray)
         """
         # pylint: disable=too-many-arguments, too-many-locals
@@ -563,7 +566,7 @@ class SynapseIORowBased(object):
             The total number of synapse types available
         :param list(float) weight_scales:
             A weight scale for each synapse type
-        :param MachineEdge machine_edge:
+        :param ~pacman.model.graphs.machine.MachineEdge machine_edge:
             The incoming machine edge that the synapses were generated from
         :param MaxRowInfo max_row_info:
             The maximum information for each of the rows

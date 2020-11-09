@@ -15,6 +15,7 @@
 
 from .abstract_accepts_incoming_synapses import AbstractAcceptsIncomingSynapses
 from .abstract_contains_units import AbstractContainsUnits
+from .abstract_has_delay_stages import AbstractHasDelayStages
 from .abstract_max_spikes import AbstractMaxSpikes
 from .abstract_population_initializable import AbstractPopulationInitializable
 from .abstract_population_settable import AbstractPopulationSettable
@@ -26,6 +27,7 @@ from .abstract_synapse_expandable import (
 from .abstract_weight_updatable import AbstractWeightUpdatable
 
 __all__ = ["AbstractAcceptsIncomingSynapses", "AbstractContainsUnits",
+           "AbstractHasDelayStages",
            "AbstractMaxSpikes", "AbstractPopulationInitializable",
            "AbstractPopulationSettable", "AbstractReadParametersBeforeSet",
            "AbstractSettable", "AbstractSynapseExpandable",
