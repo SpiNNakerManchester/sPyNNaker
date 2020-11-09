@@ -63,7 +63,7 @@ jobs:
       run: python setup.py install
       working-directory: SpiNNUtils
         
-    - name: Install vera++ and doxygen
+    - name: Install Ubuntu dependencies
       run: sudo apt-get update && sudo apt-get install vera++ doxygen gcc-arm-none-eabi --fix-missing
     
     - name: Lint C code using Vera++
