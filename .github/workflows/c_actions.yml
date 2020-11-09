@@ -44,11 +44,6 @@ jobs:
         repository: SpiNNakerManchester/SupportScripts
         path: support
         
-    - name: Set GITHUB_BRANCH
-      # This step can not be merged with Checkout Spinnaker Dependencies
-      run: |
-        echo "GITHUB_BRANCH=$(echo ${GITHUB_REF#refs/heads/} | tr / -)" >> $GITHUB_ENV
-        
     - name: Set SPINN_DIRS and NEURAL_MODELLING
       run: |
         echo "Set SPINN_DIRS to $PWD/spinnaker_tools"
