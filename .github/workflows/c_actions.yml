@@ -63,13 +63,8 @@ jobs:
       run: python setup.py install
       working-directory: SpiNNUtils
         
-    - name: Install arm-none-eabi-gcc
-      uses: fiam/arm-none-eabi-gcc@v1.0.2
-      with:
-        release: '9-2019-q4' # The arm-none-eabi-gcc release to use.
-            
     - name: Install vera++ and doxygen
-      run: sudo apt-get update && sudo apt-get install vera++ doxygen --fix-missing
+      run: sudo apt-get update && sudo apt-get install vera++ doxygen gcc-arm-none-eabi --fix-missing
     
     - name: Lint C code using Vera++
       # Note: run this before building to avoid linting modified_src directories
