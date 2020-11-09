@@ -35,7 +35,7 @@ class AbstractSynapseDynamicsStructural(object):
         :param int n_neurons:
         :return: the size of the parameters, in bytes
         :rtype: int
-        :raises PacmanInvalidParameterException
+        :raises PacmanInvalidParameterException:
         """
 
     @abstractmethod
