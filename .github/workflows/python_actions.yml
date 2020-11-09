@@ -146,7 +146,8 @@ jobs:
         support/rat.sh run
 
     - name: Build documentation with sphinx
-      if: matrix.python-version == 3.6
+      # TODO turn sphinx back on
+      if: matrix.python-version == 13.6
       run: |
         cd doc/source
         sphinx-build -W -T -E -b html -d _build/doctrees-readthedocsdirhtml -D language=en . _build/html
