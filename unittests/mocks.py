@@ -107,6 +107,7 @@ class MockSimulator(object):
                                   "enable_buffered_recording": "False"}
         self.config["MasterPopTable"] = {"generator": "BinarySearch"}
         self.config["Reports"] = {"n_profile_samples": 0}
+        self.config["Synapses"] = {"use_expander": True}
 
     def add_population(self, pop):
         pass
