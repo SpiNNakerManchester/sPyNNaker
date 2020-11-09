@@ -44,9 +44,7 @@ class DelaySupportAdder(object):
     __slots__ = [
         "_app_to_delay_map",
         "_delay_post_edge_map",
-        "_delay_pre_edges",
-        "_app_edge_min_delay",
-        "_delay_edge_mapping"]
+        "_delay_pre_edges"]
 
     INVALID_SPLITTER_FOR_DELAYS_ERROR_MSG = (
         "The app vertex {} with splitter {} does not support delays and yet "
@@ -70,8 +68,6 @@ class DelaySupportAdder(object):
         self._app_to_delay_map = dict()
         self._delay_post_edge_map = dict()
         self._delay_pre_edges = list()
-        self._app_edge_min_delay = dict()
-        self._delay_edge_mapping = dict()
 
     def __call__(self, app_graph, machine_time_step, user_max_delay):
         """ adds the delay extensions to the app graph, now that all the
@@ -211,15 +207,8 @@ class DelaySupportAdder(object):
         """
 
         # get max delay required
-        self._app_edge_min_delay[app_edge] = max(
+        max_delay_needed = max(
             synapse_info.synapse_dynamics.get_delay_maximum(
-                synapse_info.connector, synapse_info)
-            for synapse_info in synapse_infos)
-        max_delay_needed = self._app_edge_min_delay[app_edge]
-
-        # store min delay for later lookup
-        self._app_edge_min_delay[app_edge] = min(
-            synapse_info.synapse_dynamics.get_delay_minimum(
                 synapse_info.connector, synapse_info)
             for synapse_info in synapse_infos)
 
