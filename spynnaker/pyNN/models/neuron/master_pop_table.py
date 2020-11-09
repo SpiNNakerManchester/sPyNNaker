@@ -608,7 +608,7 @@ class MasterPopTableAsBinarySearch(object):
         """ Write padding to the data spec needed between blocks to align
             addresses correctly
 
-        :param ~.DataSpecificationGenerator spec:
+        :param ~data_specification.DataSpecificationGenerator spec:
             The spec to write to
         :param int next_block_start_address:
             The address we are starting at

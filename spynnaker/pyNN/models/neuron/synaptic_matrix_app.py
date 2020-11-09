@@ -100,7 +100,7 @@ class SynapticMatrixApp(object):
             synaptic_matrix_region, direct_matrix_region):
         """
 
-        :param SynapseIO synapse_io: The reader and writer of synapses
+        :param SynapseIORowBased synapse_io: The reader and writer of synapses
         :param MasterPopTableAsBinarySearch poptable:
             The master population table
         :param SynapseInformation synapse_info:
@@ -289,7 +289,7 @@ class SynapticMatrixApp(object):
             Application-level routing key information for undelayed vertices
         :param _AppKeyInfo delay_app_key_info:
             Application-level routing key information for delayed vertices
-        :param RoutingInfo routing_info:
+        :param ~pacman.model.routing_info.RoutingInfo routing_info:
             Routing key information for all incoming edges
         :param list(float) weight_scales:
             Weight scale for each synapse edge
@@ -320,7 +320,7 @@ class SynapticMatrixApp(object):
             machine_time_step):
         """ Write a synaptic matrix from host
 
-        :param DataSpecificationGenerator spec:
+        :param ~data_specification.DataSpecificationGenerator spec:
             The specification to write to
         :param int block_addr:
             The address in the synaptic matrix region to start writing at
@@ -639,8 +639,10 @@ class SynapticMatrixApp(object):
     def get_connections(self, transceiver, placement):
         """ Get the connections for this matrix from the machine
 
-        :param Transceiver transceiver: How to read the data from the machine
-        :param Placement placement: Where the matrix is on the machine
+        :param ~spinnman.transceiver.Transceiver transceiver:
+            How to read the data from the machine
+        :param ~pacman.model.placements.Placement placement:
+            Where the matrix is on the machine
         :return: A list of arrays of connections, each with dtype
             AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
         :rtype: ~numpy.ndarray
@@ -675,8 +677,10 @@ class SynapticMatrixApp(object):
     def read_generated_connection_holders(self, transceiver, placement):
         """ Read any pre-run connection holders after data has been generated
 
-        :param Transceiver transceiver: How to read the data from the machine
-        :param Placement placement: Where the matrix is on the machine
+        :param ~spinnman.transceiver.Transceiver transceiver:
+            How to read the data from the machine
+        :param ~pacman.model.placements.Placement placement:
+            Where the matrix is on the machine
         """
         if self.__synapse_info.pre_run_connection_holders:
             connections = self.get_connections(transceiver, placement)
@@ -759,7 +763,8 @@ class SynapticMatrixApp(object):
         """ Get the index in the master population table of the matrix for a
             machine edge
 
-        :param machine_edge: The edge to get the index for
+        :param ~pacman.model.graph.machine.MachineEdge machine_edge:
+            The edge to get the index for
         :rtype: int
         """
         # If there is an app-level index, it will be the same for all machine
@@ -773,7 +778,8 @@ class SynapticMatrixApp(object):
         """ Get the index in the master population table of the delayed matrix
             for a machine edge
 
-        :param machine_edge: The edge to get the index for
+        :param ~pacman.model.graph.machine.MachineEdge machine_edge:
+            The edge to get the index for
         :rtype: int
         """
         # If there is an app-level index, it will be the same for all machine

@@ -713,8 +713,10 @@ class SynapticManager(object):
             self, transceiver, placements, app_edge, synapse_info):
         """ Read the connections from the machine for a given projection
 
-        :param Transceiver transceiver: Used to read the data from the machine
-        :param Placements placements: Where the vertices are on the machine
+        :param ~spinnman.transciever.Transceiver transceiver:
+            Used to read the data from the machine
+        :param ~pacman.model.placements.Placements placements:
+            Where the vertices are on the machine
         :param ProjectionApplicationEdge app_edge:
             The application edge of the projection
         :param SynapseInformation synapse_info:
@@ -778,8 +780,10 @@ class SynapticManager(object):
         """ Fill in any pre-run connection holders for data which is generated
             on the machine, after it has been generated
 
-        :param Transceiver transceiver: How to read the data from the machine
-        :param Placement placement: where the data is to be read from
+        :param ~spinnman.transceiver.Transceiver transceiver:
+            How to read the data from the machine
+        :param ~pacman.model.placements.Placement placement:
+            where the data is to be read from
         """
         matrices = self.__get_synaptic_matrices(placement.vertex.vertex_slice)
         matrices.read_generated_connection_holders(transceiver, placement)

@@ -573,7 +573,7 @@ class SynapseIORowBased(object):
             The total number of synapse types available
         :param list(float) weight_scales:
             A weight scale for each synapse type
-        :param MachineEdge machine_edge:
+        :param ~pacman.model.graphs.machine.MachineEdge machine_edge:
             The incoming machine edge that the synapses were generated from
         :param MaxRowInfo max_row_info:
             The maximum information for each of the rows
