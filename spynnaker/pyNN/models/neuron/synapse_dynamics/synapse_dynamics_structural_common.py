@@ -89,7 +89,8 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         """
         return 1. / self.f_rew
 
-    @overrides(AbstractSynapseDynamicsStructural.write_structural_parameters)
+    @overrides(AbstractSynapseDynamicsStructural.write_structural_parameters,
+               extend_doc=False)
     def write_structural_parameters(
             self, spec, region, machine_time_step, weight_scales,
             machine_graph, machine_vertex, routing_info, synaptic_matrices):
@@ -103,11 +104,12 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         :type weight_scales: ~numpy.ndarray or list(float)
         :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
             Full machine level network
-        :param MachineVertex machine_vertex:
+        :param AbstractPopulationVertex machine_vertex:
             the vertex for which data specs are being prepared
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
             All of the routing information on the network
         :param SynapticMatrices synaptic_matrices:
+            The synaptic matrices for this vertex
         """
         spec.comment("Writing structural plasticity parameters")
         spec.switch_write_focus(region)
@@ -424,24 +426,24 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
 
     @abstractproperty
     def connections(self):
-        """
-        initial connectivity as defined via connector
-        :rtype dict:
+        """ initial connectivity as defined via connector
+
+        :rtype: dict
         """
 
     @abstractmethod
     def get_seeds(self, app_vertex=None):
-        """
-        Generate a seed for the RNG on chip that is the same for all
-        of the cores that have perform structural updates.
+        """ Generate a seed for the RNG on chip that is the same for all\
+            of the cores that have perform structural updates.
 
         It should be different between application vertices
-            but the same for the same app_vertex
-        It should be different every time called with None
+        but the same for the same app_vertex.
+        It should be different every time called with None.
 
         :param app_vertex:
         :type app_vertex: ApplicationVertex or None
         :return: list of random seed (4 words), generated randomly
+        :rtype: list(int)
         """
 
     def check_initial_delay(self, max_delay_ms):
