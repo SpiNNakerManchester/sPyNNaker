@@ -51,6 +51,11 @@ class DelaySupportAdder(object):
         "requires a delay support for edge {}. Please use a Splitter which "
         "utilises the AbstractSpynnakerSplitterDelay interface.")
 
+    DELAYS_NOT_SUPPORTED_SPLITTER = (
+        "The app vertex {} with splitter {} does not support delays and yet "
+        "requires a delay support for edge {}. Please use a Splitter which "
+        "does not have accepts_edges_from_delay_vertex turned off.")
+
     NOT_SUPPORTED_DELAY_ERROR_MSG = (
         "The maximum delay {} for projection {} is not supported "
         "by the splitter {} (max supported delay of the splitter is {} and "
@@ -223,6 +228,11 @@ class DelaySupportAdder(object):
             raise DelayExtensionException(
                 self.INVALID_SPLITTER_FOR_DELAYS_ERROR_MSG.format(
                     app_edge.post_vertex, post_splitter, app_edge))
+        if post_splitter.accepts_edges_from_delay_vertex():
+            raise DelayExtensionException(
+                self.DELAYS_NOT_SUPPORTED_SPLITTER.format(
+                    app_edge.post_vertex, post_splitter, app_edge))
+
         post_vertex_max_delay = (
                 app_edge.post_vertex.splitter.max_support_delay() *
                 (machine_time_step / MICRO_TO_MILLISECOND_CONVERSION))
