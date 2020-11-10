@@ -22,7 +22,6 @@ on: [push]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -36,6 +35,7 @@ jobs:
 
     - name: Checkout
       uses: actions/checkout@v2
+
     - name: Checkout SupportScripts
       uses: actions/checkout@v2
       with:
@@ -54,7 +54,7 @@ jobs:
 
     - name: Install -pip
       run: |
-        python -m pip install --upgrade pip
+        python -m pip install --upgrade pip setuptools wheel
         pip install 'pylint<2.5' python-coveralls 'coverage>=4.4,<5.0'
 
     - name: Install SpiNNUtils
@@ -97,47 +97,42 @@ jobs:
 
     - name: Preinstall requirements (2.7 Only)
       if: matrix.python-version == 2.7
-      run: |
-        pip install -r requirements.txt
+      run: pip install -r requirements.txt
 
     - name: Setup
-      run: |
-        python setup.py develop
+      run: python setup.py develop
 
     - name: Install requirements-test
-      run: |
-        pip install -r requirements-test.txt
+      run: pip install -r requirements-test.txt
 
     - name: Create a spynnaker.cfg
       run: |
         echo '[Machine]' > ~/.spynnaker.cfg
         echo "machineName = $SPINNAKER_BOARD_ADDRESS" >> ~/.spynnaker.cfg
-        echo "version = ${SPINNAKER_BOARD_VERSION:-5}" >> ~/.spynnaker.cfg
+        echo "version = $SPINNAKER_BOARD_VERSION" >> ~/.spynnaker.cfg
         echo '[Database]' >> ~/.spynnaker.cfg
         echo '[Simulation]' >> ~/.spynnaker.cfg
         echo '[Buffers]' >> ~/.spynnaker.cfg
+      env:
+        SPINNAKER_BOARD_ADDRESS: spinn-4.cs.man.ac.uk
+        SPINNAKER_BOARD_VERSION: 5
 
     - name: Test with pytest and coverage
       if: matrix.python-version == 3.6
-      run: |
-        pytest unittests --cov spynnaker
+      run: pytest unittests --cov spynnaker
 
     - name: Test with pytest
       if: matrix.python-version != 3.6
-      run: |
-        pytest unittests
+      run: pytest unittests
 
     - name: Lint with flake8
-      run: |
-        # run flake8
-        flake8 spynnaker unittests
+      run: flake8 spynnaker unittests
 
     - name: Lint with pylint
       # Broken in 2.7 as it can not find data_specification.exceptions
       if: matrix.python-version != 2.7
       # Note that there's special conditioning of the return code of pylint
-      run: |
-        pylint --output-format=colorized --disable=R,C spynnaker || exit $(($? & 35))
+      run: pylint --output-format=colorized --disable=R,C spynnaker || exit $(($? & 35))
 
     - name: Run rat copyright enforcement
       if: matrix.python-version == 3.6
@@ -146,13 +141,9 @@ jobs:
         support/rat.sh run
 
     - name: Build documentation with sphinx
-      # TODO turn sphinx back on
-      if: matrix.python-version == 13.6
-      run: |
-        cd doc/source
-        sphinx-build -W -T -E -b html -d _build/doctrees-readthedocsdirhtml -D language=en . _build/html
-        sphinx-build -W -T -b json -d _build/doctrees-json -D language=en . _build/json
-        sphinx-build -W -T -b singlehtml -d _build/doctrees-readthedocssinglehtmllocalmedia -D language=en . _build/localmedia
+      if: matrix.python-version == 3.6
+      run: sphinx-build -W -T -E -b html -d _build/doctrees-readthedocsdirhtml -D language=en . _build/html
+      working-directory: doc/source
 
     - name: Run coveralls and report coverage
       if: matrix.python-version == 3.6
