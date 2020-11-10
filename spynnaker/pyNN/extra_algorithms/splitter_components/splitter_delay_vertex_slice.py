@@ -19,7 +19,7 @@ from pacman.exceptions import (
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint, FixedVertexAtomsConstraint,
-    SameAtomsAsVertexConstraint, AbstractPartitionerConstraint)
+    AbstractPartitionerConstraint)
 from pacman.model.graphs.machine import MachineEdge
 from pacman.model.partitioner_splitters.abstract_splitters.\
     abstract_dependent_splitter import AbstractDependentSplitter

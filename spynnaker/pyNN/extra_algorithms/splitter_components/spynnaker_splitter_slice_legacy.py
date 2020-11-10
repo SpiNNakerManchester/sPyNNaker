@@ -12,9 +12,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from pacman.model.graphs.machine import MachineEdge
+
 from pacman.model.partitioner_splitters import SplitterSliceLegacy
-from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
     AbstractSpynnakerSplitterDelay)
 
