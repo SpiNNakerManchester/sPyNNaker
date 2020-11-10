@@ -18,8 +18,8 @@ from enum import Enum
 import numpy
 from six import with_metaclass
 
-from spinn_front_end_common.utilities import globals_variables, \
-    helpful_functions
+from spinn_front_end_common.utilities import (
+    globals_variables, helpful_functions)
 from spinn_utilities.abstract_base import abstractproperty, AbstractBase
 from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD

@@ -20,11 +20,12 @@ import logging
 import numpy
 from six import iteritems, itervalues
 
-from spinn_front_end_common.interface.interface_functions import \
-    HostExecuteDataSpecification
-from spinn_front_end_common.interface.interface_functions.host_execute_data_specification import \
-    filter_out_system_executables, _MEM_REGIONS, system_cores, \
-    filter_out_app_executables
+from spinn_front_end_common.interface.interface_functions import (
+    HostExecuteDataSpecification)
+from spinn_front_end_common.interface.interface_functions. \
+    host_execute_data_specification import (
+        filter_out_app_executables, MEM_REGIONS, system_cores,
+        filter_out_system_executables)
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
 from data_specification import DataSpecificationExecutor
@@ -32,12 +33,9 @@ from data_specification.exceptions import DataSpecificationException
 from spinn_front_end_common.interface.ds.ds_write_info import DsWriteInfo
 from spinn_front_end_common.utilities.helpful_functions import (
     write_address_to_user0)
-from spinn_front_end_common.utilities.utility_objs import (
-    ExecutableType, DataWritten)
+from spinn_front_end_common.utilities.utility_objs import DataWritten
 from spinn_front_end_common.utilities.helpful_functions import (
     emergency_recover_states_from_failure)
-from spinn_front_end_common.utilities import globals_variables, \
-    helpful_functions
 from spinn_utilities.timer import Timer
 from spynnaker.pyNN.models.neuron import PopulationMachineVertex
 from spynnaker.pyNN.models.utility_models.delays import \
@@ -237,17 +235,11 @@ class SpyNNakerHostExecuteDataSpecification(HostExecuteDataSpecification):
             raise
 
     def __set_router_timeouts(self):
-        config = globals_variables.get_simulator().config
-        n_channels = helpful_functions.read_config_int(
-            config, "SpinnMan", "multi_packets_in_flight_n_channels")
-        intermediate_channel_waits = helpful_functions.read_config_int(
-            config, "SpinnMan", "multi_packets_in_flight_channel_waits")
         for receiver in itervalues(self._core_to_conn_map):
             receiver.load_system_routing_tables(
                 self._txrx, self._monitors, self._placements)
             receiver.set_cores_for_data_streaming(
-                self._txrx, self._monitors, self._placements,
-                n_channels, intermediate_channel_waits)
+                self._txrx, self._monitors, self._placements)
 
     def __reset_router_timeouts(self):
         # reset router timeouts
@@ -316,7 +308,7 @@ class SpyNNakerHostExecuteDataSpecification(HostExecuteDataSpecification):
 
             vertex = self._placements.get_vertex_on_processor(x, y, p)
 
-            for region_id in _MEM_REGIONS:
+            for region_id in MEM_REGIONS:
                 region = executor.get_region(region_id)
                 if region is not None:
                     total_sizes[(x, y, p, region_id)] = \
@@ -559,7 +551,7 @@ class SpyNNakerHostExecuteDataSpecification(HostExecuteDataSpecification):
         matrix_size, connection_builder_size = self.__get_extra_sizes(
             machine_vertex, executor)
 
-        for region_id in _MEM_REGIONS:
+        for region_id in MEM_REGIONS:
             region = executor.get_region(region_id)
             if region is not None:
                 total_size += region.max_write_pointer
@@ -567,7 +559,7 @@ class SpyNNakerHostExecuteDataSpecification(HostExecuteDataSpecification):
         time_total = datetime.timedelta()
         timer = Timer()
         # Write each region
-        for region_id in _MEM_REGIONS:
+        for region_id in MEM_REGIONS:
             region = executor.get_region(region_id)
             if region is None:
                 continue
