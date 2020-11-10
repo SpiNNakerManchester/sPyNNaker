@@ -387,7 +387,7 @@ class SpyNNakerHostExecuteDataSpecification(HostExecuteDataSpecification):
             executable_targets, placements, report_folder=None,
             java_caller=None, processor_to_app_data_base_address=None):
         """ Execute the data specs for all system targets.
-
+        :param Placements placements: placements
         :param ~spinnman.transceiver.Transceiver transceiver:
             the spinnman instance
         :param ~spinn_machine.Machine machine:

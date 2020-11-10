@@ -88,6 +88,7 @@
             <param_name>dsg_targets</param_name>
             <param_name>uses_advanced_monitors</param_name>
             <param_name>placements</param_name>
+            <token part="SystemBinariesLoaded">BinariesLoaded</token>
         </required_inputs>
         <optional_inputs>
             <param_name>report_folder</param_name>
@@ -108,6 +109,71 @@
             <param_type>TimeToUseIO</param_type>
             <token part="DSGDataLoaded">DataLoaded</token>
             <token part="DSGAppDataLoaded">DataLoaded</token>
+        </outputs>
+    </algorithm>
+    <algorithm name="SpyNNakerHostExecuteSystemDataSpecification">
+        <python_module>spynnaker.pyNN.extra_algorithms</python_module>
+        <python_class>SpyNNakerHostExecuteDataSpecification</python_class>
+        <python_method>execute_system_data_specs</python_method>
+        <input_definitions>
+            <parameter>
+                <param_name>transceiver</param_name>
+                <param_type>MemoryTransceiver</param_type>
+            </parameter>
+            <parameter>
+                <param_name>machine</param_name>
+                <param_type>MemoryExtendedMachine</param_type>
+            </parameter>
+            <parameter>
+                <param_name>app_id</param_name>
+                <param_type>APPID</param_type>
+            </parameter>
+            <parameter>
+                <param_name>dsg_targets</param_name>
+                <param_type>DataSpecificationTargets</param_type>
+            </parameter>
+            <parameter>
+                <param_name>executable_targets</param_name>
+                <param_type>ExecutableTargets</param_type>
+            </parameter>
+            <parameter>
+                <param_name>report_folder</param_name>
+                <param_type>ReportFolder</param_type>
+            </parameter>
+             <parameter>
+                <param_name>java_caller</param_name>
+                <param_type>JavaCaller</param_type>
+            </parameter>
+            <parameter>
+                <param_name>processor_to_app_data_base_address</param_name>
+                <param_type>ProcessorToAppDataBaseAddress</param_type>
+            </parameter>
+            <parameter>
+                <param_name>region_sizes</param_name>
+                <param_type>RegionSizes</param_type>
+            </parameter>
+            <parameter>
+                <param_name>placements</param_name>
+                <param_type>MemoryPlacements</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>transceiver</param_name>
+            <param_name>machine</param_name>
+            <param_name>app_id</param_name>
+            <param_name>dsg_targets</param_name>
+            <param_name>executable_targets</param_name>
+            <param_name>region_sizes</param_name>
+            <param_name>placements</param_name>
+        </required_inputs>
+        <optional_inputs>
+            <param_name>report_folder</param_name>
+            <param_name>java_caller</param_name>
+            <param_name>processor_to_app_data_base_address</param_name>
+        </optional_inputs>
+        <outputs>
+            <param_type>ProcessorToAppDataBaseAddress</param_type>
+            <token part="DSGSystemDataLoaded">DataLoaded</token>
         </outputs>
     </algorithm>
     <algorithm name="SynapseExpander">
