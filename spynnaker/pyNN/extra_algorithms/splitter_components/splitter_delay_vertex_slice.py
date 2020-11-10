@@ -270,8 +270,7 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
         utility_calls.check_algorithm_can_support_constraints(
             constrained_vertices=[self._governed_app_vertex],
             supported_constraints=[
-                MaxVertexAtomsConstraint, FixedVertexAtomsConstraint,
-                SameAtomsAsVertexConstraint],
+                MaxVertexAtomsConstraint, FixedVertexAtomsConstraint],
             abstract_constraint_type=AbstractPartitionerConstraint)
 
     @overrides(AbstractDependentSplitter.machine_vertices_for_recording)
