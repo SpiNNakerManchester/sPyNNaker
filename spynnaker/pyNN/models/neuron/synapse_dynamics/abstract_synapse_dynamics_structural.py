@@ -29,13 +29,15 @@ class AbstractSynapseDynamicsStructural(object):
         Note: At the Application level this will be an estimate.
 
         :param graph: Graph at same level as vertex.
-        :type graph: ApplicationGraph or MachineGraph
+        :type graph: ~pacman.model.graphs.application.ApplicationGraph or
+            ~pacman.model.graphs.machine.MachineGraph
         :param vertex: Vertex at the same level as the graph
-        :type vertex: ApplicationVertex or MachineVertex
+        :type vertex: ~pacman.model.graphs.application.ApplicationVertex or
+            ~pacman.model.graphs.machine.MachineVertex
         :param int n_neurons:
         :return: the size of the parameters, in bytes
         :rtype: int
-        :raises PacmanInvalidParameterException
+        :raises PacmanInvalidParameterException:
         """
 
     @abstractmethod

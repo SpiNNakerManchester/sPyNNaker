@@ -150,14 +150,15 @@ class SpikeSourcePoissonVertex(
             max_rate=None, splitter=None):
         """
         :param int n_neurons:
-        :param constraints:
+        :param iterable(~pacman.model.constraints.AbstractConstraint) \
+                constraints:
         :param str label:
         :param float seed:
         :param int max_atoms_per_core:
-        :param model:
-        :param iterable of float rate:
-        :param iterable of int start:
-        :param iterable of int duration:
+        :param SpikeSourcePoisson model:
+        :param iterable(float) rate:
+        :param iterable(int) start:
+        :param iterable(int) duration:
         :param splitter:
         """
         # pylint: disable=too-many-arguments
@@ -543,9 +544,9 @@ class SpikeSourcePoissonVertex(
         """ Reserve memory regions for Poisson source parameters and output\
             buffer.
 
-        :param ~data_specification.DataSpecification spec:
+        :param ~data_specification.DataSpecificationGenerator spec:
             the data specification writer
-        :param ~pacman.models.placements.Placement placement:
+        :param ~pacman.model.placements.Placement placement:
             the location this vertex resides on in the machine
         :return: None
         """

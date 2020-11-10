@@ -333,7 +333,7 @@ class MasterPopTableAsBinarySearch(object):
     def get_master_population_table_size(self, in_edges):
         """ Get the size of the master population table in SDRAM
 
-        :param iterable(~pacman.model.graphs.application.ApplicationEdge)
+        :param iterable(~pacman.model.graphs.application.ApplicationEdge) \
                 in_edges:
             The edges arriving at the vertex that are to be handled by this
             table
@@ -608,7 +608,7 @@ class MasterPopTableAsBinarySearch(object):
         """ Write padding to the data spec needed between blocks to align
             addresses correctly
 
-        :param ~.DataSpecificationGenerator spec:
+        :param ~data_specification.DataSpecificationGenerator spec:
             The spec to write to
         :param int next_block_start_address:
             The address we are starting at

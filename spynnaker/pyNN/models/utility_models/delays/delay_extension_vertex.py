@@ -24,6 +24,7 @@ from spinn_front_end_common.abstract_models import (
 from spinn_front_end_common.abstract_models.impl import (
     TDMAAwareApplicationVertex)
 from spynnaker.pyNN.exceptions import DelayExtensionException
+from spynnaker.pyNN.models.abstract_models import AbstractHasDelayStages
 from .delay_block import DelayBlock
 from .delay_generator_data import DelayGeneratorData
 from spynnaker.pyNN.utilities.constants import (
@@ -33,7 +34,7 @@ logger = logging.getLogger(__name__)
 
 
 class DelayExtensionVertex(
-        TDMAAwareApplicationVertex,
+        TDMAAwareApplicationVertex, AbstractHasDelayStages,
         AbstractProvidesOutgoingPartitionConstraints):
     """ Provide delays to incoming spikes in multiples of the maximum delays\
         of a neuron (typically 16 or 32)
@@ -104,12 +105,8 @@ class DelayExtensionVertex(
         return max_slots * delay_ticks_at_post_vertex
 
     @property
+    @overrides(AbstractHasDelayStages.n_delay_stages)
     def n_delay_stages(self):
-        """ The maximum number of delay stages required by any connection\
-            out of this delay extension vertex
-
-        :rtype: int
-        """
         return self.__n_delay_stages
 
     def set_new_n_delay_stages_and_delay_per_stage(
