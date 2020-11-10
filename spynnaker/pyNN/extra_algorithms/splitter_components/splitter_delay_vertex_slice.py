@@ -48,9 +48,7 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
     """
 
     __slots__ = [
-        "_machine_vertex_by_slice",
-        "_delayed_mac_edge_to_undelayed_map",
-        "_delayed_vertex_to_un_delayed_edge"]
+        "_machine_vertex_by_slice"]
 
     ESTIMATED_CPU_CYCLES = 128
     WORDS_PER_ATOM = 11 + 16
@@ -83,9 +81,7 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
         """
         AbstractDependentSplitter.__init__(
             self, other_splitter, self.SPLITTER_NAME)
-        self._machine_vertex_by_slice = None
-        self._delayed_mac_edge_to_undelayed_map = dict()
-        self._delayed_vertex_to_un_delayed_edge = dict()
+        self._machine_vertex_by_slice = dict()
 
     @overrides(AbstractDependentSplitter.get_out_going_vertices)
     def get_out_going_vertices(self, edge, outgoing_edge_partition):
@@ -149,8 +145,9 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
         :param ResourceTracker resource_tracker: resources
         :param str label:  human readable label for machine vertex.
         :param remaining_constraints: none partitioner constraints.
+        :type remaining_constraints:
+            iterable(~pacman.model.constraints.AbstractConstraint)
         :param ApplicationGraph graph: the app graph
-        :type remaining_constraints: iterable [Constraint]
         :return: machine vertex
         :rtype: DelayExtensionMachineVertex
         """
