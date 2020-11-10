@@ -32,7 +32,7 @@ class DelayExtensionMachineVertex(
     __slots__ = [
         "__resources"]
 
-    class _DELAY_EXTENSION_REGIONS(Enum):
+    class DELAY_EXTENSION_REGIONS(Enum):
         SYSTEM = 0
         DELAY_PARAMS = 1
         PROVENANCE_REGION = 2
@@ -74,7 +74,7 @@ class DelayExtensionMachineVertex(
     @property
     @overrides(ProvidesProvenanceDataFromMachineImpl._provenance_region_id)
     def _provenance_region_id(self):
-        return self._DELAY_EXTENSION_REGIONS.PROVENANCE_REGION.value
+        return self.DELAY_EXTENSION_REGIONS.PROVENANCE_REGION.value
 
     @property
     @overrides(

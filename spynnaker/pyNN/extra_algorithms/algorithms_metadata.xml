@@ -18,6 +18,98 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="https://github.com/SpiNNakerManchester/PACMAN
             https://raw.githubusercontent.com/SpiNNakerManchester/PACMAN/master/pacman/operations/algorithms_metadata_schema.xsd">
+    <algorithm name="SpyNNakerHostExecuteDataSpecification">
+        <python_module>spynnaker.pyNN.extra_algorithms</python_module>
+        <python_class>SpyNNakerHostExecuteDataSpecification</python_class>
+        <python_method>execute_application_data_specs</python_method>
+        <input_definitions>
+            <parameter>
+                <param_name>transceiver</param_name>
+                <param_type>MemoryTransceiver</param_type>
+            </parameter>
+            <parameter>
+                <param_name>machine</param_name>
+                <param_type>MemoryExtendedMachine</param_type>
+            </parameter>
+            <parameter>
+                <param_name>app_id</param_name>
+                <param_type>APPID</param_type>
+            </parameter>
+            <parameter>
+                <param_name>dsg_targets</param_name>
+                <param_type>DataSpecificationTargets</param_type>
+            </parameter>
+            <parameter>
+                <param_name>report_folder</param_name>
+                <param_type>ReportFolder</param_type>
+            </parameter>
+             <parameter>
+                <param_name>java_caller</param_name>
+                <param_type>JavaCaller</param_type>
+            </parameter>
+            <parameter>
+                <param_name>processor_to_app_data_base_address</param_name>
+                <param_type>ProcessorToAppDataBaseAddress</param_type>
+            </parameter>
+            <parameter>
+                <param_name>uses_advanced_monitors</param_name>
+                <param_type>UsingAdvancedMonitorSupport</param_type>
+            </parameter>
+            <parameter>
+                <param_name>executable_targets</param_name>
+                <param_type>ExecutableTargets</param_type>
+            </parameter>
+            <parameter>
+                <param_name>placements</param_name>
+                <param_type>MemoryPlacements</param_type>
+            </parameter>
+            <parameter>
+                <param_name>extra_monitor_cores</param_name>
+                <param_type>MemoryExtraMonitorVertices</param_type>
+            </parameter>
+            <parameter>
+                <param_name>extra_monitor_cores_to_ethernet_connection_map</param_name>
+                <param_type>MemoryMCGatherVertexToEthernetConnectedChipMapping</param_type>
+            </parameter>
+            <parameter>
+                <param_name>disable_advanced_monitor_usage</param_name>
+                <param_type>DisableAdvancedMonitorUsageForDataIn</param_type>
+            </parameter>
+            <parameter>
+                <param_name>region_sizes</param_name>
+                <param_type>RegionSizes</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>transceiver</param_name>
+            <param_name>machine</param_name>
+            <param_name>region_sizes</param_name>
+            <param_name>app_id</param_name>
+            <param_name>dsg_targets</param_name>
+            <param_name>uses_advanced_monitors</param_name>
+            <param_name>placements</param_name>
+        </required_inputs>
+        <optional_inputs>
+            <param_name>report_folder</param_name>
+            <param_name>java_caller</param_name>
+            <param_name>processor_to_app_data_base_address</param_name>
+            <param_name>executable_targets</param_name>
+            <param_name>extra_monitor_cores</param_name>
+            <param_name>extra_monitor_cores_to_ethernet_connection_map</param_name>
+            <param_name>disable_advanced_monitor_usage</param_name>
+            <token part="DSGSystemDataLoaded">DataLoaded</token>
+            <token part="SystemBinariesLoaded">DataLoaded</token>
+        </optional_inputs>
+        <outputs>
+            <param_type>ProcessorToAppDataBaseAddress</param_type>
+            <param_type>TotalSDRAMTracker</param_type>
+            <param_type>MatrixTracker</param_type>
+            <param_type>ExpanderTracker</param_type>
+            <param_type>TimeToUseIO</param_type>
+            <token part="DSGDataLoaded">DataLoaded</token>
+            <token part="DSGAppDataLoaded">DataLoaded</token>
+        </outputs>
+    </algorithm>
     <algorithm name="SynapseExpander">
         <python_module>spynnaker.pyNN.extra_algorithms.synapse_expander</python_module>
         <python_function>synapse_expander</python_function>

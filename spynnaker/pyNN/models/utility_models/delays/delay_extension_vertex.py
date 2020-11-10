@@ -51,7 +51,7 @@ logger = logging.getLogger(__name__)
 #  6. n_delay_stages
 _DELAY_PARAM_HEADER_WORDS = 6
 # pylint: disable=protected-access
-_DELEXT_REGIONS = DelayExtensionMachineVertex._DELAY_EXTENSION_REGIONS
+_DELEXT_REGIONS = DelayExtensionMachineVertex.DELAY_EXTENSION_REGIONS
 _EXPANDER_BASE_PARAMS_SIZE = 3 * BYTES_PER_WORD
 
 # The microseconds per timestep will be divided by this for the max offset
