@@ -371,7 +371,7 @@ class SpyNNakerHostExecuteDataSpecification(HostExecuteDataSpecification):
         return (
             dw_write_info,
             {(-1, -1, -1, -1): dsg_targets.sum_over_region_sizes()},
-             {(-1, -1, -1): 0}, {(-1, -1, -1): 0},
+            {(-1, -1, -1): 0}, {(-1, -1, -1): 0},
             dsg_targets.time_to_load_in_seconds())
 
     def execute_system_data_specs(
@@ -475,11 +475,11 @@ class SpyNNakerHostExecuteDataSpecification(HostExecuteDataSpecification):
 
         for core, reader in progress.over(iteritems(sys_targets)):
             x, y, p = core
-            data_written, _matrix, _connection, _total, _ex, _time = \
+            data_written, _matrix, _connection, _total, _ex, _time = (
                 self.__python_execute(
-                    core, reader, self._txrx.write_memory, base_addresses[core],
-                    region_sizes[core],
-                    self._placements.get_vertex_on_processor(x, y, p))
+                    core, reader, self._txrx.write_memory,
+                    base_addresses[core], region_sizes[core],
+                    self._placements.get_vertex_on_processor(x, y, p)))
             self._write_info_map[core] = data_written
 
         return self._write_info_map
