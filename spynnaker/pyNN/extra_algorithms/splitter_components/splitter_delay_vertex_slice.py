@@ -14,7 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import math
 
-from pacman.exceptions import PacmanInvalidParameterException
+from pacman.exceptions import (
+    PacmanConfigurationException, PacmanInvalidParameterException)
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint, FixedVertexAtomsConstraint,
@@ -136,7 +137,7 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
     def set_governed_app_vertex(self, app_vertex):
         AbstractDependentSplitter.set_governed_app_vertex(self, app_vertex)
         if not isinstance(app_vertex, DelayExtensionVertex):
-            raise SpynnakerSplitterConfigurationException(
+            raise PacmanConfigurationException(
                 self.INVALID_POP_ERROR_MESSAGE.format(app_vertex))
 
     def create_machine_vertex(

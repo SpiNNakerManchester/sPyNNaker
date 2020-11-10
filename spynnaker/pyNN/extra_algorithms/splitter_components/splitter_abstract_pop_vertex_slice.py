@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import os
 
+from pacman.exceptions import PacmanConfigurationException
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint, FixedVertexAtomsConstraint,
@@ -28,7 +29,6 @@ from spinn_front_end_common.interface.profiling import profile_utils
 from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT)
 from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.exceptions import SpynnakerSplitterConfigurationException
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
     AbstractSpynnakerSplitterDelay)
 from spynnaker.pyNN.models.neuron import (
@@ -64,7 +64,7 @@ class SplitterAbstractPopulationVertexSlice(
     def set_governed_app_vertex(self, app_vertex):
         AbstractSplitterSlice.set_governed_app_vertex(self, app_vertex)
         if not isinstance(app_vertex, AbstractPopulationVertex):
-            raise SpynnakerSplitterConfigurationException(
+            raise PacmanConfigurationException(
                 self.INVALID_POP_ERROR_MESSAGE.format(app_vertex))
 
     @overrides(AbstractSplitterSlice.get_out_going_vertices)
