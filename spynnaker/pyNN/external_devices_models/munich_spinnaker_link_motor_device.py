@@ -15,6 +15,8 @@
 
 import logging
 
+from pacman.model.graphs.application.abstract import \
+    AbstractOneAppOneMachineVertex
 from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
@@ -24,8 +26,7 @@ from pacman.model.graphs.application import (
 from spinn_front_end_common.abstract_models import (
     AbstractProvidesOutgoingPartitionConstraints,
     AbstractVertexWithEdgeToDependentVertices)
-from spinn_front_end_common.utility_models.abstract_one_app_one_machine_vertex\
-    import AbstractOneAppOneMachineVertex
+
 from spynnaker.pyNN.models.defaults import defaults
 from .machine_munich_motor_device import MachineMunichMotorDevice
 
