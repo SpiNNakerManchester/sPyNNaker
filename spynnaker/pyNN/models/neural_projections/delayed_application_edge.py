@@ -44,7 +44,10 @@ class DelayedApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
         """
         super(DelayedApplicationEdge, self).__init__(
             pre_vertex, post_vertex, label=label)
-        self.__synapse_information = list(synapse_information)
+        if hasattr(synapse_information, '__iter__'):
+            self.__synapse_information = synapse_information
+        else:
+            self.__synapse_information = [synapse_information]
         self.__undelayed_edge = undelayed_edge
 
         # Keep the machine edges by pre- and post-slice
