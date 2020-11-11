@@ -15,9 +15,9 @@
 
 name: Publish
 
-on: [push]
-#  push:
-#    branches: [ master ]
+on:
+  push:
+    branches: [ master ]
 
 env:
   ROOT_DOC_DIR: doc/global
@@ -84,13 +84,7 @@ jobs:
           cp -vaT $C_DOC_DIR $DEPLOY_DIR/c
           cp -vaT $PY_DOC_DIR $DEPLOY_DIR/python
 
-      - name: TEST THE DOCS
-        if: ${{ env.GITHUB_BRANCH }} != "master"
-        run: ls -AlR
-        working-directory: ${{ env.DEPLOY_DIR }}
-
       - name: Deploy to GitHub Pages
-        if: ${{ env.GITHUB_BRANCH }} == "master"
         uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
