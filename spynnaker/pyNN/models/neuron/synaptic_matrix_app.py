@@ -482,8 +482,7 @@ class SynapticMatrixApp(object):
         for m_edge in self.__m_edges:
             matrix = self.__get_matrix(m_edge)
             max_delay_per_stage = (
-                m_edge.post_vertex.app_vertex.splitter.
-                max_support_delay())
+                m_edge.post_vertex.app_vertex.splitter.max_support_delay())
 
             if self.__use_app_keys:
                 syn_addr, syn_mat_offset = matrix.next_app_on_chip_address(
