@@ -215,9 +215,9 @@ class ProjectionApplicationEdge(
     def get_local_provenance_data(self):
         prov_items = list()
         for synapse_info in self.synapse_information:
+            prov_items.extend(
+                synapse_info.connector.get_provenance_data(synapse_info))
             for machine_edge in self.machine_edges:
-                prov_items.extend(
-                    synapse_info.connector.get_provenance_data(synapse_info))
                 prov_items.extend(
                     synapse_info.synapse_dynamics.get_provenance_data(
                         machine_edge.pre_vertex.label,
