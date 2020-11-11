@@ -143,7 +143,7 @@ class SynapseIORowBased(object):
 
         :param int machine_time_step: The time step of the simulation
         :param int post_vertex_max_delay_ticks: post vertex max delay
-        :rtype: int or None
+        :rtype: int
         """
         return post_vertex_max_delay_ticks * (
             machine_time_step / MICRO_TO_MILLISECOND_CONVERSION)
