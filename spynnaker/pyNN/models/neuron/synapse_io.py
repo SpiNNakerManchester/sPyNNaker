@@ -362,7 +362,7 @@ class SynapseIORowBased(object):
             The scaling of the weights for each synapse type
         :param MachineEdge machine_edge:
             The incoming machine edge that the synapses are on
-        :param int machine_time_step: Ther machine time step of the sim.
+        :param int machine_time_step: The machine time step of the sim.
         :param ProjectionApplicationEdge app_edge:
         :param MaxRowInfo max_row_info:
             The maximum row information for the synapses
