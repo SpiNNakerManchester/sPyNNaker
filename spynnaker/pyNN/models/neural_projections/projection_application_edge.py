@@ -57,7 +57,10 @@ class ProjectionApplicationEdge(
         """
         :param AbstractPopulationVertex pre_vertex:
         :param AbstractPopulationVertex post_vertex:
-        :param SynapseInformation synapse_information:
+        :param synapse_information:
+            The synapse information on this edge
+        :type synapse_information:
+            SynapseInformation or iterable(SynapseInformation)
         :param str label:
         """
         super(ProjectionApplicationEdge, self).__init__(
