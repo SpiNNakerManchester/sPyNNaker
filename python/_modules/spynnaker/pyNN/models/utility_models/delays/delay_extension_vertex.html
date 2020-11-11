@@ -98,6 +98,7 @@
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">SYSTEM_BYTES_REQUIREMENT</span><span class="p">,</span> <span class="n">SIMULATION_N_BYTES</span><span class="p">,</span> <span class="n">BITS_PER_WORD</span><span class="p">,</span>
     <span class="n">BYTES_PER_WORD</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="n">AbstractHasDelayStages</span>
 <span class="kn">from</span> <span class="nn">.delay_block</span> <span class="kn">import</span> <span class="n">DelayBlock</span>
 <span class="kn">from</span> <span class="nn">.delay_extension_machine_vertex</span> <span class="kn">import</span> <span class="n">DelayExtensionMachineVertex</span>
 <span class="kn">from</span> <span class="nn">.delay_generator_data</span> <span class="kn">import</span> <span class="n">DelayGeneratorData</span>
@@ -124,7 +125,7 @@
 
 <div class="viewcode-block" id="DelayExtensionVertex"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex">[docs]</a><span class="k">class</span> <span class="nc">DelayExtensionVertex</span><span class="p">(</span>
         <span class="n">TDMAAwareApplicationVertex</span><span class="p">,</span> <span class="n">AbstractGeneratesDataSpecification</span><span class="p">,</span>
-        <span class="n">AbstractProvidesOutgoingPartitionConstraints</span><span class="p">):</span>
+        <span class="n">AbstractProvidesOutgoingPartitionConstraints</span><span class="p">,</span> <span class="n">AbstractHasDelayStages</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Provide delays to incoming spikes in multiples of the maximum delays\</span>
 <span class="sd">        of a neuron (typically 16 or 32)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -211,12 +212,8 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_atoms</span>
 
     <span class="nd">@property</span>
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractHasDelayStages</span><span class="o">.</span><span class="n">n_delay_stages</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">n_delay_stages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The maximum number of delay stages required by any connection\</span>
-<span class="sd">            out of this delay extension vertex</span>
-
-<span class="sd">        :rtype: int</span>
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_delay_stages</span>
 
     <span class="nd">@n_delay_stages</span><span class="o">.</span><span class="n">setter</span>

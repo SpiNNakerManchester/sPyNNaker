@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
-<tagfile>
+<tagfile doxygen_version="1.8.20">
   <compound kind="file">
     <name>bit_field_expander.c</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/bit_field_expander/</path>
+    <path>/github/workspace/neural_modelling/src/bit_field_expander/</path>
     <filename>bit__field__expander_8c.html</filename>
     <includes id="synapse__row_8h" name="synapse_row.h" local="no" imported="no">neuron/synapse_row.h</includes>
     <includes id="direct__synapses_8h" name="direct_synapses.h" local="no" imported="no">neuron/direct_synapses.h</includes>
@@ -229,7 +229,7 @@
   </compound>
   <compound kind="file">
     <name>in_spikes.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/common/</path>
+    <path>/github/workspace/neural_modelling/src/common/</path>
     <filename>in__spikes_8h.html</filename>
     <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="yes" imported="no">neuron-typedefs.h</includes>
     <member kind="function" static="yes">
@@ -333,7 +333,7 @@
   </compound>
   <compound kind="file">
     <name>maths-util.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/common/</path>
+    <path>/github/workspace/neural_modelling/src/common/</path>
     <filename>maths-util_8h.html</filename>
     <member kind="define">
       <type>#define</type>
@@ -513,7 +513,7 @@
   </compound>
   <compound kind="file">
     <name>munich_protocol.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/common/</path>
+    <path>/github/workspace/neural_modelling/src/common/</path>
     <filename>munich__protocol_8h.html</filename>
     <class kind="struct">munich_key_bitfields_t</class>
     <class kind="union">munich_key_t</class>
@@ -555,6 +555,120 @@
       <name>OFFSET_TO_D</name>
       <anchorfile>munich__protocol_8h.html</anchorfile>
       <anchor>a06fc87d81c62e9abb8790b6e5713c55baad87c155efc7814564f9b47dfb651b3f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ONE_TO_ONE</name>
+      <anchorfile>connection__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55badaccc17f840cc67d0e9c1a9a331b2fb4</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ALL_TO_ALL</name>
+      <anchorfile>connection__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55ba403e4025d2925f132293a50eae7381fe</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>FIXED_PROBABILITY</name>
+      <anchorfile>connection__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55ba8f6a6db47b5476cf11f24317f14ee4a7</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>FIXED_TOTAL</name>
+      <anchorfile>connection__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55ba8338dcf5840ce1a01a4c26d9c49dc560</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>FIXED_PRE</name>
+      <anchorfile>connection__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55baa667dfec30c43a0320c7bd76b99bd4c7</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>FIXED_POST</name>
+      <anchorfile>connection__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55baa130e7b038fc0ede3b0203931063b116</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>KERNEL</name>
+      <anchorfile>connection__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55ba53c6e691e7db9eceefc0fb37cb724cd2</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>N_CONNECTION_GENERATORS</name>
+      <anchorfile>connection__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55bab1144285d7382feeb4687af0263e2467</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>STATIC_MATRIX_GENERATOR</name>
+      <anchorfile>matrix__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55baf14f18f5ed2665f8cb095c1363fc9848</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>PLASTIC_MATRIX_GENERATOR</name>
+      <anchorfile>matrix__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55ba08b27fbab7a770bae071d9defb278782</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>N_MATRIX_GENERATORS</name>
+      <anchorfile>matrix__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55baba9a03e4fd023b2837469ea1ff6225a3</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>CONSTANT</name>
+      <anchorfile>param__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55ba83972670b57415508523b5641bb46116</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>UNIFORM</name>
+      <anchorfile>param__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55ba8f44784d154005a214e0fe94119d28ef</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>NORMAL</name>
+      <anchorfile>param__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55ba50d1448013c6f17125caee18aa418af7</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>NORMAL_CLIPPED</name>
+      <anchorfile>param__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55bac40cefd2a096660da3f41d6ee6352889</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>NORMAL_CLIPPED_BOUNDARY</name>
+      <anchorfile>param__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55baca06c44d4221f47f9d61534ca1e35752</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>EXPONENTIAL</name>
+      <anchorfile>param__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55baa6055a3a8ab1aed0594419b51d9ec15e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>KERNEL</name>
+      <anchorfile>param__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55ba53c6e691e7db9eceefc0fb37cb724cd2</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>N_PARAM_GENERATORS</name>
+      <anchorfile>param__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55bab8047ff7dfdb2c76ef1e78a7e6347777</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
@@ -931,45 +1045,45 @@
     </member>
     <member kind="enumeration">
       <type></type>
-      <name>modes_e</name>
+      <name>munich_protocol_modes_e</name>
       <anchorfile>munich__protocol_8h.html</anchorfile>
-      <anchor>ada81cad6f64bf0042dba36096bf32710</anchor>
+      <anchor>a276ea595faa60fd27301105f3613b2ef</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>MUNICH_PROTOCOL_RESET_TO_DEFAULT</name>
       <anchorfile>munich__protocol_8h.html</anchorfile>
-      <anchor>ada81cad6f64bf0042dba36096bf32710a8a71e56e25b553379ea228b4a1ded8ba</anchor>
+      <anchor>a276ea595faa60fd27301105f3613b2efa8a71e56e25b553379ea228b4a1ded8ba</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>MUNICH_PROTOCOL_PUSH_BOT</name>
       <anchorfile>munich__protocol_8h.html</anchorfile>
-      <anchor>ada81cad6f64bf0042dba36096bf32710a168d928b4999466fb0ee4afe6c0ebf17</anchor>
+      <anchor>a276ea595faa60fd27301105f3613b2efa168d928b4999466fb0ee4afe6c0ebf17</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>MUNICH_PROTOCOL_SPOMNIBOT</name>
       <anchorfile>munich__protocol_8h.html</anchorfile>
-      <anchor>ada81cad6f64bf0042dba36096bf32710ab59da94c5640da6e33ea55115432aac2</anchor>
+      <anchor>a276ea595faa60fd27301105f3613b2efab59da94c5640da6e33ea55115432aac2</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>MUNICH_PROTOCOL_BALL_BALANCER</name>
       <anchorfile>munich__protocol_8h.html</anchorfile>
-      <anchor>ada81cad6f64bf0042dba36096bf32710a24993add8c6fbf8110e30b2bec6b5cde</anchor>
+      <anchor>a276ea595faa60fd27301105f3613b2efa24993add8c6fbf8110e30b2bec6b5cde</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>MUNICH_PROTOCOL_MY_ORO_BOTICS</name>
       <anchorfile>munich__protocol_8h.html</anchorfile>
-      <anchor>ada81cad6f64bf0042dba36096bf32710aac09deb99dbfa656e3055544b6b1a9cc</anchor>
+      <anchor>a276ea595faa60fd27301105f3613b2efaac09deb99dbfa656e3055544b6b1a9cc</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>MUNICH_PROTOCOL_FREE</name>
       <anchorfile>munich__protocol_8h.html</anchorfile>
-      <anchor>ada81cad6f64bf0042dba36096bf32710a591c8c75a63ce2f61e0a20f9ff12da89</anchor>
+      <anchor>a276ea595faa60fd27301105f3613b2efa591c8c75a63ce2f61e0a20f9ff12da89</anchor>
       <arglist></arglist>
     </member>
     <member kind="function" static="yes">
@@ -1339,7 +1453,7 @@
   </compound>
   <compound kind="file">
     <name>neuron-typedefs.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/common/</path>
+    <path>/github/workspace/neural_modelling/src/common/</path>
     <filename>neuron-typedefs_8h.html</filename>
     <includes id="maths-util_8h" name="maths-util.h" local="yes" imported="no">maths-util.h</includes>
     <member kind="typedef">
@@ -1401,7 +1515,7 @@
   </compound>
   <compound kind="file">
     <name>delay_extension.c</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/delay_extension/</path>
+    <path>/github/workspace/neural_modelling/src/delay_extension/</path>
     <filename>delay__extension_8c.html</filename>
     <includes id="delay__extension_8h" name="delay_extension.h" local="yes" imported="no">delay_extension.h</includes>
     <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
@@ -1678,7 +1792,7 @@
   </compound>
   <compound kind="file">
     <name>delay_extension.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/delay_extension/</path>
+    <path>/github/workspace/neural_modelling/src/delay_extension/</path>
     <filename>delay__extension_8h.html</filename>
     <class kind="struct">delay_parameters</class>
     <member kind="define">
@@ -1749,7 +1863,7 @@
   </compound>
   <compound kind="file">
     <name>additional_input.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/additional_inputs/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/additional_inputs/</path>
     <filename>additional__input_8h.html</filename>
     <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
     <member kind="typedef">
@@ -1776,7 +1890,7 @@
   </compound>
   <compound kind="file">
     <name>additional_input_ca2_adaptive_impl.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/additional_inputs/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/additional_inputs/</path>
     <filename>additional__input__ca2__adaptive__impl_8h.html</filename>
     <includes id="additional__input_8h" name="additional_input.h" local="yes" imported="no">additional_input.h</includes>
     <class kind="struct">additional_input_t</class>
@@ -1797,7 +1911,7 @@
   </compound>
   <compound kind="file">
     <name>additional_input_none_impl.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/additional_inputs/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/additional_inputs/</path>
     <filename>additional__input__none__impl_8h.html</filename>
     <includes id="additional__input_8h" name="additional_input.h" local="yes" imported="no">additional_input.h</includes>
     <class kind="struct">additional_input_t</class>
@@ -1818,7 +1932,7 @@
   </compound>
   <compound kind="file">
     <name>c_main.c</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/</path>
     <filename>c__main_8c.html</filename>
     <includes id="in__spikes_8h" name="in_spikes.h" local="no" imported="no">common/in_spikes.h</includes>
     <includes id="regions_8h" name="regions.h" local="yes" imported="no">regions.h</includes>
@@ -1843,6 +1957,30 @@
       <name>callback_priorities</name>
       <anchorfile>c__main_8c.html</anchorfile>
       <anchor>a65b19dabf5283c1ea37df964ca25e964</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>MULTICAST</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a65b19dabf5283c1ea37df964ca25e964a607d700b2c0a01c54bdadde074a7cb12</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>SDP</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a65b19dabf5283c1ea37df964ca25e964ad645defae8408de2415f3dc417f69773</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>DMA</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a65b19dabf5283c1ea37df964ca25e964a6537a62f6f155792bb9a320ee2ec4d68</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>TIMER</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a65b19dabf5283c1ea37df964ca25e964a17ba9bae1b8d7e8d6c12d46ec58e0769</anchor>
       <arglist></arglist>
     </member>
     <member kind="function" static="yes">
@@ -1953,7 +2091,7 @@
   </compound>
   <compound kind="file">
     <name>decay.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/</path>
     <filename>decay_8h.html</filename>
     <includes id="maths-util_8h" name="maths-util.h" local="no" imported="no">common/maths-util.h</includes>
     <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
@@ -2002,7 +2140,7 @@
   </compound>
   <compound kind="file">
     <name>direct_synapses.c</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/</path>
     <filename>direct__synapses_8c.html</filename>
     <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
     <member kind="define">
@@ -2036,7 +2174,7 @@
   </compound>
   <compound kind="file">
     <name>direct_synapses.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/</path>
     <filename>direct__synapses_8h.html</filename>
     <member kind="function">
       <type>bool</type>
@@ -2055,7 +2193,7 @@
   </compound>
   <compound kind="file">
     <name>neuron_impl.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/implementations/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/implementations/</path>
     <filename>neuron__impl_8h.html</filename>
     <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
     <member kind="function" static="yes">
@@ -2117,7 +2255,7 @@
   </compound>
   <compound kind="file">
     <name>neuron_impl_external_devices.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/implementations/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/implementations/</path>
     <filename>neuron__impl__external__devices_8h.html</filename>
     <includes id="neuron__impl_8h" name="neuron_impl.h" local="yes" imported="no">neuron_impl.h</includes>
     <includes id="neuron__model__lif__impl_8h" name="neuron_model_lif_impl.h" local="no" imported="no">neuron/models/neuron_model_lif_impl.h</includes>
@@ -2392,7 +2530,7 @@
   </compound>
   <compound kind="file">
     <name>neuron_impl_standard.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/implementations/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/implementations/</path>
     <filename>neuron__impl__standard_8h.html</filename>
     <includes id="neuron__impl_8h" name="neuron_impl.h" local="yes" imported="no">neuron_impl.h</includes>
     <includes id="neuron__model_8h" name="neuron_model.h" local="no" imported="no">neuron/models/neuron_model.h</includes>
@@ -2602,7 +2740,7 @@
   </compound>
   <compound kind="file">
     <name>input_type.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/input_types/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/input_types/</path>
     <filename>input__type_8h.html</filename>
     <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
     <member kind="define">
@@ -2650,7 +2788,7 @@
   </compound>
   <compound kind="file">
     <name>input_type_conductance.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/input_types/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/input_types/</path>
     <filename>input__type__conductance_8h.html</filename>
     <includes id="input__type_8h" name="input_type.h" local="yes" imported="no">input_type.h</includes>
     <class kind="struct">input_type_t</class>
@@ -2678,7 +2816,7 @@
   </compound>
   <compound kind="file">
     <name>input_type_current.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/input_types/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/input_types/</path>
     <filename>input__type__current_8h.html</filename>
     <includes id="input__type_8h" name="input_type.h" local="yes" imported="no">input_type.h</includes>
     <class kind="struct">input_type_t</class>
@@ -2713,7 +2851,7 @@
   </compound>
   <compound kind="file">
     <name>input_type_delta.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/input_types/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/input_types/</path>
     <filename>input__type__delta_8h.html</filename>
     <includes id="input__type_8h" name="input_type.h" local="yes" imported="no">input_type.h</includes>
     <class kind="struct">input_type_t</class>
@@ -2748,7 +2886,7 @@
   </compound>
   <compound kind="file">
     <name>input_type_none.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/input_types/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/input_types/</path>
     <filename>input__type__none_8h.html</filename>
     <includes id="input__type_8h" name="input_type.h" local="yes" imported="no">input_type.h</includes>
     <class kind="struct">input_type_t</class>
@@ -2790,7 +2928,7 @@
   </compound>
   <compound kind="file">
     <name>neuron_model.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/models/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/models/</path>
     <filename>neuron__model_8h.html</filename>
     <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
     <member kind="typedef">
@@ -2845,7 +2983,7 @@
   </compound>
   <compound kind="file">
     <name>neuron_model_izh_impl.c</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/models/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/models/</path>
     <filename>neuron__model__izh__impl_8c.html</filename>
     <includes id="neuron__model__izh__impl_8h" name="neuron_model_izh_impl.h" local="yes" imported="no">neuron_model_izh_impl.h</includes>
     <member kind="function" static="yes">
@@ -2921,7 +3059,7 @@
   </compound>
   <compound kind="file">
     <name>neuron_model_izh_impl.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/models/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/models/</path>
     <filename>neuron__model__izh__impl_8h.html</filename>
     <includes id="neuron__model_8h" name="neuron_model.h" local="yes" imported="no">neuron_model.h</includes>
     <class kind="struct">neuron_t</class>
@@ -2929,7 +3067,7 @@
   </compound>
   <compound kind="file">
     <name>neuron_model_lif_impl.c</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/models/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/models/</path>
     <filename>neuron__model__lif__impl_8c.html</filename>
     <includes id="neuron__model__lif__impl_8h" name="neuron_model_lif_impl.h" local="yes" imported="no">neuron_model_lif_impl.h</includes>
     <member kind="function" static="yes">
@@ -2984,7 +3122,7 @@
   </compound>
   <compound kind="file">
     <name>neuron_model_lif_impl.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/models/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/models/</path>
     <filename>neuron__model__lif__impl_8h.html</filename>
     <includes id="neuron__model_8h" name="neuron_model.h" local="yes" imported="no">neuron_model.h</includes>
     <class kind="struct">neuron_t</class>
@@ -2992,7 +3130,7 @@
   </compound>
   <compound kind="file">
     <name>neuron.c</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/</path>
     <filename>neuron_8c.html</filename>
     <includes id="neuron_8h" name="neuron.h" local="yes" imported="no">neuron.h</includes>
     <includes id="neuron__recording_8h" name="neuron_recording.h" local="yes" imported="no">neuron_recording.h</includes>
@@ -3100,7 +3238,7 @@
   </compound>
   <compound kind="file">
     <name>neuron.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/</path>
     <filename>neuron_8h.html</filename>
     <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
     <member kind="function">
@@ -3162,10 +3300,10 @@
   </compound>
   <compound kind="file">
     <name>neuron_recording.c</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/</path>
     <filename>neuron__recording_8c.html</filename>
     <includes id="neuron__recording_8h" name="neuron_recording.h" local="yes" imported="no">neuron_recording.h</includes>
-    <class kind="struct">neuron_recording_header</class>
+    <class kind="struct">neuron_recording_header_t</class>
     <member kind="define">
       <type>#define</type>
       <name>FLOOR_TO_4</name>
@@ -3295,7 +3433,7 @@
   </compound>
   <compound kind="file">
     <name>neuron_recording.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/</path>
     <filename>neuron__recording_8h.html</filename>
     <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
     <class kind="struct">recording_values_t</class>
@@ -3438,7 +3576,7 @@
   </compound>
   <compound kind="file">
     <name>maths.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/plasticity/stdp/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/</path>
     <filename>maths_8h.html</filename>
     <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
     <class kind="struct">int16_lut</class>
@@ -3501,7 +3639,7 @@
   </compound>
   <compound kind="file">
     <name>post_events.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/plasticity/stdp/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/</path>
     <filename>post__events_8h.html</filename>
     <class kind="struct">post_event_history_t</class>
     <class kind="struct">post_event_window_t</class>
@@ -3557,7 +3695,7 @@
   </compound>
   <compound kind="file">
     <name>stdp_typedefs.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/plasticity/stdp/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/</path>
     <filename>stdp__typedefs_8h.html</filename>
     <member kind="define">
       <type>#define</type>
@@ -3583,7 +3721,7 @@
   </compound>
   <compound kind="file">
     <name>synapse_dynamics_stdp_mad_impl.c</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/plasticity/stdp/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/</path>
     <filename>synapse__dynamics__stdp__mad__impl_8c.html</filename>
     <includes id="synapses_8h" name="synapses.h" local="no" imported="no">neuron/synapses.h</includes>
     <includes id="maths_8h" name="maths.h" local="yes" imported="no">maths.h</includes>
@@ -3779,7 +3917,7 @@
   </compound>
   <compound kind="file">
     <name>synapse_structure.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/plasticity/stdp/synapse_structure/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/synapse_structure/</path>
     <filename>synapse__structure_8h.html</filename>
     <includes id="weight_8h" name="weight.h" local="no" imported="no">neuron/plasticity/stdp/weight_dependence/weight.h</includes>
     <member kind="function" static="yes">
@@ -3827,7 +3965,7 @@
   </compound>
   <compound kind="file">
     <name>synapse_structure_weight_accumulator_impl.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/plasticity/stdp/synapse_structure/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/synapse_structure/</path>
     <filename>synapse__structure__weight__accumulator__impl_8h.html</filename>
     <includes id="synapse__structure_8h" name="synapse_structure.h" local="yes" imported="no">synapse_structure.h</includes>
     <class kind="struct">plastic_synapse_t</class>
@@ -3884,7 +4022,7 @@
   </compound>
   <compound kind="file">
     <name>synapse_structure_weight_impl.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/plasticity/stdp/synapse_structure/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/synapse_structure/</path>
     <filename>synapse__structure__weight__impl_8h.html</filename>
     <member kind="typedef">
       <type>weight_t</type>
@@ -3952,7 +4090,7 @@
   </compound>
   <compound kind="file">
     <name>synapse_structure_weight_state_accumulator_impl.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/plasticity/stdp/synapse_structure/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/synapse_structure/</path>
     <filename>synapse__structure__weight__state__accumulator__impl_8h.html</filename>
     <includes id="synapse__structure_8h" name="synapse_structure.h" local="yes" imported="no">synapse_structure.h</includes>
     <class kind="struct">plastic_synapse_t</class>
@@ -4009,7 +4147,7 @@
   </compound>
   <compound kind="file">
     <name>synapse_structure_weight_state_accumulator_window_impl.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/plasticity/stdp/synapse_structure/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/synapse_structure/</path>
     <filename>synapse__structure__weight__state__accumulator__window__impl_8h.html</filename>
     <includes id="synapse__structure_8h" name="synapse_structure.h" local="yes" imported="no">synapse_structure.h</includes>
     <class kind="struct">plastic_synapse_t</class>
@@ -4066,7 +4204,7 @@
   </compound>
   <compound kind="file">
     <name>random_util.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
     <filename>random__util_8h.html</filename>
     <member kind="function" static="yes">
       <type>static int32_t</type>
@@ -4078,7 +4216,7 @@
   </compound>
   <compound kind="file">
     <name>timing.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
     <filename>timing_8h.html</filename>
     <includes id="synapse__structure_8h" name="synapse_structure.h" local="no" imported="no">neuron/plasticity/stdp/synapse_structure/synapse_structure.h</includes>
     <member kind="function">
@@ -4126,7 +4264,7 @@
   </compound>
   <compound kind="file">
     <name>timing_nearest_pair_impl.c</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
     <filename>timing__nearest__pair__impl_8c.html</filename>
     <includes id="timing__nearest__pair__impl_8h" name="timing_nearest_pair_impl.h" local="yes" imported="no">timing_nearest_pair_impl.h</includes>
     <member kind="function">
@@ -4153,7 +4291,7 @@
   </compound>
   <compound kind="file">
     <name>timing_nearest_pair_impl.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
     <filename>timing__nearest__pair__impl_8h.html</filename>
     <includes id="synapse__structure__weight__impl_8h" name="synapse_structure_weight_impl.h" local="no" imported="no">neuron/plasticity/stdp/synapse_structure/synapse_structure_weight_impl.h</includes>
     <includes id="timing_8h" name="timing.h" local="yes" imported="no">timing.h</includes>
@@ -4199,7 +4337,7 @@
   </compound>
   <compound kind="file">
     <name>timing_pair_impl.c</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
     <filename>timing__pair__impl_8c.html</filename>
     <includes id="timing__pair__impl_8h" name="timing_pair_impl.h" local="yes" imported="no">timing_pair_impl.h</includes>
     <member kind="function">
@@ -4226,7 +4364,7 @@
   </compound>
   <compound kind="file">
     <name>timing_pair_impl.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
     <filename>timing__pair__impl_8h.html</filename>
     <includes id="synapse__structure__weight__impl_8h" name="synapse_structure_weight_impl.h" local="no" imported="no">neuron/plasticity/stdp/synapse_structure/synapse_structure_weight_impl.h</includes>
     <includes id="timing_8h" name="timing.h" local="yes" imported="no">timing.h</includes>
@@ -4285,7 +4423,7 @@
   </compound>
   <compound kind="file">
     <name>timing_pfister_triplet_impl.c</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
     <filename>timing__pfister__triplet__impl_8c.html</filename>
     <includes id="timing__pfister__triplet__impl_8h" name="timing_pfister_triplet_impl.h" local="yes" imported="no">timing_pfister_triplet_impl.h</includes>
     <member kind="function">
@@ -4326,7 +4464,7 @@
   </compound>
   <compound kind="file">
     <name>timing_pfister_triplet_impl.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
     <filename>timing__pfister__triplet__impl_8h.html</filename>
     <includes id="synapse__structure__weight__impl_8h" name="synapse_structure_weight_impl.h" local="no" imported="no">neuron/plasticity/stdp/synapse_structure/synapse_structure_weight_impl.h</includes>
     <includes id="timing_8h" name="timing.h" local="yes" imported="no">timing.h</includes>
@@ -4401,7 +4539,7 @@
   </compound>
   <compound kind="file">
     <name>timing_recurrent_common.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
     <filename>timing__recurrent__common_8h.html</filename>
     <includes id="timing_8h" name="timing.h" local="yes" imported="no">timing.h</includes>
     <includes id="weight__one__term_8h" name="weight_one_term.h" local="no" imported="no">neuron/plasticity/stdp/weight_dependence/weight_one_term.h</includes>
@@ -4499,7 +4637,7 @@
   </compound>
   <compound kind="file">
     <name>timing_recurrent_dual_fsm_impl.c</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
     <filename>timing__recurrent__dual__fsm__impl_8c.html</filename>
     <includes id="timing__recurrent__dual__fsm__impl_8h" name="timing_recurrent_dual_fsm_impl.h" local="yes" imported="no">timing_recurrent_dual_fsm_impl.h</includes>
     <member kind="function">
@@ -4533,7 +4671,7 @@
   </compound>
   <compound kind="file">
     <name>timing_recurrent_dual_fsm_impl.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
     <filename>timing__recurrent__dual__fsm__impl_8h.html</filename>
     <includes id="synapse__structure__weight__accumulator__impl_8h" name="synapse_structure_weight_accumulator_impl.h" local="no" imported="no">neuron/plasticity/stdp/synapse_structure/synapse_structure_weight_accumulator_impl.h</includes>
     <includes id="timing_8h" name="timing.h" local="yes" imported="no">timing.h</includes>
@@ -4601,7 +4739,7 @@
   </compound>
   <compound kind="file">
     <name>timing_recurrent_pre_stochastic_impl.c</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
     <filename>timing__recurrent__pre__stochastic__impl_8c.html</filename>
     <includes id="timing__recurrent__pre__stochastic__impl_8h" name="timing_recurrent_pre_stochastic_impl.h" local="yes" imported="no">timing_recurrent_pre_stochastic_impl.h</includes>
     <member kind="function">
@@ -4635,7 +4773,7 @@
   </compound>
   <compound kind="file">
     <name>timing_recurrent_pre_stochastic_impl.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
     <filename>timing__recurrent__pre__stochastic__impl_8h.html</filename>
     <includes id="synapse__structure__weight__state__accumulator__window__impl_8h" name="synapse_structure_weight_state_accumulator_window_impl.h" local="no" imported="no">neuron/plasticity/stdp/synapse_structure/synapse_structure_weight_state_accumulator_window_impl.h</includes>
     <includes id="timing__recurrent__common_8h" name="timing_recurrent_common.h" local="yes" imported="no">timing_recurrent_common.h</includes>
@@ -4673,7 +4811,7 @@
   </compound>
   <compound kind="file">
     <name>timing_vogels_2011_impl.c</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
     <filename>timing__vogels__2011__impl_8c.html</filename>
     <includes id="timing__vogels__2011__impl_8h" name="timing_vogels_2011_impl.h" local="yes" imported="no">timing_vogels_2011_impl.h</includes>
     <member kind="function">
@@ -4700,7 +4838,7 @@
   </compound>
   <compound kind="file">
     <name>timing_vogels_2011_impl.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
     <filename>timing__vogels__2011__impl_8h.html</filename>
     <includes id="synapse__structure__weight__impl_8h" name="synapse_structure_weight_impl.h" local="no" imported="no">neuron/plasticity/stdp/synapse_structure/synapse_structure_weight_impl.h</includes>
     <includes id="timing_8h" name="timing.h" local="yes" imported="no">timing.h</includes>
@@ -4774,7 +4912,7 @@
   </compound>
   <compound kind="file">
     <name>weight.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/plasticity/stdp/weight_dependence/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/weight_dependence/</path>
     <filename>weight_8h.html</filename>
     <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
     <includes id="synapse__row_8h" name="synapse_row.h" local="no" imported="no">neuron/synapse_row.h</includes>
@@ -4802,7 +4940,7 @@
   </compound>
   <compound kind="file">
     <name>weight_additive_one_term_impl.c</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/plasticity/stdp/weight_dependence/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/weight_dependence/</path>
     <filename>weight__additive__one__term__impl_8c.html</filename>
     <includes id="weight__additive__one__term__impl_8h" name="weight_additive_one_term_impl.h" local="yes" imported="no">weight_additive_one_term_impl.h</includes>
     <member kind="function">
@@ -4822,7 +4960,7 @@
   </compound>
   <compound kind="file">
     <name>weight_additive_one_term_impl.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/plasticity/stdp/weight_dependence/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/weight_dependence/</path>
     <filename>weight__additive__one__term__impl_8h.html</filename>
     <includes id="maths_8h" name="maths.h" local="no" imported="no">neuron/plasticity/stdp/maths.h</includes>
     <includes id="stdp__typedefs_8h" name="stdp_typedefs.h" local="no" imported="no">neuron/plasticity/stdp/stdp_typedefs.h</includes>
@@ -4861,7 +4999,7 @@
   </compound>
   <compound kind="file">
     <name>weight_additive_two_term_impl.c</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/plasticity/stdp/weight_dependence/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/weight_dependence/</path>
     <filename>weight__additive__two__term__impl_8c.html</filename>
     <includes id="weight__additive__two__term__impl_8h" name="weight_additive_two_term_impl.h" local="yes" imported="no">weight_additive_two_term_impl.h</includes>
     <member kind="function">
@@ -4881,7 +5019,7 @@
   </compound>
   <compound kind="file">
     <name>weight_additive_two_term_impl.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/plasticity/stdp/weight_dependence/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/weight_dependence/</path>
     <filename>weight__additive__two__term__impl_8h.html</filename>
     <includes id="maths_8h" name="maths.h" local="no" imported="no">neuron/plasticity/stdp/maths.h</includes>
     <includes id="stdp__typedefs_8h" name="stdp_typedefs.h" local="no" imported="no">neuron/plasticity/stdp/stdp_typedefs.h</includes>
@@ -4920,7 +5058,7 @@
   </compound>
   <compound kind="file">
     <name>weight_multiplicative_impl.c</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/plasticity/stdp/weight_dependence/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/weight_dependence/</path>
     <filename>weight__multiplicative__impl_8c.html</filename>
     <includes id="weight__multiplicative__impl_8h" name="weight_multiplicative_impl.h" local="yes" imported="no">weight_multiplicative_impl.h</includes>
     <member kind="function">
@@ -4947,7 +5085,7 @@
   </compound>
   <compound kind="file">
     <name>weight_multiplicative_impl.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/plasticity/stdp/weight_dependence/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/weight_dependence/</path>
     <filename>weight__multiplicative__impl_8h.html</filename>
     <includes id="maths_8h" name="maths.h" local="no" imported="no">neuron/plasticity/stdp/maths.h</includes>
     <includes id="stdp__typedefs_8h" name="stdp_typedefs.h" local="no" imported="no">neuron/plasticity/stdp/stdp_typedefs.h</includes>
@@ -4986,7 +5124,7 @@
   </compound>
   <compound kind="file">
     <name>weight_one_term.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/plasticity/stdp/weight_dependence/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/weight_dependence/</path>
     <filename>weight__one__term_8h.html</filename>
     <includes id="weight_8h" name="weight.h" local="yes" imported="no">weight.h</includes>
     <member kind="function" static="yes">
@@ -5006,7 +5144,7 @@
   </compound>
   <compound kind="file">
     <name>weight_two_term.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/plasticity/stdp/weight_dependence/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/weight_dependence/</path>
     <filename>weight__two__term_8h.html</filename>
     <includes id="weight_8h" name="weight.h" local="yes" imported="no">weight.h</includes>
     <member kind="function" static="yes">
@@ -5026,7 +5164,7 @@
   </compound>
   <compound kind="file">
     <name>synapse_dynamics.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/plasticity/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/plasticity/</path>
     <filename>synapse__dynamics_8h.html</filename>
     <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
     <includes id="synapse__row_8h" name="synapse_row.h" local="no" imported="no">neuron/synapse_row.h</includes>
@@ -5110,7 +5248,7 @@
   </compound>
   <compound kind="file">
     <name>synapse_dynamics_static_impl.c</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/plasticity/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/plasticity/</path>
     <filename>synapse__dynamics__static__impl_8c.html</filename>
     <includes id="synapse__dynamics_8h" name="synapse_dynamics.h" local="yes" imported="no">synapse_dynamics.h</includes>
     <member kind="function">
@@ -5228,7 +5366,7 @@
   </compound>
   <compound kind="file">
     <name>population_table.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/population_table/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/population_table/</path>
     <filename>population__table_8h.html</filename>
     <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
     <member kind="function">
@@ -5290,7 +5428,7 @@
   </compound>
   <compound kind="file">
     <name>population_table_binary_search_impl.c</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/population_table/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/population_table/</path>
     <filename>population__table__binary__search__impl_8c.html</filename>
     <includes id="population__table_8h" name="population_table.h" local="yes" imported="no">population_table.h</includes>
     <includes id="synapse__row_8h" name="synapse_row.h" local="no" imported="no">neuron/synapse_row.h</includes>
@@ -5672,7 +5810,7 @@
   </compound>
   <compound kind="file">
     <name>profile_tags.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/</path>
     <filename>neuron_2profile__tags_8h.html</filename>
     <member kind="enumeration">
       <type></type>
@@ -5714,7 +5852,7 @@
   </compound>
   <compound kind="file">
     <name>profile_tags.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/spike_source/poisson/</path>
+    <path>/github/workspace/neural_modelling/src/spike_source/poisson/</path>
     <filename>spike__source_2poisson_2profile__tags_8h.html</filename>
     <member kind="enumeration">
       <type></type>
@@ -5726,109 +5864,109 @@
   </compound>
   <compound kind="file">
     <name>regions.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/</path>
     <filename>regions_8h.html</filename>
     <member kind="enumeration">
       <type></type>
-      <name>neuron_regions_e</name>
+      <name>regions_e</name>
       <anchorfile>regions_8h.html</anchorfile>
-      <anchor>ae999d786209aa275138bef0bf9012295</anchor>
+      <anchor>a94cb8426c71368d0a24cf95fcc70a3d6</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>SYSTEM_REGION</name>
       <anchorfile>regions_8h.html</anchorfile>
-      <anchor>ae999d786209aa275138bef0bf9012295ad102acc20b0123ad06640d8c591c304f</anchor>
+      <anchor>a94cb8426c71368d0a24cf95fcc70a3d6ad102acc20b0123ad06640d8c591c304f</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>NEURON_PARAMS_REGION</name>
       <anchorfile>regions_8h.html</anchorfile>
-      <anchor>ae999d786209aa275138bef0bf9012295a0763e3d54f2b5ccc90f6ba223d6b68e8</anchor>
+      <anchor>a94cb8426c71368d0a24cf95fcc70a3d6a0763e3d54f2b5ccc90f6ba223d6b68e8</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>SYNAPSE_PARAMS_REGION</name>
       <anchorfile>regions_8h.html</anchorfile>
-      <anchor>ae999d786209aa275138bef0bf9012295a3e4b437e3952b8683d2dde3f61a15d80</anchor>
+      <anchor>a94cb8426c71368d0a24cf95fcc70a3d6a3e4b437e3952b8683d2dde3f61a15d80</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>POPULATION_TABLE_REGION</name>
       <anchorfile>regions_8h.html</anchorfile>
-      <anchor>ae999d786209aa275138bef0bf9012295aa5d73e2f95ea7659b63a96ada14f5389</anchor>
+      <anchor>a94cb8426c71368d0a24cf95fcc70a3d6aa5d73e2f95ea7659b63a96ada14f5389</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>SYNAPTIC_MATRIX_REGION</name>
       <anchorfile>regions_8h.html</anchorfile>
-      <anchor>ae999d786209aa275138bef0bf9012295ad5778663b1d738822f9b1b5ce9dd9061</anchor>
+      <anchor>a94cb8426c71368d0a24cf95fcc70a3d6ad5778663b1d738822f9b1b5ce9dd9061</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>SYNAPSE_DYNAMICS_REGION</name>
       <anchorfile>regions_8h.html</anchorfile>
-      <anchor>ae999d786209aa275138bef0bf9012295ab672882ccd8470f490be492ed18d717b</anchor>
+      <anchor>a94cb8426c71368d0a24cf95fcc70a3d6ab672882ccd8470f490be492ed18d717b</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>STRUCTURAL_DYNAMICS_REGION</name>
       <anchorfile>regions_8h.html</anchorfile>
-      <anchor>ae999d786209aa275138bef0bf9012295acd7db540d3cd331b92037b99a0447167</anchor>
+      <anchor>a94cb8426c71368d0a24cf95fcc70a3d6acd7db540d3cd331b92037b99a0447167</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>NEURON_RECORDING_REGION</name>
       <anchorfile>regions_8h.html</anchorfile>
-      <anchor>ae999d786209aa275138bef0bf9012295ad275180dd412ee1f4d842871435e2440</anchor>
+      <anchor>a94cb8426c71368d0a24cf95fcc70a3d6ad275180dd412ee1f4d842871435e2440</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>PROVENANCE_DATA_REGION</name>
       <anchorfile>regions_8h.html</anchorfile>
-      <anchor>ae999d786209aa275138bef0bf9012295a9dcdca344c3940f5dabd669af51fede2</anchor>
+      <anchor>a94cb8426c71368d0a24cf95fcc70a3d6a9dcdca344c3940f5dabd669af51fede2</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>PROFILER_REGION</name>
       <anchorfile>regions_8h.html</anchorfile>
-      <anchor>ae999d786209aa275138bef0bf9012295a161a63f4ef09daf69f48a49cc4a8ef5b</anchor>
+      <anchor>a94cb8426c71368d0a24cf95fcc70a3d6a161a63f4ef09daf69f48a49cc4a8ef5b</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>CONNECTOR_BUILDER_REGION</name>
       <anchorfile>regions_8h.html</anchorfile>
-      <anchor>ae999d786209aa275138bef0bf9012295adb65127156b69789622d7edc85785aa9</anchor>
+      <anchor>a94cb8426c71368d0a24cf95fcc70a3d6adb65127156b69789622d7edc85785aa9</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>DIRECT_MATRIX_REGION</name>
       <anchorfile>regions_8h.html</anchorfile>
-      <anchor>ae999d786209aa275138bef0bf9012295a84d4ee5aba19d8207b0707272b24d31f</anchor>
+      <anchor>a94cb8426c71368d0a24cf95fcc70a3d6a84d4ee5aba19d8207b0707272b24d31f</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>BIT_FIELD_FILTER_REGION</name>
       <anchorfile>regions_8h.html</anchorfile>
-      <anchor>ae999d786209aa275138bef0bf9012295a34f5ecbcfa6c6469d2e5d1fbbae9a55b</anchor>
+      <anchor>a94cb8426c71368d0a24cf95fcc70a3d6a34f5ecbcfa6c6469d2e5d1fbbae9a55b</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>BIT_FIELD_BUILDER</name>
       <anchorfile>regions_8h.html</anchorfile>
-      <anchor>ae999d786209aa275138bef0bf9012295a9fe4b33a648c41ceae6630767bb6dd2d</anchor>
+      <anchor>a94cb8426c71368d0a24cf95fcc70a3d6a9fe4b33a648c41ceae6630767bb6dd2d</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>BIT_FIELD_KEY_MAP</name>
       <anchorfile>regions_8h.html</anchorfile>
-      <anchor>ae999d786209aa275138bef0bf9012295ad5b5a1863e094414c5fd530f7b0c42ff</anchor>
+      <anchor>a94cb8426c71368d0a24cf95fcc70a3d6ad5b5a1863e094414c5fd530f7b0c42ff</anchor>
       <arglist></arglist>
     </member>
   </compound>
   <compound kind="file">
     <name>spike_processing.c</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/</path>
     <filename>spike__processing_8c.html</filename>
     <includes id="spike__processing_8h" name="spike_processing.h" local="yes" imported="no">spike_processing.h</includes>
     <includes id="population__table_8h" name="population_table.h" local="yes" imported="no">population_table/population_table.h</includes>
@@ -6075,10 +6213,10 @@
       <arglist></arglist>
     </member>
     <member kind="variable" static="yes">
-      <type>static struct @7</type>
+      <type>static struct @0</type>
       <name>p_per_ts_struct</name>
       <anchorfile>spike__processing_8c.html</anchorfile>
-      <anchor>a72e1a0b25adf0ccbc7bc9d9f8ac69570</anchor>
+      <anchor>ad01efea30fbccd550ba6608ec41ee61e</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable" static="yes">
@@ -6091,7 +6229,7 @@
   </compound>
   <compound kind="file">
     <name>spike_processing.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/</path>
     <filename>spike__processing_8h.html</filename>
     <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
     <includes id="in__spikes_8h" name="in_spikes.h" local="no" imported="no">common/in_spikes.h</includes>
@@ -6161,7 +6299,7 @@
   </compound>
   <compound kind="file">
     <name>elimination.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/structural_plasticity/synaptogenesis/elimination/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/structural_plasticity/synaptogenesis/elimination/</path>
     <filename>elimination_8h.html</filename>
     <includes id="sp__structs_8h" name="sp_structs.h" local="no" imported="no">neuron/structural_plasticity/synaptogenesis/sp_structs.h</includes>
     <member kind="function">
@@ -6181,7 +6319,7 @@
   </compound>
   <compound kind="file">
     <name>elimination_random_by_weight_impl.c</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/structural_plasticity/synaptogenesis/elimination/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/structural_plasticity/synaptogenesis/elimination/</path>
     <filename>elimination__random__by__weight__impl_8c.html</filename>
     <includes id="elimination__random__by__weight__impl_8h" name="elimination_random_by_weight_impl.h" local="yes" imported="no">elimination_random_by_weight_impl.h</includes>
     <member kind="function">
@@ -6194,7 +6332,7 @@
   </compound>
   <compound kind="file">
     <name>elimination_random_by_weight_impl.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/structural_plasticity/synaptogenesis/elimination/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/structural_plasticity/synaptogenesis/elimination/</path>
     <filename>elimination__random__by__weight__impl_8h.html</filename>
     <includes id="elimination_8h" name="elimination.h" local="yes" imported="no">elimination.h</includes>
     <class kind="struct">elimination_params</class>
@@ -6208,7 +6346,7 @@
   </compound>
   <compound kind="file">
     <name>formation.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/structural_plasticity/synaptogenesis/formation/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/structural_plasticity/synaptogenesis/formation/</path>
     <filename>formation_8h.html</filename>
     <includes id="sp__structs_8h" name="sp_structs.h" local="no" imported="no">neuron/structural_plasticity/synaptogenesis/sp_structs.h</includes>
     <member kind="function">
@@ -6228,7 +6366,7 @@
   </compound>
   <compound kind="file">
     <name>formation_distance_dependent_impl.c</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/structural_plasticity/synaptogenesis/formation/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/structural_plasticity/synaptogenesis/formation/</path>
     <filename>formation__distance__dependent__impl_8c.html</filename>
     <includes id="formation__distance__dependent__impl_8h" name="formation_distance_dependent_impl.h" local="yes" imported="no">formation_distance_dependent_impl.h</includes>
     <member kind="function">
@@ -6241,7 +6379,7 @@
   </compound>
   <compound kind="file">
     <name>formation_distance_dependent_impl.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/structural_plasticity/synaptogenesis/formation/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/structural_plasticity/synaptogenesis/formation/</path>
     <filename>formation__distance__dependent__impl_8h.html</filename>
     <includes id="formation_8h" name="formation.h" local="yes" imported="no">formation.h</includes>
     <class kind="struct">formation_params</class>
@@ -6269,7 +6407,7 @@
   </compound>
   <compound kind="file">
     <name>last_neuron_selection_impl.c</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/structural_plasticity/synaptogenesis/partner_selection/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/structural_plasticity/synaptogenesis/partner_selection/</path>
     <filename>last__neuron__selection__impl_8c.html</filename>
     <includes id="last__neuron__selection__impl_8h" name="last_neuron_selection_impl.h" local="yes" imported="no">last_neuron_selection_impl.h</includes>
     <member kind="function">
@@ -6310,7 +6448,7 @@
   </compound>
   <compound kind="file">
     <name>last_neuron_selection_impl.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/structural_plasticity/synaptogenesis/partner_selection/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/structural_plasticity/synaptogenesis/partner_selection/</path>
     <filename>last__neuron__selection__impl_8h.html</filename>
     <includes id="partner_8h" name="partner.h" local="yes" imported="no">partner.h</includes>
     <includes id="spike__processing_8h" name="spike_processing.h" local="no" imported="no">neuron/spike_processing.h</includes>
@@ -6345,7 +6483,7 @@
   </compound>
   <compound kind="file">
     <name>partner.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/structural_plasticity/synaptogenesis/partner_selection/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/structural_plasticity/synaptogenesis/partner_selection/</path>
     <filename>partner_8h.html</filename>
     <includes id="synapses_8h" name="synapses.h" local="no" imported="no">neuron/synapses.h</includes>
     <includes id="sp__structs_8h" name="sp_structs.h" local="no" imported="no">neuron/structural_plasticity/synaptogenesis/sp_structs.h</includes>
@@ -6380,7 +6518,7 @@
   </compound>
   <compound kind="file">
     <name>random_selection_impl.c</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/structural_plasticity/synaptogenesis/partner_selection/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/structural_plasticity/synaptogenesis/partner_selection/</path>
     <filename>random__selection__impl_8c.html</filename>
     <includes id="random__selection__impl_8h" name="random_selection_impl.h" local="yes" imported="no">random_selection_impl.h</includes>
     <member kind="function">
@@ -6393,7 +6531,7 @@
   </compound>
   <compound kind="file">
     <name>random_selection_impl.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/structural_plasticity/synaptogenesis/partner_selection/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/structural_plasticity/synaptogenesis/partner_selection/</path>
     <filename>random__selection__impl_8h.html</filename>
     <includes id="partner_8h" name="partner.h" local="yes" imported="no">partner.h</includes>
     <includes id="spike__processing_8h" name="spike_processing.h" local="no" imported="no">neuron/spike_processing.h</includes>
@@ -6414,7 +6552,7 @@
   </compound>
   <compound kind="file">
     <name>sp_structs.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/structural_plasticity/synaptogenesis/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/structural_plasticity/synaptogenesis/</path>
     <filename>sp__structs_8h.html</filename>
     <includes id="synapse__dynamics_8h" name="synapse_dynamics.h" local="no" imported="no">neuron/plasticity/synapse_dynamics.h</includes>
     <includes id="synapse__row_8h" name="synapse_row.h" local="no" imported="no">neuron/synapse_row.h</includes>
@@ -6476,7 +6614,7 @@
   </compound>
   <compound kind="file">
     <name>topographic_map_impl.c</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/structural_plasticity/synaptogenesis/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/structural_plasticity/synaptogenesis/</path>
     <filename>topographic__map__impl_8c.html</filename>
     <includes id="synaptogenesis__dynamics_8h" name="synaptogenesis_dynamics.h" local="no" imported="no">neuron/structural_plasticity/synaptogenesis_dynamics.h</includes>
     <includes id="population__table_8h" name="population_table.h" local="no" imported="no">neuron/population_table/population_table.h</includes>
@@ -6587,7 +6725,7 @@
   </compound>
   <compound kind="file">
     <name>synaptogenesis_dynamics.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/structural_plasticity/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/structural_plasticity/</path>
     <filename>synaptogenesis__dynamics_8h.html</filename>
     <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
     <member kind="function">
@@ -6642,7 +6780,7 @@
   </compound>
   <compound kind="file">
     <name>synaptogenesis_dynamics_static_impl.c</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/structural_plasticity/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/structural_plasticity/</path>
     <filename>synaptogenesis__dynamics__static__impl_8c.html</filename>
     <includes id="synaptogenesis__dynamics_8h" name="synaptogenesis_dynamics.h" local="yes" imported="no">synaptogenesis_dynamics.h</includes>
     <member kind="function">
@@ -6697,7 +6835,7 @@
   </compound>
   <compound kind="file">
     <name>synapse_row.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/</path>
     <filename>synapse__row_8h.html</filename>
     <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
     <member kind="define">
@@ -6825,7 +6963,7 @@
   </compound>
   <compound kind="file">
     <name>synapse_types.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/synapse_types/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/synapse_types/</path>
     <filename>synapse__types_8h.html</filename>
     <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
     <includes id="synapse__row_8h" name="synapse_row.h" local="no" imported="no">neuron/synapse_row.h</includes>
@@ -6888,7 +7026,7 @@
   </compound>
   <compound kind="file">
     <name>synapse_types_alpha_impl.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/synapse_types/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/synapse_types/</path>
     <filename>synapse__types__alpha__impl_8h.html</filename>
     <includes id="decay_8h" name="decay.h" local="no" imported="no">neuron/decay.h</includes>
     <includes id="synapse__types_8h" name="synapse_types.h" local="yes" imported="no">synapse_types.h</includes>
@@ -7021,7 +7159,7 @@
   </compound>
   <compound kind="file">
     <name>synapse_types_delta_impl.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/synapse_types/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/synapse_types/</path>
     <filename>synapse__types__delta__impl_8h.html</filename>
     <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
     <includes id="synapse__types_8h" name="synapse_types.h" local="yes" imported="no">synapse_types.h</includes>
@@ -7154,7 +7292,7 @@
   </compound>
   <compound kind="file">
     <name>synapse_types_dual_excitatory_exponential_impl.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/synapse_types/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/synapse_types/</path>
     <filename>synapse__types__dual__excitatory__exponential__impl_8h.html</filename>
     <includes id="decay_8h" name="decay.h" local="no" imported="no">neuron/decay.h</includes>
     <includes id="synapse__types_8h" name="synapse_types.h" local="yes" imported="no">synapse_types.h</includes>
@@ -7293,7 +7431,7 @@
   </compound>
   <compound kind="file">
     <name>synapse_types_exponential_impl.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/synapse_types/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/synapse_types/</path>
     <filename>synapse__types__exponential__impl_8h.html</filename>
     <includes id="decay_8h" name="decay.h" local="no" imported="no">neuron/decay.h</includes>
     <includes id="synapse__types_8h" name="synapse_types.h" local="yes" imported="no">synapse_types.h</includes>
@@ -7426,7 +7564,7 @@
   </compound>
   <compound kind="file">
     <name>synapse_types_semd_impl.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/synapse_types/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/synapse_types/</path>
     <filename>synapse__types__semd__impl_8h.html</filename>
     <includes id="decay_8h" name="decay.h" local="no" imported="no">neuron/decay.h</includes>
     <includes id="synapse__types_8h" name="synapse_types.h" local="yes" imported="no">synapse_types.h</includes>
@@ -7572,7 +7710,7 @@
   </compound>
   <compound kind="file">
     <name>synapses.c</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/</path>
     <filename>synapses_8c.html</filename>
     <includes id="synapses_8h" name="synapses.h" local="yes" imported="no">synapses.h</includes>
     <includes id="spike__processing_8h" name="spike_processing.h" local="yes" imported="no">spike_processing.h</includes>
@@ -7763,7 +7901,7 @@
   </compound>
   <compound kind="file">
     <name>synapses.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/</path>
     <filename>synapses_8h.html</filename>
     <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
     <includes id="synapse__row_8h" name="synapse_row.h" local="yes" imported="no">synapse_row.h</includes>
@@ -7848,7 +7986,7 @@
   </compound>
   <compound kind="file">
     <name>threshold_type.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/threshold_types/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/threshold_types/</path>
     <filename>threshold__type_8h.html</filename>
     <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
     <member kind="typedef">
@@ -7868,7 +8006,7 @@
   </compound>
   <compound kind="file">
     <name>threshold_type_maass_stochastic.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/threshold_types/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/threshold_types/</path>
     <filename>threshold__type__maass__stochastic_8h.html</filename>
     <includes id="threshold__type_8h" name="threshold_type.h" local="yes" imported="no">threshold_type.h</includes>
     <class kind="struct">threshold_type_t</class>
@@ -7889,7 +8027,7 @@
   </compound>
   <compound kind="file">
     <name>threshold_type_none.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/threshold_types/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/threshold_types/</path>
     <filename>threshold__type__none_8h.html</filename>
     <includes id="threshold__type_8h" name="threshold_type.h" local="yes" imported="no">threshold_type.h</includes>
     <class kind="struct">threshold_type_t</class>
@@ -7903,7 +8041,7 @@
   </compound>
   <compound kind="file">
     <name>threshold_type_static.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/threshold_types/</path>
+    <path>/github/workspace/neural_modelling/src/neuron/threshold_types/</path>
     <filename>threshold__type__static_8h.html</filename>
     <includes id="threshold__type_8h" name="threshold_type.h" local="yes" imported="no">threshold_type.h</includes>
     <class kind="struct">threshold_type_t</class>
@@ -7917,7 +8055,7 @@
   </compound>
   <compound kind="file">
     <name>robot_motor_control.c</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/robot_motor_control/</path>
+    <path>/github/workspace/neural_modelling/src/robot_motor_control/</path>
     <filename>robot__motor__control_8c.html</filename>
     <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
     <includes id="in__spikes_8h" name="in_spikes.h" local="no" imported="no">common/in_spikes.h</includes>
@@ -8193,7 +8331,7 @@
   </compound>
   <compound kind="file">
     <name>spike_source_poisson.c</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/spike_source/poisson/</path>
+    <path>/github/workspace/neural_modelling/src/spike_source/poisson/</path>
     <filename>spike__source__poisson_8c.html</filename>
     <includes id="maths-util_8h" name="maths-util.h" local="no" imported="no">common/maths-util.h</includes>
     <includes id="spike__source_2poisson_2profile__tags_8h" name="profile_tags.h" local="yes" imported="no">profile_tags.h</includes>
@@ -8274,33 +8412,33 @@
     </member>
     <member kind="enumeration">
       <type></type>
-      <name>ssp_callback_priorities</name>
+      <name>callback_priorities</name>
       <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>a7c54a8b18154111f876d35c32724bade</anchor>
+      <anchor>a65b19dabf5283c1ea37df964ca25e964</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>MULTICAST</name>
       <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>a7c54a8b18154111f876d35c32724badea607d700b2c0a01c54bdadde074a7cb12</anchor>
+      <anchor>a65b19dabf5283c1ea37df964ca25e964a607d700b2c0a01c54bdadde074a7cb12</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>SDP</name>
       <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>a7c54a8b18154111f876d35c32724badead645defae8408de2415f3dc417f69773</anchor>
+      <anchor>a65b19dabf5283c1ea37df964ca25e964ad645defae8408de2415f3dc417f69773</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>DMA</name>
       <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>a7c54a8b18154111f876d35c32724badea6537a62f6f155792bb9a320ee2ec4d68</anchor>
+      <anchor>a65b19dabf5283c1ea37df964ca25e964a6537a62f6f155792bb9a320ee2ec4d68</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>TIMER</name>
       <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>a7c54a8b18154111f876d35c32724badea17ba9bae1b8d7e8d6c12d46ec58e0769</anchor>
+      <anchor>a65b19dabf5283c1ea37df964ca25e964a17ba9bae1b8d7e8d6c12d46ec58e0769</anchor>
       <arglist></arglist>
     </member>
     <member kind="function" static="yes">
@@ -8586,7 +8724,7 @@
   </compound>
   <compound kind="file">
     <name>common_kernel.c</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/synapse_expander/</path>
+    <path>/github/workspace/neural_modelling/src/synapse_expander/</path>
     <filename>common__kernel_8c.html</filename>
     <includes id="common__kernel_8h" name="common_kernel.h" local="yes" imported="no">common_kernel.h</includes>
     <member kind="function">
@@ -8613,7 +8751,7 @@
   </compound>
   <compound kind="file">
     <name>common_kernel.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/synapse_expander/</path>
+    <path>/github/workspace/neural_modelling/src/synapse_expander/</path>
     <filename>common__kernel_8h.html</filename>
     <member kind="function">
       <type>uint16_t</type>
@@ -8639,7 +8777,7 @@
   </compound>
   <compound kind="file">
     <name>common_mem.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/synapse_expander/</path>
+    <path>/github/workspace/neural_modelling/src/synapse_expander/</path>
     <filename>common__mem_8h.html</filename>
     <member kind="function" static="yes">
       <type>static void</type>
@@ -8651,7 +8789,7 @@
   </compound>
   <compound kind="file">
     <name>connection_generator.c</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/synapse_expander/</path>
+    <path>/github/workspace/neural_modelling/src/synapse_expander/</path>
     <filename>connection__generator_8c.html</filename>
     <includes id="connection__generator_8h" name="connection_generator.h" local="yes" imported="no">connection_generator.h</includes>
     <includes id="generator__types_8h" name="generator_types.h" local="yes" imported="no">generator_types.h</includes>
@@ -8665,51 +8803,135 @@
     <class kind="struct">connection_generator_info</class>
     <class kind="struct">connection_generator</class>
     <member kind="enumvalue">
+      <name>OFFSET_TO_I</name>
+      <anchorfile>munich__protocol_8h.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55baa890a0ce75c6dee9ecbac3a2c87220cc</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>OFFSET_TO_F</name>
+      <anchorfile>munich__protocol_8h.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55ba964ef105cedcef1b651c6a4e58e33302</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>OFFSET_TO_D</name>
+      <anchorfile>munich__protocol_8h.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55baad87c155efc7814564f9b47dfb651b3f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
       <name>ONE_TO_ONE</name>
       <anchorfile>connection__generator_8c.html</anchorfile>
-      <anchor>abed82baf7f470b522273a3e37c24c600adaccc17f840cc67d0e9c1a9a331b2fb4</anchor>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55badaccc17f840cc67d0e9c1a9a331b2fb4</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>ALL_TO_ALL</name>
       <anchorfile>connection__generator_8c.html</anchorfile>
-      <anchor>abed82baf7f470b522273a3e37c24c600a403e4025d2925f132293a50eae7381fe</anchor>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55ba403e4025d2925f132293a50eae7381fe</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>FIXED_PROBABILITY</name>
       <anchorfile>connection__generator_8c.html</anchorfile>
-      <anchor>abed82baf7f470b522273a3e37c24c600a8f6a6db47b5476cf11f24317f14ee4a7</anchor>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55ba8f6a6db47b5476cf11f24317f14ee4a7</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>FIXED_TOTAL</name>
       <anchorfile>connection__generator_8c.html</anchorfile>
-      <anchor>abed82baf7f470b522273a3e37c24c600a8338dcf5840ce1a01a4c26d9c49dc560</anchor>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55ba8338dcf5840ce1a01a4c26d9c49dc560</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>FIXED_PRE</name>
       <anchorfile>connection__generator_8c.html</anchorfile>
-      <anchor>abed82baf7f470b522273a3e37c24c600aa667dfec30c43a0320c7bd76b99bd4c7</anchor>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55baa667dfec30c43a0320c7bd76b99bd4c7</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>FIXED_POST</name>
       <anchorfile>connection__generator_8c.html</anchorfile>
-      <anchor>abed82baf7f470b522273a3e37c24c600aa130e7b038fc0ede3b0203931063b116</anchor>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55baa130e7b038fc0ede3b0203931063b116</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>KERNEL</name>
       <anchorfile>connection__generator_8c.html</anchorfile>
-      <anchor>abed82baf7f470b522273a3e37c24c600a53c6e691e7db9eceefc0fb37cb724cd2</anchor>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55ba53c6e691e7db9eceefc0fb37cb724cd2</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>N_CONNECTION_GENERATORS</name>
       <anchorfile>connection__generator_8c.html</anchorfile>
-      <anchor>abed82baf7f470b522273a3e37c24c600ab1144285d7382feeb4687af0263e2467</anchor>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55bab1144285d7382feeb4687af0263e2467</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>STATIC_MATRIX_GENERATOR</name>
+      <anchorfile>matrix__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55baf14f18f5ed2665f8cb095c1363fc9848</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>PLASTIC_MATRIX_GENERATOR</name>
+      <anchorfile>matrix__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55ba08b27fbab7a770bae071d9defb278782</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>N_MATRIX_GENERATORS</name>
+      <anchorfile>matrix__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55baba9a03e4fd023b2837469ea1ff6225a3</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>CONSTANT</name>
+      <anchorfile>param__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55ba83972670b57415508523b5641bb46116</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>UNIFORM</name>
+      <anchorfile>param__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55ba8f44784d154005a214e0fe94119d28ef</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>NORMAL</name>
+      <anchorfile>param__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55ba50d1448013c6f17125caee18aa418af7</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>NORMAL_CLIPPED</name>
+      <anchorfile>param__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55bac40cefd2a096660da3f41d6ee6352889</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>NORMAL_CLIPPED_BOUNDARY</name>
+      <anchorfile>param__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55baca06c44d4221f47f9d61534ca1e35752</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>EXPONENTIAL</name>
+      <anchorfile>param__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55baa6055a3a8ab1aed0594419b51d9ec15e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>KERNEL</name>
+      <anchorfile>param__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55ba53c6e691e7db9eceefc0fb37cb724cd2</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>N_PARAM_GENERATORS</name>
+      <anchorfile>param__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55bab8047ff7dfdb2c76ef1e78a7e6347777</anchor>
       <arglist></arglist>
     </member>
     <member kind="function">
@@ -8743,7 +8965,7 @@
   </compound>
   <compound kind="file">
     <name>connection_generator.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/synapse_expander/</path>
+    <path>/github/workspace/neural_modelling/src/synapse_expander/</path>
     <filename>connection__generator_8h.html</filename>
     <member kind="function">
       <type>connection_generator_t</type>
@@ -8769,7 +8991,7 @@
   </compound>
   <compound kind="file">
     <name>connection_generator_all_to_all.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/synapse_expander/connection_generators/</path>
+    <path>/github/workspace/neural_modelling/src/synapse_expander/connection_generators/</path>
     <filename>connection__generator__all__to__all_8h.html</filename>
     <includes id="generator__types_8h" name="generator_types.h" local="no" imported="no">synapse_expander/generator_types.h</includes>
     <class kind="struct">all_to_all</class>
@@ -8797,7 +9019,7 @@
   </compound>
   <compound kind="file">
     <name>connection_generator_fixed_post.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/synapse_expander/connection_generators/</path>
+    <path>/github/workspace/neural_modelling/src/synapse_expander/connection_generators/</path>
     <filename>connection__generator__fixed__post_8h.html</filename>
     <includes id="rng_8h" name="rng.h" local="no" imported="no">synapse_expander/rng.h</includes>
     <class kind="struct">fixed_post_params</class>
@@ -8833,7 +9055,7 @@
   </compound>
   <compound kind="file">
     <name>connection_generator_fixed_pre.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/synapse_expander/connection_generators/</path>
+    <path>/github/workspace/neural_modelling/src/synapse_expander/connection_generators/</path>
     <filename>connection__generator__fixed__pre_8h.html</filename>
     <includes id="rng_8h" name="rng.h" local="no" imported="no">synapse_expander/rng.h</includes>
     <class kind="struct">fixed_pre_params</class>
@@ -8877,7 +9099,7 @@
   </compound>
   <compound kind="file">
     <name>connection_generator_fixed_prob.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/synapse_expander/connection_generators/</path>
+    <path>/github/workspace/neural_modelling/src/synapse_expander/connection_generators/</path>
     <filename>connection__generator__fixed__prob_8h.html</filename>
     <includes id="rng_8h" name="rng.h" local="no" imported="no">synapse_expander/rng.h</includes>
     <includes id="generator__types_8h" name="generator_types.h" local="no" imported="no">synapse_expander/generator_types.h</includes>
@@ -8907,7 +9129,7 @@
   </compound>
   <compound kind="file">
     <name>connection_generator_fixed_total.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/synapse_expander/connection_generators/</path>
+    <path>/github/workspace/neural_modelling/src/synapse_expander/connection_generators/</path>
     <filename>connection__generator__fixed__total_8h.html</filename>
     <includes id="rng_8h" name="rng.h" local="no" imported="no">synapse_expander/rng.h</includes>
     <includes id="generator__types_8h" name="generator_types.h" local="no" imported="no">synapse_expander/generator_types.h</includes>
@@ -8951,7 +9173,7 @@
   </compound>
   <compound kind="file">
     <name>connection_generator_kernel.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/synapse_expander/connection_generators/</path>
+    <path>/github/workspace/neural_modelling/src/synapse_expander/connection_generators/</path>
     <filename>connection__generator__kernel_8h.html</filename>
     <includes id="common__kernel_8h" name="common_kernel.h" local="no" imported="no">synapse_expander/common_kernel.h</includes>
     <includes id="common__mem_8h" name="common_mem.h" local="no" imported="no">synapse_expander/common_mem.h</includes>
@@ -8981,7 +9203,7 @@
   </compound>
   <compound kind="file">
     <name>connection_generator_one_to_one.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/synapse_expander/connection_generators/</path>
+    <path>/github/workspace/neural_modelling/src/synapse_expander/connection_generators/</path>
     <filename>connection__generator__one__to__one_8h.html</filename>
     <includes id="generator__types_8h" name="generator_types.h" local="no" imported="no">synapse_expander/generator_types.h</includes>
     <class kind="struct">one_to_one</class>
@@ -9009,7 +9231,7 @@
   </compound>
   <compound kind="file">
     <name>delay_expander.c</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/synapse_expander/</path>
+    <path>/github/workspace/neural_modelling/src/synapse_expander/</path>
     <filename>delay__expander_8c.html</filename>
     <includes id="connection__generator_8h" name="connection_generator.h" local="yes" imported="no">connection_generator.h</includes>
     <includes id="param__generator_8h" name="param_generator.h" local="yes" imported="no">param_generator.h</includes>
@@ -9041,7 +9263,7 @@
   </compound>
   <compound kind="file">
     <name>generator_types.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/synapse_expander/</path>
+    <path>/github/workspace/neural_modelling/src/synapse_expander/</path>
     <filename>generator__types_8h.html</filename>
     <member kind="typedef">
       <type>uint32_t</type>
@@ -9088,7 +9310,7 @@
   </compound>
   <compound kind="file">
     <name>matrix_generator.c</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/synapse_expander/</path>
+    <path>/github/workspace/neural_modelling/src/synapse_expander/</path>
     <filename>matrix__generator_8c.html</filename>
     <includes id="matrix__generator_8h" name="matrix_generator.h" local="yes" imported="no">matrix_generator.h</includes>
     <includes id="generator__types_8h" name="generator_types.h" local="yes" imported="no">generator_types.h</includes>
@@ -9098,21 +9320,135 @@
     <class kind="struct">matrix_generator_info</class>
     <class kind="struct">matrix_generator</class>
     <member kind="enumvalue">
+      <name>OFFSET_TO_I</name>
+      <anchorfile>munich__protocol_8h.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55baa890a0ce75c6dee9ecbac3a2c87220cc</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>OFFSET_TO_F</name>
+      <anchorfile>munich__protocol_8h.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55ba964ef105cedcef1b651c6a4e58e33302</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>OFFSET_TO_D</name>
+      <anchorfile>munich__protocol_8h.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55baad87c155efc7814564f9b47dfb651b3f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ONE_TO_ONE</name>
+      <anchorfile>connection__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55badaccc17f840cc67d0e9c1a9a331b2fb4</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ALL_TO_ALL</name>
+      <anchorfile>connection__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55ba403e4025d2925f132293a50eae7381fe</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>FIXED_PROBABILITY</name>
+      <anchorfile>connection__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55ba8f6a6db47b5476cf11f24317f14ee4a7</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>FIXED_TOTAL</name>
+      <anchorfile>connection__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55ba8338dcf5840ce1a01a4c26d9c49dc560</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>FIXED_PRE</name>
+      <anchorfile>connection__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55baa667dfec30c43a0320c7bd76b99bd4c7</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>FIXED_POST</name>
+      <anchorfile>connection__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55baa130e7b038fc0ede3b0203931063b116</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>KERNEL</name>
+      <anchorfile>connection__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55ba53c6e691e7db9eceefc0fb37cb724cd2</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>N_CONNECTION_GENERATORS</name>
+      <anchorfile>connection__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55bab1144285d7382feeb4687af0263e2467</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
       <name>STATIC_MATRIX_GENERATOR</name>
       <anchorfile>matrix__generator_8c.html</anchorfile>
-      <anchor>ab04a0655cd1e3bcac5e8f48c18df1a57af14f18f5ed2665f8cb095c1363fc9848</anchor>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55baf14f18f5ed2665f8cb095c1363fc9848</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>PLASTIC_MATRIX_GENERATOR</name>
       <anchorfile>matrix__generator_8c.html</anchorfile>
-      <anchor>ab04a0655cd1e3bcac5e8f48c18df1a57a08b27fbab7a770bae071d9defb278782</anchor>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55ba08b27fbab7a770bae071d9defb278782</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>N_MATRIX_GENERATORS</name>
       <anchorfile>matrix__generator_8c.html</anchorfile>
-      <anchor>ab04a0655cd1e3bcac5e8f48c18df1a57aba9a03e4fd023b2837469ea1ff6225a3</anchor>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55baba9a03e4fd023b2837469ea1ff6225a3</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>CONSTANT</name>
+      <anchorfile>param__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55ba83972670b57415508523b5641bb46116</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>UNIFORM</name>
+      <anchorfile>param__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55ba8f44784d154005a214e0fe94119d28ef</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>NORMAL</name>
+      <anchorfile>param__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55ba50d1448013c6f17125caee18aa418af7</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>NORMAL_CLIPPED</name>
+      <anchorfile>param__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55bac40cefd2a096660da3f41d6ee6352889</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>NORMAL_CLIPPED_BOUNDARY</name>
+      <anchorfile>param__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55baca06c44d4221f47f9d61534ca1e35752</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>EXPONENTIAL</name>
+      <anchorfile>param__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55baa6055a3a8ab1aed0594419b51d9ec15e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>KERNEL</name>
+      <anchorfile>param__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55ba53c6e691e7db9eceefc0fb37cb724cd2</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>N_PARAM_GENERATORS</name>
+      <anchorfile>param__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55bab8047ff7dfdb2c76ef1e78a7e6347777</anchor>
       <arglist></arglist>
     </member>
     <member kind="function">
@@ -9167,7 +9503,7 @@
   </compound>
   <compound kind="file">
     <name>matrix_generator.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/synapse_expander/</path>
+    <path>/github/workspace/neural_modelling/src/synapse_expander/</path>
     <filename>matrix__generator_8h.html</filename>
     <includes id="connection__generator_8h" name="connection_generator.h" local="yes" imported="no">connection_generator.h</includes>
     <includes id="param__generator_8h" name="param_generator.h" local="yes" imported="no">param_generator.h</includes>
@@ -9195,7 +9531,7 @@
   </compound>
   <compound kind="file">
     <name>matrix_generator_common.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/synapse_expander/matrix_generators/</path>
+    <path>/github/workspace/neural_modelling/src/synapse_expander/matrix_generators/</path>
     <filename>matrix__generator__common_8h.html</filename>
     <class kind="struct">delay_value</class>
     <member kind="define">
@@ -9215,7 +9551,7 @@
   </compound>
   <compound kind="file">
     <name>matrix_generator_static.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/synapse_expander/matrix_generators/</path>
+    <path>/github/workspace/neural_modelling/src/synapse_expander/matrix_generators/</path>
     <filename>matrix__generator__static_8h.html</filename>
     <includes id="delay__extension_8h" name="delay_extension.h" local="no" imported="no">delay_extension/delay_extension.h</includes>
     <includes id="matrix__generator__common_8h" name="matrix_generator_common.h" local="yes" imported="no">matrix_generator_common.h</includes>
@@ -9300,7 +9636,7 @@
   </compound>
   <compound kind="file">
     <name>matrix_generator_stdp.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/synapse_expander/matrix_generators/</path>
+    <path>/github/workspace/neural_modelling/src/synapse_expander/matrix_generators/</path>
     <filename>matrix__generator__stdp_8h.html</filename>
     <includes id="delay__extension_8h" name="delay_extension.h" local="no" imported="no">delay_extension/delay_extension.h</includes>
     <includes id="matrix__generator__common_8h" name="matrix_generator_common.h" local="yes" imported="no">matrix_generator_common.h</includes>
@@ -9379,7 +9715,7 @@
   </compound>
   <compound kind="file">
     <name>param_generator.c</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/synapse_expander/</path>
+    <path>/github/workspace/neural_modelling/src/synapse_expander/</path>
     <filename>param__generator_8c.html</filename>
     <includes id="param__generator_8h" name="param_generator.h" local="yes" imported="no">param_generator.h</includes>
     <includes id="generator__types_8h" name="generator_types.h" local="yes" imported="no">generator_types.h</includes>
@@ -9393,51 +9729,135 @@
     <class kind="struct">param_generator_info</class>
     <class kind="struct">param_generator</class>
     <member kind="enumvalue">
+      <name>OFFSET_TO_I</name>
+      <anchorfile>munich__protocol_8h.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55baa890a0ce75c6dee9ecbac3a2c87220cc</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>OFFSET_TO_F</name>
+      <anchorfile>munich__protocol_8h.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55ba964ef105cedcef1b651c6a4e58e33302</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>OFFSET_TO_D</name>
+      <anchorfile>munich__protocol_8h.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55baad87c155efc7814564f9b47dfb651b3f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ONE_TO_ONE</name>
+      <anchorfile>connection__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55badaccc17f840cc67d0e9c1a9a331b2fb4</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ALL_TO_ALL</name>
+      <anchorfile>connection__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55ba403e4025d2925f132293a50eae7381fe</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>FIXED_PROBABILITY</name>
+      <anchorfile>connection__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55ba8f6a6db47b5476cf11f24317f14ee4a7</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>FIXED_TOTAL</name>
+      <anchorfile>connection__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55ba8338dcf5840ce1a01a4c26d9c49dc560</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>FIXED_PRE</name>
+      <anchorfile>connection__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55baa667dfec30c43a0320c7bd76b99bd4c7</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>FIXED_POST</name>
+      <anchorfile>connection__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55baa130e7b038fc0ede3b0203931063b116</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>KERNEL</name>
+      <anchorfile>connection__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55ba53c6e691e7db9eceefc0fb37cb724cd2</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>N_CONNECTION_GENERATORS</name>
+      <anchorfile>connection__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55bab1144285d7382feeb4687af0263e2467</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>STATIC_MATRIX_GENERATOR</name>
+      <anchorfile>matrix__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55baf14f18f5ed2665f8cb095c1363fc9848</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>PLASTIC_MATRIX_GENERATOR</name>
+      <anchorfile>matrix__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55ba08b27fbab7a770bae071d9defb278782</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>N_MATRIX_GENERATORS</name>
+      <anchorfile>matrix__generator_8c.html</anchorfile>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55baba9a03e4fd023b2837469ea1ff6225a3</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
       <name>CONSTANT</name>
       <anchorfile>param__generator_8c.html</anchorfile>
-      <anchor>a385c44f6fb256e5716a2302a5b940388a83972670b57415508523b5641bb46116</anchor>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55ba83972670b57415508523b5641bb46116</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>UNIFORM</name>
       <anchorfile>param__generator_8c.html</anchorfile>
-      <anchor>a385c44f6fb256e5716a2302a5b940388a8f44784d154005a214e0fe94119d28ef</anchor>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55ba8f44784d154005a214e0fe94119d28ef</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>NORMAL</name>
       <anchorfile>param__generator_8c.html</anchorfile>
-      <anchor>a385c44f6fb256e5716a2302a5b940388a50d1448013c6f17125caee18aa418af7</anchor>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55ba50d1448013c6f17125caee18aa418af7</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>NORMAL_CLIPPED</name>
       <anchorfile>param__generator_8c.html</anchorfile>
-      <anchor>a385c44f6fb256e5716a2302a5b940388ac40cefd2a096660da3f41d6ee6352889</anchor>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55bac40cefd2a096660da3f41d6ee6352889</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>NORMAL_CLIPPED_BOUNDARY</name>
       <anchorfile>param__generator_8c.html</anchorfile>
-      <anchor>a385c44f6fb256e5716a2302a5b940388aca06c44d4221f47f9d61534ca1e35752</anchor>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55baca06c44d4221f47f9d61534ca1e35752</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>EXPONENTIAL</name>
       <anchorfile>param__generator_8c.html</anchorfile>
-      <anchor>a385c44f6fb256e5716a2302a5b940388aa6055a3a8ab1aed0594419b51d9ec15e</anchor>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55baa6055a3a8ab1aed0594419b51d9ec15e</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>KERNEL</name>
       <anchorfile>param__generator_8c.html</anchorfile>
-      <anchor>a385c44f6fb256e5716a2302a5b940388a53c6e691e7db9eceefc0fb37cb724cd2</anchor>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55ba53c6e691e7db9eceefc0fb37cb724cd2</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>N_PARAM_GENERATORS</name>
       <anchorfile>param__generator_8c.html</anchorfile>
-      <anchor>a385c44f6fb256e5716a2302a5b940388ab8047ff7dfdb2c76ef1e78a7e6347777</anchor>
+      <anchor>a06fc87d81c62e9abb8790b6e5713c55bab8047ff7dfdb2c76ef1e78a7e6347777</anchor>
       <arglist></arglist>
     </member>
     <member kind="function">
@@ -9471,7 +9891,7 @@
   </compound>
   <compound kind="file">
     <name>param_generator.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/synapse_expander/</path>
+    <path>/github/workspace/neural_modelling/src/synapse_expander/</path>
     <filename>param__generator_8h.html</filename>
     <member kind="function">
       <type>param_generator_t</type>
@@ -9497,7 +9917,7 @@
   </compound>
   <compound kind="file">
     <name>param_generator_constant.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/synapse_expander/param_generators/</path>
+    <path>/github/workspace/neural_modelling/src/synapse_expander/param_generators/</path>
     <filename>param__generator__constant_8h.html</filename>
     <includes id="generator__types_8h" name="generator_types.h" local="no" imported="no">synapse_expander/generator_types.h</includes>
     <class kind="struct">param_generator_constant</class>
@@ -9525,7 +9945,7 @@
   </compound>
   <compound kind="file">
     <name>param_generator_exponential.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/synapse_expander/param_generators/</path>
+    <path>/github/workspace/neural_modelling/src/synapse_expander/param_generators/</path>
     <filename>param__generator__exponential_8h.html</filename>
     <includes id="rng_8h" name="rng.h" local="no" imported="no">synapse_expander/rng.h</includes>
     <includes id="generator__types_8h" name="generator_types.h" local="no" imported="no">synapse_expander/generator_types.h</includes>
@@ -9555,7 +9975,7 @@
   </compound>
   <compound kind="file">
     <name>param_generator_kernel.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/synapse_expander/param_generators/</path>
+    <path>/github/workspace/neural_modelling/src/synapse_expander/param_generators/</path>
     <filename>param__generator__kernel_8h.html</filename>
     <includes id="common__kernel_8h" name="common_kernel.h" local="no" imported="no">synapse_expander/common_kernel.h</includes>
     <includes id="common__mem_8h" name="common_mem.h" local="no" imported="no">synapse_expander/common_mem.h</includes>
@@ -9586,7 +10006,7 @@
   </compound>
   <compound kind="file">
     <name>param_generator_normal.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/synapse_expander/param_generators/</path>
+    <path>/github/workspace/neural_modelling/src/synapse_expander/param_generators/</path>
     <filename>param__generator__normal_8h.html</filename>
     <includes id="rng_8h" name="rng.h" local="no" imported="no">synapse_expander/rng.h</includes>
     <includes id="generator__types_8h" name="generator_types.h" local="no" imported="no">synapse_expander/generator_types.h</includes>
@@ -9616,7 +10036,7 @@
   </compound>
   <compound kind="file">
     <name>param_generator_normal_clipped.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/synapse_expander/param_generators/</path>
+    <path>/github/workspace/neural_modelling/src/synapse_expander/param_generators/</path>
     <filename>param__generator__normal__clipped_8h.html</filename>
     <includes id="rng_8h" name="rng.h" local="no" imported="no">synapse_expander/rng.h</includes>
     <includes id="generator__types_8h" name="generator_types.h" local="no" imported="no">synapse_expander/generator_types.h</includes>
@@ -9646,7 +10066,7 @@
   </compound>
   <compound kind="file">
     <name>param_generator_normal_clipped_to_boundary.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/synapse_expander/param_generators/</path>
+    <path>/github/workspace/neural_modelling/src/synapse_expander/param_generators/</path>
     <filename>param__generator__normal__clipped__to__boundary_8h.html</filename>
     <includes id="rng_8h" name="rng.h" local="no" imported="no">synapse_expander/rng.h</includes>
     <includes id="generator__types_8h" name="generator_types.h" local="no" imported="no">synapse_expander/generator_types.h</includes>
@@ -9676,7 +10096,7 @@
   </compound>
   <compound kind="file">
     <name>param_generator_uniform.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/synapse_expander/param_generators/</path>
+    <path>/github/workspace/neural_modelling/src/synapse_expander/param_generators/</path>
     <filename>param__generator__uniform_8h.html</filename>
     <includes id="rng_8h" name="rng.h" local="no" imported="no">synapse_expander/rng.h</includes>
     <includes id="generator__types_8h" name="generator_types.h" local="no" imported="no">synapse_expander/generator_types.h</includes>
@@ -9706,7 +10126,7 @@
   </compound>
   <compound kind="file">
     <name>rng.c</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/synapse_expander/</path>
+    <path>/github/workspace/neural_modelling/src/synapse_expander/</path>
     <filename>rng_8c.html</filename>
     <includes id="rng_8h" name="rng.h" local="yes" imported="no">rng.h</includes>
     <includes id="common__mem_8h" name="common_mem.h" local="yes" imported="no">common_mem.h</includes>
@@ -9749,7 +10169,7 @@
   </compound>
   <compound kind="file">
     <name>rng.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/synapse_expander/</path>
+    <path>/github/workspace/neural_modelling/src/synapse_expander/</path>
     <filename>rng_8h.html</filename>
     <member kind="function">
       <type>rng_t</type>
@@ -9789,7 +10209,7 @@
   </compound>
   <compound kind="file">
     <name>synapse_expander.c</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/synapse_expander/</path>
+    <path>/github/workspace/neural_modelling/src/synapse_expander/</path>
     <filename>synapse__expander_8c.html</filename>
     <includes id="regions_8h" name="regions.h" local="no" imported="no">neuron/regions.h</includes>
     <includes id="matrix__generator_8h" name="matrix_generator.h" local="yes" imported="no">matrix_generator.h</includes>
@@ -11163,21 +11583,21 @@
     </member>
   </compound>
   <compound kind="struct">
-    <name>neuron_recording_header</name>
+    <name>neuron_recording_header_t</name>
     <filename>neuron__recording_8c.html</filename>
-    <anchor>structneuron__recording__header</anchor>
+    <anchor>structneuron__recording__header__t</anchor>
     <member kind="variable">
       <type>uint32_t</type>
       <name>n_recorded_vars</name>
       <anchorfile>neuron__recording_8c.html</anchorfile>
-      <anchor>acce7b4575d97dcb99c5359ad4ee97348</anchor>
+      <anchor>abedd25f4658e60246836b650b8432a7b</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
       <type>uint32_t</type>
       <name>n_bitfield_vars</name>
       <anchorfile>neuron__recording_8c.html</anchorfile>
-      <anchor>a35044dd51fe79c178f07acf694bb2062</anchor>
+      <anchor>aceb45219931c687ba2595c66b9561e18</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -12080,7 +12500,7 @@
   <compound kind="page">
     <name>index</name>
     <title>sPyNNaker: A PyNN Implementation for SpiNNaker</title>
-    <filename>index</filename>
+    <filename>index.html</filename>
     <docanchor file="index.html" title="Neuron Simulation Implementation">neuron</docanchor>
     <docanchor file="index.html" title="Support Binaries">support</docanchor>
   </compound>

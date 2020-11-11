@@ -410,22 +410,17 @@ this function</li>
 <dl class="staticmethod">
 <dt id="spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.get_master_population_table_size">
 <em class="property">static </em><code class="descname">get_master_population_table_size</code><span class="sig-paren">(</span><em>in_edges</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/master_pop_table.html#MasterPopTableAsBinarySearch.get_master_population_table_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.get_master_population_table_size" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the size of the master population table in SDRAM</p>
-<dl class="docutils">
-<dt>:param iterable(~pacman.model.graphs.application.ApplicationEdge)</dt>
-<dd><blockquote class="first">
-<div>in_edges:</div></blockquote>
-<p class="last">The edges arriving at the vertex that are to be handled by this
-table</p>
-</dd>
-</dl>
+<dd><p>Get the size of the master population table in SDRAM.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">the size the master pop table will take in SDRAM (in bytes)</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>in_edges</strong> (<em>iterable</em><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationEdge" title="(in PACMAN v)"><em>ApplicationEdge</em></a><em>)</em><em></em>) &#8211; The edges arriving at the vertex that are to be handled by this
+table</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the size the master pop table will take in SDRAM (in bytes)</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
 </tr>
 </tbody>
 </table>
@@ -517,7 +512,7 @@ table</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>spec</strong> (<em>DataSpecificationGenerator</em>) &#8211; The spec to write to</li>
+<li><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v)"><em>DataSpecificationGenerator</em></a>) &#8211; The spec to write to</li>
 <li><strong>next_block_start_address</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The address we are starting at</li>
 </ul>
 </td>
@@ -782,22 +777,31 @@ AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE</p>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><p>(row_data, delayed_row_data, delayed_source_ids, stages) where
-- row_data is the undelayed connectivity data arranged into a row</p>
-<blockquote>
-<div><p>per source, each row the same length</p>
-</div></blockquote>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><p>(<code class="docutils literal"><span class="pre">row_data</span></code>, <code class="docutils literal"><span class="pre">delayed_row_data</span></code>, <code class="docutils literal"><span class="pre">delayed_source_ids</span></code>,
+<code class="docutils literal"><span class="pre">stages</span></code>) where:</p>
 <ul class="simple">
-<li>delayed_row_data is the delayed connectivity data arranged into a
-row per source per delay stage, each row the same length</li>
-<li>delayed_source_ids is the machine-vertex-local source neuron id
-of each connection of the delayed vertices</li>
-<li>stages is the delay stage of each delayed connection</li>
+<li><dl class="first docutils">
+<dt><code class="docutils literal"><span class="pre">row_data</span></code> is the undelayed connectivity data arranged into a</dt>
+<dd>row per source, each row the same length</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><code class="docutils literal"><span class="pre">delayed_row_data</span></code> is the delayed connectivity data arranged</dt>
+<dd>into a row per source per delay stage, each row the same length</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><code class="docutils literal"><span class="pre">delayed_source_ids</span></code> is the machine-vertex-local source neuron</dt>
+<dd>id of each connection of the delayed vertices</dd>
+</dl>
+</li>
+<li><code class="docutils literal"><span class="pre">stages</span></code> is the delay stage of each delayed connection</li>
 </ul>
 </p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a>(<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a>,            <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a>)</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a>(<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a>,
+<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a>)</p>
 </td>
 </tr>
 </tbody>
@@ -818,7 +822,7 @@ of each connection of the delayed vertices</li>
 <li><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) &#8211; The synapse info that generated the synapses</li>
 <li><strong>n_synapse_types</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The total number of synapse types available</li>
 <li><strong>weight_scales</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em></em>) &#8211; A weight scale for each synapse type</li>
-<li><strong>machine_edge</strong> (<em>MachineEdge</em>) &#8211; The incoming machine edge that the synapses were generated from</li>
+<li><strong>machine_edge</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineEdge" title="(in PACMAN v)"><em>MachineEdge</em></a>) &#8211; The incoming machine edge that the synapses were generated from</li>
 <li><strong>max_row_info</strong> (<a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_io.MaxRowInfo" title="spynnaker.pyNN.models.neuron.synapse_io.MaxRowInfo"><em>MaxRowInfo</em></a>) &#8211; The maximum information for each of the rows</li>
 </ul>
 </td>
@@ -852,7 +856,7 @@ AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE</p>
 <li><strong>post_vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of the post vertex that these matrices are for</li>
 <li><strong>n_synapse_types</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The number of synapse types available</li>
 <li><strong>all_single_syn_sz</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The space available for &#8220;direct&#8221; or &#8220;single&#8221; synapses</li>
-<li><strong>synapse_io</strong> (<em>SynapseIO</em>) &#8211; How to read and write synapses</li>
+<li><strong>synapse_io</strong> (<a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_io.SynapseIORowBased" title="spynnaker.pyNN.models.neuron.synapse_io.SynapseIORowBased"><em>SynapseIORowBased</em></a>) &#8211; How to read and write synapses</li>
 <li><strong>synaptic_matrix_region</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The region where synaptic matrices are stored</li>
 <li><strong>direct_matrix_region</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The region where &#8220;direct&#8221; or &#8220;single&#8221; synapses are stored</li>
 <li><strong>poptable_region</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The region where the population table is stored</li>
@@ -890,8 +894,8 @@ AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>transceiver</strong> (<em>Transceiver</em>) &#8211; Used to read the data from the machine</li>
-<li><strong>placements</strong> (<em>Placements</em>) &#8211; Where the vertices are on the machine</li>
+<li><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan v)"><em>Transceiver</em></a>) &#8211; Used to read the data from the machine</li>
+<li><strong>placements</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placements" title="(in PACMAN v)"><em>Placements</em></a>) &#8211; Where the vertices are on the machine</li>
 <li><strong>app_edge</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge" title="spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge"><em>ProjectionApplicationEdge</em></a>) &#8211; The application edge of the projection</li>
 <li><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) &#8211; The synapse information of the projection</li>
 </ul>
@@ -953,8 +957,8 @@ reserved for the on-machine synaptic generation</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>transceiver</strong> (<em>Transceiver</em>) &#8211; How to read the data from the machine</li>
-<li><strong>placement</strong> (<em>Placement</em>) &#8211; where the data is to be read from</li>
+<li><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan v)"><em>Transceiver</em></a>) &#8211; How to read the data from the machine</li>
+<li><strong>placement</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placement" title="(in PACMAN v)"><em>Placement</em></a>) &#8211; where the data is to be read from</li>
 </ul>
 </td>
 </tr>
@@ -970,7 +974,7 @@ reserved for the on-machine synaptic generation</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>app_edges</strong> &#8211; The incoming application edges</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>app_edges</strong> (<em>iterable</em><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationEdge" title="(in PACMAN v)"><em>ApplicationEdge</em></a><em>)</em><em></em>) &#8211; The incoming application edges</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
 </tr>
@@ -986,7 +990,7 @@ reserved for the on-machine synaptic generation</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>app_edges</strong> &#8211; The incoming application edges</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>app_edges</strong> (<em>iterable</em><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationEdge" title="(in PACMAN v)"><em>ApplicationEdge</em></a><em>)</em><em></em>) &#8211; The incoming application edges</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
 </tr>
@@ -1006,12 +1010,12 @@ reserved for the on-machine synaptic generation</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>spec</strong> (<em>DataSpecificationGenerator</em>) &#8211; The spec to write to</li>
-<li><strong>machine_vertex</strong> (<em>MachineVertex</em>) &#8211; The machine vertex to write for</li>
+<li><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v)"><em>DataSpecificationGenerator</em></a>) &#8211; The spec to write to</li>
+<li><strong>machine_vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineVertex" title="(in PACMAN v)"><em>MachineVertex</em></a>) &#8211; The machine vertex to write for</li>
 <li><strong>all_syn_block_sz</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The size in bytes of the space reserved for synapses</li>
 <li><strong>weight_scales</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em></em>) &#8211; The weight scale of each synapse</li>
-<li><strong>routing_info</strong> (<em>RoutingInfo</em>) &#8211; The routing information for all edges</li>
-<li><strong>machine_graph</strong> (<em>MachineGraph</em>) &#8211; The machine graph</li>
+<li><strong>routing_info</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.routing_info/#pacman.model.routing_info.RoutingInfo" title="(in PACMAN v)"><em>RoutingInfo</em></a>) &#8211; The routing information for all edges</li>
+<li><strong>machine_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineGraph" title="(in PACMAN v)"><em>MachineGraph</em></a>) &#8211; The machine graph</li>
 </ul>
 </td>
 </tr>
@@ -1040,15 +1044,15 @@ reserved for the on-machine synaptic generation</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>synapse_io</strong> (<em>SynapseIO</em>) &#8211; The reader and writer of synapses</li>
+<li><strong>synapse_io</strong> (<a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_io.SynapseIORowBased" title="spynnaker.pyNN.models.neuron.synapse_io.SynapseIORowBased"><em>SynapseIORowBased</em></a>) &#8211; The reader and writer of synapses</li>
 <li><strong>poptable</strong> (<a class="reference internal" href="#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch" title="spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch"><em>MasterPopTableAsBinarySearch</em></a>) &#8211; The master population table</li>
 <li><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) &#8211; The projection synapse information</li>
 <li><strong>machine_edge</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionMachineEdge" title="spynnaker.pyNN.models.neural_projections.ProjectionMachineEdge"><em>ProjectionMachineEdge</em></a>) &#8211; The projection machine edge</li>
 <li><strong>app_edge</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge" title="spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge"><em>ProjectionApplicationEdge</em></a>) &#8211; The projection application edge</li>
 <li><strong>n_synapse_types</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The number of synapse types accepted</li>
 <li><strong>max_row_info</strong> (<a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_io.MaxRowInfo" title="spynnaker.pyNN.models.neuron.synapse_io.MaxRowInfo"><em>MaxRowInfo</em></a>) &#8211; Maximum row length information</li>
-<li><strong>routing_info</strong> (<em>PartitionRoutingInfo</em>) &#8211; Routing information for the edge</li>
-<li><strong>delay_routing_info</strong> (<em>PartitionRoutingInfo</em>) &#8211; Routing information for the delay edge if any</li>
+<li><strong>routing_info</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.routing_info/#pacman.model.routing_info.PartitionRoutingInfo" title="(in PACMAN v)"><em>PartitionRoutingInfo</em></a>) &#8211; Routing information for the edge</li>
+<li><strong>delay_routing_info</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.routing_info/#pacman.model.routing_info.PartitionRoutingInfo" title="(in PACMAN v)"><em>PartitionRoutingInfo</em></a>) &#8211; Routing information for the delay edge if any</li>
 <li><strong>weight_scales</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em></em>) &#8211; Weight scale for each synapse type</li>
 <li><strong>all_syn_block_sz</strong> &#8211; The space available for all synaptic matrices</li>
 <li><strong>all_single_syn_sz</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The space available for &#8220;direct&#8221; or &#8220;single&#8221; synapses</li>
@@ -1267,7 +1271,7 @@ the next offset of the single matrix</td>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>transceiver</strong> (<em>Transceiver</em>) &#8211; How to read the data from the machine</li>
-<li><strong>placement</strong> (<em>Placement</em>) &#8211; Where the matrix is on the machine</li>
+<li><strong>placement</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placement" title="(in PACMAN v)"><em>Placement</em></a>) &#8211; Where the matrix is on the machine</li>
 <li><strong>synapses_address</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The base address of the synaptic matrix region</li>
 <li><strong>single_address</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The base address of the &#8220;direct&#8221; or &#8220;single&#8221; matrix region</li>
 </ul>
@@ -1293,7 +1297,7 @@ AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>spec</strong> (<em>DataSpecificationGenerator</em>) &#8211; The specification to write to</li>
+<li><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v)"><em>DataSpecificationGenerator</em></a>) &#8211; The specification to write to</li>
 <li><strong>block_addr</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The address in the synaptic matrix region to start writing at</li>
 <li><strong>row_data</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a>) &#8211; The data to write</li>
 </ul>
@@ -1318,7 +1322,7 @@ AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>spec</strong> (<em>DataSpecificationGenerator</em>) &#8211; The specification to write to</li>
+<li><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v)"><em>DataSpecificationGenerator</em></a>) &#8211; The specification to write to</li>
 <li><strong>block_addr</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The address in the synaptic matrix region to start writing at</li>
 <li><strong>single_addr</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The address in the &#8220;direct&#8221; or &#8220;single&#8221; matrix to start at</li>
 <li><strong>single_synapses</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) &#8211; A list of &#8220;direct&#8221; or &#8220;single&#8221; synapses to write to</li>
@@ -1352,7 +1356,7 @@ app edge</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>synapse_io</strong> (<em>SynapseIO</em>) &#8211; The reader and writer of synapses</li>
+<li><strong>synapse_io</strong> (<a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_io.SynapseIORowBased" title="spynnaker.pyNN.models.neuron.synapse_io.SynapseIORowBased"><em>SynapseIORowBased</em></a>) &#8211; The reader and writer of synapses</li>
 <li><strong>poptable</strong> (<a class="reference internal" href="#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch" title="spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch"><em>MasterPopTableAsBinarySearch</em></a>) &#8211; The master population table</li>
 <li><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) &#8211; The projection synapse information</li>
 <li><strong>app_edge</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge" title="spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge"><em>ProjectionApplicationEdge</em></a>) &#8211; The projection application edge</li>
@@ -1447,8 +1451,8 @@ app edge</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>transceiver</strong> (<em>Transceiver</em>) &#8211; How to read the data from the machine</li>
-<li><strong>placement</strong> (<em>Placement</em>) &#8211; Where the matrix is on the machine</li>
+<li><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan v)"><em>Transceiver</em></a>) &#8211; How to read the data from the machine</li>
+<li><strong>placement</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placement" title="(in PACMAN v)"><em>Placement</em></a>) &#8211; Where the matrix is on the machine</li>
 </ul>
 </td>
 </tr>
@@ -1474,7 +1478,7 @@ AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>machine_edge</strong> &#8211; The edge to get the index for</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>machine_edge</strong> (<em>MachineEdge</em>) &#8211; The edge to get the index for</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
 </tr>
@@ -1493,7 +1497,7 @@ AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>machine_edge</strong> &#8211; The edge to get the index for</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>machine_edge</strong> (<em>MachineEdge</em>) &#8211; The edge to get the index for</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
 </tr>
@@ -1510,8 +1514,8 @@ AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>transceiver</strong> (<em>Transceiver</em>) &#8211; How to read the data from the machine</li>
-<li><strong>placement</strong> (<em>Placement</em>) &#8211; Where the matrix is on the machine</li>
+<li><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan v)"><em>Transceiver</em></a>) &#8211; How to read the data from the machine</li>
+<li><strong>placement</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placement" title="(in PACMAN v)"><em>Placement</em></a>) &#8211; Where the matrix is on the machine</li>
 </ul>
 </td>
 </tr>
@@ -1534,7 +1538,7 @@ AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE</p>
 <li><strong>all_syn_block_sz</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The space available for all synaptic matrices on the core</li>
 <li><strong>app_key_info</strong> (<em>_AppKeyInfo</em>) &#8211; Application-level routing key information for undelayed vertices</li>
 <li><strong>delay_app_key_info</strong> (<em>_AppKeyInfo</em>) &#8211; Application-level routing key information for delayed vertices</li>
-<li><strong>routing_info</strong> (<em>RoutingInfo</em>) &#8211; Routing key information for all incoming edges</li>
+<li><strong>routing_info</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.routing_info/#pacman.model.routing_info.RoutingInfo" title="(in PACMAN v)"><em>RoutingInfo</em></a>) &#8211; Routing key information for all incoming edges</li>
 <li><strong>weight_scales</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em></em>) &#8211; Weight scale for each synapse edge</li>
 <li><strong>m_edges</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionMachineEdge" title="spynnaker.pyNN.models.neural_projections.ProjectionMachineEdge"><em>ProjectionMachineEdge</em></a><em>)</em><em></em>) &#8211; The machine edges incoming to this vertex</li>
 </ul>
@@ -1553,7 +1557,7 @@ AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>spec</strong> (<em>DataSpecificationGenerator</em>) &#8211; The specification to write to</li>
+<li><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v)"><em>DataSpecificationGenerator</em></a>) &#8211; The specification to write to</li>
 <li><strong>block_addr</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The address in the synaptic matrix region to start writing at</li>
 <li><strong>single_addr</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The address in the &#8220;direct&#8221; or &#8220;single&#8221; matrix to start at</li>
 <li><strong>single_synapses</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em><em></em>) &#8211; A list of &#8220;direct&#8221; or &#8220;single&#8221; synapses to write to</li>
@@ -1761,7 +1765,7 @@ or None to use the default slice</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>transceiver</strong> (<em>Transceiver</em>) &#8211; How to read the connection data</li>
+<li><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan v)"><em>Transceiver</em></a>) &#8211; How to read the connection data</li>
 <li><strong>placements</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placements" title="(in PACMAN v)"><em>Placements</em></a>) &#8211; Where the connection data is on the machine</li>
 <li><strong>app_edge</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge" title="spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge"><em>ProjectionApplicationEdge</em></a>) &#8211; The edge for which the data is being read</li>
 <li><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) &#8211; The specific projection within the edge</li>
@@ -2540,12 +2544,12 @@ source, target, weight and delay</td>
 <li><strong>constraints</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v)"><em>AbstractConstraint</em></a><em>)</em><em></em>) &#8211; </li>
 <li><strong>app_vertex</strong> (<a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex" title="spynnaker.pyNN.models.neuron.AbstractPopulationVertex"><em>AbstractPopulationVertex</em></a>) &#8211; The associated application vertex</li>
 <li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of the population that this implements</li>
+<li><strong>binary_file_name</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; binary name to be run for this verte</li>
 </ul>
 </td>
 </tr>
 </tbody>
 </table>
-<p>&#64;param str binary_file_name: binary name to be run for this verte</p>
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.neuron.PopulationMachineVertex.BIT_FIELDS_NOT_READ">
 <code class="descname">BIT_FIELDS_NOT_READ</code><em class="property"> = 'N bit fields not able to be read into DTCM'</em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.BIT_FIELDS_NOT_READ" title="Permalink to this definition">¶</a></dt>
@@ -2786,8 +2790,11 @@ source, target, weight and delay</td>
 <code class="descclassname">PopulationMachineVertex.</code><code class="descname">gen_on_machine</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/population_machine_vertex.html#PopulationMachineVertex.gen_on_machine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.gen_on_machine" title="Permalink to this definition">¶</a></dt>
 <dd><p>True if the synapses of a the slice of this vertex should be generated
 on the machine.</p>
-<p>Note: The typical implementation for this method will be to ask the
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The typical implementation for this method will be to ask the
 app_vertex&#8217;s synapse_manager</p>
+</div>
 </dd></dl>
 
 <dl class="method">
@@ -2942,15 +2949,18 @@ app_vertex&#8217;s synapse_manager</p>
 <dt id="spynnaker.pyNN.models.neuron.PopulationMachineVertex.read_generated_connection_holders">
 <code class="descclassname">PopulationMachineVertex.</code><code class="descname">read_generated_connection_holders</code><span class="sig-paren">(</span><em>transceiver</em>, <em>placement</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/population_machine_vertex.html#PopulationMachineVertex.read_generated_connection_holders"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.read_generated_connection_holders" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fill in the connection holders</p>
-<p>Note: The typical implementation for this method will be to ask the
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The typical implementation for this method will be to ask the
 app_vertex&#8217;s synapse_manager</p>
+</div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>transceiver</strong> (<em>Transceiver</em>) &#8211; How the data is to be read</li>
-<li><strong>placement</strong> (<em>Placement</em>) &#8211; Where the data is on the machine</li>
+<li><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan v)"><em>Transceiver</em></a>) &#8211; How the data is to be read</li>
+<li><strong>placement</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placement" title="(in PACMAN v)"><em>Placement</em></a>) &#8211; Where the data is on the machine</li>
 </ul>
 </td>
 </tr>
@@ -3097,7 +3107,7 @@ which might change things</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>transceiver</strong> (<em>Transceiver</em>) &#8211; Used to read the data from the machine</li>
-<li><strong>placements</strong> (<em>Placements</em>) &#8211; Where the vertices are on the machine</li>
+<li><strong>placements</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placements" title="(in PACMAN v)"><em>Placements</em></a>) &#8211; Where the vertices are on the machine</li>
 <li><strong>app_edge</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge" title="spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge"><em>ProjectionApplicationEdge</em></a>) &#8211; The application edge of the projection</li>
 <li><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) &#8211; The synapse information of the projection</li>
 </ul>
@@ -3229,8 +3239,8 @@ AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>transceiver</strong> (<em>Transceiver</em>) &#8211; How to read the data from the machine</li>
-<li><strong>placement</strong> (<em>Placement</em>) &#8211; where the data is to be read from</li>
+<li><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan v)"><em>Transceiver</em></a>) &#8211; How to read the data from the machine</li>
+<li><strong>placement</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placement" title="(in PACMAN v)"><em>Placement</em></a>) &#8211; where the data is to be read from</li>
 </ul>
 </td>
 </tr>

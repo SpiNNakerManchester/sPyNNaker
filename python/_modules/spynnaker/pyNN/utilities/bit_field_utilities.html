@@ -79,40 +79,45 @@
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kn">import</span> <span class="nn">math</span>
-
 <span class="kn">from</span> <span class="nn">pacman.utilities.constants</span> <span class="kn">import</span> <span class="n">FULL_MASK</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
 <span class="kn">from</span> <span class="nn">pacman.utilities.algorithm_utilities.</span> \
-    <span class="n">partition_algorithm_utilities</span> <span class="kn">import</span> <span class="nn">determine_max_atoms_for_vertex</span>
+    <span class="n">partition_algorithm_utilities</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="n">determine_max_atoms_for_vertex</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neural_projections</span> <span class="kn">import</span> <span class="n">ProjectionApplicationEdge</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.utility_models.delays</span> <span class="kn">import</span> <span class="n">DelayExtensionVertex</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="n">AbstractHasDelayStages</span>
 
-<span class="c1"># number of elements</span>
+<span class="c1">#: number of elements</span>
 <span class="n">ELEMENTS_USED_IN_EACH_BIT_FIELD</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># n words, key, pointer to bitfield</span>
 
-<span class="c1"># n_filters, pointer for array</span>
+<span class="c1">#: n_filters, pointer for array</span>
 <span class="n">ELEMENTS_USED_IN_BIT_FIELD_HEADER</span> <span class="o">=</span> <span class="mi">2</span>
 
-<span class="c1"># n elements in each key to n atoms map for bitfield (key, n atoms)</span>
+<span class="c1">#: n elements in each key to n atoms map for bitfield (key, n atoms)</span>
 <span class="n">N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP</span> <span class="o">=</span> <span class="mi">2</span>
 
-<span class="c1"># the regions addresses needed (</span>
-<span class="c1">#  pop table, synaptic matrix, direct matrix, bit_field, bit field builder,</span>
-<span class="c1"># bit_field_key, structural region)</span>
+<span class="c1">#: the regions addresses needed (</span>
+<span class="c1">#: pop table, synaptic matrix, direct matrix, bit_field, bit field builder,</span>
+<span class="c1">#: bit_field_key, structural region)</span>
 <span class="n">N_REGIONS_ADDRESSES</span> <span class="o">=</span> <span class="mi">6</span>
 
-<span class="c1"># n key to n neurons maps size in words</span>
+<span class="c1">#: n key to n neurons maps size in words</span>
 <span class="n">N_KEYS_DATA_SET_IN_WORDS</span> <span class="o">=</span> <span class="mi">1</span>
 
-<span class="c1"># the number of bits in a word (WHY IS THIS NOT A CONSTANT SOMEWHERE!)</span>
+<span class="c1">#: the number of bits in a word</span>
+<span class="c1"># (WHY IS THIS NOT A CONSTANT SOMEWHERE!)</span>
 <span class="n">BIT_IN_A_WORD</span> <span class="o">=</span> <span class="mf">32.0</span>
 
 
 <div class="viewcode-block" id="get_estimated_sdram_for_bit_field_region"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_bit_field_region">[docs]</a><span class="k">def</span> <span class="nf">get_estimated_sdram_for_bit_field_region</span><span class="p">(</span><span class="n">app_graph</span><span class="p">,</span> <span class="n">vertex</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; estimates the sdram for the bit field region</span>
-<span class="sd">    :param app_graph: the app graph</span>
-<span class="sd">    :param vertex: machine vertex</span>
+    <span class="sd">&quot;&quot;&quot; estimates the SDRAM for the bit field region</span>
+
+<span class="sd">    :param ~pacman.model.graphs.application.ApplicationGraph app_graph:</span>
+<span class="sd">        the app graph</span>
+<span class="sd">    :param ~pacman.model.graphs.application.ApplicationVertex vertex:</span>
+<span class="sd">        app vertex</span>
 <span class="sd">    :return: the estimated number of bytes used by the bit field region</span>
+<span class="sd">    :rtype: int</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">sdram</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">for</span> <span class="n">incoming_edge</span> <span class="ow">in</span> <span class="n">app_graph</span><span class="o">.</span><span class="n">get_edges_ending_at_vertex</span><span class="p">(</span><span class="n">vertex</span><span class="p">):</span>
@@ -129,7 +134,7 @@
             <span class="n">n_atoms_per_machine_vertex</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span>
                 <span class="nb">float</span><span class="p">(</span><span class="n">incoming_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span> <span class="o">/</span>
                 <span class="n">n_machine_vertices</span><span class="p">))</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">edge_pre_vertex</span><span class="p">,</span> <span class="n">DelayExtensionVertex</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">edge_pre_vertex</span><span class="p">,</span> <span class="n">AbstractHasDelayStages</span><span class="p">):</span>
                 <span class="n">n_atoms_per_machine_vertex</span> <span class="o">*=</span> \
                     <span class="n">edge_pre_vertex</span><span class="o">.</span><span class="n">n_delay_stages</span>
             <span class="n">n_words_for_atoms</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span>
@@ -144,11 +149,13 @@
 <div class="viewcode-block" id="get_estimated_sdram_for_key_region"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_key_region">[docs]</a><span class="k">def</span> <span class="nf">get_estimated_sdram_for_key_region</span><span class="p">(</span><span class="n">app_graph</span><span class="p">,</span> <span class="n">vertex</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; gets an estimate of the bitfield builder region</span>
 
-<span class="sd">    :param app_graph: the app graph</span>
-<span class="sd">    :param vertex: machine vertex</span>
-<span class="sd">    :return: sdram needed</span>
+<span class="sd">    :param ~pacman.model.graphs.application.ApplicationGraph app_graph:</span>
+<span class="sd">        the app graph</span>
+<span class="sd">    :param ~pacman.model.graphs.application.ApplicationVertex vertex:</span>
+<span class="sd">        app vertex</span>
+<span class="sd">    :return: SDRAM needed</span>
+<span class="sd">    :rtype: int</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="c1"># basic sdram</span>
     <span class="n">sdram</span> <span class="o">=</span> <span class="n">N_KEYS_DATA_SET_IN_WORDS</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
     <span class="k">for</span> <span class="n">in_edge</span> <span class="ow">in</span> <span class="n">app_graph</span><span class="o">.</span><span class="n">get_edges_ending_at_vertex</span><span class="p">(</span><span class="n">vertex</span><span class="p">):</span>
@@ -167,13 +174,18 @@
 
 <span class="k">def</span> <span class="nf">_exact_sdram_for_bit_field_region</span><span class="p">(</span>
         <span class="n">machine_graph</span><span class="p">,</span> <span class="n">vertex</span><span class="p">,</span> <span class="n">n_key_map</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; calculates the correct sdram for the bitfield region based off \</span>
-<span class="sd">        the machine graph and graph mapper</span>
+    <span class="sd">&quot;&quot;&quot; calculates the correct SDRAM for the bitfield region based off \</span>
+<span class="sd">        the machine graph</span>
 
-<span class="sd">    :param machine_graph: machine graph</span>
-<span class="sd">    :param vertex: the machine vertex</span>
-<span class="sd">    :param n_key_map: n keys map</span>
-<span class="sd">    :return: sdram in bytes</span>
+<span class="sd">    :param ~pacman.model.graphs.machine.MachineGraph machine_graph:</span>
+<span class="sd">        machine graph</span>
+<span class="sd">    :param ~pacman.model.graphs.machine.MachineVertex vertex:</span>
+<span class="sd">        the machine vertex</span>
+<span class="sd">    :param ~pacman.model.routing_info.AbstractMachinePartitionNKeysMap \</span>
+<span class="sd">            n_key_map:</span>
+<span class="sd">        n keys map</span>
+<span class="sd">    :return: SDRAM in bytes</span>
+<span class="sd">    :rtype: int</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">sdram</span> <span class="o">=</span> <span class="n">ELEMENTS_USED_IN_BIT_FIELD_HEADER</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
     <span class="k">for</span> <span class="n">incoming_edge</span> <span class="ow">in</span> <span class="n">machine_graph</span><span class="o">.</span><span class="n">get_edges_ending_at_vertex</span><span class="p">(</span><span class="n">vertex</span><span class="p">):</span>
@@ -188,23 +200,27 @@
 
 
 <div class="viewcode-block" id="exact_sdram_for_bit_field_builder_region"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.bit_field_utilities.exact_sdram_for_bit_field_builder_region">[docs]</a><span class="k">def</span> <span class="nf">exact_sdram_for_bit_field_builder_region</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot; returns the sdram requirement for the builder region</span>
-<span class="sd">    :return: returns the sdram requirement for the builder region</span>
+    <span class="sd">&quot;&quot;&quot; Gets the SDRAM requirement for the builder region</span>
+
+<span class="sd">    :return: the SDRAM requirement for the builder region</span>
+<span class="sd">    :rtype: int</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">N_REGIONS_ADDRESSES</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span></div>
 
 
 <span class="k">def</span> <span class="nf">_exact_sdram_for_bit_field_key_region</span><span class="p">(</span><span class="n">machine_graph</span><span class="p">,</span> <span class="n">vertex</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; calcs the exact sdram for the bitfield key region</span>
+    <span class="sd">&quot;&quot;&quot; Calculates the exact SDRAM for the bitfield key region</span>
 
-<span class="sd">    :param machine_graph: machine graph</span>
-<span class="sd">    :param vertex: machine vertex</span>
+<span class="sd">    :param ~pacman.model.graphs.machine.MachineGraph machine_graph:</span>
+<span class="sd">        machine graph</span>
+<span class="sd">    :param ~pacman.model.graphs.machine.MachineVertex vertex: machine vertex</span>
 <span class="sd">    :return: bytes</span>
+<span class="sd">    :rtype: int</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="p">(</span>
-               <span class="n">N_KEYS_DATA_SET_IN_WORDS</span> <span class="o">+</span>
-               <span class="nb">len</span><span class="p">(</span><span class="n">machine_graph</span><span class="o">.</span><span class="n">get_edges_ending_at_vertex</span><span class="p">(</span><span class="n">vertex</span><span class="p">))</span> <span class="o">*</span>
-               <span class="n">N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP</span><span class="p">)</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
+        <span class="n">N_KEYS_DATA_SET_IN_WORDS</span> <span class="o">+</span>
+        <span class="nb">len</span><span class="p">(</span><span class="n">machine_graph</span><span class="o">.</span><span class="n">get_edges_ending_at_vertex</span><span class="p">(</span><span class="n">vertex</span><span class="p">))</span> <span class="o">*</span>
+        <span class="n">N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP</span><span class="p">)</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
 
 
 <div class="viewcode-block" id="reserve_bit_field_regions"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.bit_field_utilities.reserve_bit_field_regions">[docs]</a><span class="k">def</span> <span class="nf">reserve_bit_field_regions</span><span class="p">(</span>
@@ -212,14 +228,17 @@
         <span class="n">bit_filter_region</span><span class="p">,</span> <span class="n">bit_field_key_region</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; reserves the regions for the bitfields</span>
 
-<span class="sd">    :param spec: dsg file</span>
-<span class="sd">    :param machine_graph: machine graph</span>
-<span class="sd">    :param n_key_map: map between partitions and n keys</span>
-<span class="sd">    :param vertex: machine vertex</span>
-<span class="sd">    :param bit_field_builder_region: region id for the builder region</span>
-<span class="sd">    :param bit_filter_region: region id for the bitfield region</span>
-<span class="sd">    :param bit_field_key_region: region id for the key map</span>
-<span class="sd">    :rtype: None</span>
+<span class="sd">    :param ~data_specification.DataSpecificationGenerator spec:</span>
+<span class="sd">        dsg spec writer</span>
+<span class="sd">    :param ~pacman.model.graphs.machine.MachineGraph machine_graph:</span>
+<span class="sd">        machine graph</span>
+<span class="sd">    :param ~pacman.model.routing_info.AbstractMachinePartitionNKeysMap \</span>
+<span class="sd">            n_key_map:</span>
+<span class="sd">        map between partitions and n keys</span>
+<span class="sd">    :param ~pacman.model.graphs.machine.MachineVertex vertex: machine vertex</span>
+<span class="sd">    :param int bit_field_builder_region: region id for the builder region</span>
+<span class="sd">    :param int bit_filter_region: region id for the bitfield region</span>
+<span class="sd">    :param int bit_field_key_region: region id for the key map</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># reserve the final destination for the bitfields</span>
@@ -250,23 +269,26 @@
         <span class="n">structural_dynamics_region_id</span><span class="p">,</span> <span class="n">has_structural_dynamics_region</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; writes the init data needed for the bitfield generator</span>
 
-<span class="sd">    :param spec: data spec writer</span>
-<span class="sd">    :param machine_vertex: machine vertex</span>
-<span class="sd">    :param machine_graph: machine graph</span>
-<span class="sd">    :param routing_info: keys</span>
-<span class="sd">    :param n_key_map: map for edge to n keys</span>
-<span class="sd">    :param bit_field_builder_region: the region id for the bitfield builder</span>
-<span class="sd">    :param master_pop_region_id: the region id for the master pop table</span>
-<span class="sd">    :param synaptic_matrix_region_id: the region id for the synaptic matrix</span>
-<span class="sd">    :param direct_matrix_region_id: the region id for the direct matrix</span>
-<span class="sd">    :param bit_field_region_id: the region id for the bit-fields</span>
-<span class="sd">    :param bit_field_key_map_region_id: the region id for the key map</span>
-<span class="sd">    :param structural_dynamics_region_id:  the region id for the structural</span>
-<span class="sd">    :param has_structural_dynamics_region: \</span>
-<span class="sd">        bool saying if the core has a has_structural_dynamics_region or not</span>
-<span class="sd">    :rtype: None</span>
+<span class="sd">    :param ~data_specification.DataSpecificationGenerator spec:</span>
+<span class="sd">        data spec writer</span>
+<span class="sd">    :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:</span>
+<span class="sd">        machine vertex</span>
+<span class="sd">    :param ~pacman.model.graphs.machine.MachineGraph machine_graph:</span>
+<span class="sd">        machine graph</span>
+<span class="sd">    :param ~pacman.model.routing_info.RoutingInfo routing_info: keys</span>
+<span class="sd">    :param ~pacman.model.routing_info.AbstractMachinePartitionNKeysMap \</span>
+<span class="sd">            n_key_map:</span>
+<span class="sd">        map for edge to n keys</span>
+<span class="sd">    :param int bit_field_builder_region: the region id for the bitfield builder</span>
+<span class="sd">    :param int master_pop_region_id: the region id for the master pop table</span>
+<span class="sd">    :param int synaptic_matrix_region_id: the region id for the synaptic matrix</span>
+<span class="sd">    :param int direct_matrix_region_id: the region id for the direct matrix</span>
+<span class="sd">    :param int bit_field_region_id: the region id for the bit-fields</span>
+<span class="sd">    :param int bit_field_key_map_region_id: the region id for the key map</span>
+<span class="sd">    :param int structural_dynamics_region_id: the region id for the structural</span>
+<span class="sd">    :param bool has_structural_dynamics_region:</span>
+<span class="sd">        whether the core has a structural_dynamics region</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span><span class="n">bit_field_builder_region</span><span class="p">)</span>
 
     <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">master_pop_region_id</span><span class="p">)</span>

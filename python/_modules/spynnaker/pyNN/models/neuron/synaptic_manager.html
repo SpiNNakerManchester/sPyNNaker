@@ -776,8 +776,10 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Read the connections from the machine for a given projection</span>
 
-<span class="sd">        :param Transceiver transceiver: Used to read the data from the machine</span>
-<span class="sd">        :param Placements placements: Where the vertices are on the machine</span>
+<span class="sd">        :param ~spinnman.transciever.Transceiver transceiver:</span>
+<span class="sd">            Used to read the data from the machine</span>
+<span class="sd">        :param ~pacman.model.placements.Placements placements:</span>
+<span class="sd">            Where the vertices are on the machine</span>
 <span class="sd">        :param ProjectionApplicationEdge app_edge:</span>
 <span class="sd">            The application edge of the projection</span>
 <span class="sd">        :param SynapseInformation synapse_info:</span>
@@ -841,8 +843,10 @@
         <span class="sd">&quot;&quot;&quot; Fill in any pre-run connection holders for data which is generated</span>
 <span class="sd">            on the machine, after it has been generated</span>
 
-<span class="sd">        :param Transceiver transceiver: How to read the data from the machine</span>
-<span class="sd">        :param Placement placement: where the data is to be read from</span>
+<span class="sd">        :param ~spinnman.transceiver.Transceiver transceiver:</span>
+<span class="sd">            How to read the data from the machine</span>
+<span class="sd">        :param ~pacman.model.placements.Placement placement:</span>
+<span class="sd">            where the data is to be read from</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">matrices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_synaptic_matrices</span><span class="p">(</span><span class="n">placement</span><span class="o">.</span><span class="n">vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">)</span>
         <span class="n">matrices</span><span class="o">.</span><span class="n">read_generated_connection_holders</span><span class="p">(</span><span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">)</span></div>

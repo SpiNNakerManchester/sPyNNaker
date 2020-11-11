@@ -233,7 +233,7 @@
 
     <span class="k">def</span> <span class="nf">__check_list_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Makes sure the pre and post slices are sorted lists</span>
+<span class="sd">        Makes sure the pre- and post-slices are sorted lists</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__slices_list_mode</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__pre_slices</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
@@ -244,34 +244,32 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">pre_slices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get the slices for the pre_vertexes of the MachineEdges</span>
+        <span class="sd">&quot;&quot;&quot; Get the slices for the pre_vertexes of the MachineEdges</span>
 
 <span class="sd">        While the remember machine_edges remain unchanged this will return a</span>
-<span class="sd">        list with a consitent id. If the edges change a new list is created</span>
+<span class="sd">        list with a consistent id. If the edges change a new list is created</span>
 
 <span class="sd">        The List will be sorted by lo_atom.</span>
 <span class="sd">        No checking is done for overlaps or gaps</span>
 
-<span class="sd">        :return: Ordered list of pre slices</span>
-<span class="sd">        :rtype list(Slice)</span>
+<span class="sd">        :return: Ordered list of pre-slices</span>
+<span class="sd">        :rtype: list(~pacman.model.graphs.common.Slice)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__check_list_mode</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pre_slices</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">post_slices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get the slices for the post_vertexes of the MachineEdges</span>
+        <span class="sd">&quot;&quot;&quot; Get the slices for the post_vertexes of the MachineEdges</span>
 
 <span class="sd">        While the remember machine_edges remain unchanged this will return a</span>
-<span class="sd">        list with a consitent id. If the edges change a new list is created</span>
+<span class="sd">        list with a consistent id. If the edges change a new list is created</span>
 
 <span class="sd">        The List will be sorted by lo_atom.</span>
 <span class="sd">        No checking is done for overlaps or gaps</span>
 
-<span class="sd">        :return: Ordered list of post slices</span>
-<span class="sd">        :rtype list(Slice)</span>
+<span class="sd">        :return: Ordered list of post-slices</span>
+<span class="sd">        :rtype: list(~pacman.model.graphs.common.Slice)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__check_list_mode</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__post_slices</span></div>

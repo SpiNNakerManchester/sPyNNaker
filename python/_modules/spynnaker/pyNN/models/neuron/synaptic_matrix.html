@@ -147,7 +147,7 @@
                  <span class="n">all_single_syn_sz</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="sd">        :param SynapseIO synapse_io: The reader and writer of synapses</span>
+<span class="sd">        :param SynapseIORowBased synapse_io: The reader and writer of synapses</span>
 <span class="sd">        :param MasterPopTableAsBinarySearch poptable:</span>
 <span class="sd">            The master population table</span>
 <span class="sd">        :param SynapseInformation synapse_info:</span>
@@ -158,9 +158,10 @@
 <span class="sd">            The projection application edge</span>
 <span class="sd">        :param int n_synapse_types: The number of synapse types accepted</span>
 <span class="sd">        :param MaxRowInfo max_row_info: Maximum row length information</span>
-<span class="sd">        :param PartitionRoutingInfo routing_info:</span>
+<span class="sd">        :param ~pacman.model.routing_info.PartitionRoutingInfo routing_info:</span>
 <span class="sd">            Routing information for the edge</span>
-<span class="sd">        :param PartitionRoutingInfo delay_routing_info:</span>
+<span class="sd">        :param ~pacman.model.routing_info.PartitionRoutingInfo \</span>
+<span class="sd">                delay_routing_info:</span>
 <span class="sd">            Routing information for the delay edge if any</span>
 <span class="sd">        :param list(float) weight_scales: Weight scale for each synapse type</span>
 <span class="sd">        :param all_syn_block_sz:</span>
@@ -266,7 +267,8 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">block_addr</span><span class="p">,</span> <span class="n">single_synapses</span><span class="p">,</span> <span class="n">single_addr</span><span class="p">,</span> <span class="n">row_data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Write a matrix for the incoming machine vertex</span>
 
-<span class="sd">        :param DataSpecificationGenerator spec: The specification to write to</span>
+<span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
+<span class="sd">            The specification to write to</span>
 <span class="sd">        :param int block_addr:</span>
 <span class="sd">            The address in the synaptic matrix region to start writing at</span>
 <span class="sd">        :param int single_addr:</span>
@@ -310,7 +312,8 @@
 <div class="viewcode-block" id="SynapticMatrix.write_delayed_machine_matrix"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrix.SynapticMatrix.write_delayed_machine_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">write_delayed_machine_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">block_addr</span><span class="p">,</span> <span class="n">row_data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Write a delayed matrix for an incoming machine vertex</span>
 
-<span class="sd">        :param DataSpecificationGenerator spec: The specification to write to</span>
+<span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
+<span class="sd">            The specification to write to</span>
 <span class="sd">        :param int block_addr:</span>
 <span class="sd">            The address in the synaptic matrix region to start writing at</span>
 <span class="sd">        :param ~numpy.ndarray row_data: The data to write</span>
@@ -548,8 +551,10 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">synapses_address</span><span class="p">,</span> <span class="n">single_address</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Read the connections from the machine</span>
 
-<span class="sd">        :param Transceiver transceiver: How to read the data from the machine</span>
-<span class="sd">        :param Placement placement: Where the matrix is on the machine</span>
+<span class="sd">        :param ~spinnman.transciever.Transceiver transceiver:</span>
+<span class="sd">            How to read the data from the machine</span>
+<span class="sd">        :param ~pacman.model.placements.Placement placement:</span>
+<span class="sd">            Where the matrix is on the machine</span>
 <span class="sd">        :param int synapses_address:</span>
 <span class="sd">            The base address of the synaptic matrix region</span>
 <span class="sd">        :param int single_address:</span>
@@ -596,8 +601,10 @@
     <span class="k">def</span> <span class="nf">__get_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">synapses_address</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get a block of data for undelayed synapses</span>
 
-<span class="sd">        :param Transceiver transceiver: How to read the data from the machine</span>
-<span class="sd">        :param Placement placement: Where the matrix is on the machine</span>
+<span class="sd">        :param ~spinnman.transceiver.Transceiver transceiver:</span>
+<span class="sd">            How to read the data from the machine</span>
+<span class="sd">        :param ~pacman.model.placements.Placement placement:</span>
+<span class="sd">            Where the matrix is on the machine</span>
 <span class="sd">        :param int synapses_address:</span>
 <span class="sd">            The base address of the synaptic matrix region</span>
 <span class="sd">        :rtype: bytearray</span>

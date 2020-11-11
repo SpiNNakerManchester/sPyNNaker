@@ -125,20 +125,82 @@
 </div>
 <div class="section" id="module-spynnaker.pyNN.utilities.bit_field_utilities">
 <span id="spynnaker-pynn-utilities-bit-field-utilities-module"></span><h2>spynnaker.pyNN.utilities.bit_field_utilities module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.bit_field_utilities" title="Permalink to this headline">¶</a></h2>
+<dl class="data">
+<dt id="spynnaker.pyNN.utilities.bit_field_utilities.BIT_IN_A_WORD">
+<code class="descclassname">spynnaker.pyNN.utilities.bit_field_utilities.</code><code class="descname">BIT_IN_A_WORD</code><em class="property"> = 32.0</em><a class="headerlink" href="#spynnaker.pyNN.utilities.bit_field_utilities.BIT_IN_A_WORD" title="Permalink to this definition">¶</a></dt>
+<dd><p>the number of bits in a word</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="spynnaker.pyNN.utilities.bit_field_utilities.ELEMENTS_USED_IN_BIT_FIELD_HEADER">
+<code class="descclassname">spynnaker.pyNN.utilities.bit_field_utilities.</code><code class="descname">ELEMENTS_USED_IN_BIT_FIELD_HEADER</code><em class="property"> = 2</em><a class="headerlink" href="#spynnaker.pyNN.utilities.bit_field_utilities.ELEMENTS_USED_IN_BIT_FIELD_HEADER" title="Permalink to this definition">¶</a></dt>
+<dd><p>n_filters, pointer for array</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="spynnaker.pyNN.utilities.bit_field_utilities.ELEMENTS_USED_IN_EACH_BIT_FIELD">
+<code class="descclassname">spynnaker.pyNN.utilities.bit_field_utilities.</code><code class="descname">ELEMENTS_USED_IN_EACH_BIT_FIELD</code><em class="property"> = 3</em><a class="headerlink" href="#spynnaker.pyNN.utilities.bit_field_utilities.ELEMENTS_USED_IN_EACH_BIT_FIELD" title="Permalink to this definition">¶</a></dt>
+<dd><p>number of elements</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="spynnaker.pyNN.utilities.bit_field_utilities.N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP">
+<code class="descclassname">spynnaker.pyNN.utilities.bit_field_utilities.</code><code class="descname">N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP</code><em class="property"> = 2</em><a class="headerlink" href="#spynnaker.pyNN.utilities.bit_field_utilities.N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP" title="Permalink to this definition">¶</a></dt>
+<dd><p>n elements in each key to n atoms map for bitfield (key, n atoms)</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="spynnaker.pyNN.utilities.bit_field_utilities.N_KEYS_DATA_SET_IN_WORDS">
+<code class="descclassname">spynnaker.pyNN.utilities.bit_field_utilities.</code><code class="descname">N_KEYS_DATA_SET_IN_WORDS</code><em class="property"> = 1</em><a class="headerlink" href="#spynnaker.pyNN.utilities.bit_field_utilities.N_KEYS_DATA_SET_IN_WORDS" title="Permalink to this definition">¶</a></dt>
+<dd><p>n key to n neurons maps size in words</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="spynnaker.pyNN.utilities.bit_field_utilities.N_REGIONS_ADDRESSES">
+<code class="descclassname">spynnaker.pyNN.utilities.bit_field_utilities.</code><code class="descname">N_REGIONS_ADDRESSES</code><em class="property"> = 6</em><a class="headerlink" href="#spynnaker.pyNN.utilities.bit_field_utilities.N_REGIONS_ADDRESSES" title="Permalink to this definition">¶</a></dt>
+<dd><p>the regions addresses needed (
+pop table, synaptic matrix, direct matrix, bit_field, bit field builder,
+bit_field_key, structural region)</p>
+</dd></dl>
+
 <dl class="function">
 <dt id="spynnaker.pyNN.utilities.bit_field_utilities.exact_sdram_for_bit_field_builder_region">
 <code class="descclassname">spynnaker.pyNN.utilities.bit_field_utilities.</code><code class="descname">exact_sdram_for_bit_field_builder_region</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/bit_field_utilities.html#exact_sdram_for_bit_field_builder_region"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.bit_field_utilities.exact_sdram_for_bit_field_builder_region" title="Permalink to this definition">¶</a></dt>
-<dd><p>returns the sdram requirement for the builder region
-:return: returns the sdram requirement for the builder region</p>
+<dd><p>Gets the SDRAM requirement for the builder region</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">the SDRAM requirement for the builder region</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_bit_field_region">
 <code class="descclassname">spynnaker.pyNN.utilities.bit_field_utilities.</code><code class="descname">get_estimated_sdram_for_bit_field_region</code><span class="sig-paren">(</span><em>app_graph</em>, <em>vertex</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/bit_field_utilities.html#get_estimated_sdram_for_bit_field_region"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_bit_field_region" title="Permalink to this definition">¶</a></dt>
-<dd><p>estimates the sdram for the bit field region
-:param app_graph: the app graph
-:param vertex: machine vertex
-:return: the estimated number of bytes used by the bit field region</p>
+<dd><p>estimates the SDRAM for the bit field region</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>app_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationGraph" title="(in PACMAN v)"><em>ApplicationGraph</em></a>) &#8211; the app graph</li>
+<li><strong>vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v)"><em>ApplicationVertex</em></a>) &#8211; app vertex</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the estimated number of bytes used by the bit field region</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
@@ -150,12 +212,15 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>app_graph</strong> &#8211; the app graph</li>
-<li><strong>vertex</strong> &#8211; machine vertex</li>
+<li><strong>app_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationGraph" title="(in PACMAN v)"><em>ApplicationGraph</em></a>) &#8211; the app graph</li>
+<li><strong>vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v)"><em>ApplicationVertex</em></a>) &#8211; app vertex</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">sdram needed</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">SDRAM needed</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></p>
 </td>
 </tr>
 </tbody>
@@ -170,18 +235,15 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>spec</strong> &#8211; dsg file</li>
-<li><strong>machine_graph</strong> &#8211; machine graph</li>
-<li><strong>n_key_map</strong> &#8211; map between partitions and n keys</li>
-<li><strong>vertex</strong> &#8211; machine vertex</li>
-<li><strong>bit_field_builder_region</strong> &#8211; region id for the builder region</li>
-<li><strong>bit_filter_region</strong> &#8211; region id for the bitfield region</li>
-<li><strong>bit_field_key_region</strong> &#8211; region id for the key map</li>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v)"><em>DataSpecificationGenerator</em></a>) &#8211; dsg spec writer</li>
+<li><strong>machine_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineGraph" title="(in PACMAN v)"><em>MachineGraph</em></a>) &#8211; machine graph</li>
+<li><strong>n_key_map</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.routing_info/#pacman.model.routing_info.AbstractMachinePartitionNKeysMap" title="(in PACMAN v)"><em>AbstractMachinePartitionNKeysMap</em></a>) &#8211; map between partitions and n keys</li>
+<li><strong>vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineVertex" title="(in PACMAN v)"><em>MachineVertex</em></a>) &#8211; machine vertex</li>
+<li><strong>bit_field_builder_region</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; region id for the builder region</li>
+<li><strong>bit_filter_region</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; region id for the bitfield region</li>
+<li><strong>bit_field_key_region</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; region id for the key map</li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></p>
 </td>
 </tr>
 </tbody>
@@ -196,24 +258,21 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>spec</strong> &#8211; data spec writer</li>
-<li><strong>machine_vertex</strong> &#8211; machine vertex</li>
-<li><strong>machine_graph</strong> &#8211; machine graph</li>
-<li><strong>routing_info</strong> &#8211; keys</li>
-<li><strong>n_key_map</strong> &#8211; map for edge to n keys</li>
-<li><strong>bit_field_builder_region</strong> &#8211; the region id for the bitfield builder</li>
-<li><strong>master_pop_region_id</strong> &#8211; the region id for the master pop table</li>
-<li><strong>synaptic_matrix_region_id</strong> &#8211; the region id for the synaptic matrix</li>
-<li><strong>direct_matrix_region_id</strong> &#8211; the region id for the direct matrix</li>
-<li><strong>bit_field_region_id</strong> &#8211; the region id for the bit-fields</li>
-<li><strong>bit_field_key_map_region_id</strong> &#8211; the region id for the key map</li>
-<li><strong>structural_dynamics_region_id</strong> &#8211; the region id for the structural</li>
-<li><strong>has_structural_dynamics_region</strong> &#8211; bool saying if the core has a has_structural_dynamics_region or not</li>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v)"><em>DataSpecificationGenerator</em></a>) &#8211; data spec writer</li>
+<li><strong>machine_vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineVertex" title="(in PACMAN v)"><em>MachineVertex</em></a>) &#8211; machine vertex</li>
+<li><strong>machine_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineGraph" title="(in PACMAN v)"><em>MachineGraph</em></a>) &#8211; machine graph</li>
+<li><strong>routing_info</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.routing_info/#pacman.model.routing_info.RoutingInfo" title="(in PACMAN v)"><em>RoutingInfo</em></a>) &#8211; keys</li>
+<li><strong>n_key_map</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.routing_info/#pacman.model.routing_info.AbstractMachinePartitionNKeysMap" title="(in PACMAN v)"><em>AbstractMachinePartitionNKeysMap</em></a>) &#8211; map for edge to n keys</li>
+<li><strong>bit_field_builder_region</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; the region id for the bitfield builder</li>
+<li><strong>master_pop_region_id</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; the region id for the master pop table</li>
+<li><strong>synaptic_matrix_region_id</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; the region id for the synaptic matrix</li>
+<li><strong>direct_matrix_region_id</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; the region id for the direct matrix</li>
+<li><strong>bit_field_region_id</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; the region id for the bit-fields</li>
+<li><strong>bit_field_key_map_region_id</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; the region id for the key map</li>
+<li><strong>structural_dynamics_region_id</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; the region id for the structural</li>
+<li><strong>has_structural_dynamics_region</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; whether the core has a structural_dynamics region</li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></p>
 </td>
 </tr>
 </tbody>

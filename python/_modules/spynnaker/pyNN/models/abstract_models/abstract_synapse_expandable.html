@@ -86,13 +86,14 @@
 
 <span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">AbstractBase</span><span class="p">)</span>
 <div class="viewcode-block" id="AbstractSynapseExpandable"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractSynapseExpandable">[docs]</a><span class="k">class</span> <span class="nc">AbstractSynapseExpandable</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Indicates a class (most likely a MachineVertex) that has may need to</span>
+    <span class="sd">&quot;&quot;&quot; Indicates a class (most likely a MachineVertex) that has may need to\</span>
 <span class="sd">        run the SYNAPSE_EXPANDER aplx</span>
 
-<span class="sd">        Cores that do not use the synapse_manager should not implement this</span>
-<span class="sd">        api even though their app vertex may hold a synapse_manager</span>
+<span class="sd">    Cores that do not use the synapse_manager should not implement this</span>
+<span class="sd">    API even though their app vertex may hold a synapse_manager</span>
 
-<span class="sd">        Note: This is NOT implemented by the DelayExtensionMachineVertex</span>
+<span class="sd">    .. note::</span>
+<span class="sd">        This is NOT implemented by the DelayExtensionMachineVertex</span>
 <span class="sd">        which needs a different expander aplx</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -100,25 +101,27 @@
 
     <span class="nd">@abstractmethod</span>
 <div class="viewcode-block" id="AbstractSynapseExpandable.gen_on_machine"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractSynapseExpandable.gen_on_machine">[docs]</a>    <span class="k">def</span> <span class="nf">gen_on_machine</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        True if the synapses of a the slice of this vertex should be generated</span>
 <span class="sd">        on the machine.</span>
 
-<span class="sd">        Note: The typical implementation for this method will be to ask the</span>
-<span class="sd">        app_vertex&#39;s synapse_manager</span>
+<span class="sd">        .. note::</span>
+<span class="sd">            The typical implementation for this method will be to ask the</span>
+<span class="sd">            app_vertex&#39;s synapse_manager</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
     <span class="nd">@abstractmethod</span>
 <div class="viewcode-block" id="AbstractSynapseExpandable.read_generated_connection_holders"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractSynapseExpandable.read_generated_connection_holders">[docs]</a>    <span class="k">def</span> <span class="nf">read_generated_connection_holders</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Fill in the connection holders</span>
 
+<span class="sd">        .. note::</span>
+<span class="sd">            The typical implementation for this method will be to ask the</span>
+<span class="sd">            app_vertex&#39;s synapse_manager</span>
 
-<span class="sd">        Note: The typical implementation for this method will be to ask the</span>
-<span class="sd">        app_vertex&#39;s synapse_manager</span>
-
-<span class="sd">        :param Transceiver transceiver: How the data is to be read</span>
-<span class="sd">        :param Placement placement: Where the data is on the machine</span>
+<span class="sd">        :param ~spinnman.transceiver.Transceiver transceiver:</span>
+<span class="sd">            How the data is to be read</span>
+<span class="sd">        :param ~pacman.model.placements.Placement placement:</span>
+<span class="sd">            Where the data is on the machine</span>
 <span class="sd">        &quot;&quot;&quot;</span></div></div>
 </pre></div>
 

@@ -431,16 +431,19 @@
 <span class="sd">            Whether to generate undelayed data</span>
 <span class="sd">        :param bool gen_delayed:</span>
 <span class="sd">            Whether to generate delayed data</span>
-<span class="sd">        :return: (row_data, delayed_row_data, delayed_source_ids, stages) where</span>
-<span class="sd">            - row_data is the undelayed connectivity data arranged into a row</span>
-<span class="sd">              per source, each row the same length</span>
-<span class="sd">            - delayed_row_data is the delayed connectivity data arranged into a</span>
-<span class="sd">              row per source per delay stage, each row the same length</span>
-<span class="sd">            - delayed_source_ids is the machine-vertex-local source neuron id</span>
-<span class="sd">              of each connection of the delayed vertices</span>
-<span class="sd">            - stages is the delay stage of each delayed connection</span>
+<span class="sd">        :return:</span>
+<span class="sd">            (``row_data``, ``delayed_row_data``, ``delayed_source_ids``,</span>
+<span class="sd">            ``stages``) where:</span>
+
+<span class="sd">            * ``row_data`` is the undelayed connectivity data arranged into a</span>
+<span class="sd">                row per source, each row the same length</span>
+<span class="sd">            * ``delayed_row_data`` is the delayed connectivity data arranged</span>
+<span class="sd">                into a row per source per delay stage, each row the same length</span>
+<span class="sd">            * ``delayed_source_ids`` is the machine-vertex-local source neuron</span>
+<span class="sd">                id of each connection of the delayed vertices</span>
+<span class="sd">            * ``stages`` is the delay stage of each delayed connection</span>
 <span class="sd">        :rtype:</span>
-<span class="sd">            tuple(~numpy.ndarray, ~numpy.ndarray, ~numpy.ndarray,\</span>
+<span class="sd">            tuple(~numpy.ndarray, ~numpy.ndarray, ~numpy.ndarray,</span>
 <span class="sd">            ~numpy.ndarray)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=too-many-arguments, too-many-locals</span>
@@ -628,7 +631,7 @@
 <span class="sd">            The total number of synapse types available</span>
 <span class="sd">        :param list(float) weight_scales:</span>
 <span class="sd">            A weight scale for each synapse type</span>
-<span class="sd">        :param MachineEdge machine_edge:</span>
+<span class="sd">        :param ~pacman.model.graphs.machine.MachineEdge machine_edge:</span>
 <span class="sd">            The incoming machine edge that the synapses were generated from</span>
 <span class="sd">        :param MaxRowInfo max_row_info:</span>
 <span class="sd">            The maximum information for each of the rows</span>

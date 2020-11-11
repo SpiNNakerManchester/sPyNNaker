@@ -511,14 +511,14 @@ If None the assumption is all neurons are recording</li>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
-<li><strong>constraints</strong> &#8211; </li>
+<li><strong>constraints</strong> (<em>iterable</em><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v)"><em>AbstractConstraint</em></a><em>)</em><em></em>) &#8211; </li>
 <li><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; </li>
 <li><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; </li>
 <li><strong>max_atoms_per_core</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
-<li><strong>model</strong> &#8211; </li>
-<li><strong>of float rate</strong> (<em>iterable</em>) &#8211; </li>
-<li><strong>of int start</strong> (<em>iterable</em>) &#8211; </li>
-<li><strong>of int duration</strong> (<em>iterable</em>) &#8211; </li>
+<li><strong>model</strong> (<a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoisson" title="spynnaker.pyNN.models.spike_source.SpikeSourcePoisson"><em>SpikeSourcePoisson</em></a>) &#8211; </li>
+<li><strong>rate</strong> (<em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em></em>) &#8211; </li>
+<li><strong>start</strong> (<em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em><em></em>) &#8211; </li>
+<li><strong>duration</strong> (<em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em><em></em>) &#8211; </li>
 </ul>
 </td>
 </tr>
@@ -894,8 +894,8 @@ CPUCyclesPerTickResource, DTCMResource and SDRAMResource</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>spec</strong> (<em>DataSpecification</em>) &#8211; the data specification writer</li>
-<li><strong>placement</strong> (<em>Placement</em>) &#8211; the location this vertex resides on in the machine</li>
+<li><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v)"><em>DataSpecificationGenerator</em></a>) &#8211; the data specification writer</li>
+<li><strong>placement</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placement" title="(in PACMAN v)"><em>Placement</em></a>) &#8211; the location this vertex resides on in the machine</li>
 </ul>
 </td>
 </tr>

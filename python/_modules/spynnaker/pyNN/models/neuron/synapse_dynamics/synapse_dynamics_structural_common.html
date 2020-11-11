@@ -154,7 +154,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="mf">1.</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_rew</span>
 
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseDynamicsStructural</span><span class="o">.</span><span class="n">write_structural_parameters</span><span class="p">)</span>
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseDynamicsStructural</span><span class="o">.</span><span class="n">write_structural_parameters</span><span class="p">,</span>
+               <span class="n">extend_doc</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <div class="viewcode-block" id="SynapseDynamicsStructuralCommon.write_structural_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.write_structural_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">write_structural_parameters</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span>
             <span class="n">machine_graph</span><span class="p">,</span> <span class="n">machine_vertex</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span> <span class="n">synaptic_matrices</span><span class="p">):</span>
@@ -168,11 +169,12 @@
 <span class="sd">        :type weight_scales: ~numpy.ndarray or list(float)</span>
 <span class="sd">        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:</span>
 <span class="sd">            Full machine level network</span>
-<span class="sd">        :param MachineVertex machine_vertex:</span>
+<span class="sd">        :param AbstractPopulationVertex machine_vertex:</span>
 <span class="sd">            the vertex for which data specs are being prepared</span>
 <span class="sd">        :param ~pacman.model.routing_info.RoutingInfo routing_info:</span>
 <span class="sd">            All of the routing information on the network</span>
 <span class="sd">        :param SynapticMatrices synaptic_matrices:</span>
+<span class="sd">            The synaptic matrices for this vertex</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="s2">&quot;Writing structural plasticity parameters&quot;</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span><span class="n">region</span><span class="p">)</span>
@@ -489,24 +491,24 @@
 
     <span class="nd">@abstractproperty</span>
     <span class="k">def</span> <span class="nf">connections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        initial connectivity as defined via connector</span>
-<span class="sd">        :rtype dict:</span>
+        <span class="sd">&quot;&quot;&quot; initial connectivity as defined via connector</span>
+
+<span class="sd">        :rtype: dict</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
     <span class="nd">@abstractmethod</span>
 <div class="viewcode-block" id="SynapseDynamicsStructuralCommon.get_seeds"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.get_seeds">[docs]</a>    <span class="k">def</span> <span class="nf">get_seeds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_vertex</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Generate a seed for the RNG on chip that is the same for all</span>
-<span class="sd">        of the cores that have perform structural updates.</span>
+        <span class="sd">&quot;&quot;&quot; Generate a seed for the RNG on chip that is the same for all\</span>
+<span class="sd">            of the cores that have perform structural updates.</span>
 
 <span class="sd">        It should be different between application vertices</span>
-<span class="sd">            but the same for the same app_vertex</span>
-<span class="sd">        It should be different every time called with None</span>
+<span class="sd">        but the same for the same app_vertex.</span>
+<span class="sd">        It should be different every time called with None.</span>
 
 <span class="sd">        :param app_vertex:</span>
 <span class="sd">        :type app_vertex: ApplicationVertex or None</span>
 <span class="sd">        :return: list of random seed (4 words), generated randomly</span>
+<span class="sd">        :rtype: list(int)</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="SynapseDynamicsStructuralCommon.check_initial_delay"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.check_initial_delay">[docs]</a>    <span class="k">def</span> <span class="nf">check_initial_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_delay_ms</span><span class="p">):</span>

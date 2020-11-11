@@ -94,13 +94,15 @@
 <span class="sd">        Note: At the Application level this will be an estimate.</span>
 
 <span class="sd">        :param graph: Graph at same level as vertex.</span>
-<span class="sd">        :type graph: ApplicationGraph or MachineGraph</span>
+<span class="sd">        :type graph: ~pacman.model.graphs.application.ApplicationGraph or</span>
+<span class="sd">            ~pacman.model.graphs.machine.MachineGraph</span>
 <span class="sd">        :param vertex: Vertex at the same level as the graph</span>
-<span class="sd">        :type vertex: ApplicationVertex or MachineVertex</span>
+<span class="sd">        :type vertex: ~pacman.model.graphs.application.ApplicationVertex or</span>
+<span class="sd">            ~pacman.model.graphs.machine.MachineVertex</span>
 <span class="sd">        :param int n_neurons:</span>
 <span class="sd">        :return: the size of the parameters, in bytes</span>
 <span class="sd">        :rtype: int</span>
-<span class="sd">        :raises PacmanInvalidParameterException</span>
+<span class="sd">        :raises PacmanInvalidParameterException:</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
     <span class="nd">@abstractmethod</span>

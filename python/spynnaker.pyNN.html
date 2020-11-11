@@ -58,7 +58,7 @@
 <li><a class="reference internal" href="#">spynnaker.pyNN package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#spynnaker-pynn-abstract-spinnaker-common-module">spynnaker.pyNN.abstract_spinnaker_common module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.abstract_spinnaker_common">spynnaker.pyNN.abstract_spinnaker_common module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.exceptions">spynnaker.pyNN.exceptions module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.spynnaker_external_device_plugin_manager">spynnaker.pyNN.spynnaker_external_device_plugin_manager module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.spynnaker_simulator_interface">spynnaker.pyNN.spynnaker_simulator_interface module</a></li>
@@ -351,8 +351,181 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="spynnaker-pynn-abstract-spinnaker-common-module">
-<h2>spynnaker.pyNN.abstract_spinnaker_common module<a class="headerlink" href="#spynnaker-pynn-abstract-spinnaker-common-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-spynnaker.pyNN.abstract_spinnaker_common">
+<span id="spynnaker-pynn-abstract-spinnaker-common-module"></span><h2>spynnaker.pyNN.abstract_spinnaker_common module<a class="headerlink" href="#module-spynnaker.pyNN.abstract_spinnaker_common" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.abstract_spinnaker_common.</code><code class="descname">AbstractSpiNNakerCommon</code><span class="sig-paren">(</span><em>graph_label</em>, <em>database_socket_addresses</em>, <em>n_chips_required</em>, <em>n_boards_required</em>, <em>timestep</em>, <em>max_delay</em>, <em>min_delay</em>, <em>hostname</em>, <em>user_extra_algorithm_xml_path=None</em>, <em>user_extra_mapping_inputs=None</em>, <em>user_extra_algorithms_pre_run=None</em>, <em>time_scale_factor=None</em>, <em>extra_post_run_algorithms=None</em>, <em>extra_mapping_algorithms=None</em>, <em>extra_load_algorithms=None</em>, <em>front_end_versions=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/abstract_spinnaker_common.html#AbstractSpiNNakerCommon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.interface.html#spinn_front_end_common.interface.abstract_spinnaker_base.AbstractSpinnakerBase" title="(in SpiNNFrontEndCommon v)"><code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.interface.abstract_spinnaker_base.AbstractSpinnakerBase</span></code></a>, <a class="reference internal" href="#spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface" title="spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface</span></code></a></p>
+<p>Main interface for neural code.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>graph_label</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; </li>
+<li><strong>database_socket_addresses</strong> (<em>iterable</em><em>(</em><a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.html#spinn_utilities.socket_address.SocketAddress" title="(in SpiNNUtils v)"><em>SocketAddress</em></a><em>)</em><em></em>) &#8211; </li>
+<li><strong>n_chips_required</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; </li>
+<li><strong>n_boards_required</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; </li>
+<li><strong>timestep</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
+<li><strong>max_delay</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; </li>
+<li><strong>min_delay</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; </li>
+<li><strong>hostname</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; </li>
+<li><strong>user_extra_algorithm_xml_path</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; </li>
+<li><strong>user_extra_mapping_inputs</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>Any</em><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; </li>
+<li><strong>user_extra_algorithms_pre_run</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; </li>
+<li><strong>time_scale_factor</strong> &#8211; </li>
+<li><strong>extra_post_run_algorithms</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; </li>
+<li><strong>extra_mapping_algorithms</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; </li>
+<li><strong>extra_load_algorithms</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; </li>
+<li><strong>front_end_versions</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.CONFIG_FILE_NAME">
+<code class="descname">CONFIG_FILE_NAME</code><em class="property"> = 'spynnaker.cfg'</em><a class="headerlink" href="#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.CONFIG_FILE_NAME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.add_application_vertex">
+<code class="descname">add_application_vertex</code><span class="sig-paren">(</span><em>vertex</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/abstract_spinnaker_common.html#AbstractSpiNNakerCommon.add_application_vertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.add_application_vertex" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.add_population">
+<code class="descname">add_population</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/abstract_spinnaker_common.html#AbstractSpiNNakerCommon.add_population"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.add_population" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called by each population to add itself to the list.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.add_projection">
+<code class="descname">add_projection</code><span class="sig-paren">(</span><em>projection</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/abstract_spinnaker_common.html#AbstractSpiNNakerCommon.add_projection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.add_projection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called by each projection to add itself to the list.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.get_projections_data">
+<code class="descname">get_projections_data</code><span class="sig-paren">(</span><em>projection_to_attribute_map</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/abstract_spinnaker_common.html#AbstractSpiNNakerCommon.get_projections_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.get_projections_data" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Common data extractor for projection data. Allows fully</dt>
+<dd>exploitation of the ????</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>projection_to_attribute_map</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>(</em><a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.pynn_projection_common.PyNNProjectionCommon" title="spynnaker.pyNN.models.pynn_projection_common.PyNNProjectionCommon"><em>PyNNProjectionCommon</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#tuple" title="(in Python v3.6)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a><em>)</em><em></em>) &#8211; the projection to attributes mapping</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a extracted data object with get method for getting the data</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.extracted_data.ExtractedData" title="spynnaker.pyNN.utilities.extracted_data.ExtractedData">ExtractedData</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.id_counter">
+<code class="descname">id_counter</code><a class="headerlink" href="#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.id_counter" title="Permalink to this definition">¶</a></dt>
+<dd><p>The id_counter, currently used by the populations.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Maybe it could live in the pop class???</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.max_delay">
+<code class="descname">max_delay</code><a class="headerlink" href="#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.max_delay" title="Permalink to this definition">¶</a></dt>
+<dd><p>The maximum supported delay, in milliseconds.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.min_delay">
+<code class="descname">min_delay</code><a class="headerlink" href="#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.min_delay" title="Permalink to this definition">¶</a></dt>
+<dd><p>The minimum supported delay, in milliseconds.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.register_binary_search_path">
+<em class="property">static </em><code class="descname">register_binary_search_path</code><span class="sig-paren">(</span><em>search_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/abstract_spinnaker_common.html#AbstractSpiNNakerCommon.register_binary_search_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.register_binary_search_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register an additional binary search path for executables.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>search_path</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; absolute search path for binaries</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.reset_number_of_neurons_per_core">
+<code class="descname">reset_number_of_neurons_per_core</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/abstract_spinnaker_common.html#AbstractSpiNNakerCommon.reset_number_of_neurons_per_core"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.reset_number_of_neurons_per_core" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.run">
+<code class="descname">run</code><span class="sig-paren">(</span><em>run_time</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/abstract_spinnaker_common.html#AbstractSpiNNakerCommon.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the model created.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>run_time</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; the time (in milliseconds) to run the simulation for</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.set_number_of_neurons_per_core">
+<code class="descname">set_number_of_neurons_per_core</code><span class="sig-paren">(</span><em>neuron_type</em>, <em>max_permitted</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/abstract_spinnaker_common.html#AbstractSpiNNakerCommon.set_number_of_neurons_per_core"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.set_number_of_neurons_per_core" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.stop">
+<code class="descname">stop</code><span class="sig-paren">(</span><em>turn_off_machine=None</em>, <em>clear_routing_tables=None</em>, <em>clear_tags=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/abstract_spinnaker_common.html#AbstractSpiNNakerCommon.stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.stop" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>turn_off_machine</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; decides if the machine should be powered down
+after running the execution. Note that this powers down all boards
+connected to the BMP connections given to the transceiver</li>
+<li><strong>clear_routing_tables</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; informs the tool chain if it
+should turn off the clearing of the routing tables</li>
+<li><strong>clear_tags</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; informs the tool chain if it should clear the tags
+off the machine at stop</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="module-spynnaker.pyNN.exceptions">
 <span id="spynnaker-pynn-exceptions-module"></span><h2>spynnaker.pyNN.exceptions module<a class="headerlink" href="#module-spynnaker.pyNN.exceptions" title="Permalink to this headline">¶</a></h2>

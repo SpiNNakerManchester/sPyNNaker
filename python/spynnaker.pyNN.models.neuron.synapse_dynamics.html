@@ -817,8 +817,10 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>graph</strong> (<em>ApplicationGraph</em><em> or </em><em>MachineGraph</em>) &#8211; Graph at same level as vertex.</li>
-<li><strong>vertex</strong> (<em>ApplicationVertex</em><em> or </em><em>MachineVertex</em>) &#8211; Vertex at the same level as the graph</li>
+<li><strong>graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationGraph" title="(in PACMAN v)"><em>ApplicationGraph</em></a><em> or
+</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineGraph" title="(in PACMAN v)"><em>MachineGraph</em></a>) &#8211; Graph at same level as vertex.</li>
+<li><strong>vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v)"><em>ApplicationVertex</em></a><em> or
+</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineVertex" title="(in PACMAN v)"><em>MachineVertex</em></a>) &#8211; Vertex at the same level as the graph</li>
 <li><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
 </ul>
 </td>
@@ -826,12 +828,14 @@
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the size of the parameters, in bytes</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>PacmanInvalidParameterException</strong> &#8211; </p>
 </td>
 </tr>
 </tbody>
 </table>
-<p>:raises PacmanInvalidParameterException</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -1314,7 +1318,7 @@
 <li><strong>timing_dependence</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.AbstractTimingDependence" title="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.AbstractTimingDependence"><em>AbstractTimingDependence</em></a>) &#8211; </li>
 <li><strong>weight_dependence</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence" title="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence"><em>AbstractWeightDependence</em></a>) &#8211; </li>
 <li><strong>voltage_dependence</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; not supported</li>
-<li><strong>dendritic_delay_fraction</strong> (<em>flooat</em>) &#8211; [0.5, 1.0]</li>
+<li><strong>dendritic_delay_fraction</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; [0.5, 1.0]</li>
 <li><strong>weight</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; </li>
 <li><strong>delay</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; </li>
 <li><strong>pad_to_length</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; </li>
@@ -1854,8 +1858,15 @@
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.connections">
 <code class="descname">connections</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.connections" title="Permalink to this definition">¶</a></dt>
-<dd><p>initial connectivity as defined via connector
-:rtype dict:</p>
+<dd><p>initial connectivity as defined via connector</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -1874,13 +1885,10 @@
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.get_seeds">
 <code class="descname">get_seeds</code><span class="sig-paren">(</span><em>app_vertex=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_structural_common.html#SynapseDynamicsStructuralCommon.get_seeds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.get_seeds" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate a seed for the RNG on chip that is the same for all
-of the cores that have perform structural updates.</p>
-<dl class="docutils">
-<dt>It should be different between application vertices</dt>
-<dd>but the same for the same app_vertex</dd>
-</dl>
-<p>It should be different every time called with None</p>
+<dd><p>Generate a seed for the RNG on chip that is the same for all            of the cores that have perform structural updates.</p>
+<p>It should be different between application vertices
+but the same for the same app_vertex.
+It should be different every time called with None.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1888,6 +1896,8 @@ of the cores that have perform structural updates.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>app_vertex</strong> (<em>ApplicationVertex</em><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list of random seed (4 words), generated randomly</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>)</td>
 </tr>
 </tbody>
 </table>
@@ -1903,8 +1913,10 @@ of the cores that have perform structural updates.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>graph</strong> (<em>ApplicationGraph</em><em> or </em><em>MachineGraph</em>) &#8211; Graph at same level as vertex.</li>
-<li><strong>vertex</strong> (<em>ApplicationVertex</em><em> or </em><em>MachineVertex</em>) &#8211; Vertex at the same level as the graph</li>
+<li><strong>graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationGraph" title="(in PACMAN v)"><em>ApplicationGraph</em></a><em> or
+</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineGraph" title="(in PACMAN v)"><em>MachineGraph</em></a>) &#8211; Graph at same level as vertex.</li>
+<li><strong>vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v)"><em>ApplicationVertex</em></a><em> or
+</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineVertex" title="(in PACMAN v)"><em>MachineVertex</em></a>) &#8211; Vertex at the same level as the graph</li>
 <li><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
 </ul>
 </td>
@@ -1912,12 +1924,14 @@ of the cores that have perform structural updates.</p>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the size of the parameters, in bytes</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>PacmanInvalidParameterException</strong> &#8211; </p>
 </td>
 </tr>
 </tbody>
 </table>
-<p>:raises PacmanInvalidParameterException</p>
 </dd></dl>
 
 <dl class="method">
@@ -1973,25 +1987,14 @@ of the cores that have perform structural updates.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v)"><em>DataSpecificationGenerator</em></a>) &#8211; The data specification to write to</li>
+<li><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v)"><em>DataSpecificationGenerator</em></a>) &#8211; the data spec</li>
 <li><strong>region</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; region ID</li>
-<li><strong>machine_time_step</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The simulation time step</li>
-<li><strong>weight_scales</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em></em>) &#8211; Weight scaling for each synapse type</li>
-<li><strong>machine_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineGraph" title="(in PACMAN v)"><em>MachineGraph</em></a>) &#8211; The machine graph</li>
-<li><strong>machine_vertex</strong> (<em>MachineVertex</em>) &#8211; The machine vertex</li>
-<li><strong>routing_info</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.routing_info/#pacman.model.routing_info.RoutingInfo" title="(in PACMAN v)"><em>RoutingInfo</em></a>) &#8211; Routing information for all edges</li>
-<li><strong>synaptic_matrices</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrices.SynapticMatrices" title="spynnaker.pyNN.models.neuron.synaptic_matrices.SynapticMatrices"><em>SynapticMatrices</em></a>) &#8211; <blockquote>
-<div>The synaptic matrices for this vertex</div></blockquote>
-<p>Write structural plasticity parameters</p>
-</li>
-<li><strong>spec</strong> &#8211; the data spec</li>
-<li><strong>region</strong> &#8211; region ID</li>
-<li><strong>machine_time_step</strong> &#8211; the duration of a machine time step (ms)</li>
-<li><strong>weight_scales</strong> &#8211; scaling the weights</li>
-<li><strong>machine_graph</strong> &#8211; Full machine level network</li>
-<li><strong>machine_vertex</strong> &#8211; the vertex for which data specs are being prepared</li>
-<li><strong>routing_info</strong> &#8211; All of the routing information on the network</li>
-<li><strong>synaptic_matrices</strong> &#8211; </li>
+<li><strong>machine_time_step</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; the duration of a machine time step (ms)</li>
+<li><strong>weight_scales</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em></em>) &#8211; scaling the weights</li>
+<li><strong>machine_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineGraph" title="(in PACMAN v)"><em>MachineGraph</em></a>) &#8211; Full machine level network</li>
+<li><strong>machine_vertex</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex" title="spynnaker.pyNN.models.neuron.AbstractPopulationVertex"><em>AbstractPopulationVertex</em></a>) &#8211; the vertex for which data specs are being prepared</li>
+<li><strong>routing_info</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.routing_info/#pacman.model.routing_info.RoutingInfo" title="(in PACMAN v)"><em>RoutingInfo</em></a>) &#8211; All of the routing information on the network</li>
+<li><strong>synaptic_matrices</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrices.SynapticMatrices" title="spynnaker.pyNN.models.neuron.synaptic_matrices.SynapticMatrices"><em>SynapticMatrices</em></a>) &#8211; The synaptic matrices for this vertex</li>
 </ul>
 </td>
 </tr>
@@ -2048,8 +2051,15 @@ values</li>
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralStatic.connections">
 <code class="descname">connections</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralStatic.connections" title="Permalink to this definition">¶</a></dt>
-<dd><p>initial connectivity as defined via connector
-:rtype dict:</p>
+<dd><p>initial connectivity as defined via connector</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
@@ -2142,13 +2152,10 @@ values</li>
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralStatic.get_seeds">
 <code class="descname">get_seeds</code><span class="sig-paren">(</span><em>app_vertex=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_structural_static.html#SynapseDynamicsStructuralStatic.get_seeds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralStatic.get_seeds" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate a seed for the RNG on chip that is the same for all
-of the cores that have perform structural updates.</p>
-<dl class="docutils">
-<dt>It should be different between application vertices</dt>
-<dd>but the same for the same app_vertex</dd>
-</dl>
-<p>It should be different every time called with None</p>
+<dd><p>Generate a seed for the RNG on chip that is the same for all            of the cores that have perform structural updates.</p>
+<p>It should be different between application vertices
+but the same for the same app_vertex.
+It should be different every time called with None.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -2156,6 +2163,8 @@ of the cores that have perform structural updates.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>app_vertex</strong> (<em>ApplicationVertex</em><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list of random seed (4 words), generated randomly</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>)</td>
 </tr>
 </tbody>
 </table>
@@ -2400,8 +2409,15 @@ values</li>
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralSTDP.connections">
 <code class="descname">connections</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralSTDP.connections" title="Permalink to this definition">¶</a></dt>
-<dd><p>initial connectivity as defined via connector
-:rtype dict:</p>
+<dd><p>initial connectivity as defined via connector</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
@@ -2493,13 +2509,10 @@ values</li>
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralSTDP.get_seeds">
 <code class="descname">get_seeds</code><span class="sig-paren">(</span><em>app_vertex=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_structural_stdp.html#SynapseDynamicsStructuralSTDP.get_seeds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralSTDP.get_seeds" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate a seed for the RNG on chip that is the same for all
-of the cores that have perform structural updates.</p>
-<dl class="docutils">
-<dt>It should be different between application vertices</dt>
-<dd>but the same for the same app_vertex</dd>
-</dl>
-<p>It should be different every time called with None</p>
+<dd><p>Generate a seed for the RNG on chip that is the same for all            of the cores that have perform structural updates.</p>
+<p>It should be different between application vertices
+but the same for the same app_vertex.
+It should be different every time called with None.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -2507,6 +2520,8 @@ of the cores that have perform structural updates.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>app_vertex</strong> (<em>ApplicationVertex</em><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list of random seed (4 words), generated randomly</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>)</td>
 </tr>
 </tbody>
 </table>

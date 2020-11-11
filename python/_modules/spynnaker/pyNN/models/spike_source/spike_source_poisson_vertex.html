@@ -213,14 +213,15 @@
             <span class="n">max_rate</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param int n_neurons:</span>
-<span class="sd">        :param constraints:</span>
+<span class="sd">        :param iterable(~pacman.model.constraints.AbstractConstraint) \</span>
+<span class="sd">                constraints:</span>
 <span class="sd">        :param str label:</span>
 <span class="sd">        :param float seed:</span>
 <span class="sd">        :param int max_atoms_per_core:</span>
-<span class="sd">        :param model:</span>
-<span class="sd">        :param iterable of float rate:</span>
-<span class="sd">        :param iterable of int start:</span>
-<span class="sd">        :param iterable of int duration:</span>
+<span class="sd">        :param SpikeSourcePoisson model:</span>
+<span class="sd">        :param iterable(float) rate:</span>
+<span class="sd">        :param iterable(int) start:</span>
+<span class="sd">        :param iterable(int) duration:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="n">TDMAAwareApplicationVertex</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
@@ -605,9 +606,9 @@
         <span class="sd">&quot;&quot;&quot; Reserve memory regions for Poisson source parameters and output\</span>
 <span class="sd">            buffer.</span>
 
-<span class="sd">        :param ~data_specification.DataSpecification spec:</span>
+<span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
 <span class="sd">            the data specification writer</span>
-<span class="sd">        :param ~pacman.models.placements.Placement placement:</span>
+<span class="sd">        :param ~pacman.model.placements.Placement placement:</span>
 <span class="sd">            the location this vertex resides on in the machine</span>
 <span class="sd">        :return: None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
