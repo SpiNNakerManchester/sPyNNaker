@@ -79,7 +79,7 @@ class PyNNPopulationCommon(object):
             How do we constrain where to put things on SpiNNaker
         :param model: What neuron model is being run by this population
         :type model:
-            AbstractPyNNModel or
+            ~spynnaker.pyNN.models.AbstractPyNNModel or
             ~pacman.model.graphs.application.ApplicationVertex
         :param structure: How the neurons are arranged in space
         :type structure: ~pyNN.space.BaseStructure or None
@@ -670,7 +670,7 @@ class PyNNPopulationCommon(object):
         # Allow a float which has a near int value
         temp = int(round(size))
         if abs(temp - size) < 0.001:
-            logger.warning("Size of the population rounded "
+            logger.warning("Size of the population {} rounded "
                            "from {} to {}. Please use int values for size",
                            label, size, temp)
             return temp

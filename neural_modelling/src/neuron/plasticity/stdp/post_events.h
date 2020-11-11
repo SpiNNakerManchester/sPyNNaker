@@ -118,6 +118,7 @@ static inline post_event_window_t post_events_get_window_delayed(
     const uint32_t count = events->count_minus_one + 1;
     const uint32_t *end_event_time = events->times + count;
     const uint32_t *event_time = end_event_time;
+    const post_trace_t *event_trace = events->traces + count;
 
     post_event_window_t window;
     do {
@@ -130,6 +131,7 @@ static inline post_event_window_t post_events_get_window_delayed(
         // event.
         // **NOTE** next_time can be invalid
         window.next_time = event_time--;
+        window.next_trace = event_trace--;
 
         // Keep looping while event occurred after start of window and we
         // haven't hit beginning of array...
@@ -137,15 +139,11 @@ static inline post_event_window_t post_events_get_window_delayed(
 
     // Deference event to use as previous
     window.prev_time = *event_time;
+    window.prev_trace = *event_trace;
     window.prev_time_valid = event_time != events->times;
 
     // Calculate number of events
     window.num_events = (end_event_time - window.next_time);
-
-    // Using num_events, find next and previous traces
-    const post_trace_t *end_event_trace = events->traces + count;
-    window.next_trace = (end_event_trace - window.num_events);
-    window.prev_trace = *(window.next_trace - 1);
 
     // Return window
     return window;
@@ -223,14 +221,14 @@ static inline void post_events_add(
 static inline void print_delayed_window_events(
         const post_event_history_t *post_event_history,
         uint32_t begin_time, uint32_t end_time, uint32_t delay_dendritic) {
-    log_debug("     ##  printing post window  ##");
+    log_info("     ##  printing post window  ##");
     post_event_window_t post_window = post_events_get_window_delayed(
             post_event_history, begin_time, end_time);
 
     while (post_window.num_events > 0) {
         const uint32_t delayed_post_time =
                 *post_window.next_time + delay_dendritic;
-        log_debug("post spike: %u, time: %u, trace: %u",
+        log_info("post spike: %u, time: %u, trace: %u",
                 post_window.num_events, delayed_post_time,
                 *post_window.next_trace);
 

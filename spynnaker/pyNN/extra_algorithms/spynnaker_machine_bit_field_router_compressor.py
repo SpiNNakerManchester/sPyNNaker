@@ -28,7 +28,8 @@ from spinn_front_end_common.utilities import system_control_logic
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
-from spynnaker.pyNN.extra_algorithms.synapse_expander import SYNAPSE_EXPANDER
+from spynnaker.pyNN.models.abstract_models import (
+    AbstractSynapseExpandable, SYNAPSE_EXPANDER_APLX)
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +40,7 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
     def __call__(
             self, routing_tables, transceiver, machine, app_id,
             provenance_file_path, machine_graph,
-            placements, executable_finder, read_algorithm_iobuf,
+            placements, executable_finder, write_compressor_iobuf,
             produce_report, default_report_folder, target_length,
             routing_infos, time_to_try_for_each_iteration, use_timer_cut_off,
             machine_time_step, time_scale_factor, threshold_percentage,
@@ -73,7 +74,7 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
                 provenance_file_path=provenance_file_path,
                 machine_graph=machine_graph,
                 placements=placements, executable_finder=executable_finder,
-                read_algorithm_iobuf=read_algorithm_iobuf,
+                write_compressor_iobuf=write_compressor_iobuf,
                 produce_report=produce_report,
                 default_report_folder=default_report_folder,
                 target_length=target_length, routing_infos=routing_infos,
@@ -115,7 +116,7 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
 
         # locate expander executable path
         expander_executable_path = executable_finder.get_executable_path(
-            SYNAPSE_EXPANDER)
+            SYNAPSE_EXPANDER_APLX)
 
         # if any ones are going to be ran on host, ignore them from the new
         # core setup
@@ -126,13 +127,13 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
                         core_subset.x, core_subset.y, processor_id):
                     vertex = placements.get_vertex_on_processor(
                         core_subset.x, core_subset.y, processor_id)
-                    app_vertex = vertex.app_vertex
-                    if isinstance(vertex, AbstractSupportsBitFieldGeneration):
-                        if app_vertex.gen_on_machine(vertex.vertex_slice):
-                            new_cores.add_processor(
-                                expander_executable_path,
-                                core_subset.x, core_subset.y, processor_id,
-                                executable_type=ExecutableType.SYSTEM)
+                    if (isinstance(vertex, AbstractSupportsBitFieldGeneration)
+                            and isinstance(vertex, AbstractSynapseExpandable)
+                            and vertex.gen_on_machine()):
+                        new_cores.add_processor(
+                            expander_executable_path,
+                            core_subset.x, core_subset.y, processor_id,
+                            executable_type=ExecutableType.SYSTEM)
         return new_cores
 
     @staticmethod

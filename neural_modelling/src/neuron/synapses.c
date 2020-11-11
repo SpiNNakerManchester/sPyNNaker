@@ -270,7 +270,8 @@ static inline void print_synapse_parameters(void) {
 bool synapses_initialise(
         address_t synapse_params_address, uint32_t n_neurons_value,
         uint32_t n_synapse_types_value,
-        uint32_t **ring_buffer_to_input_buffer_left_shifts) {
+        uint32_t **ring_buffer_to_input_buffer_left_shifts,
+        bool* clear_input_buffers_of_late_packets_init) {
     log_debug("synapses_initialise: starting");
     n_neurons = n_neurons_value;
     n_synapse_types = n_synapse_types_value;
@@ -282,6 +283,14 @@ bool synapses_initialise(
         log_error("Not enough memory to allocate ring buffer");
         return false;
     }
+
+    // read bool flag about dropping packets that arrive too late
+    *clear_input_buffers_of_late_packets_init = synapse_params_address[0];
+
+    // shift read by 1 word.
+    synapse_params_address += 1;
+
+    // read in ring buffer to input left shifts
     spin1_memcpy(
             ring_buffer_to_input_left_shifts, synapse_params_address,
             n_synapse_types * sizeof(uint32_t));
@@ -333,6 +342,9 @@ void synapses_do_timestep_update(timer_t time) {
 
     // Disable interrupts to stop DMAs interfering with the ring buffers
     uint32_t state = spin1_irq_disable();
+
+    // Clear any outstanding spikes
+    spike_processing_clear_input_buffer(time);
 
     // Transfer the input from the ring buffers into the input buffers
     for (uint32_t neuron_index = 0; neuron_index < n_neurons;
@@ -418,7 +430,7 @@ uint32_t synapses_get_pre_synaptic_events(void) {
 }
 
 void synapses_flush_ring_buffers(void) {
-	for (uint32_t i = 0; i < ring_buffer_size; i++) {
+    for (uint32_t i = 0; i < ring_buffer_size; i++) {
         ring_buffers[i] = 0;
     }
 }

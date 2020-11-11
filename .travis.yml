@@ -34,7 +34,6 @@ cache: pip
 addons:
   apt:
     packages:
-      - libc6:i386
       - vera++
       - libxml2-utils
       - gcc-arm-none-eabi
@@ -56,7 +55,6 @@ before_install:
   # SpiNNakerManchester internal dependencies; development mode
   - support/pipinstall.sh git://github.com/SpiNNakerManchester/SpiNNUtils.git
   - support/pipinstall.sh git://github.com/SpiNNakerManchester/SpiNNMachine.git
-  - support/pipinstall.sh git://github.com/SpiNNakerManchester/SpiNNStorageHandlers.git
   - support/pipinstall.sh git://github.com/SpiNNakerManchester/SpiNNMan.git
   - support/pipinstall.sh git://github.com/SpiNNakerManchester/PACMAN.git
   - support/pipinstall.sh git://github.com/SpiNNakerManchester/DataSpecification.git
