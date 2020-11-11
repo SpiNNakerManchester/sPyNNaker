@@ -57,9 +57,7 @@ class ProjectionApplicationEdge(
         """
         :param AbstractPopulationVertex pre_vertex:
         :param AbstractPopulationVertex post_vertex:
-        :param synapse_information:
-        :type synapse_information:
-            SynapseInformation or iterable(SynapseInformation)
+        :param SynapseInformation synapse_information:
         :param str label:
         """
         super(ProjectionApplicationEdge, self).__init__(
@@ -67,7 +65,10 @@ class ProjectionApplicationEdge(
 
         # A list of all synapse information for all the projections that are
         # represented by this edge
-        self.__synapse_information = list(synapse_information)
+        if hasattr(synapse_information, '__iter__'):
+            self.__synapse_information = synapse_information
+        else:
+            self.__synapse_information = [synapse_information]
 
         # The edge from the delay extension of the pre_vertex to the
         # post_vertex - this might be None if no long delays are present
