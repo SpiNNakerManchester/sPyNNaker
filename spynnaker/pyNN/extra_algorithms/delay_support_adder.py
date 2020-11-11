@@ -228,7 +228,7 @@ class DelaySupportAdder(object):
             raise DelayExtensionException(
                 self.INVALID_SPLITTER_FOR_DELAYS_ERROR_MSG.format(
                     app_edge.post_vertex, post_splitter, app_edge))
-        if post_splitter.accepts_edges_from_delay_vertex():
+        if not post_splitter.accepts_edges_from_delay_vertex():
             raise DelayExtensionException(
                 self.DELAYS_NOT_SUPPORTED_SPLITTER.format(
                     app_edge.post_vertex, post_splitter, app_edge))
