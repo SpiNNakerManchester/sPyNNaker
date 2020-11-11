@@ -56,7 +56,7 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
             self, src_machine_vertex, dest_machine_vertex,
             common_edge_type, app_edge, machine_graph,
             app_outgoing_edge_partition, resource_tracker):
-        """ overridable method for creating the machine edges from
+        """ overridable method for creating the machine edges from\
             SplitterPartitioner
 
         :param MachineVertex src_machine_vertex: the src machine vertex of \
