@@ -24,6 +24,8 @@ from spynnaker.pyNN.extra_algorithms.splitter_components.\
         SplitterAbstractPopulationVertexSlice)
 from spynnaker.pyNN.extra_algorithms.splitter_components.\
     spynnaker_splitter_slice_legacy import SpynnakerSplitterSliceLegacy
+from spynnaker.pyNN.models.abstract_models import (
+    AbstractAcceptsIncomingSynapses)
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 from spynnaker.pyNN.models.spike_source.spike_source_array_vertex import (
     SpikeSourceArrayVertex)
@@ -70,6 +72,8 @@ class SpynnakerSplitterSelector(SplitterSelector):
                     self.spike_source_poisson_heuristic(app_vertex)
                 else:  # go to basic selector. it might know what to do
                     self.vertex_selector(app_vertex)
+            if isinstance(app_vertex, AbstractAcceptsIncomingSynapses):
+                app_vertex.verify_splitter(app_vertex.splitter)
 
     @staticmethod
     def abstract_pop_heuristic(app_vertex):
@@ -78,8 +82,8 @@ class SpynnakerSplitterSelector(SplitterSelector):
         :param ApplicationGraph app_vertex: app vertex
         :rtype: None
         """
-        app_vertex.splitter = (
-            SplitterAbstractPopulationVertexSlice())
+        splitter = SplitterAbstractPopulationVertexSlice()
+        app_vertex.splitter = splitter
 
     @staticmethod
     def external_spinnaker_link_heuristic(app_vertex):
