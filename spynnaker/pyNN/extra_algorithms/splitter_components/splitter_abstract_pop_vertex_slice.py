@@ -96,11 +96,11 @@ class SplitterAbstractPopulationVertexSlice(
                additional_arguments={"graph", "machine_time_step"})
     def get_resources_used_by_atoms(
             self, vertex_slice, graph, machine_time_step):
-        """ ger res for a APV
+        """  Gets the resources of a slice of atoms from a given app vertex.
 
-        :param vertex_slice: the slice
-        :param graph: app graph
-        :param machine_time_step: machine time step
+        :param Slice vertex_slice: the slice
+        :param MachineGraph graph: app graph
+        :param int machine_time_step: machine time step
         :rtype: ResourceContainer
         """
         variable_sdram = self.get_variable_sdram(vertex_slice)
@@ -119,7 +119,7 @@ class SplitterAbstractPopulationVertexSlice(
     def get_variable_sdram(self, vertex_slice):
         """ returns the variable sdram from the recorder.
 
-        :param vertex_slice: the atom slice for recording sdram
+        :param Slice vertex_slice: the atom slice for recording sdram
         :return: the variable sdram used by the neuron recorder
         :rtype: VariableSDRAM
         """
@@ -157,7 +157,7 @@ class SplitterAbstractPopulationVertexSlice(
     def dtcm_cost(self, vertex_slice):
         """ get the dtcm cost for the slice of atoms
 
-        :param vertex_slice: atom slice for dtcm calc.
+        :param Slice vertex_slice: atom slice for dtcm calc.
         :rtype: DTCMResource
         """
         return DTCMResource(
@@ -171,7 +171,7 @@ class SplitterAbstractPopulationVertexSlice(
     def cpu_cost(self, vertex_slice):
         """ get cpu cost for a slice of atoms
 
-        :param vertex_slice: slice of atoms
+        :param Slice vertex_slice: slice of atoms
         :rtype: CPUCyclesPerTickResourcer
         """
         return CPUCyclesPerTickResource(
