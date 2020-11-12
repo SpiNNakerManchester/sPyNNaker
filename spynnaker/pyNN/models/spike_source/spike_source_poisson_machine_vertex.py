@@ -40,8 +40,8 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
-from spinn_front_end_common.interface.profiling import AbstractHasProfileData, \
-    profile_utils
+from spinn_front_end_common.interface.profiling import (
+    AbstractHasProfileData, profile_utils)
 from spinn_front_end_common.interface.profiling.profile_utils import (
     get_profiling_data)
 from spynnaker.pyNN.models.abstract_models import AbstractMaxSpikes
@@ -255,8 +255,8 @@ class SpikeSourcePoissonMachineVertex(
             "machine_time_step", "routing_info", "graph",
             "first_machine_time_step"})
     def regenerate_data_specification(
-        self, spec, placement, machine_time_step, routing_info, graph,
-        first_machine_time_step):
+            self, spec, placement, machine_time_step, routing_info, graph,
+            first_machine_time_step):
         """
         :param int machine_time_step:
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
@@ -297,8 +297,8 @@ class SpikeSourcePoissonMachineVertex(
         }
     )
     def generate_data_specification(
-        self, spec, placement, machine_time_step, time_scale_factor,
-        routing_info, data_n_time_steps, graph, first_machine_time_step):
+            self, spec, placement, machine_time_step, time_scale_factor,
+            routing_info, data_n_time_steps, graph, first_machine_time_step):
         """
         :param int machine_time_step:
         :param int time_scale_factor:
@@ -464,7 +464,6 @@ class SpikeSourcePoissonMachineVertex(
             numpy.concatenate(([len(d), indices[i]], numpy.concatenate(d)))
             for i, d in enumerate(core_data_split[:-1])])
         spec.write_array(final_data)
-
 
     def _write_poisson_parameters(
             self, spec, graph, placement, routing_info, machine_time_step):
