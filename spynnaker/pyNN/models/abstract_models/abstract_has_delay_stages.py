@@ -13,13 +13,24 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
--r requirements.txt
-flake8
-coverage >= 4.4, < 5.0
-# pytest will be brought in by pytest-cov
-pytest-cov
-pytest-timeout
-sphinx==1.5.3
-testfixtures
-statistics
-mock
+from six import add_metaclass
+from spinn_utilities.abstract_base import (
+    AbstractBase, abstractproperty)
+
+
+@add_metaclass(AbstractBase)
+class AbstractHasDelayStages(object):
+    """ Indicates that this object (a vertex) has delay stages that are used \
+        to increase the space required for bitfields in \
+        :py:func:`spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_bit_field_region`
+    """
+
+    __slots__ = ()
+
+    @abstractproperty
+    def n_delay_stages(self):
+        """ The maximum number of delay stages required by any connection\
+            out of this delay extension vertex
+
+        :rtype: int
+        """

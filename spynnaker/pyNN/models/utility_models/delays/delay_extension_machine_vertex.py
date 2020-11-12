@@ -56,7 +56,8 @@ class DelayExtensionMachineVertex(
         :param ~pacman.model.resources.ResourceContainer resources_required:
             The resources required by the vertex
         :param str label: The optional name of the vertex
-        :param iterable(AbstractConstraint) constraints:
+        :param iterable(~pacman.model.constraints.AbstractConstraint) \
+                constraints:
             The optional initial constraints of the vertex
         :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
             The application vertex that caused this machine vertex to be

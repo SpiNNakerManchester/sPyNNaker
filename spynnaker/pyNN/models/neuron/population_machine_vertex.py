@@ -171,7 +171,7 @@ class PopulationMachineVertex(
             The associated application vertex
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of the population that this implements
-        @param str binary_file_name: binary name to be run for this verte
+        :param str binary_file_name: binary name to be run for this verte
         """
         MachineVertex.__init__(
             self, label, constraints, app_vertex, vertex_slice)

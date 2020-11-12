@@ -21,13 +21,14 @@ SYNAPSE_EXPANDER_APLX = "synapse_expander.aplx"
 
 @add_metaclass(AbstractBase)
 class AbstractSynapseExpandable(object):
-    """ Indicates a class (most likely a MachineVertex) that has may need to
+    """ Indicates a class (most likely a MachineVertex) that has may need to\
         run the SYNAPSE_EXPANDER aplx
 
-        Cores that do not use the synapse_manager should not implement this
-        api even though their app vertex may hold a synapse_manager
+    Cores that do not use the synapse_manager should not implement this
+    API even though their app vertex may hold a synapse_manager
 
-        Note: This is NOT implemented by the DelayExtensionMachineVertex
+    .. note::
+        This is NOT implemented by the DelayExtensionMachineVertex
         which needs a different expander aplx
     """
 
@@ -35,23 +36,25 @@ class AbstractSynapseExpandable(object):
 
     @abstractmethod
     def gen_on_machine(self):
-
         """
         True if the synapses of a the slice of this vertex should be generated
         on the machine.
 
-        Note: The typical implementation for this method will be to ask the
-        app_vertex's synapse_manager
+        .. note::
+            The typical implementation for this method will be to ask the
+            app_vertex's synapse_manager
         """
 
     @abstractmethod
     def read_generated_connection_holders(self, transceiver, placement):
         """ Fill in the connection holders
 
+        .. note::
+            The typical implementation for this method will be to ask the
+            app_vertex's synapse_manager
 
-        Note: The typical implementation for this method will be to ask the
-        app_vertex's synapse_manager
-
-        :param Transceiver transceiver: How the data is to be read
-        :param Placement placement: Where the data is on the machine
+        :param ~spinnman.transceiver.Transceiver transceiver:
+            How the data is to be read
+        :param ~pacman.model.placements.Placement placement:
+            Where the data is on the machine
         """

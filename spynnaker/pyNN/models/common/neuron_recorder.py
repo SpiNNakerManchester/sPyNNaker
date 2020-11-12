@@ -753,7 +753,7 @@ class NeuronRecorder(object):
 
         :param ~data_specification.DataSpecificationGenerator spec: dsg spec
         :param int neuron_recording_region: the recording region
-        :param ~pacman.model.graphs.commmon.Slice vertex_slice:
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
             the vertex slice
         :param int data_n_time_steps: how many time steps to run this time
         :rtype: None
