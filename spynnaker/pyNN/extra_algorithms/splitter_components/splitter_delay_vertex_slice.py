@@ -149,7 +149,8 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
         :param str label:  human readable label for machine vertex.
         :param remaining_constraints: none partitioner constraints.
         :param ApplicationGraph graph: the app graph
-        :type remaining_constraints: iterable [Constraint]
+        :type remaining_constraints: \
+            iterable(~pacman.model.constraints.AbstractConstraint)
         :return: machine vertex
         :rtype: DelayExtensionMachineVertex
         """
