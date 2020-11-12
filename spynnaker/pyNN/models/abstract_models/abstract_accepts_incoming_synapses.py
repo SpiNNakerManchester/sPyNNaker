@@ -16,8 +16,6 @@
 from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from pacman.exceptions import PacmanConfigurationException
-from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    AbstractSpynnakerSplitterDelay)
 
 
 @add_metaclass(AbstractBase)
@@ -72,10 +70,15 @@ class AbstractAcceptsIncomingSynapses(object):
         Any Vertex that implements this api should override
         ApplicationVertex.splitter method to also call this function
 
-        :param AbstractSpynnakerSplitterDelay splitter:
+        :param splitter:
+        :type splitter:
+            ~spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay
         :raise: PacmanConfigurationException is the spliiter is not an instance
              of AbstractSpynnakerSplitterDelay
         """
+        # Delayed import to avoid cicular dependency
+        from spynnaker.pyNN.extra_algorithms.splitter_components import (
+            AbstractSpynnakerSplitterDelay)
         if not isinstance(splitter, AbstractSpynnakerSplitterDelay):
             raise PacmanConfigurationException(
                 "The splitter needs to be an instance of "
