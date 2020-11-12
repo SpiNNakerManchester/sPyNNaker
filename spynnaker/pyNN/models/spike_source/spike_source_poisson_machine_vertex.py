@@ -63,7 +63,6 @@ def get_rates_bytes(vertex_slice, rate_data):
     """ Gets the size of the Poisson rates in bytes
 
     :param ~pacman.model.graphs.common.Slice vertex_slice:
-    :param SpynnakerRangeDictionary rate_data: the rate data
     :rtype: int
     """
     n_rates = sum(len(rate_data[i]) for i in range(
@@ -539,9 +538,9 @@ class SpikeSourcePoissonMachineVertex(
         """ Reserve memory regions for Poisson source parameters and output\
             buffer.
 
-        :param ~data_specification.DataSpecification spec:
+        :param ~data_specification.DataSpecificationGenerator spec:
             the data specification writer
-        :param ~pacman.models.placements.Placement placement:
+        :param ~pacman.model.placements.Placement placement:
             the location this vertex resides on in the machine
         :return: None
         """
