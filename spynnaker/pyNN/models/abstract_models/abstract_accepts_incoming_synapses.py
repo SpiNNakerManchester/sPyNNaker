@@ -16,6 +16,8 @@
 from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from pacman.exceptions import PacmanConfigurationException
+from spynnaker.pyNN.extra_algorithms.splitter_components import (
+    AbstractSpynnakerSplitterDelay)
 
 
 @add_metaclass(AbstractBase)
@@ -74,8 +76,6 @@ class AbstractAcceptsIncomingSynapses(object):
         :raise: PacmanConfigurationException is the spliiter is not an instance
              of AbstractSpynnakerSplitterDelay
         """
-        from spynnaker.pyNN.extra_algorithms.splitter_components import (
-            AbstractSpynnakerSplitterDelay)
         if not isinstance(splitter, AbstractSpynnakerSplitterDelay):
             raise PacmanConfigurationException(
                 "The splitter needs to be an instance of "
