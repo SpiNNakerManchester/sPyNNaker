@@ -124,7 +124,7 @@ class AbstractPopulationVertex(
         :param AbstractPyNNNeuronModel pynn_model:
             The PyNN neuron model that this vertex is working on behalf of.
         :param splitter: splitter object
-        :type splitter None or AbstractSplitterCommon
+        :type splitter: None or AbstractSplitterCommon
         """
 
         # pylint: disable=too-many-arguments, too-many-locals
