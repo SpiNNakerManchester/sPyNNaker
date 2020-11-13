@@ -541,12 +541,10 @@ class SpikeSourcePoissonVertex(
                 self.__rng, self.__seed)
         return self.__kiss_seed[vertex_slice]
 
-    @inject_items({"machine_time_step": "MachineTimeStep"})
     @overrides(
-        AbstractReadParametersBeforeSet.read_parameters_from_machine,
-        additional_arguments=["machine_time_step"])
+        AbstractReadParametersBeforeSet.read_parameters_from_machine)
     def read_parameters_from_machine(
-            self, transceiver, placement, vertex_slice, machine_time_step):
+            self, transceiver, placement, vertex_slice):
 
         # locate SDRAM address where parameters are stored
         poisson_params = placement.vertex.poisson_param_region_address(
@@ -597,6 +595,8 @@ class SpikeSourcePoissonVertex(
             spikes_per_tick[slow_elements] = 1.0 / isi[slow_elements]
 
             # Convert spikes per tick to rates
+            machine_time_step = (
+                globals_variables.get_simulator().machine_time_step)
             self.__data["rates"].set_value_by_id(
                 i,
                 spikes_per_tick *
