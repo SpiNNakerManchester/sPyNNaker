@@ -565,8 +565,7 @@ class SpikeSourcePoissonVertex(
                 placement, transceiver))
 
         # get size of poisson params
-        size_of_region = self.get_rates_bytes(
-            vertex_slice, self.__data["rates"])
+        size_of_region = get_rates_bytes(vertex_slice, self.__data["rates"])
 
         # get data from the machine
         byte_array = transceiver.read_memory(
