@@ -348,9 +348,6 @@ class SpikeSourcePoissonVertex(
 
     @property
     def duration(self):
-        if self.__is_variable_rate:
-            raise Exception(
-                "Get variable rate poisson durations with .durations")
         return self.__data["durations"]
 
     @duration.setter
