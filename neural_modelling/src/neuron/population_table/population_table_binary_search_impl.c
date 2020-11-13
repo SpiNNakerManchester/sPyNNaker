@@ -294,6 +294,9 @@ static inline void print_bitfields(uint32_t mp_i, uint32_t start,
 
 bool population_table_load_bitfields(filter_region_t *filter_region) {
 
+    if (master_population_table_length == 0) {
+        return true;
+    }
     // try allocating DTCM for starting array for bitfields
     connectivity_bit_field =
             spin1_malloc(sizeof(bit_field_t) * master_population_table_length);
