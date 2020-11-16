@@ -127,7 +127,7 @@ static inline void send_to_motor(uint32_t direction, uint32_t the_speed) {
     }
 }
 
-//! \brief Commands the robot's motors to start doing a motion
+//! \brief Command the robot's motors to start doing a motion
 //! \param[in] direction_index: The "forward" sense of motion
 //! \param[in] opposite_index: The "reverse" sense of motion
 //! \param[in] direction: for debugging
@@ -161,7 +161,7 @@ static inline void do_motion(
     }
 }
 
-//! \brief Commands the robot's motors to continue a motion started by
+//! \brief Command the robot's motors to continue a motion started by
 //!     do_motion()
 //! \param[in] direction_index: The "forward" sense of motion
 //! \param[in] opposite_index: The "reverse" sense of motion
@@ -236,7 +236,7 @@ static void timer_callback(UNUSED uint unused0, UNUSED uint unused1) {
     }
 }
 
-//! \brief Reads the configuration
+//! \brief Read the configuration
 //! \param[in] config_region: Where to read the configuration from
 static void read_parameters(motor_control_config_t *config_region) {
     log_info("Reading parameters from 0x%.8x", config_region);

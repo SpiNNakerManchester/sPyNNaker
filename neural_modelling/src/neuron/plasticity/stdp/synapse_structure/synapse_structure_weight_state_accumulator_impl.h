@@ -23,16 +23,16 @@
 //---------------------------------------
 // Structures
 //---------------------------------------
-//! Plastic synapse contains normal 16-bit weight, a small state machine and an
-//! accumulator
+//! \brief Plastic synapse contains normal 16-bit weight, a small state machine
+//!     and an accumulator
 typedef struct plastic_synapse_t {
     weight_t weight;    //!< Weight
     int8_t accumulator; //!< Accumulator
     uint8_t state;      //!< State machine state
 } plastic_synapse_t;
 
-//! The update state is a weight state with 32-bit ARM-friendly versions of the
-//! accumulator and the state
+//! \brief The update state is a weight state with 32-bit ARM-friendly versions
+//!     of the accumulator and the state
 typedef struct update_state_t {
     weight_state_t weight_state; //!< Weight state
     int32_t accumulator;         //!< Accumulator

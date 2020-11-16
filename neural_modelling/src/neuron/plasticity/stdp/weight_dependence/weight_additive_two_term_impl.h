@@ -60,7 +60,7 @@ typedef struct weight_state_t {
 // STDP weight dependence functions
 //---------------------------------------
 /*!
- * \brief Gets the initial weight state.
+ * \brief Prepare the initial weight state.
  * \param[in] weight: The weight at the start
  * \param[in] synapse_type: The type of synapse involved
  * \return The initial weight state.
@@ -107,7 +107,7 @@ static inline weight_state_t weight_two_term_apply_potentiation(
 
 //---------------------------------------
 /*!
- * \brief Gets the final weight.
+ * \brief Compute the final weight.
  * \param[in] new_state: The updated weight state
  * \return The new weight.
  */

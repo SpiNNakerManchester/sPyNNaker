@@ -142,10 +142,9 @@ static inline uint32_t get_direct_address(address_and_row_length entry) {
     return entry.address + direct_rows_base_address;
 }
 
-//! \brief Get the standard address offset out of an entry
-//!
-//! The address is in units of four words, so this multiplies by 16 (= up
-//! shifts by 4)
+//! \brief Get the standard address out of an entry
+//! \details The address is in units of four words, so this multiplies by 16
+//!     (= up shifts by 4)
 //! \param[in] entry: the table entry
 //! \return a row address (which is an offset)
 static inline uint32_t get_offset(address_and_row_length entry) {
@@ -195,7 +194,7 @@ static inline uint32_t get_neuron_id(
 }
 
 //! \brief Get the neuron id of the neuron on the source core, for a spike with
-//         extra info
+//!        extra info
 //! \param[in] entry: the table entry
 //! \param[in] extra_info: the extra info entry
 //! \param[in] spike: the spike received
@@ -225,9 +224,8 @@ static inline uint32_t get_extended_neuron_id(
     return neuron_id;
 }
 
-//! \brief Prints the master pop table.
-//!
-//! For debugging
+//! \brief Print the master pop table.
+//! \details For debugging
 static inline void print_master_population_table(void) {
     log_info("Master_population\n");
     for (uint32_t i = 0; i < master_population_table_length; i++) {

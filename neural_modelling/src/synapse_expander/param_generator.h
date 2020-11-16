@@ -41,11 +41,11 @@ param_generator_t param_generator_init(
  * \brief Generate values with a parameter generator
  * \param[in] generator: The generator to use to generate values
  * \param[in] n_indices: The number of values to generate
- * \param[in] pre_neuron_index: The index of the neuron in the pre-population
- *                              being generated
- * \param[in] indices: The n_indices post-neuron indices for each connection
- * \param[in,out] values: An array into which to place the values; will be
- *                        n_indices in size
+ * \param[in] pre_neuron_index:
+ *      The index of the neuron in the pre-population being generated
+ * \param[in] indices: The \p n_indices post-neuron indices for each connection
+ * \param[in,out] values:
+ *      An array into which to place the values; will be \p n_indices in size
  */
 void param_generator_generate(
         param_generator_t generator, uint32_t n_indices,

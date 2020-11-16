@@ -353,7 +353,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 }
 
 SOMETIMES_UNUSED // Marked unused as only used sometimes
-//! \brief Stores neuron parameters back into SDRAM
+//! \brief Store neuron parameters back into SDRAM
 //! \param[out] address: the address in SDRAM to start the store
 //! \param[in] next: Offset of next address in store
 //! \param[in] n_neurons: number of neurons

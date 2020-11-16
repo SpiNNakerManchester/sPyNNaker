@@ -44,7 +44,7 @@ struct param_generator_normal {
 };
 
 /**
- * \brief How to initialise the normal RNG parameter generator
+ * \brief Initialise the normal RNG parameter generator
  * \param[in,out] region: Region to read setup from.  Should be updated
  *                        to position just after parameters after calling.
  * \return A data item to be passed in to other functions later on
@@ -68,7 +68,7 @@ static void *param_generator_normal_initialize(address_t *region) {
 }
 
 /**
- * \brief How to free any data for the normal RNG parameter generator
+ * \brief Free any data for the normal RNG parameter generator
  * \param[in] generator: The generator to free
  */
 static void param_generator_normal_free(void *generator) {
@@ -78,14 +78,14 @@ static void param_generator_normal_free(void *generator) {
 }
 
 /**
- * \brief How to generate values with the normal RNG parameter generator
+ * \brief Generate values with the normal RNG parameter generator
  * \param[in] generator: The generator to use to generate values
  * \param[in] n_indices: The number of values to generate
- * \param[in] pre_neuron_index: The index of the neuron in the pre-population
- *                              being generated
+ * \param[in] pre_neuron_index:
+ *      The index of the neuron in the pre-population being generated
  * \param[in] indices: The \p n_indices post-neuron indices for each connection
- * \param[out] values: An array into which to place the values; will be
- *                     \p n_indices in size
+ * \param[out] values:
+ *      An array into which to place the values; will be \p n_indices in size
  */
 static void param_generator_normal_generate(
         void *generator, uint32_t n_indices, UNUSED uint32_t pre_neuron_index,

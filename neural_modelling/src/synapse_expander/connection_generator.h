@@ -16,9 +16,7 @@
  */
 
 /*! \file
- *
  * \brief Connection Generator interface
- *
  */
 
 #include <stdint.h>

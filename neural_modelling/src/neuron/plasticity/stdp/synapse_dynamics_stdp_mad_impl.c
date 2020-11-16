@@ -273,7 +273,7 @@ bool synapse_dynamics_initialise(
 
     // Load timing dependence data
     address_t weight_region_address = timing_initialise(address);
-    if (address == NULL) {
+    if (weight_region_address == NULL) {
         return false;
     }
 
@@ -479,7 +479,7 @@ bool synapse_dynamics_remove_neuron(uint32_t offset, address_t row) {
     return true;
 }
 
-//! \brief packing all of the information into the required plastic control word
+//! \brief Pack all of the information into the required plastic control word
 //! \param[in] id: The spike ID
 //! \param[in] delay: The delay
 //! \param[in] type: The synapse type

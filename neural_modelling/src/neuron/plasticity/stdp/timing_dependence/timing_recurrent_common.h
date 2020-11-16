@@ -35,27 +35,27 @@
 
 #include "random_util.h"
 
-//! \brief API: Check if there was an event in the pre-window
+//! \brief Check if there was an event in the pre-window
 //! \param[in] time_since_last_event: Length of time since last event
 //! \param[in] previous_state: The state we're in right now
 //! \return True if an event is there.
 static bool timing_recurrent_in_pre_window(
         uint32_t time_since_last_event, update_state_t previous_state);
 
-//! \brief API: Check if there was an event in the post-window
+//! \brief Check if there was an event in the post-window
 //! \param[in] time_since_last_event: Length of time since last event
 //! \param[in] previous_state: The state we're in right now
 //! \return True if an event is there.
 static bool timing_recurrent_in_post_window(
         uint32_t time_since_last_event, update_state_t previous_state);
 
-//! \brief API: Update the state with the pre-window information
+//! \brief Update the state with the pre-window information
 //! \param[in] previous_state: The state we're in right now
 //! \return The new state.
 static update_state_t timing_recurrent_calculate_pre_window(
         update_state_t previous_state);
 
-//! \brief API: Update the state with the post-window information
+//! \brief Update the state with the post-window information
 //! \param[in] previous_state: The state we're in right now
 //! \return The new state.
 static update_state_t timing_recurrent_calculate_post_window(

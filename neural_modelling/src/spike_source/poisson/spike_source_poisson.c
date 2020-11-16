@@ -557,7 +557,7 @@ static inline void expand_spike_recording_buffer(uint32_t n_spikes) {
     n_spike_buffers_allocated = n_spikes;
 }
 
-//! \brief records spikes as needed
+//! \brief Record emitted spikes as needed
 //! \param[in] neuron_id: the neurons to store spikes from
 //! \param[in] n_spikes: the number of times this neuron has spiked
 static inline void mark_spike(uint32_t neuron_id, uint32_t n_spikes) {
@@ -574,12 +574,12 @@ static inline void mark_spike(uint32_t neuron_id, uint32_t n_spikes) {
     }
 }
 
-//! \brief callback for completed recording
+//! \brief Callback for completed recording
 static void recording_complete_callback(void) {
     recording_in_progress = false;
 }
 
-//! \brief writing spikes to SDRAM
+//! \brief Write spikes to SDRAM
 //! \param[in] time: the time to which these spikes are being recorded
 static inline void record_spikes(uint32_t time) {
     while (recording_in_progress) {

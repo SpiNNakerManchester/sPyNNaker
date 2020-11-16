@@ -40,8 +40,7 @@
 #define MAX(X, Y)	((X) > (Y) ? (X) : (Y))
 
 //! \brief Lookup Table of 16-bit integers.
-//!
-//! Will be padded to a word boundary at the end.
+//! \details Will be padded to a word boundary at the end.
 typedef struct int16_lut {
     uint16_t size;    //!< Number of entries in table
     uint16_t shift;   //!< Mapping from time to table index
@@ -100,10 +99,9 @@ static inline int32_t maths_clamp_pot(int32_t x, uint32_t shift) {
 }
 
 //---------------------------------------
-//! \brief multiply two 16-bit numbers to get a 32-bit number.
-//!
-//! **NOTE:** this should 'encourage' GCC to insert SMULxy 16x16 multiply
-//!
+//! \brief Multiply two 16-bit numbers to get a 32-bit number.
+//! \details
+//!     **NOTE:** this should 'encourage' GCC to insert SMULxy 16x16 multiply
 //! \param[in] x: The first multiplicand
 //! \param[in] y: The first multiplicand
 //! \return The product
@@ -112,7 +110,7 @@ static inline int32_t maths_mul_16x16(int16_t x, int16_t y) {
 }
 
 //---------------------------------------
-//! \brief multiply two 16-bit fixed point numbers (encoded in int32_t)
+//! \brief Multiply two 16-bit fixed point numbers (encoded in int32_t)
 //! \param[in] a: The first multiplicand
 //! \param[in] b: The first multiplicand
 //! \param[in] fixed_point_position: The location of the fixed point
@@ -127,7 +125,7 @@ static inline int32_t maths_fixed_mul16(
 }
 
 //---------------------------------------
-//! \brief multiply two 32-bit fixed point numbers (encoded in int32_t)
+//! \brief Multiply two 32-bit fixed point numbers (encoded in int32_t)
 //! \param[in] a: The first multiplicand
 //! \param[in] b: The first multiplicand
 //! \param[in] fixed_point_position: The location of the fixed point

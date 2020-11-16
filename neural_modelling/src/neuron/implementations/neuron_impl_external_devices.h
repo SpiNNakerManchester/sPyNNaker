@@ -45,7 +45,7 @@ enum send_type {
 #include <debug.h>
 
 
-//! The definition of the threshold
+//! The definition of the threshold, and what to do when that happens
 typedef struct packet_firing_data_t {
     //! The key to send to update the value
     uint32_t key;
@@ -124,7 +124,9 @@ static uint global_timer_count;
 #endif // !SOMETIMES_UNUSED
 
 
-// Typesafe magic reinterpret cast
+//! \brief Typesafe magic reinterpret cast
+//! \param[in] value: The value to reinterpret
+//! \return The reinterpreted value
 static inline uint _int_bits(int value) {
     typedef union _int_bits_union {
         int int_value;
@@ -136,7 +138,7 @@ static inline uint _int_bits(int value) {
     return converter.uint_value;
 }
 
-//! \brief Converts the value into the right form for sending as a payload
+//! \brief Convert the value into the right form for sending as a payload
 //! \param[in] type: what type of payload are we really dealing with
 //! \param[in] value: the value, after scaling
 //! \return The word to go in the multicast packet payload
@@ -170,7 +172,7 @@ static bool neuron_impl_initialise(uint32_t n_neurons) {
     if (sizeof(global_neuron_params_t)) {
         global_parameters = spin1_malloc(sizeof(global_neuron_params_t));
         if (global_parameters == NULL) {
-            log_error("Unable to allocate global neuron parameters"
+            log_error("Unable to allocate global neuron parameters "
                     "- Out of DTCM");
             return false;
         }
@@ -322,9 +324,9 @@ static void neuron_impl_load_neuron_parameters(
 #endif // LOG_LEVEL >= LOG_DEBUG
 }
 
-//! \brief Determines if the device should fire
-//! \param[in] packet_firing: The parameters to use to determine if it
-//!                           should fire now
+//! \brief Determine if the device should fire
+//! \param[in] packet_firing:
+//!     The parameters to use to determine if it should fire now
 //! \return True if the neuron should fire
 static bool _test_will_fire(packet_firing_data_t *packet_firing) {
     if (packet_firing->time_until_next_send == 0) {
@@ -466,7 +468,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 }
 
 SOMETIMES_UNUSED // Marked unused as only used sometimes
-//! \brief Stores neuron parameters back into SDRAM
+//! \brief Store neuron parameters back into SDRAM
 //! \param[out] address: the address in SDRAM to start the store
 //! \param[in] next: Offset of next address in store
 //! \param[in] n_neurons: number of neurons

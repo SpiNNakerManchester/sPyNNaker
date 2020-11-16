@@ -80,13 +80,13 @@ extern uint8_t **recording_values;
 //! An array of spaces into which bitfields can be written
 extern uint32_t **bitfield_values;
 
-//! \brief function to handle when a recording stage finished
+//! \brief Handle when a recording stage finished
 static void recording_done_callback(void) {
     n_recordings_outstanding -= 1;
 }
 
-//! \brief stores a recording of a value of any type, except bitfield;
-//!        use the functions below for common types as these will be faster.
+//! \brief Store a recording of a value of any type, except bitfield;
+//!     use the functions below for common types as these will be faster.
 //! \param[in] var_index: which recording variable to write this is
 //! \param[in] neuron_index: the neuron id for this recorded data
 //! \param[in] value: pointer to the value to record for this neuron.
@@ -98,8 +98,8 @@ static inline void neuron_recording_record_value(
     spin1_memcpy(&recording_values[var_index][p], value, size);
 }
 
-//! \brief stores a recording of an accum variable only; this is faster than
-//!        neuron_recording_record_value for this type
+//! \brief Store a recording of an \p accum variable only; this is faster than
+//!     neuron_recording_record_value() for this type
 //! \param[in] var_index: which recording variable to write this is
 //! \param[in] neuron_index: the neuron id for this recorded data
 //! \param[in] value: the results to record for this neuron.
@@ -110,8 +110,8 @@ static inline void neuron_recording_record_accum(
     data[index] = value;
 }
 
-//! \brief stores a recording of a double variable only; this is faster than
-//!        neuron_recording_record_value for this type
+//! \brief Store a recording of a \p double variable only; this is faster than
+//!     neuron_recording_record_value() for this type
 //! \param[in] var_index: which recording variable to write this is
 //! \param[in] neuron_index: the neuron id for this recorded data
 //! \param[in] value: the results to record for this neuron.
@@ -122,8 +122,8 @@ static inline void neuron_recording_record_double(
     data[index] = value;
 }
 
-//! \brief stores a recording of a float variable only; this is faster than
-//!        neuron_recording_record_value for this type
+//! \brief Store a recording of a \p float variable only; this is faster than
+//!     neuron_recording_record_value() for this type
 //! \param[in] var_index: which recording variable to write this is
 //! \param[in] neuron_index: the neuron id for this recorded data
 //! \param[in] value: the results to record for this neuron.
@@ -134,8 +134,8 @@ static inline void neuron_recording_record_float(
     data[index] = value;
 }
 
-//! \brief stores a recording of an int32_t variable only; this is faster than
-//!        neuron_recording_record_value for this type
+//! \brief Store a recording of an \p int32_t variable only; this is faster
+//!     than neuron_recording_record_value() for this type
 //! \param[in] var_index: which recording variable to write this is
 //! \param[in] neuron_index: the neuron id for this recorded data
 //! \param[in] value: the results to record for this neuron.
@@ -146,9 +146,8 @@ static inline void neuron_recording_record_int32(
     data[index] = value;
 }
 
-
-//! \brief stores a recording of a set bit; this is the only way to set a bit
-//!        in a bitfield; neuron_recording_record_value doesn't work for this!
+//! \brief Store a recording of a set bit; this is the only way to set a bit
+//!     in a bitfield; neuron_recording_record_value() doesn't work for this!
 //! \param[in] var_index: which bitfield recording variable to write this is
 //! \param[in] neuron_index: which neuron to set the bit for
 static inline void neuron_recording_record_bit(
@@ -158,7 +157,7 @@ static inline void neuron_recording_record_bit(
     bit_field_set(bitfield_values[var_index], index);
 }
 
-//! \brief does the recording process of handing over to basic recording
+//! \brief The recording process of handing over to basic recording
 //! \param[in] time: the time to put into the recording stamps.
 static inline void neuron_recording_record(uint32_t time) {
     // go through all recordings
@@ -175,7 +174,6 @@ static inline void neuron_recording_record(uint32_t time) {
             recording_record_and_notify(
                 i - 1, rec_info->values, rec_info->size, recording_done_callback);
         } else {
-
             // Not recording this time, so increment by specified amount
             rec_info->count += rec_info->increment;
         }
@@ -199,14 +197,13 @@ static inline void neuron_recording_record(uint32_t time) {
                 i + N_RECORDED_VARS - 1, bf_info->values, bf_info->size,
                 recording_done_callback);
         } else {
-
             // Not recording this time, so increment by specified amount
             bf_info->count += bf_info->increment;
         }
     }
 }
 
-//! \brief sets up state for next recording.
+//! \brief Set up state for next recording.
 static inline void neuron_recording_setup_for_next_recording(void) {
     // Wait until recordings have completed, to ensure the recording space
     // can be re-written
@@ -223,24 +220,24 @@ static inline void neuron_recording_setup_for_next_recording(void) {
     }
 }
 
-//! \brief reads recording data from sdram on reset.
+//! \brief Read recording data from SDRAM on reset.
 //! \param[in] n_neurons: the number of neurons to setup for
-//! \return bool stating if the read was successful or not
+//! \return whether the read was successful or not
 bool neuron_recording_reset(uint32_t n_neurons);
 
-//! \brief sets up the recording stuff
-//! \param[in] recording_address: sdram location for the recording data
-//! \param[out] recording_flags: Output of flags which can be used to check if
-//!            a channel is enabled for recording
+//! \brief Set up the recording stuff
+//! \param[in] recording_address: SDRAM location for the recording data
+//! \param[out] recording_flags:
+//!     Flags which can be used to check if a channel is enabled for recording
 //! \param[in] n_neurons: the number of neurons to setup for
-//! \param[out] n_rec_regions_used: Output the number of regions used by neuron
-//!            recording
-//! \return bool stating if the init was successful or not
+//! \param[out] n_rec_regions_used:
+//!     The number of regions used by neuron recording
+//! \return whether the init was successful or not
 bool neuron_recording_initialise(
         void *recording_address, uint32_t *recording_flags,
         uint32_t n_neurons, uint32_t *n_rec_regions_used);
 
-//! \brief finishes recording
+//! \brief Finish recording
 void neuron_recording_finalise(void);
 
 #endif //_NEURON_RECORDING_H_

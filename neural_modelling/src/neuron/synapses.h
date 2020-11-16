@@ -55,7 +55,7 @@ static inline index_t synapses_get_ring_buffer_index_combined(
             | combined_synapse_neuron_index;
 }
 
-//! \brief Converts a weight stored in a synapse row to an input
+//! \brief Convert a weight stored in a synapse row to an input
 //! \param[in] weight: the weight to convert in synapse-row form
 //! \param[in] left_shift: the shift to use when decoding
 //! \return the actual input weight for the model
@@ -102,7 +102,7 @@ bool synapses_initialise(
 //! \param[in] time: the current simulation time
 void synapses_do_timestep_update(timer_t time);
 
-//! \brief process a synaptic row
+//! \brief Process a synaptic row
 //! \param[in] time: the simulated time
 //! \param[in] row: the synaptic row in question
 //! \param[out] write_back: whether to write back to SDRAM
@@ -110,21 +110,20 @@ void synapses_do_timestep_update(timer_t time);
 bool synapses_process_synaptic_row(
         uint32_t time, synaptic_row_t row, bool *write_back);
 
-//! \brief returns the number of times the synapses have saturated their
-//!        weights.
+//! \brief Get the number of times the synapses have saturated their weights.
 //! \return the number of times the synapses have saturated.
 uint32_t synapses_get_saturation_count(void);
 
-//! \brief returns the counters for plastic and fixed pre synaptic events based
+//! \brief Get the counters for plastic and fixed pre synaptic events based
 //!        on (if the model was compiled with SYNAPSE_BENCHMARK parameter) or
 //!        returns 0
 //! \return the counter for plastic and fixed pre synaptic events or 0
 uint32_t synapses_get_pre_synaptic_events(void);
 
-//! \brief flush the ring buffers
+//! \brief Flush the ring buffers
 void synapses_flush_ring_buffers(void);
 
-//! \brief allows clearing of DTCM used by synapses
+//! \brief Clear DTCM used by synapses
 //! \return true if successful, false otherwise
 bool synapses_shut_down(void);
 

@@ -24,12 +24,14 @@
 
 //! Configuration of synapse elimination rule
 struct elimination_params {
-    //! Probability of elimination of depressed synapse
+    //! Probability of elimination of depressed synapse;
+    //! ::u032 in integer form
     uint32_t prob_elim_depression;
-    //! Probability of elimination of potentiated synapse
+    //! Probability of elimination of potentiated synapse;
+    //! ::u032 in integer form
     uint32_t prob_elim_potentiation;
-    //! Threshold below which a synapse is depressed, and above which it is
-    //! potentiated
+    //! Threshold weight below which a synapse is depressed, and above which it
+    //! is potentiated
     uint32_t threshold;
 };
 
@@ -38,23 +40,24 @@ struct elimination_params {
 //! \param[in] params: The elimination rule configuration.
 //! \param[in] time: Time of elimination
 //! \param[in,out] row: The row to eliminate from
-//! \return if row was modified
+//! \return whether the row was modified
 static inline bool synaptogenesis_elimination_rule(
         current_state_t *restrict current_state,
         const elimination_params_t *params,
         UNUSED uint32_t time, address_t restrict row) {
     uint32_t random_number = mars_kiss64_seed(*(current_state->local_seed));
 
-    // Is weight depressed?
-    if (current_state->weight < params->threshold &&
-            random_number > params->prob_elim_depression) {
-        return false;
-    }
-
-    // Is weight potentiated or unchanged?
-    if (current_state->weight >= params->threshold &&
-            random_number > params->prob_elim_potentiation) {
-        return false;
+    // Test whether we should not eliminate any
+    if (current_state->weight < params->threshold) {
+        // Weight is depressed
+        if (random_number > params->prob_elim_depression) {
+            return false;
+        }
+    } else {
+        // Weight potentiated or unchanged
+        if (random_number > params->prob_elim_potentiation) {
+            return false;
+        }
     }
 
     return sp_structs_remove_synapse(current_state, row);

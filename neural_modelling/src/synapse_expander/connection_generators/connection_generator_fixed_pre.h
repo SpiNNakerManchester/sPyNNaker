@@ -63,7 +63,7 @@ static struct fixed_pre_globals_t fixed_pre_globals = {
 };
 
 /**
- * \brief Generates a uniformly-distributed random number
+ * \brief Generate a uniformly-distributed random number
  * \param[in,out] obj: the generator containing the RNG
  * \param[in] range: the (_upper, exclusive_) limit of the range of random
  *      numbers that may be generated. Should be in range 0..65536

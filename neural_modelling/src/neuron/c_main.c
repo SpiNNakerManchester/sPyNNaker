@@ -155,7 +155,7 @@ static void c_main_store_provenance_data(address_t provenance_region) {
     log_debug("finished other provenance data");
 }
 
-//! \brief Initialises the model by reading in the regions and checking
+//! \brief Initialise the model by reading in the regions and checking
 //!        recording data.
 //! \return True if it successfully initialised, false otherwise
 static bool initialise(void) {
@@ -258,7 +258,7 @@ static bool initialise(void) {
     return true;
 }
 
-//! \brief the function to call when resuming a simulation
+//! \brief Callback called when resuming a simulation
 void resume_callback(void) {
     data_specification_metadata_t *ds_regions =
             data_specification_get_data_address();
