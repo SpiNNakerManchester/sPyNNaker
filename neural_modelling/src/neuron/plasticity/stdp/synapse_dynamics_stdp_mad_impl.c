@@ -205,10 +205,11 @@ static inline final_state_t plasticity_update_synapse(
 //---------------------------------------
 
 void synapse_dynamics_print_plastic_synapses(
-        address_t plastic_region_address, address_t fixed_region_address,
+        address_t plastic_region_address,
+        synapse_row_fixed_part_t *fixed_region,
         uint32_t *ring_buffer_to_input_buffer_left_shifts) {
     __use(plastic_region_address);
-    __use(fixed_region_address);
+    __use(fixed_region);
     __use(ring_buffer_to_input_buffer_left_shifts);
 
 #if LOG_LEVEL >= LOG_DEBUG
@@ -217,10 +218,8 @@ void synapse_dynamics_print_plastic_synapses(
     // Extract separate arrays of weights (from plastic region),
     // Control words (from fixed region) and number of plastic synapses
     const plastic_synapse_t *plastic_words = data_ptr->synapses;
-    const control_t *control_words =
-            synapse_row_plastic_controls(fixed_region_address);
-    size_t plastic_synapse =
-            synapse_row_num_plastic_controls(fixed_region_address);
+    const control_t *control_words = synapse_row_plastic_controls(fixed_region);
+    size_t plastic_synapse = synapse_row_num_plastic_controls(fixed_region);
 
     log_debug("Plastic region %u synapses\n", plastic_synapse);
 
@@ -319,17 +318,16 @@ bool synapse_dynamics_initialise(
 }
 
 bool synapse_dynamics_process_plastic_synapses(
-        address_t plastic_region_address, address_t fixed_region_address,
+        address_t plastic_region_address,
+        synapse_row_fixed_part_t *fixed_region,
         weight_t *ring_buffers, uint32_t time) {
     synapse_row_plastic_data_t *plastic_data =
             (synapse_row_plastic_data_t *) plastic_region_address;
     // Extract separate arrays of plastic synapses (from plastic region),
     // Control words (from fixed region) and number of plastic synapses
     plastic_synapse_t *plastic_words = plastic_data->synapses;
-    const control_t *control_words =
-            synapse_row_plastic_controls(fixed_region_address);
-    size_t plastic_synapse =
-            synapse_row_num_plastic_controls(fixed_region_address);
+    const control_t *control_words = synapse_row_plastic_controls(fixed_region);
+    size_t plastic_synapse = synapse_row_num_plastic_controls(fixed_region);
 
     num_plastic_pre_synaptic_events += plastic_synapse;
 
