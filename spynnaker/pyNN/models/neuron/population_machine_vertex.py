@@ -466,8 +466,8 @@ class PopulationMachineVertex(
 
         # allow the synaptic matrix to write its data spec-able data
         self._app_vertex.synapse_manager.write_data_spec(
-            spec, self._app_vertex, self.vertex_slice, self, machine_graph,
-            application_graph, routing_info, weight_scale, machine_time_step)
+            spec, self.vertex_slice, self, machine_graph, routing_info,
+            weight_scale, machine_time_step)
         self.set_on_chip_generatable_area(
             self._app_vertex.synapse_manager.host_written_matrix_size(
                 self.vertex_slice),

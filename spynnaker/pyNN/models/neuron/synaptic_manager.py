@@ -320,17 +320,20 @@ class SynapticManager(object):
                 n_atoms, self.__n_synapse_types)
 
     def get_sdram_usage_in_bytes(
-            self, post_vertex_slice, application_graph, app_vertex):
+            self, post_vertex_slice, application_graph, app_vertex,
+            machine_graph):
         """ Get the SDRAM usage of a slice of atoms of this vertex
 
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
             The slice of atoms to get the size of
         :param ~pacman.model.graphs.application.ApplicationGraph \
                 application_graph: The application graph
+        :param ~pacman.model.graphs.machine.MachineGraph machine_graph: \
+            machine graph
         :param AbstractPopulationVertex app_vertex: The application vertex
         :rtype: int
         """
-        in_edges = application_graph.get_edges_ending_at_vertex(app_vertex)
+        in_edges = machine_graph.get_edges_ending_at_vertex(app_vertex)
         matrices = self.__get_synaptic_matrices(post_vertex_slice)
         return (
             self._get_synapse_params_size() +
@@ -601,26 +604,18 @@ class SynapticManager(object):
                 for r in self.__ring_buffer_shifts])
 
     def write_data_spec(
-            self, spec, application_vertex, post_vertex_slice, machine_vertex,
-            machine_graph, application_graph, routing_info, weight_scale,
-            machine_time_step):
+            self, spec, post_vertex_slice, machine_vertex,
+            machine_graph, routing_info, weight_scale, machine_time_step):
         """
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to
         :param ~pacman.model.graphs.application_graph.ApplicationGraph \
         application_graph: the app graph
-        :param AbstractPopulationVertex application_vertex:
-            The vertex owning the synapses
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
             The part of the vertex we're dealing with
         :param PopulationMachineVertex machine_vertex: The machine vertex
-        :param ~pacman.model.placements.Placement placement:
-            Where the vertex is placed
         :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
             The graph containing the machine vertex
-        :param ~pacman.model.graphs.application.ApplicationGraph \
-                application_graph:
-            The graph containing the application vertex
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
             How messages are routed
         :param float weight_scale: How to scale the weights of the synapses
@@ -628,8 +623,8 @@ class SynapticManager(object):
         """
 
         # Reserve the memory
-        in_edges = application_graph.get_edges_ending_at_vertex(
-            application_vertex)
+        in_edges = machine_graph.get_edges_ending_at_vertex(
+            machine_vertex)
         matrices = self.__get_synaptic_matrices(post_vertex_slice)
         all_syn_block_sz = matrices.synapses_size(in_edges)
         self._reserve_memory_regions(

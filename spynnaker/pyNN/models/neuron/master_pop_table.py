@@ -324,10 +324,9 @@ class MasterPopTableAsBinarySearch(object):
     def get_master_population_table_size(in_edges):
         """ Get the size of the master population table in SDRAM.
 
-        :param iterable(~pacman.model.graphs.application.ApplicationEdge) \
-                in_edges:
-            The edges arriving at the vertex that are to be handled by this
-            table
+        :param in_edges: The edges arriving at the vertex that are to be \
+            handled by this table
+        :type in_edges: iterable(~pacman.model.graphs.machine.MachineEdge)
         :return: the size the master pop table will take in SDRAM (in bytes)
         :rtype: int
         """
@@ -337,19 +336,21 @@ class MasterPopTableAsBinarySearch(object):
         n_vertices = 0
         n_entries = 0
         for in_edge in in_edges:
-            if isinstance(in_edge, ProjectionApplicationEdge):
+            if isinstance(in_edge.app_edge, ProjectionApplicationEdge):
                 # TODO: Fix this to be more accurate!
                 # May require modification to the master population table
                 # Get the number of atoms per core incoming
-                vertex = in_edge.pre_vertex
-                max_atoms = float(min(vertex.get_max_atoms_per_core(),
-                                      vertex.n_atoms))
+                pre_app_vertex = in_edge.pre_vertex
+                max_atoms = float(
+                    min(pre_app_vertex.get_max_atoms_per_core(),
+                        pre_app_vertex.n_atoms))
 
                 # Get the number of likely vertices
-                n_edge_vertices = int(math.ceil(vertex.n_atoms / max_atoms))
+                n_edge_vertices = int(
+                    math.ceil(pre_app_vertex.n_atoms / max_atoms))
                 n_vertices += n_edge_vertices
-                n_entries += (
-                    n_edge_vertices * len(in_edge.synapse_information))
+                n_entries += (n_edge_vertices * len(
+                    in_edge.app_edge.synapse_information))
 
         # Multiply by 2 to get an upper bound
         return (
