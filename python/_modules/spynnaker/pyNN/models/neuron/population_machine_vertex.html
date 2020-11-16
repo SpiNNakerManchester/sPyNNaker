@@ -77,8 +77,10 @@
 <span class="c1">#</span>
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
-
 <span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+
+<span class="kn">from</span> <span class="nn">pacman.executor.injection_decorator</span> <span class="kn">import</span> <span class="n">inject_items</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.simulation</span> <span class="kn">import</span> <span class="n">simulation_utilities</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">pacman.model.graphs.machine</span> <span class="kn">import</span> <span class="n">MachineVertex</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.utility_objs</span> <span class="kn">import</span> <span class="n">ProvenanceDataItem</span>
@@ -91,13 +93,20 @@
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractHasAssociatedBinary</span><span class="p">,</span> <span class="n">AbstractRecordable</span><span class="p">,</span>
     <span class="n">AbstractSupportsBitFieldGeneration</span><span class="p">,</span>
-    <span class="n">AbstractSupportsBitFieldRoutingCompression</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.profiling</span> <span class="kn">import</span> <span class="n">AbstractHasProfileData</span>
+    <span class="n">AbstractSupportsBitFieldRoutingCompression</span><span class="p">,</span>
+    <span class="n">AbstractGeneratesDataSpecification</span><span class="p">,</span> <span class="n">AbstractRewritesDataSpecification</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.profiling</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AbstractHasProfileData</span><span class="p">,</span> <span class="n">profile_utils</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.profiling.profile_utils</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">get_profiling_data</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.utility_objs</span> <span class="kn">import</span> <span class="n">ExecutableType</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.synapse_dynamics</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AbstractSynapseDynamicsStructural</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities</span> <span class="kn">import</span> <span class="n">constants</span><span class="p">,</span> <span class="n">bit_field_utilities</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="n">AbstractSynapseExpandable</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="n">POPULATION_BASED_REGIONS</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">constants</span> <span class="k">as</span> <span class="n">common_constants</span><span class="p">,</span> <span class="n">helpful_functions</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="PopulationMachineVertex"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex">[docs]</a><span class="k">class</span> <span class="nc">PopulationMachineVertex</span><span class="p">(</span>
@@ -105,7 +114,9 @@
         <span class="n">AbstractHasAssociatedBinary</span><span class="p">,</span> <span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="p">,</span>
         <span class="n">AbstractRecordable</span><span class="p">,</span> <span class="n">AbstractHasProfileData</span><span class="p">,</span>
         <span class="n">AbstractSupportsBitFieldGeneration</span><span class="p">,</span>
-        <span class="n">AbstractSupportsBitFieldRoutingCompression</span><span class="p">,</span> <span class="n">AbstractSynapseExpandable</span><span class="p">):</span>
+        <span class="n">AbstractSupportsBitFieldRoutingCompression</span><span class="p">,</span>
+        <span class="n">AbstractGeneratesDataSpecification</span><span class="p">,</span> <span class="n">AbstractSynapseExpandable</span><span class="p">,</span>
+        <span class="n">AbstractRewritesDataSpecification</span><span class="p">):</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;__binary_file_name&quot;</span><span class="p">,</span>
@@ -113,7 +124,8 @@
         <span class="s2">&quot;__resources&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__on_chip_generatable_area&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__on_chip_generatable_size&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__drop_late_spikes&quot;</span><span class="p">]</span>
+        <span class="s2">&quot;__drop_late_spikes&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__change_requires_neuron_parameters_reload&quot;</span><span class="p">]</span>
 
 <div class="viewcode-block" id="PopulationMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES">[docs]</a>    <span class="k">class</span> <span class="nc">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Entries for the provenance data generated by standard neuron \</span>
@@ -235,6 +247,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__drop_late_spikes</span> <span class="o">=</span> <span class="n">drop_late_spikes</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__on_chip_generatable_offset</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__on_chip_generatable_size</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_neuron_parameters_reload</span> <span class="o">=</span> <span class="kc">False</span>
 
 <div class="viewcode-block" id="PopulationMachineVertex.set_on_chip_generatable_area"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.set_on_chip_generatable_area">[docs]</a>    <span class="k">def</span> <span class="nf">set_on_chip_generatable_area</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__on_chip_generatable_offset</span> <span class="o">=</span> <span class="n">offset</span>
@@ -448,6 +461,227 @@
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractHasAssociatedBinary</span><span class="o">.</span><span class="n">get_binary_start_type</span><span class="p">)</span>
 <div class="viewcode-block" id="PopulationMachineVertex.get_binary_start_type"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.get_binary_start_type">[docs]</a>    <span class="k">def</span> <span class="nf">get_binary_start_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">ExecutableType</span><span class="o">.</span><span class="n">USES_SIMULATION_INTERFACE</span></div>
+
+    <span class="nd">@inject_items</span><span class="p">({</span>
+        <span class="s2">&quot;machine_time_step&quot;</span><span class="p">:</span> <span class="s2">&quot;MachineTimeStep&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;time_scale_factor&quot;</span><span class="p">:</span> <span class="s2">&quot;TimeScaleFactor&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;application_graph&quot;</span><span class="p">:</span> <span class="s2">&quot;MemoryApplicationGraph&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;machine_graph&quot;</span><span class="p">:</span> <span class="s2">&quot;MemoryMachineGraph&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;routing_info&quot;</span><span class="p">:</span> <span class="s2">&quot;MemoryRoutingInfos&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;data_n_time_steps&quot;</span><span class="p">:</span> <span class="s2">&quot;DataNTimeSteps&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;n_key_map&quot;</span><span class="p">:</span> <span class="s2">&quot;MemoryMachinePartitionNKeysMap&quot;</span>
+    <span class="p">})</span>
+    <span class="nd">@overrides</span><span class="p">(</span>
+        <span class="n">AbstractGeneratesDataSpecification</span><span class="o">.</span><span class="n">generate_data_specification</span><span class="p">,</span>
+        <span class="n">additional_arguments</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;machine_time_step&quot;</span><span class="p">,</span> <span class="s2">&quot;time_scale_factor&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;application_graph&quot;</span><span class="p">,</span> <span class="s2">&quot;machine_graph&quot;</span><span class="p">,</span> <span class="s2">&quot;routing_info&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;data_n_time_steps&quot;</span><span class="p">,</span> <span class="s2">&quot;n_key_map&quot;</span>
+        <span class="p">})</span>
+<div class="viewcode-block" id="PopulationMachineVertex.generate_data_specification"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.generate_data_specification">[docs]</a>    <span class="k">def</span> <span class="nf">generate_data_specification</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="p">,</span>
+            <span class="n">application_graph</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span> <span class="n">data_n_time_steps</span><span class="p">,</span>
+            <span class="n">n_key_map</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param machine_time_step: (injected)</span>
+<span class="sd">        :param time_scale_factor: (injected)</span>
+<span class="sd">        :param application_graph: (injected)</span>
+<span class="sd">        :param machine_graph: (injected)</span>
+<span class="sd">        :param routing_info: (injected)</span>
+<span class="sd">        :param data_n_time_steps: (injected)</span>
+<span class="sd">        :param n_key_map: (injected)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># pylint: disable=too-many-arguments, arguments-differ</span>
+
+        <span class="n">spec</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">*** Spec for block of </span><span class="si">{}</span><span class="s2"> neurons ***</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">neuron_impl</span><span class="o">.</span><span class="n">model_name</span><span class="p">))</span>
+
+        <span class="c1"># Reserve memory regions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reserve_memory_regions</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span> <span class="n">n_key_map</span><span class="p">)</span>
+
+        <span class="c1"># Declare random number generators and distributions:</span>
+        <span class="c1"># TODO add random distribution stuff</span>
+        <span class="c1"># self.write_random_distribution_declarations(spec)</span>
+
+        <span class="c1"># Get the key</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">routing_info</span><span class="o">.</span><span class="n">get_first_key_from_pre_vertex</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
+
+        <span class="c1"># Write the setup region</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span><span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">SYSTEM</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">simulation_utilities</span><span class="o">.</span><span class="n">get_simulation_header_array</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__binary_file_name</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="p">))</span>
+
+        <span class="c1"># Write the neuron recording region</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">neuron_recorder</span><span class="o">.</span><span class="n">write_neuron_recording_region</span><span class="p">(</span>
+            <span class="n">spec</span><span class="p">,</span> <span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">NEURON_RECORDING</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">,</span> <span class="n">data_n_time_steps</span><span class="p">)</span>
+
+        <span class="c1"># Write the neuron parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_neuron_parameters</span><span class="p">(</span>
+            <span class="n">spec</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">NEURON_PARAMS</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+        <span class="c1"># write profile data</span>
+        <span class="n">profile_utils</span><span class="o">.</span><span class="n">write_profile_region_data</span><span class="p">(</span>
+            <span class="n">spec</span><span class="p">,</span> <span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">PROFILING</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">n_profile_samples</span><span class="p">)</span>
+
+        <span class="c1"># Get the weight_scale value from the appropriate location</span>
+        <span class="n">weight_scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">neuron_impl</span><span class="o">.</span><span class="n">get_global_weight_scale</span><span class="p">()</span>
+
+        <span class="c1"># allow the synaptic matrix to write its data spec-able data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">synapse_manager</span><span class="o">.</span><span class="n">write_data_spec</span><span class="p">(</span>
+            <span class="n">spec</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span>
+            <span class="n">application_graph</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span> <span class="n">weight_scale</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_on_chip_generatable_area</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">synapse_manager</span><span class="o">.</span><span class="n">host_written_matrix_size</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">synapse_manager</span><span class="o">.</span><span class="n">on_chip_written_matrix_size</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">))</span>
+
+        <span class="c1"># write up the bitfield builder data</span>
+        <span class="n">bit_field_utilities</span><span class="o">.</span><span class="n">write_bitfield_init_data</span><span class="p">(</span>
+            <span class="n">spec</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span>
+            <span class="n">n_key_map</span><span class="p">,</span> <span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">BIT_FIELD_BUILDER</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">POPULATION_TABLE</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">SYNAPTIC_MATRIX</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">DIRECT_MATRIX</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">BIT_FIELD_FILTER</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">BIT_FIELD_KEY_MAP</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">STRUCTURAL_DYNAMICS</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="nb">isinstance</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">synapse_manager</span><span class="o">.</span><span class="n">synapse_dynamics</span><span class="p">,</span>
+                <span class="n">AbstractSynapseDynamicsStructural</span><span class="p">))</span>
+
+        <span class="c1"># End the writing of this specification:</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">end_specification</span><span class="p">()</span></div>
+
+    <span class="nd">@inject_items</span><span class="p">({</span><span class="s2">&quot;routing_info&quot;</span><span class="p">:</span> <span class="s2">&quot;MemoryRoutingInfos&quot;</span><span class="p">})</span>
+    <span class="nd">@overrides</span><span class="p">(</span>
+        <span class="n">AbstractRewritesDataSpecification</span><span class="o">.</span><span class="n">regenerate_data_specification</span><span class="p">,</span>
+        <span class="n">additional_arguments</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;routing_info&quot;</span><span class="p">})</span>
+<div class="viewcode-block" id="PopulationMachineVertex.regenerate_data_specification"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.regenerate_data_specification">[docs]</a>    <span class="k">def</span> <span class="nf">regenerate_data_specification</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">):</span>
+        <span class="c1"># pylint: disable=too-many-arguments, arguments-differ</span>
+
+        <span class="c1"># reserve the neuron parameters data region</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reserve_neuron_params_data_region</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+
+        <span class="c1"># write the neuron params into the new DSG region</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_neuron_parameters</span><span class="p">(</span>
+            <span class="n">key</span><span class="o">=</span><span class="n">routing_info</span><span class="o">.</span><span class="n">get_first_key_from_pre_vertex</span><span class="p">(</span>
+                <span class="bp">self</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">SPIKE_PARTITION_ID</span><span class="p">),</span>
+            <span class="n">spec</span><span class="o">=</span><span class="n">spec</span><span class="p">,</span>
+            <span class="n">region_id</span><span class="o">=</span><span class="n">constants</span><span class="o">.</span><span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">NEURON_PARAMS</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+        <span class="c1"># close spec</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">end_specification</span><span class="p">()</span></div>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractRewritesDataSpecification</span><span class="o">.</span><span class="n">reload_required</span><span class="p">)</span>
+<div class="viewcode-block" id="PopulationMachineVertex.reload_required"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.reload_required">[docs]</a>    <span class="k">def</span> <span class="nf">reload_required</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_neuron_parameters_reload</span></div>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractRewritesDataSpecification</span><span class="o">.</span><span class="n">set_reload_required</span><span class="p">)</span>
+<div class="viewcode-block" id="PopulationMachineVertex.set_reload_required"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.set_reload_required">[docs]</a>    <span class="k">def</span> <span class="nf">set_reload_required</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_neuron_parameters_reload</span> <span class="o">=</span> <span class="n">new_value</span></div>
+
+    <span class="k">def</span> <span class="nf">_reserve_memory_regions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span> <span class="n">n_key_map</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Reserve the DSG data regions.</span>
+
+<span class="sd">        :param ~.DataSpecificationGenerator spec:</span>
+<span class="sd">            the spec to write the DSG region to</span>
+<span class="sd">        :param ~.MachineGraph machine_graph: machine graph</span>
+<span class="sd">        :param n_key_map: n key map</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Reserving memory space for data regions:</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Reserve memory:</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
+            <span class="n">region</span><span class="o">=</span><span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">SYSTEM</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">size</span><span class="o">=</span><span class="n">common_constants</span><span class="o">.</span><span class="n">SIMULATION_N_BYTES</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="s1">&#39;System&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reserve_neuron_params_data_region</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+
+        <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
+            <span class="n">region</span><span class="o">=</span><span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">NEURON_RECORDING</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">neuron_recorder</span><span class="o">.</span><span class="n">get_static_sdram_usage</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">),</span>
+            <span class="n">label</span><span class="o">=</span><span class="s2">&quot;neuron recording&quot;</span><span class="p">)</span>
+
+        <span class="n">profile_utils</span><span class="o">.</span><span class="n">reserve_profile_region</span><span class="p">(</span>
+            <span class="n">spec</span><span class="p">,</span> <span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">PROFILING</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">n_profile_samples</span><span class="p">)</span>
+
+        <span class="c1"># reserve bit field region</span>
+        <span class="n">bit_field_utilities</span><span class="o">.</span><span class="n">reserve_bit_field_regions</span><span class="p">(</span>
+            <span class="n">spec</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span> <span class="n">n_key_map</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span>
+            <span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">BIT_FIELD_BUILDER</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">BIT_FIELD_FILTER</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">BIT_FIELD_KEY_MAP</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">reserve_provenance_data_region</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="PopulationMachineVertex.neuron_region_sdram_address"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.neuron_region_sdram_address">[docs]</a>    <span class="k">def</span> <span class="nf">neuron_region_sdram_address</span><span class="p">(</span><span class="n">placement</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">helpful_functions</span><span class="o">.</span><span class="n">locate_memory_region_for_placement</span><span class="p">(</span>
+                <span class="n">placement</span><span class="p">,</span> <span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">NEURON_PARAMS</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="n">transceiver</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_reserve_neuron_params_data_region</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Reserve the neuron parameter data region.</span>
+
+<span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
+<span class="sd">            the spec to write the DSG region to</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">params_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">get_sdram_usage_for_neuron_params</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
+            <span class="n">region</span><span class="o">=</span><span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">NEURON_PARAMS</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">size</span><span class="o">=</span><span class="n">params_size</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;NeuronParams&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_write_neuron_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">region_id</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">update_state_variables</span><span class="p">()</span>
+
+        <span class="c1"># pylint: disable=too-many-arguments</span>
+        <span class="n">n_atoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Writing Neuron Parameters for </span><span class="si">{}</span><span class="s2"> Neurons:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">n_atoms</span><span class="p">))</span>
+
+        <span class="c1"># Set the focus to the memory region:</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span><span class="n">region_id</span><span class="p">)</span>
+
+        <span class="c1"># store the tdma data here for this slice.</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">generate_tdma_data_specification_data</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">vertex_slices</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">))</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="c1"># Write whether the key is to be used, and then the key, or 0 if it</span>
+        <span class="c1"># isn&#39;t to be used</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+
+        <span class="c1"># Write the number of neurons in the block:</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">n_atoms</span><span class="p">)</span>
+
+        <span class="c1"># Write the number of synapse types</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">neuron_impl</span><span class="o">.</span><span class="n">get_n_synapse_types</span><span class="p">())</span>
+
+        <span class="c1"># Write the size of the incoming spike buffer</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">incoming_spike_buffer_size</span><span class="p">)</span>
+
+        <span class="c1"># Write the neuron parameters</span>
+        <span class="n">neuron_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">neuron_impl</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">parameters</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">state_variables</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">neuron_data</span><span class="p">)</span>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseExpandable</span><span class="o">.</span><span class="n">gen_on_machine</span><span class="p">)</span>
 <div class="viewcode-block" id="PopulationMachineVertex.gen_on_machine"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.gen_on_machine">[docs]</a>    <span class="k">def</span> <span class="nf">gen_on_machine</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
