@@ -22,13 +22,6 @@
 #include "post_events.h"
 #include "synapse_dynamics_stdp_common.h"
 
-/* PRIVATE FUNCTIONS */
-
-// Mark a value as possibly unused while not using any instructions, guaranteed
-#ifndef __use
-#define __use(x)    do { (void) (x); } while (0)
-#endif
-
 //---------------------------------------
 //! \brief Synapse update loop core
 //! \param[in] time: The current time

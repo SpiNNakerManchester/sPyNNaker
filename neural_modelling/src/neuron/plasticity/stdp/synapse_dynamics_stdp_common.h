@@ -114,6 +114,13 @@ typedef struct {
     plastic_synapse_t synapses[];
 } synapse_row_plastic_data_t;
 
+/* PRIVATE FUNCTIONS */
+
+// Mark a value as possibly unused while not using any instructions, guaranteed
+#ifndef __use
+#define __use(x)    do { (void) (x); } while (0)
+#endif
+
 //---------------------------------------
 // Synaptic row plastic-region implementation
 //---------------------------------------
