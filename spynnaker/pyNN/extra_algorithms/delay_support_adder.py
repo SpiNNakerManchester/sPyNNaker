@@ -229,10 +229,6 @@ class DelaySupportAdder(object):
             raise DelayExtensionException(
                 self.INVALID_SPLITTER_FOR_DELAYS_ERROR_MSG.format(
                     app_edge.post_vertex, post_splitter, app_edge))
-        if not post_splitter.accepts_edges_from_delay_vertex():
-            raise DelayExtensionException(
-                self.DELAYS_NOT_SUPPORTED_SPLITTER.format(
-                    app_edge.post_vertex, post_splitter, app_edge))
 
         post_vertex_max_delay = (
                 app_edge.post_vertex.splitter.max_support_delay() *
@@ -241,6 +237,12 @@ class DelaySupportAdder(object):
         # if does not need a delay extension, run away
         if post_vertex_max_delay >= max_delay_needed:
             return max_delay_needed, post_vertex_max_delay, False
+
+        # Check post vertex is ok with getting a delay
+        if not post_splitter.accepts_edges_from_delay_vertex():
+            raise DelayExtensionException(
+                self.DELAYS_NOT_SUPPORTED_SPLITTER.format(
+                    app_edge.post_vertex, post_splitter, app_edge))
 
         # needs a delay extension, check can be supported with 1 delay
         # extension. coz we dont do more than 1 at the moment
