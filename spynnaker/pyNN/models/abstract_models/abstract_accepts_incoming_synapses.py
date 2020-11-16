@@ -52,7 +52,7 @@ class AbstractAcceptsIncomingSynapses(object):
         # pylint: disable=too-many-arguments
         """ Get the connections from the machine post-run.
 
-        :param ~spinnman.Transceiver transceiver:
+        :param ~spinnman.transceiver.Transceiver transceiver:
             How to read the connection data
         :param ~pacman.model.placements.Placements placements:
             Where the connection data is on the machine

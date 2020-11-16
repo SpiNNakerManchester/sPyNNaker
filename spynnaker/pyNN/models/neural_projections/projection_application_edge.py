@@ -168,7 +168,7 @@ class ProjectionApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
 
     def __check_list_mode(self):
         """
-        Makes sure the pre and post slices are sorted lists
+        Makes sure the pre- and post-slices are sorted lists
         """
         if not self.__slices_list_mode:
             self.__pre_slices = sorted(
@@ -179,34 +179,32 @@ class ProjectionApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
 
     @property
     def pre_slices(self):
-        """
-        Get the slices for the pre_vertexes of the MachineEdges
+        """ Get the slices for the pre_vertexes of the MachineEdges
 
         While the remember machine_edges remain unchanged this will return a
-        list with a consitent id. If the edges change a new list is created
+        list with a consistent id. If the edges change a new list is created
 
         The List will be sorted by lo_atom.
         No checking is done for overlaps or gaps
 
-        :return: Ordered list of pre slices
-        :rtype list(Slice)
+        :return: Ordered list of pre-slices
+        :rtype: list(~pacman.model.graphs.common.Slice)
         """
         self.__check_list_mode()
         return self.__pre_slices
 
     @property
     def post_slices(self):
-        """
-        Get the slices for the post_vertexes of the MachineEdges
+        """ Get the slices for the post_vertexes of the MachineEdges
 
         While the remember machine_edges remain unchanged this will return a
-        list with a consitent id. If the edges change a new list is created
+        list with a consistent id. If the edges change a new list is created
 
         The List will be sorted by lo_atom.
         No checking is done for overlaps or gaps
 
-        :return: Ordered list of post slices
-        :rtype list(Slice)
+        :return: Ordered list of post-slices
+        :rtype: list(~pacman.model.graphs.common.Slice)
         """
         self.__check_list_mode()
         return self.__post_slices
