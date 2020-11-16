@@ -98,11 +98,11 @@ class AbstractPopulationVertex(
         :param str label: The label on the population
         :param list(~pacman.model.constraints.AbstractConstraint) constraints:
             Constraints on where a population's vertices may be placed.
-        :param int max_atoms_per_core:
+        :param int max_atoms_per_core:\
             The maximum number of atoms (neurons) per SpiNNaker core.
         :param spikes_per_second: Expected spike rate
         :type spikes_per_second: float or None
-        :param ring_buffer_sigma:
+        :param ring_buffer_sigma:\
             How many SD above the mean to go for upper bound of ring buffer \
             size; a good starting choice is 5.0. Given length of simulation \
             we can set this for approximate number of saturation events.
@@ -110,9 +110,9 @@ class AbstractPopulationVertex(
         :param incoming_spike_buffer_size:
         :type incoming_spike_buffer_size: int or None
         :param bool drop_late_spikes: control flag for dropping late packets.
-        :param AbstractNeuronImpl neuron_impl:
+        :param AbstractNeuronImpl neuron_impl:\
             The (Python side of the) implementation of the neurons themselves.
-        :param AbstractPyNNNeuronModel pynn_model:
+        :param AbstractPyNNNeuronModel pynn_model:\
             The PyNN neuron model that this vertex is working on behalf of.
         :param splitter: splitter object
         :type splitter: None or AbstractSplitterCommon

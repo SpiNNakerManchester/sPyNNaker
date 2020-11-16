@@ -90,8 +90,8 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
 
     def set_projection_information(self, machine_time_step, synapse_info):
         """ sets a connectors projection info
-        :param int machine_time_step:
-        :param SynapseInformation synapse_info:
+        :param int machine_time_step: machine time step
+        :param SynapseInformation synapse_info: the synapse info
         """
         # pylint: disable=unused-argument
         self._rng = (self._rng or NumpyRNG())
@@ -134,10 +134,10 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         """ Get the minimum delay given a float, RandomDistribution or list of\
             delays.
 
-        :param delays:
+        :param delays: the delays
         :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float
             or list(int) or list(float)
-        :param int n_connections:
+        :param int n_connections: how many connections
         """
         if isinstance(delays, RandomDistribution):
             low_estimated_delay = utility_calls.get_minimum_probable_value(
@@ -185,7 +185,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         """ Get the maximum delay specified by the user in ms, or None if\
             unbounded.
 
-        :param SynapseInformation synapse_info:
+        :param SynapseInformation synapse_info: the synapse info
         :rtype: int or None
         """
 

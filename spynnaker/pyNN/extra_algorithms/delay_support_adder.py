@@ -75,7 +75,7 @@ class DelaySupportAdder(object):
         self._delay_pre_edges = list()
 
     def __call__(self, app_graph, machine_time_step, user_max_delay):
-        """ adds the delay extensions to the app graph, now that all the
+        """ adds the delay extensions to the app graph, now that all the\
         splitter objects have been set.
 
         :param ApplicationGraph app_graph: the app graph
@@ -94,6 +94,7 @@ class DelaySupportAdder(object):
                 app_graph.outgoing_edge_partitions):
             for app_edge in app_outgoing_edge_partition.edges:
                 if isinstance(app_edge, ProjectionApplicationEdge):
+
                     # figure the max delay and if we need a delay extension
                     synapse_infos = app_edge.synapse_information
                     (max_delay_needed, post_vertex_max_delay,
@@ -124,7 +125,7 @@ class DelaySupportAdder(object):
         self._add_new_app_edges(app_graph)
 
     def _add_new_app_edges(self, app_graph):
-        """ adds new edges to the app graph. avoids mutating the arrays being
+        """ adds new edges to the app graph. avoids mutating the arrays being\
         iterated over previously.
 
         :param ApplicationGraph app_graph: app graph
@@ -137,7 +138,7 @@ class DelaySupportAdder(object):
             app_graph.add_edge(edge, constants.SPIKE_PARTITION_ID)
 
     def _create_post_delay_edge(self, delay_app_vertex, app_edge):
-        """ creates the edge between delay extension and post vertex. stores
+        """ creates the edge between delay extension and post vertex. stores\
         for future loading to the app graph when safe to do so.
 
         :param ApplicationVertex delay_app_vertex: delay extension vertex
@@ -161,7 +162,7 @@ class DelaySupportAdder(object):
     def _create_delay_app_vertex_and_pre_edge(
             self, app_outgoing_edge_partition, app_edge, post_vertex_max_delay,
             app_graph, max_delay_needed):
-        """ creates the delay extension app vertex and the edge from the src
+        """ creates the delay extension app vertex and the edge from the src\
         vertex to this delay extension. Adds to the graph, as safe to do so.
 
         :param OutgoingEdgePartition app_outgoing_edge_partition: \
@@ -201,7 +202,7 @@ class DelaySupportAdder(object):
 
     def _check_delay_values(
             self, app_edge, user_max_delay, machine_time_step, synapse_infos):
-        """ checks the delay required from the user defined max, the max delay
+        """ checks the delay required from the user defined max, the max delay\
             supported by the post vertex splitter and the delay Extensions.
 
         :param ApplicationEdge app_edge: the undelayed app edge
