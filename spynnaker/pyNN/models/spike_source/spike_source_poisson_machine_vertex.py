@@ -643,14 +643,15 @@ class SpikeSourcePoissonMachineVertex(
         seed_array = transceiver.read_memory(
             placement.x, placement.y, poisson_params + self.SEED_OFFSET_BYTES,
             self.SEED_SIZE_BYTES)
-        self.__kiss_seed[vertex_slice] = struct.unpack_from("<4I", seed_array)
+        self._app_vertex.update_kiss_seed(
+            vertex_slice, struct.unpack_from("<4I", seed_array))
 
         # locate SDRAM address where the rates are stored
         poisson_rate_region_sdram_address = (
             self.poisson_rate_region_address(placement, transceiver))
 
         # get size of poisson params
-        size_of_region = get_rates_bytes(vertex_slice, self.__data["rates"])
+        size_of_region = get_rates_bytes(vertex_slice, self._app_vertex.rates)
 
         # get data from the machine
         byte_array = transceiver.read_memory(
@@ -689,12 +690,12 @@ class SpikeSourcePoissonMachineVertex(
             # Convert spikes per tick to rates
             machine_time_step = (
                 globals_variables.get_simulator().machine_time_step)
-            self.__data["rates"].set_value_by_id(
+            self._app_vertex.rates.set_value_by_id(
                 i,
                 spikes_per_tick *
                 (MICRO_TO_SECOND_CONVERSION / float(machine_time_step)))
 
             # Store the updated time until next spike so that it can be
             # rewritten when the parameters are loaded
-            self.__data["time_to_spike"].set_value_by_id(
+            self._app_vertex.time_to_spike.set_value_by_id(
                 i, time_to_next_spike)

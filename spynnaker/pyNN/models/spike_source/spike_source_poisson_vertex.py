@@ -521,6 +521,15 @@ class SpikeSourcePoissonVertex(
                 self.__rng, self.__seed)
         return self.__kiss_seed[vertex_slice]
 
+    def update_kiss_seed(self, vertex_slice, seed):
+        """ updates a kiss seed from the machine
+
+        :param vertex_slice: the vertex slice to update seed of
+        :param seed: the seed
+        :rtype: None
+        """
+        self.__kiss_seed[vertex_slice] = seed
+
     @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(self, placements, buffer_manager, machine_time_step):
         return self.__spike_recorder.get_spikes(

@@ -640,14 +640,16 @@ class PopulationMachineVertex(
         # shift past the extra stuff before neuron parameters that we don't
         # need to read
         neuron_parameters_sdram_address = (
-            neuron_region_sdram_address + self.tdma_sdram_size_in_bytes +
-            self._BYTES_TILL_START_OF_GLOBAL_PARAMETERS)
+            neuron_region_sdram_address +
+            self._app_vertex.tdma_sdram_size_in_bytes +
+            self._app_vertex.BYTES_TILL_START_OF_GLOBAL_PARAMETERS)
 
         # get size of neuron params
-        size_of_region = self.get_sdram_usage_for_neuron_params(vertex_slice)
+        size_of_region = self._app_vertex.get_sdram_usage_for_neuron_params(
+            vertex_slice)
         size_of_region -= (
-            self._BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
-            self.tdma_sdram_size_in_bytes)
+            self._app_vertex.BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
+            self._app_vertex.tdma_sdram_size_in_bytes)
 
         # get data from the machine
         byte_array = transceiver.read_memory(
@@ -655,6 +657,6 @@ class PopulationMachineVertex(
             size_of_region)
 
         # update python neuron parameters with the data
-        self.__neuron_impl.read_data(
-            byte_array, 0, vertex_slice, self._parameters,
-            self._state_variables)
+        self._app_vertex.neuron_impl.read_data(
+            byte_array, 0, vertex_slice, self._app_vertex.parameters,
+            self._app_vertex.state_variables)

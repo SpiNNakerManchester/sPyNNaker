@@ -95,7 +95,7 @@ class AbstractPopulationVertex(
     # 5 elements before the start of global parameters
     # 1. has key, 2. key, 3. n atoms,
     # 4. n synapse types, 5. incoming spike buffer size.
-    _BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 5 * BYTES_PER_WORD
+    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 5 * BYTES_PER_WORD
 
     def __init__(
             self, n_neurons, label, constraints, max_atoms_per_core,
@@ -315,7 +315,7 @@ class AbstractPopulationVertex(
         :return: The SDRAM required for the neuron region
         """
         return (
-            self._BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
+            self.BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
             self.tdma_sdram_size_in_bytes +
             self.__neuron_impl.get_sdram_usage_in_bytes(vertex_slice.n_atoms))
 
