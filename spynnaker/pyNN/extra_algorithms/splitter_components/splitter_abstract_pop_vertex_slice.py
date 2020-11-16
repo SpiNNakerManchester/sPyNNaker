@@ -89,7 +89,9 @@ class SplitterAbstractPopulationVertexSlice(
             self.__get_binary_file_name())
 
     @inject_items({"graph": "MemoryApplicationGraph"})
-    @overrides(AbstractSplitterSlice.get_resources_used_by_atoms)
+    @overrides(
+        AbstractSplitterSlice.get_resources_used_by_atoms,
+        additional_arguments=["graph"])
     def get_resources_used_by_atoms(self, vertex_slice, graph):
         """  Gets the resources of a slice of atoms from a given app vertex.
 
