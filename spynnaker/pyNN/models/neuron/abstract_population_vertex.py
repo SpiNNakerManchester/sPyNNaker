@@ -179,6 +179,7 @@ class AbstractPopulationVertex(
     def n_atoms(self):
         return self.__n_atoms
 
+    @property
     def incoming_spike_buffer_size(self):
         return self.__incoming_spike_buffer_size
 
