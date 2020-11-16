@@ -17,14 +17,11 @@ import logging
 import math
 import numpy
 from pyNN.random import RandomDistribution
-from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.constraints.partitioner_constraints import (
     SameAtomsAsVertexConstraint)
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION)
-from spinn_front_end_common.utilities.helpful_functions import (
-    locate_extra_monitor_mc_receiver)
-from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.models.abstract_models import (
     AbstractAcceptsIncomingSynapses)
 from spynnaker.pyNN.models.neural_projections import (
@@ -33,6 +30,8 @@ from spynnaker.pyNN.models.neural_projections import (
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neuron import ConnectionHolder
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    AbstractSynapseDynamicsStructural)
 
 # pylint: disable=protected-access
 
@@ -126,8 +125,8 @@ class PyNNProjectionCommon(object):
         self.__synapse_information = SynapseInformation(
             connector, pre_synaptic_population, post_synaptic_population,
             prepop_is_view, postpop_is_view, rng, synapse_dynamics_stdp,
-            synapse_type, synapse_dynamics_stdp.weight,
-            synapse_dynamics_stdp.delay)
+            synapse_type, spinnaker_control.use_virtual_board,
+            synapse_dynamics_stdp.weight, synapse_dynamics_stdp.delay)
 
         # Set projection information in connector
         connector.set_projection_information(
@@ -157,6 +156,12 @@ class PyNNProjectionCommon(object):
                 machine_time_step / MICRO_TO_MILLISECOND_CONVERSION):
             logger.warning("The end user entered a max delay"
                            " for which the projection breaks")
+
+        # Check structural delays, as they don't support the full range yet...
+        if isinstance(synapse_dynamics_stdp,
+                      AbstractSynapseDynamicsStructural):
+            synapse_dynamics_stdp.check_initial_delay(
+                post_vertex_max_supported_delay_ms)
 
         # check that the projection edges label is not none, and give an
         # auto generated label if set to None
@@ -207,9 +212,8 @@ class PyNNProjectionCommon(object):
                 None, False, pre_vertex.n_atoms, post_vertex.n_atoms,
                 self.__virtual_connection_list)
 
-            post_vertex.add_pre_run_connection_holder(
-                connection_holder, self.__projection_edge,
-                self.__synapse_information)
+            self.__synapse_information.add_pre_run_connection_holder(
+                connection_holder)
 
     @property
     def requires_mapping(self):
@@ -312,7 +316,7 @@ class PyNNProjectionCommon(object):
         if delay_edge is None:
             delay_edge = DelayedApplicationEdge(
                 delay_vertex, post_vertex, self.__synapse_information,
-                label="{}_delayed_to_{}".format(
+                self.__projection_edge, label="{}_delayed_to_{}".format(
                     pre_vertex.label, post_vertex.label))
             self.__spinnaker_control.add_application_edge(
                 delay_edge, constants.SPIKE_PARTITION_ID)
@@ -321,14 +325,12 @@ class PyNNProjectionCommon(object):
         return delay_edge
 
     def _get_synaptic_data(
-            self, as_list, data_to_get, fixed_values=None, notify=None,
-            handle_time_out_configuration=True):
+            self, as_list, data_to_get, fixed_values=None, notify=None):
         """
         :param bool as_list:
         :param list(int) data_to_get:
         :param list(tuple(str,int)) fixed_values:
         :param callable(ConnectionHolder,None) notify:
-        :param bool handle_time_out_configuration:
         :rtype: ConnectionHolder
         """
         # pylint: disable=too-many-arguments
@@ -355,91 +357,30 @@ class PyNNProjectionCommon(object):
         # If we haven't run, add the holder to get connections, and return it
         # and set up a callback for after run to fill in this connection holder
         if not self.__spinnaker_control.has_ran:
-            post_vertex.add_pre_run_connection_holder(
-                connection_holder, self.__projection_edge,
-                self.__synapse_information)
+            self.__synapse_information.add_pre_run_connection_holder(
+                connection_holder)
             return connection_holder
 
         # Otherwise, get the connections now, as we have ran and therefore can
         # get them
-        self.__get_projection_data(
-            data_to_get, pre_vertex, post_vertex, connection_holder,
-            handle_time_out_configuration)
+        self.__get_projection_data(post_vertex, connection_holder)
         return connection_holder
 
-    def __get_projection_data(
-            self, data_to_get, pre_vertex, post_vertex, connection_holder,
-            handle_time_out_configuration):
+    def __get_projection_data(self, post_vertex, connection_holder):
         """
-        :param str data_to_get:
-        :param .ApplicationVertex pre_vertex:
         :param .AbstractPopulationVertex post_vertex:
+            The vertex that the data will be read from
         :param ConnectionHolder connection_holder:
-        :param bool handle_time_out_configuration:
+            The connection holder to fill in
         """
-        # pylint: disable=too-many-arguments, too-many-locals
         ctl = self.__spinnaker_control
 
-        # if using extra monitor functionality, locate extra data items
-        if ctl.get_generated_output("UsingAdvancedMonitorSupport"):
-            extra_monitors = ctl.get_generated_output(
-                "MemoryExtraMonitorVertices")
-            receivers = ctl.get_generated_output(
-                "MemoryMCGatherVertexToEthernetConnectedChipMapping")
-            extra_monitor_placements = ctl.get_generated_output(
-                "MemoryExtraMonitorToChipMapping")
-        else:
-            extra_monitors = None
-            receivers = None
-            extra_monitor_placements = None
-
-        edges = self.__projection_edge.machine_edges
-        progress = ProgressBar(
-            edges, "Getting {}s for projection between {} and {}".format(
-                data_to_get, pre_vertex.label, post_vertex.label))
-
-        # store receivers to reduce surplus calls
-        data_receivers = list()
-
-        for edge in progress.over(edges):
-            placement = ctl.placements.get_placement_of_vertex(
-                edge.post_vertex)
-
-            # if using extra monitor data extractor find local receiver
-            if extra_monitors is not None and handle_time_out_configuration:
-                receiver = locate_extra_monitor_mc_receiver(
-                    placement_x=placement.x, placement_y=placement.y,
-                    machine=ctl.machine,
-                    packet_gather_cores_to_ethernet_connection_map=receivers)
-                sender_extra_monitor_core = extra_monitor_placements[
-                    placement.x, placement.y]
-
-                if receiver not in data_receivers:
-                    data_receivers.append(receiver)
-                    receiver.load_system_routing_tables(
-                        ctl.transceiver, extra_monitors, ctl.placements)
-                    receiver.set_cores_for_data_streaming(
-                        ctl.transceiver, extra_monitors, ctl.placements)
-            else:
-                receiver = None
-                sender_extra_monitor_core = None
-
-            connections = post_vertex.get_connections_from_machine(
-                ctl.transceiver, placement, edge,
-                ctl.routing_infos, self.__synapse_information,
-                ctl.machine_time_step, extra_monitors is not None,
-                ctl.placements, receiver, ctl.fixed_routes,
-                sender_extra_monitor_core)
-            if connections is not None:
-                connection_holder.add_connections(connections)
-
-        for data_receiver in data_receivers:
-            data_receiver.unset_cores_for_data_streaming(
-                ctl.transceiver, extra_monitors, ctl.placements)
-            data_receiver.load_application_routing_tables(
-                ctl.transceiver, extra_monitors, ctl.placements)
-
-        connection_holder.finish()
+        connections = post_vertex.get_connections_from_machine(
+            ctl.transceiver, ctl.placements, self.__projection_edge,
+            self.__synapse_information)
+        if connections is not None:
+            connection_holder.add_connections(connections)
+            connection_holder.finish()
 
     def _clear_cache(self):
         post_vertex = self.__projection_edge.post_vertex

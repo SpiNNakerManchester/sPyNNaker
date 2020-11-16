@@ -24,6 +24,11 @@
 
 /* PRIVATE FUNCTIONS */
 
+// Mark a value as possibly unused while not using any instructions, guaranteed
+#ifndef __use
+#define __use(x)    do { (void) (x); } while (0)
+#endif
+
 //---------------------------------------
 //! \brief Synapse update loop core
 //! \param[in] time: The current time
@@ -41,7 +46,6 @@ static inline final_state_t mad_plasticity_update_synapse(
         const pre_trace_t new_pre_trace, const uint32_t delay_dendritic,
         const uint32_t delay_axonal, update_state_t current_state,
         const post_event_history_t *post_event_history) {
-
     // Apply axonal delay to time of last presynaptic spike
     const uint32_t delayed_last_pre_time = last_pre_time + delay_axonal;
 

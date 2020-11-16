@@ -176,10 +176,13 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices, post_slice_index,
-            pre_vertex_slice, post_vertex_slice, synapse_type, synapse_info):
+            self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
+            synapse_type, synapse_info):
         # pylint: disable=too-many-arguments
         # update the synapses as required, and get the number of connections
+
+        pre_slice_index = pre_slices.index(pre_vertex_slice)
+        post_slice_index = post_slices.index(post_vertex_slice)
         self._update_synapses_per_post_vertex(pre_slices, post_slices)
         n_connections = self._get_n_connections(
             pre_slice_index, post_slice_index)
@@ -279,8 +282,11 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_params)
     def gen_connector_params(
-            self, pre_slices, pre_slice_index, post_slices, post_slice_index,
-            pre_vertex_slice, post_vertex_slice, synapse_type, synapse_info):
+            self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
+            synapse_type, synapse_info):
+        pre_slice_index = pre_slices.index(pre_vertex_slice)
+        post_slice_index = post_slices.index(post_vertex_slice)
+
         params = []
 
         if synapse_info.prepop_is_view:

@@ -121,9 +121,9 @@ typedef struct {
 void synapse_dynamics_print_plastic_synapses(
         address_t plastic_region_address, address_t fixed_region_address,
         uint32_t *ring_buffer_to_input_buffer_left_shifts) {
-    use(plastic_region_address);
-    use(fixed_region_address);
-    use(ring_buffer_to_input_buffer_left_shifts);
+    __use(plastic_region_address);
+    __use(fixed_region_address);
+    __use(ring_buffer_to_input_buffer_left_shifts);
 
 #if LOG_LEVEL >= LOG_DEBUG
     synapse_row_plastic_data_t *data_ptr = plastic_region_address;

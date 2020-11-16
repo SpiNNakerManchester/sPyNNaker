@@ -24,7 +24,7 @@
 #include <common/neuron-typedefs.h>
 #include <bit_field.h>
 #include <recording.h>
-#include <common/spin1-wfi.h>
+#include <wfi.h>
 
 //! A struct of the different types of recorded data
 // Note data is just bytes here but actual type is used on writing
@@ -66,7 +66,7 @@ extern uint8_t **neuron_recording_indexes;
 extern uint8_t **bitfield_recording_indexes;
 
 //! The number of recordings outstanding
-extern uint32_t n_recordings_outstanding;
+extern volatile uint32_t n_recordings_outstanding;
 
 //! An array of recording information structures
 extern recording_info_t *recording_info;
@@ -211,7 +211,7 @@ static inline void neuron_recording_setup_for_next_recording(void) {
     // Wait until recordings have completed, to ensure the recording space
     // can be re-written
     while (n_recordings_outstanding > 0) {
-       spin1_wfi();
+        wait_for_interrupt();
     }
 
     // Reset the bitfields before starting if a beginning of recording
@@ -233,10 +233,12 @@ bool neuron_recording_reset(uint32_t n_neurons);
 //! \param[out] recording_flags: Output of flags which can be used to check if
 //!            a channel is enabled for recording
 //! \param[in] n_neurons: the number of neurons to setup for
+//! \param[out] n_rec_regions_used: Output the number of regions used by neuron
+//!            recording
 //! \return bool stating if the init was successful or not
 bool neuron_recording_initialise(
         void *recording_address, uint32_t *recording_flags,
-        uint32_t n_neurons);
+        uint32_t n_neurons, uint32_t *n_rec_regions_used);
 
 //! \brief finishes recording
 void neuron_recording_finalise(void);

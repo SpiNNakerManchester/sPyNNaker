@@ -78,8 +78,7 @@ def test_connector(
                                         MockPopulation(10, "Post"),
                                         weights, delays)
     block = connector.create_synaptic_block(
-        [pre_slice], 0, [post_slice], 0,
-        pre_slice, post_slice, 1, mock_synapse_info)
+        [pre_slice], [post_slice], pre_slice, post_slice, 1, mock_synapse_info)
     assert(numpy.array_equal(block["weight"], numpy.array(expected_weights)))
     assert(numpy.array_equal(block["delay"], numpy.array(expected_delays)))
 
@@ -124,11 +123,11 @@ def test_connector_split():
     has_block = set()
     try:
         # Check each connection is in the right place
-        for i, pre_slice in enumerate(pre_slices):
-            for j, post_slice in enumerate(post_slices):
+        for pre_slice in pre_slices:
+            for post_slice in post_slices:
                 block = connector.create_synaptic_block(
-                    pre_slices, i, post_slices, j,
-                    pre_slice, post_slice, 1, mock_synapse_info)
+                    pre_slices, post_slices, pre_slice, post_slice, 1,
+                    mock_synapse_info)
                 for source in block["source"]:
                     assert(pre_slice.lo_atom <= source <= pre_slice.hi_atom)
                 for target in block["target"]:
