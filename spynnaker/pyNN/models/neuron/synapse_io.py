@@ -504,26 +504,26 @@ class SynapseIORowBased(object):
         """ Read the synapses for a given projection synapse information\
             object out of the given data and convert to connection data
 
-        :param SynapseInformation synapse_info:
+        :param SynapseInformation synapse_info:\
             The synapse information of the synapses
-        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:\
             The slice of the source neurons of the synapses in the data
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:\
             The slice of the target neurons of the synapses in the data
-        :param int max_row_length:
+        :param int max_row_length:\
             The length of each row in the data
-        :param int n_synapse_types:
+        :param int n_synapse_types:\
             The number of synapse types in total
-        :param list(float) weight_scales:
+        :param list(float) weight_scales:\
             The weight scaling of each synapse type
-        :param bytearray data:
+        :param bytearray data:\
             The raw data containing the synapses
-        :param int machine_time_step:
+        :param int machine_time_step:\
             The time step of the simulation
         :param int post_vertex_max_delay_ticks: \
             max delayed ticks supported from post vertex
         :param bool delayed: True if the data should be considered delayed
-        :return: The connections read from the data; the dtype is
+        :return: The connections read from the data; the dtype is\
             AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
         :rtype: ~numpy.ndarray
         """
@@ -563,21 +563,21 @@ class SynapseIORowBased(object):
         """ Read the synapses for a given projection synapse information\
             object out of the given delayed and undelayed data.
 
-        :param bytearray data:
+        :param bytearray data:\
             The raw data containing the undelayed synapses
-        :param bytearray delayed_data:
+        :param bytearray delayed_data:\
             The raw data containing the delayed synapses
-        :param SynapseInformation synapse_info:
+        :param SynapseInformation synapse_info:\
             The synapse info that generated the synapses
-        :param int n_synapse_types:
+        :param int n_synapse_types:\
             The total number of synapse types available
-        :param list(float) weight_scales:
+        :param list(float) weight_scales:\
             A weight scale for each synapse type
-        :param ~pacman.model.graphs.machine.MachineEdge machine_edge:
+        :param ~pacman.model.graphs.machine.MachineEdge machine_edge:\
             The incoming machine edge that the synapses were generated from
-        :param MaxRowInfo max_row_info:
+        :param MaxRowInfo max_row_info:\
             The maximum information for each of the rows
-        :return: The connections read from the data; the dtype is
+        :return: The connections read from the data; the dtype is\
             AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
         :rtype: ~numpy.ndarray
         """
@@ -630,10 +630,10 @@ class SynapseIORowBased(object):
             values back to global values
 
         :param ~numpy.ndarray n_synapses: The number of synapses in each row
-        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:\
             The slice of atoms in the pre-vertex
-        :param ~numpy.ndarray delayed_connections:
-            The connections to convert of dtype
+        :param ~numpy.ndarray delayed_connections:\
+            The connections to convert of dtype\
             AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
         :params post_vertex_max_delay_ticks
         :return: The converted connection with the same dtype
@@ -670,20 +670,20 @@ class SynapseIORowBased(object):
             post_vertex_max_delay_ticks):
         """ Read static data from row data
 
-        :param AbstractStaticSynapseDynamics dynamics:
+        :param AbstractStaticSynapseDynamics dynamics:\
             The synapse dynamics that generated the data
-        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:\
             The slice of neurons that are the sources of the synapses
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:\
             The slice of neurons that are the targets of the synapses
-        :param int n_synapse_types:
+        :param int n_synapse_types:\
             The number of synapse types available
-        :param ~numpy.ndarray row_data:
+        :param ~numpy.ndarray row_data:\
             The raw row data to read
         :param bool delayed: True if data should be considered delayed
         :param int post_vertex_max_delay_ticks: \
             max supported delay from vertex
-        :return: the connections read with dtype
+        :return: the connections read with dtype\
             AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
         :rtype: list(~numpy.ndarray)
         """
@@ -708,11 +708,11 @@ class SynapseIORowBased(object):
         """ Parse plastic synapses from raw row data
 
         :param ~numpy.ndarray row_data: The raw data to parse
-        :param AbstractPlasticSynapseDynamics dynamics:
+        :param AbstractPlasticSynapseDynamics dynamics:\
             The dynamics that generated the data
-        :return: A tuple of the recorded length of the plastic-plastic data in
-            each row; the plastic-plastic data organised into rows; the
-            recorded length of the static-plastic data in each row; and the
+        :return: A tuple of the recorded length of the plastic-plastic data in\
+            each row; the plastic-plastic data organised into rows; the\
+            recorded length of the static-plastic data in each row; and the\
             static-plastic data organised into rows
         :rtype: tuple(~numpy.ndarray, list(~numpy.ndarray), ~numpy.ndarray,
             list(~numpy.ndarray))
@@ -737,19 +737,19 @@ class SynapseIORowBased(object):
             post_vertex_max_delay_ticks):
         """ Read plastic data from raw data
 
-        :param AbstractStaticSynapseDynamics dynamics:
+        :param AbstractStaticSynapseDynamics dynamics:\
             The synapse dynamics that generated the data
-        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:\
             The slice of neurons that are the sources of the synapses
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:\
             The slice of neurons that are the targets of the synapses
-        :param int n_synapse_types:
+        :param int n_synapse_types:\
             The number of synapse types available
-        :param ~numpy.ndarray row_data:
+        :param ~numpy.ndarray row_data:\
             The raw row data to read
         :param bool delayed: True if data should be considered delayed
         :param int post_vertex_max_delay_ticks: max delay from post vertex
-        :return: the connections read with dtype
+        :return: the connections read with dtype\
             AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
         :rtype: list(~numpy.ndarray)
         """

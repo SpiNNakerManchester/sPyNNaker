@@ -378,10 +378,10 @@ class SynapticMatrix(object):
         return block_addr, self.__syn_mat_offset
 
     def next_delay_on_chip_address(self, block_addr):
-        """ Allocate an address for a delayed machine matrix and add it to the
-            population table
+        """ Allocate an address for a delayed machine matrix and add it to \
+            the population table
 
-        :param int block_addr:
+        :param int block_addr:\
             The address at which to start the allocation
         :return: The address after the allocation and the allocated address
         :rtype: int, int
@@ -411,10 +411,10 @@ class SynapticMatrix(object):
             machine_time_step):
         """ Get the generator data for this matrix
 
-        :param int syn_mat_offset:
+        :param int syn_mat_offset:\
             The synaptic matrix offset to write the data to
         :param float machine_time_step: the sim's machine time step.
-        :param int d_mat_offset:
+        :param int d_mat_offset:\
             The synaptic matrix offset to write the delayed data to
         :param int max_delay_per_stage: around of timer ticks each delay stage\
             holds.

@@ -331,7 +331,7 @@ class MasterPopTableAsBinarySearch(object):
         self.__n_addresses = 0
 
     def get_master_population_table_size(self, in_edges):
-        """ Get the size of the master population table in SDRAM
+        """ Get the size of the master population table in SDRAM.
 
         :param iterable(~pacman.model.graphs.application.ApplicationEdge) \
                 in_edges:

@@ -17,8 +17,8 @@ from enum import Enum
 
 from pacman.executor.injection_decorator import inject_items
 from spinn_front_end_common.interface.simulation import simulation_utilities
-from spinn_front_end_common.utilities.constants import BITS_PER_WORD, \
-    BYTES_PER_WORD, SIMULATION_N_BYTES
+from spinn_front_end_common.utilities.constants import (
+    BITS_PER_WORD, BYTES_PER_WORD, SIMULATION_N_BYTES)
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.machine import MachineVertex
 from spinn_front_end_common.interface.provenance import (
