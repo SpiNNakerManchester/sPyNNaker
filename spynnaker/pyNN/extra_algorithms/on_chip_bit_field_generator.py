@@ -62,6 +62,12 @@ class OnChipBitFieldGenerator(object):
 
     _BYTES_PER_FILTER = 12
 
+    # skip merged and redundant counts.
+    _OFFSET_TO_N_BIT_FIELD_IN_BYTES = 2 * BYTES_PER_WORD
+
+    # 1. merged bitfields, 2. redundant bitfields. 3 total bitfields
+    _SIZE_OF_FILTER_REGION_IN_BYTES = 3 * BYTES_PER_WORD
+
     _ONE_WORDS = struct.Struct("<I")
 
     # bit field report file name
@@ -74,7 +80,7 @@ class OnChipBitFieldGenerator(object):
     def __call__(
             self, placements, app_graph, executable_finder,
             provenance_file_path, transceiver,
-            read_bit_field_generator_iobuf, generating_bitfield_report,
+            write_bit_field_generator_iobuf, generating_bitfield_report,
             default_report_folder, machine_graph, routing_infos,
             generating_bit_field_summary_report):
         """ loads and runs the bit field generator on chip
@@ -85,7 +91,7 @@ class OnChipBitFieldGenerator(object):
         :param provenance_file_path: the path to where provenance data items\
                                      is written
         :param transceiver: the SpiNNMan instance
-        :param read_bit_field_generator_iobuf: bool flag for report
+        :param write_bit_field_generator_iobuf: bool flag for report
         :param generating_bitfield_report: bool flag for report
         :param default_report_folder: the file path for reports
         :param machine_graph: the machine graph
@@ -97,7 +103,7 @@ class OnChipBitFieldGenerator(object):
 
         # progress bar
         progress = ProgressBar(
-            len(app_graph.vertices) * 2 + 1,
+            len(app_graph.vertices) + len(machine_graph.vertices) + 1,
             "Running bitfield generation on chip")
 
         # get data
@@ -112,7 +118,7 @@ class OnChipBitFieldGenerator(object):
         system_control_logic.run_system_application(
             expander_cores, bit_field_app_id, transceiver,
             provenance_file_path, executable_finder,
-            read_bit_field_generator_iobuf, self._check_for_success,
+            write_bit_field_generator_iobuf, self._check_for_success,
             [CPUState.FINISHED], False,
             "bit_field_expander_on_{}_{}_{}.txt", progress_bar=progress)
         # update progress bar
@@ -165,11 +171,15 @@ class OnChipBitFieldGenerator(object):
                             transceiver, placement)
 
                         # read how many bitfields there are
-                        n_bit_field_entries, = struct.unpack(
+                        n_bit_field_entries = struct.unpack(
                             "<I", transceiver.read_memory(
-                                placement.x, placement.y, bit_field_address,
-                                BYTES_PER_WORD))
-                        reading_address = bit_field_address + BYTES_PER_WORD
+                                placement.x, placement.y,
+                                bit_field_address +
+                                self._OFFSET_TO_N_BIT_FIELD_IN_BYTES,
+                                BYTES_PER_WORD))[0]
+                        reading_address = (
+                            bit_field_address +
+                            self._SIZE_OF_FILTER_REGION_IN_BYTES)
 
                         # read in each bitfield
                         for _bit_field_index in range(0, n_bit_field_entries):

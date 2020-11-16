@@ -172,16 +172,13 @@ class AbstractSpiNNakerCommon(with_metaclass(
         extra_mapping_inputs['CreateAtomToEventIdMapping'] = \
             self.config.getboolean(
                 "Database", "create_routing_info_to_neuron_id_mapping")
-        extra_mapping_inputs["ReadBitFieldGeneratorIOBUF"] = \
-            self.config.getboolean("Reports", "read_bif_field_iobuf")
+        extra_mapping_inputs["WriteBitFieldGeneratorIOBUF"] = \
+            self.config.getboolean("Reports", "write_bit_field_iobuf")
         extra_mapping_inputs["GenerateBitFieldReport"] = \
             self.config.getboolean("Reports", "generate_bit_field_report")
         extra_mapping_inputs["GenerateBitFieldSummaryReport"] = \
             self.config.getboolean(
                 "Reports", "generate_bit_field_summary_report")
-        extra_mapping_inputs["RouterCompressorWithBitFieldReadIOBuf"] = \
-            self.config.getboolean(
-                "Reports", "write_router_compressor_with_bitfield_iobuf")
         extra_mapping_inputs["SynapticExpanderReadIOBuf"] = \
             self.config.getboolean("Reports", "write_expander_iobuf")
         if user_extra_mapping_inputs is not None:
@@ -195,6 +192,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
             extra_post_run_algorithms = []
         extra_load_algorithms.append("SynapseExpander")
         extra_load_algorithms.append("OnChipBitFieldGenerator")
+        extra_load_algorithms.append("FinishConnectionHolders")
         extra_algorithms_pre_run = []
 
         if self.config.getboolean("Reports", "draw_network_graph"):

@@ -161,7 +161,8 @@ class SpynnakerExternalDevicePluginManager(object):
                 database_ack_port_num)
 
     @staticmethod
-    def activate_live_output_to(population, device):
+    def activate_live_output_to(
+            population, device, partition_id=SPIKE_PARTITION_ID):
         """ Activate the output of spikes from a population to an external\
             device. Note that all spikes will be sent to the device.
 
@@ -173,13 +174,15 @@ class SpynnakerExternalDevicePluginManager(object):
         :type device:
             PyNNPopulationCommon or
             ~pacman.model.graphs.application.ApplicationVertex
+        :param str partition_id:
+            The partition ID to activate live output to.
         """
         device_vertex = device
         # pylint: disable=protected-access
         if isinstance(device, PyNNPopulationCommon):
             device_vertex = device._get_vertex
         SpynnakerExternalDevicePluginManager.add_edge(
-            population._get_vertex, device_vertex, SPIKE_PARTITION_ID)
+            population._get_vertex, device_vertex, partition_id)
 
     @staticmethod
     def add_socket_address(socket_address):

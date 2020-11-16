@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import pytest
 from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsSTDP
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
     TimingDependenceSpikePair)
@@ -22,7 +21,6 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
 from unittests.mocks import MockSimulator
 
 
-@pytest.mark.timeout(1)
 def test_get_max_synapses():
     MockSimulator.setup()
     d = SynapseDynamicsSTDP(timing_dependence=TimingDependenceSpikePair(),

@@ -63,6 +63,18 @@ static struct fixed_pre_globals_t fixed_pre_globals = {
 };
 
 /**
+ * \brief Generate a uniformly-distributed random number
+ * \param[in,out] obj: the generator containing the RNG
+ * \param[in] range: the (_upper, exclusive_) limit of the range of random
+ *      numbers that may be generated. Should be in range 0..65536
+ * \return a random integer in the given input range.
+ */
+static uint32_t pre_random_in_range(struct fixed_pre *obj, uint32_t range) {
+    uint32_t u01 = rng_generator(obj->rng) & 0x00007fff;
+    return (u01 * range) >> 15;
+}
+
+/**
  * \brief Initialise the fixed-pre connection generator
  * \param[in,out] region: Region to read parameters from.  Should be updated
  *                        to position just after parameters after calling.
@@ -79,13 +91,110 @@ static void *connection_generator_fixed_pre_initialise(address_t *region) {
 
     // Initialise the RNG
     obj->rng = rng_init(region);
-    log_debug("Fixed Total Number Connector,  pre_lo = %u, pre_hi = %u, "
-    		"post_lo = %u, post_hi = %u, allow self connections = %u, "
+    log_debug("Fixed Number Pre Connector parameters: pre_lo = %u, pre_hi = %u, "
+            "post_lo = %u, post_hi = %u, allow self connections = %u, "
             "with replacement = %u, n_pre = %u, n pre neurons = %u",
-			obj->params.pre_lo, obj->params.pre_hi, obj->params.post_lo, obj->params.post_hi,
+            obj->params.pre_lo, obj->params.pre_hi, obj->params.post_lo, obj->params.post_hi,
             obj->params.allow_self_connections,
             obj->params.with_replacement, obj->params.n_pre,
             obj->params.n_pre_neurons);
+
+    // Build the array
+
+    // Get how many values can be sampled from
+    uint32_t n_values = obj->params.n_pre_neurons;
+
+    // Get the number of connections in each column
+    uint32_t n_conns = obj->params.n_pre;
+
+    log_debug("Generating %u from %u possible synapses", n_conns, n_values);
+
+    // The number of columns is the number of post-slices to do the calculation for
+    uint32_t n_columns = obj->params.post_hi - obj->params.post_lo + 1;
+
+    // Allocate array for each column (i.e. post-slice on this slice)
+    uint16_t (*array)[n_columns][n_conns] =
+            spin1_malloc(n_columns * n_conns * sizeof(uint16_t));
+    fixed_pre_globals.in_sdram = false;
+    if (array == NULL) {
+        log_warning("Could not allocate in DTCM, trying SDRAM");
+        array = sark_xalloc(sv->sdram_heap,
+                n_columns * n_conns * sizeof(uint16_t), 0, ALLOC_LOCK);
+        fixed_pre_globals.in_sdram = true;
+    }
+    if (array == NULL) {
+        log_error("Could not allocate array for indices");
+        rt_error(RTE_SWERR);
+    }
+
+    // Loop over the columns and fill the full_indices array accordingly
+    for (uint32_t n = 0; n < n_columns; n++) {
+        // Sample from the possible connections in this column n_conns times
+        if (obj->params.with_replacement) {
+            // Sample them with replacement
+            if (obj->params.allow_self_connections) {
+                // self connections are allowed so sample
+                for (uint32_t i = 0; i < n_conns; i++) {
+                    (*array)[n][i] = pre_random_in_range(obj, n_values);
+                }
+            } else {
+                // self connections are not allowed (on this slice)
+                for (uint32_t i = 0; i < n_conns; i++) {
+                    // Set j to the disallowed value, then test against it
+                    uint32_t j;
+
+                    do {
+                        j = pre_random_in_range(obj, n_values);
+                    } while (j == n); // + post_slice_start);
+
+                    (*array)[n][i] = j;
+                }
+            }
+        } else {
+            // Sample them without replacement using reservoir sampling
+            if (obj->params.allow_self_connections) {
+                // Self-connections are allowed so do this normally
+                for (uint32_t i = 0; i < n_conns; i++) {
+                    (*array)[n][i] = i;
+                }
+                // And now replace values if chosen at random to be replaced
+                for (uint32_t i = n_conns; i < n_values; i++) {
+                    // j = random(0, i) (inclusive)
+                    uint32_t j = pre_random_in_range(obj, i + 1);
+
+                    if (j < n_conns) {
+                        (*array)[n][j] = i;
+                    }
+                }
+            } else {
+                // Self-connections are not allowed
+                uint32_t replace_start = n_conns;
+                for (uint32_t i = 0; i < n_conns; i++) {
+                    if (i == n) { // + post_slice_start) {
+                        // set to a value not equal to i for now
+                        (*array)[n][i] = n_conns;
+                        replace_start = n_conns + 1;
+                    } else {
+                        (*array)[n][i] = i;
+                    }
+                }
+                // And now "replace" values if chosen at random to be replaced
+                for (uint32_t i = replace_start; i < n_values; i++) {
+                    if (i != n) { // + post_slice_start)) {
+                        // j = random(0, i) (inclusive)
+                        uint32_t j = pre_random_in_range(obj, i + 1);
+
+                        if (j < n_conns) {
+                            (*array)[n][j] = i;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fixed_pre_globals.full_indices = array;
+
     return obj;
 }
 
@@ -97,18 +206,6 @@ void connection_generator_fixed_pre_free(void *generator) {
     struct fixed_pre *obj = generator;
     rng_free(obj->rng);
     sark_free(generator);
-}
-
-/**
- * \brief Generate a uniformly-distributed random number
- * \param[in,out] obj: the generator containing the RNG
- * \param[in] range: the (_upper, exclusive_) limit of the range of random
- *      numbers that may be generated. Should be in range 0..65536
- * \return a random integer in the given input range.
- */
-static uint32_t pre_random_in_range(struct fixed_pre *obj, uint32_t range) {
-    uint32_t u01 = rng_generator(obj->rng) & 0x00007fff;
-    return (u01 * range) >> 15;
 }
 
 /**
@@ -143,115 +240,19 @@ uint32_t connection_generator_fixed_pre_generate(
         return 0;
     }
 
-    // Get how many values can be sampled from
-    uint32_t n_values = obj->params.n_pre_neurons;
-
-    // Get the number of connections in this column
-    uint32_t n_conns = obj->params.n_pre;
-
-    log_debug("Generating %u from %u possible synapses", n_conns, n_values);
-
-    // The number of columns is the number of post-slices to do the calculation for
-    uint32_t n_columns = post_slice_count;
-
-    // If we haven't done so then do the calculations by looping over
-    // the post-slices available here
-    if (pre_neuron_index == 0) {
-        // Ensure the array was freed
-        if (fixed_pre_globals.full_indices != NULL) {
-            log_error("Created out of order!");
-            rt_error(RTE_SWERR);
-        }
-
-        fixed_pre_globals.n_pre_neurons_done = 0;
-        // Allocate array for each column (i.e. post-slice on this slice)
-        uint16_t (*array)[n_columns][n_conns] =
-                spin1_malloc(n_columns * n_conns * sizeof(uint16_t));
-        fixed_pre_globals.in_sdram = false;
-        if (array == NULL) {
-            log_warning("Could not allocate in DTCM, trying SDRAM");
-            array = sark_xalloc(sv->sdram_heap,
-                    n_columns * n_conns * sizeof(uint16_t), 0, ALLOC_LOCK);
-            fixed_pre_globals.in_sdram = true;
-        }
-        if (array == NULL) {
-            log_error("Could not allocate array for indices");
-            rt_error(RTE_SWERR);
-        }
-        fixed_pre_globals.full_indices = array;
-
-        // Loop over the columns and fill the full_indices array accordingly
-        for (uint32_t n = 0; n < n_columns; n++) {
-            // Sample from the possible connections in this column n_conns times
-            if (obj->params.with_replacement) {
-                // Sample them with replacement
-                if (obj->params.allow_self_connections) {
-                    // self connections are allowed so sample
-                    for (uint32_t i = 0; i < n_conns; i++) {
-                        (*array)[n][i] = pre_random_in_range(obj, n_values);
-                    }
-                } else {
-                    // self connections are not allowed (on this slice)
-                    for (uint32_t i = 0; i < n_conns; i++) {
-                        // Set j to the disallowed value, then test against it
-                        uint32_t j;
-
-                        do {
-                            j = pre_random_in_range(obj, n_values);
-                        } while (j == n + post_slice_start);
-
-                        (*array)[n][i] = j;
-                    }
-                }
-            } else {
-                // Sample them without replacement using reservoir sampling
-                if (obj->params.allow_self_connections) {
-                    // Self-connections are allowed so do this normally
-                    for (uint32_t i = 0; i < n_conns; i++) {
-                        (*array)[n][i] = i;
-                    }
-                    // And now replace values if chosen at random to be replaced
-                    for (uint32_t i = n_conns; i < n_values; i++) {
-                        // j = random(0, i) (inclusive)
-                        uint32_t j = pre_random_in_range(obj, i + 1);
-
-                        if (j < n_conns) {
-                            (*array)[n][j] = i;
-                        }
-                    }
-                } else {
-                    // Self-connections are not allowed
-                    uint32_t replace_start = n_conns;
-                    for (uint32_t i = 0; i < n_conns; i++) {
-                        if (i == n + post_slice_start) {
-                            // set to a value not equal to i for now
-                            (*array)[n][i] = n_conns;
-                            replace_start = n_conns + 1;
-                        } else {
-                            (*array)[n][i] = i;
-                        }
-                    }
-                    // And now "replace" values if chosen at random to be replaced
-                    for (uint32_t i = replace_start; i < n_values; i++) {
-                        if (i != (n + post_slice_start)) {
-                            // j = random(0, i) (inclusive)
-                            uint32_t j = pre_random_in_range(obj, i + 1);
-
-                            if (j < n_conns) {
-                                (*array)[n][j] = i;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     // If not in the pre-population view range, then don't generate
     if ((pre_neuron_index < obj->params.pre_lo) ||
     		(pre_neuron_index > obj->params.pre_hi)) {
     	return 0;
     }
+
+    // Get the number of connections in each column
+    uint32_t n_conns = obj->params.n_pre;
+
+    // The number of columns is the number of post-slices to do the calculation for
+    uint32_t n_columns = obj->params.post_hi - obj->params.post_lo + 1;
+
+    fixed_pre_globals.n_pre_neurons_done = 0;
 
     uint16_t (*array)[n_columns][n_conns] = fixed_pre_globals.full_indices;
 
@@ -259,13 +260,14 @@ uint32_t connection_generator_fixed_pre_generate(
     // only generate for required columns
     uint32_t count_indices = 0;
     for (uint32_t n = 0; n < n_columns; n++) {
-    	// Only generate within the specified lo and hi of the population view
-    	if ((n + post_slice_start >= obj->params.post_lo) &&
-    			(n + post_slice_start <= obj->params.post_hi)) {
+    	// Only generate within the post-population view
+    	if ((n + obj->params.post_lo >= post_slice_start) &&
+    			(n + obj->params.post_lo < (post_slice_start + post_slice_count))) {
     		for (uint32_t i = 0; i < n_conns; i++) {
     			uint32_t j = (*array)[n][i] + obj->params.pre_lo;
     			if (j == pre_neuron_index) {
-    				indices[count_indices] = n; // On this slice!
+    			    // The index is the value locally on the slice
+    				indices[count_indices] = n + obj->params.post_lo - post_slice_start;
     				count_indices++;
     			}
     		}

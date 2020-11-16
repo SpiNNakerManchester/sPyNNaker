@@ -38,20 +38,20 @@ typedef enum region_identifiers {
     //! Provenance recording region
     PROVENANCE_REGION = 2,
     //! On-chip delay matrix expansion region
-    EXPANDER_REGION = 3
+    EXPANDER_REGION = 3,
+    //! tdma data
+    TDMA_REGION = 4,
 } region_identifiers;
 
 //! \brief Delay configuration, as read from SDRAM where it was placed by DSG
 //! or by on-chip generation
 struct delay_parameters {
+    uint32_t has_key;             //!< bool for if this vertex has a key.
     uint32_t key;                 //!< Key to use for sending messages
     uint32_t incoming_key;        //!< Key to accept messages with
     uint32_t incoming_mask;       //!< Mask to filter delay_parameters::incoming_key
     uint32_t n_atoms;             //!< Number of atoms
     uint32_t n_delay_stages;      //!< Number of delay stages
-    uint32_t random_backoff;      //!< Random backoff control parameter
-    uint32_t time_between_spikes; //!< Minimum inter-spike interval (in us)
-    uint32_t n_outgoing_edges;    //!< Number of outgoing edges
     uint32_t delay_blocks[];      //!< Descriptions of delays to apply
 };
 
