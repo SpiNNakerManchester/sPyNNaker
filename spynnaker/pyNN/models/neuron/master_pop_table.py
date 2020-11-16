@@ -17,6 +17,8 @@ import logging
 import math
 import numpy
 import ctypes
+
+from pacman.model.graphs.machine import MachineEdge
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.exceptions import (
@@ -326,7 +328,7 @@ class MasterPopTableAsBinarySearch(object):
 
         :param in_edges: The edges arriving at the vertex that are to be \
             handled by this table
-        :type in_edges: iterable(~pacman.model.graphs.machine.MachineEdge)
+        :type in_edges: iterable(~pacman.model.graphs.AbstractEdge)
         :return: the size the master pop table will take in SDRAM (in bytes)
         :rtype: int
         """
@@ -336,11 +338,16 @@ class MasterPopTableAsBinarySearch(object):
         n_vertices = 0
         n_entries = 0
         for in_edge in in_edges:
-            if isinstance(in_edge.app_edge, ProjectionApplicationEdge):
+            if isinstance(in_edge, MachineEdge):
+                app_edge = in_edge.app_edge
+            else:
+                app_edge = in_edge
+
+            if isinstance(app_edge, ProjectionApplicationEdge):
                 # TODO: Fix this to be more accurate!
                 # May require modification to the master population table
                 # Get the number of atoms per core incoming
-                pre_app_vertex = in_edge.pre_vertex
+                pre_app_vertex = app_edge.pre_vertex
                 max_atoms = float(
                     min(pre_app_vertex.get_max_atoms_per_core(),
                         pre_app_vertex.n_atoms))
@@ -350,7 +357,7 @@ class MasterPopTableAsBinarySearch(object):
                     math.ceil(pre_app_vertex.n_atoms / max_atoms))
                 n_vertices += n_edge_vertices
                 n_entries += (n_edge_vertices * len(
-                    in_edge.app_edge.synapse_information))
+                    app_edge.app_edge.synapse_information))
 
         # Multiply by 2 to get an upper bound
         return (

@@ -18,6 +18,7 @@ import numpy
 from six import iteritems, itervalues
 from collections import defaultdict
 
+from pacman.model.graphs.machine import MachineEdge
 from spinn_utilities.ordered_set import OrderedSet
 
 from pacman.model.routing_info import BaseKeyAndMask
@@ -152,53 +153,60 @@ class SynapticMatrices(object):
         self.__matrices[key] = matrix
         return matrix
 
-    def synapses_size(self, machine_edges):
+    def synapses_size(self, edges):
         """ The size of the synaptic blocks in bytes
 
-        :param machine_edges: The incoming application edges
-        :type machine_edges: iterable(~pacman.model.graphs.machine.MachineEdge)
+        :param edges: The incoming edges
+        :type edges: iterable(~pacman.model.graphs.AbstractEdge)
         :rtype: int
         """
         # Base size requirements
         # 1 word for address of direct addresses, and
         # 1 word for the size of the direct addresses matrix in bytes
         memory_size = 2 * BYTES_PER_WORD
-        for in_edge in machine_edges:
-            if isinstance(in_edge.app_edge, ProjectionApplicationEdge):
-                for synapse_info in in_edge.synapse_information:
-                    matrix = self.__app_matrix(in_edge.app_edge, synapse_info)
+        for in_edge in edges:
+            if isinstance(in_edge, MachineEdge):
+                app_edge = in_edge.app_edge
+            else:
+                app_edge = in_edge
+            if isinstance(app_edge, ProjectionApplicationEdge):
+                for synapse_info in app_edge.synapse_information:
+                    matrix = self.__app_matrix(app_edge, synapse_info)
                     memory_size = matrix.add_matrix_size(memory_size)
                     memory_size = matrix.add_delayed_matrix_size(memory_size)
         return memory_size
 
-    def size(self, machine_edges):
+    def size(self, edges):
         """ The size required by all parts of the matrices
 
-        :param iterable(~pacman.model.graphs.machine.MachineEdge) \
-                machine_edges:
-            The incoming application edges
+        :param iterable(~pacman.model.graphs.AbstractEdge) edges:
+            The incoming edges
         :rtype: int
         """
         return (
-            self.synapses_size(machine_edges) +
-            self.__gen_info_size(machine_edges) +
-            self.__poptable.get_master_population_table_size(machine_edges))
+            self.synapses_size(edges) +
+            self.__gen_info_size(edges) +
+            self.__poptable.get_master_population_table_size(edges))
 
-    def __gen_info_size(self, machine_edges):
+    def __gen_info_size(self, edges):
         """ The size in bytes of the synaptic expander parameters
 
-        :param machine_edges: The incoming application edges
-        :type machine_edges: iterable(~pacman.model.graphs.machine.MachineEdge)
+        :param edges: The incoming edges
+        :type edges: iterable(~pacman.model.graphs.AbstractEdge)
         :rtype: int
         """
         gen_on_machine = False
         size = 0
-        for machine_edge in machine_edges:
-            if not isinstance(
-                    machine_edge.app_edge, ProjectionApplicationEdge):
+        for edge in edges:
+            if isinstance(edge, MachineEdge):
+                app_edge = edge.app_edge
+            else:
+                app_edge = edge
+
+            if not isinstance(app_edge, ProjectionApplicationEdge):
                 continue
-            for synapse_info in machine_edge.app_edge.synapse_information:
-                matrix = self.__app_matrix(machine_edge.app_edge, synapse_info)
+            for synapse_info in app_edge.synapse_information:
+                matrix = self.__app_matrix(app_edge, synapse_info)
                 m_size = matrix.generator_info_size
                 if m_size > 0:
                     gen_on_machine = True

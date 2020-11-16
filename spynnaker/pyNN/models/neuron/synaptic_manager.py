@@ -320,20 +320,18 @@ class SynapticManager(object):
                 n_atoms, self.__n_synapse_types)
 
     def get_sdram_usage_in_bytes(
-            self, post_vertex_slice, application_graph, app_vertex,
-            machine_graph):
+            self, post_vertex_slice, application_graph, app_vertex):
         """ Get the SDRAM usage of a slice of atoms of this vertex
 
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
             The slice of atoms to get the size of
-        :param ~pacman.model.graphs.application.ApplicationGraph \
-                application_graph: The application graph
-        :param ~pacman.model.graphs.machine.MachineGraph machine_graph: \
-            machine graph
+        :param application_graph: The application graph
+        :type application_graph: \
+            ~pacman.model.graphs.application.ApplicationGraph
         :param AbstractPopulationVertex app_vertex: The application vertex
         :rtype: int
         """
-        in_edges = machine_graph.get_edges_ending_at_vertex(app_vertex)
+        in_edges = application_graph.get_edges_ending_at_vertex(app_vertex)
         matrices = self.__get_synaptic_matrices(post_vertex_slice)
         return (
             self._get_synapse_params_size() +
