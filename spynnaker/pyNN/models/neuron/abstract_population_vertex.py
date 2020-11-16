@@ -247,7 +247,7 @@ class AbstractPopulationVertex(
         self.__change_requires_mapping = False
         self.__change_requires_data_generation = False
 
-    def sdram_usage_for_neuron_params(self, vertex_slice):
+    def get_sdram_usage_for_neuron_params(self, vertex_slice):
         """ Calculate the SDRAM usage for just the neuron parameters region.
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
