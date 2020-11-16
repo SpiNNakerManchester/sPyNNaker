@@ -552,7 +552,8 @@ bool population_table_get_first_address(
 }
 
 bool population_table_get_next_address(
-        spike_t *spike, address_t *row_address, size_t *n_bytes_to_transfer) {
+        spike_t *spike, synaptic_row_t *row_address,
+        size_t *n_bytes_to_transfer) {
     // If there are no more items in the list, return false
     if (items_to_go == 0) {
         return false;
