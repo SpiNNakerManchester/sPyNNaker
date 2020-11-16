@@ -88,24 +88,17 @@ class SplitterAbstractPopulationVertexSlice(
             self._governed_app_vertex.synapse_manager.drop_late_spikes,
             self.__get_binary_file_name())
 
-    @inject_items({
-        "graph": "MemoryApplicationGraph",
-        "machine_time_step": "MachineTimeStep"
-    })
-    @overrides(AbstractSplitterSlice.get_resources_used_by_atoms,
-               additional_arguments={"graph", "machine_time_step"})
-    def get_resources_used_by_atoms(
-            self, vertex_slice, graph, machine_time_step):
+    @inject_items({"graph": "MemoryApplicationGraph"})
+    @overrides(AbstractSplitterSlice.get_resources_used_by_atoms)
+    def get_resources_used_by_atoms(self, vertex_slice, graph):
         """  Gets the resources of a slice of atoms from a given app vertex.
 
         :param Slice vertex_slice: the slice
         :param MachineGraph graph: app graph
-        :param int machine_time_step: machine time step
         :rtype: ResourceContainer
         """
         variable_sdram = self.get_variable_sdram(vertex_slice)
-        constant_sdram = self.constant_sdram(
-            vertex_slice, graph, machine_time_step)
+        constant_sdram = self.constant_sdram(vertex_slice, graph)
 
         # set resources required from this object
         container = ResourceContainer(
@@ -127,17 +120,16 @@ class SplitterAbstractPopulationVertexSlice(
         return self._governed_app_vertex.neuron_recorder.\
             get_variable_sdram_usage(vertex_slice)
 
-    def constant_sdram(self, vertex_slice,  graph, machine_time_step):
+    def constant_sdram(self, vertex_slice,  graph):
         """ returns the constant sdram used by the vertex slice.
 
         :param Slice vertex_slice: the atoms to get constant sdram of
         :param ApplicationGraph graph: app graph
-        :param int machine_time_step: machine time step of the sim.
         :rtype: ConstantSDRAM
         """
         sdram_requirement = (
             SYSTEM_BYTES_REQUIREMENT +
-            self._governed_app_vertex.sdram_usage_for_neuron_params(
+            self._governed_app_vertex.get_sdram_usage_for_neuron_params(
                 vertex_slice) +
             self._governed_app_vertex.neuron_recorder.get_static_sdram_usage(
                 vertex_slice) +

@@ -376,7 +376,7 @@ static inline void spike_process(void) {
             if (neuron_id < num_neurons) {
                 // Increment counter
                 if (current_time_slot_spike_counters[neuron_id] ==
-                        COUNTER_SATURATION_VALUE){
+                        COUNTER_SATURATION_VALUE) {
                     saturation_count += 1;
                 }else{
                     current_time_slot_spike_counters[neuron_id]++;
