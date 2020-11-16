@@ -378,9 +378,10 @@ static void dma_complete_callback(UNUSED uint unused, uint tag) {
                     current_buffer->row);
 
             // Print out the row for debugging
+            address_t row = (address_t) current_buffer->row;
             for (uint32_t i = 0;
                     i < (current_buffer->n_bytes_transferred >> 2); i++) {
-                log_error("%u: 0x%.8x", i, current_buffer->row[i]);
+                log_error("%u: 0x%.8x", i, row[i]);
             }
             rt_error(RTE_SWERR);
         }
