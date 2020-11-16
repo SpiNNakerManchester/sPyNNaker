@@ -33,8 +33,10 @@ class DelayedApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
             The delay extension at the start of the edge
         :param AbstractPopulationVertex post_vertex:
             The target of the synapses
-        :param SynapseInformation synapse_information:
+        :param synapse_information:
             The synapse information on this edge
+        :type synapse_information:
+            SynapseInformation or iterable(SynapseInformation)
         :param ProjectionApplicationEdge undelayed_edge:
             The edge that is used for projections without extended delays
         :param str label:

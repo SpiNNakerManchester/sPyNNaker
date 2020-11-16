@@ -15,26 +15,23 @@
 
 import logging
 
-from pacman.model.graphs.application.abstract import \
-    AbstractOneAppOneMachineVertex
-from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
     FixedMaskConstraint)
 from pacman.model.graphs.application import (
     ApplicationSpiNNakerLinkVertex)
+from pacman.model.graphs.application.abstract import (
+    AbstractOneAppOneMachineVertex)
 from spinn_front_end_common.abstract_models import (
     AbstractProvidesOutgoingPartitionConstraints,
     AbstractVertexWithEdgeToDependentVertices)
-
 from spynnaker.pyNN.models.defaults import defaults
 from .machine_munich_motor_device import MachineMunichMotorDevice
 
 logger = logging.getLogger(__name__)
 
 
-class _MunichMotorDevice(
-        ApplicationSpiNNakerLinkVertex, LegacyPartitionerAPI):
+class _MunichMotorDevice(ApplicationSpiNNakerLinkVertex):
     __slots__ = []
 
     def __init__(self, spinnaker_link_id, board_address=None):

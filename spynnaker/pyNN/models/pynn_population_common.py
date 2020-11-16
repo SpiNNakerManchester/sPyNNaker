@@ -55,8 +55,6 @@ class PyNNPopulationCommon(object):
         "__record_spike_file",
         "__record_v_file",
         "_size",
-        "_incoming_size",
-        "_outgoing_size",
         "__spinnaker_control",
         "__structure",
         "__vertex",

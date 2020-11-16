@@ -14,10 +14,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import os
 
+from pacman.exceptions import PacmanConfigurationException
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint, FixedVertexAtomsConstraint,
-    SameAtomsAsVertexConstraint, AbstractPartitionerConstraint)
+    AbstractPartitionerConstraint)
 from pacman.model.graphs.machine import MachineEdge
 from pacman.model.resources import (
     ResourceContainer, ConstantSDRAM, DTCMResource, CPUCyclesPerTickResource)
@@ -28,7 +29,6 @@ from spinn_front_end_common.interface.profiling import profile_utils
 from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT)
 from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.exceptions import SpynnakerSplitterConfigurationException
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
     AbstractSpynnakerSplitterDelay)
 from spynnaker.pyNN.models.neuron import (
@@ -64,15 +64,15 @@ class SplitterAbstractPopulationVertexSlice(
     def set_governed_app_vertex(self, app_vertex):
         AbstractSplitterSlice.set_governed_app_vertex(self, app_vertex)
         if not isinstance(app_vertex, AbstractPopulationVertex):
-            raise SpynnakerSplitterConfigurationException(
+            raise PacmanConfigurationException(
                 self.INVALID_POP_ERROR_MESSAGE.format(app_vertex))
 
-    @overrides(AbstractSplitterSlice.get_pre_vertices)
-    def get_pre_vertices(self, edge, outgoing_edge_partition):
+    @overrides(AbstractSplitterSlice.get_out_going_vertices)
+    def get_out_going_vertices(self, edge, outgoing_edge_partition):
         return self._get_map([MachineEdge])
 
-    @overrides(AbstractSplitterSlice.get_post_vertices)
-    def get_post_vertices(
+    @overrides(AbstractSplitterSlice.get_in_coming_vertices)
+    def get_in_coming_vertices(
             self, edge, outgoing_edge_partition, src_machine_vertex):
         return self._get_map([MachineEdge])
 
@@ -205,6 +205,5 @@ class SplitterAbstractPopulationVertexSlice(
         utility_calls.check_algorithm_can_support_constraints(
             constrained_vertices=[self._governed_app_vertex],
             supported_constraints=[
-                MaxVertexAtomsConstraint, FixedVertexAtomsConstraint,
-                SameAtomsAsVertexConstraint],
+                MaxVertexAtomsConstraint, FixedVertexAtomsConstraint],
             abstract_constraint_type=AbstractPartitionerConstraint)

@@ -25,10 +25,10 @@ from spinn_front_end_common.abstract_models.impl import (
     TDMAAwareApplicationVertex)
 from spynnaker.pyNN.exceptions import DelayExtensionException
 from spynnaker.pyNN.models.abstract_models import AbstractHasDelayStages
-from .delay_block import DelayBlock
-from .delay_generator_data import DelayGeneratorData
 from spynnaker.pyNN.utilities.constants import (
     POP_TABLE_MAX_ROW_LENGTH)
+from .delay_block import DelayBlock
+from .delay_generator_data import DelayGeneratorData
 
 logger = logging.getLogger(__name__)
 
@@ -107,6 +107,11 @@ class DelayExtensionVertex(
     @property
     @overrides(AbstractHasDelayStages.n_delay_stages)
     def n_delay_stages(self):
+        """ The maximum number of delay stages required by any connection\
+            out of this delay extension vertex
+
+        :rtype: int
+        """
         return self.__n_delay_stages
 
     def set_new_n_delay_stages_and_delay_per_stage(

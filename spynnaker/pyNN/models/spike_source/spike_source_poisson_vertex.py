@@ -159,7 +159,7 @@ class SpikeSourcePoissonVertex(
         :param iterable(float) rate:
         :param iterable(int) start:
         :param iterable(int) duration:
-        :param splitter:
+        :param AbstractSplitterCommon splitter:
         """
         # pylint: disable=too-many-arguments
         TDMAAwareApplicationVertex.__init__(

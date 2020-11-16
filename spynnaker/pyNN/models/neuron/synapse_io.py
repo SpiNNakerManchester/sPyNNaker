@@ -143,7 +143,7 @@ class SynapseIORowBased(object):
 
         :param int machine_time_step: The time step of the simulation
         :param int post_vertex_max_delay_ticks: post vertex max delay
-        :rtype: int or None
+        :rtype: int
         """
         return post_vertex_max_delay_ticks * (
             machine_time_step / MICRO_TO_MILLISECOND_CONVERSION)
@@ -362,7 +362,7 @@ class SynapseIORowBased(object):
             The scaling of the weights for each synapse type
         :param MachineEdge machine_edge:
             The incoming machine edge that the synapses are on
-        :param int machine_time_step: Ther machine time step of the sim.
+        :param int machine_time_step: The machine time step of the sim.
         :param ProjectionApplicationEdge app_edge:
         :param MaxRowInfo max_row_info:
             The maximum row information for the synapses

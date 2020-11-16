@@ -15,11 +15,14 @@
 
 from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from pacman.exceptions import PacmanConfigurationException
 
 
 @add_metaclass(AbstractBase)
 class AbstractAcceptsIncomingSynapses(object):
     """ Indicates an object that can be a post-vertex in a PyNN projection.
+
+    Note: See verify_splitter
     """
     __slots__ = ()
 
@@ -58,3 +61,25 @@ class AbstractAcceptsIncomingSynapses(object):
     def clear_connection_cache(self):
         """ Clear the connection data stored in the vertex so far.
         """
+
+    def verify_splitter(self, splitter):
+        """
+        Check that the spliiter implements the API(s) expected by the\
+        SynapticMatrices
+
+        Any Vertex that implements this api should override
+        ApplicationVertex.splitter method to also call this function
+
+        :param splitter:
+        :type splitter:
+            ~spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay
+        :raise: PacmanConfigurationException is the spliiter is not an instance
+             of AbstractSpynnakerSplitterDelay
+        """
+        # Delayed import to avoid cicular dependency
+        from spynnaker.pyNN.extra_algorithms.splitter_components import (
+            AbstractSpynnakerSplitterDelay)
+        if not isinstance(splitter, AbstractSpynnakerSplitterDelay):
+            raise PacmanConfigurationException(
+                "The splitter needs to be an instance of "
+                "----------------AbstractSpynnakerSplitterDelay")

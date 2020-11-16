@@ -86,6 +86,7 @@ def get_estimated_sdram_for_key_region(app_graph, vertex):
     :return: SDRAM needed
     :rtype: int
     """
+
     # basic sdram
     sdram = N_KEYS_DATA_SET_IN_WORDS * BYTES_PER_WORD
     for in_edge in app_graph.get_edges_ending_at_vertex(vertex):

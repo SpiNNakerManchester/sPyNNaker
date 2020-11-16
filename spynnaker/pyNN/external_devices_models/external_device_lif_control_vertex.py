@@ -72,7 +72,7 @@ class ExternalDeviceLifControlVertex(
         :param float ring_buffer_sigma:
         :param int incoming_spike_buffer_size:
         :param splitter: splitter from app to machine
-        :type splitter None or AbstractSplitterCommon
+        :type splitter: None or AbstractSplitterCommon
         :param list(~pacman.model.constraints.AbstractConstraint) constraints:
         """
         # pylint: disable=too-many-arguments, too-many-locals

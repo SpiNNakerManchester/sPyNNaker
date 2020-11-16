@@ -20,5 +20,5 @@ from.splitter_abstract_pop_vertex_slice import (
     SplitterAbstractPopulationVertexSlice)
 
 __all__ = [
-    'AbstractSpynnakerSplitterDelay', 'SpynnakerSplitterPartitioner',
-    'SpynnakerSplitterSelector', 'SplitterAbstractPopulationVertexSlice']
+    'AbstractSpynnakerSplitterDelay', 'SplitterAbstractPopulationVertexSlice',
+    'SpynnakerSplitterPartitioner', 'SpynnakerSplitterSelector', ]

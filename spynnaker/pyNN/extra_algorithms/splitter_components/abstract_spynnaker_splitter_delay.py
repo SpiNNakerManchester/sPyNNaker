@@ -12,12 +12,20 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase
 
 
 @add_metaclass(AbstractBase)
 class AbstractSpynnakerSplitterDelay(object):
+    """
+    Defines that a splitter is able to handle delays in some way,
+
+    Ideally the splitter and therefor the vertices it creates are able to
+    handle some delay themselves and if more is needed have the ability to
+    accept spikes from a  DelayExtensionMachineVertex
+    """
 
     __slots__ = []
 
@@ -29,3 +37,16 @@ class AbstractSpynnakerSplitterDelay(object):
         :return: int saying max delay supported in ticks
         """
         return self.MAX_SUPPORTED_DELAY_TICS
+
+    def accepts_edges_from_delay_vertex(self):
+        """
+        Confirms that the splitter's vertices can handle spikes coming from a \
+        DelayExtensionMachineVertex.
+
+        If this method returns false and the users ask for a delay larger than
+        that allowed by max_support_delay an exception will be raised
+        saying a different splitter is required.
+
+        :rtype: bool
+        """
+        return True

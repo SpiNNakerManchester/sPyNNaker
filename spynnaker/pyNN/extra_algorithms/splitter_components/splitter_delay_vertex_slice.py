@@ -14,11 +14,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import math
 
-from pacman.exceptions import PacmanInvalidParameterException
+from pacman.exceptions import (
+    PacmanConfigurationException, PacmanInvalidParameterException)
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint, FixedVertexAtomsConstraint,
-    SameAtomsAsVertexConstraint, AbstractPartitionerConstraint)
+    AbstractPartitionerConstraint)
 from pacman.model.graphs.machine import MachineEdge
 from pacman.model.partitioner_splitters.abstract_splitters.\
     abstract_dependent_splitter import AbstractDependentSplitter
@@ -47,9 +48,7 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
     """
 
     __slots__ = [
-        "_machine_vertex_by_slice",
-        "_delayed_mac_edge_to_undelayed_map",
-        "_delayed_vertex_to_un_delayed_edge"]
+        "_machine_vertex_by_slice"]
 
     ESTIMATED_CPU_CYCLES = 128
     WORDS_PER_ATOM = 11 + 16
@@ -82,12 +81,10 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
         """
         AbstractDependentSplitter.__init__(
             self, other_splitter, self.SPLITTER_NAME)
-        self._machine_vertex_by_slice = None
-        self._delayed_mac_edge_to_undelayed_map = dict()
-        self._delayed_vertex_to_un_delayed_edge = dict()
+        self._machine_vertex_by_slice = dict()
 
-    @overrides(AbstractDependentSplitter.get_pre_vertices)
-    def get_pre_vertices(self, edge, outgoing_edge_partition):
+    @overrides(AbstractDependentSplitter.get_out_going_vertices)
+    def get_out_going_vertices(self, edge, outgoing_edge_partition):
         return self._get_map([MachineEdge])
 
     @property
@@ -125,8 +122,8 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
     def get_out_going_slices(self):
         return self._other_splitter.get_out_going_slices()
 
-    @overrides(AbstractDependentSplitter.get_post_vertices)
-    def get_post_vertices(
+    @overrides(AbstractDependentSplitter.get_in_coming_vertices)
+    def get_in_coming_vertices(
             self, edge, outgoing_edge_partition, src_machine_vertex):
         return {
             self._machine_vertex_by_slice[
@@ -136,7 +133,7 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
     def set_governed_app_vertex(self, app_vertex):
         AbstractDependentSplitter.set_governed_app_vertex(self, app_vertex)
         if not isinstance(app_vertex, DelayExtensionVertex):
-            raise SpynnakerSplitterConfigurationException(
+            raise PacmanConfigurationException(
                 self.INVALID_POP_ERROR_MESSAGE.format(app_vertex))
 
     def create_machine_vertex(
@@ -148,9 +145,9 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
         :param ResourceTracker resource_tracker: resources
         :param str label:  human readable label for machine vertex.
         :param remaining_constraints: none partitioner constraints.
-        :param ApplicationGraph graph: the app graph
-        :type remaining_constraints: \
+        :type remaining_constraints:
             iterable(~pacman.model.constraints.AbstractConstraint)
+        :param ApplicationGraph graph: the app graph
         :return: machine vertex
         :rtype: DelayExtensionMachineVertex
         """
@@ -270,8 +267,7 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
         utility_calls.check_algorithm_can_support_constraints(
             constrained_vertices=[self._governed_app_vertex],
             supported_constraints=[
-                MaxVertexAtomsConstraint, FixedVertexAtomsConstraint,
-                SameAtomsAsVertexConstraint],
+                MaxVertexAtomsConstraint, FixedVertexAtomsConstraint],
             abstract_constraint_type=AbstractPartitionerConstraint)
 
     @overrides(AbstractDependentSplitter.machine_vertices_for_recording)
