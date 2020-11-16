@@ -532,7 +532,7 @@ class SynapticMatrixApp(object):
                 delay_max_addr)
 
     def __reserve_mpop_block(self, block_addr):
-        """ Reserve a block in the master population table for an undelayed
+        """ Reserve a block in the master population table for an undelayed\
             matrix
 
         :param int block_addr:
@@ -603,7 +603,7 @@ class SynapticMatrixApp(object):
                 self.__synapse_io.read_all_synapses(
                     data, delayed_data, self.__synapse_info,
                     self.__n_synapse_types, self.__weight_scales,
-                    machine_edge, self.__max_row_info, ))
+                    machine_edge, self.__max_row_info))
 
     def __next_addr(self, block_addr, size):
         """ Get the next address after a block, checking it is in range

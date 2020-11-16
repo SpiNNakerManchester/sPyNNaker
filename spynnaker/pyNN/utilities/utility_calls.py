@@ -122,6 +122,7 @@ def read_in_data_from_file(
     :param str file_path: absolute path to a file containing the data
     :param int min_atom: min neuron ID to which neurons to read in
     :param int max_atom: max neuron ID to which neurons to read in
+    :param extra:
     :param min_time: min time slot to read neurons values of.
     :type min_time: float or int
     :param max_time: max time slot to read neurons values of.
