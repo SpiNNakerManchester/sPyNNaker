@@ -216,18 +216,18 @@ class AbstractPopulationVertex(
         :rtype: None
         """
 
-        # If resetting, reset any state variables that need to be reset
-        if (self.__has_reset_last and
-                self.__initial_state_variables is not None):
-            self._state_variables = self.__copy_ranged_dict(
-                self.__initial_state_variables, self._state_variables,
-                self.__updated_state_variables)
-            self.__initial_state_variables = None
-
-        # If no initial state variables, copy them now
+        # If resetting
         if self.__has_reset_last:
-            self.__initial_state_variables = self.__copy_ranged_dict(
-                self._state_variables)
+            # reset any state variables that need to be reset
+            if self.__initial_state_variables is not None:
+                self._state_variables = self.__copy_ranged_dict(
+                    self.__initial_state_variables, self._state_variables,
+                    self.__updated_state_variables)
+                self.__initial_state_variables = None
+            else:
+                # If no initial state variables, copy them now
+                self.__initial_state_variables = self.__copy_ranged_dict(
+                    self._state_variables)
 
         # Reset things that need resetting
         self.__has_reset_last = False
