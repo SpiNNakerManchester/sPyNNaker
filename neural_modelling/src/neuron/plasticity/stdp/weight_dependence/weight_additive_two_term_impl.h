@@ -31,7 +31,7 @@
 // Structures
 //---------------------------------------
 //! The configuration of the rule
-typedef struct {
+typedef struct plasticity_weight_region_data_two_term_t {
     int32_t min_weight;     //!< Minimum weight
     int32_t max_weight;     //!< Maximum weight
 
