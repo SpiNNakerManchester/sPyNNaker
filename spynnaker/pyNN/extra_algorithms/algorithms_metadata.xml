@@ -15,12 +15,49 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
  -->
 <algorithms xmlns="https://github.com/SpiNNakerManchester/PACMAN"
-		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xsi:schemaLocation="https://github.com/SpiNNakerManchester/PACMAN
-			https://raw.githubusercontent.com/SpiNNakerManchester/PACMAN/master/pacman/operations/algorithms_metadata_schema.xsd">
-    <algorithm name="SpynnakerMachineBitFieldRouterCompressor">
-        <python_module>spynnaker.pyNN.overridden_pacman_functions.spynnaker_machine_bit_field_router_compressor</python_module>
-        <python_class>SpynnakerMachineBitFieldRouterCompressor</python_class>
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="https://github.com/SpiNNakerManchester/PACMAN
+            https://raw.githubusercontent.com/SpiNNakerManchester/PACMAN/master/pacman/operations/algorithms_metadata_schema.xsd">
+    <algorithm name="SynapseExpander">
+        <python_module>spynnaker.pyNN.extra_algorithms.synapse_expander</python_module>
+        <python_function>synapse_expander</python_function>
+        <input_definitions>
+           <parameter>
+                <param_name>placements</param_name>
+                <param_type>MemoryPlacements</param_type>
+            </parameter>
+            <parameter>
+                <param_name>transceiver</param_name>
+                <param_type>MemoryTransceiver</param_type>
+            </parameter>
+            <parameter>
+                <param_name>provenance_file_path</param_name>
+                <param_type>SystemProvenanceFilePath</param_type>
+            </parameter>
+            <parameter>
+                <param_name>executable_finder</param_name>
+                <param_type>ExecutableFinder</param_type>
+            </parameter>
+            <parameter>
+                <param_name>extract_iobuf</param_name>
+                <param_type>SynapticExpanderReadIOBuf</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>extract_iobuf</param_name>
+            <param_name>placements</param_name>
+            <param_name>transceiver</param_name>
+            <param_name>provenance_file_path</param_name>
+            <param_name>executable_finder</param_name>
+            <token part="DSGDataLoaded">DataLoaded</token>
+        </required_inputs>
+        <outputs>
+            <token part="SynapseDataExpanded">DataLoaded</token>
+        </outputs>
+    </algorithm>
+    <algorithm name="SpynnakerMachineBitFieldUnorderedRouterCompressor">
+        <python_module>spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor</python_module>
+        <python_class>SpynnakerMachineBitFieldUnorderedRouterCompressor</python_class>
         <input_definitions>
             <parameter>
                 <param_name>routing_tables</param_name>
@@ -51,12 +88,133 @@
                 <param_type>SystemProvenanceFilePath</param_type>
             </parameter>
             <parameter>
-                <param_name>no_sync_changes</param_name>
-                <param_type>NoSyncChanges</param_type>
+                <param_name>compress_as_much_as_possible</param_name>
+                <param_type>CompressionAsFarAsPos</param_type>
             </parameter>
             <parameter>
-                <param_name>compress_only_when_needed</param_name>
-                <param_type>CompressionAsNeeded</param_type>
+                <param_name>executable_finder</param_name>
+                <param_type>ExecutableFinder</param_type>
+            </parameter>
+            <parameter>
+                <param_name>write_compressor_iobuf</param_name>
+                <param_type>WriteCompressorIobuf</param_type>
+            </parameter>
+            <parameter>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
+            </parameter>
+            <parameter>
+                <param_name>placements</param_name>
+                <param_type>MemoryPlacements</param_type>
+            </parameter>
+            <parameter>
+                <param_name>produce_report</param_name>
+                <param_type>RouterBitfieldCompressionReport</param_type>
+            </parameter>
+            <parameter>
+                <param_name>default_report_folder</param_name>
+                <param_type>ReportFolder</param_type>
+            </parameter>
+            <parameter>
+                <param_name>target_length</param_name>
+                <param_type>CompressionTargetSize</param_type>
+            </parameter>
+            <parameter>
+                <param_name>routing_infos</param_name>
+                <param_type>MemoryRoutingInfos</param_type>
+            </parameter>
+            <parameter>
+                <param_name>time_to_try_for_each_iteration</param_name>
+                <param_type>RouterCompressorBitFieldTimePerAttempt</param_type>
+            </parameter>
+            <parameter>
+                <param_name>use_timer_cut_off</param_name>
+                <param_type>RouterCompressorBitFieldUseCutOff</param_type>
+            </parameter>
+            <parameter>
+                <param_name>machine_time_step</param_name>
+                <param_type>MachineTimeStep</param_type>
+            </parameter>
+            <parameter>
+                <param_name>time_scale_factor</param_name>
+                <param_type>TimeScaleFactor</param_type>
+            </parameter>
+            <parameter>
+                <param_name>provenance_data_objects</param_name>
+                <param_type>RouterCompressorProvenanceItems</param_type>
+            </parameter>
+            <parameter>
+                <param_name>read_expander_iobuf</param_name>
+                <param_type>SynapticExpanderReadIOBuf</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>read_expander_iobuf</param_name>
+            <param_name>executable_finder</param_name>
+            <param_name>write_compressor_iobuf</param_name>
+            <param_name>routing_tables</param_name>
+            <param_name>transceiver</param_name>
+            <param_name>machine</param_name>
+            <param_name>app_id</param_name>
+            <param_name>provenance_file_path</param_name>
+            <param_name>machine_graph</param_name>
+            <param_name>placements</param_name>
+            <param_name>produce_report</param_name>
+            <param_name>default_report_folder</param_name>
+            <param_name>target_length</param_name>
+            <param_name>routing_infos</param_name>
+            <param_name>threshold_percentage</param_name>
+            <param_name>time_to_try_for_each_iteration</param_name>
+            <param_name>use_timer_cut_off</param_name>
+            <param_name>machine_time_step</param_name>
+            <param_name>time_scale_factor</param_name>
+            <param_name>executable_targets</param_name>
+            <token part="BitFieldData">DataLoaded</token>
+        </required_inputs>
+        <optional_inputs>
+            <param_name>compress_as_much_as_possible</param_name>
+            <param_name>provenance_data_objects</param_name>
+        </optional_inputs>
+        <outputs>
+            <token part="MulticastRoutesLoaded">DataLoaded</token>
+            <param_type>RouterCompressorProvenanceItems</param_type>
+        </outputs>
+    </algorithm>
+    <algorithm name="SpynnakerMachineBitFieldPairRouterCompressor">
+        <python_module>spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor</python_module>
+        <python_class>SpynnakerMachineBitFieldPairRouterCompressor</python_class>
+        <input_definitions>
+            <parameter>
+                <param_name>read_expander_iobuf</param_name>
+                <param_type>SynapticExpanderReadIOBuf</param_type>
+            </parameter>
+            <parameter>
+                <param_name>routing_tables</param_name>
+                <param_type>MemoryRoutingTables</param_type>
+            </parameter>
+            <parameter>
+                <param_name>executable_targets</param_name>
+                <param_type>ExecutableTargets</param_type>
+            </parameter>
+            <parameter>
+                <param_name>threshold_percentage</param_name>
+                <param_type>RouterCompressorBitFieldPercentageThreshold</param_type>
+            </parameter>
+            <parameter>
+                <param_name>transceiver</param_name>
+                <param_type>MemoryTransceiver</param_type>
+            </parameter>
+            <parameter>
+                <param_name>machine</param_name>
+                <param_type>MemoryMachine</param_type>
+            </parameter>
+            <parameter>
+                <param_name>app_id</param_name>
+                <param_type>APPID</param_type>
+            </parameter>
+            <parameter>
+                <param_name>provenance_file_path</param_name>
+                <param_type>SystemProvenanceFilePath</param_type>
             </parameter>
             <parameter>
                 <param_name>compress_as_much_as_possible</param_name>
@@ -67,8 +225,8 @@
                 <param_type>ExecutableFinder</param_type>
             </parameter>
             <parameter>
-                <param_name>read_algorithm_iobuf</param_name>
-                <param_type>RouterCompressorWithBitFieldReadIOBuf</param_type>
+                <param_name>write_compressor_iobuf</param_name>
+                <param_type>WriteCompressorIobuf</param_type>
             </parameter>
             <parameter>
                 <param_name>machine_graph</param_name>
@@ -116,9 +274,8 @@
             </parameter>
         </input_definitions>
         <required_inputs>
-            <param_name>no_sync_changes</param_name>
             <param_name>executable_finder</param_name>
-            <param_name>read_algorithm_iobuf</param_name>
+            <param_name>write_compressor_iobuf</param_name>
             <param_name>routing_tables</param_name>
             <param_name>transceiver</param_name>
             <param_name>machine</param_name>
@@ -136,10 +293,10 @@
             <param_name>machine_time_step</param_name>
             <param_name>time_scale_factor</param_name>
             <param_name>executable_targets</param_name>
+            <param_name>read_expander_iobuf</param_name>
             <token part="BitFieldData">DataLoaded</token>
         </required_inputs>
         <optional_inputs>
-            <param_name>compress_only_when_needed</param_name>
             <param_name>compress_as_much_as_possible</param_name>
             <param_name>provenance_data_objects</param_name>
         </optional_inputs>
@@ -149,7 +306,7 @@
         </outputs>
     </algorithm>
     <algorithm name="OnChipBitFieldGenerator">
-        <python_module>spynnaker.pyNN.overridden_pacman_functions.on_chip_bit_field_generator</python_module>
+        <python_module>spynnaker.pyNN.extra_algorithms.on_chip_bit_field_generator</python_module>
         <python_class>OnChipBitFieldGenerator</python_class>
         <input_definitions>
             <parameter>
@@ -173,8 +330,8 @@
                 <param_type>MemoryPlacements</param_type>
             </parameter>
             <parameter>
-                <param_name>read_bit_field_generator_iobuf</param_name>
-                <param_type>ReadBitFieldGeneratorIOBUF</param_type>
+                <param_name>write_bit_field_generator_iobuf</param_name>
+                <param_type>WriteBitFieldGeneratorIOBUF</param_type>
             </parameter>
             <parameter>
                 <param_name>generating_bitfield_report</param_name>
@@ -203,7 +360,7 @@
             <param_name>executable_finder</param_name>
             <param_name>provenance_file_path</param_name>
             <param_name>transceiver</param_name>
-            <param_name>read_bit_field_generator_iobuf</param_name>
+            <param_name>write_bit_field_generator_iobuf</param_name>
             <param_name>generating_bitfield_report</param_name>
             <param_name>generating_bit_field_summary_report</param_name>
             <param_name>default_report_folder</param_name>
@@ -215,32 +372,8 @@
             <token part="BitFieldData">DataLoaded</token>
         </outputs>
     </algorithm>
-    <algorithm name="GraphEdgeFilter">
-        <python_module>spynnaker.pyNN.overridden_pacman_functions.graph_edge_filter</python_module>
-        <python_class>GraphEdgeFilter</python_class>
-        <input_definitions>
-            <parameter>
-                <param_name>app_graph</param_name>
-                <param_type>MemoryApplicationGraph</param_type>
-            </parameter>
-            <parameter>
-                <param_name>machine_graph</param_name>
-                <param_type>MemoryMachineGraph</param_type>
-            </parameter>
-        </input_definitions>
-        <required_inputs>
-            <param_name>machine_graph</param_name>
-        </required_inputs>
-        <optional_inputs>
-            <param_name>app_graph</param_name>
-        </optional_inputs>
-        <outputs>
-            <param_type>MemoryMachineGraph</param_type>
-            <token>EdgesFiltered</token>
-        </outputs>
-    </algorithm>
     <algorithm name="GraphEdgeWeightUpdater">
-        <python_module>spynnaker.pyNN.overridden_pacman_functions.graph_edge_weight_updater</python_module>
+        <python_module>spynnaker.pyNN.extra_algorithms.graph_edge_weight_updater</python_module>
         <python_class>GraphEdgeWeightUpdater</python_class>
         <input_definitions>
             <parameter>
@@ -256,7 +389,7 @@
         </outputs>
     </algorithm>
     <algorithm name="SpynnakerDataSpecificationWriter">
-        <python_module>spynnaker.pyNN.overridden_pacman_functions.spynnaker_data_specification_writer</python_module>
+        <python_module>spynnaker.pyNN.extra_algorithms.spynnaker_data_specification_writer</python_module>
         <python_class>SpynnakerDataSpecificationWriter</python_class>
         <input_definitions>
             <parameter>
@@ -298,7 +431,7 @@
         </outputs>
     </algorithm>
     <algorithm name="SynapticMatrixReport">
-        <python_module>spynnaker.pyNN.utilities.spynnaker_synaptic_matrix_report</python_module>
+        <python_module>spynnaker.pyNN.extra_algorithms.spynnaker_synaptic_matrix_report</python_module>
         <python_class>SpYNNakerSynapticMatrixReport</python_class>
         <input_definitions>
             <parameter>
@@ -321,7 +454,7 @@
         </required_inputs>
     </algorithm>
     <algorithm name="RedundantPacketCountReport">
-        <python_module>spynnaker.pyNN.utilities.redundant_packet_count_report</python_module>
+        <python_module>spynnaker.pyNN.extra_algorithms.redundant_packet_count_report</python_module>
         <python_class>RedundantPacketCountReport</python_class>
         <input_definitions>
             <parameter>
@@ -339,7 +472,7 @@
         </required_inputs>
     </algorithm>
     <algorithm name="SpYNNakerConnectionHolderGenerator">
-        <python_module>spynnaker.pyNN.utilities.spynnaker_connection_holder_generations</python_module>
+        <python_module>spynnaker.pyNN.extra_algorithms.spynnaker_connection_holder_generations</python_module>
         <python_class>SpYNNakerConnectionHolderGenerator</python_class>
         <input_definitions>
             <parameter>
@@ -355,7 +488,7 @@
         </outputs>
     </algorithm>
     <algorithm name="SpYNNakerNeuronGraphNetworkSpecificationReport">
-        <python_module>spynnaker.pyNN.utilities.spynnaker_neuron_network_specification_report</python_module>
+        <python_module>spynnaker.pyNN.extra_algorithms.spynnaker_neuron_network_specification_report</python_module>
         <python_class>SpYNNakerNeuronGraphNetworkSpecificationReport</python_class>
         <input_definitions>
             <parameter>
@@ -369,6 +502,20 @@
         </input_definitions>
         <required_inputs>
             <param_name>report_folder</param_name>
+            <param_name>application_graph</param_name>
+        </required_inputs>
+    </algorithm>
+    <algorithm name="FinishConnectionHolders">
+        <python_module>spynnaker.pyNN.extra_algorithms.connection_holder_finisher</python_module>
+        <python_function>finish_connection_holders</python_function>
+        <input_definitions>
+            <parameter>
+                <param_name>application_graph</param_name>
+                <param_type>MemoryApplicationGraph</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <token>DataLoaded</token>
             <param_name>application_graph</param_name>
         </required_inputs>
     </algorithm>

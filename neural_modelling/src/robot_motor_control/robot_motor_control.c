@@ -49,6 +49,12 @@ typedef struct {
     uint32_t continue_if_not_different;
 } motor_control_config_t;
 
+//! The provenance information written on application shutdown.
+struct robot_motor_control_provenance {
+    //! A count of the times that the synaptic input circular buffers overflowed
+    uint32_t n_input_buffer_overflows;
+};
+
 //! Number of counters
 #define N_COUNTERS         6
 
@@ -94,7 +100,8 @@ static uint32_t infinite_run;
 //! DSG regions in use
 enum robot_motor_control_regions_e {
     SYSTEM_REGION, //!< General simulation API control area
-    PARAMS_REGION  //!< Configuration region for this application
+    PARAMS_REGION,  //!< Configuration region for this application
+    PROVENANCE_DATA_REGION //!< Provenance region for this application
 };
 
 //! values for the priority for each callback
@@ -184,9 +191,7 @@ static inline void do_update(
 //!     to motor activity level.
 //! \param unused0: unused
 //! \param unused1: unused
-static void timer_callback(uint unused0, uint unused1) {
-    use(unused0);
-    use(unused1);
+static void timer_callback(UNUSED uint unused0, UNUSED uint unused1) {
     time++;
 
     log_debug("Timer tick %d", time);
@@ -261,13 +266,37 @@ static void read_parameters(motor_control_config_t *config_region) {
 //! \brief Add incoming spike message (in FIQ) to circular buffer
 //! \param[in] key: The received spike
 //! \param payload: ignored
-static void incoming_spike_callback(uint key, uint payload) {
+static void incoming_spike_callback(uint key, UNUSED uint payload) {
+    log_debug("Received spike %x at time %d\n", key, time);
+
+    // If there was space to add spike to incoming spike queue
+    in_spikes_add_spike(key);
+}
+
+//! \brief Add incoming spike message (in FIQ) to circular buffer
+//! \param[in] key: The received spike
+//! \param payload: ignored
+static void incoming_spike_callback_payload(uint key, uint payload) {
     use(payload);
 
     log_debug("Received spike %x at time %d\n", key, time);
 
     // If there was space to add spike to incoming spike queue
-    in_spikes_add_spike(key);
+    for (uint count = 0; count < payload; count ++){
+        in_spikes_add_spike(key);
+    }
+}
+
+//! \brief Callback to store provenance data (format: neuron_provenance).
+//! \param[out] provenance_region: Where to write the provenance data
+static void c_main_store_provenance_data(address_t provenance_region) {
+    log_debug("writing other provenance data");
+    struct robot_motor_control_provenance *prov = (void *) provenance_region;
+
+    // store the data into the provenance data region
+    prov->n_input_buffer_overflows = in_spikes_get_n_buffer_overflows();
+
+    log_debug("finished other provenance data");
 }
 
 //! \brief Read all application configuration
@@ -292,6 +321,10 @@ static bool initialize(uint32_t *timer_period) {
             &infinite_run, &time, SDP, DMA)) {
         return false;
     }
+
+    simulation_set_provenance_function(
+        c_main_store_provenance_data,
+        data_specification_get_region(PROVENANCE_DATA_REGION, ds_regions));
 
     // Get the parameters
     read_parameters(data_specification_get_region(PARAMS_REGION, ds_regions));
@@ -320,6 +353,8 @@ void c_main(void) {
 
     // Register callbacks
     spin1_callback_on(MC_PACKET_RECEIVED, incoming_spike_callback, MC);
+    spin1_callback_on(
+        MCPL_PACKET_RECEIVED, incoming_spike_callback_payload, MC);
     spin1_callback_on(TIMER_TICK, timer_callback, TIMER);
 
     // Start the time at "-1" so that the first tick will be 0

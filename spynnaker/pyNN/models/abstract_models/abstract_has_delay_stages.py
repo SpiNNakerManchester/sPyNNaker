@@ -13,6 +13,24 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .synapse_expander import synapse_expander
+from six import add_metaclass
+from spinn_utilities.abstract_base import (
+    AbstractBase, abstractproperty)
 
-__all__ = ["synapse_expander"]
+
+@add_metaclass(AbstractBase)
+class AbstractHasDelayStages(object):
+    """ Indicates that this object (a vertex) has delay stages that are used \
+        to increase the space required for bitfields in \
+        :py:func:`spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_bit_field_region`
+    """
+
+    __slots__ = ()
+
+    @abstractproperty
+    def n_delay_stages(self):
+        """ The maximum number of delay stages required by any connection\
+            out of this delay extension vertex
+
+        :rtype: int
+        """

@@ -79,7 +79,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
 
         self._rng = rng
 
-        self.__n_clipped_delays = 0
+        self.__n_clipped_delays = numpy.int64(0)
         self.__min_delay = 0
         self.__param_seeds = dict()
 
@@ -464,8 +464,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
 
     @abstractmethod
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
+            self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
             synapse_type, synapse_info):
         """ Create a synaptic block from the data.
 
@@ -476,9 +475,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float
             or list(int) or list(float)
         :param list(~pacman.model.graphs.common.Slice) pre_slices:
-        :param int pre_slice_index:
         :param list(~pacman.model.graphs.common.Slice) post_slices:
-        :param int post_slice_index:
         :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         :param AbstractSynapseType synapse_type:
@@ -495,13 +492,13 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         :rtype:
             list(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)
         """
-        name = "{}_{}_{}".format(
+        name = "connector_{}_{}_{}".format(
             synapse_info.pre_population.label,
             synapse_info.post_population.label, self.__class__.__name__)
+        # Convert to native Python integer; provenance system assumption
+        ncd = self.__n_clipped_delays.item()
         return [ProvenanceDataItem(
-            [name, "Times_synaptic_delays_got_clipped"],
-            self.__n_clipped_delays,
-            report=self.__n_clipped_delays > 0,
+            [name, "Times_synaptic_delays_got_clipped"], ncd, report=ncd > 0,
             message=(
                 "The delays in the connector {} from {} to {} was clipped "
                 "to {} a total of {} times.  This can be avoided by reducing "
@@ -509,7 +506,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
                 "timestep".format(
                     self.__class__.__name__, synapse_info.pre_population.label,
                     synapse_info.post_population.label, self.__min_delay,
-                    self.__n_clipped_delays)))]
+                    ncd)))]
 
     @property
     def safe(self):
@@ -555,3 +552,21 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         """
         # pylint: disable=unused-argument
         return False
+
+    def could_connect(self, _synapse_info, _pre_slice, _post_slice):
+        """
+        Checks if a pre slice and a post slice could connect.
+
+        Typically used to determine if a Machine Edge should be created by
+        checking that at least one of the indexes in the pre slice could
+        over time connect to at least one of the indexes in the post slice.
+
+        note: This method should never return a false negative,
+        but may return a false positives
+
+        :param ~pacman.model.graphs.common.Slice _pre_slice:
+        :param ~pacman.model.graphs.common.Slice _post_slice:
+        :param SynapseInformation _synapse_info:
+        """
+        # Unless we know for sure we must say they could connect
+        return True

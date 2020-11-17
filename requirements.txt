@@ -16,7 +16,6 @@
 SpiNNUtilities >= 1!5.1.1, < 1!6.0.0
 SpiNNMachine >= 1!5.1.1, < 1!6.0.0
 SpiNNMan >= 1!5.1.1, < 1!6.0.0
-SpiNNStorageHandlers >= 1!5.1.1, < 1!6.0.0
 SpiNNaker_PACMAN >= 1!5.1.1, < 1!6.0.0
 SpiNNaker_DataSpecification >= 1!5.1.1, < 1!6.0.0
 spalloc >= 2.0.2, < 3.0.0
@@ -25,6 +24,7 @@ numpy
 scipy
 lxml
 six
+statistics
 quantities >= 0.12.1
 pynn >= 0.9.1, < 0.10
 lazyarray >= 0.2.9, <= 0.4.0

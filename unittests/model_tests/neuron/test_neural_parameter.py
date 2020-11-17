@@ -13,12 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import io
 import os
 import platform
 import struct
 import tempfile
 from six.moves import xrange
-from spinn_storage_handlers import FileDataWriter
 from data_specification.enums import DataType
 from data_specification import DataSpecificationGenerator
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
@@ -44,7 +44,7 @@ def _iterate_parameter_values(iterator, data_type):
 def run_spec_check(method):
     MockSimulator.setup()
     if platform.system() == "Windows":
-        spec_writer = FileDataWriter("test.dat")
+        spec_writer = io.FileIO("test.dat", "wb")
         spec = DataSpecificationGenerator(spec_writer, None)
         try:
             method(spec)
@@ -53,7 +53,7 @@ def run_spec_check(method):
             os.remove("test.dat")
     else:
         with tempfile.NamedTemporaryFile() as temp:
-            spec = DataSpecificationGenerator(FileDataWriter(temp.name), None)
+            spec = DataSpecificationGenerator(io.FileIO(temp.name, "wb"), None)
             try:
                 method(spec)
             finally:

@@ -16,9 +16,8 @@
 import logging
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationEdge
+from pacman.model.partitioner_interfaces import AbstractSlicesConnect
 from .projection_machine_edge import ProjectionMachineEdge
-from spynnaker.pyNN.models.abstract_models import AbstractFilterableEdge
-
 logger = logging.getLogger(__name__)
 _DynamicsStructural = None
 
@@ -33,13 +32,21 @@ def _are_dynamics_structural(synapse_dynamics):
     return isinstance(synapse_dynamics, _DynamicsStructural)
 
 
-class ProjectionApplicationEdge(ApplicationEdge, AbstractFilterableEdge):
+class ProjectionApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
     """ An edge which terminates on an :py:class:`AbstractPopulationVertex`.
     """
     __slots__ = [
         "__delay_edge",
-        "__stored_synaptic_data_from_machine",
-        "__synapse_information"]
+        "__synapse_information",
+        # Slices of the pre_vertexes of the machine_edges
+        "__pre_slices",
+
+        # Slices of the post_vertexes of the machine_edges
+        "__post_slices",
+        # True if slices have been convered to sorted lists
+        "__slices_list_mode",
+        "__machine_edges_by_slices"
+    ]
 
     def __init__(
             self, pre_vertex, post_vertex, synapse_information, label=None):
@@ -60,7 +67,12 @@ class ProjectionApplicationEdge(ApplicationEdge, AbstractFilterableEdge):
         # post_vertex - this might be None if no long delays are present
         self.__delay_edge = None
 
-        self.__stored_synaptic_data_from_machine = None
+        # Keep the machine edges by pre- and post-vertex
+        self.__machine_edges_by_slices = dict()
+
+        self.__pre_slices = set()
+        self.__post_slices = set()
+        self.__slices_list_mode = False
 
     def add_synapse_information(self, synapse_information):
         """
@@ -99,11 +111,100 @@ class ProjectionApplicationEdge(ApplicationEdge, AbstractFilterableEdge):
     @overrides(ApplicationEdge._create_machine_edge)
     def _create_machine_edge(
             self, pre_vertex, post_vertex, label):
-        return ProjectionMachineEdge(
+        edge = ProjectionMachineEdge(
             self.__synapse_information, pre_vertex, post_vertex, self, label)
+        self.__machine_edges_by_slices[
+            pre_vertex.vertex_slice, post_vertex.vertex_slice] = edge
+        if self.__delay_edge is not None:
+            # Set the information if the delay machine edge exists
+            delayed = self.__delay_edge._get_machine_edge(
+                pre_vertex, post_vertex)
+            if delayed is not None:
+                edge.delay_edge = delayed
+                delayed.undelayed_edge = edge
+        return edge
 
-    @overrides(AbstractFilterableEdge.filter_edge)
-    def filter_edge(self):
-        return all(
-            not _are_dynamics_structural(syn_info.synapse_dynamics)
-            for syn_info in self.__synapse_information)
+    def _get_machine_edge(self, pre_vertex, post_vertex):
+        """ Get a specific machine edge of this edge
+
+        :param PopulationMachineVertex pre_vertex:
+            The vertex at the start of the machine edge
+        :param PopulationMachineVertex post_vertex:
+            The vertex at the end of the machine edge
+        :rtype: ProjectionMachineEdge or None
+        """
+        return self.__machine_edges_by_slices.get(
+            (pre_vertex.vertex_slice, post_vertex.vertex_slice))
+
+    @overrides(AbstractSlicesConnect.could_connect)
+    def could_connect(self, pre_slice, post_slice):
+        for synapse_info in self.__synapse_information:
+            # Structual Plasticity can learn connection not originally included
+            if _are_dynamics_structural(synapse_info.synapse_dynamics):
+                return True
+            if synapse_info.connector.could_connect(
+                    synapse_info, pre_slice, post_slice):
+                return True
+        return False
+
+    @overrides(ApplicationEdge.remember_associated_machine_edge)
+    def remember_associated_machine_edge(self, machine_edge):
+        super(ProjectionApplicationEdge, self).\
+            remember_associated_machine_edge(machine_edge)
+        if self.__slices_list_mode:
+            # Unexpected but if extra remember after a get convert back to sets
+            self.__pre_slices = set(self.__pre_slices)
+            self.__post_slices = set(self.__post_slices)
+            self.__slices_list_mode = False
+        self.__pre_slices.add(machine_edge.pre_vertex.vertex_slice)
+        self.__post_slices.add(machine_edge.post_vertex.vertex_slice)
+
+    @overrides(ApplicationEdge.forget_machine_edges)
+    def forget_machine_edges(self):
+        super(ProjectionApplicationEdge, self).forget_machine_edges()
+        self.__pre_slices = set()
+        self.__post_slices = set()
+        self.__slices_list_mode = False
+
+    def __check_list_mode(self):
+        """
+        Makes sure the pre- and post-slices are sorted lists
+        """
+        if not self.__slices_list_mode:
+            self.__pre_slices = sorted(
+                list(self.__pre_slices), key=lambda x: x.lo_atom)
+            self.__post_slices = sorted(
+                list(self.__post_slices), key=lambda x: x.lo_atom)
+            self.__slices_list_mode = True
+
+    @property
+    def pre_slices(self):
+        """ Get the slices for the pre_vertexes of the MachineEdges
+
+        While the remember machine_edges remain unchanged this will return a
+        list with a consistent id. If the edges change a new list is created
+
+        The List will be sorted by lo_atom.
+        No checking is done for overlaps or gaps
+
+        :return: Ordered list of pre-slices
+        :rtype: list(~pacman.model.graphs.common.Slice)
+        """
+        self.__check_list_mode()
+        return self.__pre_slices
+
+    @property
+    def post_slices(self):
+        """ Get the slices for the post_vertexes of the MachineEdges
+
+        While the remember machine_edges remain unchanged this will return a
+        list with a consistent id. If the edges change a new list is created
+
+        The List will be sorted by lo_atom.
+        No checking is done for overlaps or gaps
+
+        :return: Ordered list of post-slices
+        :rtype: list(~pacman.model.graphs.common.Slice)
+        """
+        self.__check_list_mode()
+        return self.__post_slices

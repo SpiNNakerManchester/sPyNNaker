@@ -1,0 +1,92 @@
+# Copyright (c) 2020 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+name: Publish
+
+on:
+  push:
+    branches: [ master ]
+
+env:
+  ROOT_DOC_DIR: doc/global
+  C_DOC_DIR: neural_modelling/html
+  PY_DOC_DIR: doc/source/_build/html
+  DEPLOY_DIR: deploy
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Python 3.6
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.6
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Checkout SupportScripts
+        uses: actions/checkout@v2
+        with:
+          repository: SpiNNakerManchester/SupportScripts
+          path: support
+      - name: Set dynamic environment variables
+        # This step can not be merged with Checkout Spinnaker Dependencies
+        run: |
+          echo "SPINN_DIRS=$PWD/spinnaker_tools" >> $GITHUB_ENV
+          echo "GITHUB_BRANCH=$(echo ${GITHUB_REF#refs/heads/} | tr / -)" >> $GITHUB_ENV
+      - name: Checkout SpiNNaker Dependencies
+        run: |
+          support/gitclone2.sh https://github.com/SpiNNakerManchester/spinnaker_tools.git
+          support/gitclone2.sh https://github.com/SpiNNakerManchester/SpiNNUtils.git
+          support/gitclone2.sh https://github.com/SpiNNakerManchester/SpiNNMachine.git
+          support/gitclone2.sh https://github.com/SpiNNakerManchester/SpiNNMan.git
+          support/gitclone2.sh https://github.com/SpiNNakerManchester/PACMAN.git
+          support/gitclone2.sh https://github.com/SpiNNakerManchester/DataSpecification.git
+          support/gitclone2.sh https://github.com/SpiNNakerManchester/spalloc.git
+          support/gitclone2.sh https://github.com/SpiNNakerManchester/SpiNNFrontEndCommon.git
+      - name: Read tags
+        run: make doxysetup
+        working-directory: neural_modelling
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          (cd SpiNNUtils && exec python setup.py install || exit 1)
+          (cd SpiNNMachine && exec python setup.py install || exit 1)
+          (cd SpiNNMan && exec python setup.py install || exit 1)
+          (cd PACMAN && exec python setup.py install || exit 1)
+          (cd DataSpecification && exec python setup.py install || exit 1)
+          (cd spalloc && exec python setup.py install || exit 1)
+          (cd SpiNNFrontEndCommon && exec python setup.py install || exit 1)
+          pip install -r requirements-test.txt
+
+      - name: Build Python Documentation
+        run: support/travis-sphinx.sh html -T -E -b html -d _build/doctrees-readthedocsdirhtml -D language=en . _build/html
+
+      - name: Build C documentation
+        uses: mattnotmitt/doxygen-action@v1.1.0
+        with:
+          working-directory: neural_modelling
+
+      - name: Merge documentation trees
+        run: |
+          cp -vaT $ROOT_DOC_DIR $DEPLOY_DIR
+          cp -vaT $C_DOC_DIR $DEPLOY_DIR/c
+          cp -vaT $PY_DOC_DIR $DEPLOY_DIR/python
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@3.7.1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: gh-pages
+          folder: ${{ env.DEPLOY_DIR }}

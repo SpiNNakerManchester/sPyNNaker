@@ -57,12 +57,10 @@ extensions = [
 
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3.6', None),
-    'numpy': ("https://docs.scipy.org/doc/numpy/", None),
+    'numpy': ("https://numpy.org/doc/stable/", None),
     'pynn': ("http://neuralensemble.org/docs/PyNN/", None),
     'spinn_utilities': ('https://spinnutils.readthedocs.io/en/latest/', None),
     'spinn_machine': ('https://spinnmachine.readthedocs.io/en/latest/', None),
-    'spinn_storage_handlers': (
-        'https://spinnstoragehandlers.readthedocs.io/en/latest/', None),
     'spinnman': ('https://spinnman.readthedocs.io/en/latest/', None),
     'pacman': ('https://pacman.readthedocs.io/en/latest/', None),
     'data_specification': (
@@ -219,7 +217,7 @@ html_static_path = ['_static']
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'sPyNNakerdoc'
 
-mathjax_path = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js'
+mathjax_path = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML'
 
 # -- Options for LaTeX output ---------------------------------------------
 

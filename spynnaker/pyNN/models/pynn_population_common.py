@@ -79,7 +79,7 @@ class PyNNPopulationCommon(object):
             How do we constrain where to put things on SpiNNaker
         :param model: What neuron model is being run by this population
         :type model:
-            AbstractPyNNModel or
+            ~spynnaker.pyNN.models.AbstractPyNNModel or
             ~pacman.model.graphs.application.ApplicationVertex
         :param structure: How the neurons are arranged in space
         :type structure: ~pyNN.space.BaseStructure or None
@@ -100,7 +100,10 @@ class PyNNPopulationCommon(object):
                     "A population cannot have a negative or zero size.")
             population_parameters = dict(model.default_population_parameters)
             if additional_parameters is not None:
-                population_parameters.update(additional_parameters)
+                # check that the additions are suitable. report wrong ones
+                # and ignore
+                population_parameters = self._process_additional_params(
+                    additional_parameters, population_parameters)
             self.__vertex = model.create_vertex(
                 size, label, constraints, **population_parameters)
 
@@ -178,6 +181,17 @@ class PyNNPopulationCommon(object):
         if initial_values is not None:
             for variable, value in iteritems(initial_values):
                 self._initialize(variable, value)
+
+    @staticmethod
+    def _process_additional_params(
+            additional_parameters, population_parameters):
+        for key in additional_parameters.keys():
+            if key in population_parameters:
+                population_parameters[key] = additional_parameters[key]
+            else:
+                logger.warning(
+                    "additional_parameter {} will be ignored".format(key))
+        return population_parameters
 
     @property
     def first_id(self):
@@ -656,7 +670,7 @@ class PyNNPopulationCommon(object):
         # Allow a float which has a near int value
         temp = int(round(size))
         if abs(temp - size) < 0.001:
-            logger.warning("Size of the population rounded "
+            logger.warning("Size of the population {} rounded "
                            "from {} to {}. Please use int values for size",
                            label, size, temp)
             return temp
