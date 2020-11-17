@@ -110,6 +110,7 @@ typedef void (generate_param_func)(
  * \param[in] delays: Pointer to table of delays
  * \param[in] weights: Pointer to table of weights
  * \param[in] max_stage: The maximum delay stage to support
+ * \param[in] max_delay_in_a_stage: max delay in a delay stage
  */
 typedef void (generate_row_func)(
         void *generator,

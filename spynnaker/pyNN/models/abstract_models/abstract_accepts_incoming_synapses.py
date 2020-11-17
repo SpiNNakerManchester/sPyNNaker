@@ -47,13 +47,13 @@ class AbstractAcceptsIncomingSynapses(object):
         # pylint: disable=too-many-arguments
         """ Get the connections from the machine post-run.
 
-        :param ~spinnman.transceiver.Transceiver transceiver:
+        :param ~spinnman.transceiver.Transceiver transceiver:\
             How to read the connection data
-        :param ~pacman.model.placements.Placements placements:
+        :param ~pacman.model.placements.Placements placements:\
             Where the connection data is on the machine
-        :param ProjectionApplicationEdge app_edge:
+        :param ProjectionApplicationEdge app_edge:\
             The edge for which the data is being read
-        :param SynapseInformation synapse_info:
+        :param SynapseInformation synapse_info:\
             The specific projection within the edge
         """
 
@@ -64,17 +64,17 @@ class AbstractAcceptsIncomingSynapses(object):
 
     def verify_splitter(self, splitter):
         """
-        Check that the spliiter implements the API(s) expected by the\
+        Check that the splitter implements the API(s) expected by the\
         SynapticMatrices
 
         Any Vertex that implements this api should override
         ApplicationVertex.splitter method to also call this function
 
-        :param splitter:
+        :param splitter: the splitter
         :type splitter:
             ~spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay
-        :raise: PacmanConfigurationException is the spliiter is not an instance
-             of AbstractSpynnakerSplitterDelay
+        :raises PacmanConfigurationException: is the splitter is not an \
+            instance of AbstractSpynnakerSplitterDelay
         """
         # Delayed import to avoid cicular dependency
         from spynnaker.pyNN.extra_algorithms.splitter_components import (

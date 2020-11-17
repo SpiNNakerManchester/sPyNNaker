@@ -175,7 +175,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                     if isinstance(synapse_info.synapse_dynamics,
                                   AbstractSynapseDynamicsStructural):
                         if app_edge in structural_edges:
-                            if (structural_edges[app_edge] != synapse_info):
+                            if structural_edges[app_edge] != synapse_info:
                                 raise SynapticConfigurationException(
                                    self.PAIR_ERROR)
                         else:

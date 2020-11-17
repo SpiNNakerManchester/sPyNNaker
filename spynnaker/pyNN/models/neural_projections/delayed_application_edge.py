@@ -31,11 +31,11 @@ class DelayedApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
         """
         :param DelayExtensionVertex pre_vertex:
             The delay extension at the start of the edge
-        :param AbstractPopulationVertex post_vertex:
+        :param AbstractPopulationVertex post_vertex:\
             The target of the synapses
-        :param synapse_information:
+        :param synapse_information:\
             The synapse information on this edge
-        :type synapse_information:
+        :type synapse_information:\
             SynapseInformation or iterable(SynapseInformation)
         :param ProjectionApplicationEdge undelayed_edge:
             The edge that is used for projections without extended delays
@@ -85,9 +85,9 @@ class DelayedApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
     def get_machine_edge(self, pre_vertex, post_vertex):
         """ Get a specific machine edge from this edge
 
-        :param DelayExtensionMachineVertex pre_vertex:
+        :param DelayExtensionMachineVertex pre_vertex:\
             The vertex at the start of the machine edge
-        :param PopulationMachineVertex post_vertex:
+        :param PopulationMachineVertex post_vertex:\
             The vertex at the end of the machine edge
         :rtype: MachineEdge or None
         """

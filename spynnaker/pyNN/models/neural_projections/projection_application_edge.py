@@ -57,9 +57,9 @@ class ProjectionApplicationEdge(
         """
         :param AbstractPopulationVertex pre_vertex:
         :param AbstractPopulationVertex post_vertex:
-        :param synapse_information:
+        :param synapse_information:\
             The synapse information on this edge
-        :type synapse_information:
+        :type synapse_information:\
             SynapseInformation or iterable(SynapseInformation)
         :param str label:
         """
@@ -121,9 +121,9 @@ class ProjectionApplicationEdge(
     def get_machine_edge(self, pre_vertex, post_vertex):
         """ Get a specific machine edge of this edge
 
-        :param PopulationMachineVertex pre_vertex:
+        :param PopulationMachineVertex pre_vertex:\
             The vertex at the start of the machine edge
-        :param PopulationMachineVertex post_vertex:
+        :param PopulationMachineVertex post_vertex:\
             The vertex at the end of the machine edge
         :rtype: MachineEdge or None
         """
