@@ -68,6 +68,7 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#nested-classes">Data Structures</a> &#124;
 <a href="#func-members">Functions</a> &#124;
 <a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
@@ -81,6 +82,12 @@ $(function() {
 </div>
 <p><a href="timing__vogels__2011__impl_8c_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+Data Structures</h2></td></tr>
+<tr class="memitem:structvogels__2011__config__t"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="timing__vogels__2011__impl_8c.html#structvogels__2011__config__t">vogels_2011_config_t</a></td></tr>
+<tr class="memdesc:structvogels__2011__config__t"><td class="mdescLeft">&#160;</td><td class="mdescRight">How the configuration data for vogels_2011 is laid out in SDRAM.  <a href="timing__vogels__2011__impl_8c.html#structvogels__2011__config__t">More...</a><br /></td></tr>
+<tr class="separator:structvogels__2011__config__t"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:adcf80560bde3d552d7ef273645c530fa"><td class="memItemLeft" align="right" valign="top"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="timing__vogels__2011__impl_8c.html#adcf80560bde3d552d7ef273645c530fa">timing_initialise</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> address)</td></tr>
@@ -102,7 +109,40 @@ Variables</h2></td></tr>
 <div class="textblock"><p>Initialisation for <a class="el" href="timing__vogels__2011__impl_8h.html" title="Timing rule from Vogels 2011.">timing_vogels_2011_impl.h</a>. </p>
 
 <p class="definition">Definition in file <a class="el" href="timing__vogels__2011__impl_8c_source.html">timing_vogels_2011_impl.c</a>.</p>
-</div><h2 class="groupheader">Function Documentation</h2>
+</div><hr/><h2 class="groupheader">Data Structure Documentation</h2>
+<a name="structvogels__2011__config__t" id="structvogels__2011__config__t"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#structvogels__2011__config__t">&#9670;&nbsp;</a></span>vogels_2011_config_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">struct vogels_2011_config_t</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="textblock"><p>How the configuration data for vogels_2011 is laid out in SDRAM. </p>
+
+<p class="definition">Definition at line <a class="el" href="timing__vogels__2011__impl_8c_source.html#l00032">32</a> of file <a class="el" href="timing__vogels__2011__impl_8c_source.html">timing_vogels_2011_impl.c</a>.</p>
+</div><table class="fieldtable">
+<tr><th colspan="3">Data Fields</th></tr>
+<tr><td class="fieldtype">
+<a id="a8a024b122d037ae228e79faaee401ae0"></a>int32_t</td>
+<td class="fieldname">
+alpha</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a id="af10df9250e03c8c80403c23ce0354108"></a>uint32_t</td>
+<td class="fieldname">
+lut_data[]</td>
+<td class="fielddoc">
+</td></tr>
+</table>
+
+</div>
+</div>
+<h2 class="groupheader">Function Documentation</h2>
 <a id="adcf80560bde3d552d7ef273645c530fa"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#adcf80560bde3d552d7ef273645c530fa">&#9670;&nbsp;</a></span>timing_initialise()</h2>
 
@@ -128,14 +168,14 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>address of first word after the timing data </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="timing__vogels__2011__impl_8c_source.html#l00034">34</a> of file <a class="el" href="timing__vogels__2011__impl_8c_source.html">timing_vogels_2011_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="timing__vogels__2011__impl_8c_source.html#l00040">40</a> of file <a class="el" href="timing__vogels__2011__impl_8c_source.html">timing_vogels_2011_impl.c</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Nov 16 2020 09:36:47 for sPyNNaker neural_modelling by&#160;<a href="http://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.8.20
+Generated on Tue Nov 17 2020 11:29:05 for sPyNNaker neural_modelling by&#160;<a href="http://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.8.20
 </small></address>
 </body>
 </html>

@@ -68,6 +68,7 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#nested-classes">Data Structures</a> &#124;
 <a href="#func-members">Functions</a> &#124;
 <a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
@@ -81,6 +82,12 @@ $(function() {
 </div>
 <p><a href="weight__additive__two__term__impl_8c_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+Data Structures</h2></td></tr>
+<tr class="memitem:structadditive__two__term__config__t"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="weight__additive__two__term__impl_8c.html#structadditive__two__term__config__t">additive_two_term_config_t</a></td></tr>
+<tr class="memdesc:structadditive__two__term__config__t"><td class="mdescLeft">&#160;</td><td class="mdescRight">How the configuration data for additive_two_term is laid out in SDRAM. The layout is an array of these.  <a href="weight__additive__two__term__impl_8c.html#structadditive__two__term__config__t">More...</a><br /></td></tr>
+<tr class="separator:structadditive__two__term__config__t"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a499ff9e19e3982f41bd7422fafebca2e"><td class="memItemLeft" align="right" valign="top"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="weight__additive__two__term__impl_8c.html#a499ff9e19e3982f41bd7422fafebca2e">weight_initialise</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> address, uint32_t <a class="el" href="synapses_8c.html#adedb27b3ece4d4dece0aee776a136427">n_synapse_types</a>, uint32_t *ring_buffer_to_input_buffer_left_shifts)</td></tr>
@@ -98,7 +105,64 @@ Variables</h2></td></tr>
 <div class="textblock"><p>Support code for <a class="el" href="weight__additive__two__term__impl_8h.html" title="Additive dual-term weight dependence rule.">weight_additive_two_term_impl.h</a>. </p>
 
 <p class="definition">Definition in file <a class="el" href="weight__additive__two__term__impl_8c_source.html">weight_additive_two_term_impl.c</a>.</p>
-</div><h2 class="groupheader">Function Documentation</h2>
+</div><hr/><h2 class="groupheader">Data Structure Documentation</h2>
+<a name="structadditive__two__term__config__t" id="structadditive__two__term__config__t"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#structadditive__two__term__config__t">&#9670;&nbsp;</a></span>additive_two_term_config_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">struct additive_two_term_config_t</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="textblock"><p>How the configuration data for additive_two_term is laid out in SDRAM. The layout is an array of these. </p>
+
+<p class="definition">Definition at line <a class="el" href="weight__additive__two__term__impl_8c_source.html#l00030">30</a> of file <a class="el" href="weight__additive__two__term__impl_8c_source.html">weight_additive_two_term_impl.c</a>.</p>
+</div><table class="fieldtable">
+<tr><th colspan="3">Data Fields</th></tr>
+<tr><td class="fieldtype">
+<a id="af7670fc489d26c3499e4edcd77f7da44"></a>int32_t</td>
+<td class="fieldname">
+min_weight</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a id="a841c6ebf34a7af1173bf1043554690b6"></a>int32_t</td>
+<td class="fieldname">
+max_weight</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a id="a18be6f995740db876b456e43aef781c3"></a>int32_t</td>
+<td class="fieldname">
+a2_plus</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a id="a9879dd17a25c30640474b23cb0691cfa"></a>int32_t</td>
+<td class="fieldname">
+a2_minus</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a id="a9917203b31458c243e3511fa0048bbbf"></a>int32_t</td>
+<td class="fieldname">
+a3_plus</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a id="a424a6417c0352591015200ad2aa3515e"></a>int32_t</td>
+<td class="fieldname">
+a3_minus</td>
+<td class="fielddoc">
+</td></tr>
+</table>
+
+</div>
+</div>
+<h2 class="groupheader">Function Documentation</h2>
 <a id="a499ff9e19e3982f41bd7422fafebca2e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a499ff9e19e3982f41bd7422fafebca2e">&#9670;&nbsp;</a></span>weight_initialise()</h2>
 
@@ -142,14 +206,14 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the end of the weight region as an absolute SDRAM memory address. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="weight__additive__two__term__impl_8c_source.html#l00031">31</a> of file <a class="el" href="weight__additive__two__term__impl_8c_source.html">weight_additive_two_term_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="weight__additive__two__term__impl_8c_source.html#l00042">42</a> of file <a class="el" href="weight__additive__two__term__impl_8c_source.html">weight_additive_two_term_impl.c</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Nov 16 2020 09:36:47 for sPyNNaker neural_modelling by&#160;<a href="http://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.8.20
+Generated on Tue Nov 17 2020 11:29:05 for sPyNNaker neural_modelling by&#160;<a href="http://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.8.20
 </small></address>
 </body>
 </html>

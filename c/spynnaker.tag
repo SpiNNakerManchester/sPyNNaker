@@ -4640,6 +4640,7 @@
     <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
     <filename>timing__recurrent__dual__fsm__impl_8c.html</filename>
     <includes id="timing__recurrent__dual__fsm__impl_8h" name="timing_recurrent_dual_fsm_impl.h" local="yes" imported="no">timing_recurrent_dual_fsm_impl.h</includes>
+    <class kind="struct">dual_fsm_config_t</class>
     <member kind="function">
       <type>uint32_t *</type>
       <name>timing_initialise</name>
@@ -4742,6 +4743,7 @@
     <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
     <filename>timing__recurrent__pre__stochastic__impl_8c.html</filename>
     <includes id="timing__recurrent__pre__stochastic__impl_8h" name="timing_recurrent_pre_stochastic_impl.h" local="yes" imported="no">timing_recurrent_pre_stochastic_impl.h</includes>
+    <class kind="struct">pre_stochastic_config_t</class>
     <member kind="function">
       <type>address_t</type>
       <name>timing_initialise</name>
@@ -4814,6 +4816,7 @@
     <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
     <filename>timing__vogels__2011__impl_8c.html</filename>
     <includes id="timing__vogels__2011__impl_8h" name="timing_vogels_2011_impl.h" local="yes" imported="no">timing_vogels_2011_impl.h</includes>
+    <class kind="struct">vogels_2011_config_t</class>
     <member kind="function">
       <type>address_t</type>
       <name>timing_initialise</name>
@@ -4943,6 +4946,7 @@
     <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/weight_dependence/</path>
     <filename>weight__additive__one__term__impl_8c.html</filename>
     <includes id="weight__additive__one__term__impl_8h" name="weight_additive_one_term_impl.h" local="yes" imported="no">weight_additive_one_term_impl.h</includes>
+    <class kind="struct">additive_one_term_config_t</class>
     <member kind="function">
       <type>address_t</type>
       <name>weight_initialise</name>
@@ -5002,6 +5006,7 @@
     <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/weight_dependence/</path>
     <filename>weight__additive__two__term__impl_8c.html</filename>
     <includes id="weight__additive__two__term__impl_8h" name="weight_additive_two_term_impl.h" local="yes" imported="no">weight_additive_two_term_impl.h</includes>
+    <class kind="struct">additive_two_term_config_t</class>
     <member kind="function">
       <type>address_t</type>
       <name>weight_initialise</name>
@@ -5061,6 +5066,7 @@
     <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/weight_dependence/</path>
     <filename>weight__multiplicative__impl_8c.html</filename>
     <includes id="weight__multiplicative__impl_8h" name="weight_multiplicative_impl.h" local="yes" imported="no">weight_multiplicative_impl.h</includes>
+    <class kind="struct">multiplicative_config_t</class>
     <member kind="function">
       <type>address_t</type>
       <name>weight_initialise</name>
@@ -10267,6 +10273,16 @@
     </member>
   </compound>
   <compound kind="struct">
+    <name>additive_one_term_config_t</name>
+    <filename>weight__additive__one__term__impl_8c.html</filename>
+    <anchor>structadditive__one__term__config__t</anchor>
+  </compound>
+  <compound kind="struct">
+    <name>additive_two_term_config_t</name>
+    <filename>weight__additive__two__term__impl_8c.html</filename>
+    <anchor>structadditive__two__term__config__t</anchor>
+  </compound>
+  <compound kind="struct">
     <name>address_and_row_length</name>
     <filename>population__table__binary__search__impl_8c.html</filename>
     <anchor>structaddress__and__row__length</anchor>
@@ -10705,6 +10721,11 @@
       <anchor>a9861968df19a075eac9fa7f507592fd0</anchor>
       <arglist></arglist>
     </member>
+  </compound>
+  <compound kind="struct">
+    <name>dual_fsm_config_t</name>
+    <filename>timing__recurrent__dual__fsm__impl_8c.html</filename>
+    <anchor>structdual__fsm__config__t</anchor>
   </compound>
   <compound kind="struct">
     <name>elimination_params</name>
@@ -11402,6 +11423,11 @@
       <anchor>a8a82db9be5294fc0cf7ff5fe241d8b7c</anchor>
       <arglist></arglist>
     </member>
+  </compound>
+  <compound kind="struct">
+    <name>multiplicative_config_t</name>
+    <filename>weight__multiplicative__impl_8c.html</filename>
+    <anchor>structmultiplicative__config__t</anchor>
   </compound>
   <compound kind="struct">
     <name>munich_key_bitfields_t</name>
@@ -12110,6 +12136,11 @@
     <anchor>structpre__pop__info__table__t</anchor>
   </compound>
   <compound kind="struct">
+    <name>pre_stochastic_config_t</name>
+    <filename>timing__recurrent__pre__stochastic__impl_8c.html</filename>
+    <anchor>structpre__stochastic__config__t</anchor>
+  </compound>
+  <compound kind="struct">
     <name>pre_trace_t</name>
     <filename>timing__recurrent__pre__stochastic__impl_8h.html</filename>
     <anchor>structpre__trace__t</anchor>
@@ -12435,6 +12466,11 @@
       <anchor>a2d508676e6b481d3498c2920efee4d3a</anchor>
       <arglist></arglist>
     </member>
+  </compound>
+  <compound kind="struct">
+    <name>vogels_2011_config_t</name>
+    <filename>timing__vogels__2011__impl_8c.html</filename>
+    <anchor>structvogels__2011__config__t</anchor>
   </compound>
   <compound kind="struct">
     <name>weight_state_t</name>
