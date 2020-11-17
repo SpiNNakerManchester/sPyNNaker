@@ -263,7 +263,11 @@ bool synapse_dynamics_process_plastic_synapses(
     //io_printf(IO_BUF, "t %d prev %k\n", time, last_pre_rate);
 
     REAL real_rate = convert_rate_to_input(rate);
-    real_rate = real_rate > 0.0k ? real_rate : 0.0k;
+
+    if(real_rate > 2.0k)
+        real_rate = 2.0k;
+    else if (real_rate < 0.0k)
+        real_rate = 0.0k;
 
     // Update pre-synaptic trace
     log_debug("Adding pre-synaptic event to trace at time:%u", time);
@@ -302,9 +306,14 @@ bool synapse_dynamics_process_plastic_synapses(
                            synapse_structure_get_final_weight(final_state),
                            weight_get_shift(current_state));
 
+        io_printf(IO_BUF, "IP %k t %d\n", curr_weight, time);
+
         // Add the current rate contribution with the new rate
         REAL accumulation = ring_buffers[ring_buffer_index] +
                 MULT_ROUND_STOCHASTIC_ACCUM(real_rate, curr_weight);
+
+
+        //io_printf(IO_BUF,"rate %k, weight %k\n", real_rate, curr_weight);
 
         // Update the old rate contribution with the new weight
         //accumulation += MULT_ROUND_STOCHASTIC_ACCUM((curr_weight - old_weight), last_pre_rate);

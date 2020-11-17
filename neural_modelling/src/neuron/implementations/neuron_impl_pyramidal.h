@@ -143,6 +143,9 @@ static bool neuron_impl_initialise(uint32_t n_neurons) {
             return false;
     }
 
+    for(int i = 0; i < 3; i++)
+        postsynaptic_rates[i] = 0;
+
     return true;
 }
 
@@ -241,11 +244,12 @@ static void neuron_impl_load_neuron_parameters(
 
 static inline REAL set_spike_source_rate(REAL somatic_voltage) {
 
-	REAL rate;
+	if(somatic_voltage > 2.0k)
+	    somatic_voltage = 2.0k;
+	else if(somatic_voltage < 0.0k)
+	    somatic_voltage = 0.0k;
 
-    rate = somatic_voltage > 0.0k ? somatic_voltage : 0.0k;
-
-	return rate;
+	return somatic_voltage;
 }
 
 static bool neuron_impl_do_timestep_update(index_t neuron_index,
@@ -412,7 +416,7 @@ uint32_t neuron_impl_get_starting_rate() {
 
     //io_printf(IO_BUF, "returning %k\n", neuron_array[0].rate_at_last_setting);
 
-    return neuron_array[0].rate_at_last_setting;;
+    return neuron_array[0].rate_at_last_setting;
 }
 
 static inline REAL* neuron_impl_post_rates(index_t neuron_index) {
@@ -423,7 +427,8 @@ static inline REAL* neuron_impl_post_rates(index_t neuron_index) {
     postsynaptic_rates[1] =  set_spike_source_rate(neuron->Vb);
     postsynaptic_rates[2] =  set_spike_source_rate(neuron->U_membrane * neuron->plasticity_rate_multiplier);
 
-    io_printf(IO_BUF, "Rate(Vb) %k, Rate(U) %k\n", postsynaptic_rates[1], postsynaptic_rates[2]);
+    io_printf(IO_BUF, "va %k, vb %k, u %k\n", neuron->Va, neuron->Vb, neuron->U_membrane);
+    io_printf(IO_BUF, "Rates va %k, vb %k, u %k\n", postsynaptic_rates[0], postsynaptic_rates[1], postsynaptic_rates[2]);
 
     return postsynaptic_rates;
 

@@ -94,7 +94,7 @@ static inline final_state_t plasticity_update_basal_synapse(
         update_state_t current_state,
         const post_event_history_t *post_event_history) {
 
-    io_printf(IO_BUF, "basal update\n");
+    //io_printf(IO_BUF, "basal update\n");
 
     //Apply Urbanczik-Senn Formula
     current_state = timing_apply_rate(
@@ -112,13 +112,12 @@ static inline final_state_t plasticity_update_apical_synapse(
         update_state_t current_state,
         const post_event_history_t *post_event_history) {
 
-    io_printf(IO_BUF, "apical update\n");
+    //io_printf(IO_BUF, "apical update\n");
 
     //Apply Urbanczik-Senn Formula
     current_state = timing_apply_rate(
                         current_state, v_rest,
                         post_event_history->va, last_pre_time);
-
 
     // Return final synaptic word and weight
     return synapse_structure_get_final_state(current_state);
@@ -289,7 +288,12 @@ bool synapse_dynamics_process_plastic_synapses(
     //io_printf(IO_BUF, "t %d prev %k\n", time, last_pre_rate);
 
     REAL real_rate = convert_rate_to_input(rate);
-    real_rate = real_rate > 0.0k ? real_rate : 0.0k;
+    if(real_rate > 2.0k)
+        real_rate = 2.0k;
+    else if (real_rate < 0.0k)
+        real_rate = 0.0k;
+
+    //io_printf(IO_BUF, "plast rate %k\n", real_rate);
 
     // Update pre-synaptic trace
     log_debug("Adding pre-synaptic event to trace at time:%u", time);
@@ -312,6 +316,8 @@ bool synapse_dynamics_process_plastic_synapses(
         uint32_t type_index = synapse_row_sparse_type_index(
                 control_word, synapse_type_index_mask);
 
+        //io_printf(IO_BUF, "index %d\n", index);
+
         // Create update state from the plastic synaptic word
         update_state_t current_state =
                 synapse_structure_get_update_state(*plastic_words, type);
@@ -325,11 +331,15 @@ bool synapse_dynamics_process_plastic_synapses(
 
             final_state = plasticity_update_apical_synapse(
                     time, last_pre_rate, current_state, &post_event_history[index]);
+
+            io_printf(IO_BUF, "apical ");
         }
         else if (type == 1) {
 
             final_state = plasticity_update_basal_synapse(
                     time, last_pre_rate, current_state, &post_event_history[index]);
+
+            io_printf(IO_BUF, "basal ");
         }
         // LP: THIS CHECK MIGHT BE REMOVED IF WE DECIDE TO CHANGE THE SYNAPSE TYPES
         else {
@@ -345,6 +355,8 @@ bool synapse_dynamics_process_plastic_synapses(
                            synapse_structure_get_final_weight(final_state),
                            weight_get_shift(current_state));
 
+        io_printf(IO_BUF, "%k t %d\n", curr_weight, time);
+
         // Add the current rate contribution with the new rate
         REAL accumulation = ring_buffers[ring_buffer_index] +
                 MULT_ROUND_STOCHASTIC_ACCUM(real_rate, curr_weight);
@@ -359,12 +371,14 @@ bool synapse_dynamics_process_plastic_synapses(
 //        }
 
         //io_printf(IO_BUF, "right shift %d\n", weight_get_shift(current_state));
-        io_printf(IO_BUF, "weight %k, rate %k\n", synapses_convert_weight_to_input(
-                        synapse_structure_get_final_weight(final_state),
-                        weight_get_shift(current_state)), real_rate);
+//        io_printf(IO_BUF, "weight %k, rate %k\n", synapses_convert_weight_to_input(
+//                        synapse_structure_get_final_weight(final_state),
+//                        weight_get_shift(current_state)), real_rate);
         //io_printf(IO_BUF, "adding %k ", accumulation);
 
         ring_buffers[ring_buffer_index] = accumulation;
+
+        //io_printf(IO_BUF, "plast acc %k index %d\n", accumulation, ring_buffer_index);
 
         //io_printf(IO_BUF, "weight %k\n", synapse_structure_get_final_weight(final_state));
 

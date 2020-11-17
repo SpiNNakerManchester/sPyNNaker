@@ -173,8 +173,6 @@ static inline void process_fixed_synapses(
 
     num_fixed_pre_synaptic_events += fixed_synapse;
 
-    //volatile uint32_t t = tc[T1_COUNT];
-
     //s1615 r = convert_rate_to_input(somatic_voltage);
     //r = r > 0.0k ? r : 0.0k;
     REAL rate = compute_input_rate(somatic_voltage);
@@ -211,11 +209,12 @@ static inline void process_fixed_synapses(
 
         ring_buffers[ring_buffer_index] = accumulation;
 
+        //io_printf(IO_BUF,"acc %k, t%d\n", accumulation, time);
+
+        //io_printf(IO_BUF, "acc %k index %d\n", accumulation, ring_buffer_index);
+
         //io_printf(IO_BUF, "added %k * %k = %k sh %k\n", weight, rate, ring_buffers[ring_buffer_index], (rate * weight));
     }
-
-    //t -= tc[T1_COUNT];
-    //io_printf(IO_BUF, "cnt %d\n", t);
 }
 
 //! private method for doing output debug data on the synapses
@@ -337,6 +336,8 @@ void synapses_do_timestep_update(timer_t time) {
             // Convert ring-buffer entry to input and add on to correct
             // input for this synapse type and neuron
 
+            //io_printf(IO_BUF, "writing %k to index %d\n", ring_buffers[ring_buffer_index], ring_buffer_index);
+
             neuron_add_inputs(
                     synapse_type_index, neuron_index, ring_buffers[ring_buffer_index]);
 
@@ -367,6 +368,7 @@ bool synapses_process_synaptic_row(
         // Process any plastic synapses
         profiler_write_entry_disable_fiq(
                 PROFILER_ENTER | PROFILER_PROCESS_PLASTIC_SYNAPSES);
+
         if (!synapse_dynamics_process_plastic_synapses(plastic_region_address,
                 fixed_region_address, ring_buffers, time, rate)) {
             return false;
@@ -379,7 +381,6 @@ bool synapses_process_synaptic_row(
             spike_processing_finish_write(process_id);
         }
     }
-
     // Process any fixed synapses
     // **NOTE** this is done after initiating DMA in an attempt
     // to hide cost of DMA behind this loop to improve the chance

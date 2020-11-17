@@ -57,10 +57,6 @@ static inline update_state_t timing_apply_rate(update_state_t current_state, REA
 
     REAL post_rate = post_u - post_v;
 
-    // LP tmp manual truncation to 2^-13 to avoid drifting caused by fixed point truncation. Possibly move to 2-15
-    if(post_rate < 0 && post_rate >= -0.000122k)
-        post_rate = 0;
-
     //io_printf(IO_BUF, "rate diff plast %k\n", post_rate);
 
     post_rate = post_rate * pre_rate;

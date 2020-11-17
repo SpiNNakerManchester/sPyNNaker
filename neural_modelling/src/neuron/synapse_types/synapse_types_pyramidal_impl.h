@@ -89,7 +89,7 @@ static inline void synapse_types_shape_input(
 //! \param[in] input the inputs to add.
 //! \return None
 static inline void add_input_exp(exp_params_t* exp_params, input_t input) {
-    exp_params->synaptic_input_value += input;
+    exp_params->synaptic_input_value = input;
 }
 
 //! \brief adds the inputs for a give timer period to a given neuron that is
