@@ -105,8 +105,7 @@ class SmallWorldConnector(AbstractConnector):
             return n_connections
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            synapse_info.delays, self.__n_connections, n_connections,
-            min_delay, max_delay)
+            synapse_info.delays, n_connections, min_delay, max_delay)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):

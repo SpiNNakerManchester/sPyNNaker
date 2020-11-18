@@ -16,6 +16,7 @@
 from enum import Enum
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BYTES_PER_KB)
+import numpy
 
 POSSION_SIGMA_SUMMATION_LIMIT = 3.0
 
@@ -97,3 +98,6 @@ LIVE_POISSON_CONTROL_PARTITION_ID = "CONTROL"
 
 #: The maximum row length of the master population table
 POP_TABLE_MAX_ROW_LENGTH = 256
+
+#: The probability of failure is 1 in a billion
+MAX_PROBABILITY = 0.999999999

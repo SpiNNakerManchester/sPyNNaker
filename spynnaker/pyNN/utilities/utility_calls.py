@@ -12,18 +12,19 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 """
 utility class containing simple helper methods
 """
+from __future__ import division
 import os
 import logging
 import math
 import numpy
 from pyNN.random import RandomDistribution
-from scipy.stats import binom
+from scipy.stats import binom, hypergeom
 from spinn_utilities.safe_eval import SafeEval
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+from spynnaker.pyNN.utilities.constants import MAX_PROBABILITY
 from spynnaker.pyNN.utilities.random_stats import (
     RandomStatsExponentialImpl, RandomStatsGammaImpl, RandomStatsLogNormalImpl,
     RandomStatsNormalClippedImpl, RandomStatsNormalImpl,
@@ -208,13 +209,27 @@ def read_spikes_from_file(file_path, min_atom=0, max_atom=float('inf'),
 
 
 def get_probable_maximum_selected(
-        n_total_trials, n_trials, selection_prob, chance=(1.0 / 100.0)):
+        n_trials, n_items, n_selectable, chance=MAX_PROBABILITY,
+        with_replacement=True):
     """ Get the likely maximum number of items that will be selected from a\
-        set of n_trials from a total set of n_total_trials\
-        with a probability of selection of selection_prob
+        set of n_trials with a probability of selection of selection_prob
+
+    :param int n_trials: The number of trials being done
+    :param int n_items: The number of items that can be selected from
+    :param int n_selectable:
+        The number of items that represent a successful selection
+    :param float chance:
+        How likely that the number returned won't be the actual maximum
+        (default is the closest representable floating point number < 1.0)
+    :param bool with_replacement:
+        Whether the item selected is replaced between tries
+    :rtype: int
+    :return: The likely maximum number of items that will ever be selected
     """
-    prob = 1.0 - (chance / float(n_total_trials))
-    return binom.ppf(prob, n_trials, selection_prob)
+    if with_replacement:
+        selection_prob = n_selectable / n_items
+        return binom.ppf(chance, n_trials, selection_prob)
+    return hypergeom.ppf(chance, n_items, n_selectable, n_trials)
 
 
 def get_probability_within_range(dist, lower, upper):

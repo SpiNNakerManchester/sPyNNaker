@@ -20,10 +20,12 @@ from numpy import (
     arccos, arcsin, arctan, arctan2, ceil, cos, cosh, exp, fabs, floor, fmod,
     hypot, ldexp, log, log10, modf, power, sin, sinh, sqrt, tan, tanh, maximum,
     minimum, e, pi)
+from scipy.stats import binom
 from spinn_utilities.overrides import overrides
 from spinn_utilities.safe_eval import SafeEval
 from spynnaker.pyNN.utilities import utility_calls
 from .abstract_connector import AbstractConnector
+from spynnaker.pyNN.utilities.constants import MAX_PROBABILITY
 
 logger = logging.getLogger(__name__)
 # support for arbitrary expression for the indices
@@ -84,8 +86,8 @@ class IndexBasedProbabilityConnector(AbstractConnector):
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
         self._update_probs_from_index_expression(synapse_info)
-        n_connections = utility_calls.get_probable_maximum_selected(
-            synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
+        n_connections = binom.ppf(
+            MAX_PROBABILITY,
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             numpy.amax(self.__probs))
         return self._get_delay_maximum(synapse_info.delays, n_connections)
@@ -95,30 +97,32 @@ class IndexBasedProbabilityConnector(AbstractConnector):
             self, post_vertex_slice, synapse_info, min_delay=None,
             max_delay=None):
         self._update_probs_from_index_expression(synapse_info)
-        n_connections = utility_calls.get_probable_maximum_selected(
+        n_connections = binom.ppf(
+            MAX_PROBABILITY,
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
-            post_vertex_slice.n_atoms, numpy.amax(self.__probs))
+            numpy.amax(self.__probs) *
+            (post_vertex_slice.n_atoms /
+             (synapse_info.n_pre_neurons * synapse_info.n_post_neurons)))
 
         if min_delay is None or max_delay is None:
             return int(math.ceil(n_connections))
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            synapse_info.delays,
-            synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
-            n_connections, min_delay, max_delay)
+            synapse_info.delays, n_connections, min_delay, max_delay)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):
         self._update_probs_from_index_expression(synapse_info)
-        return utility_calls.get_probable_maximum_selected(
+        return binom.ppf(
+            MAX_PROBABILITY,
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
-            synapse_info.n_pre_neurons, numpy.amax(self.__probs))
+            numpy.amax(self.__probs) * (1.0 / synapse_info.n_post_neurons))
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, synapse_info):
         self._update_probs_from_index_expression(synapse_info)
-        n_connections = utility_calls.get_probable_maximum_selected(
-            synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
+        n_connections = binom.ppf(
+            MAX_PROBABILITY,
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             numpy.amax(self.__probs))
         return self._get_weight_maximum(synapse_info.weights, n_connections)

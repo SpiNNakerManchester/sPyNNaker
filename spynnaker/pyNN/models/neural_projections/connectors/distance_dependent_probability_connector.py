@@ -20,10 +20,11 @@ from numpy import (
     arccos, arcsin, arctan, arctan2, ceil, cos, cosh, exp, fabs, floor, fmod,
     hypot, ldexp, log, log10, modf, power, sin, sinh, sqrt, tan, tanh, maximum,
     minimum, e, pi)
+from scipy.stats import binom
 from spinn_utilities.overrides import overrides
 from spinn_utilities.safe_eval import SafeEval
-from spynnaker.pyNN.utilities import utility_calls
 from .abstract_connector import AbstractConnector
+from spynnaker.pyNN.utilities.constants import MAX_PROBABILITY
 
 logger = logging.getLogger(__name__)
 # support for arbitrary expression for the distance dependence
@@ -40,7 +41,8 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
     __slots__ = [
         "__allow_self_connections",
         "__d_expression",
-        "__probs"]
+        "__probs",
+        "__max_connections"]
 
     def __init__(
             self, d_expression, allow_self_connections=True, safe=True,
@@ -85,6 +87,13 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
             self, machine_time_step, synapse_info)
         self._set_probabilities(synapse_info)
 
+        # Work out the likely maximum total number of connections between pre
+        # and post
+        self.__max_connections = binom.ppf(
+            MAX_PROBABILITY,
+            synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
+            numpy.amax(self.__probs))
+
     def _set_probabilities(self, synapse_info):
         """
         :param SynapseInformation synapse_info:
@@ -112,49 +121,45 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
         return self._get_delay_maximum(
-            synapse_info.delays,
-            utility_calls.get_probable_maximum_selected(
-                synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
-                synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
-                numpy.amax(self.__probs)))
+            synapse_info.delays, self.__max_connections)
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, post_vertex_slice, synapse_info, min_delay=None,
             max_delay=None):
         # pylint: disable=too-many-arguments
-        max_prob = numpy.amax(
-            self.__probs[0:synapse_info.n_pre_neurons,
-                         post_vertex_slice.as_slice])
-        n_connections = utility_calls.get_probable_maximum_selected(
+        # Out of all the connections likely to be formed, how many are likely
+        # to be from a single pre-vertex, and target this core
+        n_connections = binom.ppf(
+            MAX_PROBABILITY,
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
-            post_vertex_slice.n_atoms, max_prob)
+            numpy.amax(self.__probs) *
+            (post_vertex_slice.n_atoms /
+             (synapse_info.n_pre_neurons * synapse_info.n_post_neurons)))
 
+        # If no delays, this is the answer
         if min_delay is None or max_delay is None:
             return int(math.ceil(n_connections))
 
+        # Otherwise further select on the delay range
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            synapse_info.delays,
-            synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
-            n_connections, min_delay, max_delay)
+            synapse_info.delays, n_connections, min_delay, max_delay)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):
         # pylint: disable=too-many-arguments
-        return utility_calls.get_probable_maximum_selected(
+        # Out of all the connections likely to be made, how many are likely to
+        # target a single post-neuron?
+        return int(math.ceil(binom.ppf(
+            MAX_PROBABILITY,
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
-            synapse_info.n_post_neurons,
-            numpy.amax(self.__probs))
+            numpy.amax(self.__probs) * (1.0 / synapse_info.n_post_neurons))))
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, synapse_info):
         # pylint: disable=too-many-arguments
         return self._get_weight_maximum(
-            synapse_info.weights,
-            utility_calls.get_probable_maximum_selected(
-                synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
-                synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
-                numpy.amax(self.__probs)))
+            synapse_info.weights, self.__max_connections)
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(

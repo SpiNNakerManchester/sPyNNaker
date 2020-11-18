@@ -57,30 +57,26 @@ class ArrayConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
-        return self._get_delay_maximum(synapse_info.delays, len(self.__array))
+        return self._get_delay_maximum(
+            synapse_info.delays, self.__n_total_connections)
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, post_vertex_slice, synapse_info, min_delay=None,
             max_delay=None):
-        n_connections = 0
         post_lo = post_vertex_slice.lo_atom
         post_hi = post_vertex_slice.hi_atom
-        for i in range(self.__array_dims[0]):
-            for j in range(post_lo, post_hi+1):
-                if self.__array[i, j] == 1:
-                    n_connections += 1
+        n_connections = numpy.sum(self.__array[:, post_lo:post_hi + 1], axis=1)
 
         if min_delay is None and max_delay is None:
             return n_connections
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            synapse_info.delays, self.__n_total_connections, n_connections,
-            min_delay, max_delay)
+            synapse_info.delays, n_connections, min_delay, max_delay)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):
-        return self.__n_total_connections
+        return numpy.amax(numpy.sum(self.__array, axis=0))
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, synapse_info):

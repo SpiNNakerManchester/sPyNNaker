@@ -19,6 +19,7 @@ import re
 import numpy
 from pyNN.random import NumpyRNG, RandomDistribution
 from six import string_types, with_metaclass
+from scipy.stats import binom
 
 from spinn_front_end_common.utilities.constants import \
     MICRO_TO_MILLISECOND_CONVERSION
@@ -27,6 +28,7 @@ from spinn_utilities.safe_eval import SafeEval
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spynnaker.pyNN.utilities import utility_calls
+from spynnaker.pyNN.utilities.constants import MAX_PROBABILITY
 
 # global objects
 logger = logging.getLogger(__name__)
@@ -183,41 +185,31 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         raise Exception("Unrecognised delay format")
 
     def _get_n_connections_from_pre_vertex_with_delay_maximum(
-            self, delays, n_total_connections, n_connections,
-            min_delay, max_delay):
+            self, delays, n_connections, min_delay, max_delay):
         """ Get the expected number of delays that will fall within min_delay
             and max_delay given given a float, RandomDistribution or list of
             delays.
 
-        :param delays:
+        :param delays: The delays defined from outside
         :type delays: ~numpy.ndarray or pyNN.random.NumpyRNG or int or float
             or list(int) or list(float)
-        :param int n_total_connections:
         :param int n_connections:
-        :param float min_delay:
-        :param float max_delay:
+            The likely number of connections that will be made
+        :param float min_delay: The minimum delay of the range to search
+        :param float max_delay: The maximum delay of the range to search
         :rtype: float
         """
         # pylint: disable=too-many-arguments
         if isinstance(delays, RandomDistribution):
             prob_in_range = utility_calls.get_probability_within_range(
                 delays, min_delay, max_delay)
-            return int(math.ceil(utility_calls.get_probable_maximum_selected(
-                n_total_connections, n_connections, prob_in_range)))
+            return int(math.ceil(binom.ppf(
+                MAX_PROBABILITY, n_connections, prob_in_range)))
         elif numpy.isscalar(delays):
             if min_delay <= delays <= max_delay:
                 return int(math.ceil(n_connections))
             return 0
-        elif hasattr(delays, "__getitem__"):
-            n_delayed = sum([len([
-                delay for delay in delays
-                if min_delay <= delay <= max_delay])])
-            if n_delayed == 0:
-                return 0
-            n_total = len(delays)
-            prob_delayed = float(n_delayed) / float(n_total)
-            return int(math.ceil(utility_calls.get_probable_maximum_selected(
-                n_total_connections, n_connections, prob_delayed)))
+        # NOTE: Lists of delays are no longer supported in PyNN >= 0.9
         raise Exception("Unrecognised delay format")
 
     @abstractmethod

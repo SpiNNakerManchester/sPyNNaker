@@ -199,29 +199,29 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
             self, post_vertex_slice, synapse_info, min_delay=None,
             max_delay=None):
         # pylint: disable=too-many-arguments
-        prob_in_slice = min(
-            post_vertex_slice.n_atoms / float(
-                synapse_info.n_post_neurons), 1.0)
+        # All pre-neurons have a fixed number of connections; how many of those
+        # are likely to target neurons on this slice?
         n_connections = utility_calls.get_probable_maximum_selected(
-            synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
-            self.__n_post, prob_in_slice, chance=1.0/100000.0)
+            self.__n_post, synapse_info.n_post_neurons,
+            post_vertex_slice.n_atoms,
+            with_replacement=self.__with_replacement)
 
         if min_delay is None or max_delay is None:
             return int(math.ceil(n_connections))
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            synapse_info.delays,
-            synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
-            n_connections, min_delay, max_delay)
+            synapse_info.delays, n_connections, min_delay, max_delay)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):
         # pylint: disable=too-many-arguments
-        selection_prob = 1.0 / float(synapse_info.n_post_neurons)
+        # All pre-neurons have a fixed number of connections; out of all the
+        # connections made, how many are likely to target one particular
+        # neuron?  Note this is with replacement as over a number of
+        # pre-neurons
         n_connections = utility_calls.get_probable_maximum_selected(
-            synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
-            synapse_info.n_pre_neurons, selection_prob,
-            chance=1.0/100000.0)
+            self.__n_post * synapse_info.n_pre_neurons,
+            synapse_info.n_post_neurons, 1.0)
         return int(math.ceil(n_connections))
 
     @overrides(AbstractConnector.get_weight_maximum)

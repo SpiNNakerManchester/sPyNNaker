@@ -15,6 +15,7 @@
 
 import math
 import numpy
+from scipy.stats import binom
 from spinn_utilities.overrides import overrides
 from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
@@ -25,6 +26,7 @@ from .abstract_generate_connector_on_machine import (
 from .abstract_connector_supports_views_on_machine import (
     AbstractConnectorSupportsViewsOnMachine)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spynnaker.pyNN.utilities.constants import MAX_PROBABILITY
 
 N_GEN_PARAMS = 6
 
@@ -67,8 +69,9 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
-        n_connections = utility_calls.get_probable_maximum_selected(
-            synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
+        # The likely total number of connections
+        n_connections = binom.ppf(
+            MAX_PROBABILITY,
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             self._p_connect)
         return self._get_delay_maximum(synapse_info.delays, n_connections)
@@ -78,32 +81,37 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
             self, post_vertex_slice, synapse_info, min_delay=None,
             max_delay=None):
         # pylint: disable=too-many-arguments
-        n_connections = utility_calls.get_probable_maximum_selected(
+        # Combine the probability of connection in general with the probability
+        # that the connection happens on this core from one pre-neuron.
+        n_connections = binom.ppf(
+            MAX_PROBABILITY,
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
-            post_vertex_slice.n_atoms, self._p_connect, chance=1.0/10000.0)
+            self._p_connect *
+            (post_vertex_slice.n_atoms /
+             (synapse_info.n_post_neurons * synapse_info.n_post_neurons)))
 
         if min_delay is None or max_delay is None:
             return int(math.ceil(n_connections))
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            synapse_info.delays,
-            synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
-            n_connections, min_delay, max_delay)
+            synapse_info.delays, n_connections, min_delay, max_delay)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):
         # pylint: disable=too-many-arguments
-        n_connections = utility_calls.get_probable_maximum_selected(
+        # Combine the probability of connection in general with the probability
+        # that the connection happens to one post neuron
+        n_connections = binom.ppf(
+            MAX_PROBABILITY,
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
-            synapse_info.n_pre_neurons, self._p_connect,
-            chance=1.0/10000.0)
+            self._p_connect * (1.0 / synapse_info.n_post_neurons))
         return n_connections
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, synapse_info):
         # pylint: disable=too-many-arguments
-        n_connections = utility_calls.get_probable_maximum_selected(
-            synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
+        n_connections = binom.ppf(
+            MAX_PROBABILITY,
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             self._p_connect)
         return self._get_weight_maximum(synapse_info.weights, n_connections)
