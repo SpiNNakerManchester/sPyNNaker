@@ -58,7 +58,6 @@ def get_estimated_sdram_for_bit_field_region(app_graph, vertex):
                 incoming_edge.pre_vertex.splitter.get_out_going_slices())
             n_machine_vertices = len(slices)
 
-            # TODO im sure this can be merged into the max function. but meh
             slice_atoms = list()
             for vertex_slice in slices:
                 slice_atoms.append(vertex_slice.n_atoms)

@@ -143,7 +143,10 @@ class AbstractSynapseDynamics(object):
         return connector.get_delay_maximum(synapse_info)
 
     def get_delay_minimum(self, connector, synapse_info):
-        """ Get the minimum delay for the synapses
+        """ Get the minimum delay for the synapses. \
+            This will support the filtering of the undelayed edge\
+            from the graph, but requires fixes in the synaptic manager to \
+            happen first before this can be utilised fully.
 
         :param AbstractConnector connector: connector
         :param ~numpy.ndarray synapse_info: synapse info
