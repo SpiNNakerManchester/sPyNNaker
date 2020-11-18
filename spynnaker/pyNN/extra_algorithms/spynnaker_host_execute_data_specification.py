@@ -38,8 +38,8 @@ from spinn_front_end_common.utilities.helpful_functions import (
     emergency_recover_states_from_failure)
 from spinn_utilities.timer import Timer
 from spynnaker.pyNN.models.neuron import PopulationMachineVertex
-from spynnaker.pyNN.models.utility_models.delays import \
-    DelayExtensionMachineVertex
+from spynnaker.pyNN.models.utility_models.delays import (
+    DelayExtensionMachineVertex)
 from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -109,7 +109,7 @@ class SpyNNakerHostExecuteDataSpecification(HostExecuteDataSpecification):
     def __java_all(self, dsg_targets, region_sizes):
         """ Does the Data Specification Execution and loading using Java
 
-        :param DataSpecificationTargets dsg_targets:
+        :param DataSpecificationTargets dsg_targets: \
             map of placement to file path
         :return: map of of cores to descriptions of what was written
         :rtype: DsWriteInfo
@@ -131,9 +131,9 @@ class SpyNNakerHostExecuteDataSpecification(HostExecuteDataSpecification):
         """ Does the Data Specification Execution and loading using Python
 
         :param Placements placements: placements
-        :param DataSpecificationTargets dsg_targets:
+        :param DataSpecificationTargets dsg_targets: \
             map of placement to file path
-        :param dict(tuple(int,int,int),int) region_sizes:
+        :param dict(tuple(int,int,int),int) region_sizes: \
             map between vertex and list of region sizes
         :return: dict of cores to descriptions of what was written
         :rtype: dict(tuple(int,int,int), DataWritten)
@@ -176,32 +176,32 @@ class SpyNNakerHostExecuteDataSpecification(HostExecuteDataSpecification):
             disable_advanced_monitor_usage=False):
         """ Execute the data specs for all non-system targets.
 
-        :param ~spinn_machine.Machine machine:
+        :param ~spinn_machine.Machine machine: \
             the python representation of the SpiNNaker machine
-        :param ~spinnman.transceiver.Transceiver transceiver:
+        :param ~spinnman.transceiver.Transceiver transceiver:\
             the spinnman instance
         :param int app_id: the application ID of the simulation
-        :param dict(tuple(int,int,int),int) region_sizes:
+        :param dict(tuple(int,int,int),int) region_sizes:\
             the coord for region sizes for each core
-        :param DataSpecificationTargets dsg_targets:
+        :param DataSpecificationTargets dsg_targets:\
             map of placement to file path
-        :param bool uses_advanced_monitors:
+        :param bool uses_advanced_monitors:\
             whether to use fast data in protocol
-        :param ~spinnman.model.ExecutableTargets executable_targets:
+        :param ~spinnman.model.ExecutableTargets executable_targets:\
             what core will running what binary
-        :param ~pacman.model.placements.Placements placements:
+        :param ~pacman.model.placements.Placements placements:\
             where vertices are located
-        :param list(ExtraMonitorSupportMachineVertex) extra_monitor_cores:
+        :param list(ExtraMonitorSupportMachineVertex) extra_monitor_cores:\
             the deployed extra monitors, if any
-        :param extra_monitor_cores_to_ethernet_connection_map:
+        :param extra_monitor_cores_to_ethernet_connection_map:\
             how to talk to extra monitor cores
-        :type extra_monitor_cores_to_ethernet_connection_map:
+        :type extra_monitor_cores_to_ethernet_connection_map:\
             dict(tuple(int,int), DataSpeedUpPacketGatherMachineVertex)
-        :param processor_to_app_data_base_address:
+        :param processor_to_app_data_base_address:\
             map of placement and DSG data
-        :type processor_to_app_data_base_address:
+        :type processor_to_app_data_base_address:\
             dict(tuple(int,int,int), DsWriteInfo)
-        :param bool disable_advanced_monitor_usage:
+        :param bool disable_advanced_monitor_usage:\
             whether to avoid using advanced monitors even if they're available
         :return: map of placement and DSG data
         :rtype: dict(tuple(int,int,int),DataWritten) or DsWriteInfo
@@ -380,21 +380,21 @@ class SpyNNakerHostExecuteDataSpecification(HostExecuteDataSpecification):
             java_caller=None, processor_to_app_data_base_address=None):
         """ Execute the data specs for all system targets.
         :param Placements placements: placements
-        :param ~spinnman.transceiver.Transceiver transceiver:
+        :param ~spinnman.transceiver.Transceiver transceiver:\
             the spinnman instance
-        :param ~spinn_machine.Machine machine:
+        :param ~spinn_machine.Machine machine:\
             the python representation of the spinnaker machine
         :param int app_id: the application ID of the simulation
-        :param dict(tuple(int,int,int),str) dsg_targets:
+        :param dict(tuple(int,int,int),str) dsg_targets:\
             map of placement to file path
-        :param dict(tuple(int,int,int),int) region_sizes:
+        :param dict(tuple(int,int,int),int) region_sizes:\
             the coordinates for region sizes for each core
-        :param ~spinnman.model.ExecutableTargets executable_targets:
+        :param ~spinnman.model.ExecutableTargets executable_targets:\
             the map between binaries and locations and executable types
         :param str report_folder:
         :param JavaCaller java_caller:
         :param processor_to_app_data_base_address:
-        :type processor_to_app_data_base_address:
+        :type processor_to_app_data_base_address:\
             dict(tuple(int,int,int),DataWritten)
         :return: map of placement and DSG data, and loaded data flag.
         :rtype: dict(tuple(int,int,int),DataWritten) or DsWriteInfo
@@ -417,11 +417,11 @@ class SpyNNakerHostExecuteDataSpecification(HostExecuteDataSpecification):
     def __java_sys(self, dsg_targets, executable_targets, region_sizes):
         """ Does the Data Specification Execution and loading using Java
 
-        :param DataSpecificationTargets dsg_targets:
+        :param DataSpecificationTargets dsg_targets:\
             map of placement to file path
-        :param ~spinnman.model.ExecutableTargets executable_targets:
+        :param ~spinnman.model.ExecutableTargets executable_targets:\
             the map between binaries and locations and executable types
-        :param dict(tuple(int,int,int),int) region_sizes:
+        :param dict(tuple(int,int,int),int) region_sizes:\
             the coord for region sizes for each core
         :return: map of cores to descriptions of what was written
         :rtype: DsWriteInfo
@@ -446,11 +446,11 @@ class SpyNNakerHostExecuteDataSpecification(HostExecuteDataSpecification):
     def __python_sys(self, dsg_targets, executable_targets, region_sizes):
         """ Does the Data Specification Execution and loading using Python
 
-        :param DataSpecificationTargets dsg_targets:
+        :param DataSpecificationTargets dsg_targets:\
             map of placement to file path
-        :param ~spinnman.model.ExecutableTargets executable_targets:
+        :param ~spinnman.model.ExecutableTargets executable_targets:\
             the map between binaries and locations and executable types
-        :param dict(tuple(int,int,int),int) region_sizes:
+        :param dict(tuple(int,int,int),int) region_sizes:\
             the coord for region sizes for each core
         :return: dict of cores to descriptions of what was written
         :rtype: dict(tuple(int,int,int),DataWritten)
@@ -489,8 +489,8 @@ class SpyNNakerHostExecuteDataSpecification(HostExecuteDataSpecification):
             the core and our caller where that storage is.
 
         :param tuple(int,int,int) core: Which core we're talking about.
-        :param int size:
-            The total size of all storage for regions on that core, including
+        :param int size:\
+            The total size of all storage for regions on that core, including\
             for the header metadata.
         :return: address of region header table (not yet filled)
         :rtype: int
