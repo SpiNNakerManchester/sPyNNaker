@@ -23,7 +23,6 @@ from numpy import (
 from scipy.stats import binom
 from spinn_utilities.overrides import overrides
 from spinn_utilities.safe_eval import SafeEval
-from spynnaker.pyNN.utilities import utility_calls
 from .abstract_connector import AbstractConnector
 from spynnaker.pyNN.utilities.constants import MAX_PROBABILITY
 
