@@ -27,12 +27,23 @@ from spinn_front_end_common.utilities.utility_objs import ExecutableType
 
 _ONE_WORD = struct.Struct("<I")
 _THREE_WORDS = struct.Struct("<III")
-# the number of bytes needed to read a user register
-_USER_BYTES = 4
 # bits in a word
 _BITS_IN_A_WORD = 32
 # bit to mask a bit
 _BIT_MASK = 1
+
+
+def _bit_for_neuron_id(bitfield, neuron_id):
+    """ Get the bit for a neuron in the bitfield.
+
+    :param list(int) bitfield:
+        the block of words which represent the bitfield
+    :param int neuron_id: the neuron id to find the bit in the bitfield
+    :return: the bit (``0`` or ``1``)
+    :rtype: int
+    """
+    word_id, bit_in_word = divmod(neuron_id, _BITS_IN_A_WORD)
+    return (bitfield[word_id] >> bit_in_word) & _BIT_MASK
 
 
 def _percent(amount, total):
@@ -70,36 +81,38 @@ class OnChipBitFieldGenerator(object):
     # flag which states that the binary finished cleanly.
     _SUCCESS = 0
 
-    # n key to n neurons maps size in words
-    _N_KEYS_DATA_SET_IN_WORDS = 1
-
-    # n region data sets size in words
-    _N_REGION_DATA_SETS_IN_WORDS = 1
-
-    # n elements in each key to n atoms map
-    _N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP = 2
-
-    _BYTES_PER_FILTER = 12
-
-    # skip merged and redundant counts.
-    _OFFSET_TO_N_BIT_FIELD_IN_BYTES = 2 * BYTES_PER_WORD
-
-    # 1. merged bitfields, 2. redundant bitfields. 3 total bitfields
-    _SIZE_OF_FILTER_REGION_IN_BYTES = 3 * BYTES_PER_WORD
-
-    # bit field report file name
+    # bit field report file names
     _BIT_FIELD_REPORT_FILENAME = "generated_bit_fields.rpt"
     _BIT_FIELD_SUMMARY_REPORT_FILENAME = "bit_field_summary.rpt"
 
+    # Bottom 30 bits
+    _N_WORDS_MASK = 0x3FFFFFFF
+
     # binary name
     _BIT_FIELD_EXPANDER_APLX = "bit_field_expander.aplx"
+
+    # Messages used to build the summary report
+    _PER_CORE_SUMMARY = (
+        "Vertex on {}:{}:{} ({}) has total incoming packet count of {} and "
+        "a redundant packet count of {}, making a redundant packet rate of "
+        "{}%\n")
+    _PER_CHIP_SUMMARY = (
+        "Chip {}:{} has a total incoming packet count of {} and a redundant "
+        "packet count of {} given a redundancy rate of {}%\n")
+    _OVERALL_SUMMARY = (
+        "Overall, the application has estimated {} packets flying around of "
+        "which {} are redundant at reception. This is {}% of the packets\n")
+
+    # Messages used to build the detailed report
+    _CORE_DETAIL = "For core {}:{}:{} ({}), bitfields as follows:\n\n"
+    _FIELD_DETAIL = "    For key {}, neuron id {} has bit == {}\n"
 
     def __call__(
             self, placements, app_graph, executable_finder,
             provenance_file_path, transceiver, write_bit_field_generator_iobuf,
             generating_bitfield_report, default_report_folder, machine_graph,
             routing_infos, generating_bit_field_summary_report):
-        """ loads and runs the bit field generator on chip
+        """ Loads and runs the bit field generator on chip.
 
         :param ~.Placements placements: placements
         :param ~.ApplicationGraph app_graph: the app graph
@@ -151,17 +164,6 @@ class OnChipBitFieldGenerator(object):
                 default_report_folder,
                 self._BIT_FIELD_SUMMARY_REPORT_FILENAME))
 
-    _PER_CORE_SUMMARY = (
-        "Vertex on {}:{}:{} has total incoming packet count of {} and a "
-        "redundant packet count of {}, making a redundant packet rate of "
-        "{}%\n")
-    _PER_CHIP_SUMMARY = (
-        "Chip {}:{} has a total incoming packet count of {} and a redundant "
-        "packet count of {} given a redundancy rate of {}%\n")
-    _OVERALL_SUMMARY = (
-        "Overall, the application has estimated {} packets flying around of "
-        "which {} are redundant at reception. This is {}% of the packets\n")
-
     def _summary_report_bit_fields(self, app_graph, file_path):
         """ summary report of the bitfields that were generated
 
@@ -183,14 +185,14 @@ class OnChipBitFieldGenerator(object):
                     xy = (placement.x, placement.y)
                     for _, n_neurons, bitfield in self.__bitfields(placement):
                         for neuron_id in range(n_neurons):
-                            if not self.__bit_for_neuron_id(
-                                    bitfield, neuron_id):
+                            if not _bit_for_neuron_id(bitfield, neuron_id):
                                 chip_redundant_count[xy] += 1
                                 local_redundant += 1
                         local_total += n_neurons
                     chip_packet_count[xy] = local_total
                     output.write(self._PER_CORE_SUMMARY.format(
                         placement.x, placement.y, placement.p,
+                        placement.vertex.label,
                         local_total, local_redundant,
                         _percent(local_redundant, local_total)))
 
@@ -218,7 +220,7 @@ class OnChipBitFieldGenerator(object):
         :param str file_path: Where to write to
         """
         progress = ProgressBar(
-            len(app_graph.vertices), "reading back bitfields from chip")
+            app_graph.n_vertices, "reading back bitfields from chip")
         with open(file_path, "w") as output:
             # read in for each app vertex that would have a bitfield
             for app_vertex in progress.over(app_graph.vertices):
@@ -231,27 +233,15 @@ class OnChipBitFieldGenerator(object):
         :param ~.Placement placement:
         :param f:
         """
-        f.write("For core {}:{}:{}. Bitfields as follows:\n\n".format(
-            placement.x, placement.y, placement.p))
+        f.write(self._CORE_DETAIL.format(
+            placement.x, placement.y, placement.p, placement.vertex.label))
 
         for master_pop_key, n_bits, bitfield in self.__bitfields(placement):
             # put into report
             for neuron_id in range(n_bits):
-                f.write("for key {}, neuron id {} has bit == {}\n".format(
+                f.write(self._FIELD_DETAIL.format(
                     master_pop_key, neuron_id,
-                    self.__bit_for_neuron_id(bitfield, neuron_id)))
-
-    def __bit_for_neuron_id(self, bit_field, neuron_id):
-        """ locate the bit for the neuron in the bitfield
-
-        :param list(int) bit_field:
-            the block of words which represent the bitfield
-        :param int neuron_id: the neuron id to find the bit in the bitfield
-        :return: the bit (0 or 1)
-        :rtype: int
-        """
-        word_id, bit_in_word = divmod(neuron_id, _BITS_IN_A_WORD)
-        return (bit_field[word_id] >> bit_in_word) & _BIT_MASK
+                    _bit_for_neuron_id(bitfield, neuron_id)))
 
     def __bitfield_placements(self, app_vertex):
         """ The placements of the machine vertices of the given app vertex \
@@ -290,7 +280,7 @@ class OnChipBitFieldGenerator(object):
                     placement.x, placement.y, address, _THREE_WORDS.size))
             address += _THREE_WORDS.size
             # Mask off merged and all_ones flag bits
-            n_words &= 0x3FFFFFFF
+            n_words &= self._N_WORDS_MASK
 
             # get bitfield words
             if n_words:
@@ -338,7 +328,7 @@ class OnChipBitFieldGenerator(object):
             self.__txrx.get_user_1_register_address_from_core(placement.p)
         self.__txrx.write_memory(
             placement.x, placement.y, user_1_base_address,
-            _ONE_WORD.pack(bit_field_builder_region), _USER_BYTES)
+            _ONE_WORD.pack(bit_field_builder_region), _ONE_WORD.size)
 
     def __check_for_success(self, executable_targets, transceiver):
         """ Goes through the cores checking for cores that have failed to\
@@ -357,7 +347,7 @@ class OnChipBitFieldGenerator(object):
                 user_2_base_address = \
                     transceiver.get_user_2_register_address_from_core(p)
                 result, = _ONE_WORD.unpack(transceiver.read_memory(
-                    x, y, user_2_base_address, _USER_BYTES))
+                    x, y, user_2_base_address, _ONE_WORD.size))
 
                 # The result is 0 if success, otherwise failure
                 if result != self._SUCCESS:
