@@ -49,20 +49,28 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
         """ entrance for routing table compression with bit field
 
         :param routing_tables: routing tables
-        :param transceiver: spinnman instance
-        :param machine: spinnMachine instance
-        :param app_id: app id of the application
-        :param provenance_file_path: file path for prov data
-        :param machine_graph: machine graph
-        :param placements: placements on machine
-        :param threshold_percentage: the percentage of bitfields to do on chip\
-         before its considered a success
+        :type routing_tables:
+            ~pacman.model.routing_tables.MulticastRoutingTables
+        :param ~spinnman.transceiver.Transceiver transceiver: spinnman instance
+        :param ~spinn_machine.Machine machine: spinnMachine instance
+        :param int app_id: app id of the application
+        :param str provenance_file_path: file path for prov data
+        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
+            machine graph
+        :param ~pacman.model.placements.Placements placements:
+            placements on machine
+        :param int threshold_percentage:
+            the percentage of bitfields to do on chip before its considered
+            a success
         :param executable_finder: where are binaries are located
-        :param read_algorithm_iobuf: bool flag saying if read iobuf
-        :param compress_as_much_as_possible: bool flag asking if should \
-        compress as much as possible
-        :param read_expander_iobuf: reads the synaptic expander iobuf.
-        :rtype: None
+        :type executable_finder:
+            ~spinn_front_end_common.utilities.utility_objs.ExecutableFinder
+        :param bool read_algorithm_iobuf: flag saying if read iobuf
+        :param bool compress_as_much_as_possible:
+            flag asking if should compress as much as possible
+        :param bool read_expander_iobuf: reads the synaptic expander iobuf.
+        :rtype:
+            list(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)
         """
 
         # build machine compressor

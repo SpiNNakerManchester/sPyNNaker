@@ -12,7 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+from .connection_holder_finisher import finish_connection_holders
 from .graph_edge_weight_updater import GraphEdgeWeightUpdater
 from .on_chip_bit_field_generator import OnChipBitFieldGenerator
 from .spynnaker_data_specification_writer import (
@@ -21,7 +21,8 @@ from .spynnaker_machine_bit_field_router_compressor import (
     SpynnakerMachineBitFieldPairRouterCompressor,
     SpynnakerMachineBitFieldUnorderedRouterCompressor)
 
-__all__ = ["GraphEdgeWeightUpdater", "OnChipBitFieldGenerator",
+__all__ = ["finish_connection_holders",
+           "GraphEdgeWeightUpdater", "OnChipBitFieldGenerator",
            "SpynnakerDataSpecificationWriter",
            "SpynnakerMachineBitFieldPairRouterCompressor",
            "SpynnakerMachineBitFieldUnorderedRouterCompressor"]

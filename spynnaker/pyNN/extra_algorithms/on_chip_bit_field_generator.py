@@ -85,19 +85,24 @@ class OnChipBitFieldGenerator(object):
             generating_bit_field_summary_report):
         """ loads and runs the bit field generator on chip
 
-        :param placements: placements
-        :param app_graph: the app graph
+        :param ~pacman.model.placements.Placements placements: placements
+        :param ~pacman.model.graphs.application.ApplicationGraph app_graph:
+            the app graph
         :param executable_finder: the executable finder
-        :param provenance_file_path: the path to where provenance data items\
-                                     is written
-        :param transceiver: the SpiNNMan instance
-        :param write_bit_field_generator_iobuf: bool flag for report
-        :param generating_bitfield_report: bool flag for report
-        :param default_report_folder: the file path for reports
-        :param machine_graph: the machine graph
+        :type executable_finder:
+            ~spinn_front_end_common.utilities.utility_objs.ExecutableFinder
+        :param str provenance_file_path:
+            the path to where provenance data items are written
+        :param ~spinnman.transceiver.Transceiver transceiver:
+            the SpiNNMan instance
+        :param bool write_bit_field_generator_iobuf: flag for report
+        :param bool generating_bitfield_report: flag for report
+        :param str default_report_folder: the file path for reports
+        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
+            the machine graph
         :param routing_infos: the key to edge map
-        :param generating_bit_field_summary_report: bool flag for making \
-        summary report
+        :param bool generating_bit_field_summary_report:
+            flag for making summary report
         :rtype: None
         """
 

@@ -25,11 +25,6 @@ logger = logging.getLogger(__name__)
 class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
     """ Produces a report describing the graph created from the neural \
         populations and projections.
-
-    :param str report_folder: the report folder to put figure into
-    :param ~pacman.model.graphs.application.ApplicationGraph \
-            application_graph:
-        the app graph
     """
 
     @staticmethod
@@ -44,6 +39,12 @@ class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
         return graphviz.Digraph(comment=label)
 
     def __call__(self, report_folder, application_graph):
+        """
+        :param str report_folder: the report folder to put figure into
+        :param ~pacman.model.graphs.application.ApplicationGraph \
+                application_graph:
+            the app graph
+        """
         # create holders for data
         vertex_holders = dict()
         dot_diagram = self._get_diagram(

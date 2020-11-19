@@ -384,6 +384,7 @@ for f in os.listdir("."):
 
 # We want to document __call__ when encountered
 autodoc_default_options = {
+    "members": True,
     "special-members": "__call__"
 }
 
