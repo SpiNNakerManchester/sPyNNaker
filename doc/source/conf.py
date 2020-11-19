@@ -34,6 +34,11 @@ from sphinx import apidoc
 
 autodoc_mock_imports = ['_tkinter']
 
+# We want to document __call__ when encountered
+autodoc_default_options = {
+    "special-members": "__call__"
+}
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
