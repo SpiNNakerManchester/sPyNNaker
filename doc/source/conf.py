@@ -30,14 +30,8 @@
 import mock
 import os
 import sys
-from sphinx import apidoc
 
 autodoc_mock_imports = ['_tkinter']
-
-# We want to document __call__ when encountered
-autodoc_default_options = {
-    "special-members": "__call__"
-}
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -387,36 +381,56 @@ for f in os.listdir("."):
     if (os.path.isfile(f) and f.endswith(
             ".rst") and f != "index.rst" and f != "modules.rst"):
         os.remove(f)
-apidoc.main([None, '-o', ".", "../../spynnaker",
-             "../../spynnaker/pyNN/connections/[a-z]*.py",
-             "../../spynnaker/pyNN/external_devices_models/push_bot/*/[a-z]*.py",
-             "../../spynnaker/pyNN/external_devices_models/push_bot/a*.py",
-             "../../spynnaker/pyNN/external_devices_models/[a-oq-z]*.py",
-             "../../spynnaker/pyNN/models/abstract_models/[a-z]*.py",
-             "../../spynnaker/pyNN/models/common/[a-qs-z]*.py",
-             "../../spynnaker/pyNN/models/neural_projections/[abd-z]*.py",
-             "../../spynnaker/pyNN/models/neural_projections/connectors/[a-z]*.py",
-             "../../spynnaker/pyNN/models/neural_properties/[a-z]*.py",
-             "../../spynnaker/pyNN/models/neuron/additional_inputs/[a-z]*.py",
-             "../../spynnaker/pyNN/models/neuron/builds/[a-z]*.py",
-             "../../spynnaker/pyNN/models/neuron/implementations/[a-z]*.py",
-             "../../spynnaker/pyNN/models/neuron/input_types/[a-z]*.py",
-             "../../spynnaker/pyNN/models/neuron/master_pop_table_generators/[a-z]*.py",
-             "../../spynnaker/pyNN/models/neuron/neuron_models/[a-z]*.py",
-             "../../spynnaker/pyNN/models/neuron/plasticity/stdp/*/[a-z]*.py",
-             "../../spynnaker/pyNN/models/neuron/structural_plasticity/synaptogenesis/*/[a-z]*.py",
-             "../../spynnaker/pyNN/models/neuron/synapse_dynamics/[a-z]*.py",
-             "../../spynnaker/pyNN/models/neuron/synapse_io/[a-z]*.py",
-             "../../spynnaker/pyNN/models/neuron/synapse_types/[a-z]*.py",
-             "../../spynnaker/pyNN/models/neuron/threshold_types/[a-z]*.py",
-             "../../spynnaker/pyNN/models/neuron/abstract*.py",
-             "../../spynnaker/pyNN/models/neuron/population_machine*.py",
-             "../../spynnaker/pyNN/models/neuron/synaptic_manager.py",
-             "../../spynnaker/pyNN/models/neuron/[cg]*.py",
-             "../../spynnaker/pyNN/models/spike_source/*[eny].py",
-             "../../spynnaker/pyNN/models/utility_models/*/[a-z]*.py",
-             "../../spynnaker/pyNN/models/abstract_p*.py",
-             "../../spynnaker/pyNN/overridden_*/[a-z]*.py",
-             "../../spynnaker/pyNN/protocols/m*.py",
-             "../../spynnaker/pyNN/utilities/ra*/[a-z]*.py",
-             ])
+
+# We want to document __call__ when encountered
+autodoc_default_options = {
+    "special-members": "__call__"
+}
+
+# UGH!
+output_dir = os.path.abspath(".")
+os.chdir("../..")
+
+options = [
+    '-o', output_dir, "spynnaker",
+    "spynnaker/pyNN/connections/[a-z]*.py",
+    "spynnaker/pyNN/external_devices_models/push_bot/*/[a-z]*.py",
+    "spynnaker/pyNN/external_devices_models/push_bot/a*.py",
+    "spynnaker/pyNN/external_devices_models/[a-oq-z]*.py",
+    "spynnaker/pyNN/models/abstract_models/[a-z]*.py",
+    "spynnaker/pyNN/models/common/[a-qs-z]*.py",
+    "spynnaker/pyNN/models/neural_projections/[abd-z]*.py",
+    "spynnaker/pyNN/models/neural_projections/connectors/[a-z]*.py",
+    "spynnaker/pyNN/models/neural_properties/[a-z]*.py",
+    "spynnaker/pyNN/models/neuron/additional_inputs/[a-z]*.py",
+    "spynnaker/pyNN/models/neuron/builds/[a-z]*.py",
+    "spynnaker/pyNN/models/neuron/implementations/[a-z]*.py",
+    "spynnaker/pyNN/models/neuron/input_types/[a-z]*.py",
+    "spynnaker/pyNN/models/neuron/master_pop_table_generators/[a-z]*.py",
+    "spynnaker/pyNN/models/neuron/neuron_models/[a-z]*.py",
+    "spynnaker/pyNN/models/neuron/plasticity/stdp/*/[a-z]*.py",
+    "spynnaker/pyNN/models/neuron/structural_plasticity/synaptogenesis/*/[a-z]*.py",
+    "spynnaker/pyNN/models/neuron/synapse_dynamics/[a-z]*.py",
+    "spynnaker/pyNN/models/neuron/synapse_io/[a-z]*.py",
+    "spynnaker/pyNN/models/neuron/synapse_types/[a-z]*.py",
+    "spynnaker/pyNN/models/neuron/threshold_types/[a-z]*.py",
+    "spynnaker/pyNN/models/neuron/abstract*.py",
+    "spynnaker/pyNN/models/neuron/population_machine*.py",
+    "spynnaker/pyNN/models/neuron/synaptic_manager.py",
+    "spynnaker/pyNN/models/neuron/[cg]*.py",
+    "spynnaker/pyNN/models/spike_source/*[eny].py",
+    "spynnaker/pyNN/models/utility_models/*/[a-z]*.py",
+    "spynnaker/pyNN/models/abstract_p*.py",
+    "spynnaker/pyNN/overridden_*/[a-z]*.py",
+    "spynnaker/pyNN/protocols/m*.py",
+    "spynnaker/pyNN/utilities/ra*/[a-z]*.py",
+    ]
+
+try:
+    # Old style API; Python 2.7
+    from sphinx import apidoc
+    options = [None] + options
+except ImportError:
+    # New style API; Python 3.6 onwards
+    from sphinx.ext import apidoc
+apidoc.main(options)
