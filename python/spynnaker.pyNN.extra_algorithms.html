@@ -135,7 +135,28 @@ them, allowing any waiting callbacks to be called</p>
 <dt id="spynnaker.pyNN.extra_algorithms.on_chip_bit_field_generator.OnChipBitFieldGenerator">
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.extra_algorithms.on_chip_bit_field_generator.</code><code class="descname">OnChipBitFieldGenerator</code><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/on_chip_bit_field_generator.html#OnChipBitFieldGenerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.on_chip_bit_field_generator.OnChipBitFieldGenerator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>Executes bitfield and routing table entries for atom based routing</p>
+<p>Executes bitfield and routing table entries for atom based routing.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>placements</strong> (<em>placementsPlacements</em>) &#8211; placements</li>
+<li><strong>app_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationGraph" title="(in PACMAN v)"><em>ApplicationGraph</em></a>) &#8211; the app graph</li>
+<li><strong>executable_finder</strong> (<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utilities.utility_objs.html#spinn_front_end_common.utilities.utility_objs.ExecutableFinder" title="(in SpiNNFrontEndCommon v)"><em>ExecutableFinder</em></a>) &#8211; the executable finder</li>
+<li><strong>provenance_file_path</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; the path to where provenance data items is written</li>
+<li><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan v)"><em>Transceiver</em></a>) &#8211; the SpiNNMan instance</li>
+<li><strong>write_bit_field_generator_iobuf</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; flag for report</li>
+<li><strong>generating_bitfield_report</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; flag for report</li>
+<li><strong>default_report_folder</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; the file path for reports</li>
+<li><strong>machine_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineGraph" title="(in PACMAN v)"><em>MachineGraph</em></a>) &#8211; the machine graph</li>
+<li><strong>routing_infos</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.routing_info/#pacman.model.routing_info.RoutingInfo" title="(in PACMAN v)"><em>RoutingInfo</em></a>) &#8211; the key to edge map</li>
+<li><strong>generating_bit_field_summary_report</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; flag for making summary report</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
@@ -183,39 +204,22 @@ them, allowing any waiting callbacks to be called</p>
 <div class="section" id="module-spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor">
 <span id="spynnaker-pynn-extra-algorithms-spynnaker-machine-bit-field-router-compressor-module"></span><h2>spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor module<a class="headerlink" href="#module-spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.SpynnakerMachineBitFieldPairRouterCompressor">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.</code><code class="descname">SpynnakerMachineBitFieldPairRouterCompressor</code><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/spynnaker_machine_bit_field_router_compressor.html#SpynnakerMachineBitFieldPairRouterCompressor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.SpynnakerMachineBitFieldPairRouterCompressor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.SpynnakerMachineBitFieldRouterCompressor" title="spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.SpynnakerMachineBitFieldRouterCompressor"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.SpynnakerMachineBitFieldRouterCompressor</span></code></a></p>
-<dl class="method">
-<dt id="spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.SpynnakerMachineBitFieldPairRouterCompressor.compressor_factory">
-<code class="descname">compressor_factory</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/spynnaker_machine_bit_field_router_compressor.html#SpynnakerMachineBitFieldPairRouterCompressor.compressor_factory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.SpynnakerMachineBitFieldPairRouterCompressor.compressor_factory" title="Permalink to this definition">¶</a></dt>
-<dd><p>Method to call the specific compressor to use</p>
-</dd></dl>
-
+<dt id="spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.AbstractMachineBitFieldRouterCompressor">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.</code><code class="descname">AbstractMachineBitFieldRouterCompressor</code><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/spynnaker_machine_bit_field_router_compressor.html#AbstractMachineBitFieldRouterCompressor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.AbstractMachineBitFieldRouterCompressor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Adds in regeneration of synaptic matrices to bitfield compression.</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.SpynnakerMachineBitFieldRouterCompressor">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.</code><code class="descname">SpynnakerMachineBitFieldRouterCompressor</code><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/spynnaker_machine_bit_field_router_compressor.html#SpynnakerMachineBitFieldRouterCompressor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.SpynnakerMachineBitFieldRouterCompressor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<dl class="method">
-<dt id="spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.SpynnakerMachineBitFieldRouterCompressor.compressor_factory">
-<code class="descname">compressor_factory</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/spynnaker_machine_bit_field_router_compressor.html#SpynnakerMachineBitFieldRouterCompressor.compressor_factory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.SpynnakerMachineBitFieldRouterCompressor.compressor_factory" title="Permalink to this definition">¶</a></dt>
-<dd><p>Method to call the specific compressor to use</p>
-</dd></dl>
-
+<dt id="spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.SpynnakerMachineBitFieldPairRouterCompressor">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.</code><code class="descname">SpynnakerMachineBitFieldPairRouterCompressor</code><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/spynnaker_machine_bit_field_router_compressor.html#SpynnakerMachineBitFieldPairRouterCompressor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.SpynnakerMachineBitFieldPairRouterCompressor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.AbstractMachineBitFieldRouterCompressor" title="spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.AbstractMachineBitFieldRouterCompressor"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.AbstractMachineBitFieldRouterCompressor</span></code></a></p>
 </dd></dl>
 
 <dl class="class">
 <dt id="spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.SpynnakerMachineBitFieldUnorderedRouterCompressor">
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.</code><code class="descname">SpynnakerMachineBitFieldUnorderedRouterCompressor</code><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/spynnaker_machine_bit_field_router_compressor.html#SpynnakerMachineBitFieldUnorderedRouterCompressor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.SpynnakerMachineBitFieldUnorderedRouterCompressor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.SpynnakerMachineBitFieldRouterCompressor" title="spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.SpynnakerMachineBitFieldRouterCompressor"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.SpynnakerMachineBitFieldRouterCompressor</span></code></a></p>
-<dl class="method">
-<dt id="spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.SpynnakerMachineBitFieldUnorderedRouterCompressor.compressor_factory">
-<code class="descname">compressor_factory</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/spynnaker_machine_bit_field_router_compressor.html#SpynnakerMachineBitFieldUnorderedRouterCompressor.compressor_factory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.SpynnakerMachineBitFieldUnorderedRouterCompressor.compressor_factory" title="Permalink to this definition">¶</a></dt>
-<dd><p>Method to call the specific compressor to use</p>
-</dd></dl>
-
+<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.AbstractMachineBitFieldRouterCompressor" title="spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.AbstractMachineBitFieldRouterCompressor"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.AbstractMachineBitFieldRouterCompressor</span></code></a></p>
 </dd></dl>
 
 </div>
@@ -305,7 +309,28 @@ them, allowing any waiting callbacks to be called</p>
 <dt id="spynnaker.pyNN.extra_algorithms.OnChipBitFieldGenerator">
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.extra_algorithms.</code><code class="descname">OnChipBitFieldGenerator</code><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/on_chip_bit_field_generator.html#OnChipBitFieldGenerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.OnChipBitFieldGenerator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>Executes bitfield and routing table entries for atom based routing</p>
+<p>Executes bitfield and routing table entries for atom based routing.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>placements</strong> (<em>placementsPlacements</em>) &#8211; placements</li>
+<li><strong>app_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationGraph" title="(in PACMAN v)"><em>ApplicationGraph</em></a>) &#8211; the app graph</li>
+<li><strong>executable_finder</strong> (<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utilities.utility_objs.html#spinn_front_end_common.utilities.utility_objs.ExecutableFinder" title="(in SpiNNFrontEndCommon v)"><em>ExecutableFinder</em></a>) &#8211; the executable finder</li>
+<li><strong>provenance_file_path</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; the path to where provenance data items is written</li>
+<li><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan v)"><em>Transceiver</em></a>) &#8211; the SpiNNMan instance</li>
+<li><strong>write_bit_field_generator_iobuf</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; flag for report</li>
+<li><strong>generating_bitfield_report</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; flag for report</li>
+<li><strong>default_report_folder</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; the file path for reports</li>
+<li><strong>machine_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineGraph" title="(in PACMAN v)"><em>MachineGraph</em></a>) &#8211; the machine graph</li>
+<li><strong>routing_infos</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.routing_info/#pacman.model.routing_info.RoutingInfo" title="(in PACMAN v)"><em>RoutingInfo</em></a>) &#8211; the key to edge map</li>
+<li><strong>generating_bit_field_summary_report</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; flag for making summary report</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="class">
@@ -318,25 +343,13 @@ them, allowing any waiting callbacks to be called</p>
 <dl class="class">
 <dt id="spynnaker.pyNN.extra_algorithms.SpynnakerMachineBitFieldPairRouterCompressor">
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.extra_algorithms.</code><code class="descname">SpynnakerMachineBitFieldPairRouterCompressor</code><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/spynnaker_machine_bit_field_router_compressor.html#SpynnakerMachineBitFieldPairRouterCompressor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.SpynnakerMachineBitFieldPairRouterCompressor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.SpynnakerMachineBitFieldRouterCompressor" title="spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.SpynnakerMachineBitFieldRouterCompressor"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.SpynnakerMachineBitFieldRouterCompressor</span></code></a></p>
-<dl class="method">
-<dt id="spynnaker.pyNN.extra_algorithms.SpynnakerMachineBitFieldPairRouterCompressor.compressor_factory">
-<code class="descname">compressor_factory</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/spynnaker_machine_bit_field_router_compressor.html#SpynnakerMachineBitFieldPairRouterCompressor.compressor_factory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.SpynnakerMachineBitFieldPairRouterCompressor.compressor_factory" title="Permalink to this definition">¶</a></dt>
-<dd><p>Method to call the specific compressor to use</p>
-</dd></dl>
-
+<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.AbstractMachineBitFieldRouterCompressor" title="spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.AbstractMachineBitFieldRouterCompressor"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.AbstractMachineBitFieldRouterCompressor</span></code></a></p>
 </dd></dl>
 
 <dl class="class">
 <dt id="spynnaker.pyNN.extra_algorithms.SpynnakerMachineBitFieldUnorderedRouterCompressor">
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.extra_algorithms.</code><code class="descname">SpynnakerMachineBitFieldUnorderedRouterCompressor</code><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/spynnaker_machine_bit_field_router_compressor.html#SpynnakerMachineBitFieldUnorderedRouterCompressor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.SpynnakerMachineBitFieldUnorderedRouterCompressor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.SpynnakerMachineBitFieldRouterCompressor" title="spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.SpynnakerMachineBitFieldRouterCompressor"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.SpynnakerMachineBitFieldRouterCompressor</span></code></a></p>
-<dl class="method">
-<dt id="spynnaker.pyNN.extra_algorithms.SpynnakerMachineBitFieldUnorderedRouterCompressor.compressor_factory">
-<code class="descname">compressor_factory</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/spynnaker_machine_bit_field_router_compressor.html#SpynnakerMachineBitFieldUnorderedRouterCompressor.compressor_factory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.SpynnakerMachineBitFieldUnorderedRouterCompressor.compressor_factory" title="Permalink to this definition">¶</a></dt>
-<dd><p>Method to call the specific compressor to use</p>
-</dd></dl>
-
+<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.AbstractMachineBitFieldRouterCompressor" title="spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.AbstractMachineBitFieldRouterCompressor"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.AbstractMachineBitFieldRouterCompressor</span></code></a></p>
 </dd></dl>
 
 </div>

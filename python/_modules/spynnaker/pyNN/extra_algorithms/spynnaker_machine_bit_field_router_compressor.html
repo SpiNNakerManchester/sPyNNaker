@@ -82,17 +82,17 @@
 <span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">add_metaclass</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.abstract_base</span> <span class="kn">import</span> <span class="n">AbstractBase</span><span class="p">,</span> <span class="n">abstractmethod</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models.</span>\
-    <span class="n">abstract_supports_bit_field_generation</span> <span class="kn">import</span> \
-    <span class="nn">AbstractSupportsBitFieldGeneration</span>
+<span class="kn">from</span> <span class="nn">spinnman.model</span> <span class="kn">import</span> <span class="n">ExecutableTargets</span>
+<span class="kn">from</span> <span class="nn">spinnman.model.enums</span> <span class="kn">import</span> <span class="n">CPUState</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AbstractSupportsBitFieldGeneration</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.interface_functions.</span>\
     <span class="n">machine_bit_field_router_compressor</span> <span class="kn">import</span> <span class="p">(</span>
         <span class="n">MachineBitFieldPairRouterCompressor</span><span class="p">,</span>
         <span class="n">MachineBitFieldUnorderedRouterCompressor</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities</span> <span class="kn">import</span> <span class="n">system_control_logic</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.system_control_logic</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">run_system_application</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.utility_objs</span> <span class="kn">import</span> <span class="n">ExecutableType</span>
-<span class="kn">from</span> <span class="nn">spinnman.model</span> <span class="kn">import</span> <span class="n">ExecutableTargets</span>
-<span class="kn">from</span> <span class="nn">spinnman.model.enums</span> <span class="kn">import</span> <span class="n">CPUState</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractSynapseExpandable</span><span class="p">,</span> <span class="n">SYNAPSE_EXPANDER_APLX</span><span class="p">)</span>
 
@@ -100,7 +100,11 @@
 
 
 <span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">AbstractBase</span><span class="p">)</span>
-<div class="viewcode-block" id="SpynnakerMachineBitFieldRouterCompressor"><a class="viewcode-back" href="../../../../spynnaker.pyNN.extra_algorithms.html#spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.SpynnakerMachineBitFieldRouterCompressor">[docs]</a><span class="k">class</span> <span class="nc">SpynnakerMachineBitFieldRouterCompressor</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractMachineBitFieldRouterCompressor"><a class="viewcode-back" href="../../../../spynnaker.pyNN.extra_algorithms.html#spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.AbstractMachineBitFieldRouterCompressor">[docs]</a><span class="k">class</span> <span class="nc">AbstractMachineBitFieldRouterCompressor</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Adds in regeneration of synaptic matrices to bitfield compression.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_RERUN_IOBUF_NAME_PATTERN</span> <span class="o">=</span> <span class="s2">&quot;rerun_of_synaptic_expander_on_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">.txt&quot;</span>
 
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">routing_tables</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">machine</span><span class="p">,</span> <span class="n">app_id</span><span class="p">,</span>
@@ -113,25 +117,25 @@
             <span class="n">compress_as_much_as_possible</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">provenance_data_objects</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; entrance for routing table compression with bit field</span>
 
-<span class="sd">        :param routing_tables: routing tables</span>
-<span class="sd">        :param transceiver: spinnman instance</span>
-<span class="sd">        :param machine: spinnMachine instance</span>
-<span class="sd">        :param app_id: app id of the application</span>
-<span class="sd">        :param provenance_file_path: file path for prov data</span>
-<span class="sd">        :param machine_graph: machine graph</span>
-<span class="sd">        :param placements: placements on machine</span>
-<span class="sd">        :param threshold_percentage: the percentage of bitfields to do on chip\</span>
-<span class="sd">         before its considered a success</span>
+<span class="sd">        :param ~.RoutingTables routing_tables: routing tables</span>
+<span class="sd">        :param ~.Transceiver transceiver: spinnman instance</span>
+<span class="sd">        :param ~.Machine machine: spinnMachine instance</span>
+<span class="sd">        :param int app_id: app id of the application</span>
+<span class="sd">        :param str provenance_file_path: file path for prov data</span>
+<span class="sd">        :param ~.MachineGraph machine_graph: machine graph</span>
+<span class="sd">        :param ~.Placements placements: placements on machine</span>
+<span class="sd">        :param int threshold_percentage:</span>
+<span class="sd">            the percentage of bitfields to do on chip before its considered</span>
+<span class="sd">            a success</span>
 <span class="sd">        :param executable_finder: where are binaries are located</span>
-<span class="sd">        :param read_algorithm_iobuf: bool flag saying if read iobuf</span>
-<span class="sd">        :param compress_as_much_as_possible: bool flag asking if should \</span>
-<span class="sd">        compress as much as possible</span>
-<span class="sd">        :param read_expander_iobuf: reads the synaptic expander iobuf.</span>
-<span class="sd">        :rtype: None</span>
+<span class="sd">        :param bool read_algorithm_iobuf: flag saying if read iobuf</span>
+<span class="sd">        :param bool compress_as_much_as_possible:</span>
+<span class="sd">            whether to compress as much as possible</span>
+<span class="sd">        :param bool read_expander_iobuf: reads the synaptic expander iobuf.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># build machine compressor</span>
-        <span class="n">machine_bit_field_router_compressor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compressor_factory</span><span class="p">()</span>
+        <span class="n">machine_bit_field_router_compressor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compressor_factory</span><span class="p">()</span>
         <span class="p">(</span><span class="n">compressor_executable_targets</span><span class="p">,</span> <span class="n">prov_items</span><span class="p">)</span> <span class="o">=</span> \
             <span class="n">machine_bit_field_router_compressor</span><span class="p">(</span>
                 <span class="n">routing_tables</span><span class="o">=</span><span class="n">routing_tables</span><span class="p">,</span> <span class="n">transceiver</span><span class="o">=</span><span class="n">transceiver</span><span class="p">,</span>
@@ -152,9 +156,8 @@
                 <span class="n">executable_targets</span><span class="o">=</span><span class="n">executable_targets</span><span class="p">)</span>
 
         <span class="c1"># adjust cores to exclude the ones which did not give sdram.</span>
-        <span class="n">expander_chip_cores</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_locate_synaptic_expander_cores</span><span class="p">(</span>
-            <span class="n">compressor_executable_targets</span><span class="p">,</span> <span class="n">executable_finder</span><span class="p">,</span>
-            <span class="n">placements</span><span class="p">,</span> <span class="n">machine</span><span class="p">)</span>
+        <span class="n">expander_chip_cores</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_locate_expander_rerun_targets</span><span class="p">(</span>
+            <span class="n">compressor_executable_targets</span><span class="p">,</span> <span class="n">executable_finder</span><span class="p">,</span> <span class="n">placements</span><span class="p">)</span>
 
         <span class="c1"># just rerun the synaptic expander for safety purposes</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rerun_synaptic_cores</span><span class="p">(</span>
@@ -164,20 +167,18 @@
         <span class="k">return</span> <span class="n">prov_items</span>
 
     <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="SpynnakerMachineBitFieldRouterCompressor.compressor_factory"><a class="viewcode-back" href="../../../../spynnaker.pyNN.extra_algorithms.html#spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.SpynnakerMachineBitFieldRouterCompressor.compressor_factory">[docs]</a>    <span class="k">def</span> <span class="nf">compressor_factory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="s2">&quot;Method to call the specific compressor to use&quot;</span></div>
+    <span class="k">def</span> <span class="nf">_compressor_factory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s2">&quot;Method to call the specific compressor to use&quot;</span>
 
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_locate_synaptic_expander_cores</span><span class="p">(</span>
-            <span class="n">cores</span><span class="p">,</span> <span class="n">executable_finder</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">machine</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_locate_expander_rerun_targets</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">bitfield_targets</span><span class="p">,</span> <span class="n">executable_finder</span><span class="p">,</span> <span class="n">placements</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; removes host based cores for synaptic matrix regeneration</span>
 
-<span class="sd">        :param cores: the cores for everything</span>
-<span class="sd">        :param executable_finder: way to get binary path</span>
-<span class="sd">        :param machine: spiNNMachine instance.</span>
+<span class="sd">        :param ~.ExecutableTargets bitfield_targets: the cores that were used</span>
+<span class="sd">        :param ~.ExecutableFinder executable_finder: way to get binary path</span>
 <span class="sd">        :return: new targets for synaptic expander</span>
+<span class="sd">        :rtype: ~.ExecutableTargets</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">new_cores</span> <span class="o">=</span> <span class="n">ExecutableTargets</span><span class="p">()</span>
 
         <span class="c1"># locate expander executable path</span>
         <span class="n">expander_executable_path</span> <span class="o">=</span> <span class="n">executable_finder</span><span class="o">.</span><span class="n">get_executable_path</span><span class="p">(</span>
@@ -185,61 +186,70 @@
 
         <span class="c1"># if any ones are going to be ran on host, ignore them from the new</span>
         <span class="c1"># core setup</span>
-        <span class="k">for</span> <span class="n">core_subset</span> <span class="ow">in</span> <span class="n">cores</span><span class="o">.</span><span class="n">all_core_subsets</span><span class="p">:</span>
-            <span class="n">chip</span> <span class="o">=</span> <span class="n">machine</span><span class="o">.</span><span class="n">get_chip_at</span><span class="p">(</span><span class="n">core_subset</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">core_subset</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">processor_id</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">chip</span><span class="o">.</span><span class="n">n_processors</span><span class="p">):</span>
-                <span class="k">if</span> <span class="n">placements</span><span class="o">.</span><span class="n">is_processor_occupied</span><span class="p">(</span>
-                        <span class="n">core_subset</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">core_subset</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">processor_id</span><span class="p">):</span>
-                    <span class="n">vertex</span> <span class="o">=</span> <span class="n">placements</span><span class="o">.</span><span class="n">get_vertex_on_processor</span><span class="p">(</span>
-                        <span class="n">core_subset</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">core_subset</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">processor_id</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">vertex</span><span class="p">,</span> <span class="n">AbstractSupportsBitFieldGeneration</span><span class="p">)</span>
-                            <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vertex</span><span class="p">,</span> <span class="n">AbstractSynapseExpandable</span><span class="p">)</span>
-                            <span class="ow">and</span> <span class="n">vertex</span><span class="o">.</span><span class="n">gen_on_machine</span><span class="p">()):</span>
-                        <span class="n">new_cores</span><span class="o">.</span><span class="n">add_processor</span><span class="p">(</span>
-                            <span class="n">expander_executable_path</span><span class="p">,</span>
-                            <span class="n">core_subset</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">core_subset</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">processor_id</span><span class="p">,</span>
-                            <span class="n">executable_type</span><span class="o">=</span><span class="n">ExecutableType</span><span class="o">.</span><span class="n">SYSTEM</span><span class="p">)</span>
+        <span class="n">new_cores</span> <span class="o">=</span> <span class="n">ExecutableTargets</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">placement</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__machine_expandables</span><span class="p">(</span>
+                <span class="n">bitfield_targets</span><span class="o">.</span><span class="n">all_core_subsets</span><span class="p">,</span> <span class="n">placements</span><span class="p">):</span>
+            <span class="n">new_cores</span><span class="o">.</span><span class="n">add_processor</span><span class="p">(</span>
+                <span class="n">expander_executable_path</span><span class="p">,</span>
+                <span class="n">placement</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">p</span><span class="p">,</span>
+                <span class="n">executable_type</span><span class="o">=</span><span class="n">ExecutableType</span><span class="o">.</span><span class="n">SYSTEM</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">new_cores</span>
 
     <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">__machine_expandables</span><span class="p">(</span><span class="n">cores</span><span class="p">,</span> <span class="n">placements</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param ~.CoreSubsets cores:</span>
+<span class="sd">        :param ~.Placements placements:</span>
+<span class="sd">        :rtype: iterable(~.Placement)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">place</span> <span class="ow">in</span> <span class="n">placements</span><span class="o">.</span><span class="n">placements</span><span class="p">:</span>
+            <span class="n">vertex</span> <span class="o">=</span> <span class="n">place</span><span class="o">.</span><span class="n">vertex</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">cores</span><span class="o">.</span><span class="n">is_core</span><span class="p">(</span><span class="n">place</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">place</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">place</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+                    <span class="c1"># Have we overwritten it?</span>
+                    <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vertex</span><span class="p">,</span> <span class="n">AbstractSupportsBitFieldGeneration</span><span class="p">)</span>
+                    <span class="c1"># Can we fix it by rerunning?</span>
+                    <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vertex</span><span class="p">,</span> <span class="n">AbstractSynapseExpandable</span><span class="p">)</span>
+                    <span class="ow">and</span> <span class="n">vertex</span><span class="o">.</span><span class="n">gen_on_machine</span><span class="p">()):</span>
+                <span class="k">yield</span> <span class="n">place</span>
+
+    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">_rerun_synaptic_cores</span><span class="p">(</span>
-            <span class="n">synaptic_expander_rerun_cores</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span>
+            <span class="bp">cls</span><span class="p">,</span> <span class="n">synaptic_expander_rerun_cores</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span>
             <span class="n">provenance_file_path</span><span class="p">,</span> <span class="n">executable_finder</span><span class="p">,</span> <span class="n">needs_sync_barrier</span><span class="p">,</span>
             <span class="n">read_expander_iobuf</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; reruns the synaptic expander</span>
 
-<span class="sd">        :param synaptic_expander_rerun_cores: the cores to rerun the synaptic /</span>
-<span class="sd">        matrix generator for</span>
-<span class="sd">        :param transceiver: spinnman instance</span>
-<span class="sd">        :param provenance_file_path: prov file path</span>
-<span class="sd">        :param executable_finder: finder of binary file paths</span>
-<span class="sd">        :param read_expander_iobuf: bool for reading off iobuf if needed</span>
-<span class="sd">        :rtype: None</span>
+<span class="sd">        :param ~.ExecutableTargets synaptic_expander_rerun_cores:</span>
+<span class="sd">            the cores to rerun the synaptic matrix generator for</span>
+<span class="sd">        :param ~.Transceiver transceiver: spinnman instance</span>
+<span class="sd">        :param str provenance_file_path: prov file path</span>
+<span class="sd">        :param ~.ExecutableFinder executable_finder:</span>
+<span class="sd">            finder of binary file paths</span>
+<span class="sd">        :param bool needs_sync_barrier:</span>
+<span class="sd">        :param bool read_expander_iobuf: whether to read off iobuf if needed</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">synaptic_expander_rerun_cores</span><span class="o">.</span><span class="n">total_processors</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">synaptic_expander_rerun_cores</span><span class="o">.</span><span class="n">total_processors</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;rerunning synaptic expander&quot;</span><span class="p">)</span>
             <span class="n">expander_app_id</span> <span class="o">=</span> <span class="n">transceiver</span><span class="o">.</span><span class="n">app_id_tracker</span><span class="o">.</span><span class="n">get_new_id</span><span class="p">()</span>
-            <span class="n">system_control_logic</span><span class="o">.</span><span class="n">run_system_application</span><span class="p">(</span>
+            <span class="n">run_system_application</span><span class="p">(</span>
                 <span class="n">synaptic_expander_rerun_cores</span><span class="p">,</span> <span class="n">expander_app_id</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span>
                 <span class="n">provenance_file_path</span><span class="p">,</span> <span class="n">executable_finder</span><span class="p">,</span> <span class="n">read_expander_iobuf</span><span class="p">,</span>
                 <span class="kc">None</span><span class="p">,</span> <span class="p">[</span><span class="n">CPUState</span><span class="o">.</span><span class="n">FINISHED</span><span class="p">],</span> <span class="n">needs_sync_barrier</span><span class="p">,</span>
-                <span class="s2">&quot;rerun_of_synaptic_expander_on_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">.txt&quot;</span><span class="p">)</span></div>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">_RERUN_IOBUF_NAME_PATTERN</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="SpynnakerMachineBitFieldUnorderedRouterCompressor"><a class="viewcode-back" href="../../../../spynnaker.pyNN.extra_algorithms.html#spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.SpynnakerMachineBitFieldUnorderedRouterCompressor">[docs]</a><span class="k">class</span> <span class="nc">SpynnakerMachineBitFieldUnorderedRouterCompressor</span><span class="p">(</span>
-        <span class="n">SpynnakerMachineBitFieldRouterCompressor</span><span class="p">):</span>
-
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">SpynnakerMachineBitFieldRouterCompressor</span><span class="o">.</span><span class="n">compressor_factory</span><span class="p">)</span>
-<div class="viewcode-block" id="SpynnakerMachineBitFieldUnorderedRouterCompressor.compressor_factory"><a class="viewcode-back" href="../../../../spynnaker.pyNN.extra_algorithms.html#spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.SpynnakerMachineBitFieldUnorderedRouterCompressor.compressor_factory">[docs]</a>    <span class="k">def</span> <span class="nf">compressor_factory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">MachineBitFieldUnorderedRouterCompressor</span><span class="p">()</span></div></div>
+        <span class="n">AbstractMachineBitFieldRouterCompressor</span><span class="p">):</span>
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractMachineBitFieldRouterCompressor</span><span class="o">.</span><span class="n">_compressor_factory</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_compressor_factory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">MachineBitFieldUnorderedRouterCompressor</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="SpynnakerMachineBitFieldPairRouterCompressor"><a class="viewcode-back" href="../../../../spynnaker.pyNN.extra_algorithms.html#spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.SpynnakerMachineBitFieldPairRouterCompressor">[docs]</a><span class="k">class</span> <span class="nc">SpynnakerMachineBitFieldPairRouterCompressor</span><span class="p">(</span>
-        <span class="n">SpynnakerMachineBitFieldRouterCompressor</span><span class="p">):</span>
-
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">SpynnakerMachineBitFieldRouterCompressor</span><span class="o">.</span><span class="n">compressor_factory</span><span class="p">)</span>
-<div class="viewcode-block" id="SpynnakerMachineBitFieldPairRouterCompressor.compressor_factory"><a class="viewcode-back" href="../../../../spynnaker.pyNN.extra_algorithms.html#spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.SpynnakerMachineBitFieldPairRouterCompressor.compressor_factory">[docs]</a>    <span class="k">def</span> <span class="nf">compressor_factory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">MachineBitFieldPairRouterCompressor</span><span class="p">()</span></div></div>
+        <span class="n">AbstractMachineBitFieldRouterCompressor</span><span class="p">):</span>
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractMachineBitFieldRouterCompressor</span><span class="o">.</span><span class="n">_compressor_factory</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_compressor_factory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">MachineBitFieldPairRouterCompressor</span><span class="p">()</span></div>
 </pre></div>
 
           </div>
