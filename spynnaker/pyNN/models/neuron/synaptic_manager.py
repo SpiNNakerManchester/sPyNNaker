@@ -50,7 +50,8 @@ TIME_STAMP_BYTES = 4
 
 # TODO: Make sure these values are correct (particularly CPU cycles)
 _SYNAPSES_BASE_DTCM_USAGE_IN_BYTES = 28
-_SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES = 0
+# 4 for the synaptic matrix size
+_SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES = 4
 _SYNAPSES_BASE_N_CPU_CYCLES_PER_NEURON = 10
 _SYNAPSES_BASE_N_CPU_CYCLES = 8
 
@@ -543,10 +544,13 @@ class SynapticManager(object):
         return float(math.pow(2, 16 - (ring_buffer_to_input_left_shift + 1)))
 
     def _write_synapse_parameters(
-            self, spec, ring_buffer_shifts, post_vertex_slice, weight_scale):
+            self, spec, ring_buffer_shifts, post_vertex_slice, weight_scale,
+            all_syn_block_sz):
         # Get the ring buffer shifts and scaling factors
 
         spec.switch_write_focus(POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value)
+
+        spec.write_value(all_syn_block_sz, data_type=DataType.UINT32)
 
         spec.write_array(ring_buffer_shifts)
 
@@ -957,7 +961,8 @@ class SynapticManager(object):
             application_vertex, application_graph, machine_time_step,
             weight_scale)
         weight_scales = self._write_synapse_parameters(
-            spec, ring_buffer_shifts, post_vertex_slice, weight_scale)
+            spec, ring_buffer_shifts, post_vertex_slice, weight_scale,
+            all_syn_block_sz)
 
         gen_data = self._write_synaptic_matrix_and_master_population_table(
             spec, post_slices, post_slice_idx, machine_vertex,

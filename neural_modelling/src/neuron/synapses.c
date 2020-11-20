@@ -59,6 +59,8 @@ static uint32_t synapse_index_mask;
 static uint32_t synapse_type_bits;
 static uint32_t synapse_type_mask;
 
+static uint32_t *synaptic_matrix;
+
 
 /* PRIVATE FUNCTIONS */
 
@@ -232,10 +234,26 @@ bool synapses_initialise(
         address_t synapse_params_address, address_t direct_matrix_address,
         uint32_t n_neurons_value, uint32_t n_synapse_types_value,
         uint32_t **ring_buffer_to_input_buffer_left_shifts,
-        address_t *direct_synapses_address, REAL starting_rate) {
+        address_t *direct_synapses_address, REAL starting_rate,
+        address_t synaptic_matrix_address) {
+
+    size_t synaptic_matrix_size;
     log_debug("synapses_initialise: starting");
     n_neurons = n_neurons_value;
     n_synapse_types = n_synapse_types_value;
+
+    synaptic_matrix_size =  synapse_params_address[0];
+
+    // Store the synaptic matrix into DTCM
+    synaptic_matrix = spin1_malloc(synaptic_matrix_size * sizeof(uint32_t));
+    if (synaptic_matrix == NULL) {
+        log_error("Not enough memory to allocate synaptic matrix in DTCM");
+        return false;
+    }
+
+    spin1_memcpy(
+        synaptic_matrix, synaptic_matrix_address,
+        synaptic_matrix_size * sizeof(uint32_t));
 
     // Set up ring buffer left shifts
     ring_buffer_to_input_left_shifts =
@@ -245,7 +263,7 @@ bool synapses_initialise(
         return false;
     }
     spin1_memcpy(
-            ring_buffer_to_input_left_shifts, synapse_params_address,
+            ring_buffer_to_input_left_shifts, ++synapse_params_address,
             n_synapse_types * sizeof(uint32_t));
     *ring_buffer_to_input_buffer_left_shifts =
             ring_buffer_to_input_left_shifts;

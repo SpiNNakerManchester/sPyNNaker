@@ -181,12 +181,14 @@ static bool initialise(void) {
     address_t indirect_synapses_address =
             data_specification_get_region(SYNAPTIC_MATRIX_REGION, ds_regions);
     address_t direct_synapses_address;
+
     if (!synapses_initialise(
             data_specification_get_region(SYNAPSE_PARAMS_REGION, ds_regions),
             data_specification_get_region(DIRECT_MATRIX_REGION, ds_regions),
             n_neurons, n_synapse_types,
             &ring_buffer_to_input_buffer_left_shifts,
-            &direct_synapses_address, starting_rate)) {
+            &direct_synapses_address, starting_rate,
+            indirect_synapses_address)) {
         return false;
     }
 
