@@ -175,7 +175,8 @@ class SynapticMatrices(object):
                         exception_found = True
                         memory_size = e.address
                     try:
-                        memory_size = matrix.add_delayed_matrix_size(memory_size)
+                        memory_size = matrix.add_delayed_matrix_size(
+                            memory_size)
                     except AddressOutOfRangeException as e:
                         exception_found = True
                         memory_size = e.address

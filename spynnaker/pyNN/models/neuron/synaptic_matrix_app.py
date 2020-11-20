@@ -26,7 +26,8 @@ from spinn_front_end_common.utilities.helpful_functions import (
 
 from .synaptic_matrix import SynapticMatrix
 from .generator_data import GeneratorData, SYN_REGION_UNUSED
-from spynnaker.pyNN.models.neuron.master_pop_table import AddressOutOfRangeException
+from spynnaker.pyNN.models.neuron.master_pop_table import (
+    AddressOutOfRangeException)
 
 
 class SynapticMatrixApp(object):
