@@ -309,6 +309,27 @@ class _MasterPopEntry(object):
         return n_entries
 
 
+class AddressOutOfRangeException(SynapticConfigurationException):
+    """ An address that is out of range for synapses
+    """
+    __slots__ = ["__address"]
+
+    def __init__(self, address):
+        """
+
+        :param address: The address that is out of range
+        """
+        super(AddressOutOfRangeException, self).__init__(
+            "Address {} is out of range {} for this population table!".format(
+                hex(address * _ADDRESS_SCALE),
+                hex(_MAX_ADDRESS * _ADDRESS_SCALE)))
+        self.__address = address * _ADDRESS_SCALE
+
+    @property
+    def address(self):
+        return self.__address
+
+
 class MasterPopTableAsBinarySearch(object):
     """ Master population table, implemented as binary search master.
     """
@@ -386,9 +407,7 @@ class MasterPopTableAsBinarySearch(object):
         """
         addr_scaled = (next_address + (_ADDRESS_SCALE - 1)) // _ADDRESS_SCALE
         if addr_scaled > _MAX_ADDRESS:
-            raise SynapticConfigurationException(
-                "Address {} is out of range for this population table!".format(
-                    hex(addr_scaled * _ADDRESS_SCALE)))
+            raise AddressOutOfRangeException(addr_scaled)
         return addr_scaled * _ADDRESS_SCALE
 
     def initialise_table(self):
@@ -493,9 +512,7 @@ class MasterPopTableAsBinarySearch(object):
                         block_start_addr))
             start_addr = block_start_addr // _ADDRESS_SCALE
             if start_addr > _MAX_ADDRESS:
-                raise SynapticConfigurationException(
-                    "Address {} is too big for this table".format(
-                        block_start_addr))
+                raise AddressOutOfRangeException(start_addr)
         row_length = self.get_allowed_row_length(row_length)
         index = self.__entries[key_and_mask.key].append(
             start_addr, row_length - 1, is_single)

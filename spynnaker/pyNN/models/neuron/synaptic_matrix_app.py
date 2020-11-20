@@ -26,6 +26,7 @@ from spinn_front_end_common.utilities.helpful_functions import (
 
 from .synaptic_matrix import SynapticMatrix
 from .generator_data import GeneratorData, SYN_REGION_UNUSED
+from spynnaker.pyNN.models.neuron.master_pop_table import AddressOutOfRangeException
 
 
 class SynapticMatrixApp(object):
@@ -167,14 +168,6 @@ class SynapticMatrixApp(object):
         self.__received_block = None
         self.__delay_received_block = None
 
-    @property
-    def n_synapses_per_row(self):
-        return self.__max_row_info.undelayed_max_n_synapses
-
-    @property
-    def n_synapses_per_delay_row(self):
-        return self.__max_row_info.delayed_max_n_synapses
-
     def __get_matrix(self, machine_edge):
         """ Get or create a matrix object
 
@@ -198,6 +191,24 @@ class SynapticMatrixApp(object):
         self.__matrices[machine_edge] = matrix
         return matrix
 
+    def _add_block_sizes(self, addr, size):
+        connector = self.__synapse_info.connector
+        exception_found = False
+        for edge_no in range(self.__n_sub_edges):
+            pre_slice = Slice(edge_no * self.__n_sub_edges,
+                              ((edge_no + 1) * self.__n_sub_edges) - 1)
+            if connector.could_connect(self.__synapse_info, pre_slice,
+                                       self.__post_vertex_slice):
+                try:
+                    addr = self.__poptable.get_next_allowed_address(addr)
+                except AddressOutOfRangeException as e:
+                    exception_found = True
+                    addr = e.address
+                addr += size
+        if exception_found:
+            raise AddressOutOfRangeException(addr)
+        return addr
+
     def add_matrix_size(self, addr):
         """ Add the bytes required by the synaptic matrices
 
@@ -206,15 +217,8 @@ class SynapticMatrixApp(object):
         :rtype: int
         """
         if self.__max_row_info.undelayed_max_n_synapses > 0:
-            connector = self.__synapse_info.connector
             size = self.__n_sub_atoms * self.__max_row_info.undelayed_max_bytes
-            for edge_no in range(self.__n_sub_edges):
-                pre_slice = Slice(edge_no * self.__n_sub_edges,
-                                  ((edge_no + 1) * self.__n_sub_edges) - 1)
-                if connector.could_connect(self.__synapse_info, pre_slice,
-                                           self.__post_vertex_slice):
-                    addr = self.__poptable.get_next_allowed_address(addr)
-                    addr += size
+            addr = self._add_block_sizes(addr, size)
         return addr
 
     def add_delayed_matrix_size(self, addr):
@@ -225,17 +229,10 @@ class SynapticMatrixApp(object):
         :rtype: int
         """
         if self.__max_row_info.delayed_max_n_synapses > 0:
-            connector = self.__synapse_info.connector
             size = (self.__n_sub_atoms *
                     self.__max_row_info.delayed_max_bytes *
                     self.__app_edge.n_delay_stages)
-            for edge_no in range(self.__n_sub_edges):
-                pre_slice = Slice(edge_no * self.__n_sub_edges,
-                                  ((edge_no + 1) * self.__n_sub_edges) - 1)
-                if connector.could_connect(self.__synapse_info, pre_slice,
-                                           self.__post_vertex_slice):
-                    addr = self.__poptable.get_next_allowed_address(addr)
-                    addr += size
+            addr = self._add_block_sizes(addr, size)
         return addr
 
     @property

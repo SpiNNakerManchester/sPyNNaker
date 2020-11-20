@@ -27,7 +27,7 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.neural_projections import (
     ProjectionApplicationEdge, DelayedApplicationEdge)
 from spynnaker.pyNN.models.neuron.master_pop_table import (
-    MasterPopTableAsBinarySearch)
+    MasterPopTableAsBinarySearch, AddressOutOfRangeException)
 
 from .key_space_tracker import KeySpaceTracker
 from .synaptic_matrix_app import SynapticMatrixApp
@@ -164,12 +164,23 @@ class SynapticMatrices(object):
         # 1 word for address of direct addresses, and
         # 1 word for the size of the direct addresses matrix in bytes
         memory_size = 2 * BYTES_PER_WORD
+        exception_found = False
         for in_edge in app_edges:
             if isinstance(in_edge, ProjectionApplicationEdge):
                 for synapse_info in in_edge.synapse_information:
                     matrix = self.__app_matrix(in_edge, synapse_info)
-                    memory_size = matrix.add_matrix_size(memory_size)
-                    memory_size = matrix.add_delayed_matrix_size(memory_size)
+                    try:
+                        memory_size = matrix.add_matrix_size(memory_size)
+                    except AddressOutOfRangeException as e:
+                        exception_found = True
+                        memory_size = e.address
+                    try:
+                        memory_size = matrix.add_delayed_matrix_size(memory_size)
+                    except AddressOutOfRangeException as e:
+                        exception_found = True
+                        memory_size = e.address
+        if exception_found:
+            raise AddressOutOfRangeException(memory_size)
         return memory_size
 
     def size(self, app_edges):
