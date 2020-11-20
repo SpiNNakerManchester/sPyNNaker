@@ -398,6 +398,7 @@ options = [
     "spynnaker/pyNN/external_devices_models/push_bot/*/[a-z]*.py",
     "spynnaker/pyNN/external_devices_models/push_bot/a*.py",
     "spynnaker/pyNN/external_devices_models/[a-oq-z]*.py",
+    "spynnaker/pyNN/extra_algorithms/[a-z]*.py",
     "spynnaker/pyNN/models/abstract_models/[a-z]*.py",
     "spynnaker/pyNN/models/common/[a-qs-z]*.py",
     "spynnaker/pyNN/models/neural_projections/[abd-z]*.py",
@@ -426,7 +427,6 @@ options = [
     "spynnaker/pyNN/protocols/m*.py",
     "spynnaker/pyNN/utilities/ra*/[a-z]*.py",
     ]
-
 try:
     # Old style API; Python 2.7
     from sphinx import apidoc

@@ -44,7 +44,7 @@ class SpynnakerDataSpecificationWriter(GraphDataSpecificationWriter):
         :rtype:
             tuple(~spinn_front_end_common.interface.ds.DataSpecificationTargets,
             dict(tuple(int,int,int), int))
-        :raises ConfigurationException:
+        :raises ~spinn_front_end_common.exceptions.ConfigurationException:
             If the DSG asks to use more SDRAM than is available.
         """
         # pylint: disable=too-many-arguments, signature-differs

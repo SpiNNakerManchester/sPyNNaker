@@ -109,7 +109,8 @@ class OnChipBitFieldGenerator(object):
         :param str default_report_folder: the file path for reports
         :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
             the machine graph
-        :param routing_infos: the key to edge map
+        :param ~pacman.model.routing_info.RoutingInfo routing_infos:
+            the key to edge map
         :param bool generating_bit_field_summary_report:
             whether to make summary report
         """
