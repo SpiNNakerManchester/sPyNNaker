@@ -24,6 +24,10 @@
 #include "synapse_row.h"
 #include "neuron.h"
 
+//! Count of the number of times the ring buffers have saturated
+extern uint32_t synapses_saturation_count;
+
+
 //! \brief Get the index of the ring buffer for a given timestep, synapse type
 //!     and neuron index
 //! \param[in] simulation_timestep:

@@ -378,7 +378,7 @@ static void timer_callback(uint timer_count, UNUSED uint unused1) {
     log_debug("Timer tick %u", time);
 
     // If a fixed number of simulation ticks are specified and these have passed
-    if (infinite_run != TRUE && time >= simulation_ticks) {
+    if (simulation_is_finished()) {
         // handle the pause and resume functionality
         simulation_handle_pause_resume(NULL);
 
