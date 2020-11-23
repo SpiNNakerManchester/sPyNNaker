@@ -461,11 +461,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">reset_number_of_neurons_per_core</span><span class="p">()</span>
         <span class="n">globals_variables</span><span class="o">.</span><span class="n">unset_simulator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="AbstractSpiNNakerCommon.run"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_time</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractSpiNNakerCommon.run"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_time</span><span class="p">,</span> <span class="n">sync_time</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Run the model created.</span>
 
 <span class="sd">        :param run_time: the time (in milliseconds) to run the simulation for</span>
 <span class="sd">        :type run_time: float or int</span>
+<span class="sd">        :param float sync_time:</span>
+<span class="sd">            If not 0, this specifies that the simulation should pause after</span>
+<span class="sd">            this duration.  The continue_simulation() method must then be</span>
+<span class="sd">            called for the simulation to continue.</span>
 <span class="sd">        :rtype: None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=protected-access</span>
@@ -484,7 +488,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">extend_extra_post_run_algorithms</span><span class="p">(</span>
                 <span class="p">[</span><span class="s2">&quot;RedundantPacketCountReport&quot;</span><span class="p">])</span>
 
-        <span class="nb">super</span><span class="p">(</span><span class="n">AbstractSpiNNakerCommon</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">run_time</span><span class="p">)</span></div>
+        <span class="nb">super</span><span class="p">(</span><span class="n">AbstractSpiNNakerCommon</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">run_time</span><span class="p">,</span> <span class="n">sync_time</span><span class="p">)</span></div>
 
     <span class="nd">@staticmethod</span>
 <div class="viewcode-block" id="AbstractSpiNNakerCommon.register_binary_search_path"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.register_binary_search_path">[docs]</a>    <span class="k">def</span> <span class="nf">register_binary_search_path</span><span class="p">(</span><span class="n">search_path</span><span class="p">):</span>

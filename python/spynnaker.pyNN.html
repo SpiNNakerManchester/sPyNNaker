@@ -480,15 +480,22 @@
 
 <dl class="method">
 <dt id="spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.run">
-<code class="descname">run</code><span class="sig-paren">(</span><em>run_time</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/abstract_spinnaker_common.html#AbstractSpiNNakerCommon.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.run" title="Permalink to this definition">¶</a></dt>
+<code class="descname">run</code><span class="sig-paren">(</span><em>run_time</em>, <em>sync_time=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/abstract_spinnaker_common.html#AbstractSpiNNakerCommon.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.run" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run the model created.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>run_time</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; the time (in milliseconds) to run the simulation for</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>run_time</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; the time (in milliseconds) to run the simulation for</li>
+<li><strong>sync_time</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; If not 0, this specifies that the simulation should pause after
+this duration.  The continue_simulation() method must then be
+called for the simulation to continue.</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></p>
+</td>
 </tr>
 </tbody>
 </table>

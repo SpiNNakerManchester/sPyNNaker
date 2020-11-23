@@ -7787,13 +7787,6 @@
     </member>
     <member kind="function">
       <type>uint32_t</type>
-      <name>synapses_get_saturation_count</name>
-      <anchorfile>synapses_8c.html</anchorfile>
-      <anchor>a4e44cc55de4083bfb10edfcac1a57e50</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function">
-      <type>uint32_t</type>
       <name>synapses_get_pre_synaptic_events</name>
       <anchorfile>synapses_8c.html</anchorfile>
       <anchor>aa95d63df3a6fbedaaf3a0d36f824df35</anchor>
@@ -7857,13 +7850,6 @@
     </member>
     <member kind="variable" static="yes">
       <type>static uint32_t</type>
-      <name>saturation_count</name>
-      <anchorfile>synapses_8c.html</anchorfile>
-      <anchor>af98038a462abb37d565a0f4e6fbc2b2a</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" static="yes">
-      <type>static uint32_t</type>
       <name>synapse_type_index_bits</name>
       <anchorfile>synapses_8c.html</anchorfile>
       <anchor>a4cb72a09cb7c84f5c82c07d17bcb0516</anchor>
@@ -7902,6 +7888,13 @@
       <name>synapse_type_mask</name>
       <anchorfile>synapses_8c.html</anchorfile>
       <anchor>af786c2a0c6f40c688029991d5b9711a7</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>synapses_saturation_count</name>
+      <anchorfile>synapses_8c.html</anchorfile>
+      <anchor>a8b7881a6d9caca38f2050656c652cf26</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -7988,6 +7981,13 @@
       <anchorfile>synapses_8h.html</anchorfile>
       <anchor>ac237268af6684b631aef510cc52fa607</anchor>
       <arglist>(void)</arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>synapses_saturation_count</name>
+      <anchorfile>synapses_8h.html</anchorfile>
+      <anchor>a8b7881a6d9caca38f2050656c652cf26</anchor>
+      <arglist></arglist>
     </member>
   </compound>
   <compound kind="file">
