@@ -103,7 +103,8 @@
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.synapse_dynamics</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractSynapseDynamicsStructural</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities</span> <span class="kn">import</span> <span class="n">constants</span><span class="p">,</span> <span class="n">bit_field_utilities</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="n">AbstractSynapseExpandable</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AbstractSynapseExpandable</span><span class="p">,</span> <span class="n">AbstractReadParametersBeforeSet</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="n">POPULATION_BASED_REGIONS</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">constants</span> <span class="k">as</span> <span class="n">common_constants</span><span class="p">,</span> <span class="n">helpful_functions</span><span class="p">)</span>
@@ -116,7 +117,7 @@
         <span class="n">AbstractSupportsBitFieldGeneration</span><span class="p">,</span>
         <span class="n">AbstractSupportsBitFieldRoutingCompression</span><span class="p">,</span>
         <span class="n">AbstractGeneratesDataSpecification</span><span class="p">,</span> <span class="n">AbstractSynapseExpandable</span><span class="p">,</span>
-        <span class="n">AbstractRewritesDataSpecification</span><span class="p">):</span>
+        <span class="n">AbstractRewritesDataSpecification</span><span class="p">,</span> <span class="n">AbstractReadParametersBeforeSet</span><span class="p">):</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;__binary_file_name&quot;</span><span class="p">,</span>
@@ -691,7 +692,39 @@
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseExpandable</span><span class="o">.</span><span class="n">read_generated_connection_holders</span><span class="p">)</span>
 <div class="viewcode-block" id="PopulationMachineVertex.read_generated_connection_holders"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.read_generated_connection_holders">[docs]</a>    <span class="k">def</span> <span class="nf">read_generated_connection_holders</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">synapse_manager</span><span class="o">.</span><span class="n">read_generated_connection_holders</span><span class="p">(</span>
-            <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">)</span></div></div>
+            <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">)</span></div>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractReadParametersBeforeSet</span><span class="o">.</span><span class="n">read_parameters_from_machine</span><span class="p">)</span>
+<div class="viewcode-block" id="PopulationMachineVertex.read_parameters_from_machine"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.read_parameters_from_machine">[docs]</a>    <span class="k">def</span> <span class="nf">read_parameters_from_machine</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
+
+        <span class="c1"># locate SDRAM address to where the neuron parameters are stored</span>
+        <span class="n">neuron_region_sdram_address</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">neuron_region_sdram_address</span><span class="p">(</span>
+            <span class="n">placement</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">)</span>
+
+        <span class="c1"># shift past the extra stuff before neuron parameters that we don&#39;t</span>
+        <span class="c1"># need to read</span>
+        <span class="n">neuron_parameters_sdram_address</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">neuron_region_sdram_address</span> <span class="o">+</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">tdma_sdram_size_in_bytes</span> <span class="o">+</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">BYTES_TILL_START_OF_GLOBAL_PARAMETERS</span><span class="p">)</span>
+
+        <span class="c1"># get size of neuron params</span>
+        <span class="n">size_of_region</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">get_sdram_usage_for_neuron_params</span><span class="p">(</span>
+            <span class="n">vertex_slice</span><span class="p">)</span>
+        <span class="n">size_of_region</span> <span class="o">-=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">BYTES_TILL_START_OF_GLOBAL_PARAMETERS</span> <span class="o">+</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">tdma_sdram_size_in_bytes</span><span class="p">)</span>
+
+        <span class="c1"># get data from the machine</span>
+        <span class="n">byte_array</span> <span class="o">=</span> <span class="n">transceiver</span><span class="o">.</span><span class="n">read_memory</span><span class="p">(</span>
+            <span class="n">placement</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">neuron_parameters_sdram_address</span><span class="p">,</span>
+            <span class="n">size_of_region</span><span class="p">)</span>
+
+        <span class="c1"># update python neuron parameters with the data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">neuron_impl</span><span class="o">.</span><span class="n">read_data</span><span class="p">(</span>
+            <span class="n">byte_array</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">parameters</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">state_variables</span><span class="p">)</span></div></div>
 </pre></div>
 
           </div>

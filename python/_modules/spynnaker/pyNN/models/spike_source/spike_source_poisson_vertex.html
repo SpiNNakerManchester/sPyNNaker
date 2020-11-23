@@ -82,9 +82,7 @@
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">import</span> <span class="nn">scipy.stats</span>
-<span class="kn">import</span> <span class="nn">struct</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
-<span class="kn">from</span> <span class="nn">data_specification.enums</span> <span class="kn">import</span> <span class="n">DataType</span>
 <span class="kn">from</span> <span class="nn">pacman.executor.injection_decorator</span> <span class="kn">import</span> <span class="n">inject_items</span>
 <span class="kn">from</span> <span class="nn">pacman.model.constraints.key_allocator_constraints</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ContiguousKeyRangeContraint</span><span class="p">)</span>
@@ -104,22 +102,15 @@
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.profiling</span> <span class="kn">import</span> <span class="n">profile_utils</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.common</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractSpikeRecordable</span><span class="p">,</span> <span class="n">MultiSpikeRecorder</span><span class="p">,</span> <span class="n">SimplePopulationSettable</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">AbstractReadParametersBeforeSet</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.spike_source_poisson_machine_vertex</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">SpikeSourcePoissonMachineVertex</span><span class="p">,</span> <span class="n">_flatten</span><span class="p">,</span> <span class="n">get_rates_bytes</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.utility_calls</span> <span class="kn">import</span> <span class="n">create_mars_kiss_seeds</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.struct</span> <span class="kn">import</span> <span class="n">Struct</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.ranged.spynnaker_ranged_dict</span> \
     <span class="kn">import</span> <span class="nn">SpynnakerRangeDictionary</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.ranged.spynnaker_ranged_list</span> \
     <span class="kn">import</span> <span class="nn">SpynnakerRangedList</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
-
-<span class="c1"># Seed offset in parameters and size on bytes</span>
-<span class="n">SEED_OFFSET_BYTES</span> <span class="o">=</span> <span class="mi">9</span> <span class="o">*</span> <span class="mi">4</span>
-<span class="n">SEED_SIZE_BYTES</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">*</span> <span class="mi">4</span>
 
 <span class="c1"># uint32_t n_rates; uint32_t index</span>
 <span class="n">PARAMS_WORDS_PER_NEURON</span> <span class="o">=</span> <span class="mi">2</span>
@@ -137,22 +128,11 @@
 <span class="n">_MAX_OFFSET_DENOMINATOR</span> <span class="o">=</span> <span class="mi">10</span>
 
 
-<span class="n">_PoissonStruct</span> <span class="o">=</span> <span class="n">Struct</span><span class="p">([</span>
-    <span class="n">DataType</span><span class="o">.</span><span class="n">UINT32</span><span class="p">,</span>  <span class="c1"># Start Scaled</span>
-    <span class="n">DataType</span><span class="o">.</span><span class="n">UINT32</span><span class="p">,</span>  <span class="c1"># End Scaled</span>
-    <span class="n">DataType</span><span class="o">.</span><span class="n">UINT32</span><span class="p">,</span>  <span class="c1"># Next Scaled</span>
-    <span class="n">DataType</span><span class="o">.</span><span class="n">UINT32</span><span class="p">,</span>  <span class="c1"># is_fast_source</span>
-    <span class="n">DataType</span><span class="o">.</span><span class="n">U032</span><span class="p">,</span>    <span class="c1"># exp^(-spikes_per_tick)</span>
-    <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># sqrt(spikes_per_tick)</span>
-    <span class="n">DataType</span><span class="o">.</span><span class="n">UINT32</span><span class="p">,</span>   <span class="c1"># inter-spike-interval</span>
-    <span class="n">DataType</span><span class="o">.</span><span class="n">UINT32</span><span class="p">])</span>  <span class="c1"># timesteps to next spike</span>
-
-
 <div class="viewcode-block" id="SpikeSourcePoissonVertex"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex">[docs]</a><span class="k">class</span> <span class="nc">SpikeSourcePoissonVertex</span><span class="p">(</span>
         <span class="n">TDMAAwareApplicationVertex</span><span class="p">,</span> <span class="n">AbstractSpikeRecordable</span><span class="p">,</span>
         <span class="n">AbstractProvidesOutgoingPartitionConstraints</span><span class="p">,</span>
-        <span class="n">AbstractChangableAfterRun</span><span class="p">,</span> <span class="n">AbstractReadParametersBeforeSet</span><span class="p">,</span>
-        <span class="n">SimplePopulationSettable</span><span class="p">,</span> <span class="n">ProvidesKeyToAtomMappingImpl</span><span class="p">):</span>
+        <span class="n">AbstractChangableAfterRun</span><span class="p">,</span> <span class="n">SimplePopulationSettable</span><span class="p">,</span>
+        <span class="n">ProvidesKeyToAtomMappingImpl</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; A Poisson Spike source object</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
@@ -606,71 +586,14 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">__rng</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__seed</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__kiss_seed</span><span class="p">[</span><span class="n">vertex_slice</span><span class="p">]</span></div>
 
-    <span class="nd">@overrides</span><span class="p">(</span>
-        <span class="n">AbstractReadParametersBeforeSet</span><span class="o">.</span><span class="n">read_parameters_from_machine</span><span class="p">)</span>
-<div class="viewcode-block" id="SpikeSourcePoissonVertex.read_parameters_from_machine"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.read_parameters_from_machine">[docs]</a>    <span class="k">def</span> <span class="nf">read_parameters_from_machine</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
+<div class="viewcode-block" id="SpikeSourcePoissonVertex.update_kiss_seed"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.update_kiss_seed">[docs]</a>    <span class="k">def</span> <span class="nf">update_kiss_seed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">seed</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; updates a kiss seed from the machine</span>
 
-        <span class="c1"># locate SDRAM address where parameters are stored</span>
-        <span class="n">poisson_params</span> <span class="o">=</span> <span class="n">placement</span><span class="o">.</span><span class="n">vertex</span><span class="o">.</span><span class="n">poisson_param_region_address</span><span class="p">(</span>
-            <span class="n">placement</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">)</span>
-        <span class="n">seed_array</span> <span class="o">=</span> <span class="n">transceiver</span><span class="o">.</span><span class="n">read_memory</span><span class="p">(</span>
-            <span class="n">placement</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">poisson_params</span> <span class="o">+</span> <span class="n">SEED_OFFSET_BYTES</span><span class="p">,</span>
-            <span class="n">SEED_SIZE_BYTES</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__kiss_seed</span><span class="p">[</span><span class="n">vertex_slice</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack_from</span><span class="p">(</span><span class="s2">&quot;&lt;4I&quot;</span><span class="p">,</span> <span class="n">seed_array</span><span class="p">)</span>
-
-        <span class="c1"># locate SDRAM address where the rates are stored</span>
-        <span class="n">poisson_rate_region_sdram_address</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">placement</span><span class="o">.</span><span class="n">vertex</span><span class="o">.</span><span class="n">poisson_rate_region_address</span><span class="p">(</span>
-                <span class="n">placement</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">))</span>
-
-        <span class="c1"># get size of poisson params</span>
-        <span class="n">size_of_region</span> <span class="o">=</span> <span class="n">get_rates_bytes</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data</span><span class="p">[</span><span class="s2">&quot;rates&quot;</span><span class="p">])</span>
-
-        <span class="c1"># get data from the machine</span>
-        <span class="n">byte_array</span> <span class="o">=</span> <span class="n">transceiver</span><span class="o">.</span><span class="n">read_memory</span><span class="p">(</span>
-            <span class="n">placement</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
-            <span class="n">poisson_rate_region_sdram_address</span><span class="p">,</span> <span class="n">size_of_region</span><span class="p">)</span>
-
-        <span class="c1"># For each atom, read the number of rates and the rate parameters</span>
-        <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
-            <span class="n">n_values</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack_from</span><span class="p">(</span><span class="s2">&quot;&lt;I&quot;</span><span class="p">,</span> <span class="n">byte_array</span><span class="p">,</span> <span class="n">offset</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">offset</span> <span class="o">+=</span> <span class="mi">4</span>
-
-            <span class="c1"># Skip reading the index, as it will be recalculated on data write</span>
-            <span class="n">offset</span> <span class="o">+=</span> <span class="mi">4</span>
-
-            <span class="p">(</span><span class="n">_start</span><span class="p">,</span> <span class="n">_end</span><span class="p">,</span> <span class="n">_next</span><span class="p">,</span> <span class="n">is_fast_source</span><span class="p">,</span> <span class="n">exp_minus_lambda</span><span class="p">,</span>
-             <span class="n">sqrt_lambda</span><span class="p">,</span> <span class="n">isi</span><span class="p">,</span> <span class="n">time_to_next_spike</span><span class="p">)</span> <span class="o">=</span> <span class="n">_PoissonStruct</span><span class="o">.</span><span class="n">read_data</span><span class="p">(</span>
-                 <span class="n">byte_array</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">n_values</span><span class="p">)</span>
-            <span class="n">offset</span> <span class="o">+=</span> <span class="n">_PoissonStruct</span><span class="o">.</span><span class="n">get_size_in_whole_words</span><span class="p">(</span><span class="n">n_values</span><span class="p">)</span> <span class="o">*</span> <span class="mi">4</span>
-
-            <span class="c1"># Work out the spikes per tick depending on if the source is</span>
-            <span class="c1"># slow (isi), fast (exp) or faster (sqrt)</span>
-            <span class="n">is_fast_source</span> <span class="o">=</span> <span class="n">is_fast_source</span> <span class="o">==</span> <span class="mf">1.0</span>
-            <span class="n">spikes_per_tick</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">is_fast_source</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float&quot;</span><span class="p">)</span>
-            <span class="n">spikes_per_tick</span><span class="p">[</span><span class="n">is_fast_source</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
-                <span class="n">exp_minus_lambda</span><span class="p">[</span><span class="n">is_fast_source</span><span class="p">])</span> <span class="o">*</span> <span class="o">-</span><span class="mf">1.0</span>
-            <span class="n">is_faster_source</span> <span class="o">=</span> <span class="n">sqrt_lambda</span> <span class="o">&gt;</span> <span class="mi">0</span>
-            <span class="c1"># pylint: disable=assignment-from-no-return</span>
-            <span class="n">spikes_per_tick</span><span class="p">[</span><span class="n">is_faster_source</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">square</span><span class="p">(</span>
-                <span class="n">sqrt_lambda</span><span class="p">[</span><span class="n">is_faster_source</span><span class="p">])</span>
-            <span class="n">slow_elements</span> <span class="o">=</span> <span class="n">isi</span> <span class="o">&gt;</span> <span class="mi">0</span>
-            <span class="n">spikes_per_tick</span><span class="p">[</span><span class="n">slow_elements</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">isi</span><span class="p">[</span><span class="n">slow_elements</span><span class="p">]</span>
-
-            <span class="c1"># Convert spikes per tick to rates</span>
-            <span class="n">machine_time_step</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="n">globals_variables</span><span class="o">.</span><span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">machine_time_step</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__data</span><span class="p">[</span><span class="s2">&quot;rates&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">set_value_by_id</span><span class="p">(</span>
-                <span class="n">i</span><span class="p">,</span>
-                <span class="n">spikes_per_tick</span> <span class="o">*</span>
-                <span class="p">(</span><span class="n">MICRO_TO_SECOND_CONVERSION</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">machine_time_step</span><span class="p">)))</span>
-
-            <span class="c1"># Store the updated time until next spike so that it can be</span>
-            <span class="c1"># rewritten when the parameters are loaded</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__data</span><span class="p">[</span><span class="s2">&quot;time_to_spike&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">set_value_by_id</span><span class="p">(</span>
-                <span class="n">i</span><span class="p">,</span> <span class="n">time_to_next_spike</span><span class="p">)</span></div>
+<span class="sd">        :param vertex_slice: the vertex slice to update seed of</span>
+<span class="sd">        :param seed: the seed</span>
+<span class="sd">        :rtype: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__kiss_seed</span><span class="p">[</span><span class="n">vertex_slice</span><span class="p">]</span> <span class="o">=</span> <span class="n">seed</span></div>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpikeRecordable</span><span class="o">.</span><span class="n">get_spikes</span><span class="p">)</span>
 <div class="viewcode-block" id="SpikeSourcePoissonVertex.get_spikes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.get_spikes">[docs]</a>    <span class="k">def</span> <span class="nf">get_spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">):</span>
