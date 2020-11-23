@@ -196,7 +196,7 @@ static void timer_callback(UNUSED uint unused0, UNUSED uint unused1) {
 
     log_debug("Timer tick %d", time);
 
-    if ((infinite_run != TRUE) && (time == simulation_ticks)) {
+    if (simulation_is_finished()) {
         simulation_handle_pause_resume(NULL);
         log_info("Simulation complete.\n");
         simulation_ready_to_read();
