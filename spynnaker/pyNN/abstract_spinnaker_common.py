@@ -396,11 +396,15 @@ class AbstractSpiNNakerCommon(with_metaclass(
         self.reset_number_of_neurons_per_core()
         globals_variables.unset_simulator(self)
 
-    def run(self, run_time):
+    def run(self, run_time, sync_time=0.0):
         """ Run the model created.
 
         :param run_time: the time (in milliseconds) to run the simulation for
         :type run_time: float or int
+        :param float sync_time:
+            If not 0, this specifies that the simulation should pause after
+            this duration.  The continue_simulation() method must then be
+            called for the simulation to continue.
         :rtype: None
         """
         # pylint: disable=protected-access
@@ -419,7 +423,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
             self.extend_extra_post_run_algorithms(
                 ["RedundantPacketCountReport"])
 
-        super(AbstractSpiNNakerCommon, self).run(run_time)
+        super(AbstractSpiNNakerCommon, self).run(run_time, sync_time)
 
     @staticmethod
     def register_binary_search_path(search_path):
