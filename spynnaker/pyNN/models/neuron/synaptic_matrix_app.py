@@ -169,6 +169,14 @@ class SynapticMatrixApp(object):
         self.__received_block = None
         self.__delay_received_block = None
 
+    @property
+    def n_synapses_per_row(self):
+        return self.__max_row_info.undelayed_max_n_synapses
+
+    @property
+    def n_synapses_per_delay_row(self):
+        return self.__max_row_info.delayed_max_n_synapses
+
     def __get_matrix(self, machine_edge):
         """ Get or create a matrix object
 
