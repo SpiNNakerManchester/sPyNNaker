@@ -57,7 +57,7 @@ class SpYNNakerConnectionHolderGenerator(object):
             None, True, edge.pre_vertex.n_atoms, edge.post_vertex.n_atoms)
 
         for synapse_information in edge.synapse_information:
-            edge.post_vertex.add_pre_run_connection_holder(
-                connection_holder, edge, synapse_information)
+            synapse_information.add_pre_run_connection_holder(
+                connection_holder)
             # store for the report generations
             data_holders[edge, synapse_information] = connection_holder

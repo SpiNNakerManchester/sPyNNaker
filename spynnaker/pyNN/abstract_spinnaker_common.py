@@ -192,6 +192,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
             extra_post_run_algorithms = []
         extra_load_algorithms.append("SynapseExpander")
         extra_load_algorithms.append("OnChipBitFieldGenerator")
+        extra_load_algorithms.append("FinishConnectionHolders")
         extra_algorithms_pre_run = []
 
         if self.config.getboolean("Reports", "draw_network_graph"):

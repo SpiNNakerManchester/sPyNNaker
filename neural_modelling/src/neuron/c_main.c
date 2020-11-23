@@ -43,7 +43,6 @@
 #include "structural_plasticity/synaptogenesis_dynamics.h"
 #include "profile_tags.h"
 #include "direct_synapses.h"
-#include "bit_field_filter.h"
 
 #include <data_specification.h>
 #include <simulation.h>
@@ -140,14 +139,12 @@ static void c_main_store_provenance_data(address_t provenance_region) {
     prov->current_timer_tick = time;
     prov->n_plastic_synaptic_weight_saturations =
         synapse_dynamics_get_plastic_saturation_count();
-    prov->n_ghost_pop_table_searches =
-        spike_processing_get_ghost_pop_table_searches();
+    prov->n_ghost_pop_table_searches = ghost_pop_table_searches;
     prov->n_failed_bitfield_reads = failed_bit_field_reads;
     prov->n_dmas_complete = spike_processing_get_dma_complete_count();
     prov->n_spikes_processed = spike_processing_get_spike_processing_count();
-    prov->n_invalid_master_pop_table_hits =
-        spike_processing_get_invalid_master_pop_table_hits();
-    prov->n_filtered_by_bitfield = population_table_get_filtered_packet_count();
+    prov->n_invalid_master_pop_table_hits = invalid_master_pop_hits;
+    prov->n_filtered_by_bitfield = bit_field_filtered_packets;
     prov->n_rewires = spike_processing_get_successful_rewires();
     prov->n_packets_dropped_from_lateness =
         spike_processing_get_n_packets_dropped_from_lateness();
@@ -249,12 +246,13 @@ static bool initialise(void) {
     // Setup profiler
     profiler_init(data_specification_get_region(PROFILER_REGION, ds_regions));
 
-    log_info("initialising the bit field region");
-    print_post_to_pre_entry();
-    if (!bit_field_filter_initialise(data_specification_get_region(
-            BIT_FIELD_FILTER_REGION, ds_regions))) {
+    // Do bitfield configuration last to only use any unused memory
+    if (!population_table_load_bitfields(
+            data_specification_get_region(BIT_FIELD_FILTER_REGION, ds_regions))) {
         return false;
     }
+
+    print_post_to_pre_entry();
 
     log_debug("Initialise: finished");
     return true;

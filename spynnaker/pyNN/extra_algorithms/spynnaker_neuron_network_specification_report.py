@@ -15,6 +15,7 @@
 
 import logging
 import os
+from six import raise_from
 from spinn_utilities.progress_bar import ProgressBar
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
@@ -32,22 +33,28 @@ class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
         the app graph
     """
 
+    _GRAPH_TITLE = "The graph of the network in graphical form"
+    _GRAPH_NAME = "network_graph.gv"
+    _NODE_LABEL = "{} ({} neurons)"
+
     @staticmethod
     def _get_diagram(label):
+        """
+        :param str label:
+        :rtype: ~graphviz.Digraph
+        """
         # pylint: disable=import-error
         try:
             import graphviz
-        except ImportError:
-            raise SpynnakerException(
+        except ImportError as e:
+            raise_from(SpynnakerException(
                 "graphviz is required to use this report.  "
-                "Please install graphviz if you want to use this report.")
+                "Please install graphviz if you want to use this report."), e)
         return graphviz.Digraph(comment=label)
 
     def __call__(self, report_folder, application_graph):
         # create holders for data
-        vertex_holders = dict()
-        dot_diagram = self._get_diagram(
-            "The graph of the network in graphical form")
+        dot_diagram = self._get_diagram(self._GRAPH_TITLE)
 
         # build progress bar for the vertices, edges, and rendering
         progress = ProgressBar(
@@ -56,32 +63,54 @@ class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
             "generating the graphical representation of the neural network")
 
         # write vertices into dot diagram
-        for vertex_counter, vertex in progress.over(
-                enumerate(application_graph.vertices), False):
-            dot_diagram.node(
-                "{}".format(vertex_counter),
-                "{} ({} neurons)".format(vertex.label, vertex.n_atoms))
-            vertex_holders[vertex] = vertex_counter
-
+        vertex_ids = self._generate_vertices(
+            application_graph, dot_diagram, progress)
         # write edges into dot diagram
-        for partition in progress.over(
-                application_graph.outgoing_edge_partitions, False):
-            for edge in partition.edges:
-                source_vertex_id = vertex_holders[edge.pre_vertex]
-                dest_vertex_id = vertex_holders[edge.post_vertex]
-                if isinstance(edge, ProjectionApplicationEdge):
-                    for synapse_info in edge.synapse_information:
-                        dot_diagram.edge(
-                            "{}".format(source_vertex_id),
-                            "{}".format(dest_vertex_id),
-                            "{}".format(synapse_info.connector))
-                else:
-                    dot_diagram.edge(
-                        "{}".format(source_vertex_id),
-                        "{}".format(dest_vertex_id))
+        self._generate_edges(
+            application_graph, dot_diagram, vertex_ids, progress)
 
         # write dot file and generate pdf
-        file_to_output = os.path.join(report_folder, "network_graph.gv")
+        file_to_output = os.path.join(report_folder, self._GRAPH_NAME)
         dot_diagram.render(file_to_output, view=False)
         progress.update()
         progress.end()
+
+    @classmethod
+    def _generate_vertices(cls, graph, dot_diagram, progress):
+        """
+        :param ~.ApplicationGraph graph:
+        :param ~graphviz.Digraph dot_diagram:
+        :param ~.ProgressBar progress:
+        :rtype: dict(~.ApplicationVertex,str)
+        """
+        vertex_ids = dict()
+        for vertex_counter, vertex in progress.over(
+                enumerate(graph.vertices), False):
+            # Arbitrary labels used inside dot
+            vertex_id = str(vertex_counter)
+            dot_diagram.node(
+                vertex_id,
+                cls._NODE_LABEL.format(vertex.label, vertex.n_atoms))
+            vertex_ids[vertex] = vertex_id
+        return vertex_ids
+
+    @staticmethod
+    def _generate_edges(graph, dot_diagram, vertex_ids, progress):
+        """
+        :param ~.ApplicationGraph graph:
+        :param ~graphviz.Digraph dot_diagram:
+        :param dict(~.ApplicationVertex,str) vertex_ids:
+        :param ~.ProgressBar progress:
+        """
+        for partition in progress.over(graph.outgoing_edge_partitions, False):
+            for edge in partition.edges:
+                source_vertex_id = vertex_ids[edge.pre_vertex]
+                dest_vertex_id = vertex_ids[edge.post_vertex]
+                if isinstance(edge, ProjectionApplicationEdge):
+                    for synapse_info in edge.synapse_information:
+                        dot_diagram.edge(
+                            source_vertex_id, dest_vertex_id,
+                            str(synapse_info.connector))
+                else:
+                    # Unlabelled edge
+                    dot_diagram.edge(source_vertex_id, dest_vertex_id)

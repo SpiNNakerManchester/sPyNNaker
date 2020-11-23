@@ -80,7 +80,7 @@ struct expander_config {
 static bool read_connection_builder_region(address_t *in_region,
         address_t synaptic_matrix_region, uint32_t post_slice_start,
         uint32_t post_slice_count, uint32_t n_synapse_type_bits,
-        uint32_t n_synapse_index_bits, accum *weight_scales) {
+        uint32_t n_synapse_index_bits, unsigned long accum *weight_scales) {
     address_t region = *in_region;
     struct connection_builder_config config;
     fast_memcpy(&config, region, sizeof(config));
@@ -166,10 +166,10 @@ static bool run_synapse_expander(
             config.n_in_edges, config.post_slice_count, config.post_slice_start);
 
     // Read in the weight scales, one per synapse type
-    accum weight_scales[config.n_synapse_types];
+    unsigned long accum weight_scales[config.n_synapse_types];
     fast_memcpy(weight_scales, params_address,
-            sizeof(accum) * config.n_synapse_types);
-    params_address += config.n_synapse_types;
+            sizeof(unsigned long accum) * config.n_synapse_types);
+    params_address += 2 * config.n_synapse_types;
 
     // Go through each connector and generate
     for (uint32_t edge = 0; edge < config.n_in_edges; edge++) {

@@ -16,8 +16,6 @@
 import logging
 import os
 
-from spinn_front_end_common.abstract_models.impl.\
-    tdma_aware_application_vertex import TDMAAwareApplicationVertex
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
@@ -25,22 +23,18 @@ from pacman.executor.injection_decorator import inject_items
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
 from spinn_front_end_common.abstract_models import (
-    AbstractChangableAfterRun, AbstractProvidesIncomingPartitionConstraints,
-    AbstractProvidesOutgoingPartitionConstraints,
-    AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification,
-    AbstractCanReset)
+    AbstractChangableAfterRun, AbstractProvidesOutgoingPartitionConstraints,
+    AbstractCanReset, AbstractRewritesDataSpecification)
 from spinn_front_end_common.abstract_models.impl import (
-    ProvidesKeyToAtomMappingImpl)
+    ProvidesKeyToAtomMappingImpl, TDMAAwareApplicationVertex)
 from spinn_front_end_common.utilities import (
-    constants as common_constants, helpful_functions, globals_variables)
+    helpful_functions, globals_variables)
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, SYSTEM_BYTES_REQUIREMENT)
-from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.interface.profiling import profile_utils
-from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, AbstractNeuronRecordable, NeuronRecorder)
-from spynnaker.pyNN.utilities import constants, bit_field_utilities
+from spynnaker.pyNN.utilities import bit_field_utilities
 from spynnaker.pyNN.models.abstract_models import (
     AbstractPopulationInitializable, AbstractAcceptsIncomingSynapses,
     AbstractPopulationSettable, AbstractReadParametersBeforeSet,
@@ -48,7 +42,6 @@ from spynnaker.pyNN.models.abstract_models import (
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.utilities.ranged import (
     SpynnakerRangeDictionary, SpynnakerRangedList)
-from .synapse_dynamics import AbstractSynapseDynamicsStructural
 from .synaptic_manager import SynapticManager
 from .population_machine_vertex import PopulationMachineVertex
 
@@ -61,22 +54,19 @@ _NEURON_BASE_N_CPU_CYCLES = 10
 
 
 class AbstractPopulationVertex(
-        TDMAAwareApplicationVertex, AbstractGeneratesDataSpecification,
-        AbstractContainsUnits, AbstractSpikeRecordable,
-        AbstractNeuronRecordable,
+        TDMAAwareApplicationVertex, AbstractContainsUnits,
+        AbstractSpikeRecordable, AbstractNeuronRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
-        AbstractProvidesIncomingPartitionConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
-        AbstractChangableAfterRun, AbstractRewritesDataSpecification,
-        AbstractReadParametersBeforeSet, AbstractAcceptsIncomingSynapses,
-        ProvidesKeyToAtomMappingImpl, AbstractCanReset):
+        AbstractChangableAfterRun, AbstractReadParametersBeforeSet,
+        AbstractAcceptsIncomingSynapses, ProvidesKeyToAtomMappingImpl,
+        AbstractCanReset):
     """ Underlying vertex model for Neural Populations.
         Not actually abstract.
     """
 
     __slots__ = [
         "__change_requires_mapping",
-        "__change_requires_neuron_parameters_reload",
         "__change_requires_data_generation",
         "__incoming_spike_buffer_size",
         "__n_atoms",
@@ -180,7 +170,6 @@ class AbstractPopulationVertex(
 
         # bool for if state has changed.
         self.__change_requires_mapping = True
-        self.__change_requires_neuron_parameters_reload = False
         self.__change_requires_data_generation = False
         self.__has_reset_last = True
 
@@ -194,28 +183,70 @@ class AbstractPopulationVertex(
         return self.__n_atoms
 
     @property
-    def _neuron_recorder(self):  # for testing only
+    def incoming_spike_buffer_size(self):
+        return self.__incoming_spike_buffer_size
+
+    @property
+    def parameters(self):
+        return self._parameters
+
+    @property
+    def state_variables(self):
+        return self._state_variables
+
+    @property
+    def neuron_impl(self):
+        return self.__neuron_impl
+
+    @property
+    def n_profile_samples(self):
+        return self.__n_profile_samples
+
+    @property
+    def neuron_recorder(self):  # for testing only
         return self.__neuron_recorder
 
+    @property
+    def synapse_manager(self):
+        return self.__synapse_manager
+
+    def update_state_variables(self):
+        """ processes any changes since init
+
+        :rtype: None
+        """
+
+        # If resetting
+        if self.__has_reset_last:
+            # reset any state variables that need to be reset
+            if self.__initial_state_variables is not None:
+                self._state_variables = self.__copy_ranged_dict(
+                    self.__initial_state_variables, self._state_variables,
+                    self.__updated_state_variables)
+                self.__initial_state_variables = None
+            else:
+                # If no initial state variables, copy them now
+                self.__initial_state_variables = self.__copy_ranged_dict(
+                    self._state_variables)
+
+        # Reset things that need resetting
+        self.__has_reset_last = False
+        self.__updated_state_variables.clear()
+
     @inject_items({
-        "graph": "MemoryApplicationGraph",
-        "machine_time_step": "MachineTimeStep"
+        "graph": "MemoryApplicationGraph"
     })
     @overrides(
         TDMAAwareApplicationVertex.get_resources_used_by_atoms,
-        additional_arguments={
-            "graph", "machine_time_step"
-        }
+        additional_arguments={"graph"}
     )
-    def get_resources_used_by_atoms(
-            self, vertex_slice, graph, machine_time_step):
+    def get_resources_used_by_atoms(self, vertex_slice, graph):
         # pylint: disable=arguments-differ
 
         variableSDRAM = self.__neuron_recorder.get_variable_sdram_usage(
             vertex_slice)
         constantSDRAM = ConstantSDRAM(
-                self._get_sdram_usage_for_atoms(
-                    vertex_slice, graph, machine_time_step))
+            self._get_sdram_usage_for_atoms(vertex_slice, graph))
 
         # set resources required from this object
         container = ResourceContainer(
@@ -239,6 +270,9 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractChangableAfterRun.mark_no_changes)
     def mark_no_changes(self):
+        # If mapping will happen, reset things that need this
+        if self.__change_requires_mapping:
+            self.__synapse_manager.clear_all_caches()
         self.__change_requires_mapping = False
         self.__change_requires_data_generation = False
 
@@ -275,7 +309,7 @@ class AbstractPopulationVertex(
             self.__neuron_recorder.get_dtcm_usage_in_bytes(vertex_slice) +
             self.__synapse_manager.get_dtcm_usage_in_bytes())
 
-    def _get_sdram_usage_for_neuron_params(self, vertex_slice):
+    def get_sdram_usage_for_neuron_params(self, vertex_slice):
         """ Calculate the SDRAM usage for just the neuron parameters region.
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
@@ -287,16 +321,15 @@ class AbstractPopulationVertex(
             self.tdma_sdram_size_in_bytes +
             self.__neuron_impl.get_sdram_usage_in_bytes(vertex_slice.n_atoms))
 
-    def _get_sdram_usage_for_atoms(
-            self, vertex_slice, graph, machine_time_step):
+    def _get_sdram_usage_for_atoms(self, vertex_slice, graph):
         sdram_requirement = (
             SYSTEM_BYTES_REQUIREMENT +
-            self._get_sdram_usage_for_neuron_params(vertex_slice) +
-            self._neuron_recorder.get_static_sdram_usage(vertex_slice) +
+            self.get_sdram_usage_for_neuron_params(vertex_slice) +
+            self.neuron_recorder.get_static_sdram_usage(vertex_slice) +
             PopulationMachineVertex.get_provenance_data_size(
                 len(PopulationMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES)) +
             self.__synapse_manager.get_sdram_usage_in_bytes(
-                vertex_slice, machine_time_step, graph, self) +
+                vertex_slice, graph, self) +
             profile_utils.get_profile_region_size(
                 self.__n_profile_samples) +
             bit_field_utilities.get_estimated_sdram_for_bit_field_region(
@@ -305,61 +338,6 @@ class AbstractPopulationVertex(
                 graph, self) +
             bit_field_utilities.exact_sdram_for_bit_field_builder_region())
         return sdram_requirement
-
-    def _reserve_memory_regions(
-            self, spec, vertex_slice, vertex, machine_graph, n_key_map):
-        """ Reserve the DSG data regions.
-
-        :param ~.DataSpecificationGenerator spec:
-            the spec to write the DSG region to
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-            the slice of atoms from the application vertex
-        :param ~.MachineVertex vertex: this vertex
-        :param ~.MachineGraph machine_graph: machine graph
-        :param n_key_map: nkey map
-        :return: None
-        """
-        spec.comment("\nReserving memory space for data regions:\n\n")
-
-        # Reserve memory:
-        spec.reserve_memory_region(
-            region=POPULATION_BASED_REGIONS.SYSTEM.value,
-            size=common_constants.SIMULATION_N_BYTES,
-            label='System')
-
-        self._reserve_neuron_params_data_region(spec, vertex_slice)
-
-        spec.reserve_memory_region(
-            region=POPULATION_BASED_REGIONS.NEURON_RECORDING.value,
-            size=self._neuron_recorder.get_static_sdram_usage(vertex_slice),
-            label="neuron recording")
-
-        profile_utils.reserve_profile_region(
-            spec, POPULATION_BASED_REGIONS.PROFILING.value,
-            self.__n_profile_samples)
-
-        # reserve bit field region
-        bit_field_utilities.reserve_bit_field_regions(
-            spec, machine_graph, n_key_map, vertex,
-            POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER.value,
-            POPULATION_BASED_REGIONS.BIT_FIELD_FILTER.value,
-            POPULATION_BASED_REGIONS.BIT_FIELD_KEY_MAP.value)
-
-        vertex.reserve_provenance_data_region(spec)
-
-    def _reserve_neuron_params_data_region(self, spec, vertex_slice):
-        """ Reserve the neuron parameter data region.
-
-        :param ~data_specification.DataSpecificationGenerator spec:
-            the spec to write the DSG region to
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-            the slice of atoms from the application vertex
-        :return: None
-        """
-        params_size = self._get_sdram_usage_for_neuron_params(vertex_slice)
-        spec.reserve_memory_region(
-            region=POPULATION_BASED_REGIONS.NEURON_PARAMS.value,
-            size=params_size, label='NeuronParams')
 
     @staticmethod
     def __copy_ranged_dict(source, merge=None, merge_keys=None):
@@ -376,198 +354,6 @@ class AbstractPopulationVertex(
                 copy_list.set_value_by_slice(start, stop, value, is_list)
             target[key] = copy_list
         return target
-
-    def _write_neuron_parameters(self, spec, key, vertex_slice):
-
-        # If resetting, reset any state variables that need to be reset
-        if (self.__has_reset_last and
-                self.__initial_state_variables is not None):
-            self._state_variables = self.__copy_ranged_dict(
-                self.__initial_state_variables, self._state_variables,
-                self.__updated_state_variables)
-            self.__initial_state_variables = None
-
-        # If no initial state variables, copy them now
-        if self.__has_reset_last:
-            self.__initial_state_variables = self.__copy_ranged_dict(
-                self._state_variables)
-
-        # Reset things that need resetting
-        self.__has_reset_last = False
-        self.__updated_state_variables.clear()
-
-        # pylint: disable=too-many-arguments
-        n_atoms = vertex_slice.n_atoms
-        spec.comment("\nWriting Neuron Parameters for {} Neurons:\n".format(
-            n_atoms))
-
-        # Set the focus to the memory region 2 (neuron parameters):
-        spec.switch_write_focus(
-            region=constants.POPULATION_BASED_REGIONS.NEURON_PARAMS.value)
-
-        # store the tdma data here for this slice.
-        data = self.generate_tdma_data_specification_data(
-            self.vertex_slices.index(vertex_slice))
-        spec.write_array(data)
-
-        # Write whether the key is to be used, and then the key, or 0 if it
-        # isn't to be used
-        if key is None:
-            spec.write_value(data=0)
-            spec.write_value(data=0)
-        else:
-            spec.write_value(data=1)
-            spec.write_value(data=key)
-
-        # Write the number of neurons in the block:
-        spec.write_value(data=n_atoms)
-
-        # Write the number of synapse types
-        spec.write_value(data=self.__neuron_impl.get_n_synapse_types())
-
-        # Write the size of the incoming spike buffer
-        spec.write_value(data=self.__incoming_spike_buffer_size)
-
-        # Write the neuron parameters
-        neuron_data = self.__neuron_impl.get_data(
-            self._parameters, self._state_variables, vertex_slice)
-        spec.write_array(neuron_data)
-
-    @inject_items({"routing_info": "MemoryRoutingInfos"})
-    @overrides(
-        AbstractRewritesDataSpecification.regenerate_data_specification,
-        additional_arguments={"routing_info"})
-    def regenerate_data_specification(self, spec, placement, routing_info):
-        # pylint: disable=too-many-arguments, arguments-differ
-        vertex_slice = placement.vertex.vertex_slice
-
-        # reserve the neuron parameters data region
-        self._reserve_neuron_params_data_region(spec, vertex_slice)
-
-        # write the neuron params into the new DSG region
-        self._write_neuron_parameters(
-            key=routing_info.get_first_key_from_pre_vertex(
-                placement.vertex, constants.SPIKE_PARTITION_ID),
-            spec=spec, vertex_slice=vertex_slice)
-        # close spec
-        spec.end_specification()
-
-    @overrides(AbstractRewritesDataSpecification
-               .requires_memory_regions_to_be_reloaded)
-    def requires_memory_regions_to_be_reloaded(self):
-        return self.__change_requires_neuron_parameters_reload
-
-    @overrides(AbstractRewritesDataSpecification.mark_regions_reloaded)
-    def mark_regions_reloaded(self):
-        self.__change_requires_neuron_parameters_reload = False
-
-    @inject_items({
-        "machine_time_step": "MachineTimeStep",
-        "time_scale_factor": "TimeScaleFactor",
-        "application_graph": "MemoryApplicationGraph",
-        "machine_graph": "MemoryMachineGraph",
-        "routing_info": "MemoryRoutingInfos",
-        "data_n_time_steps": "DataNTimeSteps",
-        "n_key_map": "MemoryMachinePartitionNKeysMap"
-    })
-    @overrides(
-        AbstractGeneratesDataSpecification.generate_data_specification,
-        additional_arguments={
-            "machine_time_step", "time_scale_factor",
-            "application_graph", "machine_graph", "routing_info",
-            "data_n_time_steps", "n_key_map"
-        })
-    def generate_data_specification(
-            self, spec, placement, machine_time_step, time_scale_factor,
-            application_graph, machine_graph, routing_info, data_n_time_steps,
-            n_key_map):
-        """
-        :param machine_time_step: (injected)
-        :param time_scale_factor: (injected)
-        :param application_graph: (injected)
-        :param machine_graph: (injected)
-        :param routing_info: (injected)
-        :param data_n_time_steps: (injected)
-        :param n_key_map: (injected)
-        :param tdma_data: (injected)
-        """
-        # pylint: disable=too-many-arguments, arguments-differ
-        vertex = placement.vertex
-
-        spec.comment("\n*** Spec for block of {} neurons ***\n".format(
-            self.__neuron_impl.model_name))
-        vertex_slice = vertex.vertex_slice
-
-        # Reserve memory regions
-        self._reserve_memory_regions(
-            spec, vertex_slice, vertex, machine_graph, n_key_map)
-
-        # Declare random number generators and distributions:
-        # TODO add random distribution stuff
-        # self.write_random_distribution_declarations(spec)
-
-        # Get the key
-        key = routing_info.get_first_key_from_pre_vertex(
-            vertex, constants.SPIKE_PARTITION_ID)
-
-        # Write the setup region
-        spec.switch_write_focus(POPULATION_BASED_REGIONS.SYSTEM.value)
-        spec.write_array(simulation_utilities.get_simulation_header_array(
-            self._get_binary_file_name(), machine_time_step,
-            time_scale_factor))
-
-        # Write the neuron recording region
-        self._neuron_recorder.write_neuron_recording_region(
-            spec, POPULATION_BASED_REGIONS.NEURON_RECORDING.value,
-            vertex_slice, data_n_time_steps)
-
-        # Write the neuron parameters
-        self._write_neuron_parameters(spec, key, vertex_slice)
-
-        # write profile data
-        profile_utils.write_profile_region_data(
-            spec, POPULATION_BASED_REGIONS.PROFILING.value,
-            self.__n_profile_samples)
-
-        # Get the weight_scale value from the appropriate location
-        weight_scale = self.__neuron_impl.get_global_weight_scale()
-
-        # allow the synaptic matrix to write its data spec-able data
-        self.__synapse_manager.write_data_spec(
-            spec, self, vertex_slice, vertex, placement, machine_graph,
-            application_graph, routing_info,
-            weight_scale, machine_time_step)
-        vertex.set_on_chip_generatable_area(
-            self.__synapse_manager.host_written_matrix_size,
-            self.__synapse_manager.on_chip_written_matrix_size)
-
-        # write up the bitfield builder data
-        bit_field_utilities.write_bitfield_init_data(
-            spec, vertex, machine_graph, routing_info,
-            n_key_map, POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER.value,
-            POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
-            POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
-            POPULATION_BASED_REGIONS.DIRECT_MATRIX.value,
-            POPULATION_BASED_REGIONS.BIT_FIELD_FILTER.value,
-            POPULATION_BASED_REGIONS.BIT_FIELD_KEY_MAP.value,
-            POPULATION_BASED_REGIONS.STRUCTURAL_DYNAMICS.value,
-            isinstance(
-                self.__synapse_manager.synapse_dynamics,
-                AbstractSynapseDynamicsStructural))
-
-        # End the writing of this specification:
-        spec.end_specification()
-
-    def _get_binary_file_name(self):
-
-        # Split binary name into title and extension
-        binary_title, binary_extension = os.path.splitext(
-            self.__neuron_impl.binary_name)
-
-        # Reunite title and extension and return
-        return (binary_title +
-                self.__synapse_manager.vertex_executable_suffix +
-                binary_extension)
 
     @overrides(AbstractSpikeRecordable.is_recording_spikes)
     def is_recording_spikes(self):
@@ -629,7 +415,9 @@ class AbstractPopulationVertex(
                 " parameter {}".format(variable))
         self._state_variables.set_value(variable, value)
         self.__updated_state_variables.add(variable)
-        self.__change_requires_neuron_parameters_reload = True
+        for vertex in self.machine_vertices:
+            if isinstance(vertex, AbstractRewritesDataSpecification):
+                vertex.set_reload_required(True)
 
     @property
     def initialize_parameters(self):
@@ -662,6 +450,17 @@ class AbstractPopulationVertex(
         raise KeyError("No variable {} found in {}".format(
             variable, self.__neuron_impl.model_name))
 
+    def _get_binary_file_name(self):
+
+        # Split binary name into title and extension
+        binary_title, binary_extension = os.path.splitext(
+            self.__neuron_impl.binary_name)
+
+        # Reunite title and extension and return
+        return (binary_title +
+                self.__synapse_manager.vertex_executable_suffix +
+                binary_extension)
+
     @overrides(AbstractPopulationInitializable.get_initial_value)
     def get_initial_value(self, variable, selector=None):
         parameter = self._get_parameter(variable)
@@ -681,7 +480,9 @@ class AbstractPopulationVertex(
         parameter = self._get_parameter(variable)
         ranged_list = self._state_variables[parameter]
         ranged_list.set_value_by_selector(selector, value)
-        self.__change_requires_neuron_parameters_reload = True
+        for vertex in self.machine_vertices:
+            if isinstance(vertex, AbstractRewritesDataSpecification):
+                vertex.set_reload_required(True)
 
     @property
     def conductance_based(self):
@@ -709,17 +510,18 @@ class AbstractPopulationVertex(
                 "Population {} does not have parameter {}".format(
                     self.__neuron_impl.model_name, key))
         self._parameters.set_value(key, value)
-        self.__change_requires_neuron_parameters_reload = True
+        for vertex in self.machine_vertices:
+            if isinstance(vertex, AbstractRewritesDataSpecification):
+                vertex.set_reload_required(True)
 
     @overrides(AbstractReadParametersBeforeSet.read_parameters_from_machine)
     def read_parameters_from_machine(
             self, transceiver, placement, vertex_slice):
 
         # locate SDRAM address to where the neuron parameters are stored
-        neuron_region_sdram_address = \
-            helpful_functions.locate_memory_region_for_placement(
-                placement, POPULATION_BASED_REGIONS.NEURON_PARAMS.value,
-                transceiver)
+        neuron_region_sdram_address = (
+            placement.vertex.neuron_region_sdram_address(
+                placement, transceiver))
 
         # shift past the extra stuff before neuron parameters that we don't
         # need to read
@@ -728,7 +530,7 @@ class AbstractPopulationVertex(
             self._BYTES_TILL_START_OF_GLOBAL_PARAMETERS)
 
         # get size of neuron params
-        size_of_region = self._get_sdram_usage_for_neuron_params(vertex_slice)
+        size_of_region = self.get_sdram_usage_for_neuron_params(vertex_slice)
         size_of_region -= (
             self._BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
             self.tdma_sdram_size_in_bytes)
@@ -781,31 +583,16 @@ class AbstractPopulationVertex(
         :param AbstractSynapseDynamics synapse_dynamics:
         """
         self.__synapse_manager.synapse_dynamics = synapse_dynamics
-
-    @overrides(AbstractAcceptsIncomingSynapses.add_pre_run_connection_holder)
-    def add_pre_run_connection_holder(
-            self, connection_holder, projection_edge, synapse_information):
-        self.__synapse_manager.add_pre_run_connection_holder(
-            connection_holder, projection_edge, synapse_information)
-
-    def get_connection_holders(self):
-        """
-        :rtype: dict(tuple(ProjectionApplicationEdge,SynapseInformation),\
-            ConnectionHolder)
-        """
-        return self.__synapse_manager.get_connection_holders()
+        # If we are setting a synapse dynamics, we must remap even if the
+        # change above means we don't have to
+        self.__change_requires_mapping = True
 
     @overrides(AbstractAcceptsIncomingSynapses.get_connections_from_machine)
     def get_connections_from_machine(
-            self, transceiver, placement, edge, routing_infos,
-            synapse_information, machine_time_step, using_extra_monitor_cores,
-            placements=None, monitor_api=None, fixed_routes=None,
-            extra_monitor=None):
+            self, transceiver, placements, app_edge, synapse_info):
         # pylint: disable=too-many-arguments
         return self.__synapse_manager.get_connections_from_machine(
-            transceiver, placement, edge, routing_infos,
-            synapse_information, machine_time_step, using_extra_monitor_cores,
-            placements, monitor_api, fixed_routes, extra_monitor)
+            transceiver, placements, app_edge, synapse_info)
 
     def clear_connection_cache(self):
         self.__synapse_manager.clear_connection_cache()
@@ -813,16 +600,6 @@ class AbstractPopulationVertex(
     def get_maximum_delay_supported_in_ms(self, machine_time_step):
         return self.__synapse_manager.get_maximum_delay_supported_in_ms(
             machine_time_step)
-
-    @overrides(AbstractProvidesIncomingPartitionConstraints.
-               get_incoming_partition_constraints)
-    def get_incoming_partition_constraints(self, partition):
-        """ Gets the constraints for partitions going into this vertex.
-
-        :param partition: partition that goes into this vertex
-        :return: list of constraints
-        """
-        return self.__synapse_manager.get_incoming_partition_constraints()
 
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
                get_outgoing_partition_constraints)
@@ -910,21 +687,17 @@ class AbstractPopulationVertex(
     def __repr__(self):
         return self.__str__()
 
-    def gen_on_machine(self, vertex_slice):
-        """ True if the synapses of a particular slice of this population \
-            should be generated on the machine.
-
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-        """
-        return self.__synapse_manager.gen_on_machine(vertex_slice)
-
     @overrides(AbstractCanReset.reset_to_first_timestep)
     def reset_to_first_timestep(self):
         # Mark that reset has been done, and reload state variables
         self.__has_reset_last = True
-        self.__change_requires_neuron_parameters_reload = True
+        for vertex in self.machine_vertices:
+            if isinstance(vertex, AbstractRewritesDataSpecification):
+                vertex.set_reload_required(True)
 
         # If synapses change during the run,
         if self.__synapse_manager.changes_during_run:
             self.__change_requires_data_generation = True
-            self.__change_requires_neuron_parameters_reload = False
+            for vertex in self.machine_vertices:
+                if isinstance(vertex, AbstractRewritesDataSpecification):
+                    vertex.set_reload_required(False)
