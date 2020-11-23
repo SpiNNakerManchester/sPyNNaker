@@ -34,7 +34,7 @@
 
 #include <neuron/models/neuron_model.h>
 //#include <neuron/models/neuron_model_eprop_adaptive_impl.h>
-#include <neuron/models/neuron_model_sinusoid_readout_impl.h>
+#include <neuron/models/neuron_model_shd_readout_impl.h>
 
 extern neuron_pointer_t neuron_array;
 //extern global_neuron_params_pointer_t global_parameters;

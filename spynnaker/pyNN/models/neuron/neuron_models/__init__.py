@@ -21,8 +21,9 @@ from .neuron_model_eprop_adaptive import NeuronModelEPropAdaptive
 from .neuron_model_store_recall_readout import NeuronModelStoreRecallReadout
 from .neuron_model_sinusoid_readout import NeuronModelLeakyIntegrateAndFireSinusoidReadout
 from .neuron_model_left_right_readout import NeuronModelLeftRightReadout
+from .neuron_model_shd_readout import NeuronModelLeakyIntegrateAndFireSHDReadout
 
 __all__ = ["AbstractNeuronModel", "NeuronModelIzh",
            "NeuronModelLeakyIntegrateAndFire", "NeuronModelEPropAdaptive",
            "NeuronModelStoreRecallReadout", "NeuronModelLeakyIntegrateAndFireSinusoidReadout",
-           "NeuronModelLeftRightReadout"]
+           "NeuronModelLeftRightReadout", "NeuronModelLeakyIntegrateAndFireSHDReadout"]
