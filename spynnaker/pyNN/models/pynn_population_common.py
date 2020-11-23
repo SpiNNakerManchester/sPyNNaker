@@ -516,7 +516,7 @@ class PyNNPopulationCommon(object):
                     placement = globals_variables.get_simulator().\
                         placements.get_placement_of_vertex(machine_vertex)
 
-                    self.__vertex.read_parameters_from_machine(
+                    machine_vertex.read_parameters_from_machine(
                         globals_variables.get_simulator().transceiver,
                         placement, machine_vertex.vertex_slice)
 
