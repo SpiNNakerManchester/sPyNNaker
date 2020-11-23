@@ -48,6 +48,9 @@ L = "learning_signal"
 W_FB = "feedback_weight"
 WINDOW_SIZE = "window_size"
 NUMBER_OF_CUES = "number_of_cues"
+INPUT_SYNAPSES = "input_synapses"
+REC_SYNAPSES = "rec_synapses"
+NEURON_RATE = "neuron_rate"
 
 DELTA_W = "delta_w"
 Z_BAR_OLD = "z_bar_old"
@@ -108,7 +111,10 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
         "__w_fb",
         "__eta",
         "__window_size",
-        "__number_of_cues"
+        "__number_of_cues",
+        "__input_synapses",
+        "__rec_synapses",
+        "__neuron_rate"
         ]
 
     def __init__(
@@ -136,7 +142,10 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
             w_fb,
             eta,
             window_size,
-            number_of_cues
+            number_of_cues,
+            input_synapses,
+            rec_synapses,
+            neuron_rate
             ):
 
         datatype_list = [
@@ -164,7 +173,10 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
             DataType.S1615,   #  L
             DataType.S1615,   #  w_fb
             DataType.UINT32,   #  window_size
-            DataType.UINT32   #  number_of_cues
+            DataType.UINT32,   #  number_of_cues
+            DataType.UINT32,   #  input_synapses
+            DataType.UINT32,   #  rec_synapses
+            DataType.S1615   #  neuron_rate
             ]
 
         # Synapse states - always initialise to zero
@@ -218,6 +230,9 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
         self.__eta = eta
         self.__window_size = window_size
         self.__number_of_cues = number_of_cues
+        self.__input_synapses = input_synapses
+        self.__rec_synapses = rec_synapses
+        self.__neuron_rate = self.__target_rate
 
 
     @overrides(AbstractNeuronModel.get_n_cpu_cycles)
@@ -241,6 +256,9 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
         parameters[W_FB] = self.__w_fb
         parameters[WINDOW_SIZE] = self.__window_size
         parameters[NUMBER_OF_CUES] = self.__number_of_cues
+        parameters[INPUT_SYNAPSES] = self.__input_synapses
+        parameters[REC_SYNAPSES] = self.__rec_synapses
+        parameters[NEURON_RATE] = self.__neuron_rate
 
 
     @overrides(AbstractNeuronModel.add_state_variables)
@@ -308,7 +326,10 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
                 state_variables[L],
                 parameters[W_FB],
                 parameters[WINDOW_SIZE],
-                parameters[NUMBER_OF_CUES]
+                parameters[NUMBER_OF_CUES],
+                parameters[INPUT_SYNAPSES],
+                parameters[REC_SYNAPSES],
+                parameters[NEURON_RATE]
                 ]
 
         # create synaptic state - init all state to zero
@@ -356,7 +377,8 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
         (v, _v_rest, _r_membrane, _exp_tc, _i_offset, count_refrac,
          _v_reset, _tau_refrac, psi,
          big_b, small_b, _small_b_0, _e_to_dt_on_tau_a, _beta, adpt, scalar,
-         l, __w_fb, window_size, number_of_cues, delta_w, z_bar_old, z_bar, ep_a, e_bar, update_ready) = values
+         l, __w_fb, window_size, number_of_cues, input_synapses, rec_synapses, neuron_rate,
+         delta_w, z_bar_old, z_bar, ep_a, e_bar, update_ready) = values
 
         # Not sure this will work with the new array of synapse!!!
         # (Note that this function is only called if you do e.g. run(), set(),
@@ -499,6 +521,30 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
     def number_of_cues(self):
         return self.__number_of_cues
 
-    @window_size.setter
-    def window_size(self, new_value):
+    @number_of_cues.setter
+    def number_of_cues(self, new_value):
         self.__number_of_cues = new_value
+
+    @property
+    def input_synapses(self):
+        return self.__input_synapses
+
+    @input_synapses.setter
+    def input_synapses(self, new_value):
+        self.__input_synapses = new_value
+
+    @property
+    def rec_synapses(self):
+        return self.__rec_synapses
+
+    @rec_synapses.setter
+    def rec_synapses(self, new_value):
+        self.__rec_synapses = new_value
+
+    @property
+    def neuron_rate(self):
+        return self.__neuron_rate
+
+    @neuron_rate.setter
+    def neuron_rate(self, new_value):
+        self.__neuron_rate = new_value

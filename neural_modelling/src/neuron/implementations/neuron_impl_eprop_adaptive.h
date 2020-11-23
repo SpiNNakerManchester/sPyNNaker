@@ -210,7 +210,7 @@ static void neuron_impl_load_neuron_parameters(
     if (initial_regularise) {
     	global_parameters->core_target_rate = global_parameters->core_target_rate;
 //    			* n_neurons; // scales target rate depending on number of neurons
-    	global_parameters->core_pop_rate = 0.k;//global_parameters->core_pop_rate;
+    	global_parameters->core_pop_rate = global_parameters->core_target_rate * syn_dynamics_neurons_in_partition;//0.k;//global_parameters->core_pop_rate;
 //    			* n_neurons; // scale initial value, too
 
     	initial_regularise = false;
@@ -301,6 +301,8 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     // determine if a spike should occur
     threshold_type_update_threshold(neuron->z, neuron);
 
+    neuron->neuron_rate = neuron->neuron_rate * global_parameters->rate_exp_TC;
+
 
     // Record B
 //    if (neuron_index == 0){
@@ -378,8 +380,8 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 //                                    * (accum)syn_dynamics_neurons_in_partition))
 //                                    - global_parameters->core_target_rate;
 //    REAL reg_learning_signal = global_parameters->core_target_rate - (global_parameters->core_pop_rate / syn_dynamics_neurons_in_partition);
-    REAL reg_learning_signal = (global_parameters->core_pop_rate / syn_dynamics_neurons_in_partition) - global_parameters->core_target_rate;
-    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = reg_learning_signal;//global_parameters->core_pop_rate;
+//    REAL reg_learning_signal = (global_parameters->core_pop_rate / syn_dynamics_neurons_in_partition) - global_parameters->core_target_rate;
+    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->neuron_rate;//reg_learning_signal;//
 
 
 
@@ -432,7 +434,8 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
         additional_input_has_spiked(additional_input);
 
         // Add contribution from this neuron's spike to global rate trace
-        global_parameters->core_pop_rate += 1.0k;
+        global_parameters->core_pop_rate += 1k;
+        neuron->neuron_rate += 1k;
     }
 
     // Shape the existing input according to the included rule
