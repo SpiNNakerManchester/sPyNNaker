@@ -327,7 +327,13 @@ class AbstractPopulationVertex(
             PopulationMachineVertex.get_provenance_data_size(
                 len(PopulationMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES)) +
             self.__synapse_manager.get_sdram_usage_in_bytes(
-                vertex_slice, graph, self) +
+                vertex_slice, graph, self,
+                PopulationMachineVertex.POPULATION_BASED_REGIONS.
+                POPULATION_TABLE.value,
+                PopulationMachineVertex.POPULATION_BASED_REGIONS.
+                SYNAPTIC_MATRIX.value,
+                PopulationMachineVertex.POPULATION_BASED_REGIONS.
+                DIRECT_MATRIX.value) +
             profile_utils.get_profile_region_size(
                 self.__n_profile_samples) +
             bit_field_utilities.get_estimated_sdram_for_bit_field_region(
@@ -559,7 +565,13 @@ class AbstractPopulationVertex(
             self, transceiver, placements, app_edge, synapse_info):
         # pylint: disable=too-many-arguments
         return self.__synapse_manager.get_connections_from_machine(
-            transceiver, placements, app_edge, synapse_info)
+            transceiver, placements, app_edge, synapse_info,
+            PopulationMachineVertex.POPULATION_BASED_REGIONS.
+            POPULATION_TABLE.value,
+            PopulationMachineVertex.POPULATION_BASED_REGIONS.
+            SYNAPTIC_MATRIX.value,
+            PopulationMachineVertex.POPULATION_BASED_REGIONS.
+            DIRECT_MATRIX.value)
 
     def clear_connection_cache(self):
         self.__synapse_manager.clear_connection_cache()

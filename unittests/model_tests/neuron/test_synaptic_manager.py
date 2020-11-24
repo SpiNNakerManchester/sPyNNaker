@@ -62,7 +62,6 @@ from unittests.mocks import MockSimulator
 from pacman.model.placements.placements import Placements
 from pacman.model.graphs.application.application_graph import ApplicationGraph
 from data_specification.constants import MAX_MEM_REGIONS
-from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
 import io
 
 
@@ -251,7 +250,11 @@ def test_write_data_spec():
         spikes_per_second=100.0, config=config, drop_late_spikes=True)
     synaptic_manager.write_data_spec(
         spec, post_app_vertex, post_vertex_slice, post_vertex,
-        graph, app_graph, routing_info, 1.0, machine_time_step)
+        graph, app_graph, routing_info, 1.0, machine_time_step,
+        synapse_params_region=1, pop_table_region=2,
+        synaptic_matrix_region=3, synapse_dynamics_region=4,
+        struct_dynamics_region=5, connector_builder_region=6,
+        direct_matrix_region=7)
     spec.end_specification()
 
     with io.FileIO(temp_spec, "rb") as spec_reader:
@@ -270,7 +273,8 @@ def test_write_data_spec():
     try:
         connections_1 = synaptic_manager.get_connections_from_machine(
             transceiver, placements, app_edge,
-            direct_synapse_information_1)
+            direct_synapse_information_1, pop_table_region=2,
+            synaptic_matrix_region=3, direct_matrix_region=7)
 
         # Check that all the connections have the right weight and delay
         assert len(connections_1) == post_vertex_slice.n_atoms
@@ -279,7 +283,8 @@ def test_write_data_spec():
 
         connections_2 = synaptic_manager.get_connections_from_machine(
             transceiver, placements, app_edge,
-            direct_synapse_information_2)
+            direct_synapse_information_2, pop_table_region=2,
+            synaptic_matrix_region=3, direct_matrix_region=7)
 
         # Check that all the connections have the right weight and delay
         assert len(connections_2) == post_vertex_slice.n_atoms
@@ -288,7 +293,8 @@ def test_write_data_spec():
 
         connections_3 = synaptic_manager.get_connections_from_machine(
             transceiver, placements, app_edge,
-            all_to_all_synapse_information)
+            all_to_all_synapse_information, pop_table_region=2,
+            synaptic_matrix_region=3, direct_matrix_region=7)
 
         # Check that all the connections have the right weight and delay
         assert len(connections_3) == \
@@ -298,7 +304,8 @@ def test_write_data_spec():
 
         connections_4 = synaptic_manager.get_connections_from_machine(
             transceiver, placements, app_edge,
-            from_list_synapse_information)
+            from_list_synapse_information, pop_table_region=2,
+            synaptic_matrix_region=3, direct_matrix_region=7)
 
         # Check that all the connections have the right weight and delay
         assert len(connections_4) == len(from_list_list)
@@ -604,7 +611,11 @@ def test_pop_based_master_pop_table_standard(
         spikes_per_second=100.0, config=config, drop_late_spikes=True)
     synaptic_manager.write_data_spec(
         spec, post_app_vertex, post_vertex_slice, post_mac_vertex,
-        mac_graph, app_graph, routing_info, 1.0, 1.0)
+        mac_graph, app_graph, routing_info, 1.0, 1.0,
+        synapse_params_region=1, pop_table_region=2,
+        synaptic_matrix_region=3, synapse_dynamics_region=4,
+        struct_dynamics_region=5, connector_builder_region=6,
+        direct_matrix_region=7)
     spec.end_specification()
     with io.FileIO(temp_spec, "rb") as spec_reader:
         executor = DataSpecificationExecutor(
@@ -612,8 +623,7 @@ def test_pop_based_master_pop_table_standard(
         executor.execute()
 
     # Read the population table and check entries
-    region = executor.get_region(
-        POPULATION_BASED_REGIONS.POPULATION_TABLE.value)
+    region = executor.get_region(2)
     mpop_data = numpy.frombuffer(
         region.region_data, dtype="uint8").view("uint32")
     n_entries = mpop_data[0]

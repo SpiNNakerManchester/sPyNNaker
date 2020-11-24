@@ -40,7 +40,6 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 from spynnaker.pyNN.utilities import constants, bit_field_utilities
 from spynnaker.pyNN.models.abstract_models import (
     AbstractSynapseExpandable, AbstractReadParametersBeforeSet)
-from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
 from spinn_front_end_common.utilities import (
     constants as common_constants, helpful_functions)
 
@@ -92,6 +91,24 @@ class PopulationMachineVertex(
         INPUT_BUFFER_FILLED_SIZE = 13
         # the number of tdma misses
         TDMA_MISSES = 14
+
+    class POPULATION_BASED_REGIONS(Enum):
+        """Regions for populations."""
+        SYSTEM = 0
+        NEURON_PARAMS = 1
+        SYNAPSE_PARAMS = 2
+        POPULATION_TABLE = 3
+        SYNAPTIC_MATRIX = 4
+        SYNAPSE_DYNAMICS = 5
+        STRUCTURAL_DYNAMICS = 6
+        NEURON_RECORDING = 7
+        PROVENANCE_DATA = 8
+        PROFILING = 9
+        CONNECTOR_BUILDER = 10
+        DIRECT_MATRIX = 11
+        BIT_FIELD_FILTER = 12
+        BIT_FIELD_BUILDER = 13
+        BIT_FIELD_KEY_MAP = 14
 
     SATURATION_COUNT_NAME = "Times_synaptic_weights_have_saturated"
     SATURATION_COUNT_MESSAGE = (
@@ -193,27 +210,27 @@ class PopulationMachineVertex(
     def bit_field_base_address(self, transceiver, placement):
         return locate_memory_region_for_placement(
             placement=placement, transceiver=transceiver,
-            region=POPULATION_BASED_REGIONS.BIT_FIELD_FILTER.value)
+            region=self.POPULATION_BASED_REGIONS.BIT_FIELD_FILTER.value)
 
     @overrides(AbstractSupportsBitFieldRoutingCompression.
                key_to_atom_map_region_base_address)
     def key_to_atom_map_region_base_address(self, transceiver, placement):
         return locate_memory_region_for_placement(
             placement=placement, transceiver=transceiver,
-            region=POPULATION_BASED_REGIONS.BIT_FIELD_KEY_MAP.value)
+            region=self.POPULATION_BASED_REGIONS.BIT_FIELD_KEY_MAP.value)
 
     @overrides(AbstractSupportsBitFieldGeneration.bit_field_builder_region)
     def bit_field_builder_region(self, transceiver, placement):
         return locate_memory_region_for_placement(
             placement=placement, transceiver=transceiver,
-            region=POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER.value)
+            region=self.POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER.value)
 
     @overrides(AbstractSupportsBitFieldRoutingCompression.
                regeneratable_sdram_blocks_and_sizes)
     def regeneratable_sdram_blocks_and_sizes(self, transceiver, placement):
         synaptic_matrix_base_address = locate_memory_region_for_placement(
             placement=placement, transceiver=transceiver,
-            region=POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value)
+            region=self.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value)
         return [(
             self.__on_chip_generatable_offset + synaptic_matrix_base_address,
             self.__on_chip_generatable_size)]
@@ -226,7 +243,7 @@ class PopulationMachineVertex(
     @property
     @overrides(ProvidesProvenanceDataFromMachineImpl._provenance_region_id)
     def _provenance_region_id(self):
-        return POPULATION_BASED_REGIONS.PROVENANCE_DATA.value
+        return self.POPULATION_BASED_REGIONS.PROVENANCE_DATA.value
 
     @property
     @overrides(ProvidesProvenanceDataFromMachineImpl._n_additional_data_items)
@@ -382,12 +399,12 @@ class PopulationMachineVertex(
     @overrides(AbstractReceiveBuffersToHost.get_recording_region_base_address)
     def get_recording_region_base_address(self, txrx, placement):
         return locate_memory_region_for_placement(
-            placement, POPULATION_BASED_REGIONS.NEURON_RECORDING.value, txrx)
+            placement, self.POPULATION_BASED_REGIONS.NEURON_RECORDING.value, txrx)
 
     @overrides(AbstractHasProfileData.get_profile_data)
     def get_profile_data(self, transceiver, placement):
         return get_profiling_data(
-            POPULATION_BASED_REGIONS.PROFILING.value,
+            self.POPULATION_BASED_REGIONS.PROFILING.value,
             self._PROFILE_TAG_LABELS, transceiver, placement)
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
@@ -444,22 +461,22 @@ class PopulationMachineVertex(
             self, constants.SPIKE_PARTITION_ID)
 
         # Write the setup region
-        spec.switch_write_focus(POPULATION_BASED_REGIONS.SYSTEM.value)
+        spec.switch_write_focus(self.POPULATION_BASED_REGIONS.SYSTEM.value)
         spec.write_array(simulation_utilities.get_simulation_header_array(
             self.__binary_file_name, machine_time_step, time_scale_factor))
 
         # Write the neuron recording region
         self._app_vertex.neuron_recorder.write_neuron_recording_region(
-            spec, POPULATION_BASED_REGIONS.NEURON_RECORDING.value,
+            spec, self.POPULATION_BASED_REGIONS.NEURON_RECORDING.value,
             self.vertex_slice, data_n_time_steps)
 
         # Write the neuron parameters
         self._write_neuron_parameters(
-            spec, key, constants.POPULATION_BASED_REGIONS.NEURON_PARAMS.value)
+            spec, key, self.POPULATION_BASED_REGIONS.NEURON_PARAMS.value)
 
         # write profile data
         profile_utils.write_profile_region_data(
-            spec, POPULATION_BASED_REGIONS.PROFILING.value,
+            spec, self.POPULATION_BASED_REGIONS.PROFILING.value,
             self._app_vertex.n_profile_samples)
 
         # Get the weight_scale value from the appropriate location
@@ -468,23 +485,37 @@ class PopulationMachineVertex(
         # allow the synaptic matrix to write its data spec-able data
         self._app_vertex.synapse_manager.write_data_spec(
             spec, self._app_vertex, self.vertex_slice, self, machine_graph,
-            application_graph, routing_info, weight_scale, machine_time_step)
+            application_graph, routing_info, weight_scale, machine_time_step,
+            self.POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value,
+            self.POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
+            self.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
+            self.POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
+            self.POPULATION_BASED_REGIONS.STRUCTURAL_DYNAMICS.value,
+            self.POPULATION_BASED_REGIONS.CONNECTOR_BUILDER.value,
+            self.POPULATION_BASED_REGIONS.DIRECT_MATRIX.value)
         self.set_on_chip_generatable_area(
             self._app_vertex.synapse_manager.host_written_matrix_size(
-                self.vertex_slice),
+                self.vertex_slice,
+                self.POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
+                self.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
+                self.POPULATION_BASED_REGIONS.DIRECT_MATRIX.value),
             self._app_vertex.synapse_manager.on_chip_written_matrix_size(
-                self.vertex_slice))
+                self.vertex_slice,
+                self.POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
+                self.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
+                self.POPULATION_BASED_REGIONS.DIRECT_MATRIX.value))
 
         # write up the bitfield builder data
         bit_field_utilities.write_bitfield_init_data(
             spec, self, machine_graph, routing_info,
-            n_key_map, POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER.value,
-            POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
-            POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
-            POPULATION_BASED_REGIONS.DIRECT_MATRIX.value,
-            POPULATION_BASED_REGIONS.BIT_FIELD_FILTER.value,
-            POPULATION_BASED_REGIONS.BIT_FIELD_KEY_MAP.value,
-            POPULATION_BASED_REGIONS.STRUCTURAL_DYNAMICS.value,
+            n_key_map,
+            self.POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER.value,
+            self.POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
+            self.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
+            self.POPULATION_BASED_REGIONS.DIRECT_MATRIX.value,
+            self.POPULATION_BASED_REGIONS.BIT_FIELD_FILTER.value,
+            self.POPULATION_BASED_REGIONS.BIT_FIELD_KEY_MAP.value,
+            self.POPULATION_BASED_REGIONS.STRUCTURAL_DYNAMICS.value,
             isinstance(
                 self._app_vertex.synapse_manager.synapse_dynamics,
                 AbstractSynapseDynamicsStructural))
@@ -507,7 +538,7 @@ class PopulationMachineVertex(
             key=routing_info.get_first_key_from_pre_vertex(
                 self, constants.SPIKE_PARTITION_ID),
             spec=spec,
-            region_id=constants.POPULATION_BASED_REGIONS.NEURON_PARAMS.value)
+            region_id=self.POPULATION_BASED_REGIONS.NEURON_PARAMS.value)
 
         # close spec
         spec.end_specification()
@@ -533,35 +564,34 @@ class PopulationMachineVertex(
 
         # Reserve memory:
         spec.reserve_memory_region(
-            region=POPULATION_BASED_REGIONS.SYSTEM.value,
+            region=self.POPULATION_BASED_REGIONS.SYSTEM.value,
             size=common_constants.SIMULATION_N_BYTES,
             label='System')
 
         self._reserve_neuron_params_data_region(spec)
 
         spec.reserve_memory_region(
-            region=POPULATION_BASED_REGIONS.NEURON_RECORDING.value,
+            region=self.POPULATION_BASED_REGIONS.NEURON_RECORDING.value,
             size=self._app_vertex.neuron_recorder.get_static_sdram_usage(
                 self.vertex_slice),
             label="neuron recording")
 
         profile_utils.reserve_profile_region(
-            spec, POPULATION_BASED_REGIONS.PROFILING.value,
+            spec, self.POPULATION_BASED_REGIONS.PROFILING.value,
             self._app_vertex.n_profile_samples)
 
         # reserve bit field region
         bit_field_utilities.reserve_bit_field_regions(
             spec, machine_graph, n_key_map, self,
-            POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER.value,
-            POPULATION_BASED_REGIONS.BIT_FIELD_FILTER.value,
-            POPULATION_BASED_REGIONS.BIT_FIELD_KEY_MAP.value)
+            self.POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER.value,
+            self.POPULATION_BASED_REGIONS.BIT_FIELD_FILTER.value,
+            self.POPULATION_BASED_REGIONS.BIT_FIELD_KEY_MAP.value)
 
         self.reserve_provenance_data_region(spec)
 
-    @staticmethod
-    def neuron_region_sdram_address(placement, transceiver):
+    def neuron_region_sdram_address(self, placement, transceiver):
         return helpful_functions.locate_memory_region_for_placement(
-                placement, POPULATION_BASED_REGIONS.NEURON_PARAMS.value,
+                placement, self.POPULATION_BASED_REGIONS.NEURON_PARAMS.value,
                 transceiver)
 
     def _reserve_neuron_params_data_region(self, spec):
@@ -574,7 +604,7 @@ class PopulationMachineVertex(
         params_size = self._app_vertex.get_sdram_usage_for_neuron_params(
             self.vertex_slice)
         spec.reserve_memory_region(
-            region=POPULATION_BASED_REGIONS.NEURON_PARAMS.value,
+            region=self.POPULATION_BASED_REGIONS.NEURON_PARAMS.value,
             size=params_size, label='NeuronParams')
 
     def _write_neuron_parameters(self, spec, key, region_id):
@@ -622,12 +652,18 @@ class PopulationMachineVertex(
     @overrides(AbstractSynapseExpandable.gen_on_machine)
     def gen_on_machine(self):
         return self.app_vertex.synapse_manager.gen_on_machine(
-            self.vertex_slice)
+            self.vertex_slice,
+            self.POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
+            self.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
+            self.POPULATION_BASED_REGIONS.DIRECT_MATRIX.value)
 
     @overrides(AbstractSynapseExpandable.read_generated_connection_holders)
     def read_generated_connection_holders(self, transceiver, placement):
         self._app_vertex.synapse_manager.read_generated_connection_holders(
-            transceiver, placement)
+            transceiver, placement,
+            self.POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
+            self.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
+            self.POPULATION_BASED_REGIONS.DIRECT_MATRIX.value)
 
     @overrides(AbstractReadParametersBeforeSet.read_parameters_from_machine)
     def read_parameters_from_machine(

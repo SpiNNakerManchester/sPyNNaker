@@ -63,26 +63,6 @@ MAX_TIMER_TICS_SUPPORTED_PER_BLOCK = 16
 #: the minimum supported delay slot between two neurons
 MIN_SUPPORTED_DELAY = 1
 
-
-class POPULATION_BASED_REGIONS(Enum):
-    """Regions for populations."""
-    SYSTEM = 0
-    NEURON_PARAMS = 1
-    SYNAPSE_PARAMS = 2
-    POPULATION_TABLE = 3
-    SYNAPTIC_MATRIX = 4
-    SYNAPSE_DYNAMICS = 5
-    STRUCTURAL_DYNAMICS = 6
-    NEURON_RECORDING = 7
-    PROVENANCE_DATA = 8
-    PROFILING = 9
-    CONNECTOR_BUILDER = 10
-    DIRECT_MATRIX = 11
-    BIT_FIELD_FILTER = 12
-    BIT_FIELD_BUILDER = 13
-    BIT_FIELD_KEY_MAP = 14
-
-
 #: The partition ID used for spike data
 SPIKE_PARTITION_ID = "SPIKE"
 
