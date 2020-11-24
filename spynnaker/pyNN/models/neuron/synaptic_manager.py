@@ -743,15 +743,15 @@ class SynapticManager(object):
         :param int synaptic_matrix_region: dsg region id for the synaptic \
             matrix.
         :param int direct_matrix_region: dsg region id for the direct matrix.
-        :param ~spinnman.transciever.Transceiver transceiver:
+        :param ~spinnman.transciever.Transceiver transceiver:\
             Used to read the data from the machine
-        :param ~pacman.model.placements.Placements placements:
+        :param ~pacman.model.placements.Placements placements:\
             Where the vertices are on the machine
-        :param ProjectionApplicationEdge app_edge:
+        :param ProjectionApplicationEdge app_edge:\
             The application edge of the projection
-        :param SynapseInformation synapse_info:
+        :param SynapseInformation synapse_info:\
             The synapse information of the projection
-        :return: The connections from the machine, with dtype
+        :return: The connections from the machine, with dtype\
             AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
         :rtype: ~numpy.ndarray
         """
@@ -784,7 +784,7 @@ class SynapticManager(object):
         :param int synaptic_matrix_region: dsg region id for the synaptic \
             matrix.
         :param int direct_matrix_region: dsg region id for the direct matrix.
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:\
             The slice of the vertex to determine the generation status of
         :rtype: bool
         """
@@ -819,16 +819,16 @@ class SynapticManager(object):
     def read_generated_connection_holders(
             self, transceiver, placement, pop_table_region,
             synaptic_matrix_region, direct_matrix_region):
-        """ Fill in any pre-run connection holders for data which is generated
+        """ Fill in any pre-run connection holders for data which is generated\
             on the machine, after it has been generated
 
         :param int pop_table_region: dsg region id for master pop table.
         :param int synaptic_matrix_region: dsg region id for the synaptic \
             matrix.
         :param int direct_matrix_region: dsg region id for the direct matrix.
-        :param ~spinnman.transceiver.Transceiver transceiver:
+        :param ~spinnman.transceiver.Transceiver transceiver:\
             How to read the data from the machine
-        :param ~pacman.model.placements.Placement placement:
+        :param ~pacman.model.placements.Placement placement:\
             where the data is to be read from
         """
         matrices = self.__get_synaptic_matrices(
