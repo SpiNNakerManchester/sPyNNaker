@@ -1,0 +1,40 @@
+# Copyright (c) 2020 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+name: "Install Python Package from Source"
+inputs:
+  preinstall:
+    description: Whether to run the requirements.txt ahead of the main install
+    required: false
+    default: false
+  test-requirements:
+    description: Whether to run the requirements-test.txt after the main install
+    required: false
+    default: true
+  mode:
+    description: What mode to install in
+    required: false
+    default: develop
+runs:
+  using: composite
+  steps: 
+    - run: |
+        [ ${{ inputs.preinstall }} = "true" ] && pip install -r requirements.txt
+      shell: bash
+    - run: python setup.py ${{ inputs.mode }}
+      shell: bash
+    - run: |
+        [ ${{ inputs.test-requirements }} = "true" ] && pip install -r requirements-test.txt
+      shell: bash
