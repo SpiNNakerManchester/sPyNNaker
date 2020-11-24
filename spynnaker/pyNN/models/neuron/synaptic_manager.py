@@ -91,10 +91,10 @@ class SynapticManager(object):
     def __init__(self, n_synapse_types, ring_buffer_sigma, spikes_per_second,
                  config, drop_late_spikes):
         """
-        :param int n_synapse_types:
+        :param int n_synapse_types:\
             number of synapse types on a neuron (e.g., 2 for excitatory and
             inhibitory)
-        :param ring_buffer_sigma:
+        :param ring_buffer_sigma:\
             How many SD above the mean to go for upper bound; a
             good starting choice is 5.0. Given length of simulation we can
             set this for approximate number of saturation events.
@@ -147,7 +147,7 @@ class SynapticManager(object):
         :param int synaptic_matrix_region: dsg region id for the synaptic \
             matrix.
         :param int direct_matrix_region: dsg region id for the direct matrix.
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:\
             the slice of the vertex to get the matrices for
         :rtype: SynapticMatrices
         """
@@ -167,7 +167,7 @@ class SynapticManager(object):
     def host_written_matrix_size(
             self, post_vertex_slice, pop_table_region, synaptic_matrix_region,
             direct_matrix_region):
-        """ The size of the matrix written by the host for a given
+        """ The size of the matrix written by the host for a given\
             machine vertex
         :param int pop_table_region: dsg region id for master pop table.
         :param int synaptic_matrix_region: dsg region id for the synaptic \
@@ -184,7 +184,7 @@ class SynapticManager(object):
     def on_chip_written_matrix_size(
             self, post_vertex_slice, pop_table_region, synaptic_matrix_region,
             direct_matrix_region):
-        """ The size of the matrix that will be written on the machine for a
+        """ The size of the matrix that will be written on the machine for a\
             given machine vertex
         :param int pop_table_region: dsg region id for master pop table.
         :param int synaptic_matrix_region: dsg region id for the synaptic \
@@ -201,7 +201,7 @@ class SynapticManager(object):
 
     @property
     def synapse_dynamics(self):
-        """ The synapse dynamics used by the synapses e.g. plastic or static.
+        """ The synapse dynamics used by the synapses e.g. plastic or static.\
             Settable.
 
         :rtype: AbstractSynapseDynamics or None
@@ -214,8 +214,8 @@ class SynapticManager(object):
 
     @synapse_dynamics.setter
     def synapse_dynamics(self, synapse_dynamics):
-        """ Set the synapse dynamics.  Note that after setting, the dynamics
-            might not be the type set as it can be combined with the existing
+        """ Set the synapse dynamics.  Note that after setting, the dynamics\
+            might not be the type set as it can be combined with the existing\
             dynamics in exciting ways.
         """
         if self.__synapse_dynamics is None:
@@ -226,7 +226,7 @@ class SynapticManager(object):
 
     @property
     def ring_buffer_sigma(self):
-        """ The sigma in the estimation of the maximum summed ring buffer
+        """ The sigma in the estimation of the maximum summed ring buffer\
             weights.  Settable.
 
         :rtype: float
@@ -239,7 +239,7 @@ class SynapticManager(object):
 
     @property
     def spikes_per_second(self):
-        """ The assumed maximum spikes per second of an incoming population.
+        """ The assumed maximum spikes per second of an incoming population.\
             Used when calculating the ring buffer weight scaling. Settable.
 
         :rtype: float
@@ -251,8 +251,8 @@ class SynapticManager(object):
         self.__spikes_per_second = spikes_per_second
 
     def get_maximum_delay_supported_in_ms(self, machine_time_step):
-        """ The maximum delay supported by this vertex, before delay extensions
-            are needed
+        """ The maximum delay supported by this vertex, before delay \
+            extensions are needed
 
         :rtype: int
         """
@@ -322,7 +322,7 @@ class SynapticManager(object):
         :param int synaptic_matrix_region: dsg region id for the synaptic \
             matrix.
         :param int direct_matrix_region: dsg region id for the direct matrix.
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:\
             The slice of atoms to get the size of
         :param application_graph: The application graph
         :type application_graph: \
@@ -353,7 +353,7 @@ class SynapticManager(object):
         :param int struct_dynamics_region: dsg region id for the structural \
             dynamics.
         :param ~.DataSpecificationGenerator spec: The data spec to reserve in
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :param ~pacman.model.graphs.common.Slice vertex_slice:\
             The slice of the vertex to allocate for
         :param int all_syn_block_sz: The memory to reserve for synapses
         :param ~.MachineGraph machine_graph: The machine graph
@@ -633,19 +633,19 @@ class SynapticManager(object):
         :param application_graph: the app graph
         :type application_graph: \
             ~pacman.model.graphs.application_graph.ApplicationGraph
-        :param AbstractPopulationVertex application_vertex:
+        :param AbstractPopulationVertex application_vertex:\
             The vertex owning the synapses
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:\
             The part of the vertex we're dealing with
         :param PopulationMachineVertex machine_vertex: The machine vertex
-        :param ~pacman.model.placements.Placement placement:
+        :param ~pacman.model.placements.Placement placement:\
             Where the vertex is placed
-        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
+        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:\
             The graph containing the machine vertex
-        :param ~pacman.model.graphs.application.ApplicationGraph \
-                application_graph:
-            The graph containing the application vertex
-        :param ~pacman.model.routing_info.RoutingInfo routing_info:
+        :param application_graph: The graph containing the application vertex
+        :type application_graph:\
+            ~pacman.model.graphs.application.ApplicationGraph
+        :param ~pacman.model.routing_info.RoutingInfo routing_info:\
             How messages are routed
         :param float weight_scale: How to scale the weights of the synapses
         :param int machine_time_step:
@@ -697,9 +697,9 @@ class SynapticManager(object):
         """ Write the data spec for the synapse expander
         :param int connector_builder_region: dsg region id for the connection \
             builder data.
-        :param ~.DataSpecificationGenerator spec:
+        :param ~.DataSpecificationGenerator spec:\
             The specification to write to
-        :param ~pacman.model.common.Slice post_vertex_slice:
+        :param ~pacman.model.common.Slice post_vertex_slice:\
             The slice of the vertex being written
         :param list(GeneratorData) generator_data:
         """
@@ -794,7 +794,7 @@ class SynapticManager(object):
         return matrices.gen_on_machine
 
     def reset_ring_buffer_shifts(self):
-        """ Reset the ring buffer shifts; needed if projection data changes
+        """ Reset the ring buffer shifts; needed if projection data changes\
             between runs
         """
         self.__ring_buffer_shifts = None
