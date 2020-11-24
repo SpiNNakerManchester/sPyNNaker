@@ -95,6 +95,6 @@ jobs:
       uses: ./support/.github/actions/check-copyrights
 
     - name: Build documentation with sphinx
-      uses: ./support/.github/actions/sphinx
+      uses: ./.github/actions/sphinx
       with:
         directory: doc/source
