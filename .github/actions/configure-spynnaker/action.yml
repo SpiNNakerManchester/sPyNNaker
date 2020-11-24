@@ -1,0 +1,65 @@
+name: "Configure sPyNNaker for Execution"
+description: "Creates a sPyNNaker configuration file."
+inputs:
+  board-address:
+    description: The IP address of the SpiNNaker board to talk to directly
+    required: false
+    default: ""
+  version:
+    description: What version of SpiNNaker board to talk to
+    required: false
+    default: 5
+  spalloc:
+    description: Where the spalloc server is located
+    required: false
+    default: spinnaker.cs.man.ac.uk
+  port:
+    description: What port to contact spalloc on
+    required: false
+    default: 22444
+  user:
+    description: What user name to use for spalloc
+    required: false
+    default: GitHub Action Test
+  virtual:
+    description: Whether to use a virtual machine
+    required: false
+    default: false
+  width:
+    description: The width of the virtual machine, in chips
+    required: false
+    default: 8
+  height:
+    description: The height of the virtual machine, in chips
+    required: false
+    default: 8
+  time_scale_factor:
+    description: Time scale factor allows the slowing down of the simulation
+    required: false
+    default: None
+  mode:
+    description: What operation mode to use, Production or Debug
+    required: false
+    default: Production
+  data_path:
+    description: Where to write intermediate data files and provenance data
+    required: false
+    default: DEFAULT
+runs:
+  using: composite
+  steps: 
+    - run: |
+        bash ${{ github.action_path }}/mkcfg.bash
+      env:
+        M_ADDR: ${{ inputs.board-address }}
+        M_VER: ${{ inputs.version }}
+        S_HOST: ${{ inputs.spalloc }}
+        S_PORT: ${{ inputs.port }}
+        S_USER: ${{ inputs.user }}
+        V_TYPE: ${{ inputs.virtual }}
+        V_WIDTH: ${{ inputs.width }}
+        V_HEIGHT: ${{ inputs.height }}
+        M_TSF: ${{ inputs.time_scale_factor }}
+        M_MODE: ${{ inputs.mode }}
+        F_PATH: ${{ inputs.data_path }}
+      shell: bash

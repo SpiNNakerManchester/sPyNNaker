@@ -106,16 +106,9 @@ jobs:
       run: pip install -r requirements-test.txt
 
     - name: Create a spynnaker.cfg
-      run: |
-        echo '[Machine]' > ~/.spynnaker.cfg
-        echo "machineName = $SPINNAKER_BOARD_ADDRESS" >> ~/.spynnaker.cfg
-        echo "version = $SPINNAKER_BOARD_VERSION" >> ~/.spynnaker.cfg
-        echo '[Database]' >> ~/.spynnaker.cfg
-        echo '[Simulation]' >> ~/.spynnaker.cfg
-        echo '[Buffers]' >> ~/.spynnaker.cfg
-      env:
-        SPINNAKER_BOARD_ADDRESS: spinn-4.cs.man.ac.uk
-        SPINNAKER_BOARD_VERSION: 5
+      uses: .github/actions/configure-spynnaker
+      with:
+        board-address: spinn-4.cs.man.ac.uk
 
     - name: Test with pytest and coverage
       if: matrix.python-version == 3.6
