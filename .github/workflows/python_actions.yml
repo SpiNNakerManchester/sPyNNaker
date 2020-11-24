@@ -41,6 +41,7 @@ jobs:
       with:
         repository: SpiNNakerManchester/SupportScripts
         path: support
+        ref: actions
 
     - name: Checkout Spinnaker Dependencies
       run: |
@@ -129,9 +130,7 @@ jobs:
 
     - name: Run rat copyright enforcement
       if: matrix.python-version == 3.6
-      run: |
-        support/rat.sh download
-        support/rat.sh run
+      uses: ./support/.github/actions/check-copyrights
 
     - name: Build documentation with sphinx
       if: matrix.python-version == 3.6
