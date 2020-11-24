@@ -106,7 +106,7 @@ jobs:
       run: pip install -r requirements-test.txt
 
     - name: Create a spynnaker.cfg
-      uses: .github/actions/configure-spynnaker
+      uses: ./.github/actions/configure-spynnaker
       with:
         board-address: spinn-4.cs.man.ac.uk
 
