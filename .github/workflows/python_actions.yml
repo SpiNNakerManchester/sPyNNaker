@@ -95,6 +95,6 @@ jobs:
       uses: ./support/.github/actions/check-copyrights
 
     - name: Build documentation with sphinx
-      if: matrix.python-version == 3.6
-      run: sphinx-build -W -T -E -b html -d _build/doctrees-readthedocsdirhtml -D language=en . _build/html
-      working-directory: doc/source
+      uses: ./support/.github/actions/sphinx
+      with:
+        directory: doc/source
