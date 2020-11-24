@@ -31,10 +31,22 @@ runs:
   using: composite
   steps: 
     - run: |
-        [ ${{ inputs.preinstall }} = "true" ] && pip install -r requirements.txt
+        if [ ${{ inputs.preinstall }} = "true" ]; then
+          echo "::group::Doing dependency preinstall"
+          pip install -r requirements.txt
+          code=$?
+          echo "::endgroup::"
+          exit $code
+        fi
       shell: bash
-    - run: python setup.py ${{ inputs.mode }}
+    - run: exec python setup.py ${{ inputs.mode }}
       shell: bash
     - run: |
-        [ ${{ inputs.test-requirements }} = "true" ] && pip install -r requirements-test.txt
+        if [ ${{ inputs.test-requirements }} = "true" ]; then
+          echo "::group::Doing test-code install"
+          pip install -r requirement s-test.txt
+          code=$?
+          echo "::endgroup::"
+          exit $code
+        fi
       shell: bash
