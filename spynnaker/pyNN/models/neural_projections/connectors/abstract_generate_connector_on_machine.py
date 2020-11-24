@@ -105,7 +105,7 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         key = (id(pre_vertex_slice), id(post_vertex_slice))
         if key not in self.__connector_seed:
             self.__connector_seed[key] = utility_calls.create_mars_kiss_seeds(
-                rng, None)
+                rng)
         return self.__connector_seed[key]
 
     @staticmethod
@@ -124,7 +124,7 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
             return None
         key = (id(pre_vertex_slice), id(post_vertex_slice), id(values))
         if key not in seeds:
-            seeds[key] = utility_calls.create_mars_kiss_seeds(values.rng, None)
+            seeds[key] = utility_calls.create_mars_kiss_seeds(values.rng)
         return seeds[key]
 
     @staticmethod

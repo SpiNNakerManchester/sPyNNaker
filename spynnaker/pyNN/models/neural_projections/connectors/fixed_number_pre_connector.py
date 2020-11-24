@@ -298,7 +298,7 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
         key = (id(synapse_info), id(post_vertex_slice))
         if key not in self.__pre_connector_seed:
             self.__pre_connector_seed[
-                key] = utility_calls.create_mars_kiss_seeds(self._rng, None)
+                key] = utility_calls.create_mars_kiss_seeds(self._rng)
 
         # Only deal with self-connections if the two populations are the same
         self_connections = True

@@ -295,7 +295,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         key = (id(pre_vertex_slice), id(post_slices))
         if key not in self.__post_connector_seed:
             self.__post_connector_seed[
-                key] = utility_calls.create_mars_kiss_seeds(self._rng, None)
+                key] = utility_calls.create_mars_kiss_seeds(self._rng)
 
         # Only deal with self-connections if the two populations are the same
         self_connections = True
