@@ -1,0 +1,68 @@
+# Copyright (c) 2020 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+name: "Check out and install SpiNNaker dependencies"
+inputs:
+  repositories:
+    description: The list of SpiNNaker dependencies to check out
+    required: true
+  support-dir:
+    description: Where the support code is installed
+    required: false
+    default: support
+  install:
+    description: Whether to install the dependency after checking it out
+    required: false
+    default: false
+  preinstall:
+    description: Whether to pre-install the dependencies before running the installer
+    required: false
+    default: false
+runs:
+  using: composite
+  steps: 
+    - run: |
+        for repo in $DEPENDENCIES; do
+          ${{ input.support-dir }}/gitclone2.sh https://github.com/SpiNNakerManchester/$repo.git
+          if [ $DO_INSTALL = "true" ]; then
+            echo "::group::Installing $repo"
+            if [ $DO_PREINST = "true" ]; then
+              (cd $repo && pip install -r requirements.txt)
+            fi
+            (cd $repo && exec python setup.py develop)
+            echo "::endgroup::"
+          fi
+        done
+      shell: bash
+      working-directory: .
+      env:
+        DEPENDENCIES: ${{ join(input.repositories, ' ') }}
+    - run: |
+        for repo in $DEPENDENCIES; do
+          if [ $DO_INSTALL = "true" ]; then
+            echo "::group::Installing $repo"
+            if [ $DO_PREINST = "true" ]; then
+              (cd $repo && pip install -r requirements.txt)
+            fi
+            (cd $repo && exec python setup.py develop)
+            echo "::endgroup::"
+          fi
+        done
+      shell: bash
+      working-directory: .
+      env:
+        DEPENDENCIES: ${{ join(input.repositories, ' ') }}
+        DO_INSTALL: ${{ input.install }}
+        DO_PREINST: ${{ input.preinstall }}
