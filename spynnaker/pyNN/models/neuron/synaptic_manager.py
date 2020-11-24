@@ -660,8 +660,8 @@ class SynapticManager(object):
         all_syn_block_sz = matrices.synapses_size(in_edges)
         self._reserve_memory_regions(
             spec, post_vertex_slice, all_syn_block_sz, machine_graph,
-            machine_vertex, synapse_params_region, pop_table_region,
-            synaptic_matrix_region, struct_dynamics_region)
+            machine_vertex, synapse_params_region, synaptic_matrix_region,
+            synapse_dynamics_region, struct_dynamics_region)
 
         self.__update_ring_buffer_shifts_and_weight_scales(
             machine_vertex, machine_graph, machine_time_step,
