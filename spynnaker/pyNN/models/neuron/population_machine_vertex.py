@@ -399,7 +399,8 @@ class PopulationMachineVertex(
     @overrides(AbstractReceiveBuffersToHost.get_recording_region_base_address)
     def get_recording_region_base_address(self, txrx, placement):
         return locate_memory_region_for_placement(
-            placement, self.POPULATION_BASED_REGIONS.NEURON_RECORDING.value, txrx)
+            placement, self.POPULATION_BASED_REGIONS.NEURON_RECORDING.value,
+            txrx)
 
     @overrides(AbstractHasProfileData.get_profile_data)
     def get_profile_data(self, transceiver, placement):
