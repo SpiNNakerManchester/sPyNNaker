@@ -44,7 +44,7 @@ runs:
     - run: |
         if [ ${{ inputs.test-requirements }} = "true" ]; then
           echo "::group::Doing test-code install"
-          pip install -r requirement s-test.txt
+          pip install -r requirements-test.txt
           code=$?
           echo "::endgroup::"
           exit $code
