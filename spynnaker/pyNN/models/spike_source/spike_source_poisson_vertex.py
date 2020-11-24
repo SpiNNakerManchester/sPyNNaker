@@ -17,9 +17,7 @@ import logging
 import math
 import numpy
 import scipy.stats
-import struct
 from spinn_utilities.overrides import overrides
-from data_specification.enums import DataType
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
@@ -39,22 +37,15 @@ from spinn_front_end_common.utilities.constants import (
 from spinn_front_end_common.interface.profiling import profile_utils
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, MultiSpikeRecorder, SimplePopulationSettable)
-from spynnaker.pyNN.models.abstract_models import (
-    AbstractReadParametersBeforeSet)
 from .spike_source_poisson_machine_vertex import (
     SpikeSourcePoissonMachineVertex, _flatten, get_rates_bytes)
 from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
-from spynnaker.pyNN.utilities.struct import Struct
 from spynnaker.pyNN.utilities.ranged.spynnaker_ranged_dict \
     import SpynnakerRangeDictionary
 from spynnaker.pyNN.utilities.ranged.spynnaker_ranged_list \
     import SpynnakerRangedList
 
 logger = logging.getLogger(__name__)
-
-# Seed offset in parameters and size on bytes
-SEED_OFFSET_BYTES = 9 * 4
-SEED_SIZE_BYTES = 4 * 4
 
 # uint32_t n_rates; uint32_t index
 PARAMS_WORDS_PER_NEURON = 2
@@ -72,22 +63,11 @@ OVERFLOW_TIMESTEPS_FOR_SDRAM = 5
 _MAX_OFFSET_DENOMINATOR = 10
 
 
-_PoissonStruct = Struct([
-    DataType.UINT32,  # Start Scaled
-    DataType.UINT32,  # End Scaled
-    DataType.UINT32,  # Next Scaled
-    DataType.UINT32,  # is_fast_source
-    DataType.U032,    # exp^(-spikes_per_tick)
-    DataType.S1615,   # sqrt(spikes_per_tick)
-    DataType.UINT32,   # inter-spike-interval
-    DataType.UINT32])  # timesteps to next spike
-
-
 class SpikeSourcePoissonVertex(
         TDMAAwareApplicationVertex, AbstractSpikeRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
-        AbstractChangableAfterRun, AbstractReadParametersBeforeSet,
-        SimplePopulationSettable, ProvidesKeyToAtomMappingImpl):
+        AbstractChangableAfterRun, SimplePopulationSettable,
+        ProvidesKeyToAtomMappingImpl):
     """ A Poisson Spike source object
     """
     __slots__ = [
@@ -541,71 +521,14 @@ class SpikeSourcePoissonVertex(
                 self.__rng, self.__seed)
         return self.__kiss_seed[vertex_slice]
 
-    @overrides(
-        AbstractReadParametersBeforeSet.read_parameters_from_machine)
-    def read_parameters_from_machine(
-            self, transceiver, placement, vertex_slice):
+    def update_kiss_seed(self, vertex_slice, seed):
+        """ updates a kiss seed from the machine
 
-        # locate SDRAM address where parameters are stored
-        poisson_params = placement.vertex.poisson_param_region_address(
-            placement, transceiver)
-        seed_array = transceiver.read_memory(
-            placement.x, placement.y, poisson_params + SEED_OFFSET_BYTES,
-            SEED_SIZE_BYTES)
-        self.__kiss_seed[vertex_slice] = struct.unpack_from("<4I", seed_array)
-
-        # locate SDRAM address where the rates are stored
-        poisson_rate_region_sdram_address = (
-            placement.vertex.poisson_rate_region_address(
-                placement, transceiver))
-
-        # get size of poisson params
-        size_of_region = get_rates_bytes(vertex_slice, self.__data["rates"])
-
-        # get data from the machine
-        byte_array = transceiver.read_memory(
-            placement.x, placement.y,
-            poisson_rate_region_sdram_address, size_of_region)
-
-        # For each atom, read the number of rates and the rate parameters
-        offset = 0
-        for i in range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1):
-            n_values = struct.unpack_from("<I", byte_array, offset)[0]
-            offset += 4
-
-            # Skip reading the index, as it will be recalculated on data write
-            offset += 4
-
-            (_start, _end, _next, is_fast_source, exp_minus_lambda,
-             sqrt_lambda, isi, time_to_next_spike) = _PoissonStruct.read_data(
-                 byte_array, offset, n_values)
-            offset += _PoissonStruct.get_size_in_whole_words(n_values) * 4
-
-            # Work out the spikes per tick depending on if the source is
-            # slow (isi), fast (exp) or faster (sqrt)
-            is_fast_source = is_fast_source == 1.0
-            spikes_per_tick = numpy.zeros(len(is_fast_source), dtype="float")
-            spikes_per_tick[is_fast_source] = numpy.log(
-                exp_minus_lambda[is_fast_source]) * -1.0
-            is_faster_source = sqrt_lambda > 0
-            # pylint: disable=assignment-from-no-return
-            spikes_per_tick[is_faster_source] = numpy.square(
-                sqrt_lambda[is_faster_source])
-            slow_elements = isi > 0
-            spikes_per_tick[slow_elements] = 1.0 / isi[slow_elements]
-
-            # Convert spikes per tick to rates
-            machine_time_step = (
-                globals_variables.get_simulator().machine_time_step)
-            self.__data["rates"].set_value_by_id(
-                i,
-                spikes_per_tick *
-                (MICRO_TO_SECOND_CONVERSION / float(machine_time_step)))
-
-            # Store the updated time until next spike so that it can be
-            # rewritten when the parameters are loaded
-            self.__data["time_to_spike"].set_value_by_id(
-                i, time_to_next_spike)
+        :param vertex_slice: the vertex slice to update seed of
+        :param seed: the seed
+        :rtype: None
+        """
+        self.__kiss_seed[vertex_slice] = seed
 
     @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(self, placements, buffer_manager, machine_time_step):
