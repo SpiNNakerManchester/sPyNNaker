@@ -51,7 +51,7 @@ jobs:
         support/gitclone2.sh https://github.com/SpiNNakerManchester/PACMAN.git
         support/gitclone2.sh https://github.com/SpiNNakerManchester/DataSpecification.git
         support/gitclone2.sh https://github.com/SpiNNakerManchester/spalloc.git
-        support/gitclone2.sh git://github.com/SpiNNakerManchester/SpiNNFrontEndCommon.git
+        support/gitclone2.sh https://github.com/SpiNNakerManchester/SpiNNFrontEndCommon.git
 
     - name: Install -pip
       run: |
@@ -111,13 +111,13 @@ jobs:
       with:
         board-address: spinn-4.cs.man.ac.uk
 
-    - name: Test with pytest and coverage
-      if: matrix.python-version == 3.6
-      run: pytest unittests --cov spynnaker
-
     - name: Test with pytest
-      if: matrix.python-version != 3.6
-      run: pytest unittests
+      uses: ./.github/actions/pytest
+      with:
+        tests: unittests
+        coverage: ${{ matrix.python-version == 3.6 }}
+        cover-packages: spynnaker
+        coveralls-token: ${{ secrets.COVERALLS_REPO_TOKEN }}
 
     - name: Lint with flake8
       run: flake8 spynnaker unittests
@@ -125,8 +125,9 @@ jobs:
     - name: Lint with pylint
       # Broken in 2.7 as it can not find data_specification.exceptions
       if: matrix.python-version != 2.7
-      # Note that there's special conditioning of the return code of pylint
-      run: pylint --output-format=colorized --disable=R,C spynnaker || exit $(($? & 35))
+      uses: ./.github/actions/pylint
+      with: 
+        package: spynnaker
 
     - name: Run rat copyright enforcement
       if: matrix.python-version == 3.6
@@ -136,11 +137,3 @@ jobs:
       if: matrix.python-version == 3.6
       run: sphinx-build -W -T -E -b html -d _build/doctrees-readthedocsdirhtml -D language=en . _build/html
       working-directory: doc/source
-
-    - name: Run coveralls and report coverage
-      if: matrix.python-version == 3.6
-      env:
-        COVERALLS_SERVICE_NAME: 'GitHub CI'
-        COVERALLS_REPO_TOKEN : ${{ secrets.COVERALLS_REPO_TOKEN }}
-        NODE_COVERALLS_DEBUG: 1
-      run: coveralls

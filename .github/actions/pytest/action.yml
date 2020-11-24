@@ -1,0 +1,59 @@
+# Copyright (c) 2020 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+name: "Run py.test"
+description: |
+  Runs pytest and optionally coveralls.
+  Note that installing pytest and coveralls in the environment before this action is up to the caller.
+inputs:
+  tests:
+    description: The name of the Python package containing the tests
+    required: true
+  coverage:
+    description: Whether to do coverage
+    required: false
+    default: false
+  cover-packages:
+    description: The names of the Python packages to get coverage of.
+    required: false
+    default: ""
+  ci-name:
+    description: The name of the continuous integration environment.
+    required: false
+    default: 'GitHub CI'
+  coveralls-token:
+    description: The secret token used for uploading to coveralls.io
+    required: false
+    default: ""
+runs:
+  using: composite
+  steps: 
+    - run: ${{ github.action_path }}/run_pytest.bash ${{ inputs.cover-packages }}
+      if: ${{ inputs.coverage }}
+      shell: bash
+      env:
+        TEST_PKG: ${{ inputs.tests }}
+    - run: ${{ github.action_path }}/run_pytest.bash
+      if: ${{ ! inputs.coverage }}
+      shell: bash
+      env:
+        TEST_PKG: ${{ inputs.tests }}
+    - run: coveralls
+      if: ${{ inputs.coverage }}
+      env:
+        COVERALLS_SERVICE_NAME: ${{ inputs.ci-name }}
+        COVERALLS_REPO_TOKEN : ${{ inputs.coveralls-token }}
+        NODE_COVERALLS_DEBUG: 1
+      shell: bash
