@@ -51,14 +51,9 @@ jobs:
     - name: Install Spinnaker Dependencies
       uses: ./.github/actions/checkout-spinn-deps
       with:
-        repositories:
-          - SpiNNUtils
-          - SpiNNMachine
-          - SpiNNMan
-          - PACMAN
-          - DataSpecification
-          - spalloc
-          - SpiNNFrontEndCommon
+        repositories: >
+          SpiNNUtils SpiNNMachine SpiNNMan PACMAN DataSpecification spalloc 
+          SpiNNFrontEndCommon
         install: true
         preinstall: ${{ matrix.python-version == 2.7 }}
 

@@ -48,7 +48,7 @@ runs:
       shell: bash
       working-directory: .
       env:
-        DEPENDENCIES: ${{ join(input.repositories, ' ') }}
+        DEPENDENCIES: ${{ input.repositories }}
     - run: |
         for repo in $DEPENDENCIES; do
           if [ $DO_INSTALL = "true" ]; then
@@ -63,6 +63,6 @@ runs:
       shell: bash
       working-directory: .
       env:
-        DEPENDENCIES: ${{ join(input.repositories, ' ') }}
+        DEPENDENCIES: ${{ input.repositories }}
         DO_INSTALL: ${{ input.install }}
         DO_PREINST: ${{ input.preinstall }}
