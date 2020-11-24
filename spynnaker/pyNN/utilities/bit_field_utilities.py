@@ -239,7 +239,7 @@ def write_bitfield_init_data(
     for out_going_partition in machine_graph.\
             get_multicast_edge_partitions_ending_at_vertex(machine_vertex):
         # TODO do we need to do multiple times if multiple edges?
-        for edge in  out_going_partition:
+        for edge in out_going_partition:
             spec.write_value(
                 routing_info.get_first_key_from_partition(out_going_partition))
             spec.write_value(
