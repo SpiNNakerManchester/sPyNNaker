@@ -40,20 +40,23 @@ inputs:
 runs:
   using: composite
   steps: 
-    - run: ${{ github.action_path }}/run_pytest.bash ${{ inputs.cover-packages }}
-      if: ${{ inputs.coverage }}
+    - run: |
+        if [ $DO_COVERAGE == "true" ]; then
+          ${{ github.action_path }}/run_pytest.bash ${{ inputs.cover-packages }}
+        else
+          ${{ github.action_path }}/run_pytest.bash
+        fi
       shell: bash
       env:
         TEST_PKG: ${{ inputs.tests }}
-    - run: ${{ github.action_path }}/run_pytest.bash
-      if: ${{ ! inputs.coverage }}
-      shell: bash
-      env:
-        TEST_PKG: ${{ inputs.tests }}
-    - run: coveralls
-      if: ${{ inputs.coverage }}
+        DO_COVERAGE: ${{ inputs.coverage }}
+    - run: |
+        if [ $DO_COVERAGE == "true" ]; then
+          coveralls
+        fi
       env:
         COVERALLS_SERVICE_NAME: ${{ inputs.ci-name }}
         COVERALLS_REPO_TOKEN : ${{ inputs.coveralls-token }}
         NODE_COVERALLS_DEBUG: 1
+        DO_COVERAGE: ${{ inputs.coverage }}
       shell: bash
