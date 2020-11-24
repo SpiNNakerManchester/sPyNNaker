@@ -35,20 +35,12 @@ runs:
   steps: 
     - run: |
         for repo in $DEPENDENCIES; do
-          ${{ input.support-dir }}/gitclone2.sh https://github.com/SpiNNakerManchester/$repo.git
-          if [ $DO_INSTALL = "true" ]; then
-            echo "::group::Installing $repo"
-            if [ $DO_PREINST = "true" ]; then
-              (cd $repo && pip install -r requirements.txt)
-            fi
-            (cd $repo && exec python setup.py develop)
-            echo "::endgroup::"
-          fi
+          ${{ inputs.support-dir }}/gitclone2.sh https://github.com/SpiNNakerManchester/$repo.git
         done
       shell: bash
       working-directory: .
       env:
-        DEPENDENCIES: ${{ input.repositories }}
+        DEPENDENCIES: ${{ inputs.repositories }}
     - run: |
         for repo in $DEPENDENCIES; do
           if [ $DO_INSTALL = "true" ]; then
@@ -63,6 +55,6 @@ runs:
       shell: bash
       working-directory: .
       env:
-        DEPENDENCIES: ${{ input.repositories }}
-        DO_INSTALL: ${{ input.install }}
-        DO_PREINST: ${{ input.preinstall }}
+        DEPENDENCIES: ${{ inputs.repositories }}
+        DO_INSTALL: ${{ inputs.install }}
+        DO_PREINST: ${{ inputs.preinstall }}
