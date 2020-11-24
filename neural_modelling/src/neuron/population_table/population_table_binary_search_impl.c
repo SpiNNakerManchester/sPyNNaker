@@ -229,6 +229,7 @@ static inline uint32_t get_extended_neuron_id(
 //!
 //! For debugging
 static inline void print_master_population_table(void) {
+#if log_level >= LOG_DEBUG
     log_info("Master_population\n");
     for (uint32_t i = 0; i < master_population_table_length; i++) {
         master_population_table_entry entry = master_population_table[i];
@@ -255,6 +256,7 @@ static inline void print_master_population_table(void) {
         }
     }
     log_info("Population table has %u entries", master_population_table_length);
+#endif
 }
 
 //! \brief Check if the entry is a match for the given key
@@ -355,7 +357,7 @@ bool population_table_load_bitfields(filter_region_t *filter_region) {
                      sizeof(bit_field_t) * n_words_total);
              if (connectivity_bit_field[mp_i] == NULL) {
                  // If allocation fails, we can still continue
-                 log_info(
+                 log_debug(
                          "Could not initialise bit field for key %d, packets with "
                          "that key will use a DMA to check if the packet targets "
                          "anything within this core. Potentially slowing down the "
