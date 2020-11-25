@@ -85,7 +85,7 @@ jobs:
 
     - name: Run rat copyright enforcement
       if: matrix.python-version == 3.6
-      uses: ./support/.github/actions/check-copyrights
+      uses: ./support/actions/check-copyrights
 
     - name: Build documentation with sphinx
       uses: ./.github/actions/sphinx
