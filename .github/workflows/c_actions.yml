@@ -28,7 +28,7 @@ jobs:
     - name: Install Ubuntu dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install vera++ doxygen gcc-arm-none-eabi --fix-missing
+        sudo apt-get install doxygen gcc-arm-none-eabi --fix-missing
 
     - name: Set up Python 3.6
       # Note: Python is needed for spinn_utilities.make_tools when building
@@ -64,8 +64,9 @@ jobs:
       working-directory: SpiNNUtils
 
     - name: Lint C code using Vera++
-      # Note: run this before building to avoid linting modified_src directories
-      run: support/run-vera.sh neural_modelling/src
+      uses: ./support/actions/vera
+      with:
+        base-dir: neural_modelling/src
 
     - name: Build C dependencies
       run: |
