@@ -755,9 +755,7 @@ class SynapticManager(object):
             The slice of the vertex to determine the generation status of
         :rtype: bool
         """
-        matrices = self.__get_synaptic_matrices(
-            post_vertex_slice, pop_table_region, synaptic_matrix_region,
-            direct_matrix_region)
+        matrices = self.__get_synaptic_matrices(post_vertex_slice)
         return matrices.gen_on_machine
 
     def reset_ring_buffer_shifts(self):
