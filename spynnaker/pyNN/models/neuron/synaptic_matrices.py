@@ -199,6 +199,7 @@ class SynapticMatrices(object):
             synaptic_matrix_region, direct_matrix_region):
         """ Simultaneously generates both the master population table and\
             the synaptic matrix.
+
          :param int pop_table_region: dsg region id for master pop table.
         :param int synaptic_matrix_region: dsg region id for the synaptic \
             matrix.
