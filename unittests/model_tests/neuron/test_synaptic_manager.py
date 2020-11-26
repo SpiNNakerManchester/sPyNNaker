@@ -273,7 +273,7 @@ def test_write_data_spec():
     try:
         connections_1 = synaptic_manager.get_connections_from_machine(
             transceiver, placements, app_edge,
-            direct_synapse_information_1, pop_table_region=2,
+            direct_synapse_information_1,
             synaptic_matrix_region=3, direct_matrix_region=7)
 
         # Check that all the connections have the right weight and delay
@@ -283,7 +283,7 @@ def test_write_data_spec():
 
         connections_2 = synaptic_manager.get_connections_from_machine(
             transceiver, placements, app_edge,
-            direct_synapse_information_2, pop_table_region=2,
+            direct_synapse_information_2,
             synaptic_matrix_region=3, direct_matrix_region=7)
 
         # Check that all the connections have the right weight and delay
@@ -293,7 +293,7 @@ def test_write_data_spec():
 
         connections_3 = synaptic_manager.get_connections_from_machine(
             transceiver, placements, app_edge,
-            all_to_all_synapse_information, pop_table_region=2,
+            all_to_all_synapse_information,
             synaptic_matrix_region=3, direct_matrix_region=7)
 
         # Check that all the connections have the right weight and delay
@@ -304,7 +304,7 @@ def test_write_data_spec():
 
         connections_4 = synaptic_manager.get_connections_from_machine(
             transceiver, placements, app_edge,
-            from_list_synapse_information, pop_table_region=2,
+            from_list_synapse_information,
             synaptic_matrix_region=3, direct_matrix_region=7)
 
         # Check that all the connections have the right weight and delay
