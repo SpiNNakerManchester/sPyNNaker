@@ -197,7 +197,7 @@ class SynapticMatrices(object):
             self, spec, machine_vertex, all_syn_block_sz, weight_scales,
             routing_info, machine_graph, pop_table_region,
             synaptic_matrix_region, direct_matrix_region):
-        """ Simultaneously generates both the master population table and
+        """ Simultaneously generates both the master population table and\
             the synaptic matrix.
          :param int pop_table_region: dsg region id for master pop table.
         :param int synaptic_matrix_region: dsg region id for the synaptic \
@@ -214,7 +214,6 @@ class SynapticMatrices(object):
             The routing information for all edges
         :param ~pacman.model.graphs.machine.MachineGraph machine_graph:\
             The machine graph
-
         :return: A list of generator data to be written elsewhere
         :rtype: list(GeneratorData)
         """
