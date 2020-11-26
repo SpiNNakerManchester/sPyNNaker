@@ -87,6 +87,12 @@ jobs:
       if: matrix.python-version == 3.6
       uses: ./support/actions/check-copyrights
 
+    - name: Validate all XML
+      if: matrix.python-version == 3.6
+      uses: ./support/actions/validate-xml
+      with:
+        base-path: spynnaker
+
     - name: Build documentation with sphinx
       uses: ./support/actions/sphinx
       with:
