@@ -51,7 +51,8 @@ class PopulationMachineVertex(
         AbstractSupportsBitFieldGeneration,
         AbstractSupportsBitFieldRoutingCompression,
         AbstractGeneratesDataSpecification, AbstractSynapseExpandable,
-        AbstractRewritesDataSpecification, AbstractReadParametersBeforeSet):
+        AbstractRewritesDataSpecification, AbstractReadParametersBeforeSet,
+        AbstractUtilisesSynapticManager):
 
     __slots__ = [
         "__binary_file_name",
@@ -496,15 +497,9 @@ class PopulationMachineVertex(
             self.POPULATION_BASED_REGIONS.DIRECT_MATRIX.value)
         self.set_on_chip_generatable_area(
             self._app_vertex.synapse_manager.host_written_matrix_size(
-                self.vertex_slice,
-                self.POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
-                self.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
-                self.POPULATION_BASED_REGIONS.DIRECT_MATRIX.value),
+                self.vertex_slice),
             self._app_vertex.synapse_manager.on_chip_written_matrix_size(
-                self.vertex_slice,
-                self.POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
-                self.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
-                self.POPULATION_BASED_REGIONS.DIRECT_MATRIX.value))
+                self.vertex_slice))
 
         # write up the bitfield builder data
         bit_field_utilities.write_bitfield_init_data(
@@ -662,7 +657,6 @@ class PopulationMachineVertex(
     def read_generated_connection_holders(self, transceiver, placement):
         self._app_vertex.synapse_manager.read_generated_connection_holders(
             transceiver, placement,
-            self.POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
             self.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
             self.POPULATION_BASED_REGIONS.DIRECT_MATRIX.value)
 

@@ -139,14 +139,8 @@ class SynapticManager(object):
         # Post vertex slice to synaptic matrices
         self.__synaptic_matrices = dict()
 
-    def __get_synaptic_matrices(
-            self, post_vertex_slice, pop_table_region, synaptic_matrix_region,
-            direct_matrix_region):
+    def __get_synaptic_matrices(self, post_vertex_slice):
         """ Get the synaptic matrices for a given slice of the vertex
-        :param int pop_table_region: dsg region id for master pop table.
-        :param int synaptic_matrix_region: dsg region id for the synaptic \
-            matrix.
-        :param int direct_matrix_region: dsg region id for the direct matrix.
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:\
             the slice of the vertex to get the matrices for
         :rtype: SynapticMatrices
@@ -158,44 +152,25 @@ class SynapticManager(object):
         # Otherwise generate new ones
         matrices = SynapticMatrices(
             post_vertex_slice, self.__n_synapse_types,
-            self.__all_single_syn_sz, self.__synapse_io,
-            synaptic_matrix_region, direct_matrix_region,
-            pop_table_region)
-        self.__synaptic_matrices[post_vertex_slice] = matrices
+            self.__all_single_syn_sz, self.__synapse_io)
         return matrices
 
-    def host_written_matrix_size(
-            self, post_vertex_slice, pop_table_region, synaptic_matrix_region,
-            direct_matrix_region):
+    def host_written_matrix_size(self, post_vertex_slice):
         """ The size of the matrix written by the host for a given\
             machine vertex
-        :param int pop_table_region: dsg region id for master pop table.
-        :param int synaptic_matrix_region: dsg region id for the synaptic \
-            matrix.
-        :param int direct_matrix_region: dsg region id for the direct matrix.
         :param post_vertex_slice: The slice of the vertex to get the size of
         :rtype: int
         """
-        matrices = self.__get_synaptic_matrices(
-            post_vertex_slice, pop_table_region, synaptic_matrix_region,
-            direct_matrix_region)
+        matrices = self.__get_synaptic_matrices(post_vertex_slice)
         return matrices.host_generated_block_addr
 
-    def on_chip_written_matrix_size(
-            self, post_vertex_slice, pop_table_region, synaptic_matrix_region,
-            direct_matrix_region):
+    def on_chip_written_matrix_size(self, post_vertex_slice):
         """ The size of the matrix that will be written on the machine for a\
             given machine vertex
-        :param int pop_table_region: dsg region id for master pop table.
-        :param int synaptic_matrix_region: dsg region id for the synaptic \
-            matrix.
-        :param int direct_matrix_region: dsg region id for the direct matrix.
         :param post_vertex_slice: The slice of the vertex to get the size of
         :rtype: int
         """
-        matrices = self.__get_synaptic_matrices(
-            post_vertex_slice, pop_table_region, synaptic_matrix_region,
-            direct_matrix_region)
+        matrices = self.__get_synaptic_matrices(post_vertex_slice)
         return (matrices.on_chip_generated_block_addr -
                 matrices.host_generated_block_addr)
 
@@ -315,13 +290,8 @@ class SynapticManager(object):
                 n_atoms, self.__n_synapse_types)
 
     def get_sdram_usage_in_bytes(
-            self, post_vertex_slice, application_graph, app_vertex,
-            pop_table_region, synaptic_matrix_region, direct_matrix_region):
+            self, post_vertex_slice, application_graph, app_vertex):
         """ Get the SDRAM usage of a slice of atoms of this vertex
-        :param int pop_table_region: dsg region id for master pop table.
-        :param int synaptic_matrix_region: dsg region id for the synaptic \
-            matrix.
-        :param int direct_matrix_region: dsg region id for the direct matrix.
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:\
             The slice of atoms to get the size of
         :param application_graph: The application graph
@@ -331,9 +301,7 @@ class SynapticManager(object):
         :rtype: int
         """
         in_edges = application_graph.get_edges_ending_at_vertex(app_vertex)
-        matrices = self.__get_synaptic_matrices(
-            post_vertex_slice, pop_table_region, synaptic_matrix_region,
-            direct_matrix_region)
+        matrices = self.__get_synaptic_matrices(post_vertex_slice)
         return (
             self._get_synapse_params_size() +
             self._get_synapse_dynamics_parameter_size(
@@ -654,9 +622,7 @@ class SynapticManager(object):
         # Reserve the memory
         in_edges = application_graph.get_edges_ending_at_vertex(
             application_vertex)
-        matrices = self.__get_synaptic_matrices(
-            post_vertex_slice, pop_table_region, synaptic_matrix_region,
-            direct_matrix_region)
+        matrices = self.__get_synaptic_matrices(post_vertex_slice)
         all_syn_block_sz = matrices.synapses_size(in_edges)
         self._reserve_memory_regions(
             spec, post_vertex_slice, all_syn_block_sz, machine_graph,
@@ -674,7 +640,8 @@ class SynapticManager(object):
 
         gen_data = matrices.write_synaptic_matrix_and_master_population_table(
             spec, machine_vertex, all_syn_block_sz, self.__weight_scales,
-            routing_info, machine_graph)
+            routing_info, machine_graph, pop_table_region,
+            synaptic_matrix_region, direct_matrix_region)
 
         if self.__synapse_dynamics is not None:
             self.__synapse_dynamics.write_parameters(
@@ -737,9 +704,8 @@ class SynapticManager(object):
 
     def get_connections_from_machine(
             self, transceiver, placements, app_edge, synapse_info,
-            pop_table_region, synaptic_matrix_region, direct_matrix_region):
+            synaptic_matrix_region, direct_matrix_region):
         """ Read the connections from the machine for a given projection
-        :param int pop_table_region: dsg region id for master pop table.
         :param int synaptic_matrix_region: dsg region id for the synaptic \
             matrix.
         :param int direct_matrix_region: dsg region id for the direct matrix.
@@ -768,11 +734,10 @@ class SynapticManager(object):
         for post_vertex in progress.over(post_vertices):
             post_slice = post_vertex.vertex_slice
             placement = placements.get_placement_of_vertex(post_vertex)
-            matrix = self.__get_synaptic_matrices(
-                post_slice, pop_table_region, synaptic_matrix_region,
-                direct_matrix_region)
+            matrix = self.__get_synaptic_matrices(post_slice)
             connections.extend(matrix.get_connections_from_machine(
-                transceiver, placement, app_edge, synapse_info))
+                transceiver, placement, app_edge, synapse_info,
+                synaptic_matrix_region, direct_matrix_region))
         return numpy.concatenate(connections)
 
     def gen_on_machine(
@@ -817,12 +782,11 @@ class SynapticManager(object):
         return self.__synapse_dynamics.changes_during_run
 
     def read_generated_connection_holders(
-            self, transceiver, placement, pop_table_region,
-            synaptic_matrix_region, direct_matrix_region):
+            self, transceiver, placement, synaptic_matrix_region,
+            direct_matrix_region):
         """ Fill in any pre-run connection holders for data which is generated\
             on the machine, after it has been generated
 
-        :param int pop_table_region: dsg region id for master pop table.
         :param int synaptic_matrix_region: dsg region id for the synaptic \
             matrix.
         :param int direct_matrix_region: dsg region id for the direct matrix.
@@ -832,9 +796,10 @@ class SynapticManager(object):
             where the data is to be read from
         """
         matrices = self.__get_synaptic_matrices(
-            placement.vertex.vertex_slice, pop_table_region,
-            synaptic_matrix_region, direct_matrix_region)
-        matrices.read_generated_connection_holders(transceiver, placement)
+            placement.vertex.vertex_slice)
+        matrices.read_generated_connection_holders(
+            transceiver, placement, synaptic_matrix_region,
+            direct_matrix_region)
 
     def clear_all_caches(self):
         """ Clears all cached data in the case that a reset requires remapping

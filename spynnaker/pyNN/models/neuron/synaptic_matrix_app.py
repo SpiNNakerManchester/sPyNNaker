@@ -48,10 +48,6 @@ class SynapticMatrixApp(object):
         "__all_single_syn_sz",
         # The slice of the post vertex these matrices are for
         "__post_vertex_slice",
-        # The ID of the synaptic matrix region
-        "__synaptic_matrix_region",
-        # The ID of the "direct" or "single" matrix region
-        "__direct_matrix_region",
         # Any machine-level matrices for this application matrix
         "__matrices",
         # The maximum row length of delayed and undelayed matrices
@@ -95,8 +91,7 @@ class SynapticMatrixApp(object):
 
     def __init__(
             self, synapse_io, poptable, synapse_info, app_edge,
-            n_synapse_types, all_single_syn_sz, post_vertex_slice,
-            synaptic_matrix_region, direct_matrix_region):
+            n_synapse_types, all_single_syn_sz, post_vertex_slice):
         """
 
         :param SynapseIORowBased synapse_io: The reader and writer of synapses
@@ -111,10 +106,6 @@ class SynapticMatrixApp(object):
             The space available for "direct" or "single" synapses
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
             The slice of the post-vertex the matrix is for
-        :param int synaptic_matrix_region:
-            The region where synaptic matrices are stored
-        :param int direct_matrix_region:
-            The region where "direct" or "single" synapses are stored
         """
         self.__synapse_io = synapse_io
         self.__poptable = poptable
@@ -123,8 +114,6 @@ class SynapticMatrixApp(object):
         self.__n_synapse_types = n_synapse_types
         self.__all_single_syn_sz = all_single_syn_sz
         self.__post_vertex_slice = post_vertex_slice
-        self.__synaptic_matrix_region = synaptic_matrix_region
-        self.__direct_matrix_region = direct_matrix_region
 
         # Map of machine_edge to .SynapticMatrix
         self.__matrices = dict()
@@ -618,11 +607,16 @@ class SynapticMatrixApp(object):
             raise Exception(
                 "Index of " + self.__synapse_info + " has changed!")
 
-    def get_connections(self, transceiver, placement):
+    def get_connections(
+            self, transceiver, placement, synaptic_matrix_region,
+            direct_matrix_region):
         """ Get the connections for this matrix from the machine
 
         :param ~spinnman.transceiver.Transceiver transceiver:
             How to read the data from the machine
+        :param int synaptic_matrix_region: dsg region id for the synaptic \
+            matrix.
+        :param int direct_matrix_region: dsg region id for the direct matrix.
         :param ~pacman.model.placements.Placement placement:
             Where the matrix is on the machine
         :return: A list of arrays of connections, each with dtype
@@ -633,9 +627,9 @@ class SynapticMatrixApp(object):
         if self.__m_edges is None:
             return []
         synapses_address = locate_memory_region_for_placement(
-            placement, self.__synaptic_matrix_region, transceiver)
+            placement, synaptic_matrix_region, transceiver)
         single_address = (locate_memory_region_for_placement(
-            placement, self.__direct_matrix_region, transceiver) +
+            placement, direct_matrix_region, transceiver) +
             BYTES_PER_WORD)
         if self.__use_app_keys:
             return self.__read_connections(
@@ -656,16 +650,22 @@ class SynapticMatrixApp(object):
         for matrix in itervalues(self.__matrices):
             matrix.clear_connection_cache()
 
-    def read_generated_connection_holders(self, transceiver, placement):
+    def read_generated_connection_holders(
+            self, transceiver, placement, synaptic_matrix_region,
+            direct_matrix_region):
         """ Read any pre-run connection holders after data has been generated
-
+        :param int synaptic_matrix_region: dsg region id for the synaptic \
+            matrix.
+        :param int direct_matrix_region: dsg region id for the direct matrix.
         :param ~spinnman.transceiver.Transceiver transceiver:
             How to read the data from the machine
         :param ~pacman.model.placements.Placement placement:
             Where the matrix is on the machine
         """
         if self.__synapse_info.pre_run_connection_holders:
-            connections = self.get_connections(transceiver, placement)
+            connections = self.get_connections(
+                transceiver, placement, synaptic_matrix_region,
+                direct_matrix_region)
             if connections:
                 connections = numpy.concatenate(connections)
                 for holder in self.__synapse_info.pre_run_connection_holders:

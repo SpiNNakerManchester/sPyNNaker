@@ -58,12 +58,6 @@ class SynapticMatrices(object):
         "__all_single_syn_sz",
         # The synapse reader and writer to convert between SpiNNaker and host
         "__synapse_io",
-        # The ID of the synaptic matrix region
-        "__synaptic_matrix_region",
-        # The ID of the "direct" or "single" matrix region
-        "__direct_matrix_region",
-        # The ID of the master population table region
-        "__poptable_region",
         # The master population table data structure
         "__poptable",
         # The sub-matrices for each incoming edge
@@ -80,8 +74,7 @@ class SynapticMatrices(object):
 
     def __init__(
             self, post_vertex_slice, n_synapse_types, all_single_syn_sz,
-            synapse_io, synaptic_matrix_region, direct_matrix_region,
-            poptable_region):
+            synapse_io):
         """
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
             The slice of the post vertex that these matrices are for
@@ -89,20 +82,11 @@ class SynapticMatrices(object):
         :param int all_single_syn_sz:
             The space available for "direct" or "single" synapses
         :param SynapseIORowBased synapse_io: How to read and write synapses
-        :param int synaptic_matrix_region:
-            The region where synaptic matrices are stored
-        :param int direct_matrix_region:
-            The region where "direct" or "single" synapses are stored
-        :param int poptable_region:
-            The region where the population table is stored
         """
         self.__post_vertex_slice = post_vertex_slice
         self.__n_synapse_types = n_synapse_types
         self.__all_single_syn_sz = all_single_syn_sz
         self.__synapse_io = synapse_io
-        self.__synaptic_matrix_region = synaptic_matrix_region
-        self.__direct_matrix_region = direct_matrix_region
-        self.__poptable_region = poptable_region
 
         # Set up the master population table
         self.__poptable = MasterPopTableAsBinarySearch()
@@ -147,17 +131,16 @@ class SynapticMatrices(object):
         matrix = SynapticMatrixApp(
             self.__synapse_io, self.__poptable, synapse_info, app_edge,
             self.__n_synapse_types, self.__all_single_syn_sz,
-            self.__post_vertex_slice, self.__synaptic_matrix_region,
-            self.__direct_matrix_region)
+            self.__post_vertex_slice)
         self.__matrices[key] = matrix
         return matrix
 
     def synapses_size(self, app_edges):
         """ The size of the synaptic blocks in bytes
 
-        :param iterable(~pacman.model.graphs.application.ApplicationEdge) \
-                app_edges:
-            The incoming application edges
+        :param app_edges: The incoming application edges
+        :type app_edges: \
+            iterable(~pacman.model.graphs.application.ApplicationEdge)
         :rtype: int
         """
         # Base size requirements
@@ -175,9 +158,9 @@ class SynapticMatrices(object):
     def size(self, app_edges):
         """ The size required by all parts of the matrices
 
-        :param iterable(~pacman.model.graphs.application.ApplicationEdge) \
-                app_edges:
-            The incoming application edges
+        :param app_edges: The incoming application edges
+        :type app_edges: \
+            iterable(~pacman.model.graphs.application.ApplicationEdge)
         :rtype: int
         """
         return (
@@ -188,9 +171,9 @@ class SynapticMatrices(object):
     def __gen_info_size(self, app_edges):
         """ The size in bytes of the synaptic expander parameters
 
-        :param iterable(~pacman.model.graphs.application.ApplicationEdge) \
-                app_edges:
-            The incoming application edges
+        :param app_edges: The incoming application edges
+        :type app_edges: \
+            iterable(~pacman.model.graphs.application.ApplicationEdge)
         :rtype: int
         """
         gen_on_machine = False
@@ -212,10 +195,14 @@ class SynapticMatrices(object):
 
     def write_synaptic_matrix_and_master_population_table(
             self, spec, machine_vertex, all_syn_block_sz, weight_scales,
-            routing_info, machine_graph):
+            routing_info, machine_graph, pop_table_region,
+            synaptic_matrix_region, direct_matrix_region):
         """ Simultaneously generates both the master population table and
             the synaptic matrix.
-
+         :param int pop_table_region: dsg region id for master pop table.
+        :param int synaptic_matrix_region: dsg region id for the synaptic \
+            matrix.
+        :param int direct_matrix_region: dsg region id for the direct matrix.
         :param ~data_specification.DataSpecificationGenerator spec:
             The spec to write to
         :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:
@@ -227,6 +214,7 @@ class SynapticMatrices(object):
             The routing information for all edges
         :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
             The machine graph
+
         :return: A list of generator data to be written elsewhere
         :rtype: list(GeneratorData)
         """
@@ -250,7 +238,7 @@ class SynapticMatrices(object):
         single_addr = 0
 
         # Lets write some synapses
-        spec.switch_write_focus(self.__synaptic_matrix_region)
+        spec.switch_write_focus(synaptic_matrix_region)
 
         # Store a list of synapse info to be generated on the machine
         generate_on_machine = list()
@@ -291,24 +279,24 @@ class SynapticMatrices(object):
         self.__on_chip_generated_block_addr = block_addr
 
         # Finish the master population table
-        self.__poptable.finish_master_pop_table(
-            spec, self.__poptable_region)
+        self.__poptable.finish_master_pop_table(spec, pop_table_region)
 
         # Write the size and data of single synapses to the direct region
         single_data = numpy.concatenate(single_synapses)
         single_data_words = len(single_data)
         spec.reserve_memory_region(
-            region=self.__direct_matrix_region,
+            region=direct_matrix_region,
             size=(single_data_words + 1) * BYTES_PER_WORD,
             label='DirectMatrix')
-        spec.switch_write_focus(self.__direct_matrix_region)
+        spec.switch_write_focus(direct_matrix_region)
         spec.write_value(single_data_words * BYTES_PER_WORD)
         if single_data_words:
             spec.write_array(single_data)
 
         return generator_data
 
-    def __in_edges_by_app_edge(self, in_machine_edges, routing_info):
+    @staticmethod
+    def __in_edges_by_app_edge(in_machine_edges, routing_info):
         """ Convert a list of machine edges to a dict of
             application edge -> list of machine edges, and a key tracker
 
@@ -417,7 +405,7 @@ class SynapticMatrices(object):
         :param list(Slice) slices: The list of slices to check
         :rtype: bool
         """
-        slices = sorted(slices, key=lambda s: s.lo_atom)
+        slices = sorted(slices, key=lambda si: si.lo_atom)
         slice_atoms = slices[-1].hi_atom - slices[0].lo_atom + 1
         if slice_atoms != n_atoms:
             return False
@@ -530,35 +518,47 @@ class SynapticMatrices(object):
                                            key_space_tracker)
 
     def get_connections_from_machine(
-            self, transceiver, placement, app_edge, synapse_info):
+            self, transceiver, placement, app_edge, synapse_info,
+            synaptic_matrix_region, direct_matrix_region):
         """ Get the synaptic connections from the machine
 
-        :param ~spinnman.transceiver.Transceiver transceiver:
+        :param ~spinnman.transceiver.Transceiver transceiver:\
             Used to read the data from the machine
-        :param ~pacman.model.placements.Placements placements:
-            Where the vertices are on the machine
-        :param ProjectionApplicationEdge app_edge:
+        :param ~pacman.model.placements.Placements placement:\
+            Where the vertex is on the machine
+        :param int synaptic_matrix_region: dsg region id for the synaptic \
+            matrix.
+        :param int direct_matrix_region: dsg region id for the direct matrix.
+        :param ProjectionApplicationEdge app_edge:\
             The application edge of the projection
-        :param SynapseInformation synapse_info:
+        :param SynapseInformation synapse_info:\
             The synapse information of the projection
-        :return: A list of arrays of connections, each with dtype
+        :return: A list of arrays of connections, each with dtype\
             AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
         :rtype: ~numpy.ndarray
         """
         matrix = self.__app_matrix(app_edge, synapse_info)
-        return matrix.get_connections(transceiver, placement)
+        return matrix.get_connections(
+            transceiver, placement, synaptic_matrix_region,
+            direct_matrix_region)
 
-    def read_generated_connection_holders(self, transceiver, placement):
+    def read_generated_connection_holders(
+            self, transceiver, placement, synaptic_matrix_region,
+            direct_matrix_region):
         """ Fill in any pre-run connection holders for data which is generated
             on the machine, after it has been generated
-
+        :param int synaptic_matrix_region: dsg region id for the synaptic \
+            matrix.
+        :param int direct_matrix_region: dsg region id for the direct matrix.
         :param ~spinnman.transceiver.Transceiver transceiver:
             How to read the data from the machine
         :param ~pacman.model.placements.Placement placement:
             where the data is to be read from
         """
         for matrix in itervalues(self.__matrices):
-            matrix.read_generated_connection_holders(transceiver, placement)
+            matrix.read_generated_connection_holders(
+                transceiver, placement, synaptic_matrix_region,
+                direct_matrix_region)
 
     def clear_connection_cache(self):
         """ Clear any values read from the machine
