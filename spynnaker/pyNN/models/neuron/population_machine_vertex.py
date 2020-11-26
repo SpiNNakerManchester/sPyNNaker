@@ -51,8 +51,7 @@ class PopulationMachineVertex(
         AbstractSupportsBitFieldGeneration,
         AbstractSupportsBitFieldRoutingCompression,
         AbstractGeneratesDataSpecification, AbstractSynapseExpandable,
-        AbstractRewritesDataSpecification, AbstractReadParametersBeforeSet,
-        AbstractUtilisesSynapticManager):
+        AbstractRewritesDataSpecification, AbstractReadParametersBeforeSet):
 
     __slots__ = [
         "__binary_file_name",
