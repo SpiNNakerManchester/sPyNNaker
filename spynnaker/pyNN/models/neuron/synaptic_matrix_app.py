@@ -29,7 +29,7 @@ from .generator_data import GeneratorData, SYN_REGION_UNUSED
 
 
 class SynapticMatrixApp(object):
-    """ The synaptic matrix (and delay matrix if applicable) for an incoming
+    """ The synaptic matrix (and delay matrix if applicable) for an incoming\
         app edge
     """
 
@@ -95,16 +95,16 @@ class SynapticMatrixApp(object):
         """
 
         :param SynapseIORowBased synapse_io: The reader and writer of synapses
-        :param MasterPopTableAsBinarySearch poptable:
+        :param MasterPopTableAsBinarySearch poptable:\
             The master population table
-        :param SynapseInformation synapse_info:
+        :param SynapseInformation synapse_info:\
             The projection synapse information
-        :param ProjectionApplicationEdge app_edge:
+        :param ProjectionApplicationEdge app_edge:\
             The projection application edge
         :param int n_synapse_types: The number of synapse types accepted
-        :param int all_single_syn_sz:
+        :param int all_single_syn_sz:\
             The space available for "direct" or "single" synapses
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:\
             The slice of the post-vertex the matrix is for
         """
         self.__synapse_io = synapse_io
@@ -159,8 +159,9 @@ class SynapticMatrixApp(object):
     def __get_matrix(self, machine_edge):
         """ Get or create a matrix object
 
-        :param ~pacman.model.graph.machine.machine_edge.MachineEdge
-            machine_edge: The machine edge to get the matrix for
+        :param machine_edge: The machine edge to get the matrix for
+        :type machine_edge: \
+            ~pacman.model.graph.machine.machine_edge.MachineEdge
         :rtype: SynapticMatrix
         """
         if machine_edge in self.__matrices:
@@ -234,7 +235,7 @@ class SynapticMatrixApp(object):
     def can_generate_on_machine(self, single_addr):
         """ Determine if an app edge can be generated on the machine
 
-        :param int single_addr:
+        :param int single_addr:\
             The address for "direct" or "single" synapses so far
         :rtype: bool
         """
@@ -246,7 +247,7 @@ class SynapticMatrixApp(object):
         """ Determine if an app edge can use the direct matrix for all of its\
             synapse information
 
-        :param int single_addr:
+        :param int single_addr:\
             The address for "direct" or "single" synapses so far
         :rtype: bool
         """
@@ -260,20 +261,20 @@ class SynapticMatrixApp(object):
 
     def set_info(self, all_syn_block_sz, app_key_info, delay_app_key_info,
                  routing_info, weight_scales, m_edges):
-        """ Set extra information that isn't necessarily available when the
+        """ Set extra information that isn't necessarily available when the\
             class is created.
 
-        :param int all_syn_block_sz:
+        :param int all_syn_block_sz:\
             The space available for all synaptic matrices on the core
-        :param _AppKeyInfo app_key_info:
+        :param _AppKeyInfo app_key_info:\
             Application-level routing key information for undelayed vertices
-        :param _AppKeyInfo delay_app_key_info:
+        :param _AppKeyInfo delay_app_key_info:\
             Application-level routing key information for delayed vertices
-        :param ~pacman.model.routing_info.RoutingInfo routing_info:
+        :param ~pacman.model.routing_info.RoutingInfo routing_info:\
             Routing key information for all incoming edges
-        :param list(float) weight_scales:
+        :param list(float) weight_scales:\
             Weight scale for each synapse edge
-        :param list(ProjectionMachineEdge) m_edges:
+        :param list(ProjectionMachineEdge) m_edges:\
             The machine edges incoming to this vertex
         """
         self.__all_syn_block_sz = all_syn_block_sz
@@ -298,13 +299,13 @@ class SynapticMatrixApp(object):
     def write_matrix(self, spec, block_addr, single_addr, single_synapses):
         """ Write a synaptic matrix from host
 
-        :param ~data_specification.DataSpecificationGenerator spec:
+        :param ~data_specification.DataSpecificationGenerator spec:\
             The specification to write to
-        :param int block_addr:
+        :param int block_addr:\
             The address in the synaptic matrix region to start writing at
-        :param int single_addr:
+        :param int single_addr:\
             The address in the "direct" or "single" matrix to start at
-        :param list(int) single_synapses:
+        :param list(int) single_synapses:\
             A list of "direct" or "single" synapses to write to
         :return: The updated block_addr and single_addr
         :rtype: tuple(int, int)
@@ -342,11 +343,11 @@ class SynapticMatrixApp(object):
     def __write_app_matrix(self, spec, block_addr, matrix_data):
         """ Write a matrix for a whole incoming application vertex as one
 
-        :param DataSpecificationGenerator spec:
+        :param DataSpecificationGenerator spec:\
             The specification to write to
-        :param int block_addr:
+        :param int block_addr:\
             The address in the synaptic matrix region to start writing at
-        :param list(ProjectionMachineEdge, ~numpy.ndarray) matrix_data:
+        :param list(ProjectionMachineEdge, ~numpy.ndarray) matrix_data:\
             The data for each machine edge to be combined into a single matrix
         :return: The updated block address
         :rtype: int
@@ -389,11 +390,11 @@ class SynapticMatrixApp(object):
     def __write_delay_app_matrix(self, spec, block_addr, matrix_data):
         """ Write a delay matrix for a whole incoming application vertex as one
 
-        :param DataSpecificationGenerator spec:
+        :param DataSpecificationGenerator spec:\
             The specification to write to
-        :param int block_addr:
+        :param int block_addr:\
             The address in the synaptic matrix region to start writing at
-        :param list(ProjectionMachineEdge, ~numpy.ndarray) matrix_data:
+        :param list(ProjectionMachineEdge, ~numpy.ndarray) matrix_data:\
             The data for each machine edge to be combined into a single matrix
         :return: The updated block address
         :rtype: int
@@ -440,7 +441,7 @@ class SynapticMatrixApp(object):
         """ Prepare to write a matrix using an on-chip generator
 
         :param list(GeneratorData) generator_data: List of data to add to
-        :param int block_addr:
+        :param int block_addr:\
             The address in the synaptic matrix region to start writing at
         :return: The updated block address
         :rtype: int
@@ -479,14 +480,14 @@ class SynapticMatrixApp(object):
         return block_addr
 
     def __reserve_app_blocks(self, block_addr):
-        """ Reserve blocks for a whole-application-vertex matrix if possible,
+        """ Reserve blocks for a whole-application-vertex matrix if possible,\
             and tell the master population table
 
-        :param int block_addr:
+        :param int block_addr:\
             The address in the synaptic matrix region to start at
-        :return: The updated block address, the synaptic matrix address,
-            the delayed synaptic matrix address,
-            the maximum synaptic matrix address,
+        :return: The updated block address, the synaptic matrix address,\
+            the delayed synaptic matrix address,\
+            the maximum synaptic matrix address,\
             and the maximum delayed synaptic matrix address
         :rtype: int, int, int, int, int
         """
@@ -503,12 +504,12 @@ class SynapticMatrixApp(object):
                 delay_max_addr)
 
     def __reserve_mpop_block(self, block_addr):
-        """ Reserve a block in the master population table for an undelayed
+        """ Reserve a block in the master population table for an undelayed\
             matrix
 
-        :param int block_addr:
+        :param int block_addr:\
             The address in the synaptic matrix region to start at
-        :return: The updated block address, the reserved address,
+        :return: The updated block address, the reserved address,\
             and the maximum address
         :rtype: int, int, int
         """
@@ -534,9 +535,9 @@ class SynapticMatrixApp(object):
     def __reserve_delay_mpop_block(self, block_addr):
         """ Reserve a block in the master population table for a delayed matrix
 
-        :param int block_addr:
+        :param int block_addr:\
             The address in the synaptic matrix region to start at
-        :return: The updated block address, the reserved address,
+        :return: The updated block address, the reserved address,\
             and the maximum address
         :rtype: int, int, int
         """
@@ -566,7 +567,7 @@ class SynapticMatrixApp(object):
 
         :param ~numpy.ndarray data: The row data created
         :param ~numpy.ndarray delayed_data: The delayed row data created
-        :param MachineEdge machine_edge:
+        :param MachineEdge machine_edge:\
             The machine edge the connections are for
         """
         for conn_holder in self.__synapse_info.pre_run_connection_holders:
@@ -612,14 +613,14 @@ class SynapticMatrixApp(object):
             direct_matrix_region):
         """ Get the connections for this matrix from the machine
 
-        :param ~spinnman.transceiver.Transceiver transceiver:
+        :param ~spinnman.transceiver.Transceiver transceiver:\
             How to read the data from the machine
         :param int synaptic_matrix_region: dsg region id for the synaptic \
             matrix.
         :param int direct_matrix_region: dsg region id for the direct matrix.
-        :param ~pacman.model.placements.Placement placement:
+        :param ~pacman.model.placements.Placement placement:\
             Where the matrix is on the machine
-        :return: A list of arrays of connections, each with dtype
+        :return: A list of arrays of connections, each with dtype\
             AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
         :rtype: ~numpy.ndarray
         """
@@ -657,9 +658,9 @@ class SynapticMatrixApp(object):
         :param int synaptic_matrix_region: dsg region id for the synaptic \
             matrix.
         :param int direct_matrix_region: dsg region id for the direct matrix.
-        :param ~spinnman.transceiver.Transceiver transceiver:
+        :param ~spinnman.transceiver.Transceiver transceiver:\
             How to read the data from the machine
-        :param ~pacman.model.placements.Placement placement:
+        :param ~pacman.model.placements.Placement placement:\
             Where the matrix is on the machine
         """
         if self.__synapse_info.pre_run_connection_holders:
@@ -676,9 +677,9 @@ class SynapticMatrixApp(object):
 
         :param Transceiver transceiver: How to read the data from the machine
         :param Placement placement: Where the matrix is on the machine
-        :param int synapses_address:
+        :param int synapses_address:\
             The base address of the synaptic matrix region
-        :return: A list of arrays of connections, each with dtype
+        :return: A list of arrays of connections, each with dtype\
             AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
         :rtype: ~numpy.ndarray
         """
@@ -710,7 +711,7 @@ class SynapticMatrixApp(object):
 
         :param Transceiver transceiver: How to read the data from the machine
         :param Placement placement: Where the matrix is on the machine
-        :param int synapses_address:
+        :param int synapses_address:\
             The base address of the synaptic matrix region
         :rtype: bytearray
         """
@@ -727,7 +728,7 @@ class SynapticMatrixApp(object):
 
         :param Transceiver transceiver: How to read the data from the machine
         :param Placement placement: Where the matrix is on the machine
-        :param int synapses_address:
+        :param int synapses_address:\
             The base address of the synaptic matrix region
         :rtype: bytearray
         """
@@ -740,10 +741,10 @@ class SynapticMatrixApp(object):
         return block
 
     def get_index(self, machine_edge):
-        """ Get the index in the master population table of the matrix for a
+        """ Get the index in the master population table of the matrix for a\
             machine edge
 
-        :param ~pacman.model.graph.machine.MachineEdge machine_edge:
+        :param ~pacman.model.graph.machine.MachineEdge machine_edge:\
             The edge to get the index for
         :rtype: int
         """
@@ -755,10 +756,10 @@ class SynapticMatrixApp(object):
         return matrix.index
 
     def get_delay_index(self, machine_edge):
-        """ Get the index in the master population table of the delayed matrix
+        """ Get the index in the master population table of the delayed matrix\
             for a machine edge
 
-        :param ~pacman.model.graph.machine.MachineEdge machine_edge:
+        :param ~pacman.model.graph.machine.MachineEdge machine_edge:\
             The edge to get the index for
         :rtype: int
         """
