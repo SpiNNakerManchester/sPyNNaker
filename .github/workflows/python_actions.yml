@@ -44,10 +44,10 @@ jobs:
         ref: actions
 
     - name: Install pip, etc
-      uses: ./.github/actions/python-tools
+      uses: ./support/actions/python-tools
 
     - name: Install Spinnaker Dependencies
-      uses: ./.github/actions/checkout-spinn-deps
+      uses: ./support/actions/checkout-spinn-deps
       with:
         repositories: >
           SpiNNUtils SpiNNMachine SpiNNMan PACMAN DataSpecification spalloc 
@@ -56,17 +56,17 @@ jobs:
         preinstall: ${{ matrix.python-version == 2.7 }}
 
     - name: Setup
-      uses: ./.github/actions/run-setup
+      uses: ./support/actions/run-setup
       with:
         preinstall: ${{ matrix.python-version == 2.7 }}
 
     - name: Create a spynnaker.cfg
-      uses: ./.github/actions/configure-spynnaker
+      uses: ./support/actions/configure-spynnaker
       with:
         board-address: spinn-4.cs.man.ac.uk
 
     - name: Test with pytest
-      uses: ./.github/actions/pytest
+      uses: ./support/actions/pytest
       with:
         tests: unittests
         coverage: ${{ matrix.python-version == 3.6 }}
@@ -79,7 +79,7 @@ jobs:
     - name: Lint with pylint
       # Broken in 2.7 as it can not find data_specification.exceptions
       if: matrix.python-version != 2.7
-      uses: ./.github/actions/pylint
+      uses: ./support/actions/pylint
       with: 
         package: spynnaker
 
@@ -88,6 +88,6 @@ jobs:
       uses: ./support/actions/check-copyrights
 
     - name: Build documentation with sphinx
-      uses: ./.github/actions/sphinx
+      uses: ./support/actions/sphinx
       with:
         directory: doc/source

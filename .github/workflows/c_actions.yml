@@ -46,12 +46,10 @@ jobs:
         path: support
 
     - name: Checkout SpiNNaker Dependencies
-      run: |
-        support/gitclone2.sh https://github.com/SpiNNakerManchester/spinnaker_tools.git
-        support/gitclone2.sh https://github.com/SpiNNakerManchester/spinn_common.git
-        support/gitclone2.sh https://github.com/SpiNNakerManchester/SpiNNFrontEndCommon.git
+      uses: ./support/actions/checkout-spinn-deps
+      with:
         # Note: SpiNNUtils needed for spinn_utilities.make_tools
-        support/gitclone2.sh https://github.com/SpiNNakerManchester/SpiNNUtils.git
+        repositories: spinnaker_tools spinn_common SpiNNFrontEndCommon SpiNNUtils
 
     - name: Set SPINN_DIRS and NEURAL_MODELLING
       run: |
