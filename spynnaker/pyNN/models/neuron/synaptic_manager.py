@@ -153,6 +153,8 @@ class SynapticManager(object):
         matrices = SynapticMatrices(
             post_vertex_slice, self.__n_synapse_types,
             self.__all_single_syn_sz, self.__synapse_io)
+
+        self.__synaptic_matrices[post_vertex_slice] = matrices
         return matrices
 
     def host_written_matrix_size(self, post_vertex_slice):
