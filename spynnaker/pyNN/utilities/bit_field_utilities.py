@@ -238,12 +238,10 @@ def write_bitfield_init_data(
     # load in key to max atoms map
     for out_going_partition in machine_graph.\
             get_multicast_edge_partitions_ending_at_vertex(machine_vertex):
-        # TODO do we need to do multiple times if multiple edges?
-        for edge in out_going_partition.edges:
-            spec.write_value(
-                routing_info.get_first_key_from_partition(out_going_partition))
-            spec.write_value(
-                n_key_map.n_keys_for_partition(out_going_partition))
+        spec.write_value(
+            routing_info.get_first_key_from_partition(out_going_partition))
+        spec.write_value(
+            n_key_map.n_keys_for_partition(out_going_partition))
 
     # ensure if nothing else that n bitfields in bitfield region set to 0
     spec.switch_write_focus(bit_field_region_id)
