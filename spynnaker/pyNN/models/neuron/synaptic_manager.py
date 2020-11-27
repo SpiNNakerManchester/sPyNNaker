@@ -794,7 +794,7 @@ class SynapticManager(object):
         """ Fill in any pre-run connection holders for data which is generated
             on the machine, after it has been generated
 
-        :param int synaptic_matrix_region: dsg region id for the synaptic 
+        :param int synaptic_matrix_region: dsg region id for the synaptic
             matrix.
         :param int direct_matrix_region: dsg region id for the direct matrix.
         :param ~spinnman.transceiver.Transceiver transceiver:
