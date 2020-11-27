@@ -90,13 +90,16 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         :rtype: bool
         """
 
+        if not self.__use_expander:
+            return False
+
         # Scalars are fine on the machine
         if numpy.isscalar(values):
             return True
 
         # Only certain types of random distributions are supported for\
         # generation on the machine
-        if isinstance(values, RandomDistribution) and self.__use_expander:
+        if isinstance(values, RandomDistribution):
             return values.name in PARAM_TYPE_BY_NAME
 
         return False
