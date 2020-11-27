@@ -93,7 +93,6 @@ class SynapticMatrixApp(object):
             self, synapse_io, poptable, synapse_info, app_edge,
             n_synapse_types, all_single_syn_sz, post_vertex_slice):
         """
-
         :param SynapseIORowBased synapse_io: The reader and writer of synapses
         :param MasterPopTableAsBinarySearch poptable:
             The master population table
@@ -159,8 +158,9 @@ class SynapticMatrixApp(object):
     def __get_matrix(self, machine_edge):
         """ Get or create a matrix object
 
-        :param ~pacman.model.graph.machine.machine_edge.MachineEdge
-            machine_edge: The machine edge to get the matrix for
+        :param machine_edge: The machine edge to get the matrix for
+        :type machine_edge:
+            ~pacman.model.graph.machine.machine_edge.MachineEdge
         :rtype: SynapticMatrix
         """
         if machine_edge in self.__matrices:
@@ -488,7 +488,7 @@ class SynapticMatrixApp(object):
             the delayed synaptic matrix address,
             the maximum synaptic matrix address,
             and the maximum delayed synaptic matrix address
-        :rtype: int, int, int, int, int
+        :rtype: tuple(int, int, int, int, int)
         """
         if not self.__use_app_keys:
             return (block_addr, SYN_REGION_UNUSED, SYN_REGION_UNUSED, None,
@@ -510,7 +510,7 @@ class SynapticMatrixApp(object):
             The address in the synaptic matrix region to start at
         :return: The updated block address, the reserved address,
             and the maximum address
-        :rtype: int, int, int
+        :rtype: tuple(int, int, int)
         """
         # If there is no routing information, don't reserve anything
         if self.__app_key_info is None:
@@ -538,7 +538,7 @@ class SynapticMatrixApp(object):
             The address in the synaptic matrix region to start at
         :return: The updated block address, the reserved address,
             and the maximum address
-        :rtype: int, int, int
+        :rtype: tuple(int, int, int)
         """
         # If there is no routing information don't reserve anything
         if self.__delay_app_key_info is None:
@@ -614,11 +614,11 @@ class SynapticMatrixApp(object):
 
         :param ~spinnman.transceiver.Transceiver transceiver:
             How to read the data from the machine
-        :param int synaptic_matrix_region: dsg region id for the synaptic
-            matrix.
-        :param int direct_matrix_region: dsg region id for the direct matrix.
         :param ~pacman.model.placements.Placement placement:
             Where the matrix is on the machine
+        :param int synaptic_matrix_region:
+            dsg region id for the synaptic matrix.
+        :param int direct_matrix_region: dsg region id for the direct matrix.
         :return: A list of arrays of connections, each with dtype
             AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
         :rtype: ~numpy.ndarray
@@ -655,13 +655,13 @@ class SynapticMatrixApp(object):
             direct_matrix_region):
         """ Read any pre-run connection holders after data has been generated
 
-        :param int synaptic_matrix_region: dsg region id for the synaptic
-            matrix.
-        :param int direct_matrix_region: dsg region id for the direct matrix.
         :param ~spinnman.transceiver.Transceiver transceiver:
             How to read the data from the machine
         :param ~pacman.model.placements.Placement placement:
             Where the matrix is on the machine
+        :param int synaptic_matrix_region:
+            dsg region id for the synaptic matrix.
+        :param int direct_matrix_region: dsg region id for the direct matrix.
         """
         if self.__synapse_info.pre_run_connection_holders:
             connections = self.get_connections(

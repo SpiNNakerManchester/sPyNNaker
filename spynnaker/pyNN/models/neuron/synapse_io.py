@@ -754,7 +754,7 @@ class SynapseIORowBased(object):
     def get_block_n_bytes(self, max_row_n_words, n_rows):
         """ Get the number of bytes in a block
 
-        :param int max_row_n_words:\
+        :param int max_row_n_words:
             The maximum row length in words, excluding headers
         :param int n_rows: The number of rows in the block
         :rtype: int

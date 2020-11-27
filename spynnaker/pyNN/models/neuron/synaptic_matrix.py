@@ -81,7 +81,6 @@ class SynapticMatrix(object):
                  delay_routing_info, weight_scales, all_syn_block_sz,
                  all_single_syn_sz):
         """
-
         :param SynapseIORowBased synapse_io: The reader and writer of synapses
         :param MasterPopTableAsBinarySearch poptable:
             The master population table

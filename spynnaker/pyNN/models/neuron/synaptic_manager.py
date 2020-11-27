@@ -91,7 +91,6 @@ class SynapticManager(object):
     def __init__(self, n_synapse_types, ring_buffer_sigma, spikes_per_second,
                  config, drop_late_spikes):
         """
-
         :param int n_synapse_types:
             number of synapse types on a neuron (e.g., 2 for excitatory and
             inhibitory)
@@ -301,8 +300,9 @@ class SynapticManager(object):
 
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
             The slice of atoms to get the size of
-        :param ~pacman.model.graphs.application.ApplicationGraph \
-                application_graph: The application graph
+        :param application_graph: The application graph
+        :type application_graph:
+            ~pacman.model.graphs.application.ApplicationGraph
         :param AbstractPopulationVertex app_vertex: The application vertex
         :rtype: int
         """
@@ -320,19 +320,19 @@ class SynapticManager(object):
             synapse_dynamics_region, struct_dynamics_region):
         """ Reserve memory regions for a core
 
-        :param int synapse_params_region: dsg region id for synapse params.
-        :param int synaptic_matrix_region: dsg region id for the synaptic
-            matrix.
-        :param int synapse_dynamics_region: dsg region id for the synapse
-            dynamics.
-        :param int struct_dynamics_region: dsg region id for the structural
-            dynamics.
         :param ~.DataSpecificationGenerator spec: The data spec to reserve in
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of the vertex to allocate for
         :param int all_syn_block_sz: The memory to reserve for synapses
         :param ~.MachineGraph machine_graph: The machine graph
         :param ~.MachineVertex machine_vertex: The machine vertex
+        :param int synapse_params_region: dsg region id for synapse params.
+        :param int synaptic_matrix_region:
+            dsg region id for the synaptic matrix.
+        :param int synapse_dynamics_region:
+            dsg region id for the synapse dynamics.
+        :param int struct_dynamics_region:
+            dsg region id for the structural dynamics.
         """
         spec.reserve_memory_region(
             region=synapse_params_region,
@@ -380,20 +380,20 @@ class SynapticManager(object):
 
         Requires an assessment of maximum Poisson input rate.
 
-        Assumes knowledge of mean and SD of weight distribution, fan-in\
+        Assumes knowledge of mean and SD of weight distribution, fan-in
         and timestep.
 
-        All arguments should be assumed real values except n_synapses_in\
+        All arguments should be assumed real values except ``n_synapses_in``
         which will be an integer.
 
-        :param float weight_mean: Mean of weight distribution (in either nA or\
+        :param float weight_mean: Mean of weight distribution (in either nA or
             microSiemens as required)
         :param float weight_std_dev: SD of weight distribution
         :param float spikes_per_second: Maximum expected Poisson rate in Hz
         :param int machine_timestep: in us
         :param int n_synapses_in: No of connected synapses
-        :param float sigma: How many SD above the mean to go for upper bound;\
-            a good starting choice is 5.0. Given length of simulation we can\
+        :param float sigma: How many SD above the mean to go for upper bound;
+            a good starting choice is 5.0. Given length of simulation we can
             set this for approximate number of saturation events.
         :rtype: float
         """
@@ -592,38 +592,33 @@ class SynapticManager(object):
             struct_dynamics_region, connector_builder_region,
             direct_matrix_region):
         """
-
-        :param int pop_table_region: dsg region id for master pop table.
-        :param int synaptic_matrix_region: dsg region id for the synaptic
-            matrix.
-        :param int direct_matrix_region: dsg region id for the direct matrix.
-        :param int synapse_params_region: dsg region id for the synapse params.
-        :param int synapse_dynamics_region: dsg region id for the synapse
-            dynamics.
-        :param int struct_dynamics_region: dsg region id for the structural
-            dynamics.
-        :param int connector_builder_region: dsg region id for the connection
-            building data.
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to
-        :param ~pacman.model.graphs.application_graph.ApplicationGraph \
-        application_graph: the app graph
         :param AbstractPopulationVertex application_vertex:
             The vertex owning the synapses
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
             The part of the vertex we're dealing with
         :param PopulationMachineVertex machine_vertex: The machine vertex
-        :param ~pacman.model.placements.Placement placement:
-            Where the vertex is placed
         :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
             The graph containing the machine vertex
-        :param ~pacman.model.graphs.application.ApplicationGraph \
-                application_graph:
-            The graph containing the application vertex
+        :param application_graph: The graph containing the application vertex
+        :type application_graph:
+            ~pacman.model.graphs.application.ApplicationGraph
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
             How messages are routed
         :param float weight_scale: How to scale the weights of the synapses
         :param int machine_time_step:
+        :param int synapse_params_region: dsg region id for the synapse params.
+        :param int pop_table_region: dsg region id for master pop table.
+        :param int synaptic_matrix_region:
+            dsg region id for the synaptic matrix.
+        :param int synapse_dynamics_region:
+            dsg region id for the synapse dynamics.
+        :param int struct_dynamics_region:
+            dsg region id for the structural dynamics.
+        :param int connector_builder_region:
+            dsg region id for the connection building data.
+        :param int direct_matrix_region: dsg region id for the direct matrix.
         """
 
         # Reserve the memory
@@ -670,13 +665,13 @@ class SynapticManager(object):
             connector_builder_region):
         """ Write the data spec for the synapse expander
 
-        :param int connector_builder_region: dsg region id for the connection
-            builder data.
         :param ~.DataSpecificationGenerator spec:
             The specification to write to
         :param ~pacman.model.common.Slice post_vertex_slice:
             The slice of the vertex being written
         :param list(GeneratorData) generator_data:
+        :param int connector_builder_region:
+            dsg region id for the connection builder data.
         """
         if not generator_data:
             return
@@ -715,9 +710,6 @@ class SynapticManager(object):
             synaptic_matrix_region, direct_matrix_region):
         """ Read the connections from the machine for a given projection
 
-        :param int synaptic_matrix_region: dsg region id for the synaptic
-            matrix.
-        :param int direct_matrix_region: dsg region id for the direct matrix.
         :param ~spinnman.transciever.Transceiver transceiver:
             Used to read the data from the machine
         :param ~pacman.model.placements.Placements placements:
@@ -726,6 +718,9 @@ class SynapticManager(object):
             The application edge of the projection
         :param SynapseInformation synapse_info:
             The synapse information of the projection
+        :param int synaptic_matrix_region:
+            dsg region id for the synaptic matrix.
+        :param int direct_matrix_region: dsg region id for the direct matrix.
         :return: The connections from the machine, with dtype
             AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
         :rtype: ~numpy.ndarray
@@ -754,12 +749,12 @@ class SynapticManager(object):
             direct_matrix_region):
         """ True if the synapses should be generated on the machine
 
-        :param int pop_table_region: dsg region id for master pop table.
-        :param int synaptic_matrix_region: dsg region id for the synaptic
-            matrix.
-        :param int direct_matrix_region: dsg region id for the direct matrix.
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:\
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
             The slice of the vertex to determine the generation status of
+        :param int pop_table_region: dsg region id for master pop table.
+        :param int synaptic_matrix_region:
+            dsg region id for the synaptic matrix.
+        :param int direct_matrix_region: dsg region id for the direct matrix.
         :rtype: bool
         """
         matrices = self.__get_synaptic_matrices(post_vertex_slice)
@@ -794,13 +789,13 @@ class SynapticManager(object):
         """ Fill in any pre-run connection holders for data which is generated
             on the machine, after it has been generated
 
-        :param int synaptic_matrix_region: dsg region id for the synaptic
-            matrix.
-        :param int direct_matrix_region: dsg region id for the direct matrix.
         :param ~spinnman.transceiver.Transceiver transceiver:
             How to read the data from the machine
         :param ~pacman.model.placements.Placement placement:
             where the data is to be read from
+        :param int synaptic_matrix_region:
+            dsg region id for the synaptic matrix.
+        :param int direct_matrix_region: dsg region id for the direct matrix.
         """
         matrices = self.__get_synaptic_matrices(
             placement.vertex.vertex_slice)

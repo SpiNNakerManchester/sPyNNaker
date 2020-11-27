@@ -28,7 +28,7 @@ class SpYNNakerConnectionHolderGenerator(object):
             application_graph:
         app graph
     :return: the set of connection holders for after DSG generation
-    :rtype: dict(tuple(ProjectionApplicationEdge, SynapseInformation), \
+    :rtype: dict(tuple(ProjectionApplicationEdge, SynapseInformation),
         ConnectionHolder)
     """
 

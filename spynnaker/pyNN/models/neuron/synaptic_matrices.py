@@ -138,9 +138,9 @@ class SynapticMatrices(object):
     def synapses_size(self, app_edges):
         """ The size of the synaptic blocks in bytes
 
-        :param iterable(~pacman.model.graphs.application.ApplicationEdge) \
-                app_edges:
-            The incoming application edges
+        :param app_edges: The incoming application edges
+        :type app_edges:
+            iterable(~pacman.model.graphs.application.ApplicationEdge)
         :rtype: int
         """
         # Base size requirements
@@ -158,9 +158,9 @@ class SynapticMatrices(object):
     def size(self, app_edges):
         """ The size required by all parts of the matrices
 
-        :param iterable(~pacman.model.graphs.application.ApplicationEdge) \
-                app_edges:
-            The incoming application edges
+        :param app_edges: The incoming application edges
+        :type app_edges:
+            iterable(~pacman.model.graphs.application.ApplicationEdge)
         :rtype: int
         """
         return (
@@ -171,9 +171,9 @@ class SynapticMatrices(object):
     def __gen_info_size(self, app_edges):
         """ The size in bytes of the synaptic expander parameters
 
-        :param iterable(~pacman.model.graphs.application.ApplicationEdge) \
-                app_edges:
-            The incoming application edges
+        :param app_edges: The incoming application edges
+        :type app_edges:
+            iterable(~pacman.model.graphs.application.ApplicationEdge)
         :rtype: int
         """
         gen_on_machine = False
@@ -200,10 +200,6 @@ class SynapticMatrices(object):
         """ Simultaneously generates both the master population table and
             the synaptic matrix.
 
-        :param int pop_table_region: dsg region id for master pop table.
-        :param int synaptic_matrix_region: dsg region id for the synaptic
-            matrix.
-        :param int direct_matrix_region: dsg region id for the direct matrix.
         :param ~data_specification.DataSpecificationGenerator spec:
             The spec to write to
         :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:
@@ -215,6 +211,10 @@ class SynapticMatrices(object):
             The routing information for all edges
         :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
             The machine graph
+        :param int pop_table_region: dsg region id for master pop table.
+        :param int synaptic_matrix_region:
+            dsg region id for the synaptic matrix.
+        :param int direct_matrix_region: dsg region id for the direct matrix.
         :return: A list of generator data to be written elsewhere
         :rtype: list(GeneratorData)
         """
@@ -363,8 +363,8 @@ class SynapticMatrices(object):
             The key and slice of each relevant machine vertex in the incoming
             application vertex
         :param int mask: The mask that covers all keys
-        :param n_stages: The number of delay stages
-        :param key_space_tracker:
+        :param int n_stages: The number of delay stages
+        :param KeySpaceTracker key_space_tracker:
             A key space tracker that has been filled in with all keys this
             vertex will receive
         :rtype: None or _AppKeyInfo
@@ -526,13 +526,13 @@ class SynapticMatrices(object):
             Used to read the data from the machine
         :param ~pacman.model.placements.Placements placement:
             Where the vertex is on the machine
-        :param int synaptic_matrix_region: dsg region id for the synaptic
-            matrix.
-        :param int direct_matrix_region: dsg region id for the direct matrix.
         :param ProjectionApplicationEdge app_edge:
             The application edge of the projection
         :param SynapseInformation synapse_info:
             The synapse information of the projection
+        :param int synaptic_matrix_region:
+            dsg region id for the synaptic matrix.
+        :param int direct_matrix_region: dsg region id for the direct matrix.
         :return: A list of arrays of connections, each with dtype
             AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
         :rtype: ~numpy.ndarray
@@ -548,13 +548,13 @@ class SynapticMatrices(object):
         """ Fill in any pre-run connection holders for data which is generated
             on the machine, after it has been generated
 
-        :param int synaptic_matrix_region: dsg region id for the synaptic
-            matrix.
-        :param int direct_matrix_region: dsg region id for the direct matrix.
         :param ~spinnman.transceiver.Transceiver transceiver:
             How to read the data from the machine
         :param ~pacman.model.placements.Placement placement:
             where the data is to be read from
+        :param int synaptic_matrix_region:
+            dsg region id for the synaptic matrix.
+        :param int direct_matrix_region: dsg region id for the direct matrix.
         """
         for matrix in itervalues(self.__matrices):
             matrix.read_generated_connection_holders(
@@ -598,7 +598,6 @@ class _AppKeyInfo(object):
 
     def __init__(self, app_key, app_mask, core_mask, core_shift, n_neurons):
         """
-
         :param int app_key: The application-level key
         :param int app_mask: The application-level mask
         :param int core_mask: The mask to get the core from the key
