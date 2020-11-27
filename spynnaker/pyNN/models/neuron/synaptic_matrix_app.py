@@ -654,6 +654,7 @@ class SynapticMatrixApp(object):
             self, transceiver, placement, synaptic_matrix_region,
             direct_matrix_region):
         """ Read any pre-run connection holders after data has been generated
+
         :param int synaptic_matrix_region: dsg region id for the synaptic
             matrix.
         :param int direct_matrix_region: dsg region id for the direct matrix.
