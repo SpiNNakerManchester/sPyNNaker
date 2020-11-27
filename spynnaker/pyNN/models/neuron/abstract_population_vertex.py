@@ -37,8 +37,7 @@ from spynnaker.pyNN.models.common import (
 from spynnaker.pyNN.utilities import bit_field_utilities
 from spynnaker.pyNN.models.abstract_models import (
     AbstractPopulationInitializable, AbstractAcceptsIncomingSynapses,
-    AbstractPopulationSettable, AbstractReadParametersBeforeSet,
-    AbstractContainsUnits)
+    AbstractPopulationSettable, AbstractContainsUnits)
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.utilities.ranged import (
     SpynnakerRangeDictionary, SpynnakerRangedList)
@@ -58,9 +57,8 @@ class AbstractPopulationVertex(
         AbstractSpikeRecordable, AbstractNeuronRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
-        AbstractChangableAfterRun, AbstractReadParametersBeforeSet,
-        AbstractAcceptsIncomingSynapses, ProvidesKeyToAtomMappingImpl,
-        AbstractCanReset):
+        AbstractChangableAfterRun, AbstractAcceptsIncomingSynapses,
+        ProvidesKeyToAtomMappingImpl, AbstractCanReset):
     """ Underlying vertex model for Neural Populations.
         Not actually abstract.
     """
@@ -97,7 +95,7 @@ class AbstractPopulationVertex(
     # 5 elements before the start of global parameters
     # 1. has key, 2. key, 3. n atoms,
     # 4. n synapse types, 5. incoming spike buffer size.
-    _BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 5 * BYTES_PER_WORD
+    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 5 * BYTES_PER_WORD
 
     def __init__(
             self, n_neurons, label, constraints, max_atoms_per_core,
@@ -317,7 +315,7 @@ class AbstractPopulationVertex(
         :return: The SDRAM required for the neuron region
         """
         return (
-            self._BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
+            self.BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
             self.tdma_sdram_size_in_bytes +
             self.__neuron_impl.get_sdram_usage_in_bytes(vertex_slice.n_atoms))
 
@@ -513,37 +511,6 @@ class AbstractPopulationVertex(
         for vertex in self.machine_vertices:
             if isinstance(vertex, AbstractRewritesDataSpecification):
                 vertex.set_reload_required(True)
-
-    @overrides(AbstractReadParametersBeforeSet.read_parameters_from_machine)
-    def read_parameters_from_machine(
-            self, transceiver, placement, vertex_slice):
-
-        # locate SDRAM address to where the neuron parameters are stored
-        neuron_region_sdram_address = (
-            placement.vertex.neuron_region_sdram_address(
-                placement, transceiver))
-
-        # shift past the extra stuff before neuron parameters that we don't
-        # need to read
-        neuron_parameters_sdram_address = (
-            neuron_region_sdram_address + self.tdma_sdram_size_in_bytes +
-            self._BYTES_TILL_START_OF_GLOBAL_PARAMETERS)
-
-        # get size of neuron params
-        size_of_region = self.get_sdram_usage_for_neuron_params(vertex_slice)
-        size_of_region -= (
-            self._BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
-            self.tdma_sdram_size_in_bytes)
-
-        # get data from the machine
-        byte_array = transceiver.read_memory(
-            placement.x, placement.y, neuron_parameters_sdram_address,
-            size_of_region)
-
-        # update python neuron parameters with the data
-        self.__neuron_impl.read_data(
-            byte_array, 0, vertex_slice, self._parameters,
-            self._state_variables)
 
     @property
     def weight_scale(self):
