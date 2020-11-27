@@ -28,11 +28,13 @@ from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION)
 from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
+from pacman.model.constraints.key_allocator_constraints import (
+    ContiguousKeyRangeContraint)
 from pacman.model.graphs.machine import MachineVertex
 from spinn_front_end_common.abstract_models import (
-    AbstractHasAssociatedBinary, AbstractSupportsDatabaseInjection,
-    AbstractRecordable, AbstractRewritesDataSpecification,
-    AbstractGeneratesDataSpecification)
+    AbstractHasAssociatedBinary, AbstractProvidesOutgoingPartitionConstraints,
+    AbstractSupportsDatabaseInjection, AbstractRecordable,
+    AbstractRewritesDataSpecification, AbstractGeneratesDataSpecification)
 from spinn_front_end_common.interface.provenance import (
     ProvidesProvenanceDataFromMachineImpl)
 from spinn_front_end_common.interface.buffer_management.buffer_models import (
@@ -87,7 +89,8 @@ class SpikeSourcePoissonMachineVertex(
         ProvidesProvenanceDataFromMachineImpl, AbstractRecordable,
         AbstractSupportsDatabaseInjection, AbstractHasProfileData,
         AbstractHasAssociatedBinary, AbstractRewritesDataSpecification,
-        AbstractGeneratesDataSpecification, AbstractReadParametersBeforeSet):
+        AbstractGeneratesDataSpecification, AbstractReadParametersBeforeSet,
+        AbstractProvidesOutgoingPartitionConstraints):
 
     __slots__ = [
         "__buffered_sdram_per_timestep",
@@ -699,3 +702,8 @@ class SpikeSourcePoissonMachineVertex(
             # rewritten when the parameters are loaded
             self._app_vertex.time_to_spike.set_value_by_id(
                 i, time_to_next_spike)
+
+    @overrides(AbstractProvidesOutgoingPartitionConstraints.
+               get_outgoing_partition_constraints)
+    def get_outgoing_partition_constraints(self, partition):
+        return [ContiguousKeyRangeContraint()]

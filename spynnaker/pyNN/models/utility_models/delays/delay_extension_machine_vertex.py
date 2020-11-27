@@ -15,11 +15,13 @@
 
 from enum import Enum
 from spinn_utilities.overrides import overrides
+from pacman.model.constraints.key_allocator_constraints import (
+    ContiguousKeyRangeContraint)
 from pacman.model.graphs.machine import MachineVertex
 from spinn_front_end_common.interface.provenance import (
     ProvidesProvenanceDataFromMachineImpl)
 from spinn_front_end_common.abstract_models import (
-    AbstractHasAssociatedBinary)
+    AbstractHasAssociatedBinary, AbstractProvidesOutgoingPartitionConstraints)
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 
@@ -28,7 +30,8 @@ DELAY_EXPANDER_APLX = "delay_expander.aplx"
 
 class DelayExtensionMachineVertex(
         MachineVertex, ProvidesProvenanceDataFromMachineImpl,
-        AbstractHasAssociatedBinary):
+        AbstractHasAssociatedBinary,
+        AbstractProvidesOutgoingPartitionConstraints):
     __slots__ = [
         "__resources"]
 
@@ -180,3 +183,8 @@ class DelayExtensionMachineVertex(
             return True
         else:
             return False
+
+    @overrides(AbstractProvidesOutgoingPartitionConstraints.
+               get_outgoing_partition_constraints)
+    def get_outgoing_partition_constraints(self, partition):
+        return [ContiguousKeyRangeContraint()]

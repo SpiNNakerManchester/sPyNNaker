@@ -19,13 +19,10 @@ import numpy
 import scipy.stats
 from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
-from pacman.model.constraints.key_allocator_constraints import (
-    ContiguousKeyRangeContraint)
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
 from spinn_front_end_common.abstract_models import (
-    AbstractChangableAfterRun, AbstractProvidesOutgoingPartitionConstraints,
-    AbstractRewritesDataSpecification)
+    AbstractChangableAfterRun, AbstractRewritesDataSpecification)
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl, TDMAAwareApplicationVertex)
 from spinn_front_end_common.interface.buffer_management import (
@@ -65,7 +62,6 @@ _MAX_OFFSET_DENOMINATOR = 10
 
 class SpikeSourcePoissonVertex(
         TDMAAwareApplicationVertex, AbstractSpikeRecordable,
-        AbstractProvidesOutgoingPartitionConstraints,
         AbstractChangableAfterRun, SimplePopulationSettable,
         ProvidesKeyToAtomMappingImpl):
     """ A Poisson Spike source object
@@ -536,11 +532,6 @@ class SpikeSourcePoissonVertex(
             self.label, buffer_manager,
             SpikeSourcePoissonVertex.SPIKE_RECORDING_REGION_ID,
             placements, self, machine_time_step)
-
-    @overrides(AbstractProvidesOutgoingPartitionConstraints.
-               get_outgoing_partition_constraints)
-    def get_outgoing_partition_constraints(self, partition):
-        return [ContiguousKeyRangeContraint()]
 
     @overrides(AbstractSpikeRecordable.clear_spike_recording)
     def clear_spike_recording(self, buffer_manager, placements):
