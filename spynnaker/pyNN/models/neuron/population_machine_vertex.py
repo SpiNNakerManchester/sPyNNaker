@@ -17,7 +17,11 @@ from enum import Enum
 from pacman.executor.injection_decorator import inject_items
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_utilities.overrides import overrides
+from pacman.model.constraints.key_allocator_constraints import (
+    ContiguousKeyRangeContraint)
 from pacman.model.graphs.machine import MachineVertex
+from spinn_front_end_common.abstract_models import (
+    AbstractProvidesOutgoingPartitionConstraints)
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 from spinn_front_end_common.interface.provenance import (
     ProvidesProvenanceDataFromMachineImpl)
@@ -49,6 +53,7 @@ class PopulationMachineVertex(
         MachineVertex, AbstractReceiveBuffersToHost,
         AbstractHasAssociatedBinary, ProvidesProvenanceDataFromMachineImpl,
         AbstractRecordable, AbstractHasProfileData,
+        AbstractProvidesOutgoingPartitionConstraints,
         AbstractSupportsBitFieldGeneration,
         AbstractSupportsBitFieldRoutingCompression,
         AbstractGeneratesDataSpecification, AbstractSynapseExpandable,
@@ -660,3 +665,13 @@ class PopulationMachineVertex(
         self._app_vertex.neuron_impl.read_data(
             byte_array, 0, vertex_slice, self._app_vertex.parameters,
             self._app_vertex.state_variables)
+
+    @overrides(AbstractProvidesOutgoingPartitionConstraints.
+               get_outgoing_partition_constraints)
+    def get_outgoing_partition_constraints(self, partition):
+        """ Gets the constraints for partitions going out of this vertex.
+
+        :param partition: the partition that leaves this vertex
+        :return: list of constraints
+        """
+        return [ContiguousKeyRangeContraint()]

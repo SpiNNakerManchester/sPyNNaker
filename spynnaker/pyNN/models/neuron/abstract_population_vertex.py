@@ -17,14 +17,12 @@ import logging
 import os
 
 from spinn_utilities.overrides import overrides
-from pacman.model.constraints.key_allocator_constraints import (
-    ContiguousKeyRangeContraint)
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
 from spinn_front_end_common.abstract_models import (
-    AbstractChangableAfterRun, AbstractProvidesOutgoingPartitionConstraints,
-    AbstractCanReset, AbstractRewritesDataSpecification)
+    AbstractChangableAfterRun, AbstractCanReset,
+    AbstractRewritesDataSpecification)
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl, TDMAAwareApplicationVertex)
 from spinn_front_end_common.utilities import (
@@ -55,7 +53,6 @@ _NEURON_BASE_N_CPU_CYCLES = 10
 class AbstractPopulationVertex(
         TDMAAwareApplicationVertex, AbstractContainsUnits,
         AbstractSpikeRecordable, AbstractNeuronRecordable,
-        AbstractProvidesOutgoingPartitionConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
         AbstractChangableAfterRun, AbstractAcceptsIncomingSynapses,
         ProvidesKeyToAtomMappingImpl, AbstractCanReset):
@@ -567,16 +564,6 @@ class AbstractPopulationVertex(
     def get_maximum_delay_supported_in_ms(self, machine_time_step):
         return self.__synapse_manager.get_maximum_delay_supported_in_ms(
             machine_time_step)
-
-    @overrides(AbstractProvidesOutgoingPartitionConstraints.
-               get_outgoing_partition_constraints)
-    def get_outgoing_partition_constraints(self, partition):
-        """ Gets the constraints for partitions going out of this vertex.
-
-        :param partition: the partition that leaves this vertex
-        :return: list of constraints
-        """
-        return [ContiguousKeyRangeContraint()]
 
     @overrides(
         AbstractNeuronRecordable.clear_recording)
