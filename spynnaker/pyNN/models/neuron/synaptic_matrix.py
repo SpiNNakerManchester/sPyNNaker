@@ -23,6 +23,7 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
     OneToOneConnector)
 
 from .generator_data import GeneratorData, SYN_REGION_UNUSED
+from .synapse_io import get_synapses, convert_to_connections
 
 
 class SynapticMatrix(object):
@@ -30,8 +31,6 @@ class SynapticMatrix(object):
     """
 
     __slots__ = [
-        # The reader and writer of synaptic matrices
-        "__synapse_io",
         # The master population table
         "__poptable",
         # The synapse info used to generate the matrices
@@ -76,13 +75,12 @@ class SynapticMatrix(object):
         "__delay_received_block"
     ]
 
-    def __init__(self, synapse_io, poptable, synapse_info, machine_edge,
+    def __init__(self, poptable, synapse_info, machine_edge,
                  app_edge, n_synapse_types, max_row_info, routing_info,
                  delay_routing_info, weight_scales, all_syn_block_sz,
                  all_single_syn_sz):
         """
 
-        :param SynapseIORowBased synapse_io: The reader and writer of synapses
         :param MasterPopTableAsBinarySearch poptable:
             The master population table
         :param SynapseInformation synapse_info:
@@ -104,7 +102,6 @@ class SynapticMatrix(object):
         :param int all_single_syn_sz:
             The space available for "direct" or "single" synapses
         """
-        self.__synapse_io = synapse_io
         self.__poptable = poptable
         self.__synapse_info = synapse_info
         self.__machine_edge = machine_edge
@@ -180,7 +177,7 @@ class SynapticMatrix(object):
         # keys to decide if we should actually generate any data; this is
         # because a single edge might have been filtered
         (row_data, delayed_row_data, delayed_source_ids,
-         delay_stages) = self.__synapse_io.get_synapses(
+         delay_stages) = get_synapses(
             self.__synapse_info, self.__app_edge.n_delay_stages,
             self.__n_synapse_types, self.__weight_scales,
             self.__machine_edge, self.__max_row_info,
@@ -510,7 +507,7 @@ class SynapticMatrix(object):
             else:
                 block = self.__get_block(
                     transceiver, placement, synapses_address)
-            connections.append(self.__synapse_io.convert_to_connections(
+            connections.append(convert_to_connections(
                 self.__synapse_info, pre_slice, post_slice,
                 self.__max_row_info.undelayed_max_words,
                 self.__n_synapse_types, self.__weight_scales, block,
@@ -519,7 +516,7 @@ class SynapticMatrix(object):
         if self.__delay_syn_mat_offset is not None:
             block = self.__get_delayed_block(
                 transceiver, placement, synapses_address)
-            connections.append(self.__synapse_io.convert_to_connections(
+            connections.append(convert_to_connections(
                 self.__synapse_info, pre_slice, post_slice,
                 self.__max_row_info.delayed_max_words, self.__n_synapse_types,
                 self.__weight_scales, block,

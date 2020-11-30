@@ -26,6 +26,8 @@ from spinn_front_end_common.utilities.helpful_functions import (
 
 from .synaptic_matrix import SynapticMatrix
 from .generator_data import GeneratorData, SYN_REGION_UNUSED
+from .synapse_io import (
+    get_max_row_info, read_all_synapses, convert_to_connections)
 
 
 class SynapticMatrixApp(object):
@@ -34,8 +36,6 @@ class SynapticMatrixApp(object):
     """
 
     __slots__ = [
-        # The reader and writer of the synapses
-        "__synapse_io",
         # The master population table
         "__poptable",
         # The synaptic info that these matrices are for
@@ -94,12 +94,11 @@ class SynapticMatrixApp(object):
     ]
 
     def __init__(
-            self, synapse_io, poptable, synapse_info, app_edge,
+            self, poptable, synapse_info, app_edge,
             n_synapse_types, all_single_syn_sz, post_vertex_slice,
             synaptic_matrix_region, direct_matrix_region):
         """
 
-        :param SynapseIORowBased synapse_io: The reader and writer of synapses
         :param MasterPopTableAsBinarySearch poptable:
             The master population table
         :param SynapseInformation synapse_info:
@@ -116,7 +115,6 @@ class SynapticMatrixApp(object):
         :param int direct_matrix_region:
             The region where "direct" or "single" synapses are stored
         """
-        self.__synapse_io = synapse_io
         self.__poptable = poptable
         self.__synapse_info = synapse_info
         self.__app_edge = app_edge
@@ -130,7 +128,7 @@ class SynapticMatrixApp(object):
         self.__matrices = dict()
 
         # Calculate the max row info for this edge
-        self.__max_row_info = self.__synapse_io.get_max_row_info(
+        self.__max_row_info = get_max_row_info(
             synapse_info, self.__post_vertex_slice,
             app_edge.n_delay_stages, self.__poptable,
             globals_variables.get_simulator().machine_time_step, app_edge)
@@ -183,7 +181,7 @@ class SynapticMatrixApp(object):
             delayed_r_info = self.__routing_info.get_routing_info_for_edge(
                 machine_edge.delay_edge)
         matrix = SynapticMatrix(
-            self.__synapse_io, self.__poptable, self.__synapse_info,
+            self.__poptable, self.__synapse_info,
             machine_edge, self.__app_edge, self.__n_synapse_types,
             self.__max_row_info, r_info, delayed_r_info, self.__weight_scales,
             self.__all_syn_block_sz, self.__all_single_syn_sz)
@@ -582,7 +580,7 @@ class SynapticMatrixApp(object):
         """
         for conn_holder in self.__synapse_info.pre_run_connection_holders:
             conn_holder.add_connections(
-                self.__synapse_io.read_all_synapses(
+                read_all_synapses(
                     data, delayed_data, self.__synapse_info,
                     self.__n_synapse_types, self.__weight_scales,
                     machine_edge, self.__max_row_info))
@@ -688,7 +686,7 @@ class SynapticMatrixApp(object):
 
         if self.__syn_mat_offset is not None:
             block = self.__get_block(transceiver, placement, synapses_address)
-            connections.append(self.__synapse_io.convert_to_connections(
+            connections.append(convert_to_connections(
                 self.__synapse_info, pre_slice, self.__post_vertex_slice,
                 self.__max_row_info.undelayed_max_words,
                 self.__n_synapse_types, self.__weight_scales, block,
@@ -697,7 +695,7 @@ class SynapticMatrixApp(object):
         if self.__delay_syn_mat_offset is not None:
             block = self.__get_delayed_block(
                 transceiver, placement, synapses_address)
-            connections.append(self.__synapse_io.convert_to_connections(
+            connections.append(convert_to_connections(
                 self.__synapse_info, pre_slice, self.__post_vertex_slice,
                 self.__max_row_info.delayed_max_words, self.__n_synapse_types,
                 self.__weight_scales, block,

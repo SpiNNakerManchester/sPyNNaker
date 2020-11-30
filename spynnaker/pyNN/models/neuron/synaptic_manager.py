@@ -28,7 +28,6 @@ from spinn_front_end_common.utilities.constants import (
 
 from spynnaker.pyNN.models.neural_projections import ProjectionMachineEdge
 from spynnaker.pyNN.models.abstract_models import AbstractMaxSpikes
-from spynnaker.pyNN.models.neuron.synapse_io import SynapseIORowBased
 from spynnaker.pyNN.utilities.constants import (
     POPULATION_BASED_REGIONS, POSSION_SIGMA_SUMMATION_LIMIT)
 from spynnaker.pyNN.utilities.utility_calls import (get_n_bits)
@@ -38,6 +37,7 @@ from .synapse_dynamics import (
     AbstractSynapseDynamics, AbstractSynapseDynamicsStructural)
 from .synaptic_matrices import SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES
 from .synaptic_matrices import SynapticMatrices
+from .synapse_io import get_maximum_delay_supported_in_ms
 
 TIME_STAMP_BYTES = BYTES_PER_WORD
 
@@ -70,8 +70,6 @@ class SynapticManager(object):
         "__spikes_per_second",
         # The dynamics used by the synapses e.g. STDP, static etc.
         "__synapse_dynamics",
-        # The reader and writer of synapses to and from SpiNNaker
-        "__synapse_io",
         # A list of scale factors for the weights for each synapse type
         "__weight_scales",
         # A list of ring buffer shift values corresponding to the weight
@@ -133,9 +131,6 @@ class SynapticManager(object):
         self._direct_matrix_region = \
             POPULATION_BASED_REGIONS.DIRECT_MATRIX.value
 
-        # Create the synapse IO
-        self.__synapse_io = SynapseIORowBased()
-
         if self.__ring_buffer_sigma is None:
             self.__ring_buffer_sigma = config.getfloat(
                 "Simulation", "ring_buffer_sigma")
@@ -177,9 +172,8 @@ class SynapticManager(object):
         # Otherwise generate new ones
         matrices = SynapticMatrices(
             post_vertex_slice, self.__n_synapse_types,
-            self.__all_single_syn_sz, self.__synapse_io,
-            self._synaptic_matrix_region, self._direct_matrix_region,
-            self._pop_table_region)
+            self.__all_single_syn_sz, self._synaptic_matrix_region,
+            self._direct_matrix_region, self._pop_table_region)
         self.__synaptic_matrices[post_vertex_slice] = matrices
         return matrices
 
@@ -261,7 +255,7 @@ class SynapticManager(object):
 
         :rtype: int
         """
-        return self.__synapse_io.get_maximum_delay_supported_in_ms(
+        return get_maximum_delay_supported_in_ms(
             machine_time_step)
 
     @property
