@@ -36,11 +36,6 @@ class SpynnakerSimulatorInterface(SimulatorInterface):
 
     # declared in FEC common and used in 7 and 8
     @abstractproperty
-    def max_delay(self):
-        pass
-
-    # declared in FEC common and used in 7 and 8
-    @abstractproperty
     def min_delay(self):
         pass
 

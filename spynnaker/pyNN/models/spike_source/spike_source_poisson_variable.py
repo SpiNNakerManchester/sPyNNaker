@@ -12,11 +12,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+from spinn_utilities.overrides import overrides
 from .spike_source_poisson_vertex import SpikeSourcePoissonVertex
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 
-_population_parameters = {"seed": None}
+_population_parameters = {"seed": None, "splitter": None}
 
 DEFAULT_MAX_ATOMS_PER_CORE = 500
 
@@ -42,9 +42,13 @@ class SpikeSourcePoissonVariable(AbstractPyNNModel):
             return DEFAULT_MAX_ATOMS_PER_CORE
         return super(SpikeSourcePoissonVariable, cls).get_max_atoms_per_core()
 
-    def create_vertex(self, n_neurons, label, constraints, seed):
+    @overrides(AbstractPyNNModel.create_vertex,
+               additional_arguments=default_population_parameters.keys())
+    def create_vertex(
+            self, n_neurons, label, constraints, seed, splitter):
         # pylint: disable=arguments-differ
         max_atoms = self.get_max_atoms_per_core()
         return SpikeSourcePoissonVertex(
             n_neurons, constraints, label, seed, max_atoms, self,
-            rates=self._rates, starts=self._starts, durations=self._durations)
+            rates=self._rates, starts=self._starts, durations=self._durations,
+            splitter=splitter)
