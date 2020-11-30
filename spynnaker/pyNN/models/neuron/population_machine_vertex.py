@@ -43,7 +43,6 @@ from spynnaker.pyNN.models.abstract_models import (
 from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
 from spinn_front_end_common.utilities import (
     constants as common_constants, helpful_functions)
-from .synaptic_matrices import SynapticMatrices
 
 
 class PopulationMachineVertex(
