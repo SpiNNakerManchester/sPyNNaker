@@ -187,10 +187,6 @@ class PopulationMachineVertex(
         self.__on_chip_generatable_size = None
         self.__change_requires_neuron_parameters_reload = False
 
-        self.__synaptic_matrices = SynapticMatrices(
-            vertex_slice, n_synapse_types, all_single_syn_sz, synapse_io, synaptic_matrix_region, direct_matrix_region, poptable_region
-            )
-
     def set_on_chip_generatable_area(self, offset, size):
         self.__on_chip_generatable_offset = offset
         self.__on_chip_generatable_size = size
