@@ -52,7 +52,9 @@ typedef struct master_population_table_entry {
     //! Flag to indicate if an extra_info struct is present
     uint32_t extra_info_flag: 1;
     //! The number of entries in ::address_list for this entry
-    uint32_t count: 16;
+    uint32_t count: 15;
+    //! Flag to indicate if the synaptic block should be cached in DTCM.
+    uint32_t cache_in_dtcm: 1;
 } master_population_table_entry;
 
 //! \brief A packed extra info (note: same size as address and row length)
