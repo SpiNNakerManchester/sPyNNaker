@@ -64,6 +64,7 @@ class AbstractPopulationVertex(
     """
 
     __slots__ = [
+        "__all_single_syn_sz",
         "__change_requires_mapping",
         "__change_requires_data_generation",
         "__incoming_spike_buffer_size",
@@ -142,6 +143,10 @@ class AbstractPopulationVertex(
             self.__incoming_spike_buffer_size = config.getint(
                 "Simulation", "incoming_spike_buffer_size")
 
+        # Limit the DTCM used by one-to-one connections
+        self.__all_single_syn_sz = config.getint(
+            "Simulation", "one_to_one_connection_dtcm_max_bytes")
+
         self.__neuron_impl = neuron_impl
         self.__pynn_model = pynn_model
         self._parameters = SpynnakerRangeDictionary(n_neurons)
@@ -179,6 +184,14 @@ class AbstractPopulationVertex(
     @overrides(TDMAAwareApplicationVertex.n_atoms)
     def n_atoms(self):
         return self.__n_atoms
+
+    @property
+    def all_single_syn_size(self):
+        """ The maximum amount of DTCM to use for single synapses
+
+        :rtype: int
+        """
+        return self.__all_single_syn_sz
 
     @property
     def incoming_spike_buffer_size(self):

@@ -29,7 +29,7 @@ from spinn_front_end_common.utilities.constants import (
 from spynnaker.pyNN.models.neural_projections import ProjectionMachineEdge
 from spynnaker.pyNN.models.abstract_models import AbstractMaxSpikes
 from spynnaker.pyNN.utilities.constants import (
-    POPULATION_BASED_REGIONS, POSSION_SIGMA_SUMMATION_LIMIT)
+    POSSION_SIGMA_SUMMATION_LIMIT)
 from spynnaker.pyNN.utilities.utility_calls import (get_n_bits)
 from spynnaker.pyNN.utilities.running_stats import RunningStats
 
@@ -150,10 +150,6 @@ class SynapticManager(object):
         # Keep the details once computed to allow reading back
         self.__weight_scales = None
         self.__ring_buffer_shifts = None
-
-        # Limit the DTCM used by one-to-one connections
-        self.__all_single_syn_sz = config.getint(
-            "Simulation", "one_to_one_connection_dtcm_max_bytes")
 
         # Post vertex slice to synaptic matrices
         self.__synaptic_matrices = dict()

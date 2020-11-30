@@ -21,8 +21,7 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.exceptions import (
     SynapseRowTooBigException, SynapticConfigurationException)
-from spynnaker.pyNN.utilities.constants import (
-    POPULATION_BASED_REGIONS, POP_TABLE_MAX_ROW_LENGTH)
+from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
 from spynnaker.pyNN.utilities.bit_field_utilities import BIT_IN_A_WORD
 
 logger = logging.getLogger(__name__)
@@ -552,7 +551,7 @@ class MasterPopTableAsBinarySearch(object):
             n_entries * _MASTER_POP_ENTRY_SIZE_BYTES +
             self.__n_addresses * _ADDRESS_LIST_ENTRY_SIZE_BYTES)
         spec.reserve_memory_region(
-            region=POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
+            region=master_pop_table_region,
             size=master_pop_table_sz, label='PopTable')
         spec.switch_write_focus(region=master_pop_table_region)
 
