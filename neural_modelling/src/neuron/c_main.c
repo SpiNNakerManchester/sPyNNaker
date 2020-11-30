@@ -246,6 +246,14 @@ static bool initialise(void) {
     // Setup profiler
     profiler_init(data_specification_get_region(PROFILER_REGION, ds_regions));
 
+    // update user 2 with DTCM available before bitfields.
+    uint dtcm_free_block = sark_heap_max(sark.heap, 0);
+    // Get pointer to 1st virtual processor info struct in SRAM
+    vcpu_t *virtual_processor_table = (vcpu_t*) SV_VCPU;
+
+    // set the cores user2 register to the size of the free dtcm before bitfields
+    virtual_processor_table[spin1_get_core_id()].user2 = dtcm_free_block;
+
     // Do bitfield configuration last to only use any unused memory
     if (!population_table_load_bitfields(
             data_specification_get_region(BIT_FIELD_FILTER_REGION, ds_regions))) {
