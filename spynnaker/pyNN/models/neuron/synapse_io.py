@@ -682,21 +682,21 @@ def _read_plastic_data(
 
 
 def _rescale_connections(
-            connections, machine_time_step, weight_scales, synapse_info):
-        """ Scale the connection data into machine values
+        connections, machine_time_step, weight_scales, synapse_info):
+    """ Scale the connection data into machine values
 
-        :param ~numpy.ndarray connections: The connections to be rescaled
-        :param int machine_time_step: The time step of the simulation
-        :param list(float) weight_scales: The weight scale of each synapse type
-        :param SynapseInformation synapse_info:
-            The synapse information of the connections
-        """
-        # Return the delays values to milliseconds
-        connections["delay"] /= (
-                MICRO_TO_MILLISECOND_CONVERSION / machine_time_step)
-        # Undo the weight scaling
-        connections["weight"] /= weight_scales[synapse_info.synapse_type]
-        return connections
+    :param ~numpy.ndarray connections: The connections to be rescaled
+    :param int machine_time_step: The time step of the simulation
+    :param list(float) weight_scales: The weight scale of each synapse type
+    :param SynapseInformation synapse_info:
+        The synapse information of the connections
+    """
+    # Return the delays values to milliseconds
+    connections["delay"] /= (
+            MICRO_TO_MILLISECOND_CONVERSION / machine_time_step)
+    # Undo the weight scaling
+    connections["weight"] /= weight_scales[synapse_info.synapse_type]
+    return connections
 
 
 def __convert_delayed_data(
