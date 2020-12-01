@@ -22,8 +22,6 @@ from spinn_front_end_common.abstract_models import (
     AbstractHasAssociatedBinary)
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
-from spinn_front_end_common.abstract_models.impl\
-    .tdma_aware_application_vertex import get_tdma_provenance_item
 
 DELAY_EXPANDER_APLX = "delay_expander.aplx"
 
@@ -154,9 +152,8 @@ class DelayExtensionMachineVertex(
         provenance_items.append(ProvenanceDataItem(
             self._add_name(names, "Number_of_times_delayed_to_spread_traffic"),
             n_delays))
-        provenance_items.append(
-            get_tdma_provenance_item(
-                names, x, y, p, n_times_tdma_fell_behind))
+        provenance_items.append(self._app_vertex.get_tdma_provenance_item(
+            names, x, y, p, n_times_tdma_fell_behind))
 
         return provenance_items
 

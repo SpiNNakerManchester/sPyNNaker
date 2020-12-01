@@ -36,8 +36,6 @@ from spinn_front_end_common.interface.profiling import (
 from spinn_front_end_common.interface.profiling.profile_utils import (
     get_profiling_data)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
-from spinn_front_end_common.abstract_models.impl\
-    .tdma_aware_application_vertex import get_tdma_provenance_item
 from spinn_front_end_common.utilities import (
     constants as common_constants, helpful_functions)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
@@ -400,8 +398,8 @@ class PopulationMachineVertex(
             self._add_name(names, self._MAX_FILLED_SIZE_OF_INPUT_BUFFER_NAME),
             input_buffer_max_filled_size, report=False))
 
-        provenance_items.append(get_tdma_provenance_item(
-                names, x, y, p, tdma_misses))
+        provenance_items.append(self._app_vertex.get_tdma_provenance_item(
+            names, x, y, p, tdma_misses))
         return provenance_items
 
     @overrides(AbstractReceiveBuffersToHost.get_recorded_region_ids)
@@ -713,7 +711,7 @@ class PopulationMachineVertex(
         spec.reserve_memory_region(
             region=self.REGIONS.CONNECTOR_BUILDER.value,
             size=n_bytes, label="ConnectorBuilderRegion")
-        spec.switch_write_focus(self._connector_builder_region)
+        spec.switch_write_focus(self.REGIONS.CONNECTOR_BUILDER.value)
 
         spec.write_value(len(generator_data))
         spec.write_value(self.vertex_slice.lo_atom)

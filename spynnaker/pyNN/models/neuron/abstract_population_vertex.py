@@ -989,7 +989,7 @@ class AbstractPopulationVertex(
             return 0
 
         return self.__synapse_dynamics.get_parameters_sdram_usage_in_bytes(
-            vertex_slice.n_atoms, self.__n_synapse_types)
+            vertex_slice.n_atoms, self.__neuron_impl.get_n_synapse_types())
 
     def get_structural_dynamics_size(self, vertex_slice):
         """ Get the size of the structural dynamics region

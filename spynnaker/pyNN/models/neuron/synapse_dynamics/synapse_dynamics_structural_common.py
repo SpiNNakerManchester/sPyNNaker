@@ -24,8 +24,7 @@ from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION, MICRO_TO_SECOND_CONVERSION,
     BYTES_PER_WORD, BYTES_PER_SHORT)
-from spynnaker.pyNN.models.neural_projections import (
-    ProjectionApplicationEdge, ProjectionMachineEdge)
+from spynnaker.pyNN.models.neural_projections import ProjectionMachineEdge
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
@@ -137,25 +136,6 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
             dynamics = synapse_info.synapse_dynamics
             dynamics.elimination.write_parameters(
                 spec, weight_scales[synapse_info.synapse_type])
-
-    def __get_structural_edges_by_app(self, incoming_projections):
-        """ Get structural edges using the projections
-
-        :param ~pacman.model.graphs.application.ApplicationGraph app_graph:
-        :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
-        :rtype: dict(ProjectionApplicationEdge, SynapseInformation)
-        """
-        structural_edges = dict()
-        for app_edge in app_graph.get_edges_ending_at_vertex(app_vertex):
-            if isinstance(app_edge, ProjectionApplicationEdge):
-                for synapse_info in app_edge.synapse_information:
-                    if isinstance(synapse_info.synapse_dynamics,
-                                  AbstractSynapseDynamicsStructural):
-                        if app_edge in structural_edges:
-                            raise SynapticConfigurationException(
-                                self.PAIR_ERROR)
-                        structural_edges[app_edge] = synapse_info
-        return structural_edges
 
     def __get_structural_edges_by_machine(self, machine_graph, machine_vertex):
         """
@@ -353,31 +333,32 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
             self, incoming_projections, n_neurons):
         # Work out how many sub-edges we will end up with, as this is used
         # for key_atom_info
-        structural_edges = self.__get_structural_edges_by_app(
-            incoming_projections)
-
         # pylint: disable=no-member
         param_sizes = (
             self.partner_selection.get_parameters_sdram_usage_in_bytes())
         n_sub_edges = 0
-        for (app_edge, synapse_info) in structural_edges.items():
-            if app_edge.pre_vertex.machine_vertices:
-                # TODO: Check the type of the vertices
-                n_sub_edges += len(app_edge.pre_vertex.machine_vertices)
-            else:
-                max_atoms = app_edge.pre_vertex.get_max_atoms_per_core()
-                if app_edge.pre_vertex.n_atoms < max_atoms:
-                    max_atoms = app_edge.pre_vertex.n_atoms
-                n_sub_edges += int(math.ceil(
-                    float(app_edge.pre_vertex.n_atoms) / float(max_atoms)))
-            dynamics = synapse_info.synapse_dynamics
-            param_sizes += dynamics.formation\
-                .get_parameters_sdram_usage_in_bytes()
-            param_sizes += dynamics.elimination\
-                .get_parameters_sdram_usage_in_bytes()
+        n_structural_edges = 0
+        for proj in incoming_projections:
+            dynamics = proj._synapse_information.synapse_dynamics
+            if isinstance(dynamics, AbstractSynapseDynamicsStructural):
+                n_structural_edges += 1
+                app_edge = proj._projection_edge
+                if app_edge.pre_vertex.machine_vertices:
+                    # TODO: Check the type of the vertices
+                    n_sub_edges += len(app_edge.pre_vertex.machine_vertices)
+                else:
+                    max_atoms = app_edge.pre_vertex.get_max_atoms_per_core()
+                    if app_edge.pre_vertex.n_atoms < max_atoms:
+                        max_atoms = app_edge.pre_vertex.n_atoms
+                    n_sub_edges += int(math.ceil(
+                        float(app_edge.pre_vertex.n_atoms) / float(max_atoms)))
+                param_sizes += dynamics.formation\
+                    .get_parameters_sdram_usage_in_bytes()
+                param_sizes += dynamics.elimination\
+                    .get_parameters_sdram_usage_in_bytes()
 
         return int((self._REWIRING_DATA_SIZE +
-                   (self._PRE_POP_INFO_BASE_SIZE * len(structural_edges)) +
+                   (self._PRE_POP_INFO_BASE_SIZE * n_structural_edges) +
                    (self._KEY_ATOM_INFO_SIZE * n_sub_edges) +
                    (self._POST_TO_PRE_ENTRY_SIZE * n_neurons * self.s_max) +
                    param_sizes))
