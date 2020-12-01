@@ -940,7 +940,7 @@ class AbstractPopulationVertex(
     @overrides(AbstractAcceptsIncomingSynapses.get_connections_from_machine)
     def get_connections_from_machine(
             self, transceiver, placements, app_edge, synapse_info):
-        """ Read the connections from the machine for a given projection
+        """ Read the connections from the machine for a given projection.
 
         :param ~spinnman.transciever.Transceiver transceiver:
             Used to read the data from the machine
