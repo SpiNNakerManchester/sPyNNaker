@@ -50,7 +50,7 @@
 #endif
 
 extern uint32_t time;
-extern REAL learning_signal;
+extern REAL learning_signal[20];
 //uint32_t neurons_in_pop;
 uint32_t syn_dynamics_neurons_in_partition;
 

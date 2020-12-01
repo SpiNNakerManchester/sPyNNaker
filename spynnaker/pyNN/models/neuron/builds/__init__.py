@@ -31,10 +31,11 @@ from .eprop_adaptive import EPropAdaptive
 from .store_recall_readout import StoreRecallReadout
 from .sinusoid_readout import SinusoidReadout
 from .left_right_readout import LeftRightReadout
+from .shd_readout import SHDReadout
 
 __all__ = ["EIFConductanceAlphaPopulation", "HHCondExp", "IFCondAlpha",
            "IFCondExpBase", "IFCurrAlpha", "IFCurrDualExpBase",
            "IFCurrExpBase", "IFFacetsConductancePopulation", "IzkCondExpBase",
            "IzkCurrExpBase", "IFCondExpStoc",
            "IFCurrDelta", "IFCurrExpCa2Adaptive", "IFCurrExpSEMDBase",
-           "EPropAdaptive", "StoreRecallReadout", "SinusoidReadout", "LeftRightReadout"]
+           "EPropAdaptive", "StoreRecallReadout", "SinusoidReadout", "LeftRightReadout", "SHDReadout"]

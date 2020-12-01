@@ -22,7 +22,7 @@
 bool printed_value = false;
 REAL v_mem_error;
 REAL new_learning_signal;
-extern REAL learning_signal;
+extern REAL learning_signal[20];
 REAL local_eta;
 extern uint32_t time;
 extern global_neuron_params_pointer_t global_parameters;
@@ -105,7 +105,7 @@ state_t neuron_model_state_update(
 //  This parameter is OK to update, as the actual size of the array is set in the header file, which matches the Python code. This should make it possible to do a pause and resume cycle and have reliable unloading of data.
 //    uint32_t total_input_synapses_per_neuron = 100; //todo should this be fixed?
 //    uint32_t total_recurrent_synapses_per_neuron = 100; //todo should this be fixed?
-    uint32_t recurrent_offset = 100;
+    uint32_t recurrent_offset = 700;
 
 
 //    neuron->psi = neuron->psi << 10;
@@ -147,7 +147,7 @@ state_t neuron_model_state_update(
     if (time % neuron->window_size == neuron->window_size - 1 & !printed_value){ //hardcoded time of reset
         io_printf(IO_BUF, "1 %u, rate err:%k, rate:%k, target:%k\tL:%k, v_mem:%k\n",
         time, reg_learning_signal, global_parameters->core_pop_rate, global_parameters->core_target_rate,
-        learning_signal, v_mem_error);
+        learning_signal[0], v_mem_error);
 //        global_parameters->core_pop_rate = 0.k;
 //        REAL reg_learning_signal = ((global_parameters->core_pop_rate / 1.225k)//(accum)(time%1300))
 //                                / (accum)syn_dynamics_neurons_in_partition) - global_parameters->core_target_rate;
@@ -165,14 +165,17 @@ state_t neuron_model_state_update(
 //    if (new_learning_signal != learning_signal){// && time%1300 > 1100){
 //        io_printf(IO_BUF, "L:%k, rL:%k, cL:%k, nL:%k\n", learning_signal, reg_learning_signal, learning_signal + reg_learning_signal, new_learning_signal);
 //    if (reg_learning_signal > 0.5k || reg_learning_signal < -0.5k){
-    new_learning_signal = (learning_signal * neuron->w_fb) + v_mem_error + (reg_learning_signal);
+    new_learning_signal =  v_mem_error + (reg_learning_signal);
+    for (uint32_t syn_ind=0; syn_ind < 20; syn_ind++){
+        new_learning_signal += (learning_signal[syn_ind] * neuron->w_fb[syn_ind]);
+    }
 //    new_learning_signal = reg_learning_signal;
 //    }
 //        new_learning_signal = learning_signal;
 //    }
 //    neuron->L = learning_signal;
 
-    uint32_t test_length = (150*neuron->number_of_cues)+1000+150;
+    uint32_t test_length = 1000;//(150*neuron->number_of_cues)+1000+150;
     if(neuron->number_of_cues == 0){
         test_length = neuron->window_size;
     }

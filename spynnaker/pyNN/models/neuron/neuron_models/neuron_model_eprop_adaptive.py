@@ -20,7 +20,7 @@ from pacman.executor.injection_decorator import inject_items
 from .abstract_neuron_model import AbstractNeuronModel
 
 # constants
-SYNAPSES_PER_NEURON = 250
+SYNAPSES_PER_NEURON = 956
 
 
 
@@ -139,13 +139,13 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
             target_rate,
             tau_err,
             l,
-            w_fb,
             eta,
             window_size,
             number_of_cues,
             input_synapses,
             rec_synapses,
-            neuron_rate
+            neuron_rate,
+            w_fb
             ):
 
         datatype_list = [
@@ -171,13 +171,14 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
             DataType.S1615,
             # Learning signal
             DataType.S1615,   #  L
-            DataType.S1615,   #  w_fb
             DataType.UINT32,   #  window_size
             DataType.UINT32,   #  number_of_cues
             DataType.UINT32,   #  input_synapses
             DataType.UINT32,   #  rec_synapses
-            DataType.S1615   #  neuron_rate
+            DataType.S1615,   #  neuron_rate
+            DataType.S1615,   #  w_fb
             ]
+        datatype_list.extend([DataType.S1615] * 19)
 
         # Synapse states - always initialise to zero
         eprop_syn_state = [ # synaptic state, one per synapse (kept in DTCM)

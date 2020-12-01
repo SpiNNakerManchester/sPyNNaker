@@ -283,26 +283,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     }
     accumulated_softmax += output_errors[neuron_index];
 
-    accum exp_0 = expk(global_parameters->readout_V_0);// * 0.1k);
-            accum exp_1 = expk(global_parameters->readout_V_1);// * 0.1k);
-//            io_printf(IO_BUF, "or here - ");
-            if (exp_0 == 0k && exp_1 == 0k){
-                if (global_parameters->readout_V_0 > global_parameters->readout_V_1){
-                    softmax_0 = 1k;
-                    softmax_1 = 0k;
-                }
-            else{
-//                accum denominator = 1.k  / (exp_1 + exp_0);
-                softmax_0 = exp_0 / (exp_1 + exp_0);
-                softmax_1 = exp_1 / (exp_1 + exp_0);
-            }
-            else{
-                global_parameters->cross_entropy = -logk(softmax_0);
-                learning_signal = softmax_0 - 1.k;
-                is_it_right = 0;
-            }
-
-    recorded_variable_values[V_RECORDING_INDEX] = voltage;
+//    recorded_variable_values[V_RECORDING_INDEX] = voltage;
     if (neuron_index == 19){
 
         // Calculate error
@@ -312,26 +293,28 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
             if (n_ind == global_parameters->target_V[target_ind]){
                 correct_output = 1.k;
             }
-            learning_signal = output_errors[n_ind] - correct_output;
+            learning_signal[n_ind] = output_errors[n_ind] - correct_output;
             // Send error (learning signal) as packet with payload
             while (!spin1_send_mc_packet(
-                    key | n_ind,  bitsk(learning_signal), 1 )) {
+                    key | n_ind,  bitsk(learning_signal[n_ind]), 1 )) {
                 spin1_delay_us(1);
             }
         }
-        if (time % 800 == 0){ // after every test is finished
+        if (time % 1000 == 0){ // after every test is finished
             target_ind += 1;
         }
     }
-    else{
-        // Record 'Error'
-        recorded_variable_values[V_RECORDING_INDEX] =
-//                neuron->syn_state[0].z_bar;
-                global_parameters->target_V[target_ind];
-//        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
-//                - global_parameters->target_V[target_ind];
-    }
-    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[neuron_index*20].z_bar;
+//    else{
+//        // Record 'Error'
+//        recorded_variable_values[V_RECORDING_INDEX] =
+////                neuron->syn_state[0].z_bar;
+//                global_parameters->target_V[target_ind];
+////        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
+////                - global_parameters->target_V[target_ind];
+//    }
+//    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[neuron_index*20].z_bar;
+    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = learning_signal[global_parameters->target_V[target_ind]];
+
     // Record target
     recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] =
 //        			global_parameters->target_V[target_ind];

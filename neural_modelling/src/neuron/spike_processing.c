@@ -56,7 +56,7 @@ static uint32_t number_of_rewires = 0;
 static bool any_spike = false;
 
 /* PRIVATE FUNCTIONS - static for inlining */
-REAL learning_signal;
+REAL learning_signal[20] = {0.k};
 
 static inline void do_dma_read(
         address_t row_address, size_t n_bytes_to_transfer) {
@@ -245,7 +245,8 @@ static void dma_complete_callback(uint unused, uint tag) {
 
 static void multicast_packet_wpayload_received_callback(uint key, uint payload){
 
-	learning_signal = kbits(payload);
+    int id = (key && 31) % 20;
+	learning_signal[id] = kbits(payload);
 
 	// Print payload to test transmission of error
 //	io_printf(IO_BUF, "payload: %k\n", learning_signal);

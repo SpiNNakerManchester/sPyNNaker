@@ -49,11 +49,12 @@ class EPropAdaptive(AbstractPyNNNeuronModelStandard):
             B=10, small_b=0, small_b_0=10, tau_a=500, beta=1.8,
 
             # Learning signal and weight update constants
-            l=0, w_fb=0.5, eta=1.0, window_size=13000, number_of_cues=0,
+            l=0, eta=1.0, window_size=13000, number_of_cues=0,
 
             input_synapses=100,
             rec_synapses=100,
-            neuron_rate=10
+            neuron_rate=10,
+            w_fb=[0.5]
 
             ):
         # pylint: disable=too-many-arguments, too-many-locals
@@ -68,10 +69,11 @@ class EPropAdaptive(AbstractPyNNNeuronModelStandard):
             # Regularisation params
             target_rate, tau_err, 
             # Learning signal params
-            l, w_fb, eta, window_size, number_of_cues,
+            l, eta, window_size, number_of_cues,
             input_synapses,
             rec_synapses,
-            neuron_rate
+            neuron_rate,
+            w_fb
             )
 
         synapse_type = SynapseTypeEPropAdaptive(
@@ -89,6 +91,6 @@ class EPropAdaptive(AbstractPyNNNeuronModelStandard):
 
     @classmethod
     def get_max_atoms_per_core(cls):
-        return 8
+        return 2
 
 

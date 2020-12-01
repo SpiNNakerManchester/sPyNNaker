@@ -8,7 +8,7 @@ from spynnaker.pyNN.models.neuron.input_types import InputTypeCurrent
 from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeStatic
 
 
-class SinusoidReadout(AbstractPyNNNeuronModelStandard):
+class SHDReadout(AbstractPyNNNeuronModelStandard):
     """
     """
 
@@ -42,7 +42,7 @@ class SinusoidReadout(AbstractPyNNNeuronModelStandard):
 
         threshold_type = ThresholdTypeStatic(v_thresh)
 
-        super(SinusoidReadout, self).__init__(
+        super(SHDReadout, self).__init__(
             model_name="shd_readout",
             binary="shd_readout.aplx",
             neuron_model=neuron_model, input_type=input_type,
