@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from enum import Enum
 
+from data_specification.enums.data_type import DataType
 from pacman.executor.injection_decorator import inject_items
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_utilities.overrides import overrides
@@ -35,14 +36,18 @@ from spinn_front_end_common.interface.profiling import (
 from spinn_front_end_common.interface.profiling.profile_utils import (
     get_profiling_data)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
+from spinn_front_end_common.abstract_models.impl\
+    .tdma_aware_application_vertex import get_tdma_provenance_item
+from spinn_front_end_common.utilities import (
+    constants as common_constants, helpful_functions)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.utilities import constants, bit_field_utilities
 from spynnaker.pyNN.models.abstract_models import (
     AbstractSynapseExpandable, AbstractReadParametersBeforeSet)
-from spinn_front_end_common.utilities import (
-    constants as common_constants, helpful_functions)
-from .synaptic_matrices import SynapticMatrices
+from spynnaker.pyNN.utilities.utility_calls import get_n_bits
+from .synaptic_matrices import (
+    SynapticMatrices, SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES)
 
 
 class PopulationMachineVertex(
@@ -60,7 +65,6 @@ class PopulationMachineVertex(
         "__resources",
         "__on_chip_generatable_area",
         "__on_chip_generatable_size",
-        "__drop_late_spikes",
         "__change_requires_neuron_parameters_reload",
         "__synaptic_matrices"]
 
@@ -180,12 +184,11 @@ class PopulationMachineVertex(
 
     def __init__(
             self, resources_required, recorded_region_ids, label, constraints,
-            app_vertex, vertex_slice, drop_late_spikes, binary_file_name):
+            app_vertex, vertex_slice, binary_file_name):
         """
         :param ~pacman.model.resources.ResourceContainer resources_required:
         :param iterable(int) recorded_region_ids:
         :param str label:
-        :param bool drop_late_spikes: control flag for dropping packets.
         :param list(~pacman.model.constraints.AbstractConstraint) constraints:
         :param AbstractPopulationVertex app_vertex:
             The associated application vertex
@@ -199,14 +202,13 @@ class PopulationMachineVertex(
         AbstractRecordable.__init__(self)
         self.__recorded_region_ids = recorded_region_ids
         self.__resources = resources_required
-        self.__drop_late_spikes = drop_late_spikes
         self.__on_chip_generatable_offset = None
         self.__on_chip_generatable_size = None
         self.__change_requires_neuron_parameters_reload = False
 
         self.__synaptic_matrices = SynapticMatrices(
-            vertex_slice, app_vertex.neuron_impl.n_synapse_types,
-            app_vertex.all_single_syn_sz,
+            vertex_slice, app_vertex.neuron_impl.get_n_synapse_types(),
+            app_vertex.all_single_syn_size,
             self.REGIONS.SYNAPTIC_MATRIX.value,
             self.REGIONS.DIRECT_MATRIX.value,
             self.REGIONS.POPULATION_TABLE.value)
@@ -386,7 +388,8 @@ class PopulationMachineVertex(
                 "performance.".format(
                     n_packets_filtered_by_bit_field_filter, x, y, p)))))
         late_message = (
-            self._N_LATE_SPIKES_MESSAGE_DROP if self.__drop_late_spikes
+            self._N_LATE_SPIKES_MESSAGE_DROP
+            if self._app_vertex.drop_late_spikes
             else self._N_LATE_SPIKES_MESSAGE_NO_DROP)
         provenance_items.append(ProvenanceDataItem(
             self._add_name(names, self._N_LATE_SPIKES_NAME),
@@ -397,7 +400,7 @@ class PopulationMachineVertex(
             self._add_name(names, self._MAX_FILLED_SIZE_OF_INPUT_BUFFER_NAME),
             input_buffer_max_filled_size, report=False))
 
-        provenance_items.append(self._app_vertex.get_tdma_provenance_item(
+        provenance_items.append(get_tdma_provenance_item(
                 names, x, y, p, tdma_misses))
         return provenance_items
 
@@ -427,7 +430,6 @@ class PopulationMachineVertex(
     @inject_items({
         "machine_time_step": "MachineTimeStep",
         "time_scale_factor": "TimeScaleFactor",
-        "application_graph": "MemoryApplicationGraph",
         "machine_graph": "MemoryMachineGraph",
         "routing_info": "MemoryRoutingInfos",
         "data_n_time_steps": "DataNTimeSteps",
@@ -437,12 +439,12 @@ class PopulationMachineVertex(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={
             "machine_time_step", "time_scale_factor",
-            "application_graph", "machine_graph", "routing_info",
+            "machine_graph", "routing_info",
             "data_n_time_steps", "n_key_map"
         })
     def generate_data_specification(
             self, spec, placement, machine_time_step, time_scale_factor,
-            application_graph, machine_graph, routing_info, data_n_time_steps,
+            machine_graph, routing_info, data_n_time_steps,
             n_key_map):
         """
         :param machine_time_step: (injected)
@@ -459,15 +461,10 @@ class PopulationMachineVertex(
             self._app_vertex.neuron_impl.model_name))
 
         # Reserve memory regions
-        self._reserve_memory_regions(spec, machine_graph, n_key_map)
-
-        # Declare random number generators and distributions:
-        # TODO add random distribution stuff
-        # self.write_random_distribution_declarations(spec)
-
-        # Get the key
-        key = routing_info.get_first_key_from_pre_vertex(
-            self, constants.SPIKE_PARTITION_ID)
+        all_syn_block_sz = self._app_vertex.get_synapses_size(
+            self.vertex_slice)
+        self._reserve_memory_regions(
+            spec, machine_graph, n_key_map, all_syn_block_sz)
 
         # Write the setup region
         spec.switch_write_focus(self.REGIONS.SYSTEM.value)
@@ -479,7 +476,9 @@ class PopulationMachineVertex(
             spec, self.REGIONS.NEURON_RECORDING.value,
             self.vertex_slice, data_n_time_steps)
 
-        # Write the neuron parameters
+        # Write the neuron parameters with the key
+        key = routing_info.get_first_key_from_pre_vertex(
+            self, constants.SPIKE_PARTITION_ID)
         self._write_neuron_parameters(
             spec, key, self.REGIONS.NEURON_PARAMS.value)
 
@@ -488,18 +487,37 @@ class PopulationMachineVertex(
             spec, self.REGIONS.PROFILING.value,
             self._app_vertex.n_profile_samples)
 
-        # Get the weight_scale value from the appropriate location
-        weight_scale = self._app_vertex.neuron_impl.get_global_weight_scale()
+        # Write synapse parameters
+        spec.switch_write_focus(self.REGIONS.SYNAPSE_PARAMS.value)
+        spec.write_value(int(self._app_vertex.drop_late_spikes))
+        spec.write_array(self._app_vertex.get_ring_buffer_shifts(
+            machine_time_step))
 
-        # allow the synaptic matrix to write its data spec-able data
-        self._app_vertex.synapse_manager.write_data_spec(
-            spec, self._app_vertex, self.vertex_slice, self, machine_graph,
-            application_graph, routing_info, weight_scale, machine_time_step)
+        # Write the synaptic matrices
+        weight_scales = self._app_vertex.get_weight_scales(machine_time_step)
+        gen_data = self.__synaptic_matrices\
+            .write_synaptic_matrix_and_master_population_table(
+                spec, self, all_syn_block_sz, weight_scales,
+                routing_info, machine_graph)
+
+        # Write any synapse dynamics
+        synapse_dynamics = self._app_vertex.synapse_dynamics
+        if synapse_dynamics is not None:
+            synapse_dynamics.write_parameters(
+                spec, self.REGIONS.SYNAPSE_DYNAMICS.value,
+                machine_time_step, weight_scales)
+
+            if isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural):
+                synapse_dynamics.write_structural_parameters(
+                    spec, self.REGIONS.STRUCTURAL_DYNAMICS.value,
+                    machine_time_step, weight_scales, machine_graph, self,
+                    routing_info, self.__synaptic_matrices)
+
+        self._write_synapse_expander_data_spec(spec, gen_data, weight_scales)
+
         self.set_on_chip_generatable_area(
-            self._app_vertex.synapse_manager.host_written_matrix_size(
-                self.vertex_slice),
-            self._app_vertex.synapse_manager.on_chip_written_matrix_size(
-                self.vertex_slice))
+            self.__synaptic_matrices.host_generated_block_addr,
+            self.__synaptic_matrices.on_chip_generated_block_addr)
 
         # write up the bitfield builder data
         bit_field_utilities.write_bitfield_init_data(
@@ -511,9 +529,7 @@ class PopulationMachineVertex(
             self.REGIONS.BIT_FIELD_FILTER.value,
             self.REGIONS.BIT_FIELD_KEY_MAP.value,
             self.REGIONS.STRUCTURAL_DYNAMICS.value,
-            isinstance(
-                self._app_vertex.synapse_manager.synapse_dynamics,
-                AbstractSynapseDynamicsStructural))
+            isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural))
 
         # End the writing of this specification:
         spec.end_specification()
@@ -546,13 +562,17 @@ class PopulationMachineVertex(
     def set_reload_required(self, new_value):
         self.__change_requires_neuron_parameters_reload = new_value
 
-    def _reserve_memory_regions(self, spec, machine_graph, n_key_map):
+    def _reserve_memory_regions(
+            self, spec, machine_graph, n_key_map, all_syn_block_sz):
         """ Reserve the DSG data regions.
 
         :param ~.DataSpecificationGenerator spec:
             the spec to write the DSG region to
         :param ~.MachineGraph machine_graph: machine graph
         :param n_key_map: n key map
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The slice of the vertex to allocate for
+        :param ~.MachineVertex machine_vertex: The machine vertex
         :return: None
         """
         spec.comment("\nReserving memory space for data regions:\n\n")
@@ -583,6 +603,31 @@ class PopulationMachineVertex(
             self.REGIONS.BIT_FIELD_KEY_MAP.value)
 
         self.reserve_provenance_data_region(spec)
+
+        spec.reserve_memory_region(
+            region=self.REGIONS.SYNAPSE_PARAMS.value,
+            size=self._app_vertex.get_synapse_params_size(),
+            label='SynapseParams')
+
+        if all_syn_block_sz > 0:
+            spec.reserve_memory_region(
+                region=self.REGIONS.SYNAPTIC_MATRIX.value,
+                size=all_syn_block_sz, label='SynBlocks')
+
+        synapse_dynamics_sz = self._app_vertex.get_synapse_dynamics_size(
+            self.vertex_slice)
+        if synapse_dynamics_sz != 0:
+            spec.reserve_memory_region(
+                region=self.REGIONS.SYNAPSE_DYNAMICS.value,
+                size=synapse_dynamics_sz, label='synapseDynamicsParams')
+
+        structural_dynamics_sz = self._app_vertex.get_structural_dynamics_size(
+            self.vertex_slice)
+        if structural_dynamics_sz != 0:
+            spec.reserve_memory_region(
+                region=self.REGIONS.STRUCTURAL_DYNAMICS.value,
+                size=structural_dynamics_sz,
+                label='synapseDynamicsStructuralParams')
 
     @staticmethod
     def neuron_region_sdram_address(placement, transceiver):
@@ -645,14 +690,56 @@ class PopulationMachineVertex(
             self.vertex_slice)
         spec.write_array(neuron_data)
 
+    def _write_synapse_expander_data_spec(
+            self, spec, generator_data, weight_scales):
+        """ Write the data spec for the synapse expander
+
+        :param ~.DataSpecificationGenerator spec:
+            The specification to write to
+        :param list(GeneratorData) generator_data: The data to be written
+        :param weight_scales: scaling of weights on each synapse
+        :type weight_scales: list(int or float)
+        """
+        if not generator_data:
+            return
+
+        n_synapse_types = self._app_vertex.neuron_impl.get_n_synapse_types()
+        n_bytes = (
+            SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES +
+            (n_synapse_types * DataType.U3232.size))
+        for data in generator_data:
+            n_bytes += data.size
+
+        spec.reserve_memory_region(
+            region=self.REGIONS.CONNECTOR_BUILDER.value,
+            size=n_bytes, label="ConnectorBuilderRegion")
+        spec.switch_write_focus(self._connector_builder_region)
+
+        spec.write_value(len(generator_data))
+        spec.write_value(self.vertex_slice.lo_atom)
+        spec.write_value(self.vertex_slice.n_atoms)
+        spec.write_value(n_synapse_types)
+        spec.write_value(get_n_bits(n_synapse_types))
+        n_neuron_id_bits = get_n_bits(self.vertex_slice.n_atoms)
+        spec.write_value(n_neuron_id_bits)
+        for w in weight_scales:
+            # if the weights are high enough and the population size large
+            # enough, then weight_scales < 1 will result in a zero scale
+            # if converted to an int, so we use U3232 here instead (as there
+            # can be scales larger than U1616.max in conductance-based models)
+            dtype = DataType.U3232
+            spec.write_value(data=min(w, dtype.max), data_type=dtype)
+
+        for data in generator_data:
+            spec.write_array(data.gen_data)
+
     @overrides(AbstractSynapseExpandable.gen_on_machine)
     def gen_on_machine(self):
-        return self.app_vertex.synapse_manager.gen_on_machine(
-            self.vertex_slice)
+        return self.__synaptic_matrices.gen_on_machine
 
     @overrides(AbstractSynapseExpandable.read_generated_connection_holders)
     def read_generated_connection_holders(self, transceiver, placement):
-        self._app_vertex.synapse_manager.read_generated_connection_holders(
+        self.__synaptic_matrices.read_generated_connection_holders(
             transceiver, placement)
 
     @overrides(AbstractReadParametersBeforeSet.read_parameters_from_machine)
@@ -686,3 +773,24 @@ class PopulationMachineVertex(
         self._app_vertex.neuron_impl.read_data(
             byte_array, 0, vertex_slice, self._app_vertex.parameters,
             self._app_vertex.state_variables)
+
+    def get_connections_from_machine(
+            self, transceiver, placement, app_edge, synapse_info):
+        """ Get the connections from the machine for this vertex.
+
+        :param ~spinnman.transceiver.Transceiver transceiver:
+            How to read the connection data
+        :param ~pacman.model.placement.Placement placements:
+            Where the connection data is on the machine
+        :param ProjectionApplicationEdge app_edge:
+            The edge for which the data is being read
+        :param SynapseInformation synapse_info:
+            The specific projection within the edge
+        """
+        return self.__synaptic_matrices.get_connections_from_machine(
+            transceiver, placement, app_edge, synapse_info)
+
+    def clear_connection_cache(self):
+        """ Flush the cache of connection information; needed for a second run
+        """
+        self.__synaptic_matrices.clear_connection_cache()

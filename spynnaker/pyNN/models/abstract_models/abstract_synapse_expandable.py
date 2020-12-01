@@ -24,9 +24,6 @@ class AbstractSynapseExpandable(object):
     """ Indicates a class (most likely a MachineVertex) that has may need to\
         run the SYNAPSE_EXPANDER aplx
 
-    Cores that do not use the synapse_manager should not implement this
-    API even though their app vertex may hold a synapse_manager
-
     .. note::
         This is NOT implemented by the DelayExtensionMachineVertex
         which needs a different expander aplx
@@ -39,19 +36,11 @@ class AbstractSynapseExpandable(object):
         """
         True if the synapses of a the slice of this vertex should be generated
         on the machine.
-
-        .. note::
-            The typical implementation for this method will be to ask the
-            app_vertex's synapse_manager
         """
 
     @abstractmethod
     def read_generated_connection_holders(self, transceiver, placement):
         """ Fill in the connection holders
-
-        .. note::
-            The typical implementation for this method will be to ask the
-            app_vertex's synapse_manager
 
         :param ~spinnman.transceiver.Transceiver transceiver:
             How the data is to be read

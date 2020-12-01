@@ -28,6 +28,7 @@ from .synaptic_matrix import SynapticMatrix
 from .generator_data import GeneratorData, SYN_REGION_UNUSED
 from .synapse_io import (
     get_max_row_info, read_all_synapses, convert_to_connections)
+from .master_pop_table import MasterPopTableAsBinarySearch
 
 
 class SynapticMatrixApp(object):
@@ -130,7 +131,7 @@ class SynapticMatrixApp(object):
         # Calculate the max row info for this edge
         self.__max_row_info = get_max_row_info(
             synapse_info, self.__post_vertex_slice,
-            app_edge.n_delay_stages, self.__poptable,
+            app_edge.n_delay_stages,
             globals_variables.get_simulator().machine_time_step, app_edge)
 
         # These are set directly later
@@ -198,7 +199,8 @@ class SynapticMatrixApp(object):
         if self.__max_row_info.undelayed_max_n_synapses > 0:
             size = self.__n_sub_atoms * self.__max_row_info.undelayed_max_bytes
             for _ in range(self.__n_sub_edges):
-                addr = self.__poptable.get_next_allowed_address(addr)
+                addr = MasterPopTableAsBinarySearch.get_next_allowed_address(
+                    addr)
                 addr += size
         return addr
 
@@ -214,7 +216,8 @@ class SynapticMatrixApp(object):
                     self.__max_row_info.delayed_max_bytes *
                     self.__app_edge.n_delay_stages)
             for _ in range(self.__n_sub_edges):
-                addr = self.__poptable.get_next_allowed_address(addr)
+                addr = MasterPopTableAsBinarySearch.get_next_allowed_address(
+                    addr)
                 addr += size
         return addr
 

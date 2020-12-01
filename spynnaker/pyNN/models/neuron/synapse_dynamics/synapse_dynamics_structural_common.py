@@ -21,10 +21,6 @@ from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
 from spinn_utilities.overrides import overrides
 from data_specification.enums.data_type import DataType
-from pacman.model.graphs.application import (
-    ApplicationGraph, ApplicationVertex)
-from pacman.model.graphs.machine import (MachineGraph, MachineVertex)
-from pacman.exceptions import PacmanInvalidParameterException
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION, MICRO_TO_SECOND_CONVERSION,
     BYTES_PER_WORD, BYTES_PER_SHORT)
@@ -142,8 +138,9 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
             dynamics.elimination.write_parameters(
                 spec, weight_scales[synapse_info.synapse_type])
 
-    def __get_structural_edges_by_app(self, app_graph, app_vertex):
-        """
+    def __get_structural_edges_by_app(self, incoming_projections):
+        """ Get structural edges using the projections
+
         :param ~pacman.model.graphs.application.ApplicationGraph app_graph:
         :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
         :rtype: dict(ProjectionApplicationEdge, SynapseInformation)
@@ -353,30 +350,20 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
     @overrides(AbstractSynapseDynamicsStructural.
                get_structural_parameters_sdram_usage_in_bytes)
     def get_structural_parameters_sdram_usage_in_bytes(
-            self, graph, vertex, n_neurons):
+            self, incoming_projections, n_neurons):
         # Work out how many sub-edges we will end up with, as this is used
         # for key_atom_info
-        n_sub_edges = 0
-        if (isinstance(graph, ApplicationGraph) and
-                isinstance(vertex, ApplicationVertex)):
-            structural_edges = self.__get_structural_edges_by_app(
-                graph, vertex)
-            machine_edges_by_app = None
-        elif (isinstance(graph, MachineGraph) and
-                isinstance(vertex, MachineVertex)):
-            structural_edges, machine_edges_by_app = \
-                self.__get_structural_edges_by_machine(graph, vertex)
-        else:
-            raise PacmanInvalidParameterException(
-                "vertex", vertex, "Not at the same level as graph")
-        # Also keep track of the parameter sizes
+        structural_edges = self.__get_structural_edges_by_app(
+            incoming_projections)
 
         # pylint: disable=no-member
         param_sizes = (
             self.partner_selection.get_parameters_sdram_usage_in_bytes())
+        n_sub_edges = 0
         for (app_edge, synapse_info) in structural_edges.items():
-            if machine_edges_by_app:
-                n_sub_edges += len(machine_edges_by_app[app_edge])
+            if app_edge.pre_vertex.machine_vertices:
+                # TODO: Check the type of the vertices
+                n_sub_edges += len(app_edge.pre_vertex.machine_vertices)
             else:
                 max_atoms = app_edge.pre_vertex.get_max_atoms_per_core()
                 if app_edge.pre_vertex.n_atoms < max_atoms:

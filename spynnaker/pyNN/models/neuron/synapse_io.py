@@ -26,6 +26,7 @@ from spynnaker.pyNN.exceptions import SynapseRowTooBigException
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractStaticSynapseDynamics, AbstractSynapseDynamicsStructural,
     AbstractSynapseDynamics)
+from .master_pop_table import MasterPopTableAsBinarySearch
 
 _N_HEADER_WORDS = 3
 # There are 16 slots, one per time step
@@ -140,8 +141,8 @@ def get_maximum_delay_supported_in_ms(machine_time_step):
 
 
 def get_max_row_info(
-        synapse_info, post_vertex_slice, n_delay_stages,
-        population_table, machine_time_step, in_edge):
+        synapse_info, post_vertex_slice, n_delay_stages, machine_time_step,
+        in_edge):
     """ Get the information about the maximum lengths of delayed and\
         undelayed rows in bytes (including header), words (without header)\
         and number of synapses
@@ -152,8 +153,6 @@ def get_max_row_info(
         The slice of the machine vertex being represented
     :param int n_delay_stages:
         The number of delay stages on the edge
-    :param MasterPopTableAsBinarySearch population_table:
-        The population table to be used
     :param int machine_time_step:
         The time step of the simulation
     :param ProjectionApplicationEdge in_edge:
@@ -205,11 +204,9 @@ def get_max_row_info(
 
     # Adjust for the allowed row lengths from the population table
     undelayed_max_n_words = _get_allowed_row_length(
-        undelayed_n_words, dynamics, population_table, in_edge,
-        max_undelayed_n_synapses)
+        undelayed_n_words, dynamics, in_edge,  max_undelayed_n_synapses)
     delayed_max_n_words = _get_allowed_row_length(
-        delayed_n_words, dynamics, population_table, in_edge,
-        max_delayed_n_synapses)
+        delayed_n_words, dynamics, in_edge, max_delayed_n_synapses)
 
     undelayed_max_bytes = 0
     if undelayed_max_n_words > 0:
@@ -226,15 +223,12 @@ def get_max_row_info(
         undelayed_max_n_words, delayed_max_n_words)
 
 
-def _get_allowed_row_length(
-        n_words, dynamics, population_table, in_edge, n_synapses):
+def _get_allowed_row_length(n_words, dynamics, in_edge, n_synapses):
     """ Get the allowed row length in words in the population table for a
         desired row length in words
 
     :param int n_words: The number of words in the row
     :param AbstractSynapseDynamics dynamics: The synapse dynamics used
-    :param MasterPopTableAsBinarySearch population_table:
-        The population table that holds the row lengths
     :param ProjectionApplicationEdge in_edge: The incoming edge
     :param int n_synapses: The number of synapses for the number of words
     :raises SynapseRowTooBigException:
@@ -243,7 +237,7 @@ def _get_allowed_row_length(
     if n_words == 0:
         return 0
     try:
-        return population_table.get_allowed_row_length(n_words)
+        return MasterPopTableAsBinarySearch.get_allowed_row_length(n_words)
     except SynapseRowTooBigException as e:
         # Find the number of synapses available for the maximum population
         # table size, as extracted from the exception

@@ -199,9 +199,8 @@ class PyNNProjectionCommon(object):
         # add projection to the SpiNNaker control system
         spinnaker_control.add_projection(self)
 
-        # reset the ring buffer shifts
-        post_vertex = post_synaptic_population._get_vertex
-        post_vertex.reset_ring_buffer_shifts()
+        # Add to the list of incoming projections
+        post_vertex.add_incoming_projection(self)
 
         # If there is a virtual board, we need to hold the data in case the
         # user asks for it

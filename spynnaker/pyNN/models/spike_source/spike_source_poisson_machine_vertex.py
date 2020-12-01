@@ -45,6 +45,8 @@ from spinn_front_end_common.interface.profiling import (
     AbstractHasProfileData, profile_utils)
 from spinn_front_end_common.interface.profiling.profile_utils import (
     get_profiling_data)
+from spinn_front_end_common.abstract_models.impl\
+    .tdma_aware_application_vertex import get_tdma_provenance_item
 from spynnaker.pyNN.models.abstract_models import (
     AbstractMaxSpikes, AbstractReadParametersBeforeSet)
 from spynnaker.pyNN.utilities import constants
@@ -229,7 +231,7 @@ class SpikeSourcePoissonMachineVertex(
         label, x, y, p, names = self._get_placement_details(placement)
 
         provenance_items.append(
-            self._app_vertex.get_tdma_provenance_item(
+            get_tdma_provenance_item(
                 names, x, y, p, n_times_tdma_fell_behind))
         return provenance_items
 

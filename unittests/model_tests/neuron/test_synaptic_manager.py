@@ -35,7 +35,6 @@ from pacman.model.routing_info import (
 from pacman.model.graphs.application import ApplicationVertex
 from data_specification import (
     DataSpecificationGenerator, DataSpecificationExecutor)
-from spynnaker.pyNN.models.neuron import SynapticManager
 from spynnaker.pyNN.abstract_spinnaker_common import AbstractSpiNNakerCommon
 import spynnaker.pyNN.abstract_spinnaker_common as abstract_spinnaker_common
 from spynnaker.pyNN.models.neural_projections import (
@@ -62,8 +61,12 @@ from unittests.mocks import MockSimulator
 from pacman.model.placements.placements import Placements
 from pacman.model.graphs.application.application_graph import ApplicationGraph
 from data_specification.constants import MAX_MEM_REGIONS
-from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
 import io
+from spynnaker.pyNN.models.neuron.builds.if_curr_exp_base import IFCurrExpBase
+from pacman.model.routing_info import DictBasedMachinePartitionNKeysMap
+from pacman.executor.injection_decorator import injection_context
+from spinn_front_end_common.interface.interface_functions import (
+    LocalTDMABuilder)
 
 
 class MockSynapseIO(object):
@@ -131,6 +134,13 @@ class SimpleApplicationVertex(ApplicationVertex):
         pass
 
 
+class MockProjection(object):
+
+    def __init__(self, projection_edge, synapse_information):
+        self._projection_edge = projection_edge
+        self._synapse_information = synapse_information
+
+
 def say_false(self, weights, delays):
     return False
 
@@ -138,7 +148,7 @@ def say_false(self, weights, delays):
 def test_write_data_spec():
     MockSimulator.setup()
     # Add an sdram so max SDRAM is high enough
-    SDRAM(10000)
+    SDRAM(100000)
 
     # UGLY but the mock transceiver NEED generate_on_machine to be False
     AbstractGenerateConnectorOnMachine.generate_on_machine = say_false
@@ -158,7 +168,11 @@ def test_write_data_spec():
     pre_vertex = pre_app_vertex.create_machine_vertex(
         pre_vertex_slice, None)
     placements.add_placement(Placement(pre_vertex, 0, 0, 1))
-    post_app_vertex = SimpleApplicationVertex(10, label="post")
+    post_app_model = IFCurrExpBase()
+    post_app_vertex = post_app_model.create_vertex(
+        n_neurons=10, label="post", constraints=None, spikes_per_second=None,
+        ring_buffer_sigma=None, incoming_spike_buffer_size=None,
+        n_steps_per_timestep=1, drop_late_spikes=True)
     post_vertex_slice = Slice(0, 9)
     post_vertex = post_app_vertex.create_machine_vertex(
         post_vertex_slice, None)
@@ -201,6 +215,14 @@ def test_write_data_spec():
     app_edge.add_synapse_information(direct_synapse_information_2)
     app_edge.add_synapse_information(all_to_all_synapse_information)
     app_edge.add_synapse_information(from_list_synapse_information)
+    post_app_vertex.add_incoming_projection(MockProjection(
+        app_edge, direct_synapse_information_1))
+    post_app_vertex.add_incoming_projection(MockProjection(
+        app_edge, direct_synapse_information_2))
+    post_app_vertex.add_incoming_projection(MockProjection(
+        app_edge, all_to_all_synapse_information))
+    post_app_vertex.add_incoming_projection(MockProjection(
+        app_edge, from_list_synapse_information))
     delay_app_vertex.n_delay_stages = n_delay_stages
     delay_edge = DelayedApplicationEdge(
         delay_app_vertex, post_app_vertex, direct_synapse_information_1,
@@ -231,28 +253,36 @@ def test_write_data_spec():
 
     routing_info = RoutingInfo()
     key = 0
+    pre_vertex_part = graph.get_outgoing_edge_partition_starting_at_vertex(
+        pre_vertex, partition_name)
     routing_info.add_partition_info(PartitionRoutingInfo(
-        [BaseKeyAndMask(key, 0xFFFFFFF0)],
-        graph.get_outgoing_edge_partition_starting_at_vertex(
-            pre_vertex, partition_name)))
+        [BaseKeyAndMask(key, 0xFFFFFFF0)], pre_vertex_part))
     delay_key = 0xF0
     delay_key_and_mask = BaseKeyAndMask(delay_key, 0xFFFFFFF0)
+    delay_vertex_part = graph.get_outgoing_edge_partition_starting_at_vertex(
+        delay_vertex, partition_name)
     delay_routing_info = PartitionRoutingInfo(
-        [delay_key_and_mask],
-        graph.get_outgoing_edge_partition_starting_at_vertex(
-            delay_vertex, partition_name))
+        [delay_key_and_mask], delay_vertex_part)
     routing_info.add_partition_info(delay_routing_info)
+    n_key_map = DictBasedMachinePartitionNKeysMap()
+    n_key_map.set_n_keys_for_partition(pre_vertex_part, 10)
+    n_key_map.set_n_keys_for_partition(delay_vertex_part, 10)
+
+    LocalTDMABuilder().__call__(
+        graph, machine_time_step, 1.0, n_key_map, app_graph)
 
     temp_spec = tempfile.mktemp()
     spec = DataSpecificationGenerator(io.FileIO(temp_spec, "wb"), None)
 
-    synaptic_manager = SynapticManager(
-        n_synapse_types=2, ring_buffer_sigma=5.0,
-        spikes_per_second=100.0, config=config, drop_late_spikes=True)
-    synaptic_manager.write_data_spec(
-        spec, post_app_vertex, post_vertex_slice, post_vertex,
-        graph, app_graph, routing_info, 1.0, machine_time_step)
-    spec.end_specification()
+    with injection_context({
+            "MachineTimeStep": machine_time_step,
+            "TimeScaleFactor": 1.0,
+            "MemoryMachineGraph": graph,
+            "MemoryRoutingInfos": routing_info,
+            "DataNTimeSteps": 100,
+            "MemoryMachinePartitionNKeysMap": n_key_map}):
+
+        post_vertex.generate_data_specification(spec, post_vertex_placement)
 
     with io.FileIO(temp_spec, "rb") as spec_reader:
         executor = DataSpecificationExecutor(spec_reader, 20000)
@@ -268,7 +298,7 @@ def test_write_data_spec():
     transceiver = MockTransceiverRawData(all_data)
     report_folder = mkdtemp()
     try:
-        connections_1 = synaptic_manager.get_connections_from_machine(
+        connections_1 = post_app_vertex.get_connections_from_machine(
             transceiver, placements, app_edge,
             direct_synapse_information_1)
 
@@ -277,7 +307,7 @@ def test_write_data_spec():
         assert all([conn["weight"] == 1.5 for conn in connections_1])
         assert all([conn["delay"] == 1.0 for conn in connections_1])
 
-        connections_2 = synaptic_manager.get_connections_from_machine(
+        connections_2 = post_app_vertex.get_connections_from_machine(
             transceiver, placements, app_edge,
             direct_synapse_information_2)
 
@@ -286,7 +316,7 @@ def test_write_data_spec():
         assert all([conn["weight"] == 2.5 for conn in connections_2])
         assert all([conn["delay"] == 2.0 for conn in connections_2])
 
-        connections_3 = synaptic_manager.get_connections_from_machine(
+        connections_3 = post_app_vertex.get_connections_from_machine(
             transceiver, placements, app_edge,
             all_to_all_synapse_information)
 
@@ -296,7 +326,7 @@ def test_write_data_spec():
         assert all([conn["weight"] == 4.5 for conn in connections_3])
         assert all([conn["delay"] == 4.0 for conn in connections_3])
 
-        connections_4 = synaptic_manager.get_connections_from_machine(
+        connections_4 = post_app_vertex.get_connections_from_machine(
             transceiver, placements, app_edge,
             from_list_synapse_information)
 
@@ -312,14 +342,11 @@ def test_write_data_spec():
 
 def test_set_synapse_dynamics():
     MockSimulator.setup()
-    default_config_paths = os.path.join(
-        os.path.dirname(abstract_spinnaker_common.__file__),
-        AbstractSpiNNakerCommon.CONFIG_FILE_NAME)
-    config = conf_loader.load_config(
-        AbstractSpiNNakerCommon.CONFIG_FILE_NAME, default_config_paths)
-    synaptic_manager = SynapticManager(
-        n_synapse_types=2, ring_buffer_sigma=5.0,
-        spikes_per_second=100.0, config=config, drop_late_spikes=True)
+    post_app_model = IFCurrExpBase()
+    post_app_vertex = post_app_model.create_vertex(
+        n_neurons=10, label="post", constraints=None, spikes_per_second=None,
+        ring_buffer_sigma=None, incoming_spike_buffer_size=None,
+        n_steps_per_timestep=1, drop_late_spikes=True)
 
     static = SynapseDynamicsStatic()
     stdp = SynapseDynamicsSTDP(
@@ -356,121 +383,124 @@ def test_set_synapse_dynamics():
         weight_dependence=WeightDependenceMultiplicative())
 
     # This should be fine as it is the first call
-    synaptic_manager.synapse_dynamics = static
+    post_app_vertex.synapse_dynamics = static
 
     # This should be fine as STDP overrides static
-    synaptic_manager.synapse_dynamics = stdp
+    post_app_vertex.synapse_dynamics = stdp
 
     # This should fail because STDP dependences are difference
     with pytest.raises(SynapticConfigurationException):
-        synaptic_manager.synapse_dynamics = alt_stdp
+        post_app_vertex.synapse_dynamics = alt_stdp
 
     # This should work because STDP dependences are the same
-    synaptic_manager.synapse_dynamics = stdp
+    post_app_vertex.synapse_dynamics = stdp
 
     # This should work because static always works, but the type should
     # still be STDP
-    synaptic_manager.synapse_dynamics = static
+    post_app_vertex.synapse_dynamics = static
     assert isinstance(
-        synaptic_manager.synapse_dynamics, SynapseDynamicsSTDP)
+        post_app_vertex.synapse_dynamics, SynapseDynamicsSTDP)
 
     # This should work but should merge with the STDP rule
-    synaptic_manager.synapse_dynamics = static_struct
+    post_app_vertex.synapse_dynamics = static_struct
     assert isinstance(
-        synaptic_manager.synapse_dynamics, SynapseDynamicsStructuralSTDP)
+        post_app_vertex.synapse_dynamics, SynapseDynamicsStructuralSTDP)
 
     # These should work as static / the STDP is the same but neither should
     # change anything
-    synaptic_manager.synapse_dynamics = static
+    post_app_vertex.synapse_dynamics = static
     assert isinstance(
-        synaptic_manager.synapse_dynamics, SynapseDynamicsStructuralSTDP)
-    synaptic_manager.synapse_dynamics = stdp
+        post_app_vertex.synapse_dynamics, SynapseDynamicsStructuralSTDP)
+    post_app_vertex.synapse_dynamics = stdp
     assert isinstance(
-        synaptic_manager.synapse_dynamics, SynapseDynamicsStructuralSTDP)
-    synaptic_manager.synapse_dynamics = static_struct
+        post_app_vertex.synapse_dynamics, SynapseDynamicsStructuralSTDP)
+    post_app_vertex.synapse_dynamics = static_struct
     assert isinstance(
-        synaptic_manager.synapse_dynamics, SynapseDynamicsStructuralSTDP)
+        post_app_vertex.synapse_dynamics, SynapseDynamicsStructuralSTDP)
 
     # These should fail as things are different
     with pytest.raises(SynapticConfigurationException):
-        synaptic_manager.synapse_dynamics = alt_static_struct
+        post_app_vertex.synapse_dynamics = alt_static_struct
     with pytest.raises(SynapticConfigurationException):
-        synaptic_manager.synapse_dynamics = alt_stdp
+        post_app_vertex.synapse_dynamics = alt_stdp
 
     # This should pass as same structural STDP
-    synaptic_manager.synapse_dynamics = stdp_struct
+    post_app_vertex.synapse_dynamics = stdp_struct
     assert isinstance(
-        synaptic_manager.synapse_dynamics, SynapseDynamicsStructuralSTDP)
+        post_app_vertex.synapse_dynamics, SynapseDynamicsStructuralSTDP)
 
     # These should fail as both different
     with pytest.raises(SynapticConfigurationException):
-        synaptic_manager.synapse_dynamics = alt_stdp_struct
+        post_app_vertex.synapse_dynamics = alt_stdp_struct
     with pytest.raises(SynapticConfigurationException):
-        synaptic_manager.synapse_dynamics = alt_stdp_struct_2
+        post_app_vertex.synapse_dynamics = alt_stdp_struct_2
 
     # Try starting again to get a couple more combinations
-    synaptic_manager = SynapticManager(
-        n_synapse_types=2, ring_buffer_sigma=5.0,
-        spikes_per_second=100.0, config=config, drop_late_spikes=True)
+    post_app_vertex = post_app_model.create_vertex(
+        n_neurons=10, label="post", constraints=None, spikes_per_second=None,
+        ring_buffer_sigma=None, incoming_spike_buffer_size=None,
+        n_steps_per_timestep=1, drop_late_spikes=True)
 
     # STDP followed by structural STDP should result in Structural STDP
-    synaptic_manager.synapse_dynamics = stdp
-    synaptic_manager.synapse_dynamics = stdp_struct
+    post_app_vertex.synapse_dynamics = stdp
+    post_app_vertex.synapse_dynamics = stdp_struct
     assert isinstance(
-        synaptic_manager.synapse_dynamics, SynapseDynamicsStructuralSTDP)
+        post_app_vertex.synapse_dynamics, SynapseDynamicsStructuralSTDP)
 
     # ... and should fail here because of differences
     with pytest.raises(SynapticConfigurationException):
-        synaptic_manager.synapse_dynamics = alt_stdp
+        post_app_vertex.synapse_dynamics = alt_stdp
     with pytest.raises(SynapticConfigurationException):
-        synaptic_manager.synapse_dynamics = alt_static_struct
+        post_app_vertex.synapse_dynamics = alt_static_struct
     with pytest.raises(SynapticConfigurationException):
-        synaptic_manager.synapse_dynamics = alt_stdp_struct
+        post_app_vertex.synapse_dynamics = alt_stdp_struct
     with pytest.raises(SynapticConfigurationException):
-        synaptic_manager.synapse_dynamics = alt_stdp_struct_2
+        post_app_vertex.synapse_dynamics = alt_stdp_struct_2
 
     # One more time!
-    synaptic_manager = SynapticManager(
-        n_synapse_types=2, ring_buffer_sigma=5.0,
-        spikes_per_second=100.0, config=config, drop_late_spikes=True)
+    post_app_vertex = post_app_model.create_vertex(
+        n_neurons=10, label="post", constraints=None, spikes_per_second=None,
+        ring_buffer_sigma=None, incoming_spike_buffer_size=None,
+        n_steps_per_timestep=1, drop_late_spikes=True)
 
     # Static followed by static structural should result in static
     # structural
-    synaptic_manager.synapse_dynamics = static
-    synaptic_manager.synapse_dynamics = static_struct
+    post_app_vertex.synapse_dynamics = static
+    post_app_vertex.synapse_dynamics = static_struct
     assert isinstance(
-        synaptic_manager.synapse_dynamics, SynapseDynamicsStructuralStatic)
+        post_app_vertex.synapse_dynamics, SynapseDynamicsStructuralStatic)
 
     # ... and should fail here because of differences
     with pytest.raises(SynapticConfigurationException):
-        synaptic_manager.synapse_dynamics = alt_static_struct
+        post_app_vertex.synapse_dynamics = alt_static_struct
     with pytest.raises(SynapticConfigurationException):
-        synaptic_manager.synapse_dynamics = alt_stdp_struct
+        post_app_vertex.synapse_dynamics = alt_stdp_struct
 
     # This should be fine
-    synaptic_manager.synapse_dynamics = static
+    post_app_vertex.synapse_dynamics = static
 
     # This should be OK, but should merge with STDP (opposite of above)
-    synaptic_manager.synapse_dynamics = stdp
+    post_app_vertex.synapse_dynamics = stdp
     assert isinstance(
-        synaptic_manager.synapse_dynamics, SynapseDynamicsStructuralSTDP)
+        post_app_vertex.synapse_dynamics, SynapseDynamicsStructuralSTDP)
 
     # ... and now these should fail
     with pytest.raises(SynapticConfigurationException):
-        synaptic_manager.synapse_dynamics = alt_stdp
+        post_app_vertex.synapse_dynamics = alt_stdp
     with pytest.raises(SynapticConfigurationException):
-        synaptic_manager.synapse_dynamics = alt_static_struct
+        post_app_vertex.synapse_dynamics = alt_static_struct
     with pytest.raises(SynapticConfigurationException):
-        synaptic_manager.synapse_dynamics = alt_stdp_struct
+        post_app_vertex.synapse_dynamics = alt_stdp_struct
     with pytest.raises(SynapticConfigurationException):
-        synaptic_manager.synapse_dynamics = alt_stdp_struct_2
+        post_app_vertex.synapse_dynamics = alt_stdp_struct_2
 
     # OK, just one more, honest
-    synaptic_manager = SynapticManager(
-        n_synapse_types=2, ring_buffer_sigma=5.0,
-        spikes_per_second=100.0, config=config, drop_late_spikes=True)
-    synaptic_manager.synapse_dynamics = static_struct
-    synaptic_manager.synapse_dynamics = stdp_struct
+    post_app_vertex = post_app_model.create_vertex(
+        n_neurons=10, label="post", constraints=None, spikes_per_second=None,
+        ring_buffer_sigma=None, incoming_spike_buffer_size=None,
+        n_steps_per_timestep=1, drop_late_spikes=True)
+    post_app_vertex.synapse_dynamics = static_struct
+    post_app_vertex.synapse_dynamics = stdp_struct
 
 
 @pytest.mark.parametrize(
@@ -497,12 +527,6 @@ def test_pop_based_master_pop_table_standard(
     # Add an sdram so max SDRAM is high enough
     SDRAM(4000000)
 
-    default_config_paths = os.path.join(
-        os.path.dirname(abstract_spinnaker_common.__file__),
-        AbstractSpiNNakerCommon.CONFIG_FILE_NAME)
-    config = conf_loader.load_config(
-        AbstractSpiNNakerCommon.CONFIG_FILE_NAME, default_config_paths)
-
     # Make simple source and target, where the source has 1000 atoms
     # split into 10 vertices (100 each) and the target has 100 atoms in
     # a single vertex
@@ -510,9 +534,13 @@ def test_pop_based_master_pop_table_standard(
     mac_graph = MachineGraph("Test", app_graph)
     pre_app_vertex = SimpleApplicationVertex(1000)
     app_graph.add_vertex(pre_app_vertex)
-    post_vertex_slice = Slice(0, 99)
-    post_app_vertex = SimpleApplicationVertex(100)
+    post_app_model = IFCurrExpBase()
+    post_app_vertex = post_app_model.create_vertex(
+        n_neurons=10, label="post", constraints=None, spikes_per_second=None,
+        ring_buffer_sigma=None, incoming_spike_buffer_size=None,
+        n_steps_per_timestep=1, drop_late_spikes=True)
     app_graph.add_vertex(post_app_vertex)
+    post_vertex_slice = Slice(0, 9)
     post_mac_vertex = post_app_vertex.create_machine_vertex(
         post_vertex_slice, None)
     mac_graph.add_vertex(post_mac_vertex)
@@ -540,6 +568,7 @@ def test_pop_based_master_pop_table_standard(
     # Make the routing info line up to force an app key in the pop table if
     # the constraints match up
     routing_info = RoutingInfo()
+    n_key_map = DictBasedMachinePartitionNKeysMap()
     n_key_bits = int(math.ceil(math.log(100, 2)))
     n_keys = 2**n_key_bits
     mask = 0xFFFFFFFF - (n_keys - 1)
@@ -563,6 +592,8 @@ def test_pop_based_master_pop_table_standard(
     app_edge = ProjectionApplicationEdge(
         pre_app_vertex, post_app_vertex, synapse_info)
     app_graph.add_edge(app_edge, "Test")
+    post_app_vertex.add_incoming_projection(MockProjection(
+        app_edge, synapse_info))
 
     # Create the machine edges
     for pre_mac_vertex in pre_app_vertex.machine_vertices:
@@ -575,6 +606,7 @@ def test_pop_based_master_pop_table_standard(
             partition_info = PartitionRoutingInfo(
                 [BaseKeyAndMask(i * n_keys, mask)], partition)
             routing_info.add_partition_info(partition_info)
+            n_key_map.set_n_keys_for_partition(partition, n_keys)
 
     # Create the delay application edge and delay machine edges
     if delayed_indices_connected:
@@ -595,17 +627,25 @@ def test_pop_based_master_pop_table_standard(
                     [BaseKeyAndMask(base_d_key + (i * n_keys), mask)],
                     partition)
                 routing_info.add_partition_info(partition_info)
+                n_key_map.set_n_keys_for_partition(partition, n_keys)
+
+    LocalTDMABuilder().__call__(
+        mac_graph, 1000, 1.0, n_key_map, app_graph)
 
     # Generate the data
     temp_spec = tempfile.mktemp()
     spec = DataSpecificationGenerator(io.FileIO(temp_spec, "wb"), None)
-    synaptic_manager = SynapticManager(
-        n_synapse_types=2, ring_buffer_sigma=5.0,
-        spikes_per_second=100.0, config=config, drop_late_spikes=True)
-    synaptic_manager.write_data_spec(
-        spec, post_app_vertex, post_vertex_slice, post_mac_vertex,
-        mac_graph, app_graph, routing_info, 1.0, 1.0)
-    spec.end_specification()
+
+    with injection_context({
+            "MachineTimeStep": 1000,
+            "TimeScaleFactor": 1.0,
+            "MemoryMachineGraph": mac_graph,
+            "MemoryRoutingInfos": routing_info,
+            "DataNTimeSteps": 100,
+            "MemoryMachinePartitionNKeysMap": n_key_map}):
+
+        post_mac_vertex.generate_data_specification(spec, None)
+
     with io.FileIO(temp_spec, "rb") as spec_reader:
         executor = DataSpecificationExecutor(
             spec_reader, SDRAM.max_sdram_found)
@@ -613,7 +653,7 @@ def test_pop_based_master_pop_table_standard(
 
     # Read the population table and check entries
     region = executor.get_region(
-        POPULATION_BASED_REGIONS.POPULATION_TABLE.value)
+        post_mac_vertex.REGIONS.POPULATION_TABLE.value)
     mpop_data = numpy.frombuffer(
         region.region_data, dtype="uint8").view("uint32")
     n_entries = mpop_data[0]
