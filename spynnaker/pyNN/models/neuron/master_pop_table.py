@@ -448,7 +448,7 @@ class MasterPopTableAsBinarySearch(object):
                 "The core mask of {} is too big (maximum {})".format(
                     core_mask, _MAX_CORE_MASK))
 
-        self.__update_master_population_table(
+        return self.__update_master_population_table(
             block_start_addr, row_length, key_and_mask, core_mask, core_shift,
             n_neurons, False)
 
