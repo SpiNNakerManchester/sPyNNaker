@@ -573,4 +573,4 @@ class AbstractPopulationVertex(
             self.__change_requires_data_generation = True
             for vertex in self.machine_vertices:
                 if isinstance(vertex, AbstractRewritesDataSpecification):
-                    vertex.set_reload_required(False)
+                    vertex.set_reload_required(True)
