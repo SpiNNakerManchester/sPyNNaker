@@ -56,22 +56,6 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
             self, src_machine_vertex, dest_machine_vertex,
             common_edge_type, app_edge, machine_graph,
             app_outgoing_edge_partition, resource_tracker):
-        """ overridable method for creating the machine edges from\
-            SplitterPartitioner
-
-        :param MachineVertex src_machine_vertex: the src machine vertex of \
-            the new machine edge.
-        :param MachineVertex dest_machine_vertex: the dest machine vertex of \
-            the new machine edge.
-        :param MachineEdge common_edge_type: the edge type to build.
-        :param ApplicationEdge app_edge: the app edge this machine edge is \
-            associated with
-        :param MachineGraph machine_graph: the machine graph
-        :param Resource resource_tracker: the resource tracker
-        :param OutgoingEdgePartition app_outgoing_edge_partition: \
-            the outgoing partition to get the identifier for.
-        :rtype: None
-        """
 
         # filter off connectivity
         if (isinstance(app_edge, AbstractSlicesConnect) and not
