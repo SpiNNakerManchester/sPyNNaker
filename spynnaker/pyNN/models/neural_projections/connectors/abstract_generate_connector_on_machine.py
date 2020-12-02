@@ -17,6 +17,9 @@ from pyNN.random import available_distributions, RandomDistribution
 from enum import Enum
 import numpy
 from six import with_metaclass
+
+from spinn_front_end_common.utilities import (
+    globals_variables, helpful_functions)
 from spinn_utilities.abstract_base import abstractproperty, AbstractBase
 from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
@@ -58,7 +61,8 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
     __slots__ = [
         "__delay_seed",
         "__weight_seed",
-        "__connector_seed"
+        "__connector_seed",
+        "__use_expander"
     ]
 
     def __init__(self, safe=True, callback=None, verbose=False):
@@ -72,6 +76,9 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         self.__delay_seed = dict()
         self.__weight_seed = dict()
         self.__connector_seed = dict()
+        config = globals_variables.get_simulator().config
+        self.__use_expander = helpful_functions.read_config_boolean(
+            config, "Synapses", "use_expander")
 
     def _generate_lists_on_machine(self, values):
         """ Checks if the connector should generate lists on machine rather\
@@ -82,6 +89,9 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         :type values: int or ~pyNN.random.NumpyRNG
         :rtype: bool
         """
+
+        if not self.__use_expander:
+            return False
 
         # Scalars are fine on the machine
         if numpy.isscalar(values):

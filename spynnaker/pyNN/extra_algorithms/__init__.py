@@ -20,8 +20,11 @@ from .spynnaker_data_specification_writer import (
 from .spynnaker_machine_bit_field_router_compressor import (
     SpynnakerMachineBitFieldPairRouterCompressor,
     SpynnakerMachineBitFieldUnorderedRouterCompressor)
+from .spynnaker_host_execute_data_specification import (
+    SpyNNakerHostExecuteDataSpecification)
 
 __all__ = ["GraphEdgeWeightUpdater", "OnChipBitFieldGenerator",
            "SpynnakerDataSpecificationWriter",
            "SpynnakerMachineBitFieldPairRouterCompressor",
-           "SpynnakerMachineBitFieldUnorderedRouterCompressor"]
+           "SpynnakerMachineBitFieldUnorderedRouterCompressor",
+           "SpyNNakerHostExecuteDataSpecification"]

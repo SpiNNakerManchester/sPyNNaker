@@ -148,7 +148,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
             if high is None:
                 return max_estimated_delay
 
-            # The maximum is the minimum of the possible maximums
+            # The minimum is the maximum of the possible minimums
             return min(max_estimated_delay, high)
         elif numpy.isscalar(delays):
             return delays

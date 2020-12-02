@@ -208,7 +208,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
 
         # Now do the actual random choice from the available connections
         try:
-            chosen = numpy.random.choice(
+            chosen = self._rng.choice(
                 pairs.shape[0], size=n_connections,
                 replace=self.__with_replacement)
         except Exception as e:  # pylint: disable=broad-except
