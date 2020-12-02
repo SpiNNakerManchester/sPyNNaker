@@ -215,7 +215,7 @@ static inline void process_fixed_synapses(
 
         //io_printf(IO_BUF, "acc %k index %d\n", accumulation, ring_buffer_index);
 
-        //io_printf(IO_BUF, "added %k * %k = %k sh %k\n", weight, rate, ring_buffers[ring_buffer_index], (rate * weight));
+        io_printf(IO_BUF, "weight %k in rate %k\n", weight, rate);
     }
 }
 
@@ -234,7 +234,7 @@ bool synapses_initialise(
         address_t synapse_params_address, address_t direct_matrix_address,
         uint32_t n_neurons_value, uint32_t n_synapse_types_value,
         uint32_t **ring_buffer_to_input_buffer_left_shifts,
-        address_t *direct_synapses_address, REAL starting_rate,
+        address_t *dtcm_synaptic_matrix, REAL starting_rate,
         address_t synaptic_matrix_address) {
 
     size_t synaptic_matrix_size;
@@ -255,6 +255,9 @@ bool synapses_initialise(
         synaptic_matrix, synaptic_matrix_address,
         synaptic_matrix_size * sizeof(uint32_t));
 
+    // address_t is a uint32_t*
+    *dtcm_synaptic_matrix = synaptic_matrix;
+
     // Set up ring buffer left shifts
     ring_buffer_to_input_left_shifts =
             spin1_malloc(n_synapse_types * sizeof(uint32_t));
@@ -269,23 +272,24 @@ bool synapses_initialise(
             ring_buffer_to_input_left_shifts;
 
 
+    // REMOVE
     // Work out the positions of the direct and indirect synaptic matrices
     // and copy the direct matrix to DTCM
-    uint32_t direct_matrix_size = direct_matrix_address[0];
-    log_debug("Direct matrix malloc size is %d", direct_matrix_size);
-
-    if (direct_matrix_size != 0) {
-        *direct_synapses_address = spin1_malloc(direct_matrix_size);
-        if (*direct_synapses_address == NULL) {
-            log_error("Not enough memory to allocate direct matrix");
-            return false;
-        }
-        log_debug("Copying %u bytes of direct synapses to 0x%08x",
-                direct_matrix_size, *direct_synapses_address);
-        spin1_memcpy(
-                *direct_synapses_address, &direct_matrix_address[1],
-                direct_matrix_size);
-    }
+//    uint32_t direct_matrix_size = direct_matrix_address[0];
+//    log_debug("Direct matrix malloc size is %d", direct_matrix_size);
+//
+//    if (direct_matrix_size != 0) {
+//        *direct_synapses_address = spin1_malloc(direct_matrix_size);
+//        if (*direct_synapses_address == NULL) {
+//            log_error("Not enough memory to allocate direct matrix");
+//            return false;
+//        }
+//        log_debug("Copying %u bytes of direct synapses to 0x%08x",
+//                direct_matrix_size, *direct_synapses_address);
+//        spin1_memcpy(
+//                *direct_synapses_address, &direct_matrix_address[1],
+//                direct_matrix_size);
+//    }
 
     log_debug("synapses_initialise: completed successfully");
     print_synapse_parameters();
@@ -370,7 +374,7 @@ void synapses_do_timestep_update(timer_t time) {
 }
 
 bool synapses_process_synaptic_row(
-        uint32_t time, synaptic_row_t row, bool write, uint32_t process_id, uint32_t rate) {
+        uint32_t time, synaptic_row_t row, uint32_t rate) {
     print_synaptic_row(row);
 
     // Get address of non-plastic region from row
@@ -395,9 +399,9 @@ bool synapses_process_synaptic_row(
                 PROFILER_EXIT | PROFILER_PROCESS_PLASTIC_SYNAPSES);
 
         // Perform DMA write back
-        if (write) {
-            spike_processing_finish_write(process_id);
-        }
+//        if (write) {
+//            spike_processing_finish_write(process_id);
+//        }
     }
     // Process any fixed synapses
     // **NOTE** this is done after initiating DMA in an attempt

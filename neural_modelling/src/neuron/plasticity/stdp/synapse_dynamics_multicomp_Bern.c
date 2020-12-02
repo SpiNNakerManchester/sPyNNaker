@@ -94,8 +94,7 @@ static inline final_state_t plasticity_update_synapse(
 
     //Apply Urbanczik-Senn Formula
     current_state = timing_apply_rate(
-                        current_state, post_event_history->u_rate,
-                        post_event_history->v_rate, last_pre_time);
+                        current_state, *post_event_history, last_pre_time);
 
 
     // Return final synaptic word and weight
@@ -346,7 +345,7 @@ void synapse_dynamics_process_post_synaptic_event(index_t neuron_index, REAL *ra
     // Add post-event
     post_event_history_t *history = &post_event_history[neuron_index];
 
-    post_events_update(history, rates[1], rates[0]);
+    post_events_update(history, *rates);
 }
 
 input_t synapse_dynamics_get_intrinsic_bias(

@@ -31,9 +31,8 @@
 
 typedef struct {
 
-    REAL u_rate;
-    REAL vb_rate;
-    REAL va;
+    REAL vb_diff;
+    REAL va_diff;
 
 } post_event_history_t;
 
@@ -56,20 +55,18 @@ static inline post_event_history_t *post_events_init_buffers(
     // Loop through neurons
     for (uint32_t n = 0; n < n_neurons; n++) {
         // Add initial placeholder entry to buffer
-        post_event_history[n].u_rate = 0.0k;
-        post_event_history[n].vb_rate = 0.0k;
-        post_event_history[n].va = 0.0k;
+        post_event_history[n].vb_diff = 0.0k;
+        post_event_history[n].va_diff = 0.0k;
     }
 
     return post_event_history;
 }
 
 static inline void post_events_update(
-        post_event_history_t *post_event_history, REAL va, REAL vb_rate, REAL u_rate) {
+        post_event_history_t *post_event_history, REAL va_diff, REAL vb_diff) {
 
-    post_event_history->u_rate = u_rate;
-    post_event_history->vb_rate = vb_rate;
-    post_event_history->va = va;
+    post_event_history->vb_diff = vb_diff;
+    post_event_history->va_diff = va_diff;
 
 }
 

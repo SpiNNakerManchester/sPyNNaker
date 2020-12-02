@@ -29,12 +29,7 @@
 // Structures
 //---------------------------------------
 
-typedef struct {
-
-    REAL u_rate;
-    REAL v_rate;
-
-} post_event_history_t;
+typedef REAL post_event_history_t;
 
 //---------------------------------------
 // Inline functions
@@ -55,18 +50,16 @@ static inline post_event_history_t *post_events_init_buffers(
     // Loop through neurons
     for (uint32_t n = 0; n < n_neurons; n++) {
         // Add initial placeholder entry to buffer
-        post_event_history[n].u_rate = 0.0k;
-        post_event_history[n].v_rate = 0.0k;
+        post_event_history[n] = 0.0k;
     }
 
     return post_event_history;
 }
 
 static inline void post_events_update(
-        post_event_history_t *post_event_history, REAL u_rate, REAL v_rate) {
+        post_event_history_t *post_event_history, REAL rate_diff) {
 
-    post_event_history->u_rate = u_rate;
-    post_event_history->v_rate = v_rate;
+    *post_event_history = rate_diff;
 
 }
 

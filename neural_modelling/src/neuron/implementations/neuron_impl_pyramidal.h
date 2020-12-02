@@ -136,14 +136,14 @@ static bool neuron_impl_initialise(uint32_t n_neurons) {
     }
 
     // Allocate DTCM for the rates used for plasticity
-    postsynaptic_rates = spin1_malloc(3 * sizeof(REAL));
+    postsynaptic_rates = spin1_malloc(2 * sizeof(REAL));
     if(postsynaptic_rates == NULL) {
         log_error("Unable to allocate postsynaptic rates array"
                     " - Out of DTCM");
             return false;
     }
 
-    for(int i = 0; i < 3; i++)
+    for(int i = 0; i < 2; i++)
         postsynaptic_rates[i] = 0;
 
     return true;
@@ -423,12 +423,12 @@ static inline REAL* neuron_impl_post_rates(index_t neuron_index) {
 
     neuron_pointer_t neuron = &neuron_array[neuron_index];
 
-    postsynaptic_rates[0] =  neuron->Va;
-    postsynaptic_rates[1] =  set_spike_source_rate(neuron->Vb);
-    postsynaptic_rates[2] =  set_spike_source_rate(neuron->U_membrane * neuron->plasticity_rate_multiplier);
+    postsynaptic_rates[0] =  neuron->U_rest - neuron->Va;
+    postsynaptic_rates[1] =
+        set_spike_source_rate(neuron->U_membrane * neuron->plasticity_rate_multiplier) - set_spike_source_rate(neuron->Vb);
 
     io_printf(IO_BUF, "va %k, vb %k, u %k\n", neuron->Va, neuron->Vb, neuron->U_membrane);
-    io_printf(IO_BUF, "Rates va %k, vb %k, u %k\n", postsynaptic_rates[0], postsynaptic_rates[1], postsynaptic_rates[2]);
+    io_printf(IO_BUF, "Rates diff ap %k, bas %k\n", postsynaptic_rates[0], postsynaptic_rates[1]);
 
     return postsynaptic_rates;
 

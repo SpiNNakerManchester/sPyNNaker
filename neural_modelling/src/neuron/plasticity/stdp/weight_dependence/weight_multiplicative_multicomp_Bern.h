@@ -1,4 +1,4 @@
-/*
+ /*
  * Copyright (c) 2017-2019 The University of Manchester
  *
  * This program is free software: you can redistribute it and/or modify

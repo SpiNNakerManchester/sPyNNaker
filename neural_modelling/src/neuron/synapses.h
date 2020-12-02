@@ -71,7 +71,7 @@ bool synapses_initialise(
         address_t synapse_params_address, address_t direct_matrix_address,
         uint32_t n_neurons, uint32_t n_synapse_types,
         uint32_t **ring_buffer_to_input_buffer_left_shifts,
-        address_t *direct_synapses_address, REAL starting_rate,
+        address_t *dtcm_synaptic_matrix, REAL starting_rate,
         address_t synaptic_matrix_address);
 
 void synapses_do_timestep_update(timer_t time);
@@ -84,7 +84,7 @@ void synapses_do_timestep_update(timer_t time);
 //! \param[in] rate: input rate
 //! \return bool if successful or not
 bool synapses_process_synaptic_row(
-        uint32_t time, synaptic_row_t row, bool write, uint32_t process_id, uint32_t rate);
+        uint32_t time, synaptic_row_t row, uint32_t rate);
 
 //! \brief returns the number of times the synapses have saturated their
 //!        weights.

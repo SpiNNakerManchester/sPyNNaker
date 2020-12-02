@@ -640,6 +640,7 @@ class SynapticManager(object):
                         generate_on_machine.append((
                             synapse_info, pre_slices, pre_vertex_slice,
                             pre_slice_index, app_edge, rinfo))
+                    # WITH SYN MATRIX IN DTCM WE SHOULD NEVER GET INTO THIS ELSE! THIS IS FOR DIRECT SYNAPSES!!!!!!!!!!
                     else:
                         block_addr, single_addr, index = self.__write_block(
                             spec, synaptic_matrix_region, synapse_info,
