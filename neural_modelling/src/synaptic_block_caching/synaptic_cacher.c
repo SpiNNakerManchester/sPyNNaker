@@ -26,12 +26,20 @@
 #include <neuron/synapse_row.h>
 #include <neuron/direct_synapses.h>
 #include <neuron/population_table/population_table.h>
+#include <malloc_extras.h>
 
 // stuff needed for the structural stuff to work
 #include <neuron/structural_plasticity/synaptogenesis/sp_structs.h>
 
 #include <filter_info.h>
 #include <key_atom_map.h>
+
+typedef struct not_redundant_tracker_t {
+    // not redundant count
+    uint32_t not_redundant_count;
+    // filter pointer
+    filter_info_t *filter;
+} not_redundant_tracker_t;
 
 //! Byte to word conversion
 #define BYTE_TO_WORD_CONVERSION 4
@@ -74,6 +82,9 @@ uint32_t * row_data;
 //! Says if we should run
 bool can_run = true;
 
+//! dtcm tracker from the core in question
+int dtcm_to_use = 0;
+
 /*****************************stuff needed for structural stuff to work*/
 
 //! The instantiation of the rewiring data
@@ -85,18 +96,28 @@ static post_to_pre_entry *post_to_pre_table;
 //! Pre-population information table
 pre_pop_info_table_t pre_info;
 
+static not_redundant_tracker_t* not_redundant_tracker = NULL;
+
 /***************************************************************/
 
 
 //! \brief Mark this process as failed.
 static inline void fail_shut_down(void) {
     vcpu()->user2 = 1;
-    bit_field_base_address->n_filters = 0;
 }
 
 //! \brief Mark this process as succeeded.
 static inline void success_shut_down(void) {
     vcpu()->user2 = 0;
+}
+
+//! \brief Determine how many bits are not set in a bit field
+//! \param[in] filter: The bitfield to look for redundancy in
+//! \return How many not redundant packets there are
+static uint32_t n_not_redundant(filter_info_t filter) {
+    uint32_t n_atoms = filter.n_atoms;
+    uint32_t n_words = get_bit_field_size(n_atoms);
+    return count_bit_field(filter.data, n_words);
 }
 
 //! \brief Read in the vertex region addresses
@@ -115,7 +136,6 @@ void read_in_addresses(void) {
             builder_data->bit_field_region_id, dsg_metadata);
 
     // fill in size zero in case population table never read in
-    bit_field_base_address->n_filters = 0;
     direct_matrix_region_base_address = data_specification_get_region(
             builder_data->direct_matrix_region_id, dsg_metadata);
 
@@ -136,6 +156,9 @@ void read_in_addresses(void) {
     log_debug("Structural matrix region base address = %0x",
             structural_matrix_region_base_address);
     log_info("Finished reading in vertex data region addresses");
+
+    // read user 2 into store
+    dtcm_to_use = vcpu()->user2;
 }
 
 //! \brief Set up the master pop table and synaptic matrix for the bit field
@@ -171,13 +194,64 @@ bool initialise(void) {
 
     // set up a sdram read for a row
     log_debug("Allocating dtcm for row data");
-    row_data = spin1_malloc(row_max_n_words * sizeof(uint32_t));
+    row_data = MALLOC(row_max_n_words * sizeof(uint32_t));
     if (row_data == NULL) {
         log_error("Could not allocate dtcm for the row data");
         return false;
     }
     log_debug("Finished pop table set connectivity lookup");
 
+    // sort out user 2 to see if we have anything to do
+    if (dtcm_to_use == 0) {
+        can_run = false;
+    }
+
+    return true;
+}
+
+//! \brief sorts out bitfields for most important
+bool sort_out_bitfields(void) {
+    // get the bitfields in a copy form
+    log_info("%d", population_table_get_length());
+    not_redundant_tracker = MALLOC(
+        sizeof(not_redundant_tracker_t) * bit_field_base_address->n_filters);
+
+    if (not_redundant_tracker == NULL) {
+        log_error("failed to malloc the main array");
+        return false;
+    }
+
+    // store filter info
+    for (uint32_t bit_field = 0; bit_field < bit_field_base_address->n_filters;
+            bit_field++) {
+        spin1_memcpy(
+            not_redundant_tracker[bit_field].filter,
+            &bit_field_base_address->filters[bit_field], sizeof(filter_info_t));
+
+        // deduce redundancy
+        not_redundant_tracker[bit_field].not_redundant_count = n_not_redundant(
+            bit_field_base_address->filters[bit_field]);
+    }
+
+    // print for debug purposes
+    for (uint32_t bit_field = 0; bit_field < bit_field_base_address->n_filters;
+            bit_field++) {
+        log_info(
+            "bitfield with index %d has key %d and has redundant count of %d",
+            bit_field, not_redundant_tracker[bit_field].filter->key,
+            not_redundant_tracker[bit_field].not_redundant_count);
+    }
+
+    // sort so that most not redundant at front
+
+
+
+
+}
+
+//! \brief determines which blocks can be DTCM'ed.
+bool cache_blocks(void) {
+    log_info("plan to fill %d bytes of DTCM", dtcm_to_use);
     return true;
 }
 
@@ -188,16 +262,28 @@ void c_main(void) {
 
     log_info("Starting the synaptic block cacher");
 
+    // set up the dtcm/sdram malloc system.
+    malloc_extras_turn_off_safety();
+    malloc_extras_initialise_no_fake_heap_data();
+
     // read in sdram data
     read_in_addresses();
 
-    // generate bit field for each vertex regions
+    // set up stores etc
     if (!initialise()) {
         log_error("Failed to init the master pop and synaptic matrix");
         fail_shut_down();
     }
 
     if (can_run) {
-        success_shut_down();
+        bool success = sort_out_bitfields();
+        if (!success) {
+            fail_shut_down();
+        }
+        success = cache_blocks();
+        if (!success) {
+            fail_shut_down();
+        }
     }
+    success_shut_down();
 }
