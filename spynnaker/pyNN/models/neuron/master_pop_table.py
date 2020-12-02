@@ -18,7 +18,6 @@ import math
 import numpy
 import ctypes
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.exceptions import (
     SynapseRowTooBigException, SynapticConfigurationException)
 from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
@@ -151,8 +150,8 @@ _EXTRA_INFO_ENTRY_SIZE_BYTES = ctypes.sizeof(_ExtraInfoCType)
 # Base size - 2 words for size of table and address list
 _BASE_SIZE_BYTES = 8
 
-# Over-scale of estimate for safety
-_OVERSCALE = 2
+# Number of times to multiply for delays
+_DELAY_SCALE = 2
 
 # A ctypes pointer to a uint32
 _UINT32_PTR = ctypes.POINTER(ctypes.c_uint32)
@@ -320,7 +319,7 @@ class MasterPopTableAsBinarySearch(object):
         self.__n_addresses = 0
 
     @staticmethod
-    def get_master_population_table_size(in_edges):
+    def get_master_population_table_size(incoming_projections):
         """ Get the size of the master population table in SDRAM.
 
         :param iterable(~pacman.model.graphs.application.ApplicationEdge) \
@@ -330,32 +329,44 @@ class MasterPopTableAsBinarySearch(object):
         :return: the size the master pop table will take in SDRAM (in bytes)
         :rtype: int
         """
+        # There will be an address list entry for each incoming projection
+        n_entries = len(incoming_projections)
 
-        # Entry for each edge - but don't know the edges yet, so
-        # assume multiple entries for each edge
+        # Count the pre-machine-vertices
         n_vertices = 0
-        n_entries = 0
-        for in_edge in in_edges:
-            if isinstance(in_edge, ProjectionApplicationEdge):
-                # TODO: Fix this to be more accurate!
-                # May require modification to the master population table
-                # Get the number of atoms per core incoming
+        seen_edges = set()
+        for proj in incoming_projections:
+            in_edge = proj._projection_edge
+
+            # If we haven't seen this edge before, add it in
+            if in_edge not in seen_edges:
+                seen_edges.add(in_edge)
                 vertex = in_edge.pre_vertex
-                max_atoms = float(min(vertex.get_max_atoms_per_core(),
-                                      vertex.n_atoms))
 
-                # Get the number of likely vertices
-                n_edge_vertices = int(math.ceil(vertex.n_atoms / max_atoms))
-                n_vertices += n_edge_vertices
-                n_entries += (
-                    n_edge_vertices * len(in_edge.synapse_information))
+                # If the pre-vertex not been partitioned, estimate
+                if not vertex.machine_vertices:
+                    max_atoms = float(min(vertex.get_max_atoms_per_core(),
+                                          vertex.n_atoms))
 
-        # Multiply by 2 to get an upper bound
+                    # Get the number of likely vertices
+                    edge_vertices = int(math.ceil(vertex.n_atoms / max_atoms))
+
+                # If it has been partitioned, use the actual number of
+                # pre-vertices
+                else:
+                    edge_vertices = len(vertex.machine_vertices)
+
+                # If there are also delays, double it
+                if in_edge.n_delay_stages:
+                    edge_vertices *= _DELAY_SCALE
+
+                n_vertices += edge_vertices
+
         return (
             _BASE_SIZE_BYTES +
-            (n_vertices * _OVERSCALE * _MASTER_POP_ENTRY_SIZE_BYTES) +
-            (n_vertices * _OVERSCALE * _EXTRA_INFO_ENTRY_SIZE_BYTES) +
-            (n_entries * _OVERSCALE * _ADDRESS_LIST_ENTRY_SIZE_BYTES))
+            (n_vertices * _MASTER_POP_ENTRY_SIZE_BYTES) +
+            (n_vertices * _EXTRA_INFO_ENTRY_SIZE_BYTES) +
+            (n_entries * _ADDRESS_LIST_ENTRY_SIZE_BYTES))
 
     @staticmethod
     def get_allowed_row_length(row_length):

@@ -22,19 +22,18 @@ from spinn_utilities.ordered_set import OrderedSet
 
 from pacman.model.routing_info import BaseKeyAndMask
 
+from data_specification.enums.data_type import DataType
+
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 from spynnaker.pyNN.models.neural_projections import (
     ProjectionApplicationEdge, DelayedApplicationEdge)
 from spynnaker.pyNN.models.neuron.master_pop_table import (
     MasterPopTableAsBinarySearch)
+from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 
 from .key_space_tracker import KeySpaceTracker
 from .synaptic_matrix_app import SynapticMatrixApp
-
-
-# Amount to scale synapse SDRAM estimate by to make sure the synapses fit
-_SYNAPSE_SDRAM_OVERSCALE = 1.1
 
 # 1 for n_edges
 # 2 for post_vertex_slice.lo_atom, post_vertex_slice.n_atoms
@@ -62,6 +61,8 @@ class SynapticMatrices(object):
         "__direct_matrix_region",
         # The ID of the master population table region
         "__poptable_region",
+        # The ID of the connection builder region
+        "__connection_builder_region",
         # The master population table data structure
         "__poptable",
         # The sub-matrices for each incoming edge
@@ -78,7 +79,8 @@ class SynapticMatrices(object):
 
     def __init__(
             self, post_vertex_slice, n_synapse_types, all_single_syn_sz,
-            synaptic_matrix_region, direct_matrix_region, poptable_region):
+            synaptic_matrix_region, direct_matrix_region, poptable_region,
+            connection_builder_region):
         """
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
             The slice of the post vertex that these matrices are for
@@ -91,6 +93,8 @@ class SynapticMatrices(object):
             The region where "direct" or "single" synapses are stored
         :param int poptable_region:
             The region where the population table is stored
+        :param int connection_builder_region:
+            The region where the synapse generator information is stored
         """
         self.__post_vertex_slice = post_vertex_slice
         self.__n_synapse_types = n_synapse_types
@@ -98,6 +102,7 @@ class SynapticMatrices(object):
         self.__synaptic_matrix_region = synaptic_matrix_region
         self.__direct_matrix_region = direct_matrix_region
         self.__poptable_region = poptable_region
+        self.__connection_builder_region = connection_builder_region
 
         # Set up the master population table
         self.__poptable = MasterPopTableAsBinarySearch()
@@ -147,69 +152,11 @@ class SynapticMatrices(object):
         self.__matrices[key] = matrix
         return matrix
 
-    def synapses_size(self, app_edges):
-        """ The size of the synaptic blocks in bytes
-
-        :param iterable(~pacman.model.graphs.application.ApplicationEdge) \
-                app_edges:
-            The incoming application edges
-        :rtype: int
-        """
-        # Base size requirements
-        # 1 word for address of direct addresses, and
-        # 1 word for the size of the direct addresses matrix in bytes
-        memory_size = 2 * BYTES_PER_WORD
-        for in_edge in app_edges:
-            if isinstance(in_edge, ProjectionApplicationEdge):
-                for synapse_info in in_edge.synapse_information:
-                    matrix = self.__app_matrix(in_edge, synapse_info)
-                    memory_size = matrix.add_matrix_size(memory_size)
-                    memory_size = matrix.add_delayed_matrix_size(memory_size)
-        return memory_size
-
-    def size(self, app_edges):
-        """ The size required by all parts of the matrices
-
-        :param iterable(~pacman.model.graphs.application.ApplicationEdge) \
-                app_edges:
-            The incoming application edges
-        :rtype: int
-        """
-        return (
-            self.synapses_size(app_edges) +
-            self.__gen_info_size(app_edges) +
-            self.__poptable.get_master_population_table_size(app_edges))
-
-    def __gen_info_size(self, app_edges):
-        """ The size in bytes of the synaptic expander parameters
-
-        :param iterable(~pacman.model.graphs.application.ApplicationEdge) \
-                app_edges:
-            The incoming application edges
-        :rtype: int
-        """
-        gen_on_machine = False
-        size = 0
-        for app_edge in app_edges:
-            if not isinstance(app_edge, ProjectionApplicationEdge):
-                continue
-            for synapse_info in app_edge.synapse_information:
-                matrix = self.__app_matrix(app_edge, synapse_info)
-                m_size = matrix.generator_info_size
-                if m_size > 0:
-                    gen_on_machine = True
-                    size += m_size
-
-        if gen_on_machine:
-            size += SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES
-            size += self.__n_synapse_types * BYTES_PER_WORD
-        return size
-
-    def write_synaptic_matrix_and_master_population_table(
+    def write_synaptic_data(
             self, spec, machine_vertex, all_syn_block_sz, weight_scales,
             routing_info, machine_graph):
         """ Simultaneously generates both the master population table and
-            the synaptic matrix.
+            the synaptic matrix, as well as any synapse generator data
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The spec to write to
@@ -222,8 +169,6 @@ class SynapticMatrices(object):
             The routing information for all edges
         :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
             The machine graph
-        :return: A list of generator data to be written elsewhere
-        :rtype: list(GeneratorData)
         """
         spec.comment(
             "\nWriting Synaptic Matrix and Master Population Table:\n")
@@ -301,7 +246,50 @@ class SynapticMatrices(object):
         if single_data_words:
             spec.write_array(single_data)
 
-        return generator_data
+        self.__write_synapse_expander_data_spec(
+            spec, generator_data, weight_scales)
+
+    def __write_synapse_expander_data_spec(
+            self, spec, generator_data, weight_scales):
+        """ Write the data spec for the synapse expander
+
+        :param ~.DataSpecificationGenerator spec:
+            The specification to write to
+        :param list(GeneratorData) generator_data: The data to be written
+        :param weight_scales: scaling of weights on each synapse
+        :type weight_scales: list(int or float)
+        """
+        if not generator_data:
+            return
+
+        n_bytes = (
+            SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES +
+            (self.__n_synapse_types * DataType.U3232.size))
+        for data in generator_data:
+            n_bytes += data.size
+
+        spec.reserve_memory_region(
+            region=self.__connection_builder_region,
+            size=n_bytes, label="ConnectorBuilderRegion")
+        spec.switch_write_focus(self.__connection_builder_region)
+
+        spec.write_value(len(generator_data))
+        spec.write_value(self.__post_vertex_slice.lo_atom)
+        spec.write_value(self.__post_vertex_slice.n_atoms)
+        spec.write_value(self.__n_synapse_types)
+        spec.write_value(get_n_bits(self.__n_synapse_types))
+        n_neuron_id_bits = get_n_bits(self.__post_vertex_slice.n_atoms)
+        spec.write_value(n_neuron_id_bits)
+        for w in weight_scales:
+            # if the weights are high enough and the population size large
+            # enough, then weight_scales < 1 will result in a zero scale
+            # if converted to an int, so we use U3232 here instead (as there
+            # can be scales larger than U1616.max in conductance-based models)
+            dtype = DataType.U3232
+            spec.write_value(data=min(w, dtype.max), data_type=dtype)
+
+        for data in generator_data:
+            spec.write_array(data.gen_data)
 
     def __in_edges_by_app_edge(self, in_machine_edges, routing_info):
         """ Convert a list of machine edges to a dict of

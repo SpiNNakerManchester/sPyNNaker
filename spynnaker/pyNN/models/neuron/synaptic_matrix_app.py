@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import division
-import math
 import numpy
 from six import itervalues
 
@@ -25,10 +24,9 @@ from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
 
 from .synaptic_matrix import SynapticMatrix
-from .generator_data import GeneratorData, SYN_REGION_UNUSED
+from .generator_data import SYN_REGION_UNUSED
 from .synapse_io import (
     get_max_row_info, read_all_synapses, convert_to_connections)
-from .master_pop_table import MasterPopTableAsBinarySearch
 
 
 class SynapticMatrixApp(object):
@@ -75,10 +73,6 @@ class SynapticMatrixApp(object):
         "__matrix_size",
         # The expected size in bytes of a delayed synaptic matrix
         "__delay_matrix_size",
-        # The number of atoms in the machine-level pre-vertices
-        "__n_sub_atoms",
-        # The number of machine edges expected for this application edge
-        "__n_sub_edges",
         # The offset of the undelayed synaptic matrix in the region
         "__syn_mat_offset",
         # The offset of the delayed synaptic matrix in the region
@@ -150,11 +144,6 @@ class SynapticMatrixApp(object):
             self.__app_edge.pre_vertex.n_atoms *
             self.__app_edge.n_delay_stages *
             self.__max_row_info.delayed_max_bytes)
-        vertex = self.__app_edge.pre_vertex
-        self.__n_sub_atoms = int(min(
-            vertex.get_max_atoms_per_core(), vertex.n_atoms))
-        self.__n_sub_edges = int(
-            math.ceil(vertex.n_atoms / self.__n_sub_atoms))
 
         # These are computed during synaptic generation
         self.__syn_mat_offset = None
@@ -188,60 +177,6 @@ class SynapticMatrixApp(object):
             self.__all_syn_block_sz, self.__all_single_syn_sz)
         self.__matrices[machine_edge] = matrix
         return matrix
-
-    def add_matrix_size(self, addr):
-        """ Add the bytes required by the synaptic matrices
-
-        :param addr: The initial address
-        :return: The final address after adding synapses
-        :rtype: int
-        """
-        if self.__max_row_info.undelayed_max_n_synapses > 0:
-            size = self.__n_sub_atoms * self.__max_row_info.undelayed_max_bytes
-            for _ in range(self.__n_sub_edges):
-                addr = MasterPopTableAsBinarySearch.get_next_allowed_address(
-                    addr)
-                addr += size
-        return addr
-
-    def add_delayed_matrix_size(self, addr):
-        """ Add the bytes required by the delayed synaptic matrices
-
-        :param addr: The initial address
-        :return: The final address after adding synapses
-        :rtype: int
-        """
-        if self.__max_row_info.delayed_max_n_synapses > 0:
-            size = (self.__n_sub_atoms *
-                    self.__max_row_info.delayed_max_bytes *
-                    self.__app_edge.n_delay_stages)
-            for _ in range(self.__n_sub_edges):
-                addr = MasterPopTableAsBinarySearch.get_next_allowed_address(
-                    addr)
-                addr += size
-        return addr
-
-    @property
-    def generator_info_size(self):
-        """ The number of bytes required by the generator information
-
-        :rtype: int
-        """
-        if not self.__synapse_info.may_generate_on_machine():
-            return 0
-
-        connector = self.__synapse_info.connector
-        dynamics = self.__synapse_info.synapse_dynamics
-        gen_size = sum((
-            GeneratorData.BASE_SIZE,
-            connector.gen_delay_params_size_in_bytes(
-                self.__synapse_info.delays),
-            connector.gen_weight_params_size_in_bytes(
-                self.__synapse_info.weights),
-            connector.gen_connector_params_size_in_bytes,
-            dynamics.gen_matrix_params_size_in_bytes
-        ))
-        return gen_size * self.__n_sub_edges
 
     def can_generate_on_machine(self, single_addr):
         """ Determine if an app edge can be generated on the machine
@@ -603,21 +538,6 @@ class SynapticMatrixApp(object):
                 "Too much synaptic memory has been written: {} of {} "
                 .format(next_addr, self.__all_syn_block_sz))
         return next_addr
-
-    def __update_synapse_index(self, index):
-        """ Update the index of a synapse, checking it matches against indices\
-            for other synapse_info for the same edge
-
-        :param index: The index to set
-        :raises Exception: If the index doesn't match the currently set index
-        """
-        if self.__index is None:
-            self.__index = index
-        elif self.__index != index:
-            # This should never happen as things should be aligned over all
-            # machine vertices, but check just in case!
-            raise Exception(
-                "Index of " + self.__synapse_info + " has changed!")
 
     def get_connections(self, transceiver, placement):
         """ Get the connections for this matrix from the machine

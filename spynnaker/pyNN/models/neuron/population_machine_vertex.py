@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from enum import Enum
 
-from data_specification.enums.data_type import DataType
 from pacman.executor.injection_decorator import inject_items
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_utilities.overrides import overrides
@@ -36,16 +35,14 @@ from spinn_front_end_common.interface.profiling import (
 from spinn_front_end_common.interface.profiling.profile_utils import (
     get_profiling_data)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
-from spinn_front_end_common.utilities import (
-    constants as common_constants, helpful_functions)
+from spinn_front_end_common.utilities import helpful_functions
+from spinn_front_end_common.utilities.constants import SIMULATION_N_BYTES
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.utilities import constants, bit_field_utilities
 from spynnaker.pyNN.models.abstract_models import (
     AbstractSynapseExpandable, AbstractReadParametersBeforeSet)
-from spynnaker.pyNN.utilities.utility_calls import get_n_bits
-from .synaptic_matrices import (
-    SynapticMatrices, SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES)
+from .synaptic_matrices import SynapticMatrices
 
 
 class PopulationMachineVertex(
@@ -209,7 +206,8 @@ class PopulationMachineVertex(
             app_vertex.all_single_syn_size,
             self.REGIONS.SYNAPTIC_MATRIX.value,
             self.REGIONS.DIRECT_MATRIX.value,
-            self.REGIONS.POPULATION_TABLE.value)
+            self.REGIONS.POPULATION_TABLE.value,
+            self.REGIONS.CONNECTOR_BUILDER.value)
 
     def set_on_chip_generatable_area(self, offset, size):
         self.__on_chip_generatable_offset = offset
@@ -493,10 +491,9 @@ class PopulationMachineVertex(
 
         # Write the synaptic matrices
         weight_scales = self._app_vertex.get_weight_scales(machine_time_step)
-        gen_data = self.__synaptic_matrices\
-            .write_synaptic_matrix_and_master_population_table(
-                spec, self, all_syn_block_sz, weight_scales,
-                routing_info, machine_graph)
+        self.__synaptic_matrices.write_synaptic_data(
+            spec, self, all_syn_block_sz, weight_scales, routing_info,
+            machine_graph)
 
         # Write any synapse dynamics
         synapse_dynamics = self._app_vertex.synapse_dynamics
@@ -510,8 +507,6 @@ class PopulationMachineVertex(
                     spec, self.REGIONS.STRUCTURAL_DYNAMICS.value,
                     machine_time_step, weight_scales, machine_graph, self,
                     routing_info, self.__synaptic_matrices)
-
-        self._write_synapse_expander_data_spec(spec, gen_data, weight_scales)
 
         self.set_on_chip_generatable_area(
             self.__synaptic_matrices.host_generated_block_addr,
@@ -578,7 +573,7 @@ class PopulationMachineVertex(
         # Reserve memory:
         spec.reserve_memory_region(
             region=self.REGIONS.SYSTEM.value,
-            size=common_constants.SIMULATION_N_BYTES,
+            size=SIMULATION_N_BYTES,
             label='System')
 
         self._reserve_neuron_params_data_region(spec)
@@ -687,49 +682,6 @@ class PopulationMachineVertex(
             self._app_vertex.parameters, self._app_vertex.state_variables,
             self.vertex_slice)
         spec.write_array(neuron_data)
-
-    def _write_synapse_expander_data_spec(
-            self, spec, generator_data, weight_scales):
-        """ Write the data spec for the synapse expander
-
-        :param ~.DataSpecificationGenerator spec:
-            The specification to write to
-        :param list(GeneratorData) generator_data: The data to be written
-        :param weight_scales: scaling of weights on each synapse
-        :type weight_scales: list(int or float)
-        """
-        if not generator_data:
-            return
-
-        n_synapse_types = self._app_vertex.neuron_impl.get_n_synapse_types()
-        n_bytes = (
-            SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES +
-            (n_synapse_types * DataType.U3232.size))
-        for data in generator_data:
-            n_bytes += data.size
-
-        spec.reserve_memory_region(
-            region=self.REGIONS.CONNECTOR_BUILDER.value,
-            size=n_bytes, label="ConnectorBuilderRegion")
-        spec.switch_write_focus(self.REGIONS.CONNECTOR_BUILDER.value)
-
-        spec.write_value(len(generator_data))
-        spec.write_value(self.vertex_slice.lo_atom)
-        spec.write_value(self.vertex_slice.n_atoms)
-        spec.write_value(n_synapse_types)
-        spec.write_value(get_n_bits(n_synapse_types))
-        n_neuron_id_bits = get_n_bits(self.vertex_slice.n_atoms)
-        spec.write_value(n_neuron_id_bits)
-        for w in weight_scales:
-            # if the weights are high enough and the population size large
-            # enough, then weight_scales < 1 will result in a zero scale
-            # if converted to an int, so we use U3232 here instead (as there
-            # can be scales larger than U1616.max in conductance-based models)
-            dtype = DataType.U3232
-            spec.write_value(data=min(w, dtype.max), data_type=dtype)
-
-        for data in generator_data:
-            spec.write_array(data.gen_data)
 
     @overrides(AbstractSynapseExpandable.gen_on_machine)
     def gen_on_machine(self):

@@ -52,6 +52,8 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 from .population_machine_vertex import PopulationMachineVertex
 from .synapse_io import get_maximum_delay_supported_in_ms, get_max_row_info
 from .master_pop_table import MasterPopTableAsBinarySearch
+from .generator_data import GeneratorData
+from .synaptic_matrices import SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES
 
 logger = logging.getLogger(__name__)
 
@@ -407,6 +409,8 @@ class AbstractPopulationVertex(
             self.get_synapse_dynamics_size(vertex_slice) +
             self.get_structural_dynamics_size(vertex_slice) +
             self.get_synapses_size(vertex_slice) +
+            self.get_pop_table_size() +
+            self.get_synapse_expander_size() +
             profile_utils.get_profile_region_size(
                 self.__n_profile_samples) +
             bit_field_utilities.get_estimated_sdram_for_bit_field_region(
@@ -1014,7 +1018,7 @@ class AbstractPopulationVertex(
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of the vertex to get the usage of
         """
-        addr = 0
+        addr = 2 * BYTES_PER_WORD
         for proj in self.__incoming_projections:
             addr = self.__add_matrix_size(addr, proj, vertex_slice)
         return addr
@@ -1056,3 +1060,54 @@ class AbstractPopulationVertex(
                     addr)
                 addr += size
         return addr
+
+    def get_pop_table_size(self):
+        """ Get the size of the master population table in bytes
+
+        :rtype: int
+        """
+        return MasterPopTableAsBinarySearch.get_master_population_table_size(
+            self.__incoming_projections)
+
+    def get_synapse_expander_size(self):
+        """ Get the size of the synapse expander region in bytes
+
+        :rtype: int
+        """
+        size = 0
+        for proj in self.__incoming_projections:
+            synapse_info = proj._synapse_information
+            app_edge = proj._projection_edge
+            n_sub_edges = len(app_edge.pre_vertex.machine_vertices)
+            if not n_sub_edges:
+                vertex = app_edge.pre_vertex
+                max_atoms = float(min(vertex.get_max_atoms_per_core(),
+                                      vertex.n_atoms))
+                n_sub_edges = int(math.ceil(vertex.n_atoms / max_atoms))
+            size += self.__generator_info_size(synapse_info) * n_sub_edges
+
+        # If anything generates data, also add some base information
+        if size:
+            size += SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES
+            size += self.__neuron_impl.get_n_synapse_types() * BYTES_PER_WORD
+        return size
+
+    @staticmethod
+    def __generator_info_size(synapse_info):
+        """ The number of bytes required by the generator information
+
+        :rtype: int
+        """
+        if not synapse_info.may_generate_on_machine():
+            return 0
+
+        connector = synapse_info.connector
+        dynamics = synapse_info.synapse_dynamics
+        gen_size = sum((
+            GeneratorData.BASE_SIZE,
+            connector.gen_delay_params_size_in_bytes(synapse_info.delays),
+            connector.gen_weight_params_size_in_bytes(synapse_info.weights),
+            connector.gen_connector_params_size_in_bytes,
+            dynamics.gen_matrix_params_size_in_bytes
+        ))
+        return gen_size
