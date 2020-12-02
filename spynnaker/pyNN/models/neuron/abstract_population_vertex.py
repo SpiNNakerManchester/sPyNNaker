@@ -406,6 +406,7 @@ class AbstractPopulationVertex(
             self.neuron_recorder.get_static_sdram_usage(vertex_slice) +
             PopulationMachineVertex.get_provenance_data_size(
                 len(PopulationMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES)) +
+            self.get_synapse_params_size() +
             self.get_synapse_dynamics_size(vertex_slice) +
             self.get_structural_dynamics_size(vertex_slice) +
             self.get_synapses_size(vertex_slice) +
