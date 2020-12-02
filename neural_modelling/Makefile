@@ -15,6 +15,7 @@
 
 BUILDS = synapse_expander \
          bit_field_expander \
+         synaptic_block_caching \
          spike_source/poisson \
          delay_extension \
          robot_motor_control \
