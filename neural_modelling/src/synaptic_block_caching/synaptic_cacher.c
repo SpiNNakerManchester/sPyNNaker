@@ -22,6 +22,7 @@
 #include <spin1_api.h>
 #include <data_specification.h>
 #include <debug.h>
+#include <common/bit_field_common.h>
 #include <neuron/synapse_row.h>
 #include <neuron/direct_synapses.h>
 #include <neuron/population_table/population_table.h>
@@ -67,6 +68,12 @@ address_t direct_synapses_address;
 //!     synapse row from sdram.
 uint32_t row_max_n_words;
 
+//! Holds SDRAM read row
+uint32_t * row_data;
+
+//! Says if we should run
+bool can_run = true;
+
 /*****************************stuff needed for structural stuff to work*/
 
 //! The instantiation of the rewiring data
@@ -80,14 +87,17 @@ pre_pop_info_table_t pre_info;
 
 /***************************************************************/
 
-//! \brief Get this processor's virtual CPU control table in SRAM.
-//! \return a pointer to the virtual control table
-static inline vcpu_t *vcpu(void) {
-    vcpu_t *sark_virtual_processor_info = (vcpu_t *) SV_VCPU;
-    uint core = spin1_get_core_id();
-    return &sark_virtual_processor_info[core];
+
+//! \brief Mark this process as failed.
+static inline void fail_shut_down(void) {
+    vcpu()->user2 = 1;
+    bit_field_base_address->n_filters = 0;
 }
 
+//! \brief Mark this process as succeeded.
+static inline void success_shut_down(void) {
+    vcpu()->user2 = 0;
+}
 
 //! \brief Read in the vertex region addresses
 void read_in_addresses(void) {
@@ -115,16 +125,6 @@ void read_in_addresses(void) {
         structural_matrix_region_base_address = data_specification_get_region(
                 builder_data->structural_matrix_region_id, dsg_metadata);
     }
-    key_atom_data_t *keys_to_max_atoms_sdram = data_specification_get_region(
-            builder_data->bit_field_key_map_region_id, dsg_metadata);
-    uint32_t pair_size = sizeof(key_atom_data_t) +
-            (keys_to_max_atoms_sdram->n_pairs * sizeof(key_atom_pair_t));
-    keys_to_max_atoms = spin1_malloc(pair_size);
-    if (keys_to_max_atoms == NULL) {
-        log_error("Couldn't allocate memory for key_to_max_atoms");
-        rt_error(RTE_SWERR);
-    }
-    spin1_memcpy(keys_to_max_atoms, keys_to_max_atoms_sdram, pair_size);
 
     // printer
     log_debug("master_pop_table_base_address = %0x", master_pop_base_address);
@@ -169,11 +169,6 @@ bool initialise(void) {
         }
     }
 
-    // read in the correct key to max atom map
-#ifdef __PRINT_KEY_ATOM_MAP__
-    print_key_to_max_atom_map();
-#endif
-
     // set up a sdram read for a row
     log_debug("Allocating dtcm for row data");
     row_data = spin1_malloc(row_max_n_words * sizeof(uint32_t));
@@ -183,205 +178,6 @@ bool initialise(void) {
     }
     log_debug("Finished pop table set connectivity lookup");
 
-    return true;
-}
-
-//! \brief Check plastic and fixed elements to see if there is a target.
-//! \param[in] row: the synaptic row
-//! \return Whether there is target.
-bool process_synaptic_row(synaptic_row_t row) {
-    // get address of plastic region from row
-    if (synapse_row_plastic_size(row) > 0) {
-        log_debug("Plastic row had entries, so cant be pruned");
-        return true;
-    }
-
-    // Get address of non-plastic region from row
-    address_t fixed_region_address = synapse_row_fixed_region(row);
-    uint32_t fixed_synapse =
-            synapse_row_num_fixed_synapses(fixed_region_address);
-    if (fixed_synapse == 0) {
-        log_debug("Plastic and fixed do not have entries, so can be pruned");
-        return false;
-    } else {
-        log_debug("Fixed row has entries, so cant be pruned");
-        return true;
-    }
-}
-
-//! \brief Do an SDRAM read to get synaptic row.
-//! \param[in] row_address: the SDRAM address to read
-//! \param[in] n_bytes_to_transfer:
-//!     how many bytes to read to get the synaptic row
-//! \return Whether there is target
-static bool do_sdram_read_and_test(
-        address_t row_address, uint32_t n_bytes_to_transfer) {
-    spin1_memcpy(row_data, row_address, n_bytes_to_transfer);
-    log_debug("Process synaptic row");
-    return process_synaptic_row(row_data);
-}
-
-//! \brief Sort filters by key
-static inline void sort_by_key(void) {
-    filter_info_t *filters = bit_field_base_address->filters;
-    for (uint32_t i = 1; i < bit_field_base_address->n_filters; i++) {
-        const filter_info_t temp = filters[i];
-
-        uint32_t j;
-        for (j = i; j > 0 && filters[j - 1].key > temp.key; j--) {
-            filters[j] = filters[j - 1];
-        }
-        filters[j] = temp;
-    }
-}
-
-//! Determine which bit fields are redundant
-static void determine_redundancy(void) {
-    // Semantic sugar to keep the code a little shorter
-    filter_info_t *filters = bit_field_base_address->filters;
-    for (uint32_t i = 0; i < bit_field_base_address->n_filters; i++) {
-        filters[i].merged = 0;
-        filters[i].all_ones = 0;
-        int i_atoms = filters[i].n_atoms;
-        int i_words = get_bit_field_size(i_atoms);
-        if (i_atoms == count_bit_field(filters[i].data, i_words)) {
-            filters[i].all_ones = 1;
-        }
-    }
-
-    for (uint32_t i = 0; i < bit_field_base_address->n_filters; i++) {
-        log_info("    Key: 0x%08x, Filter:", filters[i].key);
-        uint32_t n_words = get_bit_field_size(filters[i].n_atoms);
-        for (uint32_t j = 0; j < n_words; j++) {
-            log_info("        0x%08x", filters[i].data[j]);
-        }
-    }
-}
-
-//! \brief Create the bitfield for this master pop table and synaptic matrix.
-//! \return Whether it was successful at generating the bitfield
-bool generate_bit_field(void) {
-    // write how many entries (thus bitfields) are to be generated into sdram
-    log_debug("Update by pop length");
-    bit_field_base_address->n_filters = keys_to_max_atoms->n_pairs;
-
-    // location where to dump the bitfields into (right after the filter structs
-    address_t bit_field_words_location = (address_t)
-            &bit_field_base_address->filters[bit_field_base_address->n_filters];
-    log_debug("bit_field_words_location is %x", bit_field_words_location);
-    int position = 0;
-
-     // iterate through the master pop entries
-    log_debug("Starting master pop entry bit field generation");
-    for (uint32_t i = 0; i < keys_to_max_atoms->n_pairs; i++) {
-
-        // determine keys masks and n_neurons
-        spike_t key = keys_to_max_atoms->pairs[i].key;
-        uint32_t n_neurons = keys_to_max_atoms->pairs[i].n_atoms;
-
-        // generate the bitfield for this master pop entry
-        uint32_t n_words = get_bit_field_size(n_neurons);
-
-        log_debug("Bitfield %d, key = %d, n_neurons = %d",
-                i, (uint32_t) key, n_neurons);
-        bit_field_t bit_field = bit_field_alloc(n_neurons);
-        if (bit_field == NULL) {
-            log_error("Could not allocate dtcm for bit field");
-            return false;
-        }
-
-        // set the bitfield to 0. so assuming a miss on everything
-        clear_bit_field(bit_field, n_words);
-
-        // iterate through neurons and ask for rows from master pop table
-        log_debug("Searching neuron ids");
-        for (uint32_t neuron_id=0; neuron_id < n_neurons; neuron_id++) {
-            // update key with neuron id
-            spike_t new_key = (spike_t) (key + neuron_id);
-            log_debug("New key for neurons %d is %0x", neuron_id, new_key);
-
-            // check if this is governed by the structural stuff. if so,
-            // avoid filtering as it could change over time
-            bool bit_found = false;
-            if (structural_matrix_region_base_address != NULL) {
-                uint32_t dummy1 = 0, dummy2 = 0, dummy3 = 0, dummy4 = 0;
-                bit_found = sp_structs_find_by_spike(&pre_info, new_key,
-                        &dummy1, &dummy2, &dummy3, &dummy4);
-            }
-
-            // holder for the bytes to transfer if we need to read SDRAM.
-            size_t n_bytes_to_transfer;
-
-            // used to store the row from the master pop / synaptic matrix,
-            // not going to be used in reality.
-            address_t row_address;
-            if (!bit_found) {
-                if (population_table_get_first_address(
-                        new_key, &row_address, &n_bytes_to_transfer)) {
-                    log_debug("%d", neuron_id);
-
-                    // This is a direct row to process, so will have 1 target,
-                    // so no need to go further
-                    if (n_bytes_to_transfer == 0) {
-                        log_debug("Direct synapse");
-                        bit_found = true;
-                    } else {
-                        // sdram read (faking dma transfer)
-                        log_debug("DMA read synapse");
-                        bit_found = do_sdram_read_and_test(
-                                row_address, n_bytes_to_transfer);
-                    }
-
-                    while (!bit_found && population_table_get_next_address(
-                            &new_key, &row_address, &n_bytes_to_transfer)){
-                        log_debug("%d", neuron_id);
-
-                        // This is a direct row to process, so will have 1
-                        // target, so no need to go further
-                        if (n_bytes_to_transfer == 0) {
-                            log_debug("Direct synapse");
-                            bit_found = true;
-                        } else {
-                            // sdram read (faking dma transfer)
-                            log_debug("DMA read synapse");
-                            bit_found = do_sdram_read_and_test(
-                                    row_address, n_bytes_to_transfer);
-                        }
-                    }
-                }
-            }
-
-            // if returned false, then the bitfield should be set to 0.
-            // Which its by default already set to. so do nothing. so no else.
-            log_debug("bit_found %d", bit_found);
-            if (bit_found) {
-                bit_field_set(bit_field, neuron_id);
-            }
-        }
-
-        log_debug("Writing bitfield to sdram for core use");
-        bit_field_base_address->filters[i].key = key;
-        log_debug("Putting master pop key %d in entry %d", key, i);
-        bit_field_base_address->filters[i].n_atoms = n_neurons;
-        log_debug("Putting n_atom %d in entry %d", n_neurons, i);
-        // write bitfield to sdram.
-        log_debug("Writing to address %0x, %d words to write",
-                &bit_field_words_location[position], n_words);
-        spin1_memcpy(&bit_field_words_location[position], bit_field,
-                n_words * BYTE_TO_WORD_CONVERSION);
-        // update pointer to correct place
-        bit_field_base_address->filters[i].data =
-                (bit_field_t) &bit_field_words_location[position];
-
-        // update tracker
-        position += n_words;
-
-        // free dtcm of bitfield.
-        log_debug("Freeing the bitfield dtcm");
-        sark_free(bit_field);
-    }
-    determine_redundancy();
-    sort_by_key();
     return true;
 }
 
@@ -402,13 +198,6 @@ void c_main(void) {
     }
 
     if (can_run) {
-        log_info("Generating bit field");
-        if (!generate_bit_field()) {
-            log_error("Failed to generate bitfield");
-            fail_shut_down();
-        } else {
-            success_shut_down();
-            log_info("Successfully processed the bitfield");
-        }
+        success_shut_down();
     }
 }

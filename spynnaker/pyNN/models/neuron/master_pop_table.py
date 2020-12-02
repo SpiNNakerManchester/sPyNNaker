@@ -85,7 +85,10 @@ class _MasterPopEntryCType(ctypes.LittleEndianStructure):
         # Flag to indicate if an extra_info struct is present
         ("extra_info_flag", ctypes.c_uint32, 1),
         # The number of entries in ::address_list for this entry
-        ("count", ctypes.c_uint32, 16)
+        ("count", ctypes.c_uint32, 15),
+        # bool flag for if the synaptic blocks associated with this is
+        # to be cached in DTCM.
+        ("cache_in_dtcm", ctypes.c_uint32, 1)
     ]
 
 
@@ -279,6 +282,7 @@ class _MasterPopEntry(object):
         entry.start = start
         count = len(self.__addresses_and_row_lengths)
         entry.count = count
+        entry.cache_in_dtcm = 1
 
         # Mark where the next entry starts and the number added; this might
         # change if there is extra info
@@ -428,8 +432,6 @@ class MasterPopTableAsBinarySearch(object):
         :param int core_shift: The shift of the mask to get to the core_mask
         :param int n_neurons:
             The number of neurons in each machine vertex (bar the last)
-        :param bool is_single:
-            Flag that states if the entry is a direct entry for a single row.
         :return: The index of the entry, to be used to retrieve it
         :rtype: int
         :raises SynapticConfigurationException: If a bad address is used.
@@ -531,6 +533,10 @@ class MasterPopTableAsBinarySearch(object):
         index = self.__entries[key_and_mask.key].append_invalid()
         self.__n_addresses += 1
         return index
+
+    def read_back_master_pop(self, transceiver, placement):
+        pass
+
 
     def finish_master_pop_table(self, spec, master_pop_table_region):
         """ Complete the master pop table in the data specification.

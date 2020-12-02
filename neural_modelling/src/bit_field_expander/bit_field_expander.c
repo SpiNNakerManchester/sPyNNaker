@@ -22,6 +22,7 @@
 #include <spin1_api.h>
 #include <data_specification.h>
 #include <debug.h>
+#include <common/bit_field_common.h>
 #include <neuron/synapse_row.h>
 #include <neuron/direct_synapses.h>
 #include <neuron/population_table/population_table.h>
@@ -100,32 +101,6 @@ static post_to_pre_entry *post_to_pre_table;
 pre_pop_info_table_t pre_info;
 
 /***************************************************************/
-
-//! \brief Format of the builder region in SDRAM
-typedef struct builder_region_struct {
-    //! What region to find master population table in
-    int master_pop_region_id;
-    //! What region to find the synaptic matrix in
-    int synaptic_matrix_region_id;
-    //! What region to find the direct matrix in
-    int direct_matrix_region_id;
-    //! What region to find bitfield region information in
-    int bit_field_region_id;
-    //! What region to find bitfield key map information in
-    int bit_field_key_map_region_id;
-    //! What region to find structural plasticity information in
-    int structural_matrix_region_id;
-} builder_region_struct;
-
-/***************************************************************/
-
-//! \brief Get this processor's virtual CPU control table in SRAM.
-//! \return a pointer to the virtual control table
-static inline vcpu_t *vcpu(void) {
-    vcpu_t *sark_virtual_processor_info = (vcpu_t *) SV_VCPU;
-    uint core = spin1_get_core_id();
-    return &sark_virtual_processor_info[core];
-}
 
 //! \brief Mark this process as failed.
 static inline void fail_shut_down(void) {

@@ -607,8 +607,9 @@ class SynapticManager(object):
         """
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to
-        :param ~pacman.model.graphs.application_graph.ApplicationGraph \
-        application_graph: the app graph
+        :param application_graph: the app graph
+        :type application_graph:
+            ~pacman.model.graphs.application_graph.ApplicationGraph
         :param AbstractPopulationVertex application_vertex:
             The vertex owning the synapses
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:

@@ -145,6 +145,13 @@ class AbstractSpiNNakerCommon(with_metaclass(
             front_end_versions=versions)
 
         extra_mapping_inputs = dict()
+        extra_mapping_inputs['WriteSynapticBlockCacherIOBUF'] = \
+            self.config.getboolean(
+                "Reports", "write_synaptic_block_cacher_iobuf")
+        extra_mapping_inputs['WriteSynapticBlockCacherReport'] = \
+            self.config.getboolean(
+                "Reports", "write_synaptic_block_cacher_report")
+
         extra_mapping_inputs['RouterBitfieldCompressionReport'] = \
             self.config.getboolean(
                 "Reports", "generate_router_compression_with_bitfield_report")
