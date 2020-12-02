@@ -50,7 +50,7 @@ class AbstractPopulationVertex(
         AbstractPopulationInitializable, AbstractPopulationSettable,
         AbstractChangableAfterRun, AbstractAcceptsIncomingSynapses,
         ProvidesKeyToAtomMappingImpl, AbstractCanReset):
-    """ Underlying vertex model for Neural Populations.
+    """ Underlying vertex model for Neural Populations.\
         Not actually abstract.
     """
 
@@ -96,24 +96,25 @@ class AbstractPopulationVertex(
         :param str label: The label on the population
         :param list(~pacman.model.constraints.AbstractConstraint) constraints:
             Constraints on where a population's vertices may be placed.
-        :param int max_atoms_per_core:\
+        :param int max_atoms_per_core:
             The maximum number of atoms (neurons) per SpiNNaker core.
         :param spikes_per_second: Expected spike rate
         :type spikes_per_second: float or None
-        :param ring_buffer_sigma:\
-            How many SD above the mean to go for upper bound of ring buffer \
-            size; a good starting choice is 5.0. Given length of simulation \
+        :param ring_buffer_sigma:
+            How many SD above the mean to go for upper bound of ring buffer
+            size; a good starting choice is 5.0. Given length of simulation
             we can set this for approximate number of saturation events.
         :type ring_buffer_sigma: float or None
         :param incoming_spike_buffer_size:
         :type incoming_spike_buffer_size: int or None
         :param bool drop_late_spikes: control flag for dropping late packets.
-        :param AbstractNeuronImpl neuron_impl:\
+        :param AbstractNeuronImpl neuron_impl:
             The (Python side of the) implementation of the neurons themselves.
-        :param AbstractPyNNNeuronModel pynn_model:\
+        :param AbstractPyNNNeuronModel pynn_model:
             The PyNN neuron model that this vertex is working on behalf of.
         :param splitter: splitter object
-        :type splitter: None or AbstractSplitterCommon
+        :type splitter: None or
+            ~pacman.model.partitioner_splitters.abstract_splitters.AbstractSplitterCommon
         """
 
         # pylint: disable=too-many-arguments, too-many-locals
@@ -530,11 +531,11 @@ class AbstractPopulationVertex(
     def describe(self):
         """ Get a human-readable description of the cell or synapse type.
 
-        The output may be customised by specifying a different template\
-        together with an associated template engine\
+        The output may be customised by specifying a different template
+        together with an associated template engine
         (see :py:mod:`pyNN.descriptions`).
 
-        If template is None, then a dictionary containing the template context\
+        If template is None, then a dictionary containing the template context
         will be returned.
 
         :rtype: dict(str, ...)

@@ -12,20 +12,18 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.graphs.application import (
     ApplicationSpiNNakerLinkVertex, ApplicationFPGAVertex)
 from pacman.model.partitioner_splitters.splitter_one_to_one_legacy import (
     SplitterOneToOneLegacy)
 from spinn_front_end_common.interface.splitter_selectors import (
     SplitterSelector)
-from spinn_utilities.progress_bar import ProgressBar
-from spynnaker.pyNN.extra_algorithms.splitter_components.\
-    splitter_abstract_pop_vertex_slice import (
-        SplitterAbstractPopulationVertexSlice)
-from spynnaker.pyNN.extra_algorithms.splitter_components.\
-    spynnaker_splitter_slice_legacy import SpynnakerSplitterSliceLegacy
 from spynnaker.pyNN.models.abstract_models import (
     AbstractAcceptsIncomingSynapses)
+from .splitter_abstract_pop_vertex_slice import (
+    SplitterAbstractPopulationVertexSlice)
+from .spynnaker_splitter_slice_legacy import SpynnakerSplitterSliceLegacy
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 from spynnaker.pyNN.models.spike_source.spike_source_array_vertex import (
     SpikeSourceArrayVertex)
@@ -41,17 +39,16 @@ class SpynnakerSplitterSelector(SplitterSelector):
         default for the rest is the SpynnakerSplitterSliceLegacy.
 
     :param ApplicationGraph app_graph: app graph
-    :rtype: None
+    :raises PacmanConfigurationException: If a bad configuration is set
     """
 
     PROGRESS_BAR_NAME = "Adding Splitter selectors where appropriate"
 
     def __call__(self, app_graph):
-        """ basic selector which puts the legacy splitter object on \
-        everything without a splitter object
+        """ Add a splitter to every vertex that doesn't already have one.
 
         :param ApplicationGraph app_graph: app graph
-        :rtype: None
+        :raises PacmanConfigurationException: If a bad configuration is set
         """
 
         progress_bar = ProgressBar(
@@ -77,46 +74,46 @@ class SpynnakerSplitterSelector(SplitterSelector):
 
     @staticmethod
     def abstract_pop_heuristic(app_vertex):
-        """ allows future overrides
+        """ Assign the splitter for APV. Allows future overrides
 
-        :param ApplicationGraph app_vertex: app vertex
-        :rtype: None
+        :param ~pacman.model.graphs.application.ApplicationGraph app_vertex:
+            app vertex
         """
-        splitter = SplitterAbstractPopulationVertexSlice()
-        app_vertex.splitter = splitter
+        app_vertex.splitter = SplitterAbstractPopulationVertexSlice()
 
     @staticmethod
     def external_spinnaker_link_heuristic(app_vertex):
-        """ allows future overrides
+        """ Assign the splitter for SpiNNaker link vertices.\
+            Allows future overrides
 
-        :param ApplicationGraph app_vertex: app vertex
-        :rtype: None
+        :param ~pacman.model.graphs.application.ApplicationGraph app_vertex:
+            app vertex
         """
         app_vertex.splitter = SplitterOneToOneLegacy()
 
     @staticmethod
     def external_fpga_link_heuristic(app_vertex):
-        """ allows future overrides
+        """ Assign the splitter for FPGA link vertices. Allows future overrides
 
-        :param ApplicationGraph app_vertex: app vertex
-        :rtype: None
+        :param ~pacman.model.graphs.application.ApplicationGraph app_vertex:
+            app vertex
         """
         app_vertex.splitter = SplitterOneToOneLegacy()
 
     @staticmethod
     def spike_source_array_heuristic(app_vertex):
-        """ allows future overrides
+        """ Assign the splitter for SSA. Allows future overrides
 
-        :param ApplicationGraph app_vertex: app vertex
-        :rtype: None
+        :param ~pacman.model.graphs.application.ApplicationGraph app_vertex:
+            app vertex
         """
         app_vertex.splitter = SpynnakerSplitterSliceLegacy()
 
     @staticmethod
     def spike_source_poisson_heuristic(app_vertex):
-        """ allows future overrides
+        """ Assign the splitter for SSP. Allows future overrides
 
-        :param ApplicationGraph app_vertex: app vertex
-        :rtype: None
+        :param ~pacman.model.graphs.application.ApplicationGraph app_vertex:
+            app vertex
         """
         app_vertex.splitter = SpynnakerSplitterSliceLegacy()

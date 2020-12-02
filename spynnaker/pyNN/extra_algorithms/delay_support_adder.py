@@ -20,9 +20,7 @@ from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from spynnaker.pyNN.exceptions import DelayExtensionException
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    AbstractSpynnakerSplitterDelay)
-from spynnaker.pyNN.extra_algorithms.splitter_components.\
-    splitter_delay_vertex_slice import SplitterDelayVertexSlice
+    AbstractSpynnakerSplitterDelay, SplitterDelayVertexSlice)
 from spynnaker.pyNN.models.neural_projections import (
     ProjectionApplicationEdge, DelayedApplicationEdge,
     DelayAfferentApplicationEdge)
@@ -76,12 +74,12 @@ class DelaySupportAdder(object):
 
     def __call__(self, app_graph, machine_time_step, user_max_delay):
         """ adds the delay extensions to the app graph, now that all the\
-        splitter objects have been set.
+            splitter objects have been set.
 
-        :param ApplicationGraph app_graph: the app graph
+        :param ~pacman.model.graphs.application.ApplicationGraph app_graph:
+            the app graph
         :param int machine_time_step: the machine time step
         :param int user_max_delay: the user defined max delay
-        :rtype: None
         """
 
         # progress abr and data holders
@@ -126,7 +124,7 @@ class DelaySupportAdder(object):
 
     def _add_new_app_edges(self, app_graph):
         """ adds new edges to the app graph. avoids mutating the arrays being\
-        iterated over previously.
+            iterated over previously.
 
         :param ApplicationGraph app_graph: app graph
         :rtype: None
@@ -139,7 +137,7 @@ class DelaySupportAdder(object):
 
     def _create_post_delay_edge(self, delay_app_vertex, app_edge):
         """ creates the edge between delay extension and post vertex. stores\
-        for future loading to the app graph when safe to do so.
+            for future loading to the app graph when safe to do so.
 
         :param ApplicationVertex delay_app_vertex: delay extension vertex
         :param app_edge: the undelayed app edge this is associated with.
@@ -163,9 +161,10 @@ class DelaySupportAdder(object):
             self, app_outgoing_edge_partition, app_edge, post_vertex_max_delay,
             app_graph, max_delay_needed):
         """ creates the delay extension app vertex and the edge from the src\
-        vertex to this delay extension. Adds to the graph, as safe to do so.
+            vertex to this delay extension. Adds to the graph, as safe to do\
+            so.
 
-        :param OutgoingEdgePartition app_outgoing_edge_partition: \
+        :param OutgoingEdgePartition app_outgoing_edge_partition:
             the original outgoing edge partition.
         :param AppEdge app_edge: the undelayed app edge.
         :param int post_vertex_max_delay: delay supported by post vertex.

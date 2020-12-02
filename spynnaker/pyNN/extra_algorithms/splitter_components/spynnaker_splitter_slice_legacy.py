@@ -14,8 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from pacman.model.partitioner_splitters import SplitterSliceLegacy
-from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    AbstractSpynnakerSplitterDelay)
+from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
 
 
 class SpynnakerSplitterSliceLegacy(

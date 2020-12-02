@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import os
 
+from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.partitioner_constraints import (
@@ -22,15 +23,13 @@ from pacman.model.constraints.partitioner_constraints import (
 from pacman.model.graphs.machine import MachineEdge
 from pacman.model.resources import (
     ResourceContainer, ConstantSDRAM, DTCMResource, CPUCyclesPerTickResource)
-from pacman.model.partitioner_splitters.abstract_splitters.\
-    abstract_splitter_slice import AbstractSplitterSlice
+from pacman.model.partitioner_splitters.abstract_splitters import (
+    AbstractSplitterSlice)
 from pacman.utilities import utility_calls
 from spinn_front_end_common.interface.profiling import profile_utils
 from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT)
-from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    AbstractSpynnakerSplitterDelay)
+from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
 from spynnaker.pyNN.models.neuron import (
     AbstractPopulationVertex, PopulationMachineVertex)
 from spynnaker.pyNN.utilities import bit_field_utilities
