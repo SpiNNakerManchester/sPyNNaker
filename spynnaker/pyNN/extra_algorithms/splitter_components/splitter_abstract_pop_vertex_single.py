@@ -111,7 +111,7 @@ class SplitterAbstractPopulationVertexSingle(
 
     def get_resources_used_by_atoms(self, graph):
         """  Gets the resources of a given app vertex.
-        :param MachineGraph graph: app graph
+        :param ApplicationGraph graph: the app graph
         :rtype: ResourceContainer
         """
         vertex_slice = Slice(0, self._governed_app_vertex.n_atoms)
