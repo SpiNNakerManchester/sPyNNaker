@@ -102,7 +102,7 @@ static not_redundant_tracker_t* not_redundant_tracker = NULL;
 
 
 //! \brief Mark this process as failed.
-static inline void fail_shut_down(void) {
+static void fail_shut_down(void) {
     vcpu()->user2 = 1;
 }
 
@@ -121,7 +121,7 @@ static uint32_t n_not_redundant(filter_info_t filter) {
 }
 
 //! \brief Read in the vertex region addresses
-void read_in_addresses(void) {
+static inline void read_in_addresses(void) {
     // get the data (linked to sdram tag 2 and assume the app ids match)
     data_specification_metadata_t *dsg_metadata =
             data_specification_get_data_address();
@@ -164,7 +164,7 @@ void read_in_addresses(void) {
 //! \brief Set up the master pop table and synaptic matrix for the bit field
 //!        processing.
 //! \return whether the init was successful.
-bool initialise(void) {
+static inline bool initialise(void) {
     // init the synapses to get direct synapse address
     log_info("Direct synapse init");
     if (!direct_synapses_initialise(
@@ -209,10 +209,21 @@ bool initialise(void) {
     return true;
 }
 
-//! \brief sorts out bitfields for most important
-bool sort_out_bitfields(void) {
+//! \brief prints the store
+static void print_store(void) {
+    // print for debug purposes
+    for (uint32_t bit_field = 0; bit_field < bit_field_base_address->n_filters;
+            bit_field++) {
+        log_info(
+            "bitfield with index %d has key %d and has none redundant count of %d",
+            bit_field, not_redundant_tracker[bit_field].filter->key,
+            not_redundant_tracker[bit_field].not_redundant_count);
+    }
+}
+
+//! \brief reads in the bitfields
+static inline void read_in_bitfields(void) {
     // get the bitfields in a copy form
-    log_info("%d", population_table_get_length());
     not_redundant_tracker = MALLOC(
         sizeof(not_redundant_tracker_t) * bit_field_base_address->n_filters);
 
@@ -232,26 +243,44 @@ bool sort_out_bitfields(void) {
         not_redundant_tracker[bit_field].not_redundant_count = n_not_redundant(
             bit_field_base_address->filters[bit_field]);
     }
+}
 
-    // print for debug purposes
-    for (uint32_t bit_field = 0; bit_field < bit_field_base_address->n_filters;
-            bit_field++) {
-        log_info(
-            "bitfield with index %d has key %d and has redundant count of %d",
-            bit_field, not_redundant_tracker[bit_field].filter->key,
-            not_redundant_tracker[bit_field].not_redundant_count);
+//! \brief sorts so that bitfields with most none redundant at front
+static inline void sort(void) {
+    for (uint32_t i = 1; i < bit_field_base_address->n_filters; i++) {
+        const not_redundant_tracker_t temp = not_redundant_tracker[i];
+
+        uint32_t j;
+        for (j = i; j > 0 &&
+                not_redundant_tracker[j - 1].not_redundant_count <=
+                temp.not_redundant_count; j--) {
+            not_redundant_tracker[j] = not_redundant_tracker[j - 1];
+        }
+        not_redundant_tracker[j] = temp;
     }
+}
 
+//! \brief sorts out bitfields for most important
+static inline bool sort_out_bitfields(void) {
+    // read in the stuff
+    read_in_bitfields();
+    // debug
+    print_store();
     // sort so that most not redundant at front
-
-
-
-
+    sort();
+    log_info("after sort");
+    print_store();
 }
 
 //! \brief determines which blocks can be DTCM'ed.
-bool cache_blocks(void) {
+static inline bool cache_blocks(void) {
     log_info("plan to fill %d bytes of DTCM", dtcm_to_use);
+
+    for (uint32_t bit_field_index = 0;
+            bit_field_index < bit_field_base_address->n_filters;
+            bit_field_index++) {
+
+    }
     return true;
 }
 
