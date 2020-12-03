@@ -14,31 +14,21 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-import math
 import numpy
 from pyNN.random import RandomDistribution
-from pacman.model.constraints.partitioner_constraints import (
-    SameAtomsAsVertexConstraint)
-from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION)
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.models.abstract_models import (
     AbstractAcceptsIncomingSynapses)
 from spynnaker.pyNN.models.neural_projections import (
-    DelayedApplicationEdge, SynapseInformation,
-    ProjectionApplicationEdge, DelayAfferentApplicationEdge)
-from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
+    SynapseInformation, ProjectionApplicationEdge)
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neuron import ConnectionHolder
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractSynapseDynamicsStructural)
 
 # pylint: disable=protected-access
 
 logger = logging.getLogger(__name__)
-_delay_extension_max_supported_delay = (
-    constants.MAX_DELAY_BLOCKS * constants.MAX_TIMER_TICS_SUPPORTED_PER_BLOCK)
-# The maximum delay supported by the Delay extension, in ticks.
 
 
 # noinspection PyProtectedMember
@@ -64,7 +54,7 @@ class PyNNProjectionCommon(object):
             self, spinnaker_control, connector, synapse_dynamics_stdp,
             target, pre_synaptic_population, post_synaptic_population,
             prepop_is_view, postpop_is_view,
-            rng, machine_time_step, user_max_delay, label, time_scale_factor):
+            rng, machine_time_step, label, time_scale_factor):
         """
         :param spinnaker_control: The simulator engine core.
         :type spinnaker_control:
@@ -81,7 +71,6 @@ class PyNNProjectionCommon(object):
         :param rng:
         :type rng: ~pyNN.random.NumpyRNG or None
         :param int machine_time_step:
-        :param float user_max_delay: User-provided max delay
         :param label: Label for the projection, or None to generate one
         :type label: str or None
         :param int time_scale_factor:
@@ -132,37 +121,6 @@ class PyNNProjectionCommon(object):
         connector.set_projection_information(
             machine_time_step, self.__synapse_information)
 
-        # handle max delay
-        max_delay = synapse_dynamics_stdp.get_delay_maximum(
-            connector, self.__synapse_information)
-        if max_delay is None:
-            max_delay = user_max_delay
-
-        # check if all delays requested can fit into the natively supported
-        # delays in the models
-        post_vertex_max_supported_delay_ms = (
-            post_vertex.get_maximum_delay_supported_in_ms(machine_time_step))
-        max_supported_delay_ms = (
-            post_vertex_max_supported_delay_ms +
-            _delay_extension_max_supported_delay *
-            (machine_time_step / MICRO_TO_MILLISECOND_CONVERSION))
-        if max_delay > max_supported_delay_ms:
-            raise ConfigurationException(
-                "The maximum delay {} for projection is not supported "
-                "(max supported delay is {})".format(max_delay,
-                                                     max_supported_delay_ms))
-
-        if max_delay > user_max_delay / (
-                machine_time_step / MICRO_TO_MILLISECOND_CONVERSION):
-            logger.warning("The end user entered a max delay"
-                           " for which the projection breaks")
-
-        # Check structural delays, as they don't support the full range yet...
-        if isinstance(synapse_dynamics_stdp,
-                      AbstractSynapseDynamicsStructural):
-            synapse_dynamics_stdp.check_initial_delay(
-                post_vertex_max_supported_delay_ms)
-
         # check that the projection edges label is not none, and give an
         # auto generated label if set to None
         if label is None:
@@ -187,14 +145,6 @@ class PyNNProjectionCommon(object):
             # add edge to the graph
             spinnaker_control.add_application_edge(
                 self.__projection_edge, constants.SPIKE_PARTITION_ID)
-
-        # If the delay exceeds the post vertex delay, add a delay extension
-        if max_delay > post_vertex_max_supported_delay_ms:
-            delay_edge = self._add_delay_extension(
-                pre_synaptic_population, post_synaptic_population, max_delay,
-                post_vertex_max_supported_delay_ms, machine_time_step,
-                time_scale_factor)
-            self.__projection_edge.delay_edge = delay_edge
 
         # add projection to the SpiNNaker control system
         spinnaker_control.add_projection(self)
@@ -265,64 +215,6 @@ class PyNNProjectionCommon(object):
             if edge.pre_vertex == pre_synaptic_vertex:
                 return edge
         return None
-
-    def _add_delay_extension(
-            self, pre_synaptic_population, post_synaptic_population,
-            max_delay_for_projection, max_delay_per_neuron, machine_time_step,
-            time_scale_factor):
-        """ Instantiate delay extension component
-
-        :param PyNNPopulationCommon pre_synaptic_population:
-        :param PyNNPopulationCommon post_synaptic_population:
-        :param int max_delay_for_projection:
-        :param int max_delay_per_neuron:
-        :param int machine_time_step:
-        :param int time_scale_factor:
-        :rtype: DelayedApplicationEdge
-        """
-        # pylint: disable=too-many-arguments
-        delay_vertex = pre_synaptic_population._internal_delay_vertex
-        pre_vertex = pre_synaptic_population._get_vertex
-        post_vertex = post_synaptic_population._get_vertex
-
-        # Create a delay extension vertex to do the extra delays
-        if delay_vertex is None:
-            delay_name = "{}_delayed".format(pre_vertex.label)
-            delay_vertex = DelayExtensionVertex(
-                pre_vertex.n_atoms, max_delay_per_neuron, pre_vertex,
-                machine_time_step, time_scale_factor, label=delay_name)
-            pre_synaptic_population._internal_delay_vertex = delay_vertex
-            pre_vertex.add_constraint(
-                SameAtomsAsVertexConstraint(delay_vertex))
-            self.__spinnaker_control.add_application_vertex(delay_vertex)
-
-            # Add the edge
-            delay_afferent_edge = DelayAfferentApplicationEdge(
-                pre_vertex, delay_vertex, label="{}_to_DelayExtension".format(
-                    pre_vertex.label))
-            self.__spinnaker_control.add_application_edge(
-                delay_afferent_edge, constants.SPIKE_PARTITION_ID)
-
-        # Ensure that the delay extension knows how many states it will
-        # support
-        n_stages = int(math.ceil(
-            float(max_delay_for_projection - max_delay_per_neuron) /
-            float(max_delay_per_neuron)))
-        if n_stages > delay_vertex.n_delay_stages:
-            delay_vertex.n_delay_stages = n_stages
-
-        # Create the delay edge if there isn't one already
-        delay_edge = self._find_existing_edge(delay_vertex, post_vertex)
-        if delay_edge is None:
-            delay_edge = DelayedApplicationEdge(
-                delay_vertex, post_vertex, self.__synapse_information,
-                self.__projection_edge, label="{}_delayed_to_{}".format(
-                    pre_vertex.label, post_vertex.label))
-            self.__spinnaker_control.add_application_edge(
-                delay_edge, constants.SPIKE_PARTITION_ID)
-        else:
-            delay_edge.add_synapse_information(self.__synapse_information)
-        return delay_edge
 
     def _get_synaptic_data(
             self, as_list, data_to_get, fixed_values=None, notify=None):
