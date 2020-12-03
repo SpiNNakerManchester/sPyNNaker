@@ -87,7 +87,6 @@
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities</span> <span class="kn">import</span> <span class="n">globals_variables</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neural_projections.connectors</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractConnector</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="n">MAX_SUPPORTED_DELAY_TICS</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SynapseRowTooBigException</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.synapse_dynamics</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractStaticSynapseDynamics</span><span class="p">,</span> <span class="n">AbstractSynapseDynamicsStructural</span><span class="p">,</span>
@@ -158,7 +157,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">undelayed_max_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Maximum number of bytes, including headers, in a row of the</span>
+        <span class="sd">&quot;&quot;&quot; Maximum number of bytes, including headers, in a row of the\</span>
 <span class="sd">            undelayed matrix</span>
 
 <span class="sd">        :rtype: int</span>
@@ -167,7 +166,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">delayed_max_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Maximum number of bytes, including headers, in a row of the</span>
+        <span class="sd">&quot;&quot;&quot; Maximum number of bytes, including headers, in a row of the\</span>
 <span class="sd">            delayed matrix</span>
 
 <span class="sd">        :rtype: int</span>
@@ -176,7 +175,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">undelayed_max_words</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Maximum number of words, excluding headers, in a row of the</span>
+        <span class="sd">&quot;&quot;&quot; Maximum number of words, excluding headers, in a row of the\</span>
 <span class="sd">            undelayed matrix</span>
 
 <span class="sd">        :rtype: int</span>
@@ -185,7 +184,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">delayed_max_words</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Maximum number of words, excluding headers, in a row of the</span>
+        <span class="sd">&quot;&quot;&quot; Maximum number of words, excluding headers, in a row of the\</span>
 <span class="sd">            undelayed matrix</span>
 
 <span class="sd">        :rtype: int</span>
@@ -202,15 +201,16 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[]</span>
 
-<div class="viewcode-block" id="SynapseIORowBased.get_maximum_delay_supported_in_ms"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synapse_io.SynapseIORowBased.get_maximum_delay_supported_in_ms">[docs]</a>    <span class="k">def</span> <span class="nf">get_maximum_delay_supported_in_ms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">):</span>
+<div class="viewcode-block" id="SynapseIORowBased.get_maximum_delay_supported_in_ms"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synapse_io.SynapseIORowBased.get_maximum_delay_supported_in_ms">[docs]</a>    <span class="k">def</span> <span class="nf">get_maximum_delay_supported_in_ms</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">post_vertex_max_delay_ticks</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the maximum delay supported by the synapse representation \</span>
 <span class="sd">            before extensions are required, or None if any delay is supported</span>
 
 <span class="sd">        :param int machine_time_step: The time step of the simulation</span>
+<span class="sd">        :param int post_vertex_max_delay_ticks: post vertex max delay</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># There are 16 slots, one per time step</span>
-        <span class="k">return</span> <span class="n">MAX_SUPPORTED_DELAY_TICS</span> <span class="o">*</span> <span class="p">(</span>
+        <span class="k">return</span> <span class="n">post_vertex_max_delay_ticks</span> <span class="o">*</span> <span class="p">(</span>
             <span class="n">machine_time_step</span> <span class="o">/</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">)</span></div>
 
     <span class="nd">@staticmethod</span>
@@ -225,7 +225,7 @@
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_get_allowed_row_length</span><span class="p">(</span>
             <span class="n">n_words</span><span class="p">,</span> <span class="n">dynamics</span><span class="p">,</span> <span class="n">population_table</span><span class="p">,</span> <span class="n">in_edge</span><span class="p">,</span> <span class="n">n_synapses</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the allowed row length in words in the population table for a</span>
+        <span class="sd">&quot;&quot;&quot; Get the allowed row length in words in the population table for a\</span>
 <span class="sd">            desired row length in words</span>
 
 <span class="sd">        :param int n_words: The number of words in the row</span>
@@ -279,7 +279,8 @@
 <span class="sd">            If the synapse information can&#39;t be represented</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">max_delay_supported</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_maximum_delay_supported_in_ms</span><span class="p">(</span>
-            <span class="n">machine_time_step</span><span class="p">)</span>
+            <span class="n">machine_time_step</span><span class="p">,</span>
+            <span class="n">in_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">max_support_delay</span><span class="p">())</span>
         <span class="n">max_delay</span> <span class="o">=</span> <span class="n">max_delay_supported</span> <span class="o">*</span> <span class="p">(</span><span class="n">n_delay_stages</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">pad_to_length</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">pad_to_length</span>
 
@@ -410,7 +411,8 @@
 
 <div class="viewcode-block" id="SynapseIORowBased.get_synapses"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synapse_io.SynapseIORowBased.get_synapses">[docs]</a>    <span class="k">def</span> <span class="nf">get_synapses</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">n_delay_stages</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span>
-            <span class="n">machine_edge</span><span class="p">,</span> <span class="n">max_row_info</span><span class="p">,</span> <span class="n">gen_undelayed</span><span class="p">,</span> <span class="n">gen_delayed</span><span class="p">):</span>
+            <span class="n">machine_edge</span><span class="p">,</span> <span class="n">max_row_info</span><span class="p">,</span> <span class="n">gen_undelayed</span><span class="p">,</span> <span class="n">gen_delayed</span><span class="p">,</span>
+            <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the synapses as an array of words for non-delayed synapses and\</span>
 <span class="sd">            an array of words for delayed synapses. This is used to prepare\</span>
 <span class="sd">            information for *deployment to SpiNNaker*.</span>
@@ -423,8 +425,10 @@
 <span class="sd">            The number of synapse types in total to be represented</span>
 <span class="sd">        :param list(float) weight_scales:</span>
 <span class="sd">            The scaling of the weights for each synapse type</span>
-<span class="sd">        :param ProjectionMachineEdge machine_edge:</span>
+<span class="sd">        :param MachineEdge machine_edge:</span>
 <span class="sd">            The incoming machine edge that the synapses are on</span>
+<span class="sd">        :param int machine_time_step: The machine time step of the sim.</span>
+<span class="sd">        :param ProjectionApplicationEdge app_edge:</span>
 <span class="sd">        :param MaxRowInfo max_row_info:</span>
 <span class="sd">            The maximum row information for the synapses</span>
 <span class="sd">        :param bool gen_undelayed:</span>
@@ -449,8 +453,9 @@
         <span class="c1"># pylint: disable=too-many-arguments, too-many-locals</span>
         <span class="c1"># pylint: disable=assignment-from-no-return</span>
         <span class="c1"># Get delays in timesteps</span>
-        <span class="n">machine_time_step</span> <span class="o">=</span> <span class="n">globals_variables</span><span class="o">.</span><span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">machine_time_step</span>
-        <span class="n">max_delay</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_maximum_delay_supported_in_ms</span><span class="p">(</span><span class="n">machine_time_step</span><span class="p">)</span>
+        <span class="n">max_delay</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_maximum_delay_supported_in_ms</span><span class="p">(</span>
+            <span class="n">machine_time_step</span><span class="p">,</span>
+            <span class="n">app_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">max_support_delay</span><span class="p">())</span>
         <span class="k">if</span> <span class="n">max_delay</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">max_delay</span> <span class="o">*=</span> <span class="p">(</span><span class="n">MICRO_TO_MILLISECOND_CONVERSION</span> <span class="o">/</span> <span class="n">machine_time_step</span><span class="p">)</span>
 
@@ -560,7 +565,7 @@
 <div class="viewcode-block" id="SynapseIORowBased.convert_to_connections"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synapse_io.SynapseIORowBased.convert_to_connections">[docs]</a>    <span class="k">def</span> <span class="nf">convert_to_connections</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
             <span class="n">max_row_length</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span>
-            <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">delayed</span><span class="p">):</span>
+            <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">delayed</span><span class="p">,</span> <span class="n">post_vertex_max_delay_ticks</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Read the synapses for a given projection synapse information\</span>
 <span class="sd">            object out of the given data and convert to connection data</span>
 
@@ -580,6 +585,8 @@
 <span class="sd">            The raw data containing the synapses</span>
 <span class="sd">        :param int machine_time_step:</span>
 <span class="sd">            The time step of the simulation</span>
+<span class="sd">        :param int post_vertex_max_delay_ticks:</span>
+<span class="sd">            max delayed ticks supported from post vertex</span>
 <span class="sd">        :param bool delayed: True if the data should be considered delayed</span>
 <span class="sd">        :return: The connections read from the data; the dtype is</span>
 <span class="sd">            AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE</span>
@@ -599,12 +606,12 @@
             <span class="c1"># Read static data</span>
             <span class="n">connections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_static_data</span><span class="p">(</span>
                 <span class="n">dynamics</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span>
-                <span class="n">row_data</span><span class="p">,</span> <span class="n">delayed</span><span class="p">)</span>
+                <span class="n">row_data</span><span class="p">,</span> <span class="n">delayed</span><span class="p">,</span> <span class="n">post_vertex_max_delay_ticks</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Read plastic data</span>
             <span class="n">connections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_plastic_data</span><span class="p">(</span>
                 <span class="n">dynamics</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span>
-                <span class="n">row_data</span><span class="p">,</span> <span class="n">delayed</span><span class="p">)</span>
+                <span class="n">row_data</span><span class="p">,</span> <span class="n">delayed</span><span class="p">,</span> <span class="n">post_vertex_max_delay_ticks</span><span class="p">)</span>
 
         <span class="c1"># There might still be no connections if the row was all padding</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">connections</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
@@ -643,16 +650,20 @@
         <span class="n">machine_time_step</span> <span class="o">=</span> <span class="n">globals_variables</span><span class="o">.</span><span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">machine_time_step</span>
         <span class="n">pre_vertex_slice</span> <span class="o">=</span> <span class="n">machine_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">vertex_slice</span>
         <span class="n">post_vertex_slice</span> <span class="o">=</span> <span class="n">machine_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">vertex_slice</span>
+        <span class="n">post_splitter</span> <span class="o">=</span> <span class="n">machine_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">app_vertex</span><span class="o">.</span><span class="n">splitter</span>
+        <span class="n">post_vertex_max_delay_ticks</span> <span class="o">=</span> <span class="n">post_splitter</span><span class="o">.</span><span class="n">max_support_delay</span><span class="p">()</span>
         <span class="n">max_row_length</span> <span class="o">=</span> <span class="n">max_row_info</span><span class="o">.</span><span class="n">undelayed_max_words</span>
         <span class="n">delayed_max_row_length</span> <span class="o">=</span> <span class="n">max_row_info</span><span class="o">.</span><span class="n">delayed_max_words</span>
         <span class="n">connections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">convert_to_connections</span><span class="p">(</span>
             <span class="n">synapse_info</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">max_row_length</span><span class="p">,</span>
             <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span>
-            <span class="n">delayed</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+            <span class="n">delayed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">post_vertex_max_delay_ticks</span><span class="o">=</span><span class="n">post_vertex_max_delay_ticks</span><span class="p">))</span>
         <span class="n">connections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">convert_to_connections</span><span class="p">(</span>
             <span class="n">synapse_info</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
             <span class="n">delayed_max_row_length</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span>
-            <span class="n">delayed_data</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">delayed</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+            <span class="n">delayed_data</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">delayed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">post_vertex_max_delay_ticks</span><span class="o">=</span><span class="n">post_vertex_max_delay_ticks</span><span class="p">))</span>
 
         <span class="c1"># Join the connections into a single list and return it</span>
         <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">connections</span><span class="p">)</span></div>
@@ -678,7 +689,8 @@
             <span class="p">[</span><span class="n">row_data</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">ff_start</span><span class="p">:</span><span class="n">ff_end</span><span class="p">[</span><span class="n">row</span><span class="p">]]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_rows</span><span class="p">)])</span>
 
     <span class="k">def</span> <span class="nf">__convert_delayed_data</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">n_synapses</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">delayed_connections</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">n_synapses</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">delayed_connections</span><span class="p">,</span>
+            <span class="n">post_vertex_max_delay_ticks</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Take the delayed_connections and convert the source ids and delay\</span>
 <span class="sd">            values back to global values</span>
 
@@ -688,6 +700,7 @@
 <span class="sd">        :param ~numpy.ndarray delayed_connections:</span>
 <span class="sd">            The connections to convert of dtype</span>
 <span class="sd">            AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE</span>
+<span class="sd">        :params post_vertex_max_delay_ticks</span>
 <span class="sd">        :return: The converted connection with the same dtype</span>
 <span class="sd">        :rtype: ~numpy.ndarray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -698,7 +711,7 @@
             <span class="n">i</span> <span class="o">//</span> <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">synapse_ids</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint32&quot;</span><span class="p">)</span>
         <span class="c1"># Work out the delay for each stage</span>
-        <span class="n">row_min_delay</span> <span class="o">=</span> <span class="p">(</span><span class="n">row_stage</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">MAX_SUPPORTED_DELAY_TICS</span>
+        <span class="n">row_min_delay</span> <span class="o">=</span> <span class="p">(</span><span class="n">row_stage</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">post_vertex_max_delay_ticks</span>
         <span class="c1"># Repeat the delay for all connections in the same row</span>
         <span class="n">connection_min_delay</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span>
             <span class="n">numpy</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">row_min_delay</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">n_synapses</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
@@ -718,7 +731,8 @@
 
     <span class="k">def</span> <span class="nf">_read_static_data</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">dynamics</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
-            <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">row_data</span><span class="p">,</span> <span class="n">delayed</span><span class="p">):</span>
+            <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">row_data</span><span class="p">,</span> <span class="n">delayed</span><span class="p">,</span>
+            <span class="n">post_vertex_max_delay_ticks</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Read static data from row data</span>
 
 <span class="sd">        :param AbstractStaticSynapseDynamics dynamics:</span>
@@ -732,6 +746,8 @@
 <span class="sd">        :param ~numpy.ndarray row_data:</span>
 <span class="sd">            The raw row data to read</span>
 <span class="sd">        :param bool delayed: True if data should be considered delayed</span>
+<span class="sd">        :param int post_vertex_max_delay_ticks:</span>
+<span class="sd">            max supported delay from vertex</span>
 <span class="sd">        :return: the connections read with dtype</span>
 <span class="sd">            AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE</span>
 <span class="sd">        :rtype: list(~numpy.ndarray)</span>
@@ -746,7 +762,8 @@
         <span class="k">if</span> <span class="n">delayed</span><span class="p">:</span>
             <span class="n">n_synapses</span> <span class="o">=</span> <span class="n">dynamics</span><span class="o">.</span><span class="n">get_n_synapses_in_rows</span><span class="p">(</span><span class="n">ff_size</span><span class="p">)</span>
             <span class="n">connections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__convert_delayed_data</span><span class="p">(</span>
-                <span class="n">n_synapses</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">connections</span><span class="p">)</span>
+                <span class="n">n_synapses</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">connections</span><span class="p">,</span>
+                <span class="n">post_vertex_max_delay_ticks</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">connections</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span>
         <span class="k">return</span> <span class="n">connections</span>
@@ -781,7 +798,8 @@
 
     <span class="k">def</span> <span class="nf">_read_plastic_data</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">dynamics</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
-            <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">row_data</span><span class="p">,</span> <span class="n">delayed</span><span class="p">):</span>
+            <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">row_data</span><span class="p">,</span> <span class="n">delayed</span><span class="p">,</span>
+            <span class="n">post_vertex_max_delay_ticks</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Read plastic data from raw data</span>
 
 <span class="sd">        :param AbstractStaticSynapseDynamics dynamics:</span>
@@ -795,6 +813,7 @@
 <span class="sd">        :param ~numpy.ndarray row_data:</span>
 <span class="sd">            The raw row data to read</span>
 <span class="sd">        :param bool delayed: True if data should be considered delayed</span>
+<span class="sd">        :param int post_vertex_max_delay_ticks: max delay from post vertex</span>
 <span class="sd">        :return: the connections read with dtype</span>
 <span class="sd">            AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE</span>
 <span class="sd">        :rtype: list(~numpy.ndarray)</span>
@@ -811,7 +830,8 @@
         <span class="k">if</span> <span class="n">delayed</span><span class="p">:</span>
             <span class="n">n_synapses</span> <span class="o">=</span> <span class="n">dynamics</span><span class="o">.</span><span class="n">get_n_synapses_in_rows</span><span class="p">(</span><span class="n">pp_size</span><span class="p">,</span> <span class="n">fp_size</span><span class="p">)</span>
             <span class="n">connections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__convert_delayed_data</span><span class="p">(</span>
-                <span class="n">n_synapses</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">connections</span><span class="p">)</span>
+                <span class="n">n_synapses</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">connections</span><span class="p">,</span>
+                <span class="n">post_vertex_max_delay_ticks</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">connections</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span>
         <span class="k">return</span> <span class="n">connections</span>
@@ -819,7 +839,7 @@
 <div class="viewcode-block" id="SynapseIORowBased.get_block_n_bytes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synapse_io.SynapseIORowBased.get_block_n_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">get_block_n_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_row_n_words</span><span class="p">,</span> <span class="n">n_rows</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the number of bytes in a block</span>
 
-<span class="sd">        :param int max_row_n_words:\</span>
+<span class="sd">        :param int max_row_n_words:</span>
 <span class="sd">            The maximum row length in words, excluding headers</span>
 <span class="sd">        :param int n_rows: The number of rows in the block</span>
 <span class="sd">        :rtype: int</span>

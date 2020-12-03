@@ -103,6 +103,7 @@
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.abstract_models.</code><code class="descname">AbstractAcceptsIncomingSynapses</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_accepts_incoming_synapses.html#AbstractAcceptsIncomingSynapses"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
 <p>Indicates an object that can be a post-vertex in a PyNN projection.</p>
+<p>Note: See verify_splitter</p>
 <dl class="method">
 <dt id="spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.clear_connection_cache">
 <code class="descname">clear_connection_cache</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_accepts_incoming_synapses.html#AbstractAcceptsIncomingSynapses.clear_connection_cache"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.clear_connection_cache" title="Permalink to this definition">¶</a></dt>
@@ -124,22 +125,6 @@
 <li><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) &#8211; The specific projection within the edge</li>
 </ul>
 </td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.get_maximum_delay_supported_in_ms">
-<code class="descname">get_maximum_delay_supported_in_ms</code><span class="sig-paren">(</span><em>machine_time_step</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_accepts_incoming_synapses.html#AbstractAcceptsIncomingSynapses.get_maximum_delay_supported_in_ms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.get_maximum_delay_supported_in_ms" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the maximum delay supported by this vertex.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>machine_time_step</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; microseconds</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
 </tr>
 </tbody>
 </table>
@@ -170,6 +155,24 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>synapse_dynamics</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics" title="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics"><em>AbstractSynapseDynamics</em></a>) &#8211; </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.verify_splitter">
+<code class="descname">verify_splitter</code><span class="sig-paren">(</span><em>splitter</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_accepts_incoming_synapses.html#AbstractAcceptsIncomingSynapses.verify_splitter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.verify_splitter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that the splitter implements the API(s) expected by the        SynapticMatrices</p>
+<p>Any Vertex that implements this api should override
+ApplicationVertex.splitter method to also call this function</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>splitter</strong> (<a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay" title="spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay"><em>AbstractSpynnakerSplitterDelay</em></a>) &#8211; the splitter</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>PacmanConfigurationException</strong> &#8211; is the splitter is not an             instance of AbstractSpynnakerSplitterDelay</td>
 </tr>
 </tbody>
 </table>

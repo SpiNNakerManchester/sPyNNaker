@@ -247,6 +247,15 @@
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_process_additional_params</span><span class="p">(</span>
             <span class="n">additional_parameters</span><span class="p">,</span> <span class="n">population_parameters</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; essential method for allowing things like splitter objects at\</span>
+<span class="sd">            pop level</span>
+
+<span class="sd">        :param additional_parameters: the additional params handed down from</span>
+<span class="sd">            user</span>
+<span class="sd">        :param population_parameters: the additional params the vertex can</span>
+<span class="sd">            support.</span>
+<span class="sd">        :return: the list of params that are accepted.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">additional_parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">population_parameters</span><span class="p">:</span>
                 <span class="n">population_parameters</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">additional_parameters</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
@@ -323,13 +332,13 @@
         <span class="sd">&quot;&quot;&quot; Get the values of a parameter for every local cell in the\</span>
 <span class="sd">            population.</span>
 
-<span class="sd">        :param parameter_names: Name of parameter. This is either a single\</span>
+<span class="sd">        :param parameter_names: Name of parameter. This is either a single</span>
 <span class="sd">            string or a list of strings</span>
 <span class="sd">        :type parameter_names: str or iterable(str)</span>
 <span class="sd">        :param bool gather: pointless on sPyNNaker</span>
 <span class="sd">        :param bool simplify: ignored</span>
-<span class="sd">        :return: A single list of values (or possibly a single value) if\</span>
-<span class="sd">            paramter_names is a string, or a dict of these if parameter names\</span>
+<span class="sd">        :return: A single list of values (or possibly a single value) if</span>
+<span class="sd">            paramter_names is a string, or a dict of these if parameter names</span>
 <span class="sd">            is a list.</span>
 <span class="sd">        :rtype: str or list(str) or dict(str,str) or dict(str,list(str))</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -354,15 +363,15 @@
         <span class="sd">&quot;&quot;&quot; Get the values of a parameter for the selected cell in the\</span>
 <span class="sd">            population.</span>
 
-<span class="sd">        :param selector: a description of the subrange to accept. \</span>
-<span class="sd">            Or None for all. See: \</span>
+<span class="sd">        :param selector: a description of the subrange to accept.</span>
+<span class="sd">            Or None for all. See:</span>
 <span class="sd">            :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`</span>
 <span class="sd">        :type selector: slice or int or iterable(bool) or iterable(int)</span>
-<span class="sd">        :param parameter_names: Name of parameter. This is either a\</span>
+<span class="sd">        :param parameter_names: Name of parameter. This is either a</span>
 <span class="sd">            single string or a list of strings</span>
 <span class="sd">        :type parameter_names: str or iterable(str)</span>
-<span class="sd">        :return: A single list of values (or possibly a single value) if\</span>
-<span class="sd">            paramter_names is a string or a dict of these if parameter names\</span>
+<span class="sd">        :return: A single list of values (or possibly a single value) if</span>
+<span class="sd">            paramter_names is a string or a dict of these if parameter names</span>
 <span class="sd">            is a list.</span>
 <span class="sd">        :rtype: str or list(str) or dict(str,str) or dict(str,list(str))</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -509,9 +518,9 @@
 <div class="viewcode-block" id="PyNNPopulationCommon.set"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.set">[docs]</a>    <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameter</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Set one or more parameters for every cell in the population.</span>
 
-<span class="sd">        param can be a dict, in which case value should not be supplied, or a\</span>
-<span class="sd">        string giving the parameter name, in which case value is the parameter\</span>
-<span class="sd">        value. value can be a numeric value, or list of such\</span>
+<span class="sd">        param can be a dict, in which case value should not be supplied, or a</span>
+<span class="sd">        string giving the parameter name, in which case value is the parameter</span>
+<span class="sd">        value. value can be a numeric value, or list of such</span>
 <span class="sd">        (e.g. for setting spike times)::</span>
 
 <span class="sd">            p.set(&quot;tau_m&quot;, 20.0).</span>
@@ -536,8 +545,8 @@
 <div class="viewcode-block" id="PyNNPopulationCommon.set_by_selector"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.set_by_selector">[docs]</a>    <span class="k">def</span> <span class="nf">set_by_selector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selector</span><span class="p">,</span> <span class="n">parameter</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Set one or more parameters for selected cell in the population.</span>
 
-<span class="sd">        param can be a dict, in which case value should not be supplied, or a\</span>
-<span class="sd">        string giving the parameter name, in which case value is the parameter\</span>
+<span class="sd">        param can be a dict, in which case value should not be supplied, or a</span>
+<span class="sd">        string giving the parameter name, in which case value is the parameter</span>
 <span class="sd">        value. value can be a numeric value, or list of such</span>
 <span class="sd">        (e.g. for setting spike times)::</span>
 

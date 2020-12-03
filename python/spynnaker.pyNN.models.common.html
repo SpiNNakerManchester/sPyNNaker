@@ -286,6 +286,29 @@
 </dd></dl>
 
 <dl class="method">
+<dt id="spynnaker.pyNN.models.common.AbstractNeuronRecordable.get_expected_n_rows">
+<code class="descname">get_expected_n_rows</code><span class="sig-paren">(</span><em>n_machine_time_steps</em>, <em>sampling_rate</em>, <em>vertex</em>, <em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/abstract_neuron_recordable.html#AbstractNeuronRecordable.get_expected_n_rows"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.AbstractNeuronRecordable.get_expected_n_rows" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the number of expected rows for a given runtime</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>n_machine_time_steps</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; map of vertex to steps.</li>
+<li><strong>sampling_rate</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; the sampling rate for this vertex</li>
+<li><strong>vertex</strong> (<em>MachineVertex</em>) &#8211; the machine vertex</li>
+<li><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; the variable being recorded</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int the number of rows expected.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="spynnaker.pyNN.models.common.AbstractNeuronRecordable.get_neuron_sampling_interval">
 <code class="descname">get_neuron_sampling_interval</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/abstract_neuron_recordable.html#AbstractNeuronRecordable.get_neuron_sampling_interval"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.AbstractNeuronRecordable.get_neuron_sampling_interval" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the current sampling interval for this variable</p>

@@ -79,31 +79,21 @@
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">from</span> <span class="nn">pyNN.random</span> <span class="kn">import</span> <span class="n">RandomDistribution</span>
-<span class="kn">from</span> <span class="nn">pacman.model.constraints.partitioner_constraints</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">SameAtomsAsVertexConstraint</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.exceptions</span> <span class="kn">import</span> <span class="n">ConfigurationException</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.exceptions</span> <span class="kn">import</span> <span class="n">ConfigurationException</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractAcceptsIncomingSynapses</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neural_projections</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">DelayedApplicationEdge</span><span class="p">,</span> <span class="n">SynapseInformation</span><span class="p">,</span>
-    <span class="n">ProjectionApplicationEdge</span><span class="p">,</span> <span class="n">DelayAfferentApplicationEdge</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.utility_models.delays</span> <span class="kn">import</span> <span class="n">DelayExtensionVertex</span>
+    <span class="n">SynapseInformation</span><span class="p">,</span> <span class="n">ProjectionApplicationEdge</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities</span> <span class="kn">import</span> <span class="n">constants</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron</span> <span class="kn">import</span> <span class="n">ConnectionHolder</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.synapse_dynamics</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">AbstractSynapseDynamicsStructural</span><span class="p">)</span>
 
 <span class="c1"># pylint: disable=protected-access</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
-<span class="n">_delay_extension_max_supported_delay</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">constants</span><span class="o">.</span><span class="n">MAX_DELAY_BLOCKS</span> <span class="o">*</span> <span class="n">constants</span><span class="o">.</span><span class="n">MAX_TIMER_TICS_SUPPORTED_PER_BLOCK</span><span class="p">)</span>
-<span class="c1"># The maximum delay supported by the Delay extension, in ticks.</span>
 
 
 <span class="c1"># noinspection PyProtectedMember</span>
@@ -129,7 +119,7 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">spinnaker_control</span><span class="p">,</span> <span class="n">connector</span><span class="p">,</span> <span class="n">synapse_dynamics_stdp</span><span class="p">,</span>
             <span class="n">target</span><span class="p">,</span> <span class="n">pre_synaptic_population</span><span class="p">,</span> <span class="n">post_synaptic_population</span><span class="p">,</span>
             <span class="n">prepop_is_view</span><span class="p">,</span> <span class="n">postpop_is_view</span><span class="p">,</span>
-            <span class="n">rng</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">user_max_delay</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="p">):</span>
+            <span class="n">rng</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param spinnaker_control: The simulator engine core.</span>
 <span class="sd">        :type spinnaker_control:</span>
@@ -146,7 +136,6 @@
 <span class="sd">        :param rng:</span>
 <span class="sd">        :type rng: ~pyNN.random.NumpyRNG or None</span>
 <span class="sd">        :param int machine_time_step:</span>
-<span class="sd">        :param float user_max_delay: User-provided max delay</span>
 <span class="sd">        :param label: Label for the projection, or None to generate one</span>
 <span class="sd">        :type label: str or None</span>
 <span class="sd">        :param int time_scale_factor:</span>
@@ -197,37 +186,6 @@
         <span class="n">connector</span><span class="o">.</span><span class="n">set_projection_information</span><span class="p">(</span>
             <span class="n">machine_time_step</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span><span class="p">)</span>
 
-        <span class="c1"># handle max delay</span>
-        <span class="n">max_delay</span> <span class="o">=</span> <span class="n">synapse_dynamics_stdp</span><span class="o">.</span><span class="n">get_delay_maximum</span><span class="p">(</span>
-            <span class="n">connector</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">max_delay</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">max_delay</span> <span class="o">=</span> <span class="n">user_max_delay</span>
-
-        <span class="c1"># check if all delays requested can fit into the natively supported</span>
-        <span class="c1"># delays in the models</span>
-        <span class="n">post_vertex_max_supported_delay_ms</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">post_vertex</span><span class="o">.</span><span class="n">get_maximum_delay_supported_in_ms</span><span class="p">(</span><span class="n">machine_time_step</span><span class="p">))</span>
-        <span class="n">max_supported_delay_ms</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">post_vertex_max_supported_delay_ms</span> <span class="o">+</span>
-            <span class="n">_delay_extension_max_supported_delay</span> <span class="o">*</span>
-            <span class="p">(</span><span class="n">machine_time_step</span> <span class="o">/</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">max_delay</span> <span class="o">&gt;</span> <span class="n">max_supported_delay_ms</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
-                <span class="s2">&quot;The maximum delay </span><span class="si">{}</span><span class="s2"> for projection is not supported &quot;</span>
-                <span class="s2">&quot;(max supported delay is </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">max_delay</span><span class="p">,</span>
-                                                     <span class="n">max_supported_delay_ms</span><span class="p">))</span>
-
-        <span class="k">if</span> <span class="n">max_delay</span> <span class="o">&gt;</span> <span class="n">user_max_delay</span> <span class="o">/</span> <span class="p">(</span>
-                <span class="n">machine_time_step</span> <span class="o">/</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">):</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;The end user entered a max delay&quot;</span>
-                           <span class="s2">&quot; for which the projection breaks&quot;</span><span class="p">)</span>
-
-        <span class="c1"># Check structural delays, as they don&#39;t support the full range yet...</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">synapse_dynamics_stdp</span><span class="p">,</span>
-                      <span class="n">AbstractSynapseDynamicsStructural</span><span class="p">):</span>
-            <span class="n">synapse_dynamics_stdp</span><span class="o">.</span><span class="n">check_initial_delay</span><span class="p">(</span>
-                <span class="n">post_vertex_max_supported_delay_ms</span><span class="p">)</span>
-
         <span class="c1"># check that the projection edges label is not none, and give an</span>
         <span class="c1"># auto generated label if set to None</span>
         <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -252,14 +210,6 @@
             <span class="c1"># add edge to the graph</span>
             <span class="n">spinnaker_control</span><span class="o">.</span><span class="n">add_application_edge</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__projection_edge</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
-
-        <span class="c1"># If the delay exceeds the post vertex delay, add a delay extension</span>
-        <span class="k">if</span> <span class="n">max_delay</span> <span class="o">&gt;</span> <span class="n">post_vertex_max_supported_delay_ms</span><span class="p">:</span>
-            <span class="n">delay_edge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_add_delay_extension</span><span class="p">(</span>
-                <span class="n">pre_synaptic_population</span><span class="p">,</span> <span class="n">post_synaptic_population</span><span class="p">,</span> <span class="n">max_delay</span><span class="p">,</span>
-                <span class="n">post_vertex_max_supported_delay_ms</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span>
-                <span class="n">time_scale_factor</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__projection_edge</span><span class="o">.</span><span class="n">delay_edge</span> <span class="o">=</span> <span class="n">delay_edge</span>
 
         <span class="c1"># add projection to the SpiNNaker control system</span>
         <span class="n">spinnaker_control</span><span class="o">.</span><span class="n">add_projection</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -330,64 +280,6 @@
             <span class="k">if</span> <span class="n">edge</span><span class="o">.</span><span class="n">pre_vertex</span> <span class="o">==</span> <span class="n">pre_synaptic_vertex</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">edge</span>
         <span class="k">return</span> <span class="kc">None</span>
-
-    <span class="k">def</span> <span class="nf">_add_delay_extension</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">pre_synaptic_population</span><span class="p">,</span> <span class="n">post_synaptic_population</span><span class="p">,</span>
-            <span class="n">max_delay_for_projection</span><span class="p">,</span> <span class="n">max_delay_per_neuron</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span>
-            <span class="n">time_scale_factor</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Instantiate delay extension component</span>
-
-<span class="sd">        :param PyNNPopulationCommon pre_synaptic_population:</span>
-<span class="sd">        :param PyNNPopulationCommon post_synaptic_population:</span>
-<span class="sd">        :param int max_delay_for_projection:</span>
-<span class="sd">        :param int max_delay_per_neuron:</span>
-<span class="sd">        :param int machine_time_step:</span>
-<span class="sd">        :param int time_scale_factor:</span>
-<span class="sd">        :rtype: DelayedApplicationEdge</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># pylint: disable=too-many-arguments</span>
-        <span class="n">delay_vertex</span> <span class="o">=</span> <span class="n">pre_synaptic_population</span><span class="o">.</span><span class="n">_internal_delay_vertex</span>
-        <span class="n">pre_vertex</span> <span class="o">=</span> <span class="n">pre_synaptic_population</span><span class="o">.</span><span class="n">_get_vertex</span>
-        <span class="n">post_vertex</span> <span class="o">=</span> <span class="n">post_synaptic_population</span><span class="o">.</span><span class="n">_get_vertex</span>
-
-        <span class="c1"># Create a delay extension vertex to do the extra delays</span>
-        <span class="k">if</span> <span class="n">delay_vertex</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">delay_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_delayed&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
-            <span class="n">delay_vertex</span> <span class="o">=</span> <span class="n">DelayExtensionVertex</span><span class="p">(</span>
-                <span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">,</span> <span class="n">max_delay_per_neuron</span><span class="p">,</span> <span class="n">pre_vertex</span><span class="p">,</span>
-                <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">delay_name</span><span class="p">)</span>
-            <span class="n">pre_synaptic_population</span><span class="o">.</span><span class="n">_internal_delay_vertex</span> <span class="o">=</span> <span class="n">delay_vertex</span>
-            <span class="n">pre_vertex</span><span class="o">.</span><span class="n">add_constraint</span><span class="p">(</span>
-                <span class="n">SameAtomsAsVertexConstraint</span><span class="p">(</span><span class="n">delay_vertex</span><span class="p">))</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__spinnaker_control</span><span class="o">.</span><span class="n">add_application_vertex</span><span class="p">(</span><span class="n">delay_vertex</span><span class="p">)</span>
-
-            <span class="c1"># Add the edge</span>
-            <span class="n">delay_afferent_edge</span> <span class="o">=</span> <span class="n">DelayAfferentApplicationEdge</span><span class="p">(</span>
-                <span class="n">pre_vertex</span><span class="p">,</span> <span class="n">delay_vertex</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_to_DelayExtension&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">pre_vertex</span><span class="o">.</span><span class="n">label</span><span class="p">))</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__spinnaker_control</span><span class="o">.</span><span class="n">add_application_edge</span><span class="p">(</span>
-                <span class="n">delay_afferent_edge</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
-
-        <span class="c1"># Ensure that the delay extension knows how many states it will</span>
-        <span class="c1"># support</span>
-        <span class="n">n_stages</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span>
-            <span class="nb">float</span><span class="p">(</span><span class="n">max_delay_for_projection</span> <span class="o">-</span> <span class="n">max_delay_per_neuron</span><span class="p">)</span> <span class="o">/</span>
-            <span class="nb">float</span><span class="p">(</span><span class="n">max_delay_per_neuron</span><span class="p">)))</span>
-        <span class="k">if</span> <span class="n">n_stages</span> <span class="o">&gt;</span> <span class="n">delay_vertex</span><span class="o">.</span><span class="n">n_delay_stages</span><span class="p">:</span>
-            <span class="n">delay_vertex</span><span class="o">.</span><span class="n">n_delay_stages</span> <span class="o">=</span> <span class="n">n_stages</span>
-
-        <span class="c1"># Create the delay edge if there isn&#39;t one already</span>
-        <span class="n">delay_edge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_existing_edge</span><span class="p">(</span><span class="n">delay_vertex</span><span class="p">,</span> <span class="n">post_vertex</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">delay_edge</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">delay_edge</span> <span class="o">=</span> <span class="n">DelayedApplicationEdge</span><span class="p">(</span>
-                <span class="n">delay_vertex</span><span class="p">,</span> <span class="n">post_vertex</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__projection_edge</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_delayed_to_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">pre_vertex</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">post_vertex</span><span class="o">.</span><span class="n">label</span><span class="p">))</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__spinnaker_control</span><span class="o">.</span><span class="n">add_application_edge</span><span class="p">(</span>
-                <span class="n">delay_edge</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">delay_edge</span><span class="o">.</span><span class="n">add_synapse_information</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">delay_edge</span>
 
     <span class="k">def</span> <span class="nf">_get_synaptic_data</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">as_list</span><span class="p">,</span> <span class="n">data_to_get</span><span class="p">,</span> <span class="n">fixed_values</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">notify</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>

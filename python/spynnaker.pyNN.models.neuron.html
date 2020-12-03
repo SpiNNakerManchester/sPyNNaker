@@ -275,6 +275,21 @@
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.master_pop_table.</code><code class="descname">MasterPopTableAsBinarySearch</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/master_pop_table.html#MasterPopTableAsBinarySearch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
 <p>Master population table, implemented as binary search master.</p>
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.MAX_ROW_LENGTH_ERROR_MSG">
+<code class="descname">MAX_ROW_LENGTH_ERROR_MSG</code><em class="property"> = 'Only rows of up to 256 entries are allowed'</em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.MAX_ROW_LENGTH_ERROR_MSG" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.OUT_OF_RANGE_ERROR_MESSAGE">
+<code class="descname">OUT_OF_RANGE_ERROR_MESSAGE</code><em class="property"> = 'Address {} is out of range for this population table!'</em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.OUT_OF_RANGE_ERROR_MESSAGE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.UPPER_BOUND_FUDGE">
+<code class="descname">UPPER_BOUND_FUDGE</code><em class="property"> = 2</em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.UPPER_BOUND_FUDGE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.add_application_entry">
 <code class="descname">add_application_entry</code><span class="sig-paren">(</span><em>block_start_addr</em>, <em>row_length</em>, <em>key_and_mask</em>, <em>core_mask</em>, <em>core_shift</em>, <em>n_neurons</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/master_pop_table.html#MasterPopTableAsBinarySearch.add_application_entry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.add_application_entry" title="Permalink to this definition">¶</a></dt>
@@ -387,11 +402,10 @@ this function</li>
 </table>
 </dd></dl>
 
-<dl class="staticmethod">
+<dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.get_allowed_row_length">
-<em class="property">static </em><code class="descname">get_allowed_row_length</code><span class="sig-paren">(</span><em>row_length</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/master_pop_table.html#MasterPopTableAsBinarySearch.get_allowed_row_length"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.get_allowed_row_length" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the next allowed row length</p>
-<table class="docutils field-list" frame="void" rules="none">
+<code class="descname">get_allowed_row_length</code><span class="sig-paren">(</span><em>row_length</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/master_pop_table.html#MasterPopTableAsBinarySearch.get_allowed_row_length"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.get_allowed_row_length" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
@@ -407,9 +421,9 @@ this function</li>
 </table>
 </dd></dl>
 
-<dl class="staticmethod">
+<dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.get_master_population_table_size">
-<em class="property">static </em><code class="descname">get_master_population_table_size</code><span class="sig-paren">(</span><em>in_edges</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/master_pop_table.html#MasterPopTableAsBinarySearch.get_master_population_table_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.get_master_population_table_size" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_master_population_table_size</code><span class="sig-paren">(</span><em>in_edges</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/master_pop_table.html#MasterPopTableAsBinarySearch.get_master_population_table_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.get_master_population_table_size" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the size of the master population table in SDRAM.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -426,9 +440,9 @@ table</td>
 </table>
 </dd></dl>
 
-<dl class="staticmethod">
+<dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.get_next_allowed_address">
-<em class="property">static </em><code class="descname">get_next_allowed_address</code><span class="sig-paren">(</span><em>next_address</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/master_pop_table.html#MasterPopTableAsBinarySearch.get_next_allowed_address"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.get_next_allowed_address" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_next_allowed_address</code><span class="sig-paren">(</span><em>next_address</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/master_pop_table.html#MasterPopTableAsBinarySearch.get_next_allowed_address"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.get_next_allowed_address" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the next allowed address</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -560,10 +574,7 @@ delayed matrix</li>
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.neuron.synapse_io.MaxRowInfo.delayed_max_bytes">
 <code class="descname">delayed_max_bytes</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_io.MaxRowInfo.delayed_max_bytes" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>Maximum number of bytes, including headers, in a row of the</dt>
-<dd>delayed matrix</dd>
-</dl>
+<dd><p>Maximum number of bytes, including headers, in a row of the            delayed matrix</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -591,10 +602,7 @@ delayed matrix</li>
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.neuron.synapse_io.MaxRowInfo.delayed_max_words">
 <code class="descname">delayed_max_words</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_io.MaxRowInfo.delayed_max_words" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>Maximum number of words, excluding headers, in a row of the</dt>
-<dd>undelayed matrix</dd>
-</dl>
+<dd><p>Maximum number of words, excluding headers, in a row of the            undelayed matrix</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -608,10 +616,7 @@ delayed matrix</li>
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.neuron.synapse_io.MaxRowInfo.undelayed_max_bytes">
 <code class="descname">undelayed_max_bytes</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_io.MaxRowInfo.undelayed_max_bytes" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>Maximum number of bytes, including headers, in a row of the</dt>
-<dd>undelayed matrix</dd>
-</dl>
+<dd><p>Maximum number of bytes, including headers, in a row of the            undelayed matrix</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -639,10 +644,7 @@ delayed matrix</li>
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.neuron.synapse_io.MaxRowInfo.undelayed_max_words">
 <code class="descname">undelayed_max_words</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_io.MaxRowInfo.undelayed_max_words" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>Maximum number of words, excluding headers, in a row of the</dt>
-<dd>undelayed matrix</dd>
-</dl>
+<dd><p>Maximum number of words, excluding headers, in a row of the            undelayed matrix</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -662,7 +664,7 @@ delayed matrix</li>
 <p>A SynapseRowIO implementation that uses a row for each source neuron,        where each row consists of a fixed region, a plastic region, and a        fixed-plastic region (this is the bits of the plastic row that don&#8217;t        actually change).  The plastic region structure is determined by the        synapse dynamics of the connector.</p>
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.synapse_io.SynapseIORowBased.convert_to_connections">
-<code class="descname">convert_to_connections</code><span class="sig-paren">(</span><em>synapse_info</em>, <em>pre_vertex_slice</em>, <em>post_vertex_slice</em>, <em>max_row_length</em>, <em>n_synapse_types</em>, <em>weight_scales</em>, <em>data</em>, <em>machine_time_step</em>, <em>delayed</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_io.html#SynapseIORowBased.convert_to_connections"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_io.SynapseIORowBased.convert_to_connections" title="Permalink to this definition">¶</a></dt>
+<code class="descname">convert_to_connections</code><span class="sig-paren">(</span><em>synapse_info</em>, <em>pre_vertex_slice</em>, <em>post_vertex_slice</em>, <em>max_row_length</em>, <em>n_synapse_types</em>, <em>weight_scales</em>, <em>data</em>, <em>machine_time_step</em>, <em>delayed</em>, <em>post_vertex_max_delay_ticks</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_io.html#SynapseIORowBased.convert_to_connections"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_io.SynapseIORowBased.convert_to_connections" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read the synapses for a given projection synapse information            object out of the given data and convert to connection data</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -677,6 +679,7 @@ delayed matrix</li>
 <li><strong>weight_scales</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em></em>) &#8211; The weight scaling of each synapse type</li>
 <li><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#bytearray" title="(in Python v3.6)"><em>bytearray</em></a>) &#8211; The raw data containing the synapses</li>
 <li><strong>machine_time_step</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The time step of the simulation</li>
+<li><strong>post_vertex_max_delay_ticks</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; max delayed ticks supported from post vertex</li>
 <li><strong>delayed</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; True if the data should be considered delayed</li>
 </ul>
 </td>
@@ -743,15 +746,20 @@ AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE</p>
 
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.synapse_io.SynapseIORowBased.get_maximum_delay_supported_in_ms">
-<code class="descname">get_maximum_delay_supported_in_ms</code><span class="sig-paren">(</span><em>machine_time_step</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_io.html#SynapseIORowBased.get_maximum_delay_supported_in_ms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_io.SynapseIORowBased.get_maximum_delay_supported_in_ms" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_maximum_delay_supported_in_ms</code><span class="sig-paren">(</span><em>machine_time_step</em>, <em>post_vertex_max_delay_ticks</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_io.html#SynapseIORowBased.get_maximum_delay_supported_in_ms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_io.SynapseIORowBased.get_maximum_delay_supported_in_ms" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the maximum delay supported by the synapse representation             before extensions are required, or None if any delay is supported</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>machine_time_step</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The time step of the simulation</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>machine_time_step</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The time step of the simulation</li>
+<li><strong>post_vertex_max_delay_ticks</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; post vertex max delay</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -759,7 +767,7 @@ AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE</p>
 
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.synapse_io.SynapseIORowBased.get_synapses">
-<code class="descname">get_synapses</code><span class="sig-paren">(</span><em>synapse_info</em>, <em>n_delay_stages</em>, <em>n_synapse_types</em>, <em>weight_scales</em>, <em>machine_edge</em>, <em>max_row_info</em>, <em>gen_undelayed</em>, <em>gen_delayed</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_io.html#SynapseIORowBased.get_synapses"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_io.SynapseIORowBased.get_synapses" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_synapses</code><span class="sig-paren">(</span><em>synapse_info</em>, <em>n_delay_stages</em>, <em>n_synapse_types</em>, <em>weight_scales</em>, <em>machine_edge</em>, <em>max_row_info</em>, <em>gen_undelayed</em>, <em>gen_delayed</em>, <em>machine_time_step</em>, <em>app_edge</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_io.html#SynapseIORowBased.get_synapses"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_io.SynapseIORowBased.get_synapses" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the synapses as an array of words for non-delayed synapses and            an array of words for delayed synapses. This is used to prepare            information for <em>deployment to SpiNNaker</em>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -770,7 +778,9 @@ AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE</p>
 <li><strong>n_delay_stages</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The number of delay stages in total to be represented</li>
 <li><strong>n_synapse_types</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The number of synapse types in total to be represented</li>
 <li><strong>weight_scales</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em></em>) &#8211; The scaling of the weights for each synapse type</li>
-<li><strong>machine_edge</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionMachineEdge" title="spynnaker.pyNN.models.neural_projections.ProjectionMachineEdge"><em>ProjectionMachineEdge</em></a>) &#8211; The incoming machine edge that the synapses are on</li>
+<li><strong>machine_edge</strong> (<em>MachineEdge</em>) &#8211; The incoming machine edge that the synapses are on</li>
+<li><strong>machine_time_step</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The machine time step of the sim.</li>
+<li><strong>app_edge</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge" title="spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge"><em>ProjectionApplicationEdge</em></a>) &#8211; </li>
 <li><strong>max_row_info</strong> (<a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_io.MaxRowInfo" title="spynnaker.pyNN.models.neuron.synapse_io.MaxRowInfo"><em>MaxRowInfo</em></a>) &#8211; The maximum row information for the synapses</li>
 <li><strong>gen_undelayed</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; Whether to generate undelayed data</li>
 <li><strong>gen_delayed</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; Whether to generate delayed data</li>
@@ -923,7 +933,7 @@ AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>app_edge</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge" title="spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge"><em>ProjectionApplicationEdge</em></a>) &#8211; The application edge of the projection</li>
 <li><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) &#8211; The synapse information of the projection</li>
-<li><strong>machine_edge</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionMachineEdge" title="spynnaker.pyNN.models.neural_projections.ProjectionMachineEdge"><em>ProjectionMachineEdge</em></a>) &#8211; The machine edge to get the index of</li>
+<li><strong>machine_edge</strong> (<em>MachineEdge</em>) &#8211; The machine edge to get the index of</li>
 </ul>
 </td>
 </tr>
@@ -1000,7 +1010,7 @@ reserved for the on-machine synaptic generation</p>
 
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.synaptic_matrices.SynapticMatrices.write_synaptic_matrix_and_master_population_table">
-<code class="descname">write_synaptic_matrix_and_master_population_table</code><span class="sig-paren">(</span><em>spec</em>, <em>machine_vertex</em>, <em>all_syn_block_sz</em>, <em>weight_scales</em>, <em>routing_info</em>, <em>machine_graph</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synaptic_matrices.html#SynapticMatrices.write_synaptic_matrix_and_master_population_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synaptic_matrices.SynapticMatrices.write_synaptic_matrix_and_master_population_table" title="Permalink to this definition">¶</a></dt>
+<code class="descname">write_synaptic_matrix_and_master_population_table</code><span class="sig-paren">(</span><em>spec</em>, <em>machine_vertex</em>, <em>all_syn_block_sz</em>, <em>weight_scales</em>, <em>routing_info</em>, <em>machine_graph</em>, <em>machine_time_step</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synaptic_matrices.html#SynapticMatrices.write_synaptic_matrix_and_master_population_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synaptic_matrices.SynapticMatrices.write_synaptic_matrix_and_master_population_table" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
 <dt>Simultaneously generates both the master population table and</dt>
 <dd>the synaptic matrix.</dd>
@@ -1016,6 +1026,7 @@ reserved for the on-machine synaptic generation</p>
 <li><strong>weight_scales</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em></em>) &#8211; The weight scale of each synapse</li>
 <li><strong>routing_info</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.routing_info/#pacman.model.routing_info.RoutingInfo" title="(in PACMAN v)"><em>RoutingInfo</em></a>) &#8211; The routing information for all edges</li>
 <li><strong>machine_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineGraph" title="(in PACMAN v)"><em>MachineGraph</em></a>) &#8211; The machine graph</li>
+<li><strong>machine_time_step</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; sim machine time step</li>
 </ul>
 </td>
 </tr>
@@ -1047,7 +1058,7 @@ reserved for the on-machine synaptic generation</p>
 <li><strong>synapse_io</strong> (<a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_io.SynapseIORowBased" title="spynnaker.pyNN.models.neuron.synapse_io.SynapseIORowBased"><em>SynapseIORowBased</em></a>) &#8211; The reader and writer of synapses</li>
 <li><strong>poptable</strong> (<a class="reference internal" href="#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch" title="spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch"><em>MasterPopTableAsBinarySearch</em></a>) &#8211; The master population table</li>
 <li><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) &#8211; The projection synapse information</li>
-<li><strong>machine_edge</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionMachineEdge" title="spynnaker.pyNN.models.neural_projections.ProjectionMachineEdge"><em>ProjectionMachineEdge</em></a>) &#8211; The projection machine edge</li>
+<li><strong>machine_edge</strong> (<em>MachineEdge</em>) &#8211; The projection machine edge</li>
 <li><strong>app_edge</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge" title="spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge"><em>ProjectionApplicationEdge</em></a>) &#8211; The projection application edge</li>
 <li><strong>n_synapse_types</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The number of synapse types accepted</li>
 <li><strong>max_row_info</strong> (<a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_io.MaxRowInfo" title="spynnaker.pyNN.models.neuron.synapse_io.MaxRowInfo"><em>MaxRowInfo</em></a>) &#8211; Maximum row length information</li>
@@ -1083,7 +1094,7 @@ reserved for the on-machine synaptic generation</p>
 
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.synaptic_matrix.SynapticMatrix.get_generator_data">
-<code class="descname">get_generator_data</code><span class="sig-paren">(</span><em>syn_mat_offset</em>, <em>d_mat_offset</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synaptic_matrix.html#SynapticMatrix.get_generator_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synaptic_matrix.SynapticMatrix.get_generator_data" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_generator_data</code><span class="sig-paren">(</span><em>syn_mat_offset</em>, <em>d_mat_offset</em>, <em>max_delay_per_stage</em>, <em>machine_time_step</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synaptic_matrix.html#SynapticMatrix.get_generator_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synaptic_matrix.SynapticMatrix.get_generator_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the generator data for this matrix</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1091,7 +1102,10 @@ reserved for the on-machine synaptic generation</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>syn_mat_offset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The synaptic matrix offset to write the data to</li>
+<li><strong>machine_time_step</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; the sim&#8217;s machine time step.</li>
 <li><strong>d_mat_offset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The synaptic matrix offset to write the delayed data to</li>
+<li><strong>max_delay_per_stage</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; around of timer ticks each delay stage
+holds.</li>
 </ul>
 </td>
 </tr>
@@ -1104,15 +1118,17 @@ reserved for the on-machine synaptic generation</p>
 
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.synaptic_matrix.SynapticMatrix.get_row_data">
-<code class="descname">get_row_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synaptic_matrix.html#SynapticMatrix.get_row_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synaptic_matrix.SynapticMatrix.get_row_data" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_row_data</code><span class="sig-paren">(</span><em>machine_time_step</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synaptic_matrix.html#SynapticMatrix.get_row_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synaptic_matrix.SynapticMatrix.get_row_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate the row data for a synaptic matrix from the description</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The data and the delayed data</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>machine_time_step</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; the sim machine time step.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a>(<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a> or <a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a> or <a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a>)</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The data and the delayed data</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a>(<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a> or <a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a> or <a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a>)</td>
 </tr>
 </tbody>
 </table>
@@ -1168,10 +1184,7 @@ the next offset of the single matrix</td>
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.synaptic_matrix.SynapticMatrix.next_app_delay_on_chip_address">
 <code class="descname">next_app_delay_on_chip_address</code><span class="sig-paren">(</span><em>app_block_addr</em>, <em>max_app_addr</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synaptic_matrix.html#SynapticMatrix.next_app_delay_on_chip_address"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synaptic_matrix.SynapticMatrix.next_app_delay_on_chip_address" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>Allocate a machine-level address of a delayed matrix from within an</dt>
-<dd>app-level allocation</dd>
-</dl>
+<dd><p>Allocate a machine-level address of a delayed matrix from within            an app-level allocation</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1195,10 +1208,7 @@ the next offset of the single matrix</td>
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.synaptic_matrix.SynapticMatrix.next_app_on_chip_address">
 <code class="descname">next_app_on_chip_address</code><span class="sig-paren">(</span><em>app_block_addr</em>, <em>max_app_addr</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synaptic_matrix.html#SynapticMatrix.next_app_on_chip_address"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synaptic_matrix.SynapticMatrix.next_app_on_chip_address" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>Allocate a machine-level address of a matrix from within an</dt>
-<dd>app-level allocation</dd>
-</dl>
+<dd><p>Allocate a machine-level address of a matrix from within an            app-level allocation</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1222,10 +1232,7 @@ the next offset of the single matrix</td>
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.synaptic_matrix.SynapticMatrix.next_delay_on_chip_address">
 <code class="descname">next_delay_on_chip_address</code><span class="sig-paren">(</span><em>block_addr</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synaptic_matrix.html#SynapticMatrix.next_delay_on_chip_address"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synaptic_matrix.SynapticMatrix.next_delay_on_chip_address" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>Allocate an address for a delayed machine matrix and add it to the</dt>
-<dd>population table</dd>
-</dl>
+<dd><p>Allocate an address for a delayed machine matrix and add it to             the population table</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1243,10 +1250,7 @@ the next offset of the single matrix</td>
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.synaptic_matrix.SynapticMatrix.next_on_chip_address">
 <code class="descname">next_on_chip_address</code><span class="sig-paren">(</span><em>block_addr</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synaptic_matrix.html#SynapticMatrix.next_on_chip_address"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synaptic_matrix.SynapticMatrix.next_on_chip_address" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>Allocate an address for a machine matrix and add it to the</dt>
-<dd>population table</dd>
-</dl>
+<dd><p>Allocate an address for a machine matrix and add it to the            population table</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1540,7 +1544,7 @@ AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE</p>
 <li><strong>delay_app_key_info</strong> (<em>_AppKeyInfo</em>) &#8211; Application-level routing key information for delayed vertices</li>
 <li><strong>routing_info</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.routing_info/#pacman.model.routing_info.RoutingInfo" title="(in PACMAN v)"><em>RoutingInfo</em></a>) &#8211; Routing key information for all incoming edges</li>
 <li><strong>weight_scales</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em></em>) &#8211; Weight scale for each synapse edge</li>
-<li><strong>m_edges</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionMachineEdge" title="spynnaker.pyNN.models.neural_projections.ProjectionMachineEdge"><em>ProjectionMachineEdge</em></a><em>)</em><em></em>) &#8211; The machine edges incoming to this vertex</li>
+<li><strong>m_edges</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><em>MachineEdge</em><em>)</em><em></em>) &#8211; The machine edges incoming to this vertex</li>
 </ul>
 </td>
 </tr>
@@ -1550,7 +1554,7 @@ AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE</p>
 
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.synaptic_matrix_app.SynapticMatrixApp.write_matrix">
-<code class="descname">write_matrix</code><span class="sig-paren">(</span><em>spec</em>, <em>block_addr</em>, <em>single_addr</em>, <em>single_synapses</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synaptic_matrix_app.html#SynapticMatrixApp.write_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synaptic_matrix_app.SynapticMatrixApp.write_matrix" title="Permalink to this definition">¶</a></dt>
+<code class="descname">write_matrix</code><span class="sig-paren">(</span><em>spec</em>, <em>block_addr</em>, <em>single_addr</em>, <em>single_synapses</em>, <em>machine_time_step</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synaptic_matrix_app.html#SynapticMatrixApp.write_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synaptic_matrix_app.SynapticMatrixApp.write_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a synaptic matrix from host</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1561,6 +1565,7 @@ AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE</p>
 <li><strong>block_addr</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The address in the synaptic matrix region to start writing at</li>
 <li><strong>single_addr</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The address in the &#8220;direct&#8221; or &#8220;single&#8221; matrix to start at</li>
 <li><strong>single_synapses</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em><em></em>) &#8211; A list of &#8220;direct&#8221; or &#8220;single&#8221; synapses to write to</li>
+<li><strong>machine_time_step</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; the simulation machine time step</li>
 </ul>
 </td>
 </tr>
@@ -1576,7 +1581,7 @@ AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE</p>
 
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.synaptic_matrix_app.SynapticMatrixApp.write_on_chip_matrix_data">
-<code class="descname">write_on_chip_matrix_data</code><span class="sig-paren">(</span><em>generator_data</em>, <em>block_addr</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synaptic_matrix_app.html#SynapticMatrixApp.write_on_chip_matrix_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synaptic_matrix_app.SynapticMatrixApp.write_on_chip_matrix_data" title="Permalink to this definition">¶</a></dt>
+<code class="descname">write_on_chip_matrix_data</code><span class="sig-paren">(</span><em>generator_data</em>, <em>block_addr</em>, <em>machine_time_step</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synaptic_matrix_app.html#SynapticMatrixApp.write_on_chip_matrix_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synaptic_matrix_app.SynapticMatrixApp.write_on_chip_matrix_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prepare to write a matrix using an on-chip generator</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1585,6 +1590,7 @@ AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>generator_data</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><em>GeneratorData</em><em>)</em><em></em>) &#8211; List of data to add to</li>
 <li><strong>block_addr</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The address in the synaptic matrix region to start writing at</li>
+<li><strong>machine_time_step</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; the sim machine time step</li>
 </ul>
 </td>
 </tr>
@@ -1605,10 +1611,9 @@ AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE</p>
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.models.neuron" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.</code><code class="descname">AbstractPopulationVertex</code><span class="sig-paren">(</span><em>n_neurons</em>, <em>label</em>, <em>constraints</em>, <em>max_atoms_per_core</em>, <em>spikes_per_second</em>, <em>ring_buffer_sigma</em>, <em>incoming_spike_buffer_size</em>, <em>neuron_impl</em>, <em>pynn_model</em>, <em>drop_late_spikes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.</code><code class="descname">AbstractPopulationVertex</code><span class="sig-paren">(</span><em>n_neurons</em>, <em>label</em>, <em>constraints</em>, <em>max_atoms_per_core</em>, <em>spikes_per_second</em>, <em>ring_buffer_sigma</em>, <em>incoming_spike_buffer_size</em>, <em>neuron_impl</em>, <em>pynn_model</em>, <em>drop_late_spikes</em>, <em>splitter</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.impl.tdma_aware_application_vertex.TDMAAwareApplicationVertex</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.abstract_models.abstract_contains_units.AbstractContainsUnits</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.common.abstract_spike_recordable.AbstractSpikeRecordable</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.common.abstract_neuron_recordable.AbstractNeuronRecordable</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_provides_outgoing_partition_constraints.AbstractProvidesOutgoingPartitionConstraints</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.abstract_models.abstract_population_initializable.AbstractPopulationInitializable</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.abstract_models.abstract_population_settable.AbstractPopulationSettable</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_changable_after_run.AbstractChangableAfterRun</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.abstract_models.abstract_accepts_incoming_synapses.AbstractAcceptsIncomingSynapses</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.impl.provides_key_to_atom_mapping_impl.ProvidesKeyToAtomMappingImpl</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_can_reset.AbstractCanReset</span></code></p>
-<p>Underlying vertex model for Neural Populations.
-Not actually abstract.</p>
+<p>Underlying vertex model for Neural Populations.        Not actually abstract.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1619,11 +1624,15 @@ Not actually abstract.</p>
 <li><strong>constraints</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v)"><em>AbstractConstraint</em></a><em>)</em><em></em>) &#8211; Constraints on where a population&#8217;s vertices may be placed.</li>
 <li><strong>max_atoms_per_core</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The maximum number of atoms (neurons) per SpiNNaker core.</li>
 <li><strong>spikes_per_second</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; Expected spike rate</li>
-<li><strong>ring_buffer_sigma</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; How many SD above the mean to go for upper bound of ring buffer             size; a good starting choice is 5.0. Given length of simulation             we can set this for approximate number of saturation events.</li>
+<li><strong>ring_buffer_sigma</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; How many SD above the mean to go for upper bound of ring buffer
+size; a good starting choice is 5.0. Given length of simulation
+we can set this for approximate number of saturation events.</li>
 <li><strong>incoming_spike_buffer_size</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; </li>
 <li><strong>drop_late_spikes</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; control flag for dropping late packets.</li>
 <li><strong>neuron_impl</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl" title="spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl"><em>AbstractNeuronImpl</em></a>) &#8211; The (Python side of the) implementation of the neurons themselves.</li>
 <li><strong>pynn_model</strong> (<a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModel" title="spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModel"><em>AbstractPyNNNeuronModel</em></a>) &#8211; The PyNN neuron model that this vertex is working on behalf of.</li>
+<li><strong>splitter</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a><em> or
+</em><em>AbstractSplitterCommon</em>) &#8211; splitter object</li>
 </ul>
 </td>
 </tr>
@@ -1696,32 +1705,14 @@ Not actually abstract.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.create_machine_vertex">
-<code class="descname">create_machine_vertex</code><span class="sig-paren">(</span><em>vertex_slice</em>, <em>resources_required</em>, <em>label=None</em>, <em>constraints=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.create_machine_vertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.create_machine_vertex" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a machine vertex from this application vertex</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; The slice of atoms that the machine vertex will cover,
-or None to use the default slice</li>
-<li><strong>resources_required</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.resources/#pacman.model.resources.ResourceContainer" title="(in PACMAN v)"><em>ResourceContainer</em></a>) &#8211; The resources used by the machine vertex.</li>
-<li><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; human readable label for the machine vertex</li>
-<li><strong>constraints</strong> (<em>iterable</em><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v)"><em>AbstractConstraint</em></a><em>)</em><em></em>) &#8211; Constraints to be passed on to the machine vertex.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.describe">
 <code class="descname">describe</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.describe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.describe" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a human-readable description of the cell or synapse type.</p>
-<p>The output may be customised by specifying a different template        together with an associated template engine        (see <code class="xref py py-mod docutils literal"><span class="pre">pyNN.descriptions</span></code>).</p>
-<p>If template is None, then a dictionary containing the template context        will be returned.</p>
+<p>The output may be customised by specifying a different template
+together with an associated template engine
+(see <code class="xref py py-mod docutils literal"><span class="pre">pyNN.descriptions</span></code>).</p>
+<p>If template is None, then a dictionary containing the template context
+will be returned.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1747,19 +1738,6 @@ or None to use the default slice</li>
 <li><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) &#8211; The specific projection within the edge</li>
 </ul>
 </td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_cpu_usage_for_atoms">
-<code class="descname">get_cpu_usage_for_atoms</code><span class="sig-paren">(</span><em>vertex_slice</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.get_cpu_usage_for_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_cpu_usage_for_atoms" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; </td>
 </tr>
 </tbody>
 </table>
@@ -1793,13 +1771,23 @@ or None to use the default slice</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_dtcm_usage_for_atoms">
-<code class="descname">get_dtcm_usage_for_atoms</code><span class="sig-paren">(</span><em>vertex_slice</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.get_dtcm_usage_for_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_dtcm_usage_for_atoms" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
+<dt id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_expected_n_rows">
+<code class="descname">get_expected_n_rows</code><span class="sig-paren">(</span><em>n_machine_time_steps</em>, <em>sampling_rate</em>, <em>vertex</em>, <em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.get_expected_n_rows"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_expected_n_rows" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the number of expected rows for a given runtime</p>
+<table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; </td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>n_machine_time_steps</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; map of vertex to steps.</li>
+<li><strong>sampling_rate</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; the sampling rate for this vertex</li>
+<li><strong>vertex</strong> (<em>MachineVertex</em>) &#8211; the machine vertex</li>
+<li><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; the variable being recorded</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int the number of rows expected.</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -1832,11 +1820,6 @@ all. See:
 </tbody>
 </table>
 </dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_maximum_delay_supported_in_ms">
-<code class="descname">get_maximum_delay_supported_in_ms</code><span class="sig-paren">(</span><em>machine_time_step</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.get_maximum_delay_supported_in_ms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_maximum_delay_supported_in_ms" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_neuron_sampling_interval">
@@ -1893,25 +1876,6 @@ Gets the constraints for partitions going out of this vertex.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>)</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_resources_used_by_atoms">
-<code class="descname">get_resources_used_by_atoms</code><span class="sig-paren">(</span><em>vertex_slice</em>, <em>graph</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.get_resources_used_by_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_resources_used_by_atoms" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the separate resource requirements for a range of atoms</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; the low value of atoms to calculate resources from</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a Resource container that contains a
-CPUCyclesPerTickResource, DTCMResource and SDRAMResource</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.resources/#pacman.model.resources.ResourceContainer" title="(in PACMAN v)">ResourceContainer</a></td>
 </tr>
 </tbody>
 </table>
@@ -2342,7 +2306,7 @@ If None the assumption is all neurons are recording</li>
 </table>
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModel.create_vertex">
-<code class="descname">create_vertex</code><span class="sig-paren">(</span><em>n_neurons</em>, <em>label</em>, <em>constraints</em>, <em>spikes_per_second</em>, <em>ring_buffer_sigma</em>, <em>incoming_spike_buffer_size</em>, <em>drop_late_spikes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_pynn_neuron_model.html#AbstractPyNNNeuronModel.create_vertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModel.create_vertex" title="Permalink to this definition">¶</a></dt>
+<code class="descname">create_vertex</code><span class="sig-paren">(</span><em>n_neurons</em>, <em>label</em>, <em>constraints</em>, <em>spikes_per_second</em>, <em>ring_buffer_sigma</em>, <em>incoming_spike_buffer_size</em>, <em>drop_late_spikes</em>, <em>splitter</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_pynn_neuron_model.html#AbstractPyNNNeuronModel.create_vertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModel.create_vertex" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a vertex for a population of the model</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2367,7 +2331,7 @@ If None the assumption is all neurons are recording</li>
 
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModel.default_population_parameters">
-<code class="descname">default_population_parameters</code><em class="property"> = {'spikes_per_second': None, 'ring_buffer_sigma': None, 'incoming_spike_buffer_size': None, 'drop_late_spikes': None}</em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModel.default_population_parameters" title="Permalink to this definition">¶</a></dt>
+<code class="descname">default_population_parameters</code><em class="property"> = {'spikes_per_second': None, 'ring_buffer_sigma': None, 'incoming_spike_buffer_size': None, 'drop_late_spikes': None, 'splitter': None}</em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModel.default_population_parameters" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
@@ -2406,7 +2370,7 @@ If None the assumption is all neurons are recording</li>
 </table>
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModelStandard.create_vertex">
-<code class="descname">create_vertex</code><span class="sig-paren">(</span><em>n_neurons</em>, <em>label</em>, <em>constraints</em>, <em>spikes_per_second</em>, <em>ring_buffer_sigma</em>, <em>incoming_spike_buffer_size</em>, <em>n_steps_per_timestep</em>, <em>drop_late_spikes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_pynn_neuron_model_standard.html#AbstractPyNNNeuronModelStandard.create_vertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModelStandard.create_vertex" title="Permalink to this definition">¶</a></dt>
+<code class="descname">create_vertex</code><span class="sig-paren">(</span><em>n_neurons</em>, <em>label</em>, <em>constraints</em>, <em>spikes_per_second</em>, <em>ring_buffer_sigma</em>, <em>incoming_spike_buffer_size</em>, <em>n_steps_per_timestep</em>, <em>drop_late_spikes</em>, <em>splitter</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_pynn_neuron_model_standard.html#AbstractPyNNNeuronModelStandard.create_vertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModelStandard.create_vertex" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a vertex for a population of the model</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2431,7 +2395,7 @@ If None the assumption is all neurons are recording</li>
 
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModelStandard.default_population_parameters">
-<code class="descname">default_population_parameters</code><em class="property"> = {'spikes_per_second': None, 'ring_buffer_sigma': None, 'incoming_spike_buffer_size': None, 'drop_late_spikes': None, 'n_steps_per_timestep': 1}</em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModelStandard.default_population_parameters" title="Permalink to this definition">¶</a></dt>
+<code class="descname">default_population_parameters</code><em class="property"> = {'spikes_per_second': None, 'ring_buffer_sigma': None, 'incoming_spike_buffer_size': None, 'drop_late_spikes': None, 'splitter': None, 'n_steps_per_timestep': 1}</em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModelStandard.default_population_parameters" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -3124,8 +3088,28 @@ set this for approximate number of saturation events.</li>
 <dd></dd></dl>
 
 <dl class="attribute">
+<dt id="spynnaker.pyNN.models.neuron.SynapticManager.INDEXS_DONT_MATCH_ERROR_MESSAGE">
+<code class="descname">INDEXS_DONT_MATCH_ERROR_MESSAGE</code><em class="property"> = 'Delay index {} and normal index {} do not match'</em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.SynapticManager.INDEXS_DONT_MATCH_ERROR_MESSAGE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.neuron.SynapticManager.NOT_EXACT_SLICES_ERROR_MESSAGE">
+<code class="descname">NOT_EXACT_SLICES_ERROR_MESSAGE</code><em class="property"> = 'The splitter {} is returning estimated slices during DSG. This is deemed an error. Please fix and try again'</em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.SynapticManager.NOT_EXACT_SLICES_ERROR_MESSAGE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.neuron.SynapticManager.NO_DELAY_EDGE_FOR_SRC_IDS_MESSAGE">
+<code class="descname">NO_DELAY_EDGE_FOR_SRC_IDS_MESSAGE</code><em class="property"> = 'Found delayed source IDs but no delay machine edge for {}'</em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.SynapticManager.NO_DELAY_EDGE_FOR_SRC_IDS_MESSAGE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
 <dt id="spynnaker.pyNN.models.neuron.SynapticManager.STATIC_SYNAPSE_MATRIX_SDRAM_IN_BYTES">
 <code class="descname">STATIC_SYNAPSE_MATRIX_SDRAM_IN_BYTES</code><em class="property"> = 8</em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.SynapticManager.STATIC_SYNAPSE_MATRIX_SDRAM_IN_BYTES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.neuron.SynapticManager.TOO_MUCH_WRITTEN_SYNAPTIC_DATA">
+<code class="descname">TOO_MUCH_WRITTEN_SYNAPTIC_DATA</code><em class="property"> = 'Too much synaptic memory has been written: {} of {} '</em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.SynapticManager.TOO_MUCH_WRITTEN_SYNAPTIC_DATA" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -3207,23 +3191,6 @@ AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE</p>
 <dt id="spynnaker.pyNN.models.neuron.SynapticManager.get_dtcm_usage_in_bytes">
 <code class="descname">get_dtcm_usage_in_bytes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synaptic_manager.html#SynapticManager.get_dtcm_usage_in_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.SynapticManager.get_dtcm_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.SynapticManager.get_maximum_delay_supported_in_ms">
-<code class="descname">get_maximum_delay_supported_in_ms</code><span class="sig-paren">(</span><em>machine_time_step</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synaptic_manager.html#SynapticManager.get_maximum_delay_supported_in_ms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.SynapticManager.get_maximum_delay_supported_in_ms" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>The maximum delay supported by this vertex, before delay extensions</dt>
-<dd>are needed</dd>
-</dl>
-<table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
@@ -3417,7 +3384,7 @@ between runs</p>
 <li><strong>application_graph</strong> &#8211; The graph containing the application vertex</li>
 <li><strong>routing_info</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.routing_info/#pacman.model.routing_info.RoutingInfo" title="(in PACMAN v)"><em>RoutingInfo</em></a>) &#8211; How messages are routed</li>
 <li><strong>weight_scale</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; How to scale the weights of the synapses</li>
-<li><strong>machine_time_step</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
+<li><strong>machine_time_step</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; </li>
 </ul>
 </td>
 </tr>

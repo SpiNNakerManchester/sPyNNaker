@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>spynnaker.pyNN.models.neural_projections.delayed_machine_edge &#8212; sPyNNaker  documentation</title>
+    <title>spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_slice_legacy &#8212; sPyNNaker  documentation</title>
     
     <link rel="stylesheet" href="../../../../../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
@@ -62,8 +62,8 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <h1>Source code for spynnaker.pyNN.models.neural_projections.delayed_machine_edge</h1><div class="highlight"><pre>
-<span></span><span class="c1"># Copyright (c) 2017-2019 The University of Manchester</span>
+  <h1>Source code for spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_slice_legacy</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2020-2021 The University of Manchester</span>
 <span class="c1">#</span>
 <span class="c1"># This program is free software: you can redistribute it and/or modify</span>
 <span class="c1"># it under the terms of the GNU General Public License as published by</span>
@@ -78,47 +78,16 @@
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
-<span class="kn">from</span> <span class="nn">pacman.model.graphs.machine</span> <span class="kn">import</span> <span class="n">MachineEdge</span>
+<span class="kn">from</span> <span class="nn">pacman.model.partitioner_splitters</span> <span class="kn">import</span> <span class="n">SplitterSliceLegacy</span>
+<span class="kn">from</span> <span class="nn">.abstract_spynnaker_splitter_delay</span> <span class="kn">import</span> <span class="n">AbstractSpynnakerSplitterDelay</span>
 
 
-<div class="viewcode-block" id="DelayedMachineEdge"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.DelayedMachineEdge">[docs]</a><span class="k">class</span> <span class="nc">DelayedMachineEdge</span><span class="p">(</span><span class="n">MachineEdge</span><span class="p">):</span>
-    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;__synapse_information&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__undelayed_edge&quot;</span><span class="p">]</span>
+<div class="viewcode-block" id="SpynnakerSplitterSliceLegacy"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_slice_legacy.SpynnakerSplitterSliceLegacy">[docs]</a><span class="k">class</span> <span class="nc">SpynnakerSplitterSliceLegacy</span><span class="p">(</span>
+        <span class="n">SplitterSliceLegacy</span><span class="p">,</span> <span class="n">AbstractSpynnakerSplitterDelay</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">synapse_information</span><span class="p">,</span> <span class="n">pre_vertex</span><span class="p">,</span> <span class="n">post_vertex</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span>
-            <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param list(SynapseInformation) synapse_information:</span>
-<span class="sd">        :param DelayExtensionMachineVertex pre_vertex:</span>
-<span class="sd">        :param PopulationMachineVertex post_vertex:</span>
-<span class="sd">        :param str label:</span>
-<span class="sd">        :param int weight:</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># pylint: disable=too-many-arguments</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">DelayedMachineEdge</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">pre_vertex</span><span class="p">,</span> <span class="n">post_vertex</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">traffic_weight</span><span class="o">=</span><span class="n">weight</span><span class="p">,</span>
-            <span class="n">app_edge</span><span class="o">=</span><span class="n">app_edge</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span> <span class="o">=</span> <span class="n">synapse_information</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__undelayed_edge</span> <span class="o">=</span> <span class="kc">None</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">undelayed_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the edge used for Projections without extended delays</span>
-
-<span class="sd">        :rtype: ProjectionMachineEdge or None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__undelayed_edge</span>
-
-    <span class="nd">@undelayed_edge</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">undelayed_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">undelayed_edge</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Set the edge used for Projections without extended delays</span>
-
-<span class="sd">        :param ProjectionMachineEdge undelayed_edge:</span>
-<span class="sd">            The edge to set</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__undelayed_edge</span> <span class="o">=</span> <span class="n">undelayed_edge</span></div>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">SplitterSliceLegacy</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;spynnaker_splitter_slice_legacy&quot;</span><span class="p">)</span>
+        <span class="n">AbstractSpynnakerSplitterDelay</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 </pre></div>
 
           </div>

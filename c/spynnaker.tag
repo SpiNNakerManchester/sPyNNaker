@@ -1528,6 +1528,13 @@
       <anchor>aa8a96f886dfb6ce7692f035fe49597c2</anchor>
       <arglist></arglist>
     </member>
+    <member kind="define">
+      <type>#define</type>
+      <name>COUNTER_SATURATION_VALUE</name>
+      <anchorfile>delay__extension_8c.html</anchorfile>
+      <anchor>a7857bce08704e7040406ce50c0fd52b7</anchor>
+      <arglist></arglist>
+    </member>
     <member kind="enumeration">
       <type></type>
       <name>delay_extension_callback_priorities</name>
@@ -1728,6 +1735,13 @@
     </member>
     <member kind="variable" static="yes">
       <type>static uint32_t</type>
+      <name>n_delay_in_a_stage</name>
+      <anchorfile>delay__extension_8c.html</anchorfile>
+      <anchor>aeb4240f3e630b0b67c607c606562b3d1</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static uint32_t</type>
       <name>num_delay_slots_mask</name>
       <anchorfile>delay__extension_8c.html</anchorfile>
       <anchor>a72085e13d5dfdbd948a0773dd1e13096</anchor>
@@ -1775,6 +1789,27 @@
       <anchor>a5afaacadf2ba06d040be6c3c3b173feb</anchor>
       <arglist></arglist>
     </member>
+    <member kind="variable" static="yes">
+      <type>static uint32_t</type>
+      <name>saturation_count</name>
+      <anchorfile>delay__extension_8c.html</anchorfile>
+      <anchor>af98038a462abb37d565a0f4e6fbc2b2a</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static uint32_t</type>
+      <name>n_packets_dropped_due_to_invalid_neuron_value</name>
+      <anchorfile>delay__extension_8c.html</anchorfile>
+      <anchor>a34eb84f659416414ae2ab50093e1f6aa</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static uint32_t</type>
+      <name>n_packets_dropped_due_to_invalid_key</name>
+      <anchorfile>delay__extension_8c.html</anchorfile>
+      <anchor>ae8c134de34cba293cb75cb5b5dc24e21</anchor>
+      <arglist></arglist>
+    </member>
     <member kind="variable">
       <type>uint</type>
       <name>ticks</name>
@@ -1795,13 +1830,6 @@
     <path>/github/workspace/neural_modelling/src/delay_extension/</path>
     <filename>delay__extension_8h.html</filename>
     <class kind="struct">delay_parameters</class>
-    <member kind="define">
-      <type>#define</type>
-      <name>DELAY_STAGE_LENGTH</name>
-      <anchorfile>delay__extension_8h.html</anchorfile>
-      <anchor>a48634ce49aad40ac1c5cb1b8be213499</anchor>
-      <arglist></arglist>
-    </member>
     <member kind="define">
       <type>#define</type>
       <name>pack_delay_index_stage</name>
@@ -9310,8 +9338,8 @@
       <type>void()</type>
       <name>generate_row_func</name>
       <anchorfile>generator__types_8h.html</anchorfile>
-      <anchor>a5d5b66117a496c73ac9441edfea33a43</anchor>
-      <arglist>(void *generator, address_t synaptic_matrix, address_t delayed_synaptic_matrix, uint32_t n_pre_neurons, uint32_t pre_neuron_index, uint32_t max_row_n_words, uint32_t max_delayed_row_n_words, uint32_t synapse_type_bits, uint32_t synapse_index_bits, uint32_t synapse_type, uint32_t n_synapses, uint16_t *indices, uint16_t *delays, uint16_t *weights, uint32_t max_stage)</arglist>
+      <anchor>a8d1b332d6f35a47155fc48aabebeaf80</anchor>
+      <arglist>(void *generator, address_t synaptic_matrix, address_t delayed_synaptic_matrix, uint32_t n_pre_neurons, uint32_t pre_neuron_index, uint32_t max_row_n_words, uint32_t max_delayed_row_n_words, uint32_t synapse_type_bits, uint32_t synapse_index_bits, uint32_t synapse_type, uint32_t n_synapses, uint16_t *indices, uint16_t *delays, uint16_t *weights, uint32_t max_stage, uint32_t max_delay_in_a_stage)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -9475,8 +9503,8 @@
       <type>static void</type>
       <name>matrix_generator_write_row</name>
       <anchorfile>matrix__generator_8c.html</anchorfile>
-      <anchor>a577e684ea5256802bc6d68987d38a3ad</anchor>
-      <arglist>(matrix_generator_t generator, address_t synaptic_matrix, address_t delayed_synaptic_matrix, uint32_t n_pre_neurons, uint32_t pre_neuron_index, uint32_t max_row_n_words, uint32_t max_delayed_row_n_words, uint32_t n_synapse_type_bits, uint32_t n_synapse_index_bits, uint32_t synapse_type, uint32_t n_synapses, uint16_t *indices, uint16_t *delays, uint16_t *weights, uint32_t max_stage)</arglist>
+      <anchor>a94ef2f50254210f92e2d2ea5d85c486d</anchor>
+      <arglist>(matrix_generator_t generator, address_t synaptic_matrix, address_t delayed_synaptic_matrix, uint32_t n_pre_neurons, uint32_t pre_neuron_index, uint32_t max_row_n_words, uint32_t max_delayed_row_n_words, uint32_t n_synapse_type_bits, uint32_t n_synapse_index_bits, uint32_t synapse_type, uint32_t n_synapses, uint16_t *indices, uint16_t *delays, uint16_t *weights, uint32_t max_stage, uint32_t max_delay_per_stage)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static uint16_t</type>
@@ -9496,8 +9524,8 @@
       <type>bool</type>
       <name>matrix_generator_generate</name>
       <anchorfile>matrix__generator_8c.html</anchorfile>
-      <anchor>a03cb6707e51f2de5b204c25d37011062</anchor>
-      <arglist>(matrix_generator_t generator, address_t synaptic_matrix, address_t delayed_synaptic_matrix, uint32_t max_row_n_words, uint32_t max_delayed_row_n_words, uint32_t max_row_n_synapses, uint32_t max_delayed_row_n_synapses, uint32_t n_synapse_type_bits, uint32_t n_synapse_index_bits, uint32_t synapse_type, unsigned long accum *weight_scales, uint32_t post_slice_start, uint32_t post_slice_count, uint32_t pre_slice_start, uint32_t pre_slice_count, connection_generator_t connection_generator, param_generator_t delay_generator, param_generator_t weight_generator, uint32_t max_stage, accum timestep_per_delay)</arglist>
+      <anchor>a0830f8d698bd7251d62c094a41d9d160</anchor>
+      <arglist>(matrix_generator_t generator, address_t synaptic_matrix, address_t delayed_synaptic_matrix, uint32_t max_row_n_words, uint32_t max_delayed_row_n_words, uint32_t max_row_n_synapses, uint32_t max_delayed_row_n_synapses, uint32_t n_synapse_type_bits, uint32_t n_synapse_index_bits, uint32_t synapse_type, unsigned long accum *weight_scales, uint32_t post_slice_start, uint32_t post_slice_count, uint32_t pre_slice_start, uint32_t pre_slice_count, connection_generator_t connection_generator, param_generator_t delay_generator, param_generator_t weight_generator, uint32_t max_stage, uint32_t max_delay_in_a_stage, accum timestep_per_delay)</arglist>
     </member>
     <member kind="variable" static="yes">
       <type>static const struct matrix_generator_info</type>
@@ -9531,8 +9559,8 @@
       <type>bool</type>
       <name>matrix_generator_generate</name>
       <anchorfile>matrix__generator_8h.html</anchorfile>
-      <anchor>a03cb6707e51f2de5b204c25d37011062</anchor>
-      <arglist>(matrix_generator_t generator, address_t synaptic_matrix, address_t delayed_synaptic_matrix, uint32_t max_row_n_words, uint32_t max_delayed_row_n_words, uint32_t max_row_n_synapses, uint32_t max_delayed_row_n_synapses, uint32_t n_synapse_type_bits, uint32_t n_synapse_index_bits, uint32_t synapse_type, unsigned long accum *weight_scales, uint32_t post_slice_start, uint32_t post_slice_count, uint32_t pre_slice_start, uint32_t pre_slice_count, connection_generator_t connection_generator, param_generator_t delay_generator, param_generator_t weight_generator, uint32_t max_stage, accum timestep_per_delay)</arglist>
+      <anchor>a3a75ff58588bafc87d46b933290ba3e1</anchor>
+      <arglist>(matrix_generator_t generator, address_t synaptic_matrix, address_t delayed_synaptic_matrix, uint32_t max_row_n_words, uint32_t max_delayed_row_n_words, uint32_t max_row_n_synapses, uint32_t max_delayed_row_n_synapses, uint32_t n_synapse_type_bits, uint32_t n_synapse_index_bits, uint32_t synapse_type, unsigned long accum *weight_scales, uint32_t post_slice_start, uint32_t post_slice_count, uint32_t pre_slice_start, uint32_t pre_slice_count, connection_generator_t connection_generator, param_generator_t delay_generator, param_generator_t weight_generator, uint32_t max_stage, uint32_t max_delay_per_stage, accum timestep_per_delay)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -9540,19 +9568,12 @@
     <path>/github/workspace/neural_modelling/src/synapse_expander/matrix_generators/</path>
     <filename>matrix__generator__common_8h.html</filename>
     <class kind="struct">delay_value</class>
-    <member kind="define">
-      <type>#define</type>
-      <name>MAX_DELAY</name>
-      <anchorfile>matrix__generator__common_8h.html</anchorfile>
-      <anchor>a16027d8acc5301e440cefa086eb9db2a</anchor>
-      <arglist></arglist>
-    </member>
     <member kind="function" static="yes">
       <type>static struct delay_value</type>
       <name>get_delay</name>
       <anchorfile>matrix__generator__common_8h.html</anchorfile>
-      <anchor>aaffaf8d20874f964c224271c048c1375</anchor>
-      <arglist>(uint16_t delay_value, uint32_t max_stage)</arglist>
+      <anchor>a70d02afe8081b6ed99856fe4594e88e8</anchor>
+      <arglist>(uint16_t delay_value, uint32_t max_stage, uint32_t max_delay_per_stage)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -9636,8 +9657,8 @@
       <type>static void</type>
       <name>matrix_generator_static_write_row</name>
       <anchorfile>matrix__generator__static_8h.html</anchorfile>
-      <anchor>a691175407865992f7fef972af2aeec92</anchor>
-      <arglist>(void *generator, address_t synaptic_matrix, address_t delayed_synaptic_matrix, uint32_t n_pre_neurons, uint32_t pre_neuron_index, uint32_t max_row_n_words, uint32_t max_delayed_row_n_words, uint32_t synapse_type_bits, uint32_t synapse_index_bits, uint32_t synapse_type, uint32_t n_synapses, uint16_t *indices, uint16_t *delays, uint16_t *weights, uint32_t max_stage)</arglist>
+      <anchor>a03d500a7b238275b5b5a32fd32ff6f80</anchor>
+      <arglist>(void *generator, address_t synaptic_matrix, address_t delayed_synaptic_matrix, uint32_t n_pre_neurons, uint32_t pre_neuron_index, uint32_t max_row_n_words, uint32_t max_delayed_row_n_words, uint32_t synapse_type_bits, uint32_t synapse_index_bits, uint32_t synapse_type, uint32_t n_synapses, uint16_t *indices, uint16_t *delays, uint16_t *weights, uint32_t max_stage, uint32_t max_delay_per_stage)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -9715,8 +9736,8 @@
       <type>void</type>
       <name>matrix_generator_stdp_write_row</name>
       <anchorfile>matrix__generator__stdp_8h.html</anchorfile>
-      <anchor>ae75889fca592bbadef4e459c81c04db7</anchor>
-      <arglist>(void *generator, address_t synaptic_matrix, address_t delayed_synaptic_matrix, uint32_t n_pre_neurons, uint32_t pre_neuron_index, uint32_t max_row_n_words, uint32_t max_delayed_row_n_words, uint32_t synapse_type_bits, uint32_t synapse_index_bits, uint32_t synapse_type, uint32_t n_synapses, uint16_t *indices, uint16_t *delays, uint16_t *weights, uint32_t max_stage)</arglist>
+      <anchor>a7e08d07102afbb52373e761318380e97</anchor>
+      <arglist>(void *generator, address_t synaptic_matrix, address_t delayed_synaptic_matrix, uint32_t n_pre_neurons, uint32_t pre_neuron_index, uint32_t max_row_n_words, uint32_t max_delayed_row_n_words, uint32_t synapse_type_bits, uint32_t synapse_index_bits, uint32_t synapse_type, uint32_t n_synapses, uint16_t *indices, uint16_t *delays, uint16_t *weights, uint32_t max_stage, uint32_t max_delay_per_stage)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -10617,6 +10638,27 @@
       <anchor>a91449b33fd2d1a77fac263c2de918e29</anchor>
       <arglist></arglist>
     </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_packets_lost_due_to_count_saturation</name>
+      <anchorfile>delay__extension_8c.html</anchorfile>
+      <anchor>aac3499d38dafe99c13b7f0f373dae57d</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_packets_dropped_due_to_invalid_neuron_value</name>
+      <anchorfile>delay__extension_8c.html</anchorfile>
+      <anchor>a42963fa621bbc30f989a6ca372780c86</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_packets_dropped_due_to_invalid_key</name>
+      <anchorfile>delay__extension_8c.html</anchorfile>
+      <anchor>a1dce1d90e3a85858e234dda0be1c229b</anchor>
+      <arglist></arglist>
+    </member>
   </compound>
   <compound kind="struct">
     <name>delay_parameters</name>
@@ -10662,6 +10704,13 @@
       <name>n_delay_stages</name>
       <anchorfile>delay__extension_8h.html</anchorfile>
       <anchor>ae066739d171e52ac2fa7001f58891b42</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_delay_in_a_stage</name>
+      <anchorfile>delay__extension_8h.html</anchorfile>
+      <anchor>a834003ce931356a849f561dcd7fa2960</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">

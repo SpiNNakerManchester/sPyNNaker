@@ -187,6 +187,7 @@
 <span class="sd">    :param str file_path: absolute path to a file containing the data</span>
 <span class="sd">    :param int min_atom: min neuron ID to which neurons to read in</span>
 <span class="sd">    :param int max_atom: max neuron ID to which neurons to read in</span>
+<span class="sd">    :param extra:</span>
 <span class="sd">    :param min_time: min time slot to read neurons values of.</span>
 <span class="sd">    :type min_time: float or int</span>
 <span class="sd">    :param max_time: max time slot to read neurons values of.</span>
@@ -279,6 +280,16 @@
 <span class="sd">        with a probability of selection of selection_prob</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">prob</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="p">(</span><span class="n">chance</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">n_total_trials</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">binom</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">n_trials</span><span class="p">,</span> <span class="n">selection_prob</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_probable_minimum_selected"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.get_probable_minimum_selected">[docs]</a><span class="k">def</span> <span class="nf">get_probable_minimum_selected</span><span class="p">(</span>
+        <span class="n">n_total_trials</span><span class="p">,</span> <span class="n">n_trials</span><span class="p">,</span> <span class="n">selection_prob</span><span class="p">,</span> <span class="n">chance</span><span class="o">=</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">100.0</span><span class="p">)):</span>
+    <span class="sd">&quot;&quot;&quot; Get the likely minimum number of items that will be selected from a\</span>
+<span class="sd">        set of n_trials from a total set of n_total_trials\</span>
+<span class="sd">        with a probability of selection of selection_prob</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">prob</span> <span class="o">=</span> <span class="p">(</span><span class="n">chance</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">n_total_trials</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">binom</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">n_trials</span><span class="p">,</span> <span class="n">selection_prob</span><span class="p">)</span></div>
 
 

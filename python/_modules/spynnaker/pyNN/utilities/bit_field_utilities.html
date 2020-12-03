@@ -80,9 +80,6 @@
 
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">from</span> <span class="nn">pacman.utilities.constants</span> <span class="kn">import</span> <span class="n">FULL_MASK</span>
-<span class="kn">from</span> <span class="nn">pacman.utilities.algorithm_utilities.</span> \
-    <span class="n">partition_algorithm_utilities</span> <span class="kn">import</span> <span class="p">(</span>
-        <span class="n">determine_max_atoms_for_vertex</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neural_projections</span> <span class="kn">import</span> <span class="n">ProjectionApplicationEdge</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="n">AbstractHasDelayStages</span>
@@ -122,21 +119,18 @@
     <span class="n">sdram</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">for</span> <span class="n">incoming_edge</span> <span class="ow">in</span> <span class="n">app_graph</span><span class="o">.</span><span class="n">get_edges_ending_at_vertex</span><span class="p">(</span><span class="n">vertex</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">incoming_edge</span><span class="p">,</span> <span class="n">ProjectionApplicationEdge</span><span class="p">):</span>
-            <span class="n">edge_pre_vertex</span> <span class="o">=</span> <span class="n">incoming_edge</span><span class="o">.</span><span class="n">pre_vertex</span>
-            <span class="n">max_atoms</span> <span class="o">=</span> <span class="n">determine_max_atoms_for_vertex</span><span class="p">(</span><span class="n">edge_pre_vertex</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">incoming_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">&lt;</span> <span class="n">max_atoms</span><span class="p">:</span>
-                <span class="n">max_atoms</span> <span class="o">=</span> <span class="n">incoming_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_atoms</span>
+            <span class="n">slices</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">incoming_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_out_going_slices</span><span class="p">())</span>
+            <span class="n">n_machine_vertices</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">slices</span><span class="p">)</span>
 
-            <span class="c1"># Get the number of likely vertices</span>
-            <span class="n">n_machine_vertices</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span>
-                <span class="nb">float</span><span class="p">(</span><span class="n">incoming_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span> <span class="o">/</span>
-                <span class="nb">float</span><span class="p">(</span><span class="n">max_atoms</span><span class="p">)))</span>
-            <span class="n">n_atoms_per_machine_vertex</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span>
-                <span class="nb">float</span><span class="p">(</span><span class="n">incoming_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span> <span class="o">/</span>
-                <span class="n">n_machine_vertices</span><span class="p">))</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">edge_pre_vertex</span><span class="p">,</span> <span class="n">AbstractHasDelayStages</span><span class="p">):</span>
+            <span class="n">slice_atoms</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">vertex_slice</span> <span class="ow">in</span> <span class="n">slices</span><span class="p">:</span>
+                <span class="n">slice_atoms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
+            <span class="n">n_atoms_per_machine_vertex</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">slice_atoms</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">incoming_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="p">,</span> <span class="n">AbstractHasDelayStages</span><span class="p">):</span>
                 <span class="n">n_atoms_per_machine_vertex</span> <span class="o">*=</span> \
-                    <span class="n">edge_pre_vertex</span><span class="o">.</span><span class="n">n_delay_stages</span>
+                    <span class="n">incoming_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_delay_stages</span>
             <span class="n">n_words_for_atoms</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span>
                 <span class="n">n_atoms_per_machine_vertex</span> <span class="o">/</span> <span class="n">BIT_IN_A_WORD</span><span class="p">))</span>
             <span class="n">sdram</span> <span class="o">+=</span> <span class="p">(</span>
@@ -156,19 +150,15 @@
 <span class="sd">    :return: SDRAM needed</span>
 <span class="sd">    :rtype: int</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="c1"># basic sdram</span>
     <span class="n">sdram</span> <span class="o">=</span> <span class="n">N_KEYS_DATA_SET_IN_WORDS</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
     <span class="k">for</span> <span class="n">in_edge</span> <span class="ow">in</span> <span class="n">app_graph</span><span class="o">.</span><span class="n">get_edges_ending_at_vertex</span><span class="p">(</span><span class="n">vertex</span><span class="p">):</span>
 
         <span class="c1"># Get the number of likely vertices</span>
-        <span class="n">edge_pre_vertex</span> <span class="o">=</span> <span class="n">in_edge</span><span class="o">.</span><span class="n">pre_vertex</span>
-        <span class="n">max_atoms</span> <span class="o">=</span> <span class="n">determine_max_atoms_for_vertex</span><span class="p">(</span><span class="n">edge_pre_vertex</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">in_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">&lt;</span> <span class="n">max_atoms</span><span class="p">:</span>
-            <span class="n">max_atoms</span> <span class="o">=</span> <span class="n">in_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_atoms</span>
-        <span class="n">n_edge_vertices</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span>
-            <span class="nb">float</span><span class="p">(</span><span class="n">in_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">max_atoms</span><span class="p">)))</span>
-        <span class="n">sdram</span> <span class="o">+=</span> <span class="p">(</span><span class="n">n_edge_vertices</span> <span class="o">*</span> <span class="n">N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP</span> <span class="o">*</span>
-                  <span class="n">BYTES_PER_WORD</span><span class="p">)</span>
+        <span class="n">slices</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">in_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_out_going_slices</span><span class="p">()</span>
+        <span class="n">sdram</span> <span class="o">+=</span> <span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">slices</span><span class="p">)</span> <span class="o">*</span> <span class="n">N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">sdram</span></div>
 
 

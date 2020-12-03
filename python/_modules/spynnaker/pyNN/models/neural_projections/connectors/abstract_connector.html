@@ -116,8 +116,6 @@
         <span class="s2">&quot;_delays&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__min_delay&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__n_clipped_delays&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;_n_post_neurons&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;_n_pre_neurons&quot;</span><span class="p">,</span>
         <span class="s2">&quot;_rng&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__safe&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__space&quot;</span><span class="p">,</span>
@@ -156,9 +154,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__space</span> <span class="o">=</span> <span class="n">space</span></div>
 
 <div class="viewcode-block" id="AbstractConnector.set_projection_information"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.set_projection_information">[docs]</a>    <span class="k">def</span> <span class="nf">set_projection_information</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param int machine_time_step:</span>
-<span class="sd">        :param SynapseInformation synapse_info:</span>
+        <span class="sd">&quot;&quot;&quot; sets a connectors projection info</span>
+<span class="sd">        :param int machine_time_step: machine time step</span>
+<span class="sd">        :param SynapseInformation synapse_info: the synapse info</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=unused-argument</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rng</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rng</span> <span class="ow">or</span> <span class="n">NumpyRNG</span><span class="p">())</span>
@@ -197,6 +195,31 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_parameter</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="s2">&quot;weights&quot;</span><span class="p">,</span> <span class="n">allow_lists</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_parameter</span><span class="p">(</span><span class="n">delays</span><span class="p">,</span> <span class="s2">&quot;delays&quot;</span><span class="p">,</span> <span class="n">allow_lists</span><span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">_get_delay_minimum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delays</span><span class="p">,</span> <span class="n">n_connections</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the minimum delay given a float, RandomDistribution or list of\</span>
+<span class="sd">            delays.</span>
+
+<span class="sd">        :param delays: the delays</span>
+<span class="sd">        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float</span>
+<span class="sd">            or list(int) or list(float)</span>
+<span class="sd">        :param int n_connections: how many connections</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">delays</span><span class="p">,</span> <span class="n">RandomDistribution</span><span class="p">):</span>
+            <span class="n">low_estimated_delay</span> <span class="o">=</span> <span class="n">utility_calls</span><span class="o">.</span><span class="n">get_minimum_probable_value</span><span class="p">(</span>
+                <span class="n">delays</span><span class="p">,</span> <span class="n">n_connections</span><span class="p">)</span>
+            <span class="n">low</span> <span class="o">=</span> <span class="n">utility_calls</span><span class="o">.</span><span class="n">low</span><span class="p">(</span><span class="n">delays</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">low</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">low_estimated_delay</span>
+
+            <span class="c1"># The minimum is the maximum of the possible maximums</span>
+            <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">low_estimated_delay</span><span class="p">,</span> <span class="n">low</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">delays</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">delays</span>
+        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">delays</span><span class="p">,</span> <span class="s2">&quot;__getitem__&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">delays</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Unrecognised delay format: </span><span class="si">{:s}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="nb">type</span><span class="p">(</span><span class="n">delays</span><span class="p">)))</span>
+
     <span class="k">def</span> <span class="nf">_get_delay_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delays</span><span class="p">,</span> <span class="n">n_connections</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the maximum delay given a float, RandomDistribution or list of\</span>
 <span class="sd">            delays.</span>
@@ -225,6 +248,15 @@
     <span class="nd">@abstractmethod</span>
 <div class="viewcode-block" id="AbstractConnector.get_delay_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.get_delay_maximum">[docs]</a>    <span class="k">def</span> <span class="nf">get_delay_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the maximum delay specified by the user in ms, or None if\</span>
+<span class="sd">            unbounded.</span>
+
+<span class="sd">        :param SynapseInformation synapse_info: the synapse info</span>
+<span class="sd">        :rtype: int or None</span>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+    <span class="nd">@abstractmethod</span>
+<div class="viewcode-block" id="AbstractConnector.get_delay_minimum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.get_delay_minimum">[docs]</a>    <span class="k">def</span> <span class="nf">get_delay_minimum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the minimum delay specified by the user in ms, or None if\</span>
 <span class="sd">            unbounded.</span>
 
 <span class="sd">        :param SynapseInformation synapse_info:</span>

@@ -77,23 +77,37 @@
 <span class="c1">#</span>
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
-
+<span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+
+<span class="kn">from</span> <span class="nn">pacman.executor.injection_decorator</span> <span class="kn">import</span> <span class="n">inject_items</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.simulation</span> <span class="kn">import</span> <span class="n">simulation_utilities</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">BITS_PER_WORD</span><span class="p">,</span> <span class="n">BYTES_PER_WORD</span><span class="p">,</span> <span class="n">SIMULATION_N_BYTES</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">pacman.model.graphs.machine</span> <span class="kn">import</span> <span class="n">MachineVertex</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.provenance</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">AbstractHasAssociatedBinary</span><span class="p">)</span>
+    <span class="n">AbstractHasAssociatedBinary</span><span class="p">,</span> <span class="n">AbstractGeneratesDataSpecification</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.utility_objs</span> <span class="kn">import</span> <span class="n">ProvenanceDataItem</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.utility_objs</span> <span class="kn">import</span> <span class="n">ExecutableType</span>
+
+<span class="c1">#  1. has_key 2. key 3. incoming_key 4. incoming_mask 5. n_atoms</span>
+<span class="c1">#  6. n_delay_stages, 7. the number of delay supported by each delay stage</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="n">SPIKE_PARTITION_ID</span>
+
+<span class="n">_DELAY_PARAM_HEADER_WORDS</span> <span class="o">=</span> <span class="mi">7</span>
+
+<span class="n">_EXPANDER_BASE_PARAMS_SIZE</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
 
 <span class="n">DELAY_EXPANDER_APLX</span> <span class="o">=</span> <span class="s2">&quot;delay_expander.aplx&quot;</span>
 
 
 <div class="viewcode-block" id="DelayExtensionMachineVertex"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex">[docs]</a><span class="k">class</span> <span class="nc">DelayExtensionMachineVertex</span><span class="p">(</span>
         <span class="n">MachineVertex</span><span class="p">,</span> <span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="p">,</span>
-        <span class="n">AbstractHasAssociatedBinary</span><span class="p">):</span>
+        <span class="n">AbstractHasAssociatedBinary</span><span class="p">,</span> <span class="n">AbstractGeneratesDataSpecification</span><span class="p">):</span>
+
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;__resources&quot;</span><span class="p">]</span>
 
@@ -111,9 +125,63 @@
         <span class="n">N_PACKETS_SENT</span> <span class="o">=</span> <span class="mi">3</span>
         <span class="n">N_BUFFER_OVERFLOWS</span> <span class="o">=</span> <span class="mi">4</span>
         <span class="n">N_DELAYS</span> <span class="o">=</span> <span class="mi">5</span>
-        <span class="n">N_TIMES_TDMA_FELL_BEHIND</span> <span class="o">=</span> <span class="mi">6</span></div>
+        <span class="n">N_TIMES_TDMA_FELL_BEHIND</span> <span class="o">=</span> <span class="mi">6</span>
+        <span class="n">N_PACKETS_LOST_DUE_TO_COUNT_SATURATION</span> <span class="o">=</span> <span class="mi">7</span>
+        <span class="n">N_PACKETS_WITH_INVALID_NEURON_IDS</span> <span class="o">=</span> <span class="mi">8</span>
+        <span class="n">N_PACKETS_DROPPED_DUE_TO_INVALID_KEY</span> <span class="o">=</span> <span class="mi">9</span></div>
 
     <span class="n">N_EXTRA_PROVENANCE_DATA_ENTRIES</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="p">)</span>
+
+    <span class="n">COUNT_SATURATION_ERROR_MESSAGE</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;The delay extension </span><span class="si">{}</span><span class="s2"> has dropped </span><span class="si">{}</span><span class="s2"> packets because during &quot;</span>
+        <span class="s2">&quot;certain time steps a neuron was asked to spike more than 256 times. &quot;</span>
+        <span class="s2">&quot;This causes a saturation on the count tracker which is a uint8. &quot;</span>
+        <span class="s2">&quot;Reduce the packet rates, or modify the delay extension to have &quot;</span>
+        <span class="s2">&quot;larger counters.&quot;</span><span class="p">)</span>
+
+    <span class="n">COUNT_SATURATION_NAME</span> <span class="o">=</span> <span class="s2">&quot;saturation_count&quot;</span>
+
+    <span class="n">INVALID_NEURON_IDS_ERROR_MESSAGE</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;The delay extension </span><span class="si">{}</span><span class="s2"> has dropped </span><span class="si">{}</span><span class="s2"> packets because their &quot;</span>
+        <span class="s2">&quot;neuron id was not valid. This is likely a routing issue. &quot;</span>
+        <span class="s2">&quot;Please fix and try again&quot;</span><span class="p">)</span>
+
+    <span class="n">INVALID_NEURON_ID_COUNT_NAME</span> <span class="o">=</span> <span class="s2">&quot;invalid_neuron_count&quot;</span>
+
+    <span class="n">PACKETS_DROPPED_FROM_INVALID_KEY_ERROR_MESSAGE</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;The delay extension </span><span class="si">{}</span><span class="s2"> has dropped </span><span class="si">{}</span><span class="s2"> packets due to the packet &quot;</span>
+        <span class="s2">&quot;key being invalid. This is likely a routing issue. &quot;</span>
+        <span class="s2">&quot;Please fix and try again&quot;</span><span class="p">)</span>
+
+    <span class="n">INVALID_KEY_COUNT_NAME</span> <span class="o">=</span> <span class="s2">&quot;invalid_key_count&quot;</span>
+
+    <span class="n">N_PACKETS_RECEIVED_NAME</span> <span class="o">=</span> <span class="s2">&quot;Number_of_packets_received&quot;</span>
+
+    <span class="n">N_PACKETS_PROCESSED_NAME</span> <span class="o">=</span> <span class="s2">&quot;Number_of_packets_processed&quot;</span>
+
+    <span class="n">MISMATCH_PROCESSED_FROM_RECEIVED_ERROR_MESSAGE</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;The delay extension </span><span class="si">{}</span><span class="s2"> on </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2"> only processed </span><span class="si">{}</span><span class="s2"> of </span><span class="si">{}</span><span class="s2">&quot;</span>
+        <span class="s2">&quot; received packets.  This could indicate a fault.&quot;</span><span class="p">)</span>
+
+    <span class="n">MISMATCH_ADDED_FROM_PROCESSED_NAME</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;Number_of_packets_added_to_delay_slot&quot;</span><span class="p">)</span>
+
+    <span class="n">MISMATCH_ADDED_FROM_PROCESSED_ERROR_MESSAGE</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;The delay extension </span><span class="si">{}</span><span class="s2"> on </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2"> only added </span><span class="si">{}</span><span class="s2"> of </span><span class="si">{}</span><span class="s2"> processed &quot;</span>
+        <span class="s2">&quot;packets.  This could indicate a routing or filtering fault&quot;</span><span class="p">)</span>
+
+    <span class="n">N_PACKETS_SENT_NAME</span> <span class="o">=</span> <span class="s2">&quot;Number_of_packets_sent&quot;</span>
+
+    <span class="n">INPUT_BUFFER_LOST_NAME</span> <span class="o">=</span> <span class="s2">&quot;Times_the_input_buffer_lost_packets&quot;</span>
+
+    <span class="n">INPUT_BUFFER_LOST_ERROR_MESSAGE</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;The input buffer for </span><span class="si">{}</span><span class="s2"> on </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2"> lost packets on </span><span class="si">{}</span><span class="s2"> &quot;</span>
+        <span class="s2">&quot;occasions. This is often a sign that the system is running &quot;</span>
+        <span class="s2">&quot;too quickly for the number of neurons per core.  Please &quot;</span>
+        <span class="s2">&quot;increase the timer_tic or time_scale_factor or decrease the &quot;</span>
+        <span class="s2">&quot;number of neurons per core.&quot;</span><span class="p">)</span>
+
+    <span class="n">DELAYED_FOR_TRAFFIC_NAME</span> <span class="o">=</span> <span class="s2">&quot;Number_of_times_delayed_to_spread_traffic&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_required</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">app_vertex</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -176,51 +244,60 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="o">.</span><span class="n">N_DELAYS</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
         <span class="n">n_times_tdma_fell_behind</span> <span class="o">=</span> <span class="n">provenance_data</span><span class="p">[</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="o">.</span><span class="n">N_TIMES_TDMA_FELL_BEHIND</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
+        <span class="n">n_saturation</span> <span class="o">=</span> <span class="n">provenance_data</span><span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="o">.</span>
+            <span class="n">N_PACKETS_LOST_DUE_TO_COUNT_SATURATION</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
+        <span class="n">n_packets_invalid_neuron</span> <span class="o">=</span> <span class="n">provenance_data</span><span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="o">.</span>
+            <span class="n">N_PACKETS_WITH_INVALID_NEURON_IDS</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
+        <span class="n">n_packets_invalid_keys</span> <span class="o">=</span> <span class="n">provenance_data</span><span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="o">.</span>
+            <span class="n">N_PACKETS_DROPPED_DUE_TO_INVALID_KEY</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
 
         <span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_placement_details</span><span class="p">(</span><span class="n">placement</span><span class="p">)</span>
 
         <span class="c1"># translate into provenance data items</span>
         <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="s2">&quot;Number_of_packets_received&quot;</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">COUNT_SATURATION_NAME</span><span class="p">),</span>
+            <span class="n">n_saturation</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">n_saturation</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="n">message</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">COUNT_SATURATION_ERROR_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">label</span><span class="p">,</span> <span class="n">n_saturation</span><span class="p">)))</span>
+        <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">INVALID_NEURON_ID_COUNT_NAME</span><span class="p">),</span>
+            <span class="n">n_packets_invalid_neuron</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">n_packets_invalid_neuron</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="n">message</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">INVALID_NEURON_IDS_ERROR_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">label</span><span class="p">,</span> <span class="n">n_packets_invalid_neuron</span><span class="p">)))</span>
+        <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">INVALID_NEURON_ID_COUNT_NAME</span><span class="p">),</span>
+            <span class="n">n_packets_invalid_keys</span><span class="p">,</span> <span class="n">n_packets_invalid_keys</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">PACKETS_DROPPED_FROM_INVALID_KEY_ERROR_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">label</span><span class="p">,</span> <span class="n">n_packets_invalid_keys</span><span class="p">)))</span>
+        <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N_PACKETS_RECEIVED_NAME</span><span class="p">),</span>
             <span class="n">n_packets_received</span><span class="p">))</span>
         <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="s2">&quot;Number_of_packets_processed&quot;</span><span class="p">),</span>
-            <span class="n">n_packets_processed</span><span class="p">,</span>
-            <span class="n">report</span><span class="o">=</span><span class="n">n_packets_received</span> <span class="o">!=</span> <span class="n">n_packets_processed</span><span class="p">,</span>
-            <span class="n">message</span><span class="o">=</span><span class="p">(</span>
-                <span class="s2">&quot;The delay extension </span><span class="si">{}</span><span class="s2"> on </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2"> only processed </span><span class="si">{}</span><span class="s2"> of </span><span class="si">{}</span><span class="s2">&quot;</span>
-                <span class="s2">&quot; received packets.  This could indicate a fault.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">n_packets_processed</span><span class="p">,</span> <span class="n">n_packets_received</span><span class="p">))))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N_PACKETS_PROCESSED_NAME</span><span class="p">),</span>
+            <span class="n">n_packets_processed</span><span class="p">,</span> <span class="n">n_packets_received</span> <span class="o">!=</span> <span class="n">n_packets_processed</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">MISMATCH_PROCESSED_FROM_RECEIVED_ERROR_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">n_packets_processed</span><span class="p">,</span> <span class="n">n_packets_received</span><span class="p">)))</span>
         <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="s2">&quot;Number_of_packets_added_to_delay_slot&quot;</span><span class="p">),</span>
-            <span class="n">n_packets_added</span><span class="p">,</span>
-            <span class="n">report</span><span class="o">=</span><span class="n">n_packets_added</span> <span class="o">!=</span> <span class="n">n_packets_processed</span><span class="p">,</span>
-            <span class="n">message</span><span class="o">=</span><span class="p">(</span>
-                <span class="s2">&quot;The delay extension </span><span class="si">{}</span><span class="s2"> on </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2"> only added </span><span class="si">{}</span><span class="s2"> of </span><span class="si">{}</span><span class="s2">&quot;</span>
-                <span class="s2">&quot; processed packets.  This could indicate a routing or&quot;</span>
-                <span class="s2">&quot; filtering fault&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">n_packets_added</span><span class="p">,</span> <span class="n">n_packets_processed</span><span class="p">))))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">MISMATCH_ADDED_FROM_PROCESSED_NAME</span><span class="p">),</span>
+            <span class="n">n_packets_added</span><span class="p">,</span> <span class="n">n_packets_added</span> <span class="o">!=</span> <span class="n">n_packets_processed</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">MISMATCH_ADDED_FROM_PROCESSED_ERROR_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">n_packets_added</span><span class="p">,</span> <span class="n">n_packets_processed</span><span class="p">)))</span>
         <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="s2">&quot;Number_of_packets_sent&quot;</span><span class="p">),</span>
-            <span class="n">n_packets_sent</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N_PACKETS_SENT_NAME</span><span class="p">),</span> <span class="n">n_packets_sent</span><span class="p">))</span>
         <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="s2">&quot;Times_the_input_buffer_lost_packets&quot;</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">INPUT_BUFFER_LOST_NAME</span><span class="p">),</span>
             <span class="n">n_buffer_overflows</span><span class="p">,</span>
             <span class="n">report</span><span class="o">=</span><span class="n">n_buffer_overflows</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="n">message</span><span class="o">=</span><span class="p">(</span>
-                <span class="s2">&quot;The input buffer for </span><span class="si">{}</span><span class="s2"> on </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2"> lost packets on </span><span class="si">{}</span><span class="s2"> &quot;</span>
-                <span class="s2">&quot;occasions. This is often a sign that the system is running &quot;</span>
-                <span class="s2">&quot;too quickly for the number of neurons per core.  Please &quot;</span>
-                <span class="s2">&quot;increase the timer_tic or time_scale_factor or decrease the &quot;</span>
-                <span class="s2">&quot;number of neurons per core.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">n_buffer_overflows</span><span class="p">))))</span>
+            <span class="n">message</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">INPUT_BUFFER_LOST_ERROR_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">n_buffer_overflows</span><span class="p">)))</span>
         <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="s2">&quot;Number_of_times_delayed_to_spread_traffic&quot;</span><span class="p">),</span>
-            <span class="n">n_delays</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">DELAYED_FOR_TRAFFIC_NAME</span><span class="p">),</span> <span class="n">n_delays</span><span class="p">))</span>
         <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">get_tdma_provenance_item</span><span class="p">(</span>
                 <span class="n">names</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">n_times_tdma_fell_behind</span><span class="p">))</span>
-
         <span class="k">return</span> <span class="n">provenance_items</span></div>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">MachineVertex</span><span class="o">.</span><span class="n">get_n_keys_for_partition</span><span class="p">)</span>
@@ -235,16 +312,170 @@
 <div class="viewcode-block" id="DelayExtensionMachineVertex.get_binary_start_type"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.get_binary_start_type">[docs]</a>    <span class="k">def</span> <span class="nf">get_binary_start_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">ExecutableType</span><span class="o">.</span><span class="n">USES_SIMULATION_INTERFACE</span></div>
 
+    <span class="nd">@inject_items</span><span class="p">({</span>
+        <span class="s2">&quot;machine_graph&quot;</span><span class="p">:</span> <span class="s2">&quot;MemoryMachineGraph&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;routing_infos&quot;</span><span class="p">:</span> <span class="s2">&quot;MemoryRoutingInfos&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;machine_time_step&quot;</span><span class="p">:</span> <span class="s2">&quot;MachineTimeStep&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;time_scale_factor&quot;</span><span class="p">:</span> <span class="s2">&quot;TimeScaleFactor&quot;</span><span class="p">})</span>
+    <span class="nd">@overrides</span><span class="p">(</span>
+        <span class="n">AbstractGeneratesDataSpecification</span><span class="o">.</span><span class="n">generate_data_specification</span><span class="p">,</span>
+        <span class="n">additional_arguments</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;machine_graph&quot;</span><span class="p">,</span> <span class="s2">&quot;routing_infos&quot;</span><span class="p">,</span> <span class="s2">&quot;machine_time_step&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;time_scale_factor&quot;</span><span class="p">})</span>
+<div class="viewcode-block" id="DelayExtensionMachineVertex.generate_data_specification"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.generate_data_specification">[docs]</a>    <span class="k">def</span> <span class="nf">generate_data_specification</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span> <span class="n">routing_infos</span><span class="p">,</span>
+            <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:</span>
+<span class="sd">        :param ~pacman.model.routing_info.RoutingInfo routing_infos:</span>
+<span class="sd">        :param int machine_time_step: machine time step of the sim.</span>
+<span class="sd">        :param int time_scale_factor: the time scale factor of the sim.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># pylint: disable=arguments-differ</span>
+
+        <span class="n">vertex</span> <span class="o">=</span> <span class="n">placement</span><span class="o">.</span><span class="n">vertex</span>
+
+        <span class="c1"># Reserve memory:</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Reserving memory space for data regions:</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># ###################################################################</span>
+        <span class="c1"># Reserve SDRAM space for memory areas:</span>
+        <span class="n">n_words_per_stage</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
+            <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">/</span> <span class="n">BITS_PER_WORD</span><span class="p">))</span>
+        <span class="n">delay_params_sz</span> <span class="o">=</span> <span class="n">BYTES_PER_WORD</span> <span class="o">*</span> <span class="p">(</span>
+            <span class="n">_DELAY_PARAM_HEADER_WORDS</span> <span class="o">+</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">n_delay_stages</span> <span class="o">*</span> <span class="n">n_words_per_stage</span><span class="p">))</span>
+
+        <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
+            <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_DELAY_EXTENSION_REGIONS</span><span class="o">.</span><span class="n">SYSTEM</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">size</span><span class="o">=</span><span class="n">SIMULATION_N_BYTES</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;setup&#39;</span><span class="p">)</span>
+
+        <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
+            <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_DELAY_EXTENSION_REGIONS</span><span class="o">.</span><span class="n">DELAY_PARAMS</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">size</span><span class="o">=</span><span class="n">delay_params_sz</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;delay_params&#39;</span><span class="p">)</span>
+
+        <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
+            <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_DELAY_EXTENSION_REGIONS</span><span class="o">.</span><span class="n">TDMA_REGION</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">tdma_sdram_size_in_bytes</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;tdma data&quot;</span><span class="p">)</span>
+
+        <span class="c1"># reserve region for provenance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reserve_provenance_data_region</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_setup_info</span><span class="p">(</span>
+            <span class="n">spec</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="p">,</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">get_binary_file_name</span><span class="p">())</span>
+
+        <span class="n">spec</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">*** Spec for Delay Extension Instance ***</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">key</span> <span class="o">=</span> <span class="n">routing_infos</span><span class="o">.</span><span class="n">get_first_key_from_pre_vertex</span><span class="p">(</span>
+            <span class="n">vertex</span><span class="p">,</span> <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
+
+        <span class="n">incoming_key</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">incoming_mask</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">incoming_edges</span> <span class="o">=</span> <span class="n">machine_graph</span><span class="o">.</span><span class="n">get_edges_ending_at_vertex</span><span class="p">(</span>
+            <span class="n">vertex</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">incoming_edge</span> <span class="ow">in</span> <span class="n">incoming_edges</span><span class="p">:</span>
+            <span class="n">incoming_slice</span> <span class="o">=</span> <span class="n">incoming_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">vertex_slice</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">incoming_slice</span><span class="o">.</span><span class="n">lo_atom</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span> <span class="ow">and</span>
+                    <span class="n">incoming_slice</span><span class="o">.</span><span class="n">hi_atom</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span><span class="p">):</span>
+                <span class="n">r_info</span> <span class="o">=</span> <span class="n">routing_infos</span><span class="o">.</span><span class="n">get_routing_info_for_edge</span><span class="p">(</span><span class="n">incoming_edge</span><span class="p">)</span>
+                <span class="n">incoming_key</span> <span class="o">=</span> <span class="n">r_info</span><span class="o">.</span><span class="n">first_key</span>
+                <span class="n">incoming_mask</span> <span class="o">=</span> <span class="n">r_info</span><span class="o">.</span><span class="n">first_mask</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">write_delay_parameters</span><span class="p">(</span>
+            <span class="n">spec</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vertex_slice</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">incoming_key</span><span class="p">,</span> <span class="n">incoming_mask</span><span class="p">)</span>
+
+        <span class="n">generator_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">delay_generator_data</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_vertex_slice</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">generator_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">expander_size</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">size</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">generator_data</span><span class="p">)</span>
+            <span class="n">expander_size</span> <span class="o">+=</span> <span class="n">_EXPANDER_BASE_PARAMS_SIZE</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
+                <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_DELAY_EXTENSION_REGIONS</span><span class="o">.</span><span class="n">EXPANDER_REGION</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="n">size</span><span class="o">=</span><span class="n">expander_size</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;delay_expander&#39;</span><span class="p">)</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_DELAY_EXTENSION_REGIONS</span><span class="o">.</span><span class="n">EXPANDER_REGION</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">generator_data</span><span class="p">))</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">)</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">generator_data</span><span class="p">:</span>
+                <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">gen_data</span><span class="p">)</span>
+
+        <span class="c1"># add tdma data</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_DELAY_EXTENSION_REGIONS</span><span class="o">.</span><span class="n">TDMA_REGION</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">generate_tdma_data_specification_data</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">vertex_slices</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_vertex_slice</span><span class="p">)))</span>
+
+        <span class="c1"># End-of-Spec:</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">end_specification</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">_write_setup_info</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="p">,</span> <span class="n">binary_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
+<span class="sd">        :param int machine_time_step:v the machine time step</span>
+<span class="sd">        :param int time_scale_factor: the time scale factor</span>
+<span class="sd">        :param str binary_name: the binary name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Write this to the system region (to be picked up by the simulation):</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_DELAY_EXTENSION_REGIONS</span><span class="o">.</span><span class="n">SYSTEM</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">simulation_utilities</span><span class="o">.</span><span class="n">get_simulation_header_array</span><span class="p">(</span>
+            <span class="n">binary_name</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="p">))</span>
+
+<div class="viewcode-block" id="DelayExtensionMachineVertex.write_delay_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.write_delay_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">write_delay_parameters</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">incoming_key</span><span class="p">,</span> <span class="n">incoming_mask</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Generate Delay Parameter data</span>
+
+<span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
+<span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
+<span class="sd">        :param int key:</span>
+<span class="sd">        :param int incoming_key:</span>
+<span class="sd">        :param int incoming_mask:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># pylint: disable=too-many-arguments</span>
+
+        <span class="c1"># Write spec with commands to construct required delay region:</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Writing Delay Parameters for </span><span class="si">{}</span><span class="s2"> Neurons:</span><span class="se">\n</span><span class="s2">&quot;</span>
+                     <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">))</span>
+
+        <span class="c1"># Set the focus to the memory region 2 (delay parameters):</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_DELAY_EXTENSION_REGIONS</span><span class="o">.</span><span class="n">DELAY_PARAMS</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+        <span class="c1"># Write header info to the memory region:</span>
+        <span class="c1"># Write Key info for this core and the incoming key and mask:</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">incoming_key</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">incoming_mask</span><span class="p">)</span>
+
+        <span class="c1"># Write the number of neurons in the block:</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
+
+        <span class="c1"># Write the number of blocks of delays:</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">n_delay_stages</span><span class="p">)</span>
+
+        <span class="c1"># write the delay per delay stage</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">delay_per_stage</span><span class="p">)</span>
+
+        <span class="c1"># Write the actual delay blocks (create a new one if it doesn&#39;t exist)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">array_values</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">delay_blocks_for</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_vertex_slice</span><span class="p">)</span><span class="o">.</span><span class="n">delay_block</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="DelayExtensionMachineVertex.gen_on_machine"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.gen_on_machine">[docs]</a>    <span class="k">def</span> <span class="nf">gen_on_machine</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Determine if the given slice needs to be generated on the machine</span>
 
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
 <span class="sd">        :rtype: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">app_vertex</span><span class="o">.</span><span class="n">delay_generator_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">):</span>
-            <span class="k">return</span> <span class="kc">True</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">False</span></div></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">app_vertex</span><span class="o">.</span><span class="n">gen_on_machine</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">)</span></div></div>
 </pre></div>
 
           </div>

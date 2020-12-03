@@ -83,6 +83,7 @@
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">import</span> <span class="nn">scipy.stats</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
+<span class="kn">from</span> <span class="nn">pacman.model.partitioner_interfaces</span> <span class="kn">import</span> <span class="n">LegacyPartitionerAPI</span>
 <span class="kn">from</span> <span class="nn">pacman.executor.injection_decorator</span> <span class="kn">import</span> <span class="n">inject_items</span>
 <span class="kn">from</span> <span class="nn">pacman.model.constraints.key_allocator_constraints</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ContiguousKeyRangeContraint</span><span class="p">)</span>
@@ -132,9 +133,10 @@
         <span class="n">TDMAAwareApplicationVertex</span><span class="p">,</span> <span class="n">AbstractSpikeRecordable</span><span class="p">,</span>
         <span class="n">AbstractProvidesOutgoingPartitionConstraints</span><span class="p">,</span>
         <span class="n">AbstractChangableAfterRun</span><span class="p">,</span> <span class="n">SimplePopulationSettable</span><span class="p">,</span>
-        <span class="n">ProvidesKeyToAtomMappingImpl</span><span class="p">):</span>
+        <span class="n">ProvidesKeyToAtomMappingImpl</span><span class="p">,</span> <span class="n">LegacyPartitionerAPI</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; A Poisson Spike source object</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;__change_requires_mapping&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__duration&quot;</span><span class="p">,</span>
@@ -163,7 +165,7 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span>
             <span class="n">max_atoms_per_core</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">duration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rates</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">starts</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">durations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">max_rate</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="n">max_rate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">splitter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param int n_neurons:</span>
 <span class="sd">        :param iterable(~pacman.model.constraints.AbstractConstraint) \</span>
@@ -175,10 +177,13 @@
 <span class="sd">        :param iterable(float) rate:</span>
 <span class="sd">        :param iterable(int) start:</span>
 <span class="sd">        :param iterable(int) duration:</span>
+<span class="sd">        :param splitter:</span>
+<span class="sd">        :type splitter:</span>
+<span class="sd">            ~pacman.model.partitioner_splitters.abstract_splitters.AbstractSplitterCommon</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="n">TDMAAwareApplicationVertex</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">)</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">,</span> <span class="n">splitter</span><span class="p">)</span>
 
         <span class="c1"># atoms params</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__n_atoms</span> <span class="o">=</span> <span class="n">n_neurons</span>
@@ -494,7 +499,7 @@
         <span class="s2">&quot;machine_time_step&quot;</span><span class="p">:</span> <span class="s2">&quot;MachineTimeStep&quot;</span>
     <span class="p">})</span>
     <span class="nd">@overrides</span><span class="p">(</span>
-        <span class="n">TDMAAwareApplicationVertex</span><span class="o">.</span><span class="n">get_resources_used_by_atoms</span><span class="p">,</span>
+        <span class="n">LegacyPartitionerAPI</span><span class="o">.</span><span class="n">get_resources_used_by_atoms</span><span class="p">,</span>
         <span class="n">additional_arguments</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;machine_time_step&quot;</span><span class="p">}</span>
     <span class="p">)</span>
 <div class="viewcode-block" id="SpikeSourcePoissonVertex.get_resources_used_by_atoms"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.get_resources_used_by_atoms">[docs]</a>    <span class="k">def</span> <span class="nf">get_resources_used_by_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">):</span>
@@ -527,7 +532,7 @@
     <span class="k">def</span> <span class="nf">n_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_atoms</span>
 
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">TDMAAwareApplicationVertex</span><span class="o">.</span><span class="n">create_machine_vertex</span><span class="p">)</span>
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">LegacyPartitionerAPI</span><span class="o">.</span><span class="n">create_machine_vertex</span><span class="p">)</span>
 <div class="viewcode-block" id="SpikeSourcePoissonVertex.create_machine_vertex"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.create_machine_vertex">[docs]</a>    <span class="k">def</span> <span class="nf">create_machine_vertex</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">resources_required</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">constraints</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>

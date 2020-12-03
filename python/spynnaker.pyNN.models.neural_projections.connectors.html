@@ -189,6 +189,22 @@ or </em><a class="reference external" href="https://docs.python.org/3.6/library/
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) &#8211; the synapse info</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or <a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.get_delay_minimum">
+<code class="descname">get_delay_minimum</code><span class="sig-paren">(</span><em>synapse_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/abstract_connector.html#AbstractConnector.get_delay_minimum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.get_delay_minimum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the minimum delay specified by the user in ms, or None if            unbounded.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) &#8211; </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or <a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></td>
@@ -344,18 +360,9 @@ or </em><a class="reference external" href="https://docs.python.org/3.6/library/
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.set_projection_information">
 <code class="descname">set_projection_information</code><span class="sig-paren">(</span><em>machine_time_step</em>, <em>synapse_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/abstract_connector.html#AbstractConnector.set_projection_information"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.set_projection_information" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>machine_time_step</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
-<li><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) &#8211; </li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
+<dd><p>sets a connectors projection info
+:param int machine_time_step: machine time step
+:param SynapseInformation synapse_info: the synapse info</p>
 </dd></dl>
 
 <dl class="method">
@@ -774,6 +781,22 @@ or </em><a class="reference external" href="https://docs.python.org/3.6/library/
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) &#8211; the synapse info</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or <a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neural_projections.connectors.AllToAllConnector.get_delay_minimum">
+<code class="descname">get_delay_minimum</code><span class="sig-paren">(</span><em>synapse_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/all_to_all_connector.html#AllToAllConnector.get_delay_minimum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.AllToAllConnector.get_delay_minimum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the minimum delay specified by the user in ms, or None if            unbounded.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) &#8211; </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or <a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></td>
@@ -904,6 +927,22 @@ or </em><a class="reference external" href="https://docs.python.org/3.6/library/
 <dt id="spynnaker.pyNN.models.neural_projections.connectors.ArrayConnector.get_delay_maximum">
 <code class="descname">get_delay_maximum</code><span class="sig-paren">(</span><em>synapse_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/array_connector.html#ArrayConnector.get_delay_maximum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.ArrayConnector.get_delay_maximum" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the maximum delay specified by the user in ms, or None if            unbounded.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) &#8211; the synapse info</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or <a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neural_projections.connectors.ArrayConnector.get_delay_minimum">
+<code class="descname">get_delay_minimum</code><span class="sig-paren">(</span><em>synapse_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/array_connector.html#ArrayConnector.get_delay_minimum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.ArrayConnector.get_delay_minimum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the minimum delay specified by the user in ms, or None if            unbounded.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1045,6 +1084,22 @@ or </em><a class="reference external" href="https://docs.python.org/3.6/library/
 <dt id="spynnaker.pyNN.models.neural_projections.connectors.CSAConnector.get_delay_maximum">
 <code class="descname">get_delay_maximum</code><span class="sig-paren">(</span><em>synapse_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/csa_connector.html#CSAConnector.get_delay_maximum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.CSAConnector.get_delay_maximum" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the maximum delay specified by the user in ms, or None if            unbounded.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) &#8211; the synapse info</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or <a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neural_projections.connectors.CSAConnector.get_delay_minimum">
+<code class="descname">get_delay_minimum</code><span class="sig-paren">(</span><em>synapse_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/csa_connector.html#CSAConnector.get_delay_minimum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.CSAConnector.get_delay_minimum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the minimum delay specified by the user in ms, or None if            unbounded.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1237,6 +1292,22 @@ or </em><a class="reference external" href="https://docs.python.org/3.6/library/
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) &#8211; the synapse info</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or <a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neural_projections.connectors.DistanceDependentProbabilityConnector.get_delay_minimum">
+<code class="descname">get_delay_minimum</code><span class="sig-paren">(</span><em>synapse_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/distance_dependent_probability_connector.html#DistanceDependentProbabilityConnector.get_delay_minimum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.DistanceDependentProbabilityConnector.get_delay_minimum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the minimum delay specified by the user in ms, or None if            unbounded.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) &#8211; </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or <a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></td>
@@ -1313,18 +1384,9 @@ or </em><a class="reference external" href="https://docs.python.org/3.6/library/
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neural_projections.connectors.DistanceDependentProbabilityConnector.set_projection_information">
 <code class="descname">set_projection_information</code><span class="sig-paren">(</span><em>machine_time_step</em>, <em>synapse_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/distance_dependent_probability_connector.html#DistanceDependentProbabilityConnector.set_projection_information"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.DistanceDependentProbabilityConnector.set_projection_information" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>machine_time_step</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
-<li><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) &#8211; </li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
+<dd><p>sets a connectors projection info
+:param int machine_time_step: machine time step
+:param SynapseInformation synapse_info: the synapse info</p>
 </dd></dl>
 
 </dd></dl>
@@ -1452,6 +1514,22 @@ or </em><a class="reference external" href="https://docs.python.org/3.6/library/
 <dt id="spynnaker.pyNN.models.neural_projections.connectors.FixedNumberPostConnector.get_delay_maximum">
 <code class="descname">get_delay_maximum</code><span class="sig-paren">(</span><em>synapse_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/fixed_number_post_connector.html#FixedNumberPostConnector.get_delay_maximum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.FixedNumberPostConnector.get_delay_maximum" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the maximum delay specified by the user in ms, or None if            unbounded.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) &#8211; the synapse info</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or <a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neural_projections.connectors.FixedNumberPostConnector.get_delay_minimum">
+<code class="descname">get_delay_minimum</code><span class="sig-paren">(</span><em>synapse_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/fixed_number_post_connector.html#FixedNumberPostConnector.get_delay_minimum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.FixedNumberPostConnector.get_delay_minimum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the minimum delay specified by the user in ms, or None if            unbounded.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1663,6 +1741,22 @@ or </em><a class="reference external" href="https://docs.python.org/3.6/library/
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) &#8211; the synapse info</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or <a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neural_projections.connectors.FixedNumberPreConnector.get_delay_minimum">
+<code class="descname">get_delay_minimum</code><span class="sig-paren">(</span><em>synapse_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/fixed_number_pre_connector.html#FixedNumberPreConnector.get_delay_minimum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.FixedNumberPreConnector.get_delay_minimum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the minimum delay specified by the user in ms, or None if            unbounded.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) &#8211; </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or <a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></td>
@@ -1853,6 +1947,22 @@ or </em><a class="reference external" href="https://docs.python.org/3.6/library/
 <dt id="spynnaker.pyNN.models.neural_projections.connectors.FixedProbabilityConnector.get_delay_maximum">
 <code class="descname">get_delay_maximum</code><span class="sig-paren">(</span><em>synapse_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/fixed_probability_connector.html#FixedProbabilityConnector.get_delay_maximum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.FixedProbabilityConnector.get_delay_maximum" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the maximum delay specified by the user in ms, or None if            unbounded.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) &#8211; the synapse info</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or <a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neural_projections.connectors.FixedProbabilityConnector.get_delay_minimum">
+<code class="descname">get_delay_minimum</code><span class="sig-paren">(</span><em>synapse_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/fixed_probability_connector.html#FixedProbabilityConnector.get_delay_minimum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.FixedProbabilityConnector.get_delay_minimum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the minimum delay specified by the user in ms, or None if            unbounded.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -2051,6 +2161,22 @@ or </em><a class="reference external" href="https://docs.python.org/3.6/library/
 <dt id="spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.get_delay_maximum">
 <code class="descname">get_delay_maximum</code><span class="sig-paren">(</span><em>synapse_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/from_list_connector.html#FromListConnector.get_delay_maximum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.get_delay_maximum" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the maximum delay specified by the user in ms, or None if            unbounded.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) &#8211; the synapse info</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or <a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.get_delay_minimum">
+<code class="descname">get_delay_minimum</code><span class="sig-paren">(</span><em>synapse_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/from_list_connector.html#FromListConnector.get_delay_minimum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.get_delay_minimum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the minimum delay specified by the user in ms, or None if            unbounded.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -2308,6 +2434,22 @@ or </em><a class="reference external" href="https://docs.python.org/3.6/library/
 <dt id="spynnaker.pyNN.models.neural_projections.connectors.IndexBasedProbabilityConnector.get_delay_maximum">
 <code class="descname">get_delay_maximum</code><span class="sig-paren">(</span><em>synapse_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/index_based_probability_connector.html#IndexBasedProbabilityConnector.get_delay_maximum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.IndexBasedProbabilityConnector.get_delay_maximum" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the maximum delay specified by the user in ms, or None if            unbounded.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) &#8211; the synapse info</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or <a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neural_projections.connectors.IndexBasedProbabilityConnector.get_delay_minimum">
+<code class="descname">get_delay_minimum</code><span class="sig-paren">(</span><em>synapse_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/index_based_probability_connector.html#IndexBasedProbabilityConnector.get_delay_minimum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.IndexBasedProbabilityConnector.get_delay_minimum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the minimum delay specified by the user in ms, or None if            unbounded.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -2643,6 +2785,22 @@ or </em><a class="reference external" href="https://docs.python.org/3.6/library/
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) &#8211; the synapse info</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or <a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neural_projections.connectors.KernelConnector.get_delay_minimum">
+<code class="descname">get_delay_minimum</code><span class="sig-paren">(</span><em>synapse_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/kernel_connector.html#KernelConnector.get_delay_minimum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.KernelConnector.get_delay_minimum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the minimum delay specified by the user in ms, or None if            unbounded.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) &#8211; </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or <a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></td>
@@ -2829,6 +2987,22 @@ or </em><a class="reference external" href="https://docs.python.org/3.6/library/
 <dt id="spynnaker.pyNN.models.neural_projections.connectors.MultapseConnector.get_delay_maximum">
 <code class="descname">get_delay_maximum</code><span class="sig-paren">(</span><em>synapse_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/multapse_connector.html#MultapseConnector.get_delay_maximum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.MultapseConnector.get_delay_maximum" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the maximum delay specified by the user in ms, or None if            unbounded.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) &#8211; the synapse info</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or <a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neural_projections.connectors.MultapseConnector.get_delay_minimum">
+<code class="descname">get_delay_minimum</code><span class="sig-paren">(</span><em>synapse_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/multapse_connector.html#MultapseConnector.get_delay_minimum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.MultapseConnector.get_delay_minimum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the minimum delay specified by the user in ms, or None if            unbounded.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -3065,6 +3239,22 @@ or </em><a class="reference external" href="https://docs.python.org/3.6/library/
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) &#8211; the synapse info</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or <a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neural_projections.connectors.OneToOneConnector.get_delay_minimum">
+<code class="descname">get_delay_minimum</code><span class="sig-paren">(</span><em>synapse_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/one_to_one_connector.html#OneToOneConnector.get_delay_minimum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.OneToOneConnector.get_delay_minimum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the minimum delay specified by the user in ms, or None if            unbounded.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) &#8211; </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or <a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></td>
@@ -3215,6 +3405,22 @@ or </em><a class="reference external" href="https://docs.python.org/3.6/library/
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) &#8211; the synapse info</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or <a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neural_projections.connectors.SmallWorldConnector.get_delay_minimum">
+<code class="descname">get_delay_minimum</code><span class="sig-paren">(</span><em>synapse_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/small_world_connector.html#SmallWorldConnector.get_delay_minimum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.SmallWorldConnector.get_delay_minimum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the minimum delay specified by the user in ms, or None if            unbounded.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) &#8211; </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or <a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></td>
@@ -3291,18 +3497,9 @@ or </em><a class="reference external" href="https://docs.python.org/3.6/library/
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neural_projections.connectors.SmallWorldConnector.set_projection_information">
 <code class="descname">set_projection_information</code><span class="sig-paren">(</span><em>machine_time_step</em>, <em>synapse_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/small_world_connector.html#SmallWorldConnector.set_projection_information"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.SmallWorldConnector.set_projection_information" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>machine_time_step</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
-<li><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) &#8211; </li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
+<dd><p>sets a connectors projection info
+:param int machine_time_step: machine time step
+:param SynapseInformation synapse_info: the synapse info</p>
 </dd></dl>
 
 </dd></dl>

@@ -380,6 +380,18 @@
         <span class="c1"># if not then use the values that came in</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_delay_maximum</span><span class="p">(</span><span class="n">synapse_info</span><span class="o">.</span><span class="n">delays</span><span class="p">,</span> <span class="n">n_conns</span><span class="p">)</span></div>
 
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_delay_minimum</span><span class="p">)</span>
+<div class="viewcode-block" id="KernelConnector.get_delay_minimum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.KernelConnector.get_delay_minimum">[docs]</a>    <span class="k">def</span> <span class="nf">get_delay_minimum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+        <span class="c1"># I think this is overestimated, but not by much</span>
+        <span class="n">n_conns</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pre_w</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pre_h</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_w</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_h</span><span class="p">)</span>
+        <span class="c1"># Use the kernel delays if user has supplied them</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_krn_delays</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_delay_minimum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_krn_delays</span><span class="p">,</span> <span class="n">n_conns</span><span class="p">)</span>
+
+        <span class="c1"># if not then use the values that came in</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_delay_minimum</span><span class="p">(</span><span class="n">synapse_info</span><span class="o">.</span><span class="n">delays</span><span class="p">,</span> <span class="n">n_conns</span><span class="p">)</span></div>
+
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_n_connections_from_pre_vertex_maximum</span><span class="p">)</span>
 <div class="viewcode-block" id="KernelConnector.get_n_connections_from_pre_vertex_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.KernelConnector.get_n_connections_from_pre_vertex_maximum">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_connections_from_pre_vertex_maximum</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">min_delay</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>

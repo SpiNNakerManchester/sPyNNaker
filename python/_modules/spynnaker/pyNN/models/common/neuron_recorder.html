@@ -350,7 +350,9 @@
     <span class="k">def</span> <span class="nf">__read_data</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">application_vertex</span><span class="p">,</span>
             <span class="n">sampling_rate</span><span class="p">,</span> <span class="n">data_type</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">n_machine_time_steps</span><span class="p">):</span>
-        <span class="n">vertices</span> <span class="o">=</span> <span class="n">application_vertex</span><span class="o">.</span><span class="n">machine_vertices</span>
+        <span class="n">vertices</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">application_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">machine_vertices_for_recording</span><span class="p">(</span>
+                <span class="n">variable</span><span class="p">))</span>
         <span class="n">region</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__region_ids</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span>
         <span class="n">missing_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
         <span class="n">pop_level_data</span> <span class="o">=</span> <span class="kc">None</span>
@@ -361,8 +363,8 @@
 
         <span class="n">indexes</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">vertex</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">progress</span><span class="o">.</span><span class="n">over</span><span class="p">(</span><span class="n">vertices</span><span class="p">)):</span>
-            <span class="n">expected_rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expected_rows_for_a_run_time</span><span class="p">(</span>
-                <span class="n">n_machine_time_steps</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="p">)</span>
+            <span class="n">expected_rows</span> <span class="o">=</span> <span class="n">application_vertex</span><span class="o">.</span><span class="n">get_expected_n_rows</span><span class="p">(</span>
+                <span class="n">n_machine_time_steps</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="p">,</span> <span class="n">vertex</span><span class="p">,</span> <span class="n">variable</span><span class="p">)</span>
 
             <span class="n">n_items_per_timestep</span> <span class="o">=</span> <span class="mi">1</span>
             <span class="k">if</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="p">:</span>
@@ -457,7 +459,9 @@
         <span class="n">spike_times</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
         <span class="n">spike_ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
 
-        <span class="n">vertices</span> <span class="o">=</span> <span class="n">application_vertex</span><span class="o">.</span><span class="n">machine_vertices</span>
+        <span class="n">vertices</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">application_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">machine_vertices_for_recording</span><span class="p">(</span>
+                <span class="n">variable</span><span class="p">))</span>
         <span class="n">missing_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
         <span class="n">progress</span> <span class="o">=</span> <span class="n">ProgressBar</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="s2">&quot;Getting spikes for </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">label</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">vertex</span> <span class="ow">in</span> <span class="n">progress</span><span class="o">.</span><span class="n">over</span><span class="p">(</span><span class="n">vertices</span><span class="p">):</span>

@@ -113,8 +113,8 @@
         <span class="s2">&quot;__edge_count&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__id_counter&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__live_spike_recorder&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__max_delay&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__min_delay&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__max_delay&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__neurons_per_core_set&quot;</span><span class="p">,</span>
         <span class="s2">&quot;_populations&quot;</span><span class="p">,</span>
         <span class="s2">&quot;_projections&quot;</span><span class="p">]</span>
@@ -188,7 +188,7 @@
 
         <span class="c1"># timing parameters</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__min_delay</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__max_delay</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__max_delay</span> <span class="o">=</span> <span class="n">max_delay</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__neurons_per_core_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
 
@@ -208,6 +208,9 @@
                 <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span>
                              <span class="bp">self</span><span class="o">.</span><span class="n">CONFIG_FILE_NAME</span><span class="p">)],</span>
             <span class="n">front_end_versions</span><span class="o">=</span><span class="n">versions</span><span class="p">)</span>
+
+        <span class="c1"># update inputs needed by the machine level calls.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_extra_inputs</span><span class="p">({</span><span class="s1">&#39;UserDefinedMaxDelay&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_delay</span><span class="p">})</span>
 
         <span class="n">extra_mapping_inputs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="n">extra_mapping_inputs</span><span class="p">[</span><span class="s1">&#39;RouterBitfieldCompressionReport&#39;</span><span class="p">]</span> <span class="o">=</span> \
@@ -282,7 +285,7 @@
 
         <span class="c1"># set up machine targeted data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_up_timings</span><span class="p">(</span>
-            <span class="n">timestep</span><span class="p">,</span> <span class="n">min_delay</span><span class="p">,</span> <span class="n">max_delay</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="p">)</span>
+            <span class="n">timestep</span><span class="p">,</span> <span class="n">min_delay</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_up_machine_specifics</span><span class="p">(</span><span class="n">hostname</span><span class="p">)</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Setting time scale factor to </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="p">,</span>
@@ -292,8 +295,7 @@
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Setting machine time step to </span><span class="si">{}</span><span class="s2"> micro-seconds.&quot;</span><span class="p">,</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">machine_time_step</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_set_up_timings</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">timestep</span><span class="p">,</span> <span class="n">min_delay</span><span class="p">,</span> <span class="n">max_delay</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_set_up_timings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timestep</span><span class="p">,</span> <span class="n">min_delay</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="p">):</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
 
         <span class="c1"># Get the standard values</span>
@@ -317,30 +319,6 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__min_delay</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">machine_time_step</span> <span class="o">/</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">)</span>
-
-        <span class="c1"># Sort out the maximum delay</span>
-        <span class="n">natively_supported_delay_for_models</span> <span class="o">=</span> \
-            <span class="n">constants</span><span class="o">.</span><span class="n">MAX_SUPPORTED_DELAY_TICS</span>
-        <span class="n">delay_extension_max_supported_delay</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">constants</span><span class="o">.</span><span class="n">MAX_DELAY_BLOCKS</span> <span class="o">*</span>
-            <span class="n">constants</span><span class="o">.</span><span class="n">MAX_TIMER_TICS_SUPPORTED_PER_BLOCK</span><span class="p">)</span>
-        <span class="n">max_delay_tics_supported</span> <span class="o">=</span> \
-            <span class="n">natively_supported_delay_for_models</span> <span class="o">+</span> \
-            <span class="n">delay_extension_max_supported_delay</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">max_delay</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span>
-                <span class="n">max_delay</span> <span class="o">*</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span> <span class="o">&gt;</span>
-                <span class="n">max_delay_tics_supported</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">machine_time_step</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
-                <span class="s2">&quot;Pacman does not support max delays above </span><span class="si">{}</span><span class="s2"> ms with the &quot;</span>
-                <span class="s2">&quot;current machine time step&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="mf">0.144</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">machine_time_step</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">max_delay</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__max_delay</span> <span class="o">=</span> <span class="n">max_delay</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__max_delay</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="n">max_delay_tics_supported</span> <span class="o">*</span> <span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">machine_time_step</span> <span class="o">/</span>
-                    <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">))</span>
 
         <span class="c1"># Sort out the time scale factor if not user specified</span>
         <span class="c1"># (including config)</span>
@@ -409,12 +387,6 @@
         <span class="sd">&quot;&quot;&quot; The minimum supported delay, in milliseconds.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__min_delay</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">max_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The maximum supported delay, in milliseconds.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_delay</span>
 
 <div class="viewcode-block" id="AbstractSpiNNakerCommon.add_application_vertex"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.add_application_vertex">[docs]</a>    <span class="k">def</span> <span class="nf">add_application_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vertex</span><span class="p">,</span> <span class="n">CommandSender</span><span class="p">):</span>

@@ -69,7 +69,6 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Data Structures</a> &#124;
-<a href="#define-members">Macros</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">matrix_generator_common.h File Reference</div>  </div>
@@ -88,18 +87,11 @@ Data Structures</h2></td></tr>
 <tr class="memdesc:structdelay__value"><td class="mdescLeft">&#160;</td><td class="mdescRight">A converted final delay value and delay stage.  <a href="matrix__generator__common_8h.html#structdelay__value">More...</a><br /></td></tr>
 <tr class="separator:structdelay__value"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
-Macros</h2></td></tr>
-<tr class="memitem:a16027d8acc5301e440cefa086eb9db2a"><td class="memItemLeft" align="right" valign="top"><a id="a16027d8acc5301e440cefa086eb9db2a"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__common_8h.html#a16027d8acc5301e440cefa086eb9db2a">MAX_DELAY</a>&#160;&#160;&#160;16</td></tr>
-<tr class="memdesc:a16027d8acc5301e440cefa086eb9db2a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The maximum delay value that can be represented on core. <br /></td></tr>
-<tr class="separator:a16027d8acc5301e440cefa086eb9db2a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:aaffaf8d20874f964c224271c048c1375"><td class="memItemLeft" align="right" valign="top">static struct <a class="el" href="matrix__generator__common_8h.html#structdelay__value">delay_value</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__common_8h.html#aaffaf8d20874f964c224271c048c1375">get_delay</a> (uint16_t <a class="el" href="matrix__generator__common_8h.html#structdelay__value">delay_value</a>, uint32_t max_stage)</td></tr>
-<tr class="memdesc:aaffaf8d20874f964c224271c048c1375"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a converted delay value and stage.  <a href="matrix__generator__common_8h.html#aaffaf8d20874f964c224271c048c1375">More...</a><br /></td></tr>
-<tr class="separator:aaffaf8d20874f964c224271c048c1375"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a70d02afe8081b6ed99856fe4594e88e8"><td class="memItemLeft" align="right" valign="top">static struct <a class="el" href="matrix__generator__common_8h.html#structdelay__value">delay_value</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__common_8h.html#a70d02afe8081b6ed99856fe4594e88e8">get_delay</a> (uint16_t <a class="el" href="matrix__generator__common_8h.html#structdelay__value">delay_value</a>, uint32_t max_stage, uint32_t max_delay_per_stage)</td></tr>
+<tr class="memdesc:a70d02afe8081b6ed99856fe4594e88e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a converted delay value and stage.  <a href="matrix__generator__common_8h.html#a70d02afe8081b6ed99856fe4594e88e8">More...</a><br /></td></tr>
+<tr class="separator:a70d02afe8081b6ed99856fe4594e88e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Common functions for matrix generation. </p>
@@ -119,7 +111,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 <div class="textblock"><p>A converted final delay value and delay stage. </p>
 
-<p class="definition">Definition at line <a class="el" href="matrix__generator__common_8h_source.html#l00038">38</a> of file <a class="el" href="matrix__generator__common_8h_source.html">matrix_generator_common.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="matrix__generator__common_8h_source.html#l00033">33</a> of file <a class="el" href="matrix__generator__common_8h_source.html">matrix_generator_common.h</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
@@ -139,8 +131,8 @@ stage</td>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="aaffaf8d20874f964c224271c048c1375"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aaffaf8d20874f964c224271c048c1375">&#9670;&nbsp;</a></span>get_delay()</h2>
+<a id="a70d02afe8081b6ed99856fe4594e88e8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a70d02afe8081b6ed99856fe4594e88e8">&#9670;&nbsp;</a></span>get_delay()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -158,7 +150,13 @@ stage</td>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>max_stage</em>&#160;</td>
+          <td class="paramname"><em>max_stage</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>max_delay_per_stage</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -178,6 +176,7 @@ stage</td>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname"><a class="el" href="matrix__generator__common_8h.html#structdelay__value" title="A converted final delay value and delay stage.">delay_value</a></td><td>The value to convert </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">max_stage</td><td>The maximum delay stage allowed </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">max_delay_per_stage</td><td>The max delay in a delay stage </td></tr>
   </table>
   </dd>
 </dl>
@@ -190,7 +189,7 @@ stage</td>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Dec 3 2020 07:57:19 for sPyNNaker neural_modelling by&#160;<a href="http://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.8.20
+Generated on Thu Dec 3 2020 09:14:07 for sPyNNaker neural_modelling by&#160;<a href="http://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.8.20
 </small></address>
 </body>
 </html>

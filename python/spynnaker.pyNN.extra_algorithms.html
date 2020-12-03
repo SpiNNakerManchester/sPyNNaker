@@ -27,7 +27,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="spynnaker.pyNN.model_binaries package" href="spynnaker.pyNN.model_binaries.html" />
+    <link rel="next" title="spynnaker.pyNN.extra_algorithms.splitter_components package" href="spynnaker.pyNN.extra_algorithms.splitter_components.html" />
     <link rel="prev" title="spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link package" href="spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.html" /> 
   </head>
   <body role="document">
@@ -41,7 +41,7 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="spynnaker.pyNN.model_binaries.html" title="spynnaker.pyNN.model_binaries package"
+          <a href="spynnaker.pyNN.extra_algorithms.splitter_components.html" title="spynnaker.pyNN.extra_algorithms.splitter_components package"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.html" title="spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link package"
@@ -57,8 +57,10 @@
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.extra_algorithms package</a><ul>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.extra_algorithms.connection_holder_finisher">spynnaker.pyNN.extra_algorithms.connection_holder_finisher module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.extra_algorithms.delay_support_adder">spynnaker.pyNN.extra_algorithms.delay_support_adder module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.extra_algorithms.graph_edge_weight_updater">spynnaker.pyNN.extra_algorithms.graph_edge_weight_updater module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.extra_algorithms.on_chip_bit_field_generator">spynnaker.pyNN.extra_algorithms.on_chip_bit_field_generator module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.extra_algorithms.redundant_packet_count_report">spynnaker.pyNN.extra_algorithms.redundant_packet_count_report module</a></li>
@@ -77,8 +79,8 @@
   <p class="topless"><a href="spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.html"
                         title="previous chapter">spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link package</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="spynnaker.pyNN.model_binaries.html"
-                        title="next chapter">spynnaker.pyNN.model_binaries package</a></p>
+  <p class="topless"><a href="spynnaker.pyNN.extra_algorithms.splitter_components.html"
+                        title="next chapter">spynnaker.pyNN.extra_algorithms.splitter_components package</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -106,6 +108,24 @@
             
   <div class="section" id="spynnaker-pynn-extra-algorithms-package">
 <h1>spynnaker.pyNN.extra_algorithms package<a class="headerlink" href="#spynnaker-pynn-extra-algorithms-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html">spynnaker.pyNN.extra_algorithms.splitter_components package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html#module-spynnaker.pyNN.extra_algorithms.splitter_components.abstract_spynnaker_splitter_delay">spynnaker.pyNN.extra_algorithms.splitter_components.abstract_spynnaker_splitter_delay module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html#module-spynnaker.pyNN.extra_algorithms.splitter_components.splitter_abstract_pop_vertex_slice">spynnaker.pyNN.extra_algorithms.splitter_components.splitter_abstract_pop_vertex_slice module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html#module-spynnaker.pyNN.extra_algorithms.splitter_components.splitter_delay_vertex_slice">spynnaker.pyNN.extra_algorithms.splitter_components.splitter_delay_vertex_slice module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html#module-spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_partitioner">spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_partitioner module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html#module-spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_selector">spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_selector module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html#module-spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_slice_legacy">spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_slice_legacy module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html#module-spynnaker.pyNN.extra_algorithms.splitter_components">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
@@ -116,6 +136,57 @@
 <code class="descclassname">spynnaker.pyNN.extra_algorithms.connection_holder_finisher.</code><code class="descname">finish_connection_holders</code><span class="sig-paren">(</span><em>application_graph</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/connection_holder_finisher.html#finish_connection_holders"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.connection_holder_finisher.finish_connection_holders" title="Permalink to this definition">¶</a></dt>
 <dd><p>Finishes the connection holders after data has been generated within
 them, allowing any waiting callbacks to be called</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-spynnaker.pyNN.extra_algorithms.delay_support_adder">
+<span id="spynnaker-pynn-extra-algorithms-delay-support-adder-module"></span><h2>spynnaker.pyNN.extra_algorithms.delay_support_adder module<a class="headerlink" href="#module-spynnaker.pyNN.extra_algorithms.delay_support_adder" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.extra_algorithms.delay_support_adder.DelaySupportAdder">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.extra_algorithms.delay_support_adder.</code><code class="descname">DelaySupportAdder</code><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/delay_support_adder.html#DelaySupportAdder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.delay_support_adder.DelaySupportAdder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>adds delay extension vertices into the APP graph as needed</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>app_graph</strong> (<em>ApplicationGraph</em>) &#8211; the app graph</li>
+<li><strong>machine_time_step</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; the machine time step</li>
+<li><strong>user_max_delay</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; the user defined max delay</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="spynnaker.pyNN.extra_algorithms.delay_support_adder.DelaySupportAdder.APP_DELAY_PROGRESS_BAR_TEXT">
+<code class="descname">APP_DELAY_PROGRESS_BAR_TEXT</code><em class="property"> = 'Adding delay extensions as required'</em><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.delay_support_adder.DelaySupportAdder.APP_DELAY_PROGRESS_BAR_TEXT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.extra_algorithms.delay_support_adder.DelaySupportAdder.DELAYS_NOT_SUPPORTED_SPLITTER">
+<code class="descname">DELAYS_NOT_SUPPORTED_SPLITTER</code><em class="property"> = 'The app vertex {} with splitter {} does not support delays and yet requires a delay support for edge {}. Please use a Splitter which does not have accepts_edges_from_delay_vertex turned off.'</em><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.delay_support_adder.DelaySupportAdder.DELAYS_NOT_SUPPORTED_SPLITTER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.extra_algorithms.delay_support_adder.DelaySupportAdder.END_USER_MAX_DELAY_DEFILING_ERROR_MESSAGE">
+<code class="descname">END_USER_MAX_DELAY_DEFILING_ERROR_MESSAGE</code><em class="property"> = 'The end user entered a max delay for which the projection breaks'</em><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.delay_support_adder.DelaySupportAdder.END_USER_MAX_DELAY_DEFILING_ERROR_MESSAGE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.extra_algorithms.delay_support_adder.DelaySupportAdder.INVALID_SPLITTER_FOR_DELAYS_ERROR_MSG">
+<code class="descname">INVALID_SPLITTER_FOR_DELAYS_ERROR_MSG</code><em class="property"> = 'The app vertex {} with splitter {} does not support delays and yet requires a delay support for edge {}. Please use a Splitter which utilises the AbstractSpynnakerSplitterDelay interface.'</em><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.delay_support_adder.DelaySupportAdder.INVALID_SPLITTER_FOR_DELAYS_ERROR_MSG" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.extra_algorithms.delay_support_adder.DelaySupportAdder.NOT_SUPPORTED_DELAY_ERROR_MSG">
+<code class="descname">NOT_SUPPORTED_DELAY_ERROR_MSG</code><em class="property"> = 'The maximum delay {} for projection {} is not supported by the splitter {} (max supported delay of the splitter is {} and a delay extension can add {} extra delay). either reduce the delay, or use a splitter which supports a larger delay, or finally implement the code to allow multiple delay extensions. good luck.'</em><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.delay_support_adder.DelaySupportAdder.NOT_SUPPORTED_DELAY_ERROR_MSG" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 </div>
@@ -299,6 +370,54 @@ them, allowing any waiting callbacks to be called</p>
 <div class="section" id="module-spynnaker.pyNN.extra_algorithms">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.extra_algorithms" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
+<dt id="spynnaker.pyNN.extra_algorithms.DelaySupportAdder">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.extra_algorithms.</code><code class="descname">DelaySupportAdder</code><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/delay_support_adder.html#DelaySupportAdder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.DelaySupportAdder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>adds delay extension vertices into the APP graph as needed</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>app_graph</strong> (<em>ApplicationGraph</em>) &#8211; the app graph</li>
+<li><strong>machine_time_step</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; the machine time step</li>
+<li><strong>user_max_delay</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; the user defined max delay</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="spynnaker.pyNN.extra_algorithms.DelaySupportAdder.APP_DELAY_PROGRESS_BAR_TEXT">
+<code class="descname">APP_DELAY_PROGRESS_BAR_TEXT</code><em class="property"> = 'Adding delay extensions as required'</em><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.DelaySupportAdder.APP_DELAY_PROGRESS_BAR_TEXT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.extra_algorithms.DelaySupportAdder.DELAYS_NOT_SUPPORTED_SPLITTER">
+<code class="descname">DELAYS_NOT_SUPPORTED_SPLITTER</code><em class="property"> = 'The app vertex {} with splitter {} does not support delays and yet requires a delay support for edge {}. Please use a Splitter which does not have accepts_edges_from_delay_vertex turned off.'</em><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.DelaySupportAdder.DELAYS_NOT_SUPPORTED_SPLITTER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.extra_algorithms.DelaySupportAdder.END_USER_MAX_DELAY_DEFILING_ERROR_MESSAGE">
+<code class="descname">END_USER_MAX_DELAY_DEFILING_ERROR_MESSAGE</code><em class="property"> = 'The end user entered a max delay for which the projection breaks'</em><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.DelaySupportAdder.END_USER_MAX_DELAY_DEFILING_ERROR_MESSAGE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.extra_algorithms.DelaySupportAdder.INVALID_SPLITTER_FOR_DELAYS_ERROR_MSG">
+<code class="descname">INVALID_SPLITTER_FOR_DELAYS_ERROR_MSG</code><em class="property"> = 'The app vertex {} with splitter {} does not support delays and yet requires a delay support for edge {}. Please use a Splitter which utilises the AbstractSpynnakerSplitterDelay interface.'</em><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.DelaySupportAdder.INVALID_SPLITTER_FOR_DELAYS_ERROR_MSG" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.extra_algorithms.DelaySupportAdder.NOT_SUPPORTED_DELAY_ERROR_MSG">
+<code class="descname">NOT_SUPPORTED_DELAY_ERROR_MSG</code><em class="property"> = 'The maximum delay {} for projection {} is not supported by the splitter {} (max supported delay of the splitter is {} and a delay extension can add {} extra delay). either reduce the delay, or use a splitter which supports a larger delay, or finally implement the code to allow multiple delay extensions. good luck.'</em><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.DelaySupportAdder.NOT_SUPPORTED_DELAY_ERROR_MSG" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="spynnaker.pyNN.extra_algorithms.GraphEdgeWeightUpdater">
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.extra_algorithms.</code><code class="descname">GraphEdgeWeightUpdater</code><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/graph_edge_weight_updater.html#GraphEdgeWeightUpdater"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.GraphEdgeWeightUpdater" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
@@ -371,7 +490,7 @@ them, allowing any waiting callbacks to be called</p>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="spynnaker.pyNN.model_binaries.html" title="spynnaker.pyNN.model_binaries package"
+          <a href="spynnaker.pyNN.extra_algorithms.splitter_components.html" title="spynnaker.pyNN.extra_algorithms.splitter_components package"
              >next</a> |</li>
         <li class="right" >
           <a href="spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.html" title="spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link package"

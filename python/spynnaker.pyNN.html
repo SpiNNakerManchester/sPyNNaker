@@ -139,8 +139,23 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.html">spynnaker.pyNN.extra_algorithms package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html">spynnaker.pyNN.extra_algorithms.splitter_components package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html#module-spynnaker.pyNN.extra_algorithms.splitter_components.abstract_spynnaker_splitter_delay">spynnaker.pyNN.extra_algorithms.splitter_components.abstract_spynnaker_splitter_delay module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html#module-spynnaker.pyNN.extra_algorithms.splitter_components.splitter_abstract_pop_vertex_slice">spynnaker.pyNN.extra_algorithms.splitter_components.splitter_abstract_pop_vertex_slice module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html#module-spynnaker.pyNN.extra_algorithms.splitter_components.splitter_delay_vertex_slice">spynnaker.pyNN.extra_algorithms.splitter_components.splitter_delay_vertex_slice module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html#module-spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_partitioner">spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_partitioner module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html#module-spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_selector">spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_selector module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html#module-spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_slice_legacy">spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_slice_legacy module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html#module-spynnaker.pyNN.extra_algorithms.splitter_components">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.html#module-spynnaker.pyNN.extra_algorithms.connection_holder_finisher">spynnaker.pyNN.extra_algorithms.connection_holder_finisher module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.html#module-spynnaker.pyNN.extra_algorithms.delay_support_adder">spynnaker.pyNN.extra_algorithms.delay_support_adder module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.html#module-spynnaker.pyNN.extra_algorithms.graph_edge_weight_updater">spynnaker.pyNN.extra_algorithms.graph_edge_weight_updater module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.html#module-spynnaker.pyNN.extra_algorithms.on_chip_bit_field_generator">spynnaker.pyNN.extra_algorithms.on_chip_bit_field_generator module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.html#module-spynnaker.pyNN.extra_algorithms.redundant_packet_count_report">spynnaker.pyNN.extra_algorithms.redundant_packet_count_report module</a></li>
@@ -446,12 +461,6 @@
 </dd></dl>
 
 <dl class="attribute">
-<dt id="spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.max_delay">
-<code class="descname">max_delay</code><a class="headerlink" href="#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.max_delay" title="Permalink to this definition">¶</a></dt>
-<dd><p>The maximum supported delay, in milliseconds.</p>
-</dd></dl>
-
-<dl class="attribute">
 <dt id="spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.min_delay">
 <code class="descname">min_delay</code><a class="headerlink" href="#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.min_delay" title="Permalink to this definition">¶</a></dt>
 <dd><p>The minimum supported delay, in milliseconds.</p>
@@ -569,6 +578,13 @@ off the machine at stop</li>
 <em class="property">exception </em><code class="descclassname">spynnaker.pyNN.exceptions.</code><code class="descname">SpynnakerException</code><a class="reference internal" href="_modules/spynnaker/pyNN/exceptions.html#SpynnakerException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.exceptions.SpynnakerException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#Exception" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></a></p>
 <p>Superclass of all exceptions from the PyNN module.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="spynnaker.pyNN.exceptions.SpynnakerSplitterConfigurationException">
+<em class="property">exception </em><code class="descclassname">spynnaker.pyNN.exceptions.</code><code class="descname">SpynnakerSplitterConfigurationException</code><a class="reference internal" href="_modules/spynnaker/pyNN/exceptions.html#SpynnakerSplitterConfigurationException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.exceptions.SpynnakerSplitterConfigurationException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utilities.html#spinn_front_end_common.utilities.exceptions.ConfigurationException" title="(in SpiNNFrontEndCommon v)"><code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.utilities.exceptions.ConfigurationException</span></code></a></p>
+<p>Raised when a splitter configuration fails.</p>
 </dd></dl>
 
 <dl class="exception">
@@ -855,11 +871,6 @@ used, False if SDP is to be used (default)</li>
 <dl class="attribute">
 <dt id="spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface.has_reset_last">
 <code class="descname">has_reset_last</code><a class="headerlink" href="#spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface.has_reset_last" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface.max_delay">
-<code class="descname">max_delay</code><a class="headerlink" href="#spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface.max_delay" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">

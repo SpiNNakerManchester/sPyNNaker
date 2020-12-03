@@ -80,11 +80,14 @@
 
 <span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">add_metaclass</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.abstract_base</span> <span class="kn">import</span> <span class="n">AbstractBase</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">pacman.exceptions</span> <span class="kn">import</span> <span class="n">PacmanConfigurationException</span>
 
 
 <span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">AbstractBase</span><span class="p">)</span>
 <div class="viewcode-block" id="AbstractAcceptsIncomingSynapses"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses">[docs]</a><span class="k">class</span> <span class="nc">AbstractAcceptsIncomingSynapses</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Indicates an object that can be a post-vertex in a PyNN projection.</span>
+
+<span class="sd">    Note: See verify_splitter</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
 
@@ -104,33 +107,47 @@
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
     <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractAcceptsIncomingSynapses.get_maximum_delay_supported_in_ms"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.get_maximum_delay_supported_in_ms">[docs]</a>    <span class="k">def</span> <span class="nf">get_maximum_delay_supported_in_ms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the maximum delay supported by this vertex.</span>
-
-<span class="sd">        :param int machine_time_step: microseconds</span>
-<span class="sd">        :rtype: int</span>
-<span class="sd">        &quot;&quot;&quot;</span></div>
-
-    <span class="nd">@abstractmethod</span>
 <div class="viewcode-block" id="AbstractAcceptsIncomingSynapses.get_connections_from_machine"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.get_connections_from_machine">[docs]</a>    <span class="k">def</span> <span class="nf">get_connections_from_machine</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="sd">&quot;&quot;&quot; Get the connections from the machine post-run.</span>
 
-<span class="sd">        :param ~spinnman.transceiver.Transceiver transceiver:</span>
+<span class="sd">        :param ~spinnman.transceiver.Transceiver transceiver:\</span>
 <span class="sd">            How to read the connection data</span>
-<span class="sd">        :param ~pacman.model.placements.Placements placements:</span>
+<span class="sd">        :param ~pacman.model.placements.Placements placements:\</span>
 <span class="sd">            Where the connection data is on the machine</span>
-<span class="sd">        :param ProjectionApplicationEdge app_edge:</span>
+<span class="sd">        :param ProjectionApplicationEdge app_edge:\</span>
 <span class="sd">            The edge for which the data is being read</span>
-<span class="sd">        :param SynapseInformation synapse_info:</span>
+<span class="sd">        :param SynapseInformation synapse_info:\</span>
 <span class="sd">            The specific projection within the edge</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
     <span class="nd">@abstractmethod</span>
 <div class="viewcode-block" id="AbstractAcceptsIncomingSynapses.clear_connection_cache"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.clear_connection_cache">[docs]</a>    <span class="k">def</span> <span class="nf">clear_connection_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Clear the connection data stored in the vertex so far.</span>
-<span class="sd">        &quot;&quot;&quot;</span></div></div>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="AbstractAcceptsIncomingSynapses.verify_splitter"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.verify_splitter">[docs]</a>    <span class="k">def</span> <span class="nf">verify_splitter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">splitter</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check that the splitter implements the API(s) expected by the\</span>
+<span class="sd">        SynapticMatrices</span>
+
+<span class="sd">        Any Vertex that implements this api should override</span>
+<span class="sd">        ApplicationVertex.splitter method to also call this function</span>
+
+<span class="sd">        :param splitter: the splitter</span>
+<span class="sd">        :type splitter:</span>
+<span class="sd">            ~spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay</span>
+<span class="sd">        :raises PacmanConfigurationException: is the splitter is not an \</span>
+<span class="sd">            instance of AbstractSpynnakerSplitterDelay</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Delayed import to avoid cicular dependency</span>
+        <span class="kn">from</span> <span class="nn">spynnaker.pyNN.extra_algorithms.splitter_components</span> <span class="kn">import</span> <span class="p">(</span>
+            <span class="n">AbstractSpynnakerSplitterDelay</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">splitter</span><span class="p">,</span> <span class="n">AbstractSpynnakerSplitterDelay</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">PacmanConfigurationException</span><span class="p">(</span>
+                <span class="s2">&quot;The splitter needs to be an instance of &quot;</span>
+                <span class="s2">&quot;----------------AbstractSpynnakerSplitterDelay&quot;</span><span class="p">)</span></div></div>
 </pre></div>
 
           </div>

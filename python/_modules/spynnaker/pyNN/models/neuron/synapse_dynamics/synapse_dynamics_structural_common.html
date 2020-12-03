@@ -79,7 +79,6 @@
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kn">import</span> <span class="nn">collections</span>
-<span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">add_metaclass</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.abstract_base</span> <span class="kn">import</span> <span class="p">(</span>
@@ -94,7 +93,7 @@
     <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">,</span> <span class="n">MICRO_TO_SECOND_CONVERSION</span><span class="p">,</span>
     <span class="n">BYTES_PER_WORD</span><span class="p">,</span> <span class="n">BYTES_PER_SHORT</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neural_projections</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">ProjectionApplicationEdge</span><span class="p">,</span> <span class="n">ProjectionMachineEdge</span><span class="p">)</span>
+    <span class="n">ProjectionApplicationEdge</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.abstract_synapse_dynamics_structural</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractSynapseDynamicsStructural</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SynapticConfigurationException</span>
@@ -235,13 +234,13 @@
         <span class="n">machine_edges</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">machine_edge</span> <span class="ow">in</span> <span class="n">machine_graph</span><span class="o">.</span><span class="n">get_edges_ending_at_vertex</span><span class="p">(</span>
                 <span class="n">machine_vertex</span><span class="p">):</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">machine_edge</span><span class="p">,</span> <span class="n">ProjectionMachineEdge</span><span class="p">):</span>
-                <span class="k">for</span> <span class="n">synapse_info</span> <span class="ow">in</span> <span class="n">machine_edge</span><span class="o">.</span><span class="n">synapse_information</span><span class="p">:</span>
+            <span class="n">app_edge</span> <span class="o">=</span> <span class="n">machine_edge</span><span class="o">.</span><span class="n">app_edge</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">app_edge</span><span class="p">,</span> <span class="n">ProjectionApplicationEdge</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">synapse_info</span> <span class="ow">in</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">synapse_information</span><span class="p">:</span>
                     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">synapse_info</span><span class="o">.</span><span class="n">synapse_dynamics</span><span class="p">,</span>
                                   <span class="n">AbstractSynapseDynamicsStructural</span><span class="p">):</span>
-                        <span class="n">app_edge</span> <span class="o">=</span> <span class="n">machine_edge</span><span class="o">.</span><span class="n">app_edge</span>
                         <span class="k">if</span> <span class="n">app_edge</span> <span class="ow">in</span> <span class="n">structural_edges</span><span class="p">:</span>
-                            <span class="k">if</span> <span class="p">(</span><span class="n">structural_edges</span><span class="p">[</span><span class="n">app_edge</span><span class="p">]</span> <span class="o">!=</span> <span class="n">synapse_info</span><span class="p">):</span>
+                            <span class="k">if</span> <span class="n">structural_edges</span><span class="p">[</span><span class="n">app_edge</span><span class="p">]</span> <span class="o">!=</span> <span class="n">synapse_info</span><span class="p">:</span>
                                 <span class="k">raise</span> <span class="n">SynapticConfigurationException</span><span class="p">(</span>
                                    <span class="bp">self</span><span class="o">.</span><span class="n">PAIR_ERROR</span><span class="p">)</span>
                         <span class="k">else</span><span class="p">:</span>
@@ -443,11 +442,9 @@
             <span class="k">if</span> <span class="n">machine_edges_by_app</span><span class="p">:</span>
                 <span class="n">n_sub_edges</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">machine_edges_by_app</span><span class="p">[</span><span class="n">app_edge</span><span class="p">])</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">max_atoms</span> <span class="o">=</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">get_max_atoms_per_core</span><span class="p">()</span>
-                <span class="k">if</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">&lt;</span> <span class="n">max_atoms</span><span class="p">:</span>
-                    <span class="n">max_atoms</span> <span class="o">=</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_atoms</span>
-                <span class="n">n_sub_edges</span> <span class="o">+=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span>
-                    <span class="nb">float</span><span class="p">(</span><span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">max_atoms</span><span class="p">)))</span>
+                <span class="n">slices</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_out_going_slices</span><span class="p">())</span>
+                <span class="n">n_sub_edges</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">slices</span><span class="p">)</span>
             <span class="n">dynamics</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">synapse_dynamics</span>
             <span class="n">param_sizes</span> <span class="o">+=</span> <span class="n">dynamics</span><span class="o">.</span><span class="n">formation</span>\
                 <span class="o">.</span><span class="n">get_parameters_sdram_usage_in_bytes</span><span class="p">()</span>

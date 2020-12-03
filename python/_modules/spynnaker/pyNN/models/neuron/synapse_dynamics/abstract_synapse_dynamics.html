@@ -207,6 +207,17 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">connector</span><span class="o">.</span><span class="n">get_delay_maximum</span><span class="p">(</span><span class="n">synapse_info</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="AbstractSynapseDynamics.get_delay_minimum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.get_delay_minimum">[docs]</a>    <span class="k">def</span> <span class="nf">get_delay_minimum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connector</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the minimum delay for the synapses. \</span>
+<span class="sd">            This will support the filtering of the undelayed edge\</span>
+<span class="sd">            from the graph, but requires fixes in the synaptic manager to \</span>
+<span class="sd">            happen first before this can be utilised fully.</span>
+
+<span class="sd">        :param AbstractConnector connector: connector</span>
+<span class="sd">        :param ~numpy.ndarray synapse_info: synapse info</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">connector</span><span class="o">.</span><span class="n">get_delay_minimum</span><span class="p">(</span><span class="n">synapse_info</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="AbstractSynapseDynamics.get_delay_variance"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.get_delay_variance">[docs]</a>    <span class="k">def</span> <span class="nf">get_delay_variance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connector</span><span class="p">,</span> <span class="n">delays</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the variance in delay for the synapses</span>
 

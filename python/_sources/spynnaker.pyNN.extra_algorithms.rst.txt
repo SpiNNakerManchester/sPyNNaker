@@ -1,6 +1,13 @@
 spynnaker.pyNN.extra_algorithms package
 =======================================
 
+Subpackages
+-----------
+
+.. toctree::
+
+    spynnaker.pyNN.extra_algorithms.splitter_components
+
 Submodules
 ----------
 
@@ -8,6 +15,14 @@ spynnaker.pyNN.extra_algorithms.connection_holder_finisher module
 -----------------------------------------------------------------
 
 .. automodule:: spynnaker.pyNN.extra_algorithms.connection_holder_finisher
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.extra_algorithms.delay_support_adder module
+----------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.extra_algorithms.delay_support_adder
     :members:
     :undoc-members:
     :show-inheritance:

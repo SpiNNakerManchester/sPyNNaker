@@ -1,0 +1,354 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>spynnaker.pyNN.extra_algorithms.delay_support_adder &#8212; sPyNNaker  documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for spynnaker.pyNN.extra_algorithms.delay_support_adder</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2020-2021 The University of Manchester</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.progress_bar</span> <span class="kn">import</span> <span class="n">ProgressBar</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">DelayExtensionException</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.extra_algorithms.splitter_components</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AbstractSpynnakerSplitterDelay</span><span class="p">,</span> <span class="n">SplitterDelayVertexSlice</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neural_projections</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ProjectionApplicationEdge</span><span class="p">,</span> <span class="n">DelayedApplicationEdge</span><span class="p">,</span>
+    <span class="n">DelayAfferentApplicationEdge</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.utility_models.delays</span> <span class="kn">import</span> <span class="n">DelayExtensionVertex</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities</span> <span class="kn">import</span> <span class="n">constants</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="DelaySupportAdder"><a class="viewcode-back" href="../../../../spynnaker.pyNN.extra_algorithms.html#spynnaker.pyNN.extra_algorithms.delay_support_adder.DelaySupportAdder">[docs]</a><span class="k">class</span> <span class="nc">DelaySupportAdder</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; adds delay extension vertices into the APP graph as needed</span>
+
+<span class="sd">    :param ApplicationGraph app_graph: the app graph</span>
+<span class="sd">    :param int machine_time_step: the machine time step</span>
+<span class="sd">    :param int user_max_delay: the user defined max delay</span>
+<span class="sd">    :rtype: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;_app_to_delay_map&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;_delay_post_edge_map&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;_delay_pre_edges&quot;</span><span class="p">]</span>
+
+    <span class="n">INVALID_SPLITTER_FOR_DELAYS_ERROR_MSG</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;The app vertex </span><span class="si">{}</span><span class="s2"> with splitter </span><span class="si">{}</span><span class="s2"> does not support delays and yet &quot;</span>
+        <span class="s2">&quot;requires a delay support for edge </span><span class="si">{}</span><span class="s2">. Please use a Splitter which &quot;</span>
+        <span class="s2">&quot;utilises the AbstractSpynnakerSplitterDelay interface.&quot;</span><span class="p">)</span>
+
+    <span class="n">DELAYS_NOT_SUPPORTED_SPLITTER</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;The app vertex </span><span class="si">{}</span><span class="s2"> with splitter </span><span class="si">{}</span><span class="s2"> does not support delays and yet &quot;</span>
+        <span class="s2">&quot;requires a delay support for edge </span><span class="si">{}</span><span class="s2">. Please use a Splitter which &quot;</span>
+        <span class="s2">&quot;does not have accepts_edges_from_delay_vertex turned off.&quot;</span><span class="p">)</span>
+
+    <span class="n">NOT_SUPPORTED_DELAY_ERROR_MSG</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;The maximum delay </span><span class="si">{}</span><span class="s2"> for projection </span><span class="si">{}</span><span class="s2"> is not supported &quot;</span>
+        <span class="s2">&quot;by the splitter </span><span class="si">{}</span><span class="s2"> (max supported delay of the splitter is </span><span class="si">{}</span><span class="s2"> and &quot;</span>
+        <span class="s2">&quot;a delay extension can add </span><span class="si">{}</span><span class="s2"> extra delay). either reduce &quot;</span>
+        <span class="s2">&quot;the delay, or use a splitter which supports a larger delay, or &quot;</span>
+        <span class="s2">&quot;finally implement the code to allow multiple delay extensions. &quot;</span>
+        <span class="s2">&quot;good luck.&quot;</span><span class="p">)</span>
+
+    <span class="n">END_USER_MAX_DELAY_DEFILING_ERROR_MESSAGE</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;The end user entered a max delay for which the projection breaks&quot;</span><span class="p">)</span>
+
+    <span class="n">APP_DELAY_PROGRESS_BAR_TEXT</span> <span class="o">=</span> <span class="s2">&quot;Adding delay extensions as required&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_app_to_delay_map</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_delay_post_edge_map</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_delay_pre_edges</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_graph</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">user_max_delay</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; adds the delay extensions to the app graph, now that all the\</span>
+<span class="sd">            splitter objects have been set.</span>
+
+<span class="sd">        :param ~pacman.model.graphs.application.ApplicationGraph app_graph:</span>
+<span class="sd">            the app graph</span>
+<span class="sd">        :param int machine_time_step: the machine time step</span>
+<span class="sd">        :param int user_max_delay: the user defined max delay</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># progress abr and data holders</span>
+        <span class="n">progress</span> <span class="o">=</span> <span class="n">ProgressBar</span><span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">app_graph</span><span class="o">.</span><span class="n">outgoing_edge_partitions</span><span class="p">)),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">APP_DELAY_PROGRESS_BAR_TEXT</span><span class="p">)</span>
+
+        <span class="c1"># go through all partitions.</span>
+        <span class="k">for</span> <span class="n">app_outgoing_edge_partition</span> <span class="ow">in</span> <span class="n">progress</span><span class="o">.</span><span class="n">over</span><span class="p">(</span>
+                <span class="n">app_graph</span><span class="o">.</span><span class="n">outgoing_edge_partitions</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">app_edge</span> <span class="ow">in</span> <span class="n">app_outgoing_edge_partition</span><span class="o">.</span><span class="n">edges</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">app_edge</span><span class="p">,</span> <span class="n">ProjectionApplicationEdge</span><span class="p">):</span>
+
+                    <span class="c1"># figure the max delay and if we need a delay extension</span>
+                    <span class="n">synapse_infos</span> <span class="o">=</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">synapse_information</span>
+                    <span class="p">(</span><span class="n">max_delay_needed</span><span class="p">,</span> <span class="n">post_vertex_max_delay</span><span class="p">,</span>
+                     <span class="n">need_delay_extension</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_delay_values</span><span class="p">(</span>
+                        <span class="n">app_edge</span><span class="p">,</span> <span class="n">user_max_delay</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span>
+                        <span class="n">synapse_infos</span><span class="p">)</span>
+
+                    <span class="c1"># if we need a delay, add it to the app graph.</span>
+                    <span class="k">if</span> <span class="n">need_delay_extension</span><span class="p">:</span>
+                        <span class="n">delay_app_vertex</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_create_delay_app_vertex_and_pre_edge</span><span class="p">(</span>
+                                <span class="n">app_outgoing_edge_partition</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span>
+                                <span class="n">post_vertex_max_delay</span><span class="p">,</span> <span class="n">app_graph</span><span class="p">,</span>
+                                <span class="n">max_delay_needed</span><span class="p">))</span>
+
+                        <span class="c1"># update the delay extension for the max delay slots.</span>
+                        <span class="c1"># NOTE do it accumulately. coz else more loops.</span>
+                        <span class="n">delay_app_vertex</span><span class="o">.</span> \
+                            <span class="n">set_new_n_delay_stages_and_delay_per_stage</span><span class="p">(</span>
+                                <span class="n">post_vertex_max_delay</span><span class="p">,</span> <span class="n">max_delay_needed</span><span class="p">)</span>
+
+                        <span class="c1"># add the edge from the delay extension to the</span>
+                        <span class="c1"># dest vertex</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_create_post_delay_edge</span><span class="p">(</span>
+                            <span class="n">delay_app_vertex</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">)</span>
+
+        <span class="c1"># avoids mutating the list of outgoing partitions. add them afterwards</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_new_app_edges</span><span class="p">(</span><span class="n">app_graph</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_add_new_app_edges</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_graph</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; adds new edges to the app graph. avoids mutating the arrays being\</span>
+<span class="sd">            iterated over previously.</span>
+
+<span class="sd">        :param ApplicationGraph app_graph: app graph</span>
+<span class="sd">        :rtype: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delay_post_edge_map</span><span class="p">:</span>
+            <span class="n">delay_edge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delay_post_edge_map</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="n">app_graph</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">delay_edge</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delay_pre_edges</span><span class="p">:</span>
+            <span class="n">app_graph</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">edge</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_create_post_delay_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delay_app_vertex</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; creates the edge between delay extension and post vertex. stores\</span>
+<span class="sd">            for future loading to the app graph when safe to do so.</span>
+
+<span class="sd">        :param ApplicationVertex delay_app_vertex: delay extension vertex</span>
+<span class="sd">        :param app_edge: the undelayed app edge this is associated with.</span>
+<span class="sd">        :rtype: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># check for post edge</span>
+        <span class="n">delayed_edge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delay_post_edge_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">delay_app_vertex</span><span class="p">,</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">delayed_edge</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">delay_edge</span> <span class="o">=</span> <span class="n">DelayedApplicationEdge</span><span class="p">(</span>
+                <span class="n">delay_app_vertex</span><span class="p">,</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="p">,</span>
+                <span class="n">app_edge</span><span class="o">.</span><span class="n">synapse_information</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_delayed_to_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">label</span><span class="p">),</span>
+                <span class="n">undelayed_edge</span><span class="o">=</span><span class="n">app_edge</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_delay_post_edge_map</span><span class="p">[</span>
+                <span class="p">(</span><span class="n">delay_app_vertex</span><span class="p">,</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="p">)]</span> <span class="o">=</span> <span class="n">delay_edge</span>
+            <span class="n">app_edge</span><span class="o">.</span><span class="n">delay_edge</span> <span class="o">=</span> <span class="n">delay_edge</span>
+
+    <span class="k">def</span> <span class="nf">_create_delay_app_vertex_and_pre_edge</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">app_outgoing_edge_partition</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">post_vertex_max_delay</span><span class="p">,</span>
+            <span class="n">app_graph</span><span class="p">,</span> <span class="n">max_delay_needed</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; creates the delay extension app vertex and the edge from the src\</span>
+<span class="sd">            vertex to this delay extension. Adds to the graph, as safe to do\</span>
+<span class="sd">            so.</span>
+
+<span class="sd">        :param OutgoingEdgePartition app_outgoing_edge_partition:</span>
+<span class="sd">            the original outgoing edge partition.</span>
+<span class="sd">        :param AppEdge app_edge: the undelayed app edge.</span>
+<span class="sd">        :param int post_vertex_max_delay: delay supported by post vertex.</span>
+<span class="sd">        :param int max_delay_needed: the max delay needed by this app edge.</span>
+<span class="sd">        :param ApplicationGraph app_graph: the app graph.</span>
+<span class="sd">        :return: the DelayExtensionAppVertex</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># get delay extension vertex if it already exists.</span>
+        <span class="n">delay_app_vertex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_to_delay_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="n">app_outgoing_edge_partition</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">delay_app_vertex</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># build delay app vertex</span>
+            <span class="n">delay_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_delayed&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
+            <span class="n">delay_app_vertex</span> <span class="o">=</span> <span class="n">DelayExtensionVertex</span><span class="p">(</span>
+                <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">,</span> <span class="n">post_vertex_max_delay</span><span class="p">,</span>
+                <span class="n">max_delay_needed</span> <span class="o">-</span> <span class="n">post_vertex_max_delay</span><span class="p">,</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="n">delay_name</span><span class="p">)</span>
+
+            <span class="c1"># set trackers</span>
+            <span class="n">delay_app_vertex</span><span class="o">.</span><span class="n">splitter</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">SplitterDelayVertexSlice</span><span class="p">(</span><span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="p">))</span>
+            <span class="n">app_graph</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">(</span><span class="n">delay_app_vertex</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_app_to_delay_map</span><span class="p">[</span><span class="n">app_outgoing_edge_partition</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">delay_app_vertex</span><span class="p">)</span>
+
+            <span class="c1"># build afferent app edge</span>
+            <span class="n">delay_pre_edge</span> <span class="o">=</span> <span class="n">DelayAfferentApplicationEdge</span><span class="p">(</span>
+                <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="p">,</span> <span class="n">delay_app_vertex</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_to_DelayExtension&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">label</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_delay_pre_edges</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">delay_pre_edge</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">delay_app_vertex</span>
+
+    <span class="k">def</span> <span class="nf">_check_delay_values</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">user_max_delay</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">synapse_infos</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; checks the delay required from the user defined max, the max delay\</span>
+<span class="sd">            supported by the post vertex splitter and the delay Extensions.</span>
+
+<span class="sd">        :param ApplicationEdge app_edge: the undelayed app edge</span>
+<span class="sd">        :param int user_max_delay: user max delay of the sim.</span>
+<span class="sd">        :param int machine_time_step: machine time step of the sim.</span>
+<span class="sd">        :param iterable[SynapseInfo] synapse_infos: iterable of synapse infos</span>
+<span class="sd">        :return:tuple of max_delay_needed, post_vertex_max_delay, bool.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># get max delay required</span>
+        <span class="n">max_delay_needed</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+            <span class="n">synapse_info</span><span class="o">.</span><span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">get_delay_maximum</span><span class="p">(</span>
+                <span class="n">synapse_info</span><span class="o">.</span><span class="n">connector</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">synapse_info</span> <span class="ow">in</span> <span class="n">synapse_infos</span><span class="p">)</span>
+
+        <span class="c1"># check max delay works</span>
+        <span class="k">if</span> <span class="n">max_delay_needed</span> <span class="o">&gt;</span> <span class="n">user_max_delay</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">END_USER_MAX_DELAY_DEFILING_ERROR_MESSAGE</span><span class="p">)</span>
+
+        <span class="c1"># get if the post vertex needs a delay extension</span>
+        <span class="n">post_splitter</span> <span class="o">=</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">splitter</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
+                <span class="n">post_splitter</span><span class="p">,</span> <span class="n">AbstractSpynnakerSplitterDelay</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">DelayExtensionException</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">INVALID_SPLITTER_FOR_DELAYS_ERROR_MSG</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">app_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="p">,</span> <span class="n">post_splitter</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">))</span>
+
+        <span class="n">post_vertex_max_delay</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">app_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">max_support_delay</span><span class="p">()</span> <span class="o">*</span>
+                <span class="p">(</span><span class="n">machine_time_step</span> <span class="o">/</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">))</span>
+
+        <span class="c1"># if does not need a delay extension, run away</span>
+        <span class="k">if</span> <span class="n">post_vertex_max_delay</span> <span class="o">&gt;=</span> <span class="n">max_delay_needed</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">max_delay_needed</span><span class="p">,</span> <span class="n">post_vertex_max_delay</span><span class="p">,</span> <span class="kc">False</span>
+
+        <span class="c1"># Check post vertex is ok with getting a delay</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">post_splitter</span><span class="o">.</span><span class="n">accepts_edges_from_delay_vertex</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="n">DelayExtensionException</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">DELAYS_NOT_SUPPORTED_SPLITTER</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">app_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="p">,</span> <span class="n">post_splitter</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">))</span>
+
+        <span class="c1"># needs a delay extension, check can be supported with 1 delay</span>
+        <span class="c1"># extension. coz we dont do more than 1 at the moment</span>
+        <span class="n">total_supported_delay</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">post_vertex_max_delay</span> <span class="o">+</span>
+            <span class="p">(</span><span class="n">DelayExtensionVertex</span><span class="o">.</span><span class="n">get_max_delay_ticks_supported</span><span class="p">(</span>
+                <span class="n">post_vertex_max_delay</span><span class="p">)</span> <span class="o">*</span>
+             <span class="p">(</span><span class="n">machine_time_step</span> <span class="o">/</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="n">total_supported_delay</span> <span class="o">&lt;</span> <span class="n">max_delay_needed</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DelayExtensionException</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">NOT_SUPPORTED_DELAY_ERROR_MSG</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">max_delay_needed</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span>
+                    <span class="n">app_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="p">,</span>
+                    <span class="n">post_vertex_max_delay</span><span class="p">,</span>
+                    <span class="n">DelayExtensionVertex</span><span class="o">.</span><span class="n">get_max_delay_ticks_supported</span><span class="p">(</span>
+                        <span class="n">post_vertex_max_delay</span><span class="p">)))</span>
+
+        <span class="c1"># return data for building delay extensions</span>
+        <span class="k">return</span> <span class="n">max_delay_needed</span><span class="p">,</span> <span class="n">post_vertex_max_delay</span><span class="p">,</span> <span class="kc">True</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+    </div>
+  </body>
+</html>

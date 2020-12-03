@@ -114,7 +114,7 @@
 <span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
 <span class="sd">            The data specification to write to</span>
 <span class="sd">        :param int region: region ID</span>
-<span class="sd">        :param int machine_time_step: The simulation time step</span>
+<span class="sd">        :param float machine_time_step: The simulation time step</span>
 <span class="sd">        :param list(float) weight_scales: Weight scaling for each synapse type</span>
 <span class="sd">        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:</span>
 <span class="sd">            The machine graph</span>
@@ -136,7 +136,7 @@
 <span class="sd">        :param ~pacman.model.graphs.common.Slice post_vertex_slice:</span>
 <span class="sd">        :param ProjectionApplicationEdge app_edge:</span>
 <span class="sd">        :param SynapseInformation synapse_info:</span>
-<span class="sd">        :param ProjectionMachineEdge machine_edge:</span>
+<span class="sd">        :param MachineEdge machine_edge:</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
     <span class="nd">@abstractproperty</span>

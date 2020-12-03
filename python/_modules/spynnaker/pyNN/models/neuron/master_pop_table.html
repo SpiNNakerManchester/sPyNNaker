@@ -381,12 +381,21 @@
         <span class="s2">&quot;__entries&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__n_addresses&quot;</span><span class="p">]</span>
 
+    <span class="n">MAX_ROW_LENGTH_ERROR_MSG</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;Only rows of up to </span><span class="si">{}</span><span class="s2"> entries are allowed&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">POP_TABLE_MAX_ROW_LENGTH</span><span class="p">))</span>
+
+    <span class="n">OUT_OF_RANGE_ERROR_MESSAGE</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;Address </span><span class="si">{}</span><span class="s2"> is out of range for this population table!&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Over-scale of estimate for safety</span>
+    <span class="n">UPPER_BOUND_FUDGE</span> <span class="o">=</span> <span class="mi">2</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__n_addresses</span> <span class="o">=</span> <span class="mi">0</span>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="MasterPopTableAsBinarySearch.get_master_population_table_size"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.get_master_population_table_size">[docs]</a>    <span class="k">def</span> <span class="nf">get_master_population_table_size</span><span class="p">(</span><span class="n">in_edges</span><span class="p">):</span>
+<div class="viewcode-block" id="MasterPopTableAsBinarySearch.get_master_population_table_size"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.get_master_population_table_size">[docs]</a>    <span class="k">def</span> <span class="nf">get_master_population_table_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_edges</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the size of the master population table in SDRAM.</span>
 
 <span class="sd">        :param iterable(~pacman.model.graphs.application.ApplicationEdge) \</span>
@@ -403,30 +412,26 @@
         <span class="n">n_entries</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">in_edge</span> <span class="ow">in</span> <span class="n">in_edges</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">in_edge</span><span class="p">,</span> <span class="n">ProjectionApplicationEdge</span><span class="p">):</span>
-                <span class="c1"># TODO: Fix this to be more accurate!</span>
-                <span class="c1"># May require modification to the master population table</span>
-                <span class="c1"># Get the number of atoms per core incoming</span>
-                <span class="n">vertex</span> <span class="o">=</span> <span class="n">in_edge</span><span class="o">.</span><span class="n">pre_vertex</span>
-                <span class="n">max_atoms</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">vertex</span><span class="o">.</span><span class="n">get_max_atoms_per_core</span><span class="p">(),</span>
-                                      <span class="n">vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">))</span>
-
-                <span class="c1"># Get the number of likely vertices</span>
-                <span class="n">n_edge_vertices</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">vertex</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">/</span> <span class="n">max_atoms</span><span class="p">))</span>
-                <span class="n">n_vertices</span> <span class="o">+=</span> <span class="n">n_edge_vertices</span>
-                <span class="n">n_entries</span> <span class="o">+=</span> <span class="p">(</span>
-                    <span class="n">n_edge_vertices</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">in_edge</span><span class="o">.</span><span class="n">synapse_information</span><span class="p">))</span>
+                <span class="n">slices</span><span class="p">,</span> <span class="n">is_exact</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">in_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_out_going_slices</span><span class="p">())</span>
+                <span class="k">if</span> <span class="n">is_exact</span><span class="p">:</span>
+                    <span class="n">n_vertices</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">slices</span><span class="p">)</span>
+                    <span class="n">n_entries</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">in_edge</span><span class="o">.</span><span class="n">synapse_information</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">n_vertices</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">slices</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">UPPER_BOUND_FUDGE</span>
+                    <span class="n">n_entries</span> <span class="o">+=</span> <span class="p">(</span>
+                        <span class="nb">len</span><span class="p">(</span><span class="n">in_edge</span><span class="o">.</span><span class="n">synapse_information</span><span class="p">)</span> <span class="o">*</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">UPPER_BOUND_FUDGE</span><span class="p">)</span>
 
         <span class="c1"># Multiply by 2 to get an upper bound</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="n">_BASE_SIZE_BYTES</span> <span class="o">+</span>
-            <span class="p">(</span><span class="n">n_vertices</span> <span class="o">*</span> <span class="n">_OVERSCALE</span> <span class="o">*</span> <span class="n">_MASTER_POP_ENTRY_SIZE_BYTES</span><span class="p">)</span> <span class="o">+</span>
-            <span class="p">(</span><span class="n">n_vertices</span> <span class="o">*</span> <span class="n">_OVERSCALE</span> <span class="o">*</span> <span class="n">_EXTRA_INFO_ENTRY_SIZE_BYTES</span><span class="p">)</span> <span class="o">+</span>
-            <span class="p">(</span><span class="n">n_entries</span> <span class="o">*</span> <span class="n">_OVERSCALE</span> <span class="o">*</span> <span class="n">_ADDRESS_LIST_ENTRY_SIZE_BYTES</span><span class="p">))</span></div>
+            <span class="p">(</span><span class="n">n_vertices</span> <span class="o">*</span> <span class="n">_MASTER_POP_ENTRY_SIZE_BYTES</span><span class="p">)</span> <span class="o">+</span>
+            <span class="p">(</span><span class="n">n_vertices</span> <span class="o">*</span> <span class="n">_EXTRA_INFO_ENTRY_SIZE_BYTES</span><span class="p">)</span> <span class="o">+</span>
+            <span class="p">(</span><span class="n">n_entries</span> <span class="o">*</span> <span class="n">_ADDRESS_LIST_ENTRY_SIZE_BYTES</span><span class="p">))</span></div>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="MasterPopTableAsBinarySearch.get_allowed_row_length"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.get_allowed_row_length">[docs]</a>    <span class="k">def</span> <span class="nf">get_allowed_row_length</span><span class="p">(</span><span class="n">row_length</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the next allowed row length</span>
-
+<div class="viewcode-block" id="MasterPopTableAsBinarySearch.get_allowed_row_length"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.get_allowed_row_length">[docs]</a>    <span class="k">def</span> <span class="nf">get_allowed_row_length</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row_length</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param int row_length: the row length being considered</span>
 <span class="sd">        :return: the row length available</span>
 <span class="sd">        :rtype: int</span>
@@ -435,13 +440,10 @@
 
         <span class="k">if</span> <span class="n">row_length</span> <span class="o">&gt;</span> <span class="n">POP_TABLE_MAX_ROW_LENGTH</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">SynapseRowTooBigException</span><span class="p">(</span>
-                <span class="n">POP_TABLE_MAX_ROW_LENGTH</span><span class="p">,</span>
-                <span class="s2">&quot;Only rows of up to </span><span class="si">{}</span><span class="s2"> entries are allowed&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">POP_TABLE_MAX_ROW_LENGTH</span><span class="p">))</span>
+                <span class="n">POP_TABLE_MAX_ROW_LENGTH</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">MAX_ROW_LENGTH_ERROR_MSG</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">row_length</span></div>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="MasterPopTableAsBinarySearch.get_next_allowed_address"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.get_next_allowed_address">[docs]</a>    <span class="k">def</span> <span class="nf">get_next_allowed_address</span><span class="p">(</span><span class="n">next_address</span><span class="p">):</span>
+<div class="viewcode-block" id="MasterPopTableAsBinarySearch.get_next_allowed_address"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.get_next_allowed_address">[docs]</a>    <span class="k">def</span> <span class="nf">get_next_allowed_address</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">next_address</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the next allowed address</span>
 
 <span class="sd">        :param int next_address: The next address that would be used</span>
@@ -452,7 +454,7 @@
         <span class="n">addr_scaled</span> <span class="o">=</span> <span class="p">(</span><span class="n">next_address</span> <span class="o">+</span> <span class="p">(</span><span class="n">_ADDRESS_SCALE</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span> <span class="o">//</span> <span class="n">_ADDRESS_SCALE</span>
         <span class="k">if</span> <span class="n">addr_scaled</span> <span class="o">&gt;</span> <span class="n">_MAX_ADDRESS</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">SynapticConfigurationException</span><span class="p">(</span>
-                <span class="s2">&quot;Address </span><span class="si">{}</span><span class="s2"> is out of range for this population table!&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">OUT_OF_RANGE_ERROR_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="nb">hex</span><span class="p">(</span><span class="n">addr_scaled</span> <span class="o">*</span> <span class="n">_ADDRESS_SCALE</span><span class="p">)))</span>
         <span class="k">return</span> <span class="n">addr_scaled</span> <span class="o">*</span> <span class="n">_ADDRESS_SCALE</span></div>
 
