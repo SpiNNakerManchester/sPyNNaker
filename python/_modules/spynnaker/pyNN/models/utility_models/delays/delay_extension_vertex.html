@@ -154,7 +154,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">__delay_per_stage</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_delay_needed_to_support</span><span class="p">)</span>
 
         <span class="c1"># atom store</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__n_atoms</span> <span class="o">=</span> <span class="n">n_neurons</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__n_atoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">round_n_atoms</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">,</span> <span class="s2">&quot;n_neurons&quot;</span><span class="p">)</span>
 
         <span class="c1"># Dictionary of vertex_slice -&gt; delay block for data specification</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__delay_blocks</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
