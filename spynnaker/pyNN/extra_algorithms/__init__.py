@@ -28,15 +28,19 @@ from .spynnaker_neuron_network_specification_report import (
     SpYNNakerNeuronGraphNetworkSpecificationReport)
 from .spynnaker_synaptic_matrix_report import SpYNNakerSynapticMatrixReport
 from .synapse_expander import synapse_expander
+from .delay_support_adder import DelaySupportAdder
 
-__all__ = ["AbstractMachineBitFieldRouterCompressor",
-           "finish_connection_holders",
-           "GraphEdgeWeightUpdater", "OnChipBitFieldGenerator",
-           "RedundantPacketCountReport",
-           "SpYNNakerConnectionHolderGenerator",
-           "SpynnakerDataSpecificationWriter",
-           "SpynnakerMachineBitFieldPairRouterCompressor",
-           "SpynnakerMachineBitFieldUnorderedRouterCompressor",
-           "SpYNNakerNeuronGraphNetworkSpecificationReport",
-           "SpYNNakerSynapticMatrixReport",
-           "synapse_expander"]
+__all__ = [
+    "AbstractMachineBitFieldRouterCompressor",
+    "DelaySupportAdder",
+    "finish_connection_holders",
+    "GraphEdgeWeightUpdater",
+    "OnChipBitFieldGenerator",
+    "RedundantPacketCountReport",
+    "SpYNNakerConnectionHolderGenerator",
+    "SpynnakerDataSpecificationWriter",
+    "SpynnakerMachineBitFieldPairRouterCompressor",
+    "SpynnakerMachineBitFieldUnorderedRouterCompressor",
+    "SpYNNakerNeuronGraphNetworkSpecificationReport",
+    "SpYNNakerSynapticMatrixReport",
+    "synapse_expander"]

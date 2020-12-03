@@ -14,10 +14,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
+
+from spinn_front_end_common.interface.provenance import \
+    AbstractProvidesLocalProvenanceData
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationEdge
 from pacman.model.partitioner_interfaces import AbstractSlicesConnect
-from .projection_machine_edge import ProjectionMachineEdge
+
 logger = logging.getLogger(__name__)
 _DynamicsStructural = None
 
@@ -32,7 +35,9 @@ def _are_dynamics_structural(synapse_dynamics):
     return isinstance(synapse_dynamics, _DynamicsStructural)
 
 
-class ProjectionApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
+class ProjectionApplicationEdge(
+        ApplicationEdge, AbstractSlicesConnect,
+        AbstractProvidesLocalProvenanceData):
     """ An edge which terminates on an :py:class:`AbstractPopulationVertex`.
     """
     __slots__ = [
@@ -40,7 +45,6 @@ class ProjectionApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
         "__synapse_information",
         # Slices of the pre_vertexes of the machine_edges
         "__pre_slices",
-
         # Slices of the post_vertexes of the machine_edges
         "__post_slices",
         # True if slices have been convered to sorted lists
@@ -53,7 +57,10 @@ class ProjectionApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
         """
         :param AbstractPopulationVertex pre_vertex:
         :param AbstractPopulationVertex post_vertex:
-        :param SynapseInformation synapse_information:
+        :param synapse_information:
+            The synapse information on this edge
+        :type synapse_information:
+            SynapseInformation or iterable(SynapseInformation)
         :param str label:
         """
         super(ProjectionApplicationEdge, self).__init__(
@@ -61,7 +68,10 @@ class ProjectionApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
 
         # A list of all synapse information for all the projections that are
         # represented by this edge
-        self.__synapse_information = [synapse_information]
+        if hasattr(synapse_information, '__iter__'):
+            self.__synapse_information = synapse_information
+        else:
+            self.__synapse_information = [synapse_information]
 
         # The edge from the delay extension of the pre_vertex to the
         # post_vertex - this might be None if no long delays are present
@@ -108,33 +118,17 @@ class ProjectionApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
             return 0
         return self.__delay_edge.pre_vertex.n_delay_stages
 
-    @overrides(ApplicationEdge._create_machine_edge)
-    def _create_machine_edge(
-            self, pre_vertex, post_vertex, label):
-        edge = ProjectionMachineEdge(
-            self.__synapse_information, pre_vertex, post_vertex, self, label)
-        self.__machine_edges_by_slices[
-            pre_vertex.vertex_slice, post_vertex.vertex_slice] = edge
-        if self.__delay_edge is not None:
-            # Set the information if the delay machine edge exists
-            delayed = self.__delay_edge._get_machine_edge(
-                pre_vertex, post_vertex)
-            if delayed is not None:
-                edge.delay_edge = delayed
-                delayed.undelayed_edge = edge
-        return edge
-
-    def _get_machine_edge(self, pre_vertex, post_vertex):
+    def get_machine_edge(self, pre_vertex, post_vertex):
         """ Get a specific machine edge of this edge
 
         :param PopulationMachineVertex pre_vertex:
             The vertex at the start of the machine edge
         :param PopulationMachineVertex post_vertex:
             The vertex at the end of the machine edge
-        :rtype: ProjectionMachineEdge or None
+        :rtype: MachineEdge or None
         """
         return self.__machine_edges_by_slices.get(
-            (pre_vertex.vertex_slice, post_vertex.vertex_slice))
+            (pre_vertex.vertex_slice, post_vertex.vertex_slice), None)
 
     @overrides(AbstractSlicesConnect.could_connect)
     def could_connect(self, pre_slice, post_slice):
@@ -158,6 +152,9 @@ class ProjectionApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
             self.__slices_list_mode = False
         self.__pre_slices.add(machine_edge.pre_vertex.vertex_slice)
         self.__post_slices.add(machine_edge.post_vertex.vertex_slice)
+        self.__machine_edges_by_slices[
+            machine_edge.pre_vertex.vertex_slice,
+            machine_edge.post_vertex.vertex_slice] = machine_edge
 
     @overrides(ApplicationEdge.forget_machine_edges)
     def forget_machine_edges(self):
@@ -208,3 +205,16 @@ class ProjectionApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
         """
         self.__check_list_mode()
         return self.__post_slices
+
+    @overrides(AbstractProvidesLocalProvenanceData.get_local_provenance_data)
+    def get_local_provenance_data(self):
+        prov_items = list()
+        for synapse_info in self.synapse_information:
+            prov_items.extend(
+                synapse_info.connector.get_provenance_data(synapse_info))
+            for machine_edge in self.machine_edges:
+                prov_items.extend(
+                    synapse_info.synapse_dynamics.get_provenance_data(
+                        machine_edge.pre_vertex.label,
+                        machine_edge.post_vertex.label))
+        return prov_items

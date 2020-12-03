@@ -52,7 +52,7 @@ class SpikeSourceArrayVertex(
 
     def __init__(
             self, n_neurons, spike_times, constraints, label,
-            max_atoms_per_core, model):
+            max_atoms_per_core, model, splitter):
         # pylint: disable=too-many-arguments
         self.__model_name = "SpikeSourceArray"
         self.__model = model
@@ -66,7 +66,8 @@ class SpikeSourceArrayVertex(
             n_keys=n_neurons, label=label, constraints=constraints,
             max_atoms_per_core=max_atoms_per_core,
             send_buffer_times=_send_buffer_times(spike_times, time_step),
-            send_buffer_partition_id=constants.SPIKE_PARTITION_ID)
+            send_buffer_partition_id=constants.SPIKE_PARTITION_ID,
+            splitter=splitter)
 
         # handle recording
         self.__spike_recorder = EIEIOSpikeRecorder()
