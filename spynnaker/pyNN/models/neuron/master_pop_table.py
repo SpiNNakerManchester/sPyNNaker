@@ -320,12 +320,21 @@ class MasterPopTableAsBinarySearch(object):
         "__entries",
         "__n_addresses"]
 
+    MAX_ROW_LENGTH_ERROR_MSG = (
+        "Only rows of up to {} entries are allowed".format(
+            POP_TABLE_MAX_ROW_LENGTH))
+
+    OUT_OF_RANGE_ERROR_MESSAGE = (
+        "Address {} is out of range for this population table!")
+
+    # Over-scale of estimate for safety
+    UPPER_BOUND_FUDGE = 2
+
     def __init__(self):
         self.__entries = None
         self.__n_addresses = 0
 
-    @staticmethod
-    def get_master_population_table_size(in_edges):
+    def get_master_population_table_size(self, in_edges):
         """ Get the size of the master population table in SDRAM.
 
         :param iterable(~pacman.model.graphs.application.ApplicationEdge) \
@@ -342,30 +351,26 @@ class MasterPopTableAsBinarySearch(object):
         n_entries = 0
         for in_edge in in_edges:
             if isinstance(in_edge, ProjectionApplicationEdge):
-                # TODO: Fix this to be more accurate!
-                # May require modification to the master population table
-                # Get the number of atoms per core incoming
-                vertex = in_edge.pre_vertex
-                max_atoms = float(min(vertex.get_max_atoms_per_core(),
-                                      vertex.n_atoms))
-
-                # Get the number of likely vertices
-                n_edge_vertices = int(math.ceil(vertex.n_atoms / max_atoms))
-                n_vertices += n_edge_vertices
-                n_entries += (
-                    n_edge_vertices * len(in_edge.synapse_information))
+                slices, is_exact = (
+                    in_edge.pre_vertex.splitter.get_out_going_slices())
+                if is_exact:
+                    n_vertices += len(slices)
+                    n_entries += len(in_edge.synapse_information)
+                else:
+                    n_vertices += len(slices) * self.UPPER_BOUND_FUDGE
+                    n_entries += (
+                        len(in_edge.synapse_information) *
+                        self.UPPER_BOUND_FUDGE)
 
         # Multiply by 2 to get an upper bound
         return (
             _BASE_SIZE_BYTES +
-            (n_vertices * _OVERSCALE * _MASTER_POP_ENTRY_SIZE_BYTES) +
-            (n_vertices * _OVERSCALE * _EXTRA_INFO_ENTRY_SIZE_BYTES) +
-            (n_entries * _OVERSCALE * _ADDRESS_LIST_ENTRY_SIZE_BYTES))
+            (n_vertices * _MASTER_POP_ENTRY_SIZE_BYTES) +
+            (n_vertices * _EXTRA_INFO_ENTRY_SIZE_BYTES) +
+            (n_entries * _ADDRESS_LIST_ENTRY_SIZE_BYTES))
 
-    @staticmethod
-    def get_allowed_row_length(row_length):
-        """ Get the next allowed row length
-
+    def get_allowed_row_length(self, row_length):
+        """
         :param int row_length: the row length being considered
         :return: the row length available
         :rtype: int
@@ -374,13 +379,10 @@ class MasterPopTableAsBinarySearch(object):
 
         if row_length > POP_TABLE_MAX_ROW_LENGTH:
             raise SynapseRowTooBigException(
-                POP_TABLE_MAX_ROW_LENGTH,
-                "Only rows of up to {} entries are allowed".format(
-                    POP_TABLE_MAX_ROW_LENGTH))
+                POP_TABLE_MAX_ROW_LENGTH, self.MAX_ROW_LENGTH_ERROR_MSG)
         return row_length
 
-    @staticmethod
-    def get_next_allowed_address(next_address):
+    def get_next_allowed_address(self, next_address):
         """ Get the next allowed address
 
         :param int next_address: The next address that would be used
@@ -391,7 +393,7 @@ class MasterPopTableAsBinarySearch(object):
         addr_scaled = (next_address + (_ADDRESS_SCALE - 1)) // _ADDRESS_SCALE
         if addr_scaled > _MAX_ADDRESS:
             raise SynapticConfigurationException(
-                "Address {} is out of range for this population table!".format(
+                self.OUT_OF_RANGE_ERROR_MESSAGE.format(
                     hex(addr_scaled * _ADDRESS_SCALE)))
         return addr_scaled * _ADDRESS_SCALE
 
@@ -448,7 +450,7 @@ class MasterPopTableAsBinarySearch(object):
                 "The core mask of {} is too big (maximum {})".format(
                     core_mask, _MAX_CORE_MASK))
 
-        self.__update_master_population_table(
+        return self.__update_master_population_table(
             block_start_addr, row_length, key_and_mask, core_mask, core_shift,
             n_neurons, False)
 

@@ -26,7 +26,7 @@ from data_specification.enums import DataType
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, MICRO_TO_SECOND_CONVERSION)
 
-from spynnaker.pyNN.models.neural_projections import ProjectionMachineEdge
+from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.abstract_models import AbstractMaxSpikes
 from spynnaker.pyNN.models.neuron.synapse_io import SynapseIORowBased
 from spynnaker.pyNN.utilities.constants import (
@@ -97,6 +97,19 @@ class SynapticManager(object):
 
     # 1. address of direct addresses, 2. size of direct addresses matrix size
     STATIC_SYNAPSE_MATRIX_SDRAM_IN_BYTES = 2 * BYTES_PER_WORD
+
+    NOT_EXACT_SLICES_ERROR_MESSAGE = (
+        "The splitter {} is returning estimated slices during DSG. "
+        "This is deemed an error. Please fix and try again")
+
+    TOO_MUCH_WRITTEN_SYNAPTIC_DATA = (
+        "Too much synaptic memory has been written: {} of {} ")
+
+    INDEXS_DONT_MATCH_ERROR_MESSAGE = (
+        "Delay index {} and normal index {} do not match")
+
+    NO_DELAY_EDGE_FOR_SRC_IDS_MESSAGE = (
+        "Found delayed source IDs but no delay machine edge for {}")
 
     def __init__(self, n_synapse_types, ring_buffer_sigma, spikes_per_second,
                  config, drop_late_spikes):
@@ -254,15 +267,6 @@ class SynapticManager(object):
     @spikes_per_second.setter
     def spikes_per_second(self, spikes_per_second):
         self.__spikes_per_second = spikes_per_second
-
-    def get_maximum_delay_supported_in_ms(self, machine_time_step):
-        """ The maximum delay supported by this vertex, before delay extensions
-            are needed
-
-        :rtype: int
-        """
-        return self.__synapse_io.get_maximum_delay_supported_in_ms(
-            machine_time_step)
 
     @property
     def vertex_executable_suffix(self):
@@ -484,8 +488,8 @@ class SynapticManager(object):
         synapse_map = dict()
         for machine_edge in machine_graph.get_edges_ending_at_vertex(
                 machine_vertex):
-            if isinstance(machine_edge, ProjectionMachineEdge):
-                for synapse_info in machine_edge.synapse_information:
+            if isinstance(machine_edge.app_edge, ProjectionApplicationEdge):
+                for synapse_info in machine_edge.app_edge.synapse_information:
                     # Per synapse info we need any one of the edges
                     synapse_map[synapse_info] = machine_edge
 
@@ -588,7 +592,7 @@ class SynapticManager(object):
 
         :param .MachineVertex machine_vertex:
         :param .MachineGraph machine_graph:
-        :param int machine_time_step:
+        :param float machine_time_step:
         :param float weight_scale:
         """
         if self.__ring_buffer_shifts is None:
@@ -625,7 +629,7 @@ class SynapticManager(object):
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
             How messages are routed
         :param float weight_scale: How to scale the weights of the synapses
-        :param int machine_time_step:
+        :param float machine_time_step:
         """
 
         # Reserve the memory
@@ -648,7 +652,7 @@ class SynapticManager(object):
 
         gen_data = matrices.write_synaptic_matrix_and_master_population_table(
             spec, machine_vertex, all_syn_block_sz, self.__weight_scales,
-            routing_info, machine_graph)
+            routing_info, machine_graph, machine_time_step)
 
         if self.__synapse_dynamics is not None:
             self.__synapse_dynamics.write_parameters(
@@ -672,8 +676,6 @@ class SynapticManager(object):
             The specification to write to
         :param ~pacman.model.common.Slice post_vertex_slice:
             The slice of the vertex being written
-        :param weight_scales: scaling of weights on each synapse
-        :type weight_scales: list(int or float)
         :param list(GeneratorData) generator_data:
         """
         if not generator_data:
