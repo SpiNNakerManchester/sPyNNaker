@@ -15,14 +15,12 @@
 import os
 
 from pacman.model.graphs.common import Slice
-from pacman.model.partitioner_splitters import SplitterOneAppOneMachine
 from pacman.model.partitioner_splitters.abstract_splitters import \
     AbstractSplitterCommon
-from pacman.utilities.algorithm_utilities.partition_algorithm_utilities import \
-    get_remaining_constraints
+from pacman.utilities.algorithm_utilities.\
+    partition_algorithm_utilities import get_remaining_constraints
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException
-from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint, FixedVertexAtomsConstraint,
     AbstractPartitionerConstraint)
@@ -74,7 +72,7 @@ class SplitterAbstractPopulationVertexSingle(
                 vertex_slice),
             "machine vertex for {}".format(self._governed_app_vertex),
             get_remaining_constraints(self._governed_app_vertex),
-            self._governed_app_vertex,vertex_slice,
+            self._governed_app_vertex, vertex_slice,
             self._governed_app_vertex.synapse_manager.drop_late_spikes,
             self.__get_binary_file_name())
         machine_graph.add_vertex(machine_vertex)
