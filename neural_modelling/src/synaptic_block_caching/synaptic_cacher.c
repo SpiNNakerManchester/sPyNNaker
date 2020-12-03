@@ -50,6 +50,12 @@ typedef struct not_redundant_tracker_t {
 //! The minimum synapse types to sort out DTCM and get though the synapse init
 #define N_SYNAPSE_TYPES 1
 
+//! key rep for using bianry
+#define USE_BINARY 0
+
+//! key rep for using array
+#define USE_ARRAY 1
+
 //! Magic flag for if the region id is not setup
 int FAILED_REGION_ID = 0xFFFFFFFF;
 
@@ -194,7 +200,7 @@ static inline bool initialise(void) {
 
     // set up a sdram read for a row
     log_debug("Allocating dtcm for row data");
-    row_data = MALLOC(row_max_n_words * sizeof(uint32_t));
+    row_data = MALLOC_SDRAM(row_max_n_words * sizeof(uint32_t));
     if (row_data == NULL) {
         log_error("Could not allocate dtcm for the row data");
         return false;
@@ -224,7 +230,7 @@ static void print_store(void) {
 //! \brief reads in the bitfields
 static inline void read_in_bitfields(void) {
     // get the bitfields in a copy form
-    not_redundant_tracker = MALLOC(
+    not_redundant_tracker = MALLOC_SDRAM(
         sizeof(not_redundant_tracker_t) * bit_field_base_address->n_filters);
 
     if (not_redundant_tracker == NULL) {
@@ -272,16 +278,83 @@ static inline bool sort_out_bitfields(void) {
     print_store();
 }
 
+//! \brief returns the size of dtcm needed when using binary search rep
+//! \param[in] bit_field_index: index in bitfields
+//! \return: the size in bytes used by dtcm.
+static inline int calculate_binary_search_size(uint32_t bit_field_index) {
+    return 0;
+}
+
+//! \brief returns the size of dtcm needed when using array search rep
+//! \param[in] bit_field_index: index in bitfields
+//! \return: the size in bytes used by dtcm.
+static inline int calculate_array_search_size(uint32_t bit_field_index) {
+    uint dtcm_left = sark_heap_max(sark.heap, 0);
+
+    return 0;
+}
+
+//! \brief sets master pop entry to cache and sets the blocks reps.
+static void set_master_pop_to_cache(uint32_t bit_field_index, uint32_t rep) {
+    return 0;
+}
+
+static inline master_population_table_entry find_master_pop_entry(
+        uint32_t bit_field_index) {
+    uint32_t position;
+    bool success  = population_table_position_in_the_master_pop_array(
+        not_redundant_tracker[bit_field_index].filter.key, &position);
+    if (!success) {
+        log_error(
+            "failed to find a master pop table position for key %d."
+            not_redundant_tracker[bit_field_index].filter.key);
+    }
+    return population_table_entry(position);
+}
+
 //! \brief determines which blocks can be DTCM'ed.
 static inline bool cache_blocks(void) {
     log_info("plan to fill %d bytes of DTCM", dtcm_to_use);
 
+    // search all the bitfields.
     for (uint32_t bit_field_index = 0;
             bit_field_index < bit_field_base_address->n_filters;
             bit_field_index++) {
+        master_population_table_entry entry =
+            find_master_pop_entry(bit_field_index);
 
+        // trackers
+        bool cache = true;
+        uint32_t * reps = MALLOC_SDRAM(sizeof(uint32_t) * entry.count);
+        if (reps == NULL) {
+            log_error("cannot allocate sdram for the reps.");
+            return false;
+        }
+
+        for (uint32_t address_index = entry.start; address_index < entry.count;
+                address_index ++) {
+            address_list_entry address_entry =
+                population_table_get_address_entry(address_index);
+
+            int binary_search_size = calculate_binary_search_size(bit_field_index);
+            int array_search_size = calculate_array_search_size(bit_field_index);
+            // if binary better memory. see if we can cache with that rep.
+            if (binary_search_size < array_search_size) {
+                // check if can be cached
+                if (dtcm_to_use - binary_search_size > 0) {
+                    // set master pop table to cache. and remove dtcm usage.
+                    set_master_pop_to_cache(bit_field_index, USE_BINARY);
+                }
+            }
+            else{
+                // check if can be cached
+                if(dtcm_to_use - array_search_size > 0) {
+                    // set master pop table to cache. and remove dtcm usage.
+                    set_master_pop_to_cache(bit_field_index, USE_ARRAY);
+                }
+            }
+        }
     }
-    return true;
 }
 
 //! Entry point

@@ -34,7 +34,7 @@
 
 //! \brief The number of bits of address.
 //!        This is a constant as it is used more than once below.
-#define N_ADDRESS_BITS 23
+#define N_ADDRESS_BITS 22
 
 //! \brief The shift to apply to indirect addresses.
 //!    The address is in units of four words, so this multiplies by 16 (= up
@@ -76,8 +76,20 @@ typedef struct {
     //! the address
     uint32_t address : N_ADDRESS_BITS;
     //! whether this is a direct/single address
-    uint32_t is_single : 1;
+    uint32_t representation: 2;
 } address_and_row_length;
+
+//! \brief A enum for representing other data representations
+typedef enum representation_values {
+    //! representation of a direct 1 to 1
+    SINGLE = 0,
+    //! Binary Search
+    BINARY_SEARCH = 1,
+    //! 1d array
+    ARRAY = 2,
+    // other
+    OTHER = 3
+} representation_values;
 
 //! \brief An entry in the address list is either an address and row length or extra
 //! info if flagged.
@@ -136,6 +148,22 @@ uint32_t bit_field_filtered_packets = 0;
 
 //! \name Support functions
 //! \{
+
+//! \brief get a master pop entry from array
+//! \param[in] index: index to get element from
+//! \return master pop table entry.
+static inline master_population_table_entry population_table_entry(
+        uint32_t index) {
+    return master_population_table[index];
+}
+
+//! \brief get a address_list_entry from array
+//! \param[in] index: index to get element from
+//! \return the address_list_entry.
+static inline address_list_entry population_table_get_address_entry(
+        uint32_t index) {
+    return address_list[index];
+}
 
 //! \brief Get the direct row address out of an entry
 //! \param[in] entry: the table entry
@@ -248,7 +276,7 @@ static inline void print_master_population_table(void) {
             address_and_row_length addr = address_list[j].addr;
             if (addr.address == INVALID_ADDRESS) {
                 log_info("    index %d: INVALID", j);
-            } else if (!addr.is_single) {
+            } else if (!addr.representation == SINGLE) {
                 log_info("    index %d: offset: %u, address: 0x%08x, row_length: %u",
                     j, get_offset(addr), get_address(addr), get_row_length(addr));
             } else {
@@ -562,7 +590,7 @@ bool population_table_get_next_address(
 
             // If the row is a direct row, indicate this by specifying the
             // n_bytes_to_transfer is 0
-            if (item.is_single) {
+            if (item.representation == SINGLE) {
                 *row_address = (address_t) (get_direct_address(item) +
                     (last_neuron_id * sizeof(uint32_t)));
                 *n_bytes_to_transfer = 0;

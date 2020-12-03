@@ -74,5 +74,10 @@ bool population_table_get_first_address(
 bool population_table_get_next_address(
         spike_t *spike, address_t* row_address, size_t* n_bytes_to_transfer);
 
+//! \brief get a master pop entry from array
+//! \param[in] index: index to get element from
+//! \return master pop table entry.
+static inline master_population_table_entry population_table_entry(
+        uint32_t index);
 
 #endif // _POPULATION_TABLE_H_
