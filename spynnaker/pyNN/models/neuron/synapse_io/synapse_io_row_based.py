@@ -42,7 +42,7 @@ class SynapseIORowBased(AbstractSynapseIO):
     @overrides(AbstractSynapseIO.get_maximum_delay_supported_in_ms)
     def get_maximum_delay_supported_in_ms(self, machine_time_step):
         # There are 16 slots, one per time step
-        return 255 # * (machine_time_step / 1000.0)
+        return (2**10 - 1) # * (machine_time_step / 1000.0)
 
     def _n_words(self, n_bytes):
         return math.ceil(float(n_bytes) / 4.0)
