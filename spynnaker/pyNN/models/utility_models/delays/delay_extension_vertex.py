@@ -89,7 +89,7 @@ class DelayExtensionVertex(
             self.__delay_per_stage, self.__max_delay_needed_to_support)
 
         # atom store
-        self.__n_atoms = n_neurons
+        self.__n_atoms = self.round_n_atoms(n_neurons, "n_neurons")
 
         # Dictionary of vertex_slice -> delay block for data specification
         self.__delay_blocks = dict()
