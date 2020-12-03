@@ -20,11 +20,11 @@ from spinn_utilities.abstract_base import AbstractBase
 @add_metaclass(AbstractBase)
 class AbstractSpynnakerSplitterDelay(object):
     """
-    Defines that a splitter is able to handle delays in some way,\
+    Defines that a splitter is able to handle delays in some way.
 
-    Ideally the splitter and therefore the vertices it creates are able to\
-    handle some delay themselves and if more is needed have the ability to\
-    accept spikes from a  DelayExtensionMachineVertex
+    Ideally the splitter and therefore the vertices it creates are able to
+    handle some delay themselves and if more is needed have the ability to
+    accept spikes from a :py:class:`DelayExtensionMachineVertex`
     """
 
     __slots__ = []
@@ -35,18 +35,20 @@ class AbstractSpynnakerSplitterDelay(object):
     def max_support_delay(self):
         """
         returns the max amount of delay this post vertex can support.
-        :return: int saying max delay supported in ticks
+
+        :return: max delay supported in ticks
+        :rtype: int
         """
         return self.MAX_SUPPORTED_DELAY_TICS
 
     def accepts_edges_from_delay_vertex(self):
         """
         Confirms that the splitter's vertices can handle spikes coming from a \
-        DelayExtensionMachineVertex.\
+        :py:class:`DelayExtensionMachineVertex`.
 
-        If this method returns false and the users ask for a delay larger than\
-        that allowed by max_support_delay an exception will be raised\
-        saying a different splitter is required.
+        If this method returns False and the users ask for a delay larger than
+        that allowed by :py:meth:`max_support_delay`, an exception will be
+        raised saying a different splitter is required.
 
         :rtype: bool
         """

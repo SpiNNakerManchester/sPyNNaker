@@ -307,7 +307,7 @@ class SynapticMatrix(object):
         return single_addr
 
     def next_app_on_chip_address(self, app_block_addr, max_app_addr):
-        """ Allocate a machine-level address of a matrix from within an
+        """ Allocate a machine-level address of a matrix from within an\
             app-level allocation
 
         :param int app_block_addr:
@@ -328,8 +328,8 @@ class SynapticMatrix(object):
         return app_block_addr, addr
 
     def next_app_delay_on_chip_address(self, app_block_addr, max_app_addr):
-        """ Allocate a machine-level address of a delayed matrix from within an
-            app-level allocation
+        """ Allocate a machine-level address of a delayed matrix from within\
+            an app-level allocation
 
         :param int app_block_addr:
             The current position in the application block
@@ -349,7 +349,7 @@ class SynapticMatrix(object):
         return app_block_addr, addr
 
     def next_on_chip_address(self, block_addr):
-        """ Allocate an address for a machine matrix and add it to the
+        """ Allocate an address for a machine matrix and add it to the\
             population table
 
         :param int block_addr:
@@ -381,7 +381,7 @@ class SynapticMatrix(object):
         """ Allocate an address for a delayed machine matrix and add it to \
             the population table
 
-        :param int block_addr:\
+        :param int block_addr:
             The address at which to start the allocation
         :return: The address after the allocation and the allocated address
         :rtype: int, int
@@ -411,12 +411,12 @@ class SynapticMatrix(object):
             machine_time_step):
         """ Get the generator data for this matrix
 
-        :param int syn_mat_offset:\
+        :param int syn_mat_offset:
             The synaptic matrix offset to write the data to
         :param float machine_time_step: the sim's machine time step.
-        :param int d_mat_offset:\
+        :param int d_mat_offset:
             The synaptic matrix offset to write the delayed data to
-        :param int max_delay_per_stage: around of timer ticks each delay stage\
+        :param int max_delay_per_stage: around of timer ticks each delay stage
             holds.
         :rtype: GeneratorData
         """
@@ -438,8 +438,8 @@ class SynapticMatrix(object):
             self, max_delay_per_stage, machine_time_step):
         """ Write data for delayed on-chip generation
 
-        @param machine_time_step: sim machine time step
-        @param max_delay_per_stage: max delay supported by psot vertex
+        :param machine_time_step: sim machine time step
+        :param max_delay_per_stage: max delay supported by psot vertex
         """
         # If delay edge exists, tell this about the data too, so it can
         # generate its own data
@@ -460,7 +460,7 @@ class SynapticMatrix(object):
                     self.__app_edge.label))
 
     def __next_addr(self, block_addr, size, max_addr=None):
-        """ Get the next block address and check it hasn't overflowed the
+        """ Get the next block address and check it hasn't overflowed the\
             allocation
 
         :param int block_addr: The address of the allocation
