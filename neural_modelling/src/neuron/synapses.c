@@ -184,7 +184,7 @@ static inline void process_fixed_synapses(
                 synaptic_word, synapse_type_index_mask);
         int32_t weight = synapse_row_sparse_weight(synaptic_word);
 
-        io_printf(IO_BUF, "static signed w: %d \n", weight);
+        io_printf(IO_BUF, "static signed w: %d, delay: %u \n", weight, syn_ind_from_delay);
 
         // Convert into ring buffer offset
         uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
