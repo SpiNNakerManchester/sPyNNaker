@@ -65,6 +65,12 @@ class CSAConnector(AbstractConnector):
         # we can probably look at the array and do better than this?
         return self._get_delay_maximum(synapse_info.delays, n_conns_max)
 
+    @overrides(AbstractConnector.get_delay_minimum)
+    def get_delay_minimum(self, synapse_info):
+        n_conns_max = synapse_info.n_pre_neurons * synapse_info.n_post_neurons
+        # we can probably look at the array and do better than this?
+        return self._get_delay_minimum(synapse_info.delays, n_conns_max)
+
     def _get_n_connections(
             self, pre_vertex_slice, post_vertex_slice, synapse_info):
         """
