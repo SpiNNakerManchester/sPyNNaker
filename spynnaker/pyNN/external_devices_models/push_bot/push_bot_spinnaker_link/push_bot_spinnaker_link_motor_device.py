@@ -44,7 +44,6 @@ class PushBotSpiNNakerLinkMotorDevice(
         :param board_address:
             The IP address of the board that the device is connected to
         :type board_address: str or None
-        :type board_address: str or None
         """
         # pylint: disable=too-many-arguments
         PushBotEthernetMotorDevice.__init__(self, motor, protocol)
