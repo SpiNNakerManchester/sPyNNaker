@@ -48,8 +48,9 @@ class PushBotSpiNNakerLinkSpeakerDevice(
         :param int spinnaker_link_id: The SpiNNakerLink connected to
         :param int n_neurons: The number of neurons in the device
         :param str label: The label of the device
-        :param str board_address:
+        :param board_address:
             The IP address of the board that the device is connected to
+        :type board_address: str or None
         :param start_active_time: The "active time" to set at the start
         :param start_total_period: The "total period" to set at the start
         :param start_frequency: The "frequency" to set at the start
