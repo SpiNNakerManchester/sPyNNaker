@@ -123,6 +123,7 @@ static uint32_t build_static_word(
  * \param[in] delays: Pointer to table of delays
  * \param[in] weights: Pointer to table of weights
  * \param[in] max_stage: The maximum delay stage to support
+ * \param[in] max_delay_per_stage: The max delay per delay stage
  */
 static void matrix_generator_static_write_row(
         UNUSED void *generator,
@@ -132,7 +133,7 @@ static void matrix_generator_static_write_row(
         uint32_t synapse_type_bits, uint32_t synapse_index_bits,
         uint32_t synapse_type, uint32_t n_synapses,
         uint16_t *indices, uint16_t *delays, uint16_t *weights,
-        uint32_t max_stage) {
+        uint32_t max_stage, uint32_t max_delay_per_stage) {
     log_debug("Max stage = %u", max_stage);
 
     // Row address and position for each possible delay stage (including no
@@ -196,7 +197,8 @@ static void matrix_generator_static_write_row(
         uint16_t weight = weights[synapse];
 
         // Work out the delay stage and final value
-        struct delay_value delay = get_delay(delays[synapse], max_stage);
+        struct delay_value delay = get_delay(
+            delays[synapse], max_stage, max_delay_per_stage);
         if (write_address[delay.stage] == NULL) {
             log_error("Delay stage %u has not been initialised; raw delay = %u,"
                     " delay = %u, max stage = %u", delay.stage, delays[synapse],

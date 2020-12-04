@@ -85,7 +85,7 @@ class SynapticMatrix(object):
             The master population table
         :param SynapseInformation synapse_info:
             The projection synapse information
-        :param ProjectionMachineEdge machine_edge:
+        :param MachineEdge machine_edge:
             The projection machine edge
         :param ProjectionApplicationEdge app_edge:
             The projection application edge
@@ -438,7 +438,9 @@ class SynapticMatrix(object):
                 self.__app_edge.post_vertex.vertex_slices,
                 self.__machine_edge.pre_vertex.vertex_slice,
                 self.__machine_edge.post_vertex.vertex_slice,
-                self.__synapse_info, self.__app_edge.n_delay_stages + 1)
+                self.__synapse_info, self.__app_edge.n_delay_stages + 1,
+                self.__app_edge.post_vertex.splitter.max_support_delay(),
+                globals_variables.get_simulator().machine_time_step)
         elif self.__max_row_info.delayed_max_n_synapses != 0:
             raise Exception(
                 "Found delayed items but no delay machine edge for {}".format(
@@ -497,7 +499,6 @@ class SynapticMatrix(object):
         """
         pre_slice = self.__machine_edge.pre_vertex.vertex_slice
         post_slice = self.__machine_edge.post_vertex.vertex_slice
-        machine_time_step = globals_variables.get_simulator().machine_time_step
         connections = list()
 
         if self.__syn_mat_offset is not None:
@@ -507,20 +508,22 @@ class SynapticMatrix(object):
             else:
                 block = self.__get_block(
                     transceiver, placement, synapses_address)
+            splitter = self.__app_edge.post_vertex.splitter
             connections.append(convert_to_connections(
                 self.__synapse_info, pre_slice, post_slice,
                 self.__max_row_info.undelayed_max_words,
                 self.__n_synapse_types, self.__weight_scales, block,
-                machine_time_step, delayed=False))
+                False, splitter.max_support_delay()))
 
         if self.__delay_syn_mat_offset is not None:
             block = self.__get_delayed_block(
                 transceiver, placement, synapses_address)
+            splitter = self.__app_edge.post_vertex.splitter
             connections.append(convert_to_connections(
                 self.__synapse_info, pre_slice, post_slice,
                 self.__max_row_info.delayed_max_words, self.__n_synapse_types,
                 self.__weight_scales, block,
-                machine_time_step, delayed=True))
+                True, splitter.max_support_delay()))
 
         return connections
 

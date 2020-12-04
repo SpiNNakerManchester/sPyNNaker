@@ -345,11 +345,7 @@ class MasterPopTableAsBinarySearch(object):
 
                 # If the pre-vertex not been partitioned, estimate
                 if not vertex.machine_vertices:
-                    max_atoms = float(min(vertex.get_max_atoms_per_core(),
-                                          vertex.n_atoms))
-
-                    # Get the number of likely vertices
-                    edge_vertices = int(math.ceil(vertex.n_atoms / max_atoms))
+                    edge_vertices = len(vertex.splitter.get_out_going_slices())
 
                 # If it has been partitioned, use the actual number of
                 # pre-vertices

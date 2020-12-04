@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import collections
-import math
 import numpy
 from six import add_metaclass
 from spinn_utilities.abstract_base import (
@@ -24,7 +23,7 @@ from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION, MICRO_TO_SECOND_CONVERSION,
     BYTES_PER_WORD, BYTES_PER_SHORT)
-from spynnaker.pyNN.models.neural_projections import ProjectionMachineEdge
+from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
@@ -147,13 +146,13 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         machine_edges = collections.defaultdict(list)
         for machine_edge in machine_graph.get_edges_ending_at_vertex(
                 machine_vertex):
-            if isinstance(machine_edge, ProjectionMachineEdge):
-                for synapse_info in machine_edge.synapse_information:
+            app_edge = machine_edge.app_edge
+            if isinstance(app_edge, ProjectionApplicationEdge):
+                for synapse_info in app_edge.synapse_information:
                     if isinstance(synapse_info.synapse_dynamics,
                                   AbstractSynapseDynamicsStructural):
-                        app_edge = machine_edge.app_edge
                         if app_edge in structural_edges:
-                            if (structural_edges[app_edge] != synapse_info):
+                            if structural_edges[app_edge] != synapse_info:
                                 raise SynapticConfigurationException(
                                    self.PAIR_ERROR)
                         else:
@@ -347,11 +346,8 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                     # TODO: Check the type of the vertices
                     n_sub_edges += len(app_edge.pre_vertex.machine_vertices)
                 else:
-                    max_atoms = app_edge.pre_vertex.get_max_atoms_per_core()
-                    if app_edge.pre_vertex.n_atoms < max_atoms:
-                        max_atoms = app_edge.pre_vertex.n_atoms
-                    n_sub_edges += int(math.ceil(
-                        float(app_edge.pre_vertex.n_atoms) / float(max_atoms)))
+                    n_sub_edges += len(
+                        app_edge.pre_vertex.splitter.get_outgoing_slices())
                 param_sizes += dynamics.formation\
                     .get_parameters_sdram_usage_in_bytes()
                 param_sizes += dynamics.elimination\

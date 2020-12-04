@@ -21,7 +21,6 @@ from spinn_front_end_common.utilities.constants import \
 from spinn_front_end_common.utilities import globals_variables
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
-from spynnaker.pyNN.utilities.constants import MAX_SUPPORTED_DELAY_TICS
 from spynnaker.pyNN.exceptions import SynapseRowTooBigException
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractStaticSynapseDynamics, AbstractSynapseDynamicsStructural,
@@ -128,21 +127,20 @@ class MaxRowInfo(object):
         return self.__delayed_max_words
 
 
-def get_maximum_delay_supported_in_ms(machine_time_step):
+def get_maximum_delay_supported_in_ms(post_vertex_max_delay_ticks):
     """ Get the maximum delay supported by the synapse representation \
         before extensions are required, or None if any delay is supported
 
-    :param int machine_time_step: The time step of the simulation
+    :param int post_vertex_max_delay_ticks: post vertex max delay
     :rtype: int
     """
-    # There are 16 slots, one per time step
-    return MAX_SUPPORTED_DELAY_TICS * (
+    machine_time_step = globals_variables.get_simulator().machine_time_step
+    return post_vertex_max_delay_ticks * (
         machine_time_step / MICRO_TO_MILLISECOND_CONVERSION)
 
 
 def get_max_row_info(
-        synapse_info, post_vertex_slice, n_delay_stages, machine_time_step,
-        in_edge):
+        synapse_info, post_vertex_slice, n_delay_stages, in_edge):
     """ Get the information about the maximum lengths of delayed and\
         undelayed rows in bytes (including header), words (without header)\
         and number of synapses
@@ -153,8 +151,6 @@ def get_max_row_info(
         The slice of the machine vertex being represented
     :param int n_delay_stages:
         The number of delay stages on the edge
-    :param int machine_time_step:
-        The time step of the simulation
     :param ProjectionApplicationEdge in_edge:
         The incoming edge on which the synapse information is held
     :rtype: MaxRowInfo
@@ -162,7 +158,7 @@ def get_max_row_info(
         If the synapse information can't be represented
     """
     max_delay_supported = get_maximum_delay_supported_in_ms(
-        machine_time_step)
+        in_edge.post_vertex.splitter.max_support_delay())
     max_delay = max_delay_supported * (n_delay_stages + 1)
     pad_to_length = synapse_info.synapse_dynamics.pad_to_length
 
@@ -294,13 +290,11 @@ def get_synapses(
     # pylint: disable=too-many-arguments, too-many-locals
     # pylint: disable=assignment-from-no-return
     # Get delays in timesteps
+    app_edge = machine_edge.app_edge
     machine_time_step = globals_variables.get_simulator().machine_time_step
-    max_delay = get_maximum_delay_supported_in_ms(machine_time_step)
-    if max_delay is not None:
-        max_delay *= (MICRO_TO_MILLISECOND_CONVERSION / machine_time_step)
+    max_delay = app_edge.post_vertex.splitter.max_support_delay()
 
     # Get the actual connections
-    app_edge = machine_edge.app_edge
     pre_slices = app_edge.pre_vertex.vertex_slices
     post_slices = app_edge.post_vertex.vertex_slices
     pre_vertex_slice = machine_edge.pre_vertex.vertex_slice
@@ -455,7 +449,7 @@ def _get_row_data(
 def convert_to_connections(
         synapse_info, pre_vertex_slice, post_vertex_slice,
         max_row_length, n_synapse_types, weight_scales, data,
-        machine_time_step, delayed):
+        delayed, post_vertex_max_delay_ticks):
     """ Read the synapses for a given projection synapse information\
         object out of the given data and convert to connection data
 
@@ -473,9 +467,9 @@ def convert_to_connections(
         The weight scaling of each synapse type
     :param bytearray data:
         The raw data containing the synapses
-    :param int machine_time_step:
-        The time step of the simulation
     :param bool delayed: True if the data should be considered delayed
+    :param int post_vertex_max_delay_ticks:
+            max delayed ticks supported from post vertex
     :return: The connections read from the data; the dtype is
         AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
     :rtype: ~numpy.ndarray
@@ -494,12 +488,12 @@ def convert_to_connections(
         # Read static data
         connections = _read_static_data(
             dynamics, pre_vertex_slice, post_vertex_slice, n_synapse_types,
-            row_data, delayed)
+            row_data, delayed, post_vertex_max_delay_ticks)
     else:
         # Read plastic data
         connections = _read_plastic_data(
             dynamics, pre_vertex_slice, post_vertex_slice, n_synapse_types,
-            row_data, delayed)
+            row_data, delayed, post_vertex_max_delay_ticks)
 
     # There might still be no connections if the row was all padding
     if not connections.size:
@@ -507,8 +501,7 @@ def convert_to_connections(
             0, dtype=AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE)
 
     # Return the connections after appropriate scaling
-    return _rescale_connections(
-        connections, machine_time_step, weight_scales, synapse_info)
+    return _rescale_connections(connections, weight_scales, synapse_info)
 
 
 def read_all_synapses(
@@ -536,19 +529,20 @@ def read_all_synapses(
     :rtype: ~numpy.ndarray
     """
     connections = []
-    machine_time_step = globals_variables.get_simulator().machine_time_step
     pre_vertex_slice = machine_edge.pre_vertex.vertex_slice
     post_vertex_slice = machine_edge.post_vertex.vertex_slice
+    post_splitter = machine_edge.post_vertex.app_vertex.splitter
+    post_vertex_max_delay_ticks = post_splitter.max_support_delay()
     max_row_length = max_row_info.undelayed_max_words
     delayed_max_row_length = max_row_info.delayed_max_words
     connections.append(convert_to_connections(
         synapse_info, pre_vertex_slice, post_vertex_slice, max_row_length,
-        n_synapse_types, weight_scales, data, machine_time_step,
-        delayed=False))
+        n_synapse_types, weight_scales, data, False,
+        post_vertex_max_delay_ticks))
     connections.append(convert_to_connections(
         synapse_info, pre_vertex_slice, post_vertex_slice,
-        delayed_max_row_length, n_synapse_types, weight_scales,
-        delayed_data, machine_time_step, delayed=True))
+        delayed_max_row_length, n_synapse_types, weight_scales, delayed_data,
+        True, post_vertex_max_delay_ticks))
 
     # Join the connections into a single list and return it
     return numpy.concatenate(connections)
@@ -576,7 +570,7 @@ def _parse_static_data(row_data, dynamics):
 
 def _read_static_data(
         dynamics, pre_vertex_slice, post_vertex_slice,
-        n_synapse_types, row_data, delayed):
+        n_synapse_types, row_data, delayed, post_vertex_max_delay_ticks):
     """ Read static data from row data
 
     :param AbstractStaticSynapseDynamics dynamics:
@@ -590,6 +584,7 @@ def _read_static_data(
     :param ~numpy.ndarray row_data:
         The raw row data to read
     :param bool delayed: True if data should be considered delayed
+    :param int post_vertex_max_delay_ticks: post vertex delay maximum
     :return: the connections read with dtype
         AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
     :rtype: list(~numpy.ndarray)
@@ -603,7 +598,8 @@ def _read_static_data(
     if delayed:
         n_synapses = dynamics.get_n_synapses_in_rows(ff_size)
         connections = __convert_delayed_data(
-            n_synapses, pre_vertex_slice, connections)
+            n_synapses, pre_vertex_slice, connections,
+            post_vertex_max_delay_ticks)
     else:
         connections["source"] += pre_vertex_slice.lo_atom
     return connections
@@ -639,7 +635,7 @@ def _parse_plastic_data(row_data, dynamics):
 
 def _read_plastic_data(
         dynamics, pre_vertex_slice, post_vertex_slice,
-        n_synapse_types, row_data, delayed):
+        n_synapse_types, row_data, delayed, post_vertex_max_delay_ticks):
     """ Read plastic data from raw data
 
     :param AbstractStaticSynapseDynamics dynamics:
@@ -653,6 +649,7 @@ def _read_plastic_data(
     :param ~numpy.ndarray row_data:
         The raw row data to read
     :param bool delayed: True if data should be considered delayed
+    :param int post_vertex_max_delay_ticks: post vertex delay maximum
     :return: the connections read with dtype
         AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
     :rtype: list(~numpy.ndarray)
@@ -669,23 +666,24 @@ def _read_plastic_data(
     if delayed:
         n_synapses = dynamics.get_n_synapses_in_rows(pp_size, fp_size)
         connections = __convert_delayed_data(
-            n_synapses, pre_vertex_slice, connections)
+            n_synapses, pre_vertex_slice, connections,
+            post_vertex_max_delay_ticks)
     else:
         connections["source"] += pre_vertex_slice.lo_atom
     return connections
 
 
 def _rescale_connections(
-        connections, machine_time_step, weight_scales, synapse_info):
+        connections, weight_scales, synapse_info):
     """ Scale the connection data into machine values
 
     :param ~numpy.ndarray connections: The connections to be rescaled
-    :param int machine_time_step: The time step of the simulation
     :param list(float) weight_scales: The weight scale of each synapse type
     :param SynapseInformation synapse_info:
         The synapse information of the connections
     """
     # Return the delays values to milliseconds
+    machine_time_step = globals_variables.get_simulator().machine_time_step
     connections["delay"] /= (
             MICRO_TO_MILLISECOND_CONVERSION / machine_time_step)
     # Undo the weight scaling
@@ -694,7 +692,8 @@ def _rescale_connections(
 
 
 def __convert_delayed_data(
-            n_synapses, pre_vertex_slice, delayed_connections):
+            n_synapses, pre_vertex_slice, delayed_connections,
+            post_vertex_max_delay_ticks):
     """ Take the delayed_connections and convert the source ids and delay\
         values back to global values
 
@@ -704,6 +703,7 @@ def __convert_delayed_data(
     :param ~numpy.ndarray delayed_connections:
         The connections to convert of dtype
         AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
+    :param int post_vertex_max_delay_ticks: post vertex delay maximum
     :return: The converted connection with the same dtype
     :rtype: ~numpy.ndarray
     """
@@ -714,7 +714,7 @@ def __convert_delayed_data(
         i // pre_vertex_slice.n_atoms
         for i in synapse_ids], dtype="uint32")
     # Work out the delay for each stage
-    row_min_delay = (row_stage + 1) * MAX_SUPPORTED_DELAY_TICS
+    row_min_delay = (row_stage + 1) * post_vertex_max_delay_ticks
     # Repeat the delay for all connections in the same row
     connection_min_delay = numpy.concatenate([
         numpy.repeat(row_min_delay[i], n_synapses[i])

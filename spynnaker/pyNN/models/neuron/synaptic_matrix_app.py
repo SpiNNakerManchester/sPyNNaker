@@ -18,7 +18,6 @@ from six import itervalues
 
 from pacman.model.graphs.common.slice import Slice
 
-from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
@@ -125,8 +124,7 @@ class SynapticMatrixApp(object):
         # Calculate the max row info for this edge
         self.__max_row_info = get_max_row_info(
             synapse_info, self.__post_vertex_slice,
-            app_edge.n_delay_stages,
-            globals_variables.get_simulator().machine_time_step, app_edge)
+            app_edge.n_delay_stages, app_edge)
 
         # These are set directly later
         self.__all_syn_block_sz = None
@@ -167,9 +165,14 @@ class SynapticMatrixApp(object):
 
         r_info = self.__routing_info.get_routing_info_for_edge(machine_edge)
         delayed_r_info = None
-        if machine_edge.delay_edge is not None:
-            delayed_r_info = self.__routing_info.get_routing_info_for_edge(
-                machine_edge.delay_edge)
+        delayed_app_edge = machine_edge.app_edge.delay_edge
+        if delayed_app_edge is not None:
+            delayed_machine_edge = delayed_app_edge.get_machine_edge(
+                machine_edge.pre_vertex, machine_edge.post_vertex)
+            if delayed_machine_edge is not None:
+                delayed_r_info = (
+                    self.__routing_info.get_routing_info_for_edge(
+                        delayed_machine_edge))
         matrix = SynapticMatrix(
             self.__poptable, self.__synapse_info,
             machine_edge, self.__app_edge, self.__n_synapse_types,
@@ -220,7 +223,7 @@ class SynapticMatrixApp(object):
             Routing key information for all incoming edges
         :param list(float) weight_scales:
             Weight scale for each synapse edge
-        :param list(ProjectionMachineEdge) m_edges:
+        :param list(MachineEdge) m_edges:
             The machine edges incoming to this vertex
         """
         self.__all_syn_block_sz = all_syn_block_sz
@@ -293,7 +296,7 @@ class SynapticMatrixApp(object):
             The specification to write to
         :param int block_addr:
             The address in the synaptic matrix region to start writing at
-        :param list(ProjectionMachineEdge, ~numpy.ndarray) matrix_data:
+        :param list(MachineEdge, ~numpy.ndarray) matrix_data:
             The data for each machine edge to be combined into a single matrix
         :return: The updated block address
         :rtype: int
@@ -340,7 +343,7 @@ class SynapticMatrixApp(object):
             The specification to write to
         :param int block_addr:
             The address in the synaptic matrix region to start writing at
-        :param list(ProjectionMachineEdge, ~numpy.ndarray) matrix_data:
+        :param list(MachineEdge, ~numpy.ndarray) matrix_data:
             The data for each machine edge to be combined into a single matrix
         :return: The updated block address
         :rtype: int
@@ -604,25 +607,26 @@ class SynapticMatrixApp(object):
         :rtype: ~numpy.ndarray
         """
         pre_slice = Slice(0, self.__app_edge.pre_vertex.n_atoms + 1)
-        machine_time_step = globals_variables.get_simulator().machine_time_step
         connections = list()
 
         if self.__syn_mat_offset is not None:
             block = self.__get_block(transceiver, placement, synapses_address)
+            splitter = self.__app_edge.post_vertex.splitter
             connections.append(convert_to_connections(
                 self.__synapse_info, pre_slice, self.__post_vertex_slice,
                 self.__max_row_info.undelayed_max_words,
                 self.__n_synapse_types, self.__weight_scales, block,
-                machine_time_step, delayed=False))
+                False, splitter.max_support_delay()))
 
         if self.__delay_syn_mat_offset is not None:
             block = self.__get_delayed_block(
                 transceiver, placement, synapses_address)
+            splitter = self.__app_edge.post_vertex.splitter
             connections.append(convert_to_connections(
                 self.__synapse_info, pre_slice, self.__post_vertex_slice,
                 self.__max_row_info.delayed_max_words, self.__n_synapse_types,
-                self.__weight_scales, block,
-                machine_time_step, delayed=True))
+                self.__weight_scales, block, True,
+                splitter.max_support_delay()))
 
         return connections
 

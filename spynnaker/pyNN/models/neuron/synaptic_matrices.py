@@ -309,17 +309,20 @@ class SynapticMatrices(object):
         """
         in_edges_by_app_edge = defaultdict(OrderedSet)
         key_space_tracker = KeySpaceTracker()
-        for edge in in_machine_edges:
-            rinfo = routing_info.get_routing_info_for_edge(edge)
+        for machine_edge in in_machine_edges:
+            rinfo = routing_info.get_routing_info_for_edge(machine_edge)
             key_space_tracker.allocate_keys(rinfo)
-            app_edge = edge.app_edge
+            app_edge = machine_edge.app_edge
             if isinstance(app_edge, ProjectionApplicationEdge):
-                in_edges_by_app_edge[app_edge].add(edge)
+                in_edges_by_app_edge[app_edge].add(machine_edge)
             elif isinstance(app_edge, DelayedApplicationEdge):
                 # We need to make sure that if an undelayed edge is filtered
                 # but a delayed one is not, we still pick it up
+                undelayed_machine_edge = (
+                    machine_edge.app_edge.undelayed_edge.get_machine_edge(
+                        machine_edge.pre_vertex, machine_edge.post_vertex))
                 in_edges_by_app_edge[app_edge.undelayed_edge].add(
-                    edge.undelayed_edge)
+                    undelayed_machine_edge)
         return in_edges_by_app_edge, key_space_tracker
 
     @staticmethod
@@ -499,9 +502,15 @@ class SynapticMatrices(object):
         pre_slices = list()
         for m_edge in m_edges:
             # If the edge doesn't have a delay edge, give up
-            if m_edge.delay_edge is None:
+            delayed_app_edge = m_edge.app_edge.delay_edge
+            if delayed_app_edge is None:
                 return None
-            rinfo = routing_info.get_routing_info_for_edge(m_edge.delay_edge)
+            delayed_machine_edge = delayed_app_edge.get_machine_edge(
+                m_edge.pre_vertex, m_edge.post_vertex)
+            if delayed_machine_edge is None:
+                return None
+            rinfo = routing_info.get_routing_info_for_edge(
+                delayed_machine_edge)
             vertex_slice = m_edge.pre_vertex.vertex_slice
             pre_slices.append(vertex_slice)
             # No routing info at all? Must have been filtered, so doesn't work
@@ -572,7 +581,7 @@ class SynapticMatrices(object):
             The application edge of the projection
         :param SynapseInformation synapse_info:
             The synapse information of the projection
-        :param ProjectionMachineEdge machine_edge:
+        :param MachineEdge machine_edge:
             The machine edge to get the index of
         """
         matrix = self.__app_matrix(app_edge, synapse_info)
