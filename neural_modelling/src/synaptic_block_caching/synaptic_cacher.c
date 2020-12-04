@@ -330,20 +330,20 @@ static bool set_master_pop_sdram_entry_to_cache(uint32_t bit_field_index) {
     }
 
     // set to cache in sdram
-    master_population_table_entry entry =
+    master_population_table_entry* entry =
         population_table_get_master_pop_entry_from_sdram(
             master_pop_base_address, position);
-    entry.cache_in_dtcm = 1;
+    entry->cache_in_dtcm = 1;
     return true;
 }
 
 //! \brief sets sdram address to a different rep
 static inline void set_address_to_cache_reps(
         uint32_t address_entry_index, uint32_t rep) {
-    address_list_entry entry =
+    address_list_entry* entry =
         population_table_get_address_entry_from_sdram(
             master_pop_base_address, address_entry_index);
-    entry.addr.representation = rep;
+    entry->addr.representation = rep;
 }
 
 //! \brief determines which blocks can be DTCM'ed.

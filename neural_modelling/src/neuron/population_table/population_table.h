@@ -116,14 +116,14 @@ extern master_population_table_entry *master_population_table;
 //! The length of ::master_population_table
 extern uint32_t master_population_table_length;
 
-static inline master_population_table_entry
+static inline master_population_table_entry*
         population_table_get_master_pop_entry_from_sdram(
             address_t table_address, uint32_t position) {
     master_population_table_entry* start_of_entry_list =
         (master_population_table_entry*) table_address[SKIP_COUNTERS];
     uint32_t bytes_in = position * sizeof(master_population_table_entry);
     uint32_t words_in = bytes_in >> 2;
-    return start_of_entry_list[words_in];
+    return &start_of_entry_list[words_in];
 }
 
 //! \brief get a master pop entry from array
@@ -142,7 +142,7 @@ static inline address_list_entry population_table_get_address_entry(
     return address_list[index];
 }
 
-static inline address_list_entry population_table_get_address_entry_from_sdram(
+static inline address_list_entry* population_table_get_address_entry_from_sdram(
         address_t table_address, uint32_t address_entry_index) {
     uint32_t master_population_table_length = table_address[0];
     uint32_t n_master_pop_bytes =
@@ -153,7 +153,7 @@ static inline address_list_entry population_table_get_address_entry_from_sdram(
     uint32_t skip_to_correct_entry_bytes =
         address_entry_index * sizeof(address_list_entry);
     uint32_t skip_to_correct_entry_words = skip_to_correct_entry_bytes >> 2;
-    return addresses[skip_to_correct_entry_words];
+    return &addresses[skip_to_correct_entry_words];
 }
 
 //! \brief Sets up the table
