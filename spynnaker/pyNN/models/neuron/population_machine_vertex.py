@@ -58,8 +58,6 @@ class PopulationMachineVertex(
         "__binary_file_name",
         "__recorded_region_ids",
         "__resources",
-        "__on_chip_generatable_area",
-        "__on_chip_generatable_size",
         "__change_requires_neuron_parameters_reload",
         "__synaptic_matrices"]
 
@@ -197,8 +195,6 @@ class PopulationMachineVertex(
         AbstractRecordable.__init__(self)
         self.__recorded_region_ids = recorded_region_ids
         self.__resources = resources_required
-        self.__on_chip_generatable_offset = None
-        self.__on_chip_generatable_size = None
         self.__change_requires_neuron_parameters_reload = False
 
         self.__synaptic_matrices = SynapticMatrices(
@@ -208,10 +204,6 @@ class PopulationMachineVertex(
             self.REGIONS.DIRECT_MATRIX.value,
             self.REGIONS.POPULATION_TABLE.value,
             self.REGIONS.CONNECTOR_BUILDER.value)
-
-    def set_on_chip_generatable_area(self, offset, size):
-        self.__on_chip_generatable_offset = offset
-        self.__on_chip_generatable_size = size
 
     @overrides(AbstractSupportsBitFieldGeneration.bit_field_base_address)
     def bit_field_base_address(self, transceiver, placement):
@@ -239,8 +231,9 @@ class PopulationMachineVertex(
             placement=placement, transceiver=transceiver,
             region=self.REGIONS.SYNAPTIC_MATRIX.value)
         return [(
-            self.__on_chip_generatable_offset + synaptic_matrix_base_address,
-            self.__on_chip_generatable_size)]
+            self.__synaptic_matrices.host_generated_block_addr +
+            synaptic_matrix_base_address,
+            self.__synaptic_matrices.on_chip_generated_matrix_size)]
 
     @property
     @overrides(MachineVertex.resources_required)
@@ -507,10 +500,6 @@ class PopulationMachineVertex(
                     spec, self.REGIONS.STRUCTURAL_DYNAMICS.value,
                     machine_time_step, weight_scales, machine_graph, self,
                     routing_info, self.__synaptic_matrices)
-
-        self.set_on_chip_generatable_area(
-            self.__synaptic_matrices.host_generated_block_addr,
-            self.__synaptic_matrices.on_chip_generated_block_addr)
 
         # write up the bitfield builder data
         bit_field_utilities.write_bitfield_init_data(

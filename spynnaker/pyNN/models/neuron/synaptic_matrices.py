@@ -120,16 +120,24 @@ class SynapticMatrices(object):
     @property
     def host_generated_block_addr(self):
         """ The address within the synaptic region after the last block
-            written by the on-host synaptic generation
+            written by the on-host synaptic generation i.e. the start of
+            the space that can be overwritten provided the synapse expander
+            is run again
+
+        :rtype: int
         """
         return self.__host_generated_block_addr
 
     @property
-    def on_chip_generated_block_addr(self):
-        """ The address within the synaptic region after the last block
-            reserved for the on-machine synaptic generation
+    def on_chip_generated_matrix_size(self):
+        """ The size of the space used by the generated matrix i.e. the
+            space that can be overwritten provided the synapse expander
+            is run again
+
+        :rtype: int
         """
-        return self.__on_chip_generated_block_addr
+        return (self.__on_chip_generated_block_addr -
+                self.__host_generated_block_addr)
 
     def __app_matrix(self, app_edge, synapse_info):
         """ Get or create an application synaptic matrix object
