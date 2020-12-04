@@ -382,10 +382,11 @@ bool population_table_initialise(
             address_list_length, n_address_list_bytes);
 
     // Copy the master population table
-    spin1_memcpy(master_population_table, &table_address[2],
+    spin1_memcpy(master_population_table, &table_address[SKIP_COUNTERS],
             n_master_pop_bytes);
-    spin1_memcpy(address_list, &table_address[2 + n_master_pop_words],
-            n_address_list_bytes);
+    spin1_memcpy(address_list,
+        &table_address[SKIP_COUNTERS + n_master_pop_words],
+        n_address_list_bytes);
 
     // Store the base address
     log_info("The stored synaptic matrix base address is located at: 0x%08x",

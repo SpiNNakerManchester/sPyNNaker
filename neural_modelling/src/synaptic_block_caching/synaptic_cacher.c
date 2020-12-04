@@ -281,19 +281,25 @@ static inline bool sort_out_bitfields(void) {
     sort();
     log_info("after sort");
     print_store();
+    return true;
 }
 
 //! \brief returns the size of dtcm needed when using binary search rep
-//! \param[in] bit_field_index: index in bitfields
+//! \param[in] bit_field_index: index in bitfields.
+//! \param[in] entry: the address list entry.
 //! \return: the size in bytes used by dtcm.
-static inline int calculate_binary_search_size(uint32_t bit_field_index) {
+static inline int calculate_binary_search_size(
+        uint32_t bit_field_index, address_list_entry entry) {
+    uint dtcm_left = sark_heap_max(sark.heap, 0);
     return 0;
 }
 
 //! \brief returns the size of dtcm needed when using array search rep
-//! \param[in] bit_field_index: index in bitfields
+//! \param[in] bit_field_index: index in bitfields.
+//! \param[in] entry: the address list entry.
 //! \return: the size in bytes used by dtcm.
-static inline int calculate_array_search_size(uint32_t bit_field_index) {
+static inline int calculate_array_search_size(
+        uint32_t bit_field_index, address_list_entry entry) {
     uint dtcm_left = sark_heap_max(sark.heap, 0);
 
     return 0;
@@ -301,7 +307,7 @@ static inline int calculate_array_search_size(uint32_t bit_field_index) {
 
 static inline master_population_table_entry find_master_pop_entry(
         uint32_t bit_field_index) {
-    uint32_t position;
+    uint32_t position = 0;
     bool success  = population_table_position_in_the_master_pop_array(
         not_redundant_tracker[bit_field_index].filter->key, &position);
     if (!success) {
@@ -313,24 +319,31 @@ static inline master_population_table_entry find_master_pop_entry(
 }
 
 //! \brief sets master pop entry in sdram to cache mode.
-static void set_master_pop_sdram_entry_to_cache(uint32_t bit_field_index) {
+static bool set_master_pop_sdram_entry_to_cache(uint32_t bit_field_index) {
     // position in the array table.
     uint32_t position;
     bool success  = population_table_position_in_the_master_pop_array(
         not_redundant_tracker[bit_field_index].filter->key, &position);
+    if (!success) {
+        log_error("failed to read master pop entry");
+        return false;
+    }
 
     // set to cache in sdram
     master_population_table_entry entry =
         population_table_get_master_pop_entry_from_sdram(
             master_pop_base_address, position);
     entry.cache_in_dtcm = 1;
+    return true;
 }
 
-
-//! \brief sets sdram address to a differnet rep
+//! \brief sets sdram address to a different rep
 static inline void set_address_to_cache_reps(
         uint32_t address_entry_index, uint32_t rep) {
-
+    address_list_entry entry =
+        population_table_get_address_entry_from_sdram(
+            master_pop_base_address, address_entry_index);
+    entry.addr.representation = rep;
 }
 
 //! \brief determines which blocks can be DTCM'ed.
@@ -360,15 +373,17 @@ static inline bool cache_blocks(void) {
                 population_table_get_address_entry(address_index);
 
             // test memory requirements of the 2 reps.
-            int binary_search_size = calculate_binary_search_size(bit_field_index);
-            int array_search_size = calculate_array_search_size(bit_field_index);
+            int binary_search_size = calculate_binary_search_size(
+                bit_field_index, address_entry);
+            int array_search_size = calculate_array_search_size(
+                bit_field_index, address_entry);
 
             // if binary better memory. see if we can cache with that rep.
             if (binary_search_size < array_search_size) {
                 // check if can be cached
                 if (dtcm_to_use_tmp - binary_search_size > 0) {
                     reps[address_index - entry.start] = USE_BINARY;
-                    dtcm_to_use_tmp - binary_search_size;
+                    dtcm_to_use_tmp =- binary_search_size;
                 }
                 else {
                     cache = false;
@@ -377,7 +392,7 @@ static inline bool cache_blocks(void) {
             else{  // array rep better. check if can be cached
                 if(dtcm_to_use_tmp - array_search_size > 0) {
                     reps[address_index - entry.start] = USE_ARRAY;
-                    dtcm_to_use_tmp - binary_search_size;
+                    dtcm_to_use_tmp =- binary_search_size;
                 }
                 else {
                     cache = false;
@@ -388,15 +403,21 @@ static inline bool cache_blocks(void) {
         // update data structs to reflect caching
         if (cache) {
             // set master pop table to cache. and remove dtcm usage.
-            set_master_pop_sdram_entry_to_cache(bit_field_index);
+            bool success = set_master_pop_sdram_entry_to_cache(bit_field_index);
+            if (!success) {
+                return false;
+            }
+
             for (uint32_t address_index = 0; address_index < entry.count;
                     address_index ++) {
                 // set addresses to cached reps.
-                set_address_to_cache_reps(address_index, reps[address_index]);
+                set_address_to_cache_reps(
+                    address_index + entry.start, reps[address_index]);
             }
             dtcm_to_use -= dtcm_to_use_tmp;
         }
     }
+    return true;
 }
 
 //! Entry point

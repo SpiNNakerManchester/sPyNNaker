@@ -142,6 +142,20 @@ static inline address_list_entry population_table_get_address_entry(
     return address_list[index];
 }
 
+static inline address_list_entry population_table_get_address_entry_from_sdram(
+        address_t table_address, uint32_t address_entry_index) {
+    uint32_t master_population_table_length = table_address[0];
+    uint32_t n_master_pop_bytes =
+            master_population_table_length * sizeof(master_population_table_entry);
+    uint32_t n_master_pop_words = n_master_pop_bytes >> 2;
+    address_list_entry* addresses = (address_list_entry*) table_address[
+        SKIP_COUNTERS + n_master_pop_words];
+    uint32_t skip_to_correct_entry_bytes =
+        address_entry_index * sizeof(address_list_entry);
+    uint32_t skip_to_correct_entry_words = skip_to_correct_entry_bytes >> 2;
+    return addresses[skip_to_correct_entry_words];
+}
+
 //! \brief Sets up the table
 //! \param[in] table_address: The address of the start of the table data
 //! \param[in] synapse_rows_address: The address of the start of the synapse
