@@ -31,6 +31,22 @@
 
 //!================================================
 
+// \brief struct for holding a binary search element
+typedef struct binary_search_element {
+    // the src neuron id
+    uint32_t src_neuron_id;
+    // row linked
+    uint32_t* rows;
+} binary_search_element;
+
+// stores binary search components
+typedef struct binary_search_top {
+    // the number of none empty rows
+    uint32_t len_of_array;
+    // pointer to the array store of none empty rows.
+    binary_search_element* elements;
+} binary_search_top;
+
 //! \brief An entry in the master population table.
 typedef struct master_population_table_entry {
     //! The key to match against the incoming message

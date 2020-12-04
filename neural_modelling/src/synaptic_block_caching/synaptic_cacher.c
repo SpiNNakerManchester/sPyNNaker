@@ -26,20 +26,12 @@
 #include <neuron/synapse_row.h>
 #include <neuron/direct_synapses.h>
 #include <neuron/population_table/population_table.h>
-#include <malloc_extras.h>
 
 // stuff needed for the structural stuff to work
 #include <neuron/structural_plasticity/synaptogenesis/sp_structs.h>
 
 #include <filter_info.h>
 #include <key_atom_map.h>
-
-typedef struct not_redundant_tracker_t {
-    // not redundant count
-    uint32_t not_redundant_count;
-    // filter pointer
-    filter_info_t *filter;
-} not_redundant_tracker_t;
 
 //! Byte to word conversion
 #define BYTE_TO_WORD_CONVERSION 4
@@ -56,8 +48,19 @@ typedef struct not_redundant_tracker_t {
 //! key rep for using array
 #define USE_ARRAY 1
 
+//! random number for malloc cost calc
+#define ALANS_RANDOM 4
+
 //! Magic flag for if the region id is not setup
 int FAILED_REGION_ID = 0xFFFFFFFF;
+
+//! \brief tracker for not redundant
+typedef struct not_redundant_tracker_t {
+    // not redundant count
+    uint32_t not_redundant_count;
+    // filter pointer
+    filter_info_t *filter;
+} not_redundant_tracker_t;
 
 //! Master population table base address
 address_t master_pop_base_address;
@@ -91,6 +94,9 @@ bool can_run = true;
 //! dtcm tracker from the core in question
 int dtcm_to_use = 0;
 
+//! malloc cost
+int malloc_cost = 0;
+
 /*****************************stuff needed for structural stuff to work*/
 
 //! The instantiation of the rewiring data
@@ -105,6 +111,45 @@ pre_pop_info_table_t pre_info;
 static not_redundant_tracker_t* not_redundant_tracker = NULL;
 
 /***************************************************************/
+
+//! \brief returns the size of dtcm needed when using binary search rep
+//! \param[in] bit_field_index: index in bitfields.
+//! \param[in] entry: the address list entry.
+//! \return: the size in bytes used by dtcm.
+static inline int calculate_binary_search_size(
+        uint32_t bit_field_index, address_list_entry entry) {
+    uint dtcm_left = sark_heap_max(sark.heap, 0);
+    return 0;
+}
+
+//! \brief returns the size of dtcm needed when using array search rep
+//! \param[in] bit_field_index: index in bitfields.
+//! \param[in] entry: the address list entry.
+//! \return: the size in bytes used by dtcm.
+static inline int calculate_array_search_size(
+        uint32_t bit_field_index, address_list_entry entry) {
+    // tracker
+    uint dtcm_used = sark_heap_max(sark.heap, 0);
+
+    // build stores
+    uint32_t n_atoms = not_redundant_tracker[bit_field_index].filter->n_atoms;
+    uint32_t* store = sark_alloc(n_atoms * sizeof(uint32_t*))
+
+    // populate stores
+    for (uint32_t atom_index = 0; atom_index < n_atoms; atom_index++) {
+
+    }
+
+    // figure dtcm used
+    uint dtcm_left_over = sark_heap_max(sark.heap, 0);
+    dtcm_used = dtcm_used - dtcm_left_over;
+
+    // free elements
+
+
+    // return dtcm used
+    return dtcm_used;
+}
 
 
 //! \brief Mark this process as failed.
@@ -171,6 +216,19 @@ static inline void read_in_addresses(void) {
 //!        processing.
 //! \return whether the init was successful.
 static inline bool initialise(void) {
+
+    // set up malloc cost
+    uint dtcm_available = sark_heap_max(sark.heap, 0);
+    uint32_t* holder = spin1_malloc(ALANS_RANDOM * sizeof(uint32_t));
+    if (holder == NULL) {
+        log_error("failed to alloc base checker");
+        return false;
+    }
+    uint dtcm_used = sark_heap_max(sark.heap, 0) - dtcm_available;
+    malloc_cost = dtcm_used - (ALANS_RANDOM * sizeof(uint32_t));
+    log_info("malloc cost is %d", malloc_cost);
+
+
     // init the synapses to get direct synapse address
     log_info("Direct synapse init");
     if (!direct_synapses_initialise(
@@ -200,7 +258,8 @@ static inline bool initialise(void) {
 
     // set up a sdram read for a row
     log_debug("Allocating dtcm for row data");
-    row_data = MALLOC_SDRAM(row_max_n_words * sizeof(uint32_t));
+    row_data = sark_xalloc(
+        sv->sdram_heap, row_max_n_words * sizeof(uint32_t), 0, ALLOC_LOCK);
     if (row_data == NULL) {
         log_error("Could not allocate dtcm for the row data");
         return false;
@@ -230,8 +289,10 @@ static void print_store(void) {
 //! \brief reads in the bitfields
 static inline bool read_in_bitfields(void) {
     // get the bitfields in a copy form
-    not_redundant_tracker = MALLOC_SDRAM(
-        sizeof(not_redundant_tracker_t) * bit_field_base_address->n_filters);
+    not_redundant_tracker = sark_xalloc(
+        sv->sdram_heap,
+        sizeof(not_redundant_tracker_t) * bit_field_base_address->n_filters,
+        0, ALLOC_LOCK);
 
     if (not_redundant_tracker == NULL) {
         log_error("failed to malloc the main array");
@@ -284,27 +345,6 @@ static inline bool sort_out_bitfields(void) {
     return true;
 }
 
-//! \brief returns the size of dtcm needed when using binary search rep
-//! \param[in] bit_field_index: index in bitfields.
-//! \param[in] entry: the address list entry.
-//! \return: the size in bytes used by dtcm.
-static inline int calculate_binary_search_size(
-        uint32_t bit_field_index, address_list_entry entry) {
-    uint dtcm_left = sark_heap_max(sark.heap, 0);
-    return 0;
-}
-
-//! \brief returns the size of dtcm needed when using array search rep
-//! \param[in] bit_field_index: index in bitfields.
-//! \param[in] entry: the address list entry.
-//! \return: the size in bytes used by dtcm.
-static inline int calculate_array_search_size(
-        uint32_t bit_field_index, address_list_entry entry) {
-    uint dtcm_left = sark_heap_max(sark.heap, 0);
-
-    return 0;
-}
-
 static inline master_population_table_entry find_master_pop_entry(
         uint32_t bit_field_index) {
     uint32_t position = 0;
@@ -349,6 +389,10 @@ static inline void set_address_to_cache_reps(
 //! \brief determines which blocks can be DTCM'ed.
 static inline bool cache_blocks(void) {
     log_info("plan to fill %d bytes of DTCM", dtcm_to_use);
+    bool added_binary_base_cost = false;
+    bool added_array_base_cost = false;
+    bool used_binary_rep = false;
+    bool used_array_rep = false;
 
     // search all the bitfields.
     for (uint32_t bit_field_index = 0;
@@ -360,7 +404,8 @@ static inline bool cache_blocks(void) {
         // trackers
         bool cache = true;
         int dtcm_to_use_tmp = dtcm_to_use;
-        uint32_t * reps = MALLOC_SDRAM(sizeof(uint32_t) * entry.count);
+        uint32_t * reps = sark_xalloc(
+            sv->sdram_heap, sizeof(uint32_t) * entry.count, 0, ALLOC_LOCK);
         if (reps == NULL) {
             log_error("cannot allocate sdram for the reps.");
             return false;
@@ -384,6 +429,7 @@ static inline bool cache_blocks(void) {
                 if (dtcm_to_use_tmp - binary_search_size > 0) {
                     reps[address_index - entry.start] = USE_BINARY;
                     dtcm_to_use_tmp =- binary_search_size;
+                    used_binary_rep = true;
                 }
                 else {
                     cache = false;
@@ -393,11 +439,27 @@ static inline bool cache_blocks(void) {
                 if(dtcm_to_use_tmp - array_search_size > 0) {
                     reps[address_index - entry.start] = USE_ARRAY;
                     dtcm_to_use_tmp =- binary_search_size;
+                    used_array_rep = true;
                 }
                 else {
                     cache = false;
                 }
             }
+        }
+
+        // add base costs if not done already
+        if (used_binary_rep && !added_binary_base_cost) {
+            dtcm_to_use_tmp -= malloc_cost;
+            added_binary_base_cost = true;
+        }
+        if (used_array_rep && !added_array_base_cost) {
+            dtcm_to_use_tmp -= malloc_cost;
+            added_array_base_cost = true;
+        }
+
+        // final check before caching.
+        if(dtcm_to_use_tmp <= 0) {
+            cache = false;
         }
 
         // update data structs to reflect caching
@@ -426,10 +488,6 @@ void c_main(void) {
     sark_cpu_state(CPU_STATE_RUN);
 
     log_info("Starting the synaptic block cacher");
-
-    // set up the dtcm/sdram malloc system.
-    malloc_extras_turn_off_safety();
-    malloc_extras_initialise_no_fake_heap_data();
 
     // read in sdram data
     read_in_addresses();
