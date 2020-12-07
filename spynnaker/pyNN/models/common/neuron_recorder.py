@@ -285,7 +285,9 @@ class NeuronRecorder(object):
     def __read_data(
             self, label, buffer_manager, placements, application_vertex,
             sampling_rate, data_type, variable, n_machine_time_steps):
-        vertices = application_vertex.machine_vertices
+        vertices = (
+            application_vertex.splitter.machine_vertices_for_recording(
+                variable))
         region = self.__region_ids[variable]
         missing_str = ""
         pop_level_data = None
@@ -296,8 +298,8 @@ class NeuronRecorder(object):
 
         indexes = []
         for i, vertex in enumerate(progress.over(vertices)):
-            expected_rows = self.expected_rows_for_a_run_time(
-                n_machine_time_steps, sampling_rate)
+            expected_rows = application_vertex.get_expected_n_rows(
+                n_machine_time_steps, sampling_rate, vertex, variable)
 
             n_items_per_timestep = 1
             if variable in self.__sampling_rates:
@@ -392,7 +394,9 @@ class NeuronRecorder(object):
         spike_times = list()
         spike_ids = list()
 
-        vertices = application_vertex.machine_vertices
+        vertices = (
+            application_vertex.splitter.machine_vertices_for_recording(
+                variable))
         missing_str = ""
         progress = ProgressBar(vertices, "Getting spikes for {}".format(label))
         for vertex in progress.over(vertices):

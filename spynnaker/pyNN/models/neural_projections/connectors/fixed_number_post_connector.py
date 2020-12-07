@@ -100,6 +100,11 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         n_connections = synapse_info.n_pre_neurons * self.__n_post
         return self._get_delay_maximum(synapse_info.delays, n_connections)
 
+    @overrides(AbstractConnector.get_delay_minimum)
+    def get_delay_minimum(self, synapse_info):
+        n_connections = synapse_info.n_pre_neurons * self.__n_post
+        return self._get_delay_minimum(synapse_info.delays, n_connections)
+
     def _get_post_neurons(self, synapse_info):
         """
         :param SynapseInformation synapse_info:

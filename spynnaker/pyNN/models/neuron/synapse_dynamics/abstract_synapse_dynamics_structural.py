@@ -49,7 +49,7 @@ class AbstractSynapseDynamicsStructural(object):
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to
         :param int region: region ID
-        :param int machine_time_step: The simulation time step
+        :param float machine_time_step: The simulation time step
         :param list(float) weight_scales: Weight scaling for each synapse type
         :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
             The machine graph
@@ -71,7 +71,7 @@ class AbstractSynapseDynamicsStructural(object):
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         :param ProjectionApplicationEdge app_edge:
         :param SynapseInformation synapse_info:
-        :param ProjectionMachineEdge machine_edge:
+        :param MachineEdge machine_edge:
         """
 
     @abstractproperty
