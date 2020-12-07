@@ -159,8 +159,44 @@ static inline bool synapses_are_plastic_or_structural(
 //! \return: the size in bytes used by dtcm.
 static inline int calculate_binary_search_size(
         uint32_t bit_field_index, address_list_entry entry) {
-    uint dtcm_used = 0;
-    return 0;
+    // build stores
+    uint32_t dtcm_used = 0;
+    uint32_t n_atoms =
+        not_redundant_tracker->filter[bit_field_index].n_atoms;
+    uint32_t n_valid_entries = 0;
+
+    uint32_t address = population_table_get_address(entry.addr);
+    uint32_t row_length = population_table_get_row_length(entry.addr);
+    uint32_t stride = (row_length + N_SYNAPSE_ROW_HEADER_WORDS);
+
+    // populate stores
+    for (uint32_t atom_id = 0; atom_id < n_atoms; atom_id++) {
+        uint32_t atom_offset = atom_id * stride * sizeof(uint32_t);
+        address_t row_address = (address_t) (address + atom_offset);
+        // process static synapses
+        uint32_t n_targets_in_words = synapse_row_num_fixed_synapses(
+            synapse_row_fixed_region(row_address));
+
+        if (n_targets_in_words != 0) {
+            // TODO FIX WHEN STAGE 2.5 HAS HAPPENED
+            uint32_t overall_bytes =
+                (N_SYNAPSE_ROW_HEADER_WORDS + n_targets_in_words) *
+                BYTE_TO_WORD_CONVERSION;
+            dtcm_used += overall_bytes + malloc_cost;
+            n_valid_entries += 1;
+        } else {
+            log_debug(
+                "row for atom %d has no targets, so not caching", atom_id);
+        }
+    }
+
+    // accum size of binary search array
+    dtcm_used += sizeof(binary_search_top) + malloc_cost;
+    dtcm_used +=
+        n_valid_entries * sizeof(binary_search_element*) + malloc_cost;
+
+    // return dtcm used
+    return dtcm_used;
 }
 
 //! \brief returns the size of dtcm needed when using array search rep
@@ -187,11 +223,16 @@ static inline uint32_t calculate_array_search_size(
         uint32_t n_targets_in_words = synapse_row_num_fixed_synapses(
             synapse_row_fixed_region(row_address));
 
-        // TODO FIX WHEN STAGE 2.5 HAS HAPPENED
-        uint32_t overall_bytes =
-            (N_SYNAPSE_ROW_HEADER_WORDS + n_targets_in_words) *
-            BYTE_TO_WORD_CONVERSION;
-        dtcm_used += overall_bytes + malloc_cost;
+        if (n_targets_in_words != 0) {
+            // TODO FIX WHEN STAGE 2.5 HAS HAPPENED
+            uint32_t overall_bytes =
+                (N_SYNAPSE_ROW_HEADER_WORDS + n_targets_in_words) *
+                BYTE_TO_WORD_CONVERSION;
+            dtcm_used += overall_bytes + malloc_cost;
+        } else {
+            log_debug(
+                "row for atom %d has no targets, so not caching", atom_id);
+        }
     }
 
     // return dtcm used
