@@ -450,10 +450,7 @@ class PopulationMachineVertex(
             self._app_vertex.neuron_impl.model_name))
 
         # Reserve memory regions
-        all_syn_block_sz = self._app_vertex.get_synapses_size(
-            self.vertex_slice)
-        self._reserve_memory_regions(
-            spec, machine_graph, n_key_map, all_syn_block_sz)
+        self._reserve_memory_regions(spec, machine_graph, n_key_map)
 
         # Write the setup region
         spec.switch_write_focus(self.REGIONS.SYSTEM.value)
@@ -483,6 +480,8 @@ class PopulationMachineVertex(
             machine_time_step))
 
         # Write the synaptic matrices
+        all_syn_block_sz = self._app_vertex.get_synapses_size(
+            self.vertex_slice)
         weight_scales = self._app_vertex.get_weight_scales(machine_time_step)
         self.__synaptic_matrices.write_synaptic_data(
             spec, self, all_syn_block_sz, weight_scales, routing_info,
@@ -544,17 +543,13 @@ class PopulationMachineVertex(
     def set_reload_required(self, new_value):
         self.__change_requires_neuron_parameters_reload = new_value
 
-    def _reserve_memory_regions(
-            self, spec, machine_graph, n_key_map, all_syn_block_sz):
+    def _reserve_memory_regions(self, spec, machine_graph, n_key_map):
         """ Reserve the DSG data regions.
 
         :param ~.DataSpecificationGenerator spec:
             the spec to write the DSG region to
         :param ~.MachineGraph machine_graph: machine graph
         :param n_key_map: n key map
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-            The slice of the vertex to allocate for
-        :param ~.MachineVertex machine_vertex: The machine vertex
         :return: None
         """
         spec.comment("\nReserving memory space for data regions:\n\n")
@@ -590,11 +585,6 @@ class PopulationMachineVertex(
             region=self.REGIONS.SYNAPSE_PARAMS.value,
             size=self._app_vertex.get_synapse_params_size(),
             label='SynapseParams')
-
-        if all_syn_block_sz > 0:
-            spec.reserve_memory_region(
-                region=self.REGIONS.SYNAPTIC_MATRIX.value,
-                size=all_syn_block_sz, label='SynBlocks')
 
         synapse_dynamics_sz = self._app_vertex.get_synapse_dynamics_size(
             self.vertex_slice)

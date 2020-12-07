@@ -178,8 +178,16 @@ class SynapticMatrices(object):
         :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
             The machine graph
         """
+        # If there are no synapses, there is nothing to do!
+        if all_syn_block_sz == 0:
+            return
+
+        # Reserve the region
         spec.comment(
             "\nWriting Synaptic Matrix and Master Population Table:\n")
+        spec.reserve_memory_region(
+            region=self.__synaptic_matrix_region,
+            size=all_syn_block_sz, label='SynBlocks')
 
         # Track writes inside the synaptic matrix region:
         block_addr = 0

@@ -30,8 +30,7 @@ from spinn_front_end_common.abstract_models.impl import (
 from spinn_front_end_common.utilities import (
     helpful_functions, globals_variables)
 from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, SYSTEM_BYTES_REQUIREMENT, MICRO_TO_SECOND_CONVERSION)
-from spinn_front_end_common.interface.profiling import profile_utils
+    BYTES_PER_WORD, MICRO_TO_SECOND_CONVERSION)
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, AbstractNeuronRecordable, NeuronRecorder)
 from spynnaker.pyNN.models.abstract_models import (
@@ -342,28 +341,6 @@ class AbstractPopulationVertex(
             self.BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
             self.tdma_sdram_size_in_bytes +
             self.__neuron_impl.get_sdram_usage_in_bytes(vertex_slice.n_atoms))
-
-    def _get_sdram_usage_for_atoms(self, vertex_slice, graph):
-        sdram_requirement = (
-            SYSTEM_BYTES_REQUIREMENT +
-            self.get_sdram_usage_for_neuron_params(vertex_slice) +
-            self.neuron_recorder.get_static_sdram_usage(vertex_slice) +
-            PopulationMachineVertex.get_provenance_data_size(
-                len(PopulationMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES)) +
-            self.get_synapse_params_size() +
-            self.get_synapse_dynamics_size(vertex_slice) +
-            self.get_structural_dynamics_size(vertex_slice) +
-            self.get_synapses_size(vertex_slice) +
-            self.get_pop_table_size() +
-            self.get_synapse_expander_size() +
-            profile_utils.get_profile_region_size(
-                self.__n_profile_samples) +
-            bit_field_utilities.get_estimated_sdram_for_bit_field_region(
-                graph, self) +
-            bit_field_utilities.get_estimated_sdram_for_key_region(
-                graph, self) +
-            bit_field_utilities.exact_sdram_for_bit_field_builder_region())
-        return sdram_requirement
 
     @staticmethod
     def __copy_ranged_dict(source, merge=None, merge_keys=None):
@@ -965,8 +942,7 @@ class AbstractPopulationVertex(
         app_edge = projection._projection_edge
 
         max_row_info = get_max_row_info(
-            synapse_info, vertex_slice, app_edge.n_delay_stages,
-            globals_variables.get_simulator().machine_time_step, app_edge)
+            synapse_info, vertex_slice, app_edge.n_delay_stages, app_edge)
 
         vertex = app_edge.pre_vertex
         n_sub_atoms = int(min(vertex.get_max_atoms_per_core(), vertex.n_atoms))
@@ -1037,3 +1013,13 @@ class AbstractPopulationVertex(
             dynamics.gen_matrix_params_size_in_bytes
         ))
         return gen_size
+
+    @property
+    def vertex_executable_suffix(self):
+        """ The suffix of the executable name due to the type of synapses \
+            in use.
+        :rtype: str
+        """
+        if self.__synapse_dynamics is None:
+            return ""
+        return self.__synapse_dynamics.get_vertex_executable_suffix()

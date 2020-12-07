@@ -84,7 +84,6 @@ class SplitterAbstractPopulationVertexSlice(
                 vertex_slice),
             label, remaining_constraints, self._governed_app_vertex,
             vertex_slice,
-            self._governed_app_vertex.synapse_manager.drop_late_spikes,
             self.__get_binary_file_name())
 
     @inject_items({"graph": "MemoryApplicationGraph"})
@@ -136,8 +135,13 @@ class SplitterAbstractPopulationVertexSlice(
                 vertex_slice) +
             PopulationMachineVertex.get_provenance_data_size(
                 len(PopulationMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES)) +
-            self._governed_app_vertex.synapse_manager.get_sdram_usage_in_bytes(
-                vertex_slice, graph, self._governed_app_vertex) +
+            self._governed_app_vertex.get_synapse_params_size() +
+            self._governed_app_vertex.get_synapse_dynamics_size(vertex_slice) +
+            self._governed_app_vertex.get_structural_dynamics_size(
+                vertex_slice) +
+            self._governed_app_vertex.get_synapses_size(vertex_slice) +
+            self._governed_app_vertex.get_pop_table_size() +
+            self._governed_app_vertex.get_synapse_expander_size() +
             profile_utils.get_profile_region_size(
                 self._governed_app_vertex.n_profile_samples) +
             bit_field_utilities.get_estimated_sdram_for_bit_field_region(
@@ -157,9 +161,7 @@ class SplitterAbstractPopulationVertexSlice(
             self._governed_app_vertex.neuron_impl.get_dtcm_usage_in_bytes(
                 vertex_slice.n_atoms) +
             self._governed_app_vertex.neuron_recorder.get_dtcm_usage_in_bytes(
-                vertex_slice) +
-            self._governed_app_vertex.synapse_manager.
-            get_dtcm_usage_in_bytes())
+                vertex_slice))
 
     def cpu_cost(self, vertex_slice):
         """ get cpu cost for a slice of atoms
@@ -174,8 +176,7 @@ class SplitterAbstractPopulationVertexSlice(
             self._governed_app_vertex.neuron_recorder.get_n_cpu_cycles(
                 vertex_slice.n_atoms) +
             self._governed_app_vertex.neuron_impl.get_n_cpu_cycles(
-                vertex_slice.n_atoms) +
-            self._governed_app_vertex.synapse_manager.get_n_cpu_cycles())
+                vertex_slice.n_atoms))
 
     def __get_binary_file_name(self):
         """ returns the binary name for the machine vertices.
@@ -190,8 +191,8 @@ class SplitterAbstractPopulationVertexSlice(
         # Reunite title and extension and return
         return (
             binary_title +
-            self._governed_app_vertex.synapse_manager.
-            vertex_executable_suffix + binary_extension)
+            self._governed_app_vertex.vertex_executable_suffix +
+            binary_extension)
 
     @overrides(AbstractSplitterSlice.check_supported_constraints)
     def check_supported_constraints(self):

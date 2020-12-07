@@ -37,6 +37,7 @@ from pacman.model.routing_info import (
 from pacman.model.graphs.application import ApplicationVertex
 from data_specification import (
     DataSpecificationGenerator, DataSpecificationExecutor)
+from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
 from spynnaker.pyNN.abstract_spinnaker_common import AbstractSpiNNakerCommon
 import spynnaker.pyNN.abstract_spinnaker_common as abstract_spinnaker_common
 from spynnaker.pyNN.models.neural_projections import (
@@ -62,6 +63,7 @@ from spynnaker.pyNN.models.utility_models.delays import (
     DelayExtensionVertex, DelayExtensionMachineVertex)
 from spynnaker.pyNN.extra_algorithms.splitter_components.\
     splitter_delay_vertex_slice import SplitterDelayVertexSlice
+from spynnaker.pyNN.models.neuron.builds.if_curr_exp_base import IFCurrExpBase
 from pacman.model.placements.placements import Placements
 from pacman.model.graphs.application.application_graph import ApplicationGraph
 from data_specification.constants import MAX_MEM_REGIONS
@@ -70,11 +72,6 @@ from unittests.mocks import MockSimulator, MockPopulation
 from pacman.model.partitioner_splitters import SplitterSliceLegacy
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
     AbstractSpynnakerSplitterDelay)
-from spynnaker.pyNN.models.neuron.builds.if_curr_exp_base import IFCurrExpBase
-from pacman.model.routing_info import DictBasedMachinePartitionNKeysMap
-from pacman.executor.injection_decorator import injection_context
-from spinn_front_end_common.interface.interface_functions import (
-    LocalTDMABuilder)
 
 
 class MockSynapseIO(object):
@@ -149,13 +146,6 @@ class SimpleApplicationVertex(ApplicationVertex, LegacyPartitionerAPI):
         pass
 
 
-class MockProjection(object):
-
-    def __init__(self, projection_edge, synapse_information):
-        self._projection_edge = projection_edge
-        self._synapse_information = synapse_information
-
-
 def say_false(self, weights, delays):
     return False
 
@@ -188,11 +178,7 @@ def test_write_data_spec():
     pre_vertex = pre_app_vertex.create_machine_vertex(
         pre_vertex_slice, None)
     placements.add_placement(Placement(pre_vertex, 0, 0, 1))
-    post_app_model = IFCurrExpBase()
-    post_app_vertex = post_app_model.create_vertex(
-        n_neurons=10, label="post", constraints=None, spikes_per_second=None,
-        ring_buffer_sigma=None, incoming_spike_buffer_size=None,
-        n_steps_per_timestep=1, drop_late_spikes=True)
+    post_app_vertex = SimpleApplicationVertex(10, label="post")
     post_app_vertex.splitter = MockSplitter()
     post_app_vertex.splitter._called = True
     post_vertex_slice = Slice(0, 9)
@@ -240,14 +226,6 @@ def test_write_data_spec():
     app_edge.add_synapse_information(direct_synapse_information_2)
     app_edge.add_synapse_information(all_to_all_synapse_information)
     app_edge.add_synapse_information(from_list_synapse_information)
-    post_app_vertex.add_incoming_projection(MockProjection(
-        app_edge, direct_synapse_information_1))
-    post_app_vertex.add_incoming_projection(MockProjection(
-        app_edge, direct_synapse_information_2))
-    post_app_vertex.add_incoming_projection(MockProjection(
-        app_edge, all_to_all_synapse_information))
-    post_app_vertex.add_incoming_projection(MockProjection(
-        app_edge, from_list_synapse_information))
     delay_edge = DelayedApplicationEdge(
         delay_app_vertex, post_app_vertex, direct_synapse_information_1,
         app_edge)
@@ -277,36 +255,29 @@ def test_write_data_spec():
 
     routing_info = RoutingInfo()
     key = 0
-    pre_vertex_part = graph.get_outgoing_edge_partition_starting_at_vertex(
-        pre_vertex, partition_name)
     routing_info.add_partition_info(PartitionRoutingInfo(
-        [BaseKeyAndMask(key, 0xFFFFFFF0)], pre_vertex_part))
+        [BaseKeyAndMask(key, 0xFFFFFFF0)],
+        graph.get_outgoing_edge_partition_starting_at_vertex(
+            pre_vertex, partition_name)))
     delay_key = 0xF0
     delay_key_and_mask = BaseKeyAndMask(delay_key, 0xFFFFFFF0)
-    delay_vertex_part = graph.get_outgoing_edge_partition_starting_at_vertex(
-        delay_vertex, partition_name)
     delay_routing_info = PartitionRoutingInfo(
-        [delay_key_and_mask], delay_vertex_part)
+        [delay_key_and_mask],
+        graph.get_outgoing_edge_partition_starting_at_vertex(
+            delay_vertex, partition_name))
     routing_info.add_partition_info(delay_routing_info)
-    n_key_map = DictBasedMachinePartitionNKeysMap()
-    n_key_map.set_n_keys_for_partition(pre_vertex_part, 10)
-    n_key_map.set_n_keys_for_partition(delay_vertex_part, 10)
-
-    LocalTDMABuilder().__call__(
-        graph, machine_time_step, 1.0, n_key_map, app_graph)
 
     temp_spec = tempfile.mktemp()
     spec = DataSpecificationGenerator(io.FileIO(temp_spec, "wb"), None)
 
-    with injection_context({
-            "MachineTimeStep": machine_time_step,
-            "TimeScaleFactor": 1.0,
-            "MemoryMachineGraph": graph,
-            "MemoryRoutingInfos": routing_info,
-            "DataNTimeSteps": 100,
-            "MemoryMachinePartitionNKeysMap": n_key_map}):
-
-        post_vertex.generate_data_specification(spec, post_vertex_placement)
+    synaptic_matrices = SynapticMatrices(
+        post_vertex_slice, n_synapse_types=2, all_single_syn_sz=10000,
+        synaptic_matrix_region=1, direct_matrix_region=2, poptable_region=3,
+        connection_builder_region=4)
+    synaptic_matrices.write_synaptic_data(
+        spec, post_vertex, all_syn_block_sz=10000, weight_scales=[32, 32],
+        routing_info=routing_info, machine_graph=graph)
+    spec.end_specification()
 
     with io.FileIO(temp_spec, "rb") as spec_reader:
         executor = DataSpecificationExecutor(spec_reader, 20000)
@@ -322,27 +293,30 @@ def test_write_data_spec():
     transceiver = MockTransceiverRawData(all_data)
     report_folder = mkdtemp()
     try:
-        connections_1 = post_app_vertex.get_connections_from_machine(
-            transceiver, placements, app_edge,
-            direct_synapse_information_1)
+        connections_1 = numpy.concatenate(
+            synaptic_matrices.get_connections_from_machine(
+                transceiver, post_vertex_placement, app_edge,
+                direct_synapse_information_1))
 
         # Check that all the connections have the right weight and delay
         assert len(connections_1) == post_vertex_slice.n_atoms
         assert all([conn["weight"] == 1.5 for conn in connections_1])
         assert all([conn["delay"] == 1.0 for conn in connections_1])
 
-        connections_2 = post_app_vertex.get_connections_from_machine(
-            transceiver, placements, app_edge,
-            direct_synapse_information_2)
+        connections_2 = numpy.concatenate(
+            synaptic_matrices.get_connections_from_machine(
+                transceiver, post_vertex_placement, app_edge,
+                direct_synapse_information_2))
 
         # Check that all the connections have the right weight and delay
         assert len(connections_2) == post_vertex_slice.n_atoms
         assert all([conn["weight"] == 2.5 for conn in connections_2])
         assert all([conn["delay"] == 2.0 for conn in connections_2])
 
-        connections_3 = post_app_vertex.get_connections_from_machine(
-            transceiver, placements, app_edge,
-            all_to_all_synapse_information)
+        connections_3 = numpy.concatenate(
+            synaptic_matrices.get_connections_from_machine(
+                transceiver, post_vertex_placement, app_edge,
+                all_to_all_synapse_information))
 
         # Check that all the connections have the right weight and delay
         assert len(connections_3) == \
@@ -350,9 +324,10 @@ def test_write_data_spec():
         assert all([conn["weight"] == 4.5 for conn in connections_3])
         assert all([conn["delay"] == 4.0 for conn in connections_3])
 
-        connections_4 = post_app_vertex.get_connections_from_machine(
-            transceiver, placements, app_edge,
-            from_list_synapse_information)
+        connections_4 = numpy.concatenate(
+            synaptic_matrices.get_connections_from_machine(
+                transceiver, post_vertex_placement, app_edge,
+                from_list_synapse_information))
 
         # Check that all the connections have the right weight and delay
         assert len(connections_4) == len(from_list_list)
@@ -370,7 +345,7 @@ def test_set_synapse_dynamics():
     post_app_vertex = post_app_model.create_vertex(
         n_neurons=10, label="post", constraints=None, spikes_per_second=None,
         ring_buffer_sigma=None, incoming_spike_buffer_size=None,
-        n_steps_per_timestep=1, drop_late_spikes=True)
+        n_steps_per_timestep=1, drop_late_spikes=True, splitter=None)
 
     static = SynapseDynamicsStatic()
     stdp = SynapseDynamicsSTDP(
@@ -463,7 +438,7 @@ def test_set_synapse_dynamics():
     post_app_vertex = post_app_model.create_vertex(
         n_neurons=10, label="post", constraints=None, spikes_per_second=None,
         ring_buffer_sigma=None, incoming_spike_buffer_size=None,
-        n_steps_per_timestep=1, drop_late_spikes=True)
+        n_steps_per_timestep=1, drop_late_spikes=True, splitter=None)
 
     # STDP followed by structural STDP should result in Structural STDP
     post_app_vertex.synapse_dynamics = stdp
@@ -485,7 +460,7 @@ def test_set_synapse_dynamics():
     post_app_vertex = post_app_model.create_vertex(
         n_neurons=10, label="post", constraints=None, spikes_per_second=None,
         ring_buffer_sigma=None, incoming_spike_buffer_size=None,
-        n_steps_per_timestep=1, drop_late_spikes=True)
+        n_steps_per_timestep=1, drop_late_spikes=True, splitter=None)
 
     # Static followed by static structural should result in static
     # structural
@@ -522,7 +497,7 @@ def test_set_synapse_dynamics():
     post_app_vertex = post_app_model.create_vertex(
         n_neurons=10, label="post", constraints=None, spikes_per_second=None,
         ring_buffer_sigma=None, incoming_spike_buffer_size=None,
-        n_steps_per_timestep=1, drop_late_spikes=True)
+        n_steps_per_timestep=1, drop_late_spikes=True, splitter=None)
     post_app_vertex.synapse_dynamics = static_struct
     post_app_vertex.synapse_dynamics = stdp_struct
 
@@ -559,14 +534,10 @@ def test_pop_based_master_pop_table_standard(
     pre_app_vertex = SimpleApplicationVertex(1000)
     pre_app_vertex.splitter = MockSplitter()
     app_graph.add_vertex(pre_app_vertex)
-    post_app_model = IFCurrExpBase()
-    post_app_vertex = post_app_model.create_vertex(
-        n_neurons=10, label="post", constraints=None, spikes_per_second=None,
-        ring_buffer_sigma=None, incoming_spike_buffer_size=None,
-        n_steps_per_timestep=1, drop_late_spikes=True)
+    post_vertex_slice = Slice(0, 99)
+    post_app_vertex = SimpleApplicationVertex(100)
     post_app_vertex.splitter = MockSplitter()
     app_graph.add_vertex(post_app_vertex)
-    post_vertex_slice = Slice(0, 9)
     post_mac_vertex = post_app_vertex.create_machine_vertex(
         post_vertex_slice, None)
     mac_graph.add_vertex(post_mac_vertex)
@@ -595,7 +566,6 @@ def test_pop_based_master_pop_table_standard(
     # Make the routing info line up to force an app key in the pop table if
     # the constraints match up
     routing_info = RoutingInfo()
-    n_key_map = DictBasedMachinePartitionNKeysMap()
     n_key_bits = int(math.ceil(math.log(100, 2)))
     n_keys = 2**n_key_bits
     mask = 0xFFFFFFFF - (n_keys - 1)
@@ -619,8 +589,6 @@ def test_pop_based_master_pop_table_standard(
     app_edge = ProjectionApplicationEdge(
         pre_app_vertex, post_app_vertex, synapse_info)
     app_graph.add_edge(app_edge, "Test")
-    post_app_vertex.add_incoming_projection(MockProjection(
-        app_edge, synapse_info))
 
     # Create the machine edges
     for pre_mac_vertex in pre_app_vertex.machine_vertices:
@@ -633,7 +601,6 @@ def test_pop_based_master_pop_table_standard(
             partition_info = PartitionRoutingInfo(
                 [BaseKeyAndMask(i * n_keys, mask)], partition)
             routing_info.add_partition_info(partition_info)
-            n_key_map.set_n_keys_for_partition(partition, n_keys)
 
     # Create the delay application edge and delay machine edges
     if delayed_indices_connected:
@@ -654,24 +621,19 @@ def test_pop_based_master_pop_table_standard(
                     [BaseKeyAndMask(base_d_key + (i * n_keys), mask)],
                     partition)
                 routing_info.add_partition_info(partition_info)
-                n_key_map.set_n_keys_for_partition(partition, n_keys)
-
-    LocalTDMABuilder().__call__(
-        mac_graph, 1000, 1.0, n_key_map, app_graph)
 
     # Generate the data
     temp_spec = tempfile.mktemp()
     spec = DataSpecificationGenerator(io.FileIO(temp_spec, "wb"), None)
 
-    with injection_context({
-            "MachineTimeStep": 1000,
-            "TimeScaleFactor": 1.0,
-            "MemoryMachineGraph": mac_graph,
-            "MemoryRoutingInfos": routing_info,
-            "DataNTimeSteps": 100,
-            "MemoryMachinePartitionNKeysMap": n_key_map}):
-
-        post_mac_vertex.generate_data_specification(spec, None)
+    synaptic_matrices = SynapticMatrices(
+        post_vertex_slice, n_synapse_types=2, all_single_syn_sz=10000,
+        synaptic_matrix_region=1, direct_matrix_region=2, poptable_region=3,
+        connection_builder_region=4)
+    synaptic_matrices.write_synaptic_data(
+        spec, post_mac_vertex, all_syn_block_sz=1000000,
+        weight_scales=[32, 32], routing_info=routing_info,
+        machine_graph=mac_graph)
 
     with io.FileIO(temp_spec, "rb") as spec_reader:
         executor = DataSpecificationExecutor(
@@ -679,8 +641,7 @@ def test_pop_based_master_pop_table_standard(
         executor.execute()
 
     # Read the population table and check entries
-    region = executor.get_region(
-        post_mac_vertex.REGIONS.POPULATION_TABLE.value)
+    region = executor.get_region(3)
     mpop_data = numpy.frombuffer(
         region.region_data, dtype="uint8").view("uint32")
     n_entries = mpop_data[0]
