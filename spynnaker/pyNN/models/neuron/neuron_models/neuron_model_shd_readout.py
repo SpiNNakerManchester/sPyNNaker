@@ -99,7 +99,7 @@ class NeuronModelLeakyIntegrateAndFireSHDReadout(AbstractNeuronModel):
         data_types.extend(eprop_syn_state * SYNAPSES_PER_NEURON)
 
         global_data_types=[]
-        global_data_types.extend([DataType.S1615 for i in range(1024)])
+        global_data_types.extend([DataType.UINT32 for i in range(4011)])
         global_data_types.extend([DataType.S1615])    # eta (learning rate)
 
 

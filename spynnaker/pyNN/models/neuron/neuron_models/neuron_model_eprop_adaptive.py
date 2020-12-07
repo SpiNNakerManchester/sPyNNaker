@@ -20,7 +20,7 @@ from pacman.executor.injection_decorator import inject_items
 from .abstract_neuron_model import AbstractNeuronModel
 
 # constants
-SYNAPSES_PER_NEURON = 956
+SYNAPSES_PER_NEURON = 1024
 
 
 
@@ -176,9 +176,9 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
             DataType.UINT32,   #  input_synapses
             DataType.UINT32,   #  rec_synapses
             DataType.S1615,   #  neuron_rate
-            DataType.S1615,   #  w_fb
+            # DataType.S1615,   #  w_fb
             ]
-        datatype_list.extend([DataType.S1615] * 19)
+        datatype_list.extend([DataType.S1615 for i in range(10)])  # w_fb
 
         # Synapse states - always initialise to zero
         eprop_syn_state = [ # synaptic state, one per synapse (kept in DTCM)
@@ -325,13 +325,13 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
                 parameters[SCALAR],
 
                 state_variables[L],
-                parameters[W_FB],
                 parameters[WINDOW_SIZE],
                 parameters[NUMBER_OF_CUES],
                 parameters[INPUT_SYNAPSES],
                 parameters[REC_SYNAPSES],
                 parameters[NEURON_RATE]
                 ]
+        values.extend(self.__w_fb)
 
         # create synaptic state - init all state to zero
         for n in range(SYNAPSES_PER_NEURON):

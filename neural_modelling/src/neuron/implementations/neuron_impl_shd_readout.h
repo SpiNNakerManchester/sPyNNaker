@@ -55,7 +55,7 @@ static synapse_param_t *neuron_synapse_shaping_params;
 static REAL next_spike_time = 0;
 extern uint32_t time;
 extern key_t key;
-extern REAL learning_signal;
+extern REAL learning_signal[20];
 static uint32_t target_ind = 0;
 
 REAL output_errors[20] = {0.k};
@@ -284,7 +284,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     accumulated_softmax += output_errors[neuron_index];
 
 //    recorded_variable_values[V_RECORDING_INDEX] = voltage;
-    if (neuron_index == 19){
+    if (neuron_index == 9){
 
         // Calculate error
         for (uint32_t n_ind=0; n_ind < 20; n_ind++){

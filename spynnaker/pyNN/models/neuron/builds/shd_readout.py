@@ -23,7 +23,7 @@ class SHDReadout(AbstractPyNNNeuronModelStandard):
             tau_syn_E=5.0, tau_syn_E2=5.0, tau_syn_I=5.0, tau_syn_I2=5.0,
 #             mean_isi_ticks=65000, time_to_spike_ticks=65000, rate_update_threshold=0.25,
 
-            target_data =[],
+            target_data=[],
 
             # Learning signal and weight update constants
             l=0, w_fb=0.5, eta=1.0, update_ready=1024):
