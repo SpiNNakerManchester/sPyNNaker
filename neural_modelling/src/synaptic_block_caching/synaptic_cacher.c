@@ -307,12 +307,12 @@ static inline bool initialise(void) {
 
     // set up malloc cost
     uint dtcm_available = sark_heap_max(sark.heap, 0);
-    uint32_t* holder = spin1_malloc(ALANS_RANDOM * sizeof(uint32_t));
+    uint32_t* holder = sark_alloc(ALANS_RANDOM * sizeof(uint32_t), 1);
     if (holder == NULL) {
         log_error("failed to alloc base checker");
         return false;
     }
-    uint dtcm_used = sark_heap_max(sark.heap, 0) - dtcm_available;
+    uint dtcm_used = dtcm_available - sark_heap_max(sark.heap, 0);
     malloc_cost = dtcm_used - (ALANS_RANDOM * sizeof(uint32_t));
     log_info("malloc cost is %d", malloc_cost);
 
@@ -372,6 +372,7 @@ static void print_store(void) {
             bit_field, not_redundant_tracker[bit_field].filter->key,
             not_redundant_tracker[bit_field].not_redundant_count);
     }
+    log_info("fin");
 }
 
 //! \brief reads in the bitfields
@@ -390,9 +391,8 @@ static inline bool read_in_bitfields(void) {
     // store filter info
     for (uint32_t bit_field = 0; bit_field < bit_field_base_address->n_filters;
             bit_field++) {
-        spin1_memcpy(
-            not_redundant_tracker[bit_field].filter,
-            &bit_field_base_address->filters[bit_field], sizeof(filter_info_t));
+        not_redundant_tracker[bit_field].filter =
+            &bit_field_base_address->filters[bit_field];
 
         // deduce redundancy
         not_redundant_tracker[bit_field].not_redundant_count = n_not_redundant(
@@ -403,6 +403,7 @@ static inline bool read_in_bitfields(void) {
 
 //! \brief sorts so that bitfields with most none redundant at front
 static inline void sort(void) {
+    log_info("s");
     for (uint32_t i = 1; i < bit_field_base_address->n_filters; i++) {
         const not_redundant_tracker_t temp = not_redundant_tracker[i];
 
@@ -412,8 +413,10 @@ static inline void sort(void) {
                 temp.not_redundant_count; j--) {
             not_redundant_tracker[j] = not_redundant_tracker[j - 1];
         }
+        log_info("stt");
         not_redundant_tracker[j] = temp;
     }
+    log_info("st");
 }
 
 //! \brief sorts out bitfields for most important
@@ -425,9 +428,13 @@ static inline bool sort_out_bitfields(void) {
         return false;
     }
     // debug
+    log_info("A");
     print_store();
+    log_info("B");
+
     // sort so that most not redundant at front
     sort();
+
     log_info("after sort");
     print_store();
     return true;
