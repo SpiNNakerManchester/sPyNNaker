@@ -15,7 +15,6 @@
 
 from __future__ import division
 import logging
-import struct
 import numpy
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
@@ -23,7 +22,6 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.exceptions import MemReadException
 
 logger = logging.getLogger(__name__)
-_RECORDING_COUNT = struct.Struct("<I")
 _SEEK_END = 2  # Define here for Py2.7 compatibility
 
 
@@ -54,10 +52,8 @@ def get_data(transceiver, placement, region, region_size):
 
     region_base_address = locate_memory_region_for_placement(
         placement, region, transceiver)
-    number_of_bytes_written = _RECORDING_COUNT.unpack_from(
-        transceiver.read_memory(
-            placement.x, placement.y, region_base_address,
-            BYTES_PER_WORD))[0]
+    number_of_bytes_written = transceiver.read_word(
+        placement.x, placement.y, region_base_address)
 
     # Subtract 4 for the word representing the size itself
     expected_size = region_size - BYTES_PER_WORD

@@ -25,7 +25,6 @@ from spinn_front_end_common.utilities import system_control_logic
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 
-_ONE_WORD = struct.Struct("<I")
 _THREE_WORDS = struct.Struct("<III")
 # bits in a word
 _BITS_IN_A_WORD = 32
@@ -328,7 +327,7 @@ class OnChipBitFieldGenerator(object):
             self.__txrx.get_user_1_register_address_from_core(placement.p)
         self.__txrx.write_memory(
             placement.x, placement.y, user_1_base_address,
-            _ONE_WORD.pack(bit_field_builder_region), _ONE_WORD.size)
+            bit_field_builder_region)
 
     def __check_for_success(self, executable_targets, transceiver):
         """ Goes through the cores checking for cores that have failed to\
@@ -344,10 +343,8 @@ class OnChipBitFieldGenerator(object):
             y = core_subset.y
             for p in core_subset.processor_ids:
                 # Read the result from USER0 register
-                user_2_base_address = \
-                    transceiver.get_user_2_register_address_from_core(p)
-                result, = _ONE_WORD.unpack(transceiver.read_memory(
-                    x, y, user_2_base_address, _ONE_WORD.size))
+                result = transceiver.read_word(
+                    x, y, transceiver.get_user_2_register_address_from_core(p))
 
                 # The result is 0 if success, otherwise failure
                 if result != self._SUCCESS:
