@@ -21,7 +21,7 @@
 #include "neuron_model.h"
 #include <neuron/decay.h>
 
-#define SYNAPSES_PER_NEURON 956
+#define SYNAPSES_PER_NEURON 1024
 
 
 typedef struct eprop_syn_state_t {

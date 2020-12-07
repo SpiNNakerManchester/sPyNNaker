@@ -51,7 +51,7 @@
 
 //! how many bits the synapse delay will take
 #ifndef SYNAPSE_DELAY_BITS
-#define SYNAPSE_DELAY_BITS 8
+#define SYNAPSE_DELAY_BITS 10 // this is to allow up to 1028 input indexing
 #endif
 
 // Create some masks based on the number of bits
