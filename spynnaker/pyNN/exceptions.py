@@ -59,6 +59,11 @@ class DelayExtensionException(ConfigurationException):
     """
 
 
+class SpynnakerSplitterConfigurationException(ConfigurationException):
+    """ Raised when a splitter configuration fails.
+    """
+
+
 class InvalidParameterType(SpynnakerException):
     """ Raised when a parameter is not recognised.
     """

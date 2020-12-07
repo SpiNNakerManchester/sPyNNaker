@@ -49,9 +49,6 @@ static uint32_t ring_buffer_size;
 //! Amount to left shift the ring buffer by to make it an input
 static uint32_t *ring_buffer_to_input_left_shifts;
 
-//! Count of the number of times the ring buffers have saturated
-static uint32_t saturation_count = 0;
-
 //! \brief Number of bits needed for the synapse type and index
 //! \details
 //! ```
@@ -72,6 +69,9 @@ static uint32_t synapse_index_mask;
 static uint32_t synapse_type_bits;
 //! Mask to pick out the synapse type.
 static uint32_t synapse_type_mask;
+
+//! Count of the number of times the ring buffers have saturated
+uint32_t synapses_saturation_count = 0;
 
 
 /* PRIVATE FUNCTIONS */
@@ -225,7 +225,7 @@ static inline void process_fixed_synapses(
         uint32_t sat_test = accumulation & 0x10000;
         if (sat_test) {
             accumulation = sat_test - 1;
-            saturation_count++;
+            synapses_saturation_count++;
         }
 
         // Store saturated value back in ring-buffer
@@ -390,16 +390,6 @@ bool synapses_process_synaptic_row(
     return true;
 }
 
-//! \brief Get the number of times the synapses have saturated their weights.
-//! \return the number of times the synapses have saturated.
-uint32_t synapses_get_saturation_count(void) {
-    return saturation_count;
-}
-
-//! \brief Get the counters for plastic and fixed pre synaptic events
-//! based on (if the model was compiled with SYNAPSE_BENCHMARK parameter) or
-//! returns 0
-//! \return the counter for plastic and fixed pre synaptic events or 0
 uint32_t synapses_get_pre_synaptic_events(void) {
     return (num_fixed_pre_synaptic_events +
             synapse_dynamics_get_plastic_pre_synaptic_events());
@@ -417,6 +407,6 @@ bool synapses_shut_down(void) {
     sark_free(ring_buffer_to_input_left_shifts);
     sark_free(ring_buffers);
     num_fixed_pre_synaptic_events = 0;
-    saturation_count = 0;
+    synapses_saturation_count = 0;
     return true;
 }
