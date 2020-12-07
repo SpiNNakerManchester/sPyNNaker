@@ -32,17 +32,9 @@
 //!     shouldn't happen)
 #define NOT_IN_MASTER_POP_TABLE_FLAG -1
 
-//! \brief The shift to apply to indirect addresses.
-//!    The address is in units of four words, so this multiplies by 16 (= up
-//!    shifts by 4)
-#define INDIRECT_ADDRESS_SHIFT 4
-
 // An Invalid address and row length; used to keep indices aligned between
 // delayed and undelayed tables
 #define INVALID_ADDRESS ((1 << N_ADDRESS_BITS) - 1)
-
-//! Base address for the synaptic matrix's indirect rows
-static uint32_t synaptic_rows_base_address;
 
 //! Base address for the synaptic matrix's direct rows
 static uint32_t direct_rows_base_address;
@@ -61,6 +53,9 @@ static uint16_t items_to_go = 0;
 
 //! The bitfield map
 static bit_field_t *connectivity_bit_field = NULL;
+
+//! Base address for the synaptic matrix's indirect rows
+uint32_t synaptic_rows_base_address;
 
 //! The length of ::master_population_table
 uint32_t master_population_table_length;
@@ -94,33 +89,6 @@ uint32_t bit_field_filtered_packets = 0;
 //! \return a direct row address
 static inline uint32_t get_direct_address(address_and_row_length entry) {
     return entry.address + direct_rows_base_address;
-}
-
-//! \brief Get the standard address offset out of an entry
-//!
-//! The address is in units of four words, so this multiplies by 16 (= up
-//! shifts by 4)
-//! \param[in] entry: the table entry
-//! \return a row address (which is an offset)
-static inline uint32_t get_offset(address_and_row_length entry) {
-    return entry.address << INDIRECT_ADDRESS_SHIFT;
-}
-
-//! \brief Get the standard address out of an entry
-//! \param[in] entry: the table entry
-//! \return a row address
-static inline uint32_t get_address(address_and_row_length entry) {
-    return get_offset(entry) + synaptic_rows_base_address;
-}
-
-//! \brief Get the length of the row from the entry
-//!
-//! Row lengths are stored offset by 1, to allow 1-256 length rows
-//!
-//! \param[in] entry: the table entry
-//! \return the row length
-static inline uint32_t get_row_length(address_and_row_length entry) {
-    return entry.row_length + 1;
 }
 
 //! \brief Get the source core index from a spike
@@ -202,7 +170,9 @@ static inline void print_master_population_table(void) {
                 log_info("    index %d: INVALID", j);
             } else if (!addr.representation == SINGLE) {
                 log_info("    index %d: offset: %u, address: 0x%08x, row_length: %u",
-                    j, get_offset(addr), get_address(addr), get_row_length(addr));
+                    j, population_table_get_offset(addr),
+                    population_table_get_address(addr),
+                    population_table_get_row_length(addr));
             } else {
                 log_info("    index %d: offset: %u, address: 0x%08x, single",
                     j, addr.address, get_direct_address(addr));
@@ -496,8 +466,8 @@ bool population_table_get_next_address(
                 is_valid = true;
             } else {
 
-                uint32_t row_length = get_row_length(item);
-                uint32_t block_address = get_address(item);
+                uint32_t row_length = population_table_get_row_length(item);
+                uint32_t block_address = population_table_get_address(item);
                 uint32_t stride = (row_length + N_SYNAPSE_ROW_HEADER_WORDS);
                 uint32_t neuron_offset = last_neuron_id * stride * sizeof(uint32_t);
 

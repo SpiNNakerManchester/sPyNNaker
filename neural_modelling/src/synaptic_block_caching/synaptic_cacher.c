@@ -112,13 +112,54 @@ static not_redundant_tracker_t* not_redundant_tracker = NULL;
 
 /***************************************************************/
 
+//! \brief checks if the synapses in the block are plastic or structural or
+//! not. If plastic then currently they wont be cached in the first impl.
+//! \param[in] bit_field_index: index in bitfields.
+//! \param[in] entry: the address list entry.
+//! \return: bool stating if the block contains plastic synapses.
+static inline bool synapses_are_plastic_or_structural(
+        uint32_t bit_field_index, address_list_entry entry) {
+    uint32_t address = population_table_get_address(entry.addr);
+    uint32_t row_length = population_table_get_row_length(entry.addr);
+    uint32_t stride = (row_length + N_SYNAPSE_ROW_HEADER_WORDS);
+
+    uint32_t n_atoms = not_redundant_tracker->filter[bit_field_index].n_atoms;
+
+    // cycle through atoms looking for plastic and struct synapses
+    for (uint32_t atom_id = 0; atom_id < n_atoms; atom_id++) {
+        uint32_t atom_offset = atom_id * stride * sizeof(uint32_t);
+        address_t row_address = (address_t) (address + atom_offset);
+        synaptic_row_t row = (synaptic_row_t) row_address;
+
+        // plastic
+        if (synapse_row_plastic_size(row) > 0) {
+            return true;
+        }
+
+        // struct synapses
+        bool bit_found = false;
+        if (structural_matrix_region_base_address != NULL) {
+            uint32_t new_key =
+                not_redundant_tracker->filter[bit_field_index].key + atom_id;
+            uint32_t dummy1 = 0, dummy2 = 0, dummy3 = 0, dummy4 = 0;
+            bit_found = sp_structs_find_by_spike(&pre_info, new_key,
+                    &dummy1, &dummy2, &dummy3, &dummy4);
+        }
+        if (bit_found) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 //! \brief returns the size of dtcm needed when using binary search rep
 //! \param[in] bit_field_index: index in bitfields.
 //! \param[in] entry: the address list entry.
 //! \return: the size in bytes used by dtcm.
 static inline int calculate_binary_search_size(
         uint32_t bit_field_index, address_list_entry entry) {
-    uint dtcm_left = sark_heap_max(sark.heap, 0);
+    uint dtcm_used = 0;
     return 0;
 }
 
@@ -126,26 +167,32 @@ static inline int calculate_binary_search_size(
 //! \param[in] bit_field_index: index in bitfields.
 //! \param[in] entry: the address list entry.
 //! \return: the size in bytes used by dtcm.
-static inline int calculate_array_search_size(
+static inline uint32_t calculate_array_search_size(
         uint32_t bit_field_index, address_list_entry entry) {
-    // tracker
-    uint dtcm_used = sark_heap_max(sark.heap, 0);
-
     // build stores
-    uint32_t n_atoms = not_redundant_tracker[bit_field_index].filter->n_atoms;
-    uint32_t* store = sark_alloc(n_atoms * sizeof(uint32_t*))
+    uint32_t dtcm_used = 0;
+    uint32_t n_atoms =
+        not_redundant_tracker->filter[bit_field_index].n_atoms;
+    dtcm_used += n_atoms * sizeof(uint32_t*) + malloc_cost;
+
+    uint32_t address = population_table_get_address(entry.addr);
+    uint32_t row_length = population_table_get_row_length(entry.addr);
+    uint32_t stride = (row_length + N_SYNAPSE_ROW_HEADER_WORDS);
 
     // populate stores
-    for (uint32_t atom_index = 0; atom_index < n_atoms; atom_index++) {
+    for (uint32_t atom_id = 0; atom_id < n_atoms; atom_id++) {
+        uint32_t atom_offset = atom_id * stride * sizeof(uint32_t);
+        address_t row_address = (address_t) (address + atom_offset);
+        // process static synapses
+        uint32_t n_targets_in_words = synapse_row_num_fixed_synapses(
+            synapse_row_fixed_region(row_address));
 
+        // TODO FIX WHEN STAGE 2.5 HAS HAPPENED
+        uint32_t overall_bytes =
+            (N_SYNAPSE_ROW_HEADER_WORDS + n_targets_in_words) *
+            BYTE_TO_WORD_CONVERSION;
+        dtcm_used += overall_bytes + malloc_cost;
     }
-
-    // figure dtcm used
-    uint dtcm_left_over = sark_heap_max(sark.heap, 0);
-    dtcm_used = dtcm_used - dtcm_left_over;
-
-    // free elements
-
 
     // return dtcm used
     return dtcm_used;
@@ -398,68 +445,83 @@ static inline bool cache_blocks(void) {
     for (uint32_t bit_field_index = 0;
             bit_field_index < bit_field_base_address->n_filters;
             bit_field_index++) {
-        master_population_table_entry entry =
+        master_population_table_entry master_entry =
             find_master_pop_entry(bit_field_index);
 
         // trackers
         bool cache = true;
         int dtcm_to_use_tmp = dtcm_to_use;
         uint32_t * reps = sark_xalloc(
-            sv->sdram_heap, sizeof(uint32_t) * entry.count, 0, ALLOC_LOCK);
+            sv->sdram_heap, sizeof(uint32_t) * master_entry.count, 0, ALLOC_LOCK);
         if (reps == NULL) {
             log_error("cannot allocate sdram for the reps.");
             return false;
         }
 
+        // if an extra info flag is set, skip it as that is not cachable.
+        uint32_t start = master_entry.start;
+        uint32_t count = master_entry.count;
+        if (master_entry.extra_info_flag) {
+            start += 1;
+            count -= 1;
+        }
+
         // test all the blocks. all or nothing due to bitfield
-        for (uint32_t address_index = entry.start; address_index < entry.count;
+        for (uint32_t address_index = start; address_index < count;
                 address_index ++) {
             address_list_entry address_entry =
                 population_table_get_address_entry(address_index);
 
-            // test memory requirements of the 2 reps.
-            int binary_search_size = calculate_binary_search_size(
-                bit_field_index, address_entry);
-            int array_search_size = calculate_array_search_size(
-                bit_field_index, address_entry);
+            // if plastic or struct, wont cache during this impl.
+            if (synapses_are_plastic_or_structural(
+                    bit_field_index, address_entry)) {
+                cache = false;
+            }
+            else {
+                // test memory requirements of the 2 reps.
+                int binary_search_size = calculate_binary_search_size(
+                    bit_field_index, address_entry);
+                int array_search_size = calculate_array_search_size(
+                    bit_field_index, address_entry);
 
-            // if binary better memory. see if we can cache with that rep.
-            if (binary_search_size < array_search_size) {
-                // check if can be cached
-                if (dtcm_to_use_tmp - binary_search_size > 0) {
-                    reps[address_index - entry.start] = USE_BINARY;
-                    dtcm_to_use_tmp =- binary_search_size;
-                    used_binary_rep = true;
+                // if binary better memory. see if we can cache with that rep.
+                if (binary_search_size < array_search_size) {
+                    // check if can be cached
+                    if (dtcm_to_use_tmp - binary_search_size > 0) {
+                        reps[address_index - start] = USE_BINARY;
+                        dtcm_to_use_tmp =- binary_search_size;
+                        used_binary_rep = true;
+                    }
+                    else {
+                        cache = false;
+                    }
                 }
-                else {
+                else{  // array rep better. check if can be cached
+                    if(dtcm_to_use_tmp - array_search_size > 0) {
+                        reps[address_index - start] = USE_ARRAY;
+                        dtcm_to_use_tmp =- binary_search_size;
+                        used_array_rep = true;
+                    }
+                    else {
+                        cache = false;
+                    }
+                }
+
+                // add base costs if not done already
+                if (used_binary_rep && !added_binary_base_cost) {
+                    dtcm_to_use_tmp -= malloc_cost;
+                    added_binary_base_cost = true;
+                }
+                if (used_array_rep && !added_array_base_cost) {
+                    dtcm_to_use_tmp -= malloc_cost;
+                    added_array_base_cost = true;
+                }
+
+                // final check before caching.
+                if(dtcm_to_use_tmp <= 0) {
                     cache = false;
                 }
             }
-            else{  // array rep better. check if can be cached
-                if(dtcm_to_use_tmp - array_search_size > 0) {
-                    reps[address_index - entry.start] = USE_ARRAY;
-                    dtcm_to_use_tmp =- binary_search_size;
-                    used_array_rep = true;
-                }
-                else {
-                    cache = false;
-                }
-            }
-        }
-
-        // add base costs if not done already
-        if (used_binary_rep && !added_binary_base_cost) {
-            dtcm_to_use_tmp -= malloc_cost;
-            added_binary_base_cost = true;
-        }
-        if (used_array_rep && !added_array_base_cost) {
-            dtcm_to_use_tmp -= malloc_cost;
-            added_array_base_cost = true;
-        }
-
-        // final check before caching.
-        if(dtcm_to_use_tmp <= 0) {
-            cache = false;
         }
 
         // update data structs to reflect caching
@@ -470,11 +532,11 @@ static inline bool cache_blocks(void) {
                 return false;
             }
 
-            for (uint32_t address_index = 0; address_index < entry.count;
+            for (uint32_t address_index = 0; address_index < count;
                     address_index ++) {
                 // set addresses to cached reps.
                 set_address_to_cache_reps(
-                    address_index + entry.start, reps[address_index]);
+                    address_index + start, reps[address_index]);
             }
             dtcm_to_use -= dtcm_to_use_tmp;
         }

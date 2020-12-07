@@ -29,6 +29,11 @@
 //!        This is a constant as it is used more than once below.
 #define N_ADDRESS_BITS 22
 
+//! \brief The shift to apply to indirect addresses.
+//!    The address is in units of four words, so this multiplies by 16 (= up
+//!    shifts by 4)
+#define INDIRECT_ADDRESS_SHIFT 4
+
 //!================================================
 
 // \brief struct for holding a binary search element
@@ -132,6 +137,9 @@ extern master_population_table_entry *master_population_table;
 //! The length of ::master_population_table
 extern uint32_t master_population_table_length;
 
+//! Base address for the synaptic matrix's indirect rows
+extern uint32_t synaptic_rows_base_address;
+
 static inline master_population_table_entry*
         population_table_get_master_pop_entry_from_sdram(
             address_t table_address, uint32_t position) {
@@ -148,6 +156,34 @@ static inline master_population_table_entry*
 static inline master_population_table_entry population_table_entry(
         uint32_t index) {
     return master_population_table[index];
+}
+
+//! \brief Get the length of the row from the entry
+//!
+//! Row lengths are stored offset by 1, to allow 1-256 length rows
+//!
+//! \param[in] entry: the table entry
+//! \return the row length
+static inline uint32_t population_table_get_row_length(
+        address_and_row_length entry) {
+    return entry.row_length + 1;
+}
+
+//! \brief Get the standard address offset out of an entry
+//!
+//! The address is in units of four words, so this multiplies by 16 (= up
+//! shifts by 4)
+//! \param[in] entry: the table entry
+//! \return a row address (which is an offset)
+static inline uint32_t population_table_get_offset(address_and_row_length entry) {
+    return entry.address << INDIRECT_ADDRESS_SHIFT;
+}
+
+//! \brief Get the standard address out of an entry
+//! \param[in] entry: the table entry
+//! \return a row address
+static inline uint32_t population_table_get_address(address_and_row_length entry) {
+    return population_table_get_offset(entry) + synaptic_rows_base_address;
 }
 
 //! \brief get a address_list_entry from array
