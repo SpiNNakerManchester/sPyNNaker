@@ -24,6 +24,7 @@
 
 #include <common/neuron-typedefs.h>
 #include <filter_info.h>
+#include <debug.h>
 
 //! \brief The number of bits of address.
 //!        This is a constant as it is used more than once below.
@@ -33,6 +34,11 @@
 //!    The address is in units of four words, so this multiplies by 16 (= up
 //!    shifts by 4)
 #define INDIRECT_ADDRESS_SHIFT 4
+
+// An Invalid address and row length; used to keep indices aligned between
+// delayed and undelayed tables
+#define INVALID_ADDRESS ((1 << N_ADDRESS_BITS) - 1)
+
 
 //!================================================
 
@@ -92,14 +98,14 @@ typedef struct {
 
 //! \brief A enum for representing other data representations
 typedef enum representation_values {
+    //! sdram store
+    DEFAULT = 0,
     //! representation of a direct 1 to 1
-    SINGLE = 0,
+    SINGLE = 1,
     //! Binary Search
-    BINARY_SEARCH = 1,
+    BINARY_SEARCH = 2,
     //! 1d array
-    ARRAY = 2,
-    // other
-    OTHER = 3
+    ARRAY = 3,
 } representation_values;
 
 //! \brief An entry in the address list is either an address and row length or extra
@@ -139,6 +145,34 @@ extern uint32_t master_population_table_length;
 
 //! Base address for the synaptic matrix's indirect rows
 extern uint32_t synaptic_rows_base_address;
+//! Base address for the synaptic matrix's direct rows
+extern uint32_t direct_rows_base_address;
+
+//! =================================================================
+//! debug bits to change dtcm state for printing
+
+//! \brief sets a address list element to a different rep
+//! \param[in] index: position in address list.
+//! \param[in] rep: the new rep to set to.
+static inline void population_table_set_address_to_rep(
+        uint32_t index, uint32_t rep) {
+    address_list[index].addr.representation = rep;
+}
+
+//! \brief sets a population table entry to be cached.
+//! \param[in] position: the position in the master table to set to cache
+static inline void population_table_entry_set_to_cache(uint32_t position) {
+    master_population_table[position].cache_in_dtcm = 1;
+}
+
+//! =============================================================
+
+//! \brief Get the direct row address out of an entry
+//! \param[in] entry: the table entry
+//! \return a direct row address
+static inline uint32_t get_direct_address(address_and_row_length entry) {
+    return entry.address + direct_rows_base_address;
+}
 
 static inline master_population_table_entry*
         population_table_get_master_pop_entry_from_sdram(
@@ -206,6 +240,44 @@ static inline address_list_entry* population_table_get_address_entry_from_sdram(
         address_entry_index * sizeof(address_list_entry);
     uint32_t skip_to_correct_entry_words = skip_to_correct_entry_bytes >> 2;
     return &addresses[skip_to_correct_entry_words];
+}
+
+
+//! \brief Prints the master pop table.
+//!
+//! For debugging
+static inline void print_master_population_table(void) {
+    log_info("Master_population\n");
+    for (uint32_t i = 0; i < master_population_table_length; i++) {
+        master_population_table_entry entry = master_population_table[i];
+        log_info("key: 0x%08x, mask: 0x%08x", entry.key, entry.mask);
+        int count = entry.count;
+        int start = entry.start;
+        if (entry.extra_info_flag) {
+            extra_info extra = address_list[start].extra;
+            start += 1;
+            log_info("    core_mask: 0x%08x, core_shift: %u, n_neurons: %u",
+                    extra.core_mask, extra.mask_shift, extra.n_neurons);
+        }
+        for (uint16_t j = start; j < (start + count); j++) {
+            address_and_row_length addr = address_list[j].addr;
+            if (addr.address == INVALID_ADDRESS) {
+                log_info("    index %d: INVALID", j);
+            } else if (!(addr.representation == SINGLE)) {
+                log_info(
+                    "    index %d: offset: %u, address: 0x%08x, "
+                    "row_length: %u, representation %d",
+                    j, population_table_get_offset(addr),
+                    population_table_get_address(addr),
+                    population_table_get_row_length(addr),
+                    addr.representation);
+            } else {
+                log_info("    index %d: offset: %u, address: 0x%08x, representation %d",
+                    j, addr.address, get_direct_address(addr), addr.representation);
+            }
+        }
+    }
+    log_info("Population table has %u entries", master_population_table_length);
 }
 
 //! \brief Sets up the table

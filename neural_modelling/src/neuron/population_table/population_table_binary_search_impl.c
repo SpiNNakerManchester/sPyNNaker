@@ -32,13 +32,6 @@
 //!     shouldn't happen)
 #define NOT_IN_MASTER_POP_TABLE_FLAG -1
 
-// An Invalid address and row length; used to keep indices aligned between
-// delayed and undelayed tables
-#define INVALID_ADDRESS ((1 << N_ADDRESS_BITS) - 1)
-
-//! Base address for the synaptic matrix's direct rows
-static uint32_t direct_rows_base_address;
-
 //! \brief The last spike received
 static spike_t last_spike = 0;
 
@@ -53,6 +46,9 @@ static uint16_t items_to_go = 0;
 
 //! The bitfield map
 static bit_field_t *connectivity_bit_field = NULL;
+
+//! Base address for the synaptic matrix's direct rows
+uint32_t direct_rows_base_address;
 
 //! Base address for the synaptic matrix's indirect rows
 uint32_t synaptic_rows_base_address;
@@ -82,14 +78,6 @@ uint32_t bit_field_filtered_packets = 0;
 
 //! \name Support functions
 //! \{
-
-
-//! \brief Get the direct row address out of an entry
-//! \param[in] entry: the table entry
-//! \return a direct row address
-static inline uint32_t get_direct_address(address_and_row_length entry) {
-    return entry.address + direct_rows_base_address;
-}
 
 //! \brief Get the source core index from a spike
 //! \param[in] extra: The extra info entry
@@ -145,42 +133,6 @@ static inline uint32_t get_extended_neuron_id(
     }
 #endif
     return neuron_id;
-}
-
-//! \brief Prints the master pop table.
-//!
-//! For debugging
-static inline void print_master_population_table(void) {
-#if log_level >= LOG_DEBUG
-    log_info("Master_population\n");
-    for (uint32_t i = 0; i < master_population_table_length; i++) {
-        master_population_table_entry entry = master_population_table[i];
-        log_info("key: 0x%08x, mask: 0x%08x", entry.key, entry.mask);
-        int count = entry.count;
-        int start = entry.start;
-        if (entry.extra_info_flag) {
-            extra_info extra = address_list[start].extra;
-            start += 1;
-            log_info("    core_mask: 0x%08x, core_shift: %u, n_neurons: %u",
-                    extra.core_mask, extra.mask_shift, extra.n_neurons);
-        }
-        for (uint16_t j = start; j < (start + count); j++) {
-            address_and_row_length addr = address_list[j].addr;
-            if (addr.address == INVALID_ADDRESS) {
-                log_info("    index %d: INVALID", j);
-            } else if (!addr.representation == SINGLE) {
-                log_info("    index %d: offset: %u, address: 0x%08x, row_length: %u",
-                    j, population_table_get_offset(addr),
-                    population_table_get_address(addr),
-                    population_table_get_row_length(addr));
-            } else {
-                log_info("    index %d: offset: %u, address: 0x%08x, single",
-                    j, addr.address, get_direct_address(addr));
-            }
-        }
-    }
-    log_info("Population table has %u entries", master_population_table_length);
-#endif
 }
 
 //! \brief Check if the entry is a match for the given key

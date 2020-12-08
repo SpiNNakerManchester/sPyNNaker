@@ -113,12 +113,21 @@ static not_redundant_tracker_t* not_redundant_tracker = NULL;
 /***************************************************************/
 
 //! \brief checks if the synapses in the block are plastic or structural or
-//! not. If plastic then currently they wont be cached in the first impl.
+//! not direct. If plastic then currently they wont be cached in the first impl.
 //! \param[in] bit_field_index: index in bitfields.
 //! \param[in] entry: the address list entry.
 //! \return: bool stating if the block contains plastic synapses.
-static inline bool synapses_are_plastic_or_structural(
+static inline bool synapses_are_plastic_or_structural_or_direct(
         uint32_t bit_field_index, address_list_entry entry) {
+
+    // if a direct synapse do not cache
+    if (entry.addr.representation == SINGLE) {
+        return true;
+    }
+    else {
+        log_info("current rep is %d", entry.addr.representation);
+    }
+
     uint32_t address = population_table_get_address(entry.addr);
     uint32_t row_length = population_table_get_row_length(entry.addr);
     uint32_t stride = (row_length + N_SYNAPSE_ROW_HEADER_WORDS);
@@ -334,6 +343,8 @@ static inline bool initialise(void) {
         return false;
     }
 
+    print_master_population_table();
+
     log_info("Structural plastic if needed");
     if (structural_matrix_region_base_address != NULL) {
         if (! sp_structs_read_in_common(
@@ -403,7 +414,6 @@ static inline bool read_in_bitfields(void) {
 
 //! \brief sorts so that bitfields with most none redundant at front
 static inline void sort(void) {
-    log_info("s");
     for (uint32_t i = 1; i < bit_field_base_address->n_filters; i++) {
         const not_redundant_tracker_t temp = not_redundant_tracker[i];
 
@@ -413,10 +423,8 @@ static inline void sort(void) {
                 temp.not_redundant_count; j--) {
             not_redundant_tracker[j] = not_redundant_tracker[j - 1];
         }
-        log_info("stt");
         not_redundant_tracker[j] = temp;
     }
-    log_info("st");
 }
 
 //! \brief sorts out bitfields for most important
@@ -428,14 +436,11 @@ static inline bool sort_out_bitfields(void) {
         return false;
     }
     // debug
-    log_info("A");
     print_store();
-    log_info("B");
 
     // sort so that most not redundant at front
     sort();
 
-    log_info("after sort");
     print_store();
     return true;
 }
@@ -469,6 +474,11 @@ static bool set_master_pop_sdram_entry_to_cache(uint32_t bit_field_index) {
         population_table_get_master_pop_entry_from_sdram(
             master_pop_base_address, position);
     entry->cache_in_dtcm = 1;
+    log_info("setting master pop entry %d to cache in DTCM", position);
+
+    // set dtcm master pop for printing
+    population_table_entry_set_to_cache(position);
+
     return true;
 }
 
@@ -479,6 +489,8 @@ static inline void set_address_to_cache_reps(
         population_table_get_address_entry_from_sdram(
             master_pop_base_address, address_entry_index);
     entry->addr.representation = rep;
+    // set dtcm master pop just to allow printing changes
+    population_table_set_address_to_rep(address_entry_index, rep);
 }
 
 //! \brief determines which blocks can be DTCM'ed.
@@ -510,6 +522,14 @@ static inline bool cache_blocks(void) {
         uint32_t start = master_entry.start;
         uint32_t count = master_entry.count;
         if (master_entry.extra_info_flag) {
+            uint32_t position = 0;
+            bool success  = population_table_position_in_the_master_pop_array(
+                not_redundant_tracker[bit_field_index].filter->key, &position);
+            if (!success) {
+                log_info("WTF how did this happen. cant find the position");
+                return false;
+            }
+            log_info("found extra info at index %d. skipping", position);
             start += 1;
             count -= 1;
         }
@@ -521,7 +541,7 @@ static inline bool cache_blocks(void) {
                 population_table_get_address_entry(address_index);
 
             // if plastic or struct, wont cache during this impl.
-            if (synapses_are_plastic_or_structural(
+            if (synapses_are_plastic_or_structural_or_direct(
                     bit_field_index, address_entry)) {
                 cache = false;
             }
@@ -573,7 +593,12 @@ static inline bool cache_blocks(void) {
         }
 
         // update data structs to reflect caching
-        if (cache) {
+        if (!cache) {
+            for (uint32_t address_index = 0; address_index < count;
+                    address_index ++) {
+                log_info("wont cache address index %d", address_index);
+            }
+        } else {
             // set master pop table to cache. and remove dtcm usage.
             bool success = set_master_pop_sdram_entry_to_cache(bit_field_index);
             if (!success) {
@@ -617,6 +642,7 @@ void c_main(void) {
         if (!success) {
             fail_shut_down();
         }
+        print_master_population_table();
     }
     success_shut_down();
 }
