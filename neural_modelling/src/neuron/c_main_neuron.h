@@ -17,13 +17,21 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include <data_specification.h>
 #include <tdma_processing.h>
+
+#include "neuron.h"
 
 //! The provenance information provided by neurons
 struct neuron_provenance {
     //! The current time.
     uint32_t current_timer_tick;
     uint32_t n_tdma_mises;
+};
+
+struct neuron_regions {
+    uint32_t neuron_params;
+    uint32_t neuron_recording;
 };
 
 //! Declare that time exists
@@ -36,6 +44,17 @@ static inline void store_neuron_provenance(struct neuron_provenance *prov) {
     prov->n_tdma_mises = tdma_processing_times_behind();
 }
 
-static inline bool read_neuron_regions() {
+static inline bool initialise_neuron_regions(
+        data_specification_metadata_t *ds_regions,
+        struct neuron_regions regions, uint32_t *n_rec_regions_used) {
+
+    // Set up the neurons
+    if (!neuron_initialise(
+            data_specification_get_region(regions.neuron_params, ds_regions),
+            data_specification_get_region(regions.neuron_recording, ds_regions),
+            n_rec_regions_used)) {
+        return false;
+    }
+
     return true;
 }

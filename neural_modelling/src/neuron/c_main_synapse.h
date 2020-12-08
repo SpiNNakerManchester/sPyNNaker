@@ -71,6 +71,82 @@ static inline void store_synapse_provenance(struct synapse_provenance *prov) {
         spike_processing_get_max_filled_input_buffer_size();
 }
 
-static inline bool read_synapse_regions() {
+struct synapse_regions {
+    uint32_t synapse_params;
+    uint32_t direct_matrix;
+    uint32_t pop_table;
+    uint32_t synaptic_matrix;
+    uint32_t synapse_dynamics;
+    uint32_t structural_dynamics;
+    uint32_t bitfield_filter;
+};
+
+struct synapse_priorities {
+    uint32_t receive_packet;
+    uint32_t process_synapses;
+};
+
+static inline bool initialise_synapse_regions(
+        data_specification_metadata_t *ds_regions,
+        struct synapse_regions regions, struct synapse_priorities priorities,
+        uint32_t pkts_per_ts_rec_region) {
+    // Set up the synapses
+    uint32_t *ring_buffer_to_input_buffer_left_shifts;
+    bool clear_input_buffers_of_late_packets_init;
+    uint32_t incoming_spike_buffer_size;
+    uint32_t n_neurons;
+    uint32_t n_synapse_types;
+    if (!synapses_initialise(
+            data_specification_get_region(regions.synapse_params, ds_regions),
+            &n_neurons, &n_synapse_types,
+            &ring_buffer_to_input_buffer_left_shifts,
+            &clear_input_buffers_of_late_packets_init,
+            &incoming_spike_buffer_size)) {
+        return false;
+    }
+
+    // set up direct synapses
+    address_t direct_synapses_address;
+    if (!direct_synapses_initialise(
+            data_specification_get_region(regions.direct_matrix, ds_regions),
+            &direct_synapses_address)) {
+        return false;
+    }
+
+    // Set up the population table
+    uint32_t row_max_n_words;
+    if (!population_table_initialise(
+            data_specification_get_region(regions.pop_table, ds_regions),
+            data_specification_get_region(regions.synaptic_matrix, ds_regions),
+            direct_synapses_address, &row_max_n_words)) {
+        return false;
+    }
+    // Set up the synapse dynamics
+    if (!synapse_dynamics_initialise(
+            data_specification_get_region(regions.synapse_dynamics, ds_regions),
+            n_neurons, n_synapse_types,
+            ring_buffer_to_input_buffer_left_shifts)) {
+        return false;
+    }
+
+    // Set up structural plasticity dynamics
+    if (!synaptogenesis_dynamics_initialise(data_specification_get_region(
+            regions.structural_dynamics, ds_regions))) {
+        return false;
+    }
+
+    if (!spike_processing_initialise(
+            row_max_n_words, priorities.receive_packet,
+            priorities.process_synapses, incoming_spike_buffer_size,
+            clear_input_buffers_of_late_packets_init, pkts_per_ts_rec_region)) {
+        return false;
+    }
+
+    // Do bitfield configuration last to only use any unused memory
+    if (!population_table_load_bitfields(
+            data_specification_get_region(regions.bitfield_filter, ds_regions))) {
+        return false;
+    }
+
     return true;
 }

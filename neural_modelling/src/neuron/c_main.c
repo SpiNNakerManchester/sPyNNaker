@@ -36,7 +36,6 @@
 #include "c_main_neuron.h"
 #include "c_main_synapse.h"
 #include "regions.h"
-#include "neuron.h"
 #include "profile_tags.h"
 
 #include <data_specification.h>
@@ -65,8 +64,25 @@ typedef enum callback_priorities {
     MC = -1, DMA = 0, USER = 0, SDP = 1, TIMER = 2
 } callback_priorities;
 
-//! The number of regions that are to be used for recording
-#define NUMBER_OF_REGIONS_TO_RECORD 4
+const struct neuron_regions NEURON_REGIONS = {
+    .neuron_params = NEURON_PARAMS_REGION,
+    .neuron_recording = NEURON_RECORDING_REGION
+};
+
+const struct synapse_regions SYNAPSE_REGIONS = {
+    .synapse_params = SYNAPSE_PARAMS_REGION,
+    .direct_matrix = DIRECT_MATRIX_REGION,
+    .synaptic_matrix = SYNAPTIC_MATRIX_REGION,
+    .pop_table = POPULATION_TABLE_REGION,
+    .synapse_dynamics = SYNAPSE_DYNAMICS_REGION,
+    .structural_dynamics = STRUCTURAL_DYNAMICS_REGION,
+    .bitfield_filter = BIT_FIELD_FILTER_REGION
+};
+
+const struct synapse_priorities SYNAPSE_PRIORITIES = {
+    .process_synapses = USER,
+    .receive_packet = MC
+};
 
 // Globals
 
@@ -129,82 +145,26 @@ static bool initialise(void) {
         return false;
     }
     simulation_set_provenance_function(
-            c_main_store_provenance_data,
-            data_specification_get_region(PROVENANCE_DATA_REGION, ds_regions));
+        c_main_store_provenance_data,
+        data_specification_get_region(PROVENANCE_DATA_REGION, ds_regions));
 
-    // Set up the neurons
+    // Setup profiler
+    profiler_init(data_specification_get_region(PROFILER_REGION, ds_regions));
+
     uint32_t n_rec_regions_used;
-    if (!neuron_initialise(
-            data_specification_get_region(NEURON_PARAMS_REGION, ds_regions),
-            data_specification_get_region(NEURON_RECORDING_REGION, ds_regions),
-            &n_rec_regions_used)) {
+    if (!initialise_neuron_regions(
+            ds_regions, NEURON_REGIONS,  &n_rec_regions_used)) {
         return false;
     }
 
-    // Set up the synapses
-    uint32_t *ring_buffer_to_input_buffer_left_shifts;
-    bool clear_input_buffers_of_late_packets_init;
-    uint32_t incoming_spike_buffer_size;
-    uint32_t n_neurons;
-    uint32_t n_synapse_types;
-    if (!synapses_initialise(
-            data_specification_get_region(SYNAPSE_PARAMS_REGION, ds_regions),
-            &n_neurons, &n_synapse_types,
-            &ring_buffer_to_input_buffer_left_shifts,
-            &clear_input_buffers_of_late_packets_init,
-            &incoming_spike_buffer_size)) {
-        return false;
-    }
-
-    // set up direct synapses
-    address_t direct_synapses_address;
-    if (!direct_synapses_initialise(
-            data_specification_get_region(DIRECT_MATRIX_REGION, ds_regions),
-            &direct_synapses_address)) {
-        return false;
-    }
-
-    // Set up the population table
-    uint32_t row_max_n_words;
-    if (!population_table_initialise(
-            data_specification_get_region(POPULATION_TABLE_REGION, ds_regions),
-            data_specification_get_region(SYNAPTIC_MATRIX_REGION, ds_regions),
-            direct_synapses_address, &row_max_n_words)) {
-        return false;
-    }
-    // Set up the synapse dynamics
-    if (!synapse_dynamics_initialise(
-            data_specification_get_region(SYNAPSE_DYNAMICS_REGION, ds_regions),
-            n_neurons, n_synapse_types,
-            ring_buffer_to_input_buffer_left_shifts)) {
-        return false;
-    }
-
-    // Set up structural plasticity dynamics
-    if (!synaptogenesis_dynamics_initialise(data_specification_get_region(
-            STRUCTURAL_DYNAMICS_REGION, ds_regions))) {
+    if (!initialise_synapse_regions(
+            ds_regions, SYNAPSE_REGIONS, SYNAPSE_PRIORITIES,
+            n_rec_regions_used)) {
         return false;
     }
 
     rewiring_period = synaptogenesis_rewiring_period();
     rewiring = rewiring_period != -1;
-
-    if (!spike_processing_initialise(
-            row_max_n_words, MC, USER, incoming_spike_buffer_size,
-            clear_input_buffers_of_late_packets_init, n_rec_regions_used)) {
-        return false;
-    }
-
-    // Setup profiler
-    profiler_init(data_specification_get_region(PROFILER_REGION, ds_regions));
-
-    // Do bitfield configuration last to only use any unused memory
-    if (!population_table_load_bitfields(
-            data_specification_get_region(BIT_FIELD_FILTER_REGION, ds_regions))) {
-        return false;
-    }
-
-    print_post_to_pre_entry();
 
     log_debug("Initialise: finished");
     return true;
