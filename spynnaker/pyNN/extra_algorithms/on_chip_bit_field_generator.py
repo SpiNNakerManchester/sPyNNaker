@@ -24,6 +24,7 @@ from spinn_front_end_common.abstract_models import (
 from spinn_front_end_common.utilities import system_control_logic
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
+from spinn_front_end_common.utilities.helpful_functions import n_word_struct
 
 _THREE_WORDS = struct.Struct("<III")
 # bits in a word
@@ -283,8 +284,8 @@ class OnChipBitFieldGenerator(object):
 
             # get bitfield words
             if n_words:
-                bitfield = struct.unpack(
-                    "<{}I".format(n_words), self.__txrx.read_memory(
+                bitfield = n_word_struct(n_words).unpack(
+                    self.__txrx.read_memory(
                         placement.x, placement.y, read_pointer,
                         n_words * BYTES_PER_WORD))
             else:
