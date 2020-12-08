@@ -592,10 +592,23 @@ class SynapticManager(object):
         :param float weight_scale:
         """
         if self.__ring_buffer_shifts is None:
-            self.__ring_buffer_shifts = \
-                self._get_ring_buffer_to_input_left_shifts(
-                    machine_vertex, machine_graph, machine_time_step,
-                    weight_scale)
+            if (hasattr(machine_vertex, "rb_left_shifts") and
+                    machine_vertex.rb_left_shifts is not None):
+                print("=" * 80)
+                print("Using given values for RB left shifts.")
+                self.__ring_buffer_shifts = machine_vertex.rb_left_shifts
+                print("RB left shifts for {:20}".format(machine_vertex.label),
+                      "=", self.__ring_buffer_shifts)
+                print("-" * 80)
+            else:
+                print("=" * 80)
+                print("Computing values for RB left shifts for", machine_vertex.label)
+                self.__ring_buffer_shifts = \
+                    self._get_ring_buffer_to_input_left_shifts(
+                        machine_vertex, machine_graph, machine_time_step,
+                        weight_scale)
+                print("RB left shifts for {:20}".format(machine_vertex.label),
+                      "=", self.__ring_buffer_shifts)
             self.__weight_scales = numpy.array([
                 self.__get_weight_scale(r) * weight_scale
                 for r in self.__ring_buffer_shifts])
@@ -635,6 +648,11 @@ class SynapticManager(object):
         self._reserve_memory_regions(
             spec, post_vertex_slice, all_syn_block_sz, machine_graph,
             machine_vertex)
+
+        # Setting custom RB LS
+        if (self.__ring_buffer_shifts is None and
+                hasattr(application_vertex, "rb_left_shifts")):
+            machine_vertex.rb_left_shifts = application_vertex.rb_left_shifts
 
         self.__update_ring_buffer_shifts_and_weight_scales(
             machine_vertex, machine_graph, machine_time_step,

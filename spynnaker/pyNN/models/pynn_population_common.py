@@ -93,6 +93,14 @@ class PyNNPopulationCommon(object):
         # pylint: disable=too-many-arguments
         size = self.__roundsize(size, label)
 
+        # Getting custom RB LS
+        if (additional_parameters is not None and
+                "rb_left_shifts" in additional_parameters.keys()):
+            rb_left_shifts = additional_parameters['rb_left_shifts']
+            del additional_parameters['rb_left_shifts']
+        else:
+            rb_left_shifts = None
+
         # Use a provided model to create a vertex
         if isinstance(model, AbstractPyNNModel):
             if size is not None and size <= 0:
@@ -129,8 +137,10 @@ class PyNNPopulationCommon(object):
             raise ConfigurationException(
                 "Model must be either an AbstractPyNNModel or an"
                 " ApplicationVertex")
-
-        # Introspect properties of the vertex
+        # Setting custom RB LS
+        if rb_left_shifts is not None:
+            self.__vertex.rb_left_shifts = rb_left_shifts
+            # Introspect properties of the vertex
         self._vertex_population_settable = \
             isinstance(self.__vertex, AbstractPopulationSettable)
         self._vertex_population_initializable = \
