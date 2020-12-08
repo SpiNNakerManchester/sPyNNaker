@@ -44,6 +44,7 @@ from spynnaker.pyNN.utilities import constants, bit_field_utilities
 from spynnaker.pyNN.models.abstract_models import (
     AbstractSynapseExpandable, AbstractReadParametersBeforeSet)
 from .synaptic_matrices import SynapticMatrices
+import math
 
 
 class NeuronProvenance(ctypes.LittleEndianStructure):
@@ -491,17 +492,14 @@ class PopulationMachineVertex(
         self._write_neuron_parameters(
             spec, key, self.REGIONS.NEURON_PARAMS.value)
 
+        # Write the synapse parameters
+        self._write_synapse_parameters(
+            spec, self.REGIONS.SYNAPSE_PARAMS.value, machine_time_step)
+
         # write profile data
         profile_utils.write_profile_region_data(
             spec, self.REGIONS.PROFILING.value,
             self._app_vertex.n_profile_samples)
-
-        # Write synapse parameters
-        spec.switch_write_focus(self.REGIONS.SYNAPSE_PARAMS.value)
-        spec.write_value(int(self._app_vertex.drop_late_spikes))
-        spec.write_value(self._app_vertex.incoming_spike_buffer_size)
-        spec.write_array(self._app_vertex.get_ring_buffer_shifts(
-            machine_time_step))
 
         # Write the synaptic matrices
         all_syn_block_sz = self._app_vertex.get_synapses_size(
@@ -673,15 +671,27 @@ class PopulationMachineVertex(
         # Write the number of neurons in the block:
         spec.write_value(data=n_atoms)
 
-        # Write the number of synapse types
-        spec.write_value(
-            data=self._app_vertex.neuron_impl.get_n_synapse_types())
-
         # Write the neuron parameters
         neuron_data = self._app_vertex.neuron_impl.get_data(
             self._app_vertex.parameters, self._app_vertex.state_variables,
             self.vertex_slice)
         spec.write_array(neuron_data)
+
+    def _write_synapse_parameters(self, spec, region_id, machine_time_step):
+        # Get values
+        n_neurons = self.vertex_slice.n_atoms
+        n_synapse_types = self._app_vertex.neuron_impl.get_n_synapse_types()
+
+        # Write synapse parameters
+        spec.switch_write_focus(region_id)
+        spec.write_value(n_neurons)
+        spec.write_value(n_synapse_types)
+        spec.write_value(n_neurons.bit_length())
+        spec.write_value(n_synapse_types.bit_length())
+        spec.write_value(int(self._app_vertex.drop_late_spikes))
+        spec.write_value(self._app_vertex.incoming_spike_buffer_size)
+        spec.write_array(self._app_vertex.get_ring_buffer_shifts(
+            machine_time_step))
 
     @overrides(AbstractSynapseExpandable.gen_on_machine)
     def gen_on_machine(self):

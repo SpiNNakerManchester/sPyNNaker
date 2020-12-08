@@ -90,8 +90,8 @@ static inline void synapses_print_weight(
 
 //! \brief Initialise the synapse processing
 //! \param[in] synapse_params_address: Synapse configuration in SDRAM
-//! \param[in] n_neurons: Number of neurons to simulate
-//! \param[in] n_synapse_types: Number of synapse types
+//! \param[out] n_neurons: Number of neurons that will be simulated
+//! \param[out] n_synapse_types: Number of synapse types that will be simulated
 //! \param[out] ring_buffer_to_input_buffer_left_shifts:
 //!     Array of shifts to use when converting from ring buffer values to input
 //!     buffer values
@@ -100,7 +100,7 @@ static inline void synapses_print_weight(
 //! \return True if successfully initialised. False otherwise.
 bool synapses_initialise(
         address_t synapse_params_address,
-        uint32_t n_neurons, uint32_t n_synapse_types,
+        uint32_t *n_neurons, uint32_t *n_synapse_types,
         uint32_t **ring_buffer_to_input_buffer_left_shifts,
         bool* clear_input_buffers_of_late_packets_init,
         uint32_t *incoming_spike_buffer_size);

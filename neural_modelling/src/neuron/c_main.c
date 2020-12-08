@@ -95,9 +95,6 @@ static bool rewiring = false;
 //! Count the number of rewiring attempts
 static uint32_t count_rewire_attempts = 0;
 
-//! The number of neurons on the core
-static uint32_t n_neurons;
-
 //! timer count for tdma of certain models
 static uint global_timer_count;
 
@@ -136,12 +133,11 @@ static bool initialise(void) {
             data_specification_get_region(PROVENANCE_DATA_REGION, ds_regions));
 
     // Set up the neurons
-    uint32_t n_synapse_types;
-    uint32_t n_regions_used;
+    uint32_t n_rec_regions_used;
     if (!neuron_initialise(
             data_specification_get_region(NEURON_PARAMS_REGION, ds_regions),
             data_specification_get_region(NEURON_RECORDING_REGION, ds_regions),
-            &n_neurons, &n_synapse_types, &n_regions_used)) {
+            &n_rec_regions_used)) {
         return false;
     }
 
@@ -149,9 +145,11 @@ static bool initialise(void) {
     uint32_t *ring_buffer_to_input_buffer_left_shifts;
     bool clear_input_buffers_of_late_packets_init;
     uint32_t incoming_spike_buffer_size;
+    uint32_t n_neurons;
+    uint32_t n_synapse_types;
     if (!synapses_initialise(
             data_specification_get_region(SYNAPSE_PARAMS_REGION, ds_regions),
-            n_neurons, n_synapse_types,
+            &n_neurons, &n_synapse_types,
             &ring_buffer_to_input_buffer_left_shifts,
             &clear_input_buffers_of_late_packets_init,
             &incoming_spike_buffer_size)) {
@@ -193,7 +191,7 @@ static bool initialise(void) {
 
     if (!spike_processing_initialise(
             row_max_n_words, MC, USER, incoming_spike_buffer_size,
-            clear_input_buffers_of_late_packets_init, n_regions_used)) {
+            clear_input_buffers_of_late_packets_init, n_rec_regions_used)) {
         return false;
     }
 

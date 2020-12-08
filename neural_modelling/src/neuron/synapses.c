@@ -251,16 +251,34 @@ static inline void print_synapse_parameters(void) {
 #endif // LOG_LEVEL >= LOG_DEBUG
 }
 
+struct synapse_params {
+    uint32_t n_neurons;
+    uint32_t n_synapse_types;
+    uint32_t log_n_neurons;
+    uint32_t log_n_synapse_types;
+    uint32_t drop_late_packets;
+    uint32_t incoming_spike_buffer_size;
+    uint32_t ring_buffer_shifts[];
+};
+
 /* INTERFACE FUNCTIONS */
 bool synapses_initialise(
-        address_t synapse_params_address, uint32_t n_neurons_value,
-        uint32_t n_synapse_types_value,
+        address_t synapse_params_address,
+        uint32_t *n_neurons_value, uint32_t *n_synapse_types_value,
         uint32_t **ring_buffer_to_input_buffer_left_shifts,
         bool* clear_input_buffers_of_late_packets_init,
         uint32_t *incoming_spike_buffer_size) {
     log_debug("synapses_initialise: starting");
-    n_neurons = n_neurons_value;
-    n_synapse_types = n_synapse_types_value;
+    struct synapse_params *params = (struct synapse_params *) synapse_params_address;
+    *clear_input_buffers_of_late_packets_init = params->drop_late_packets;
+    *incoming_spike_buffer_size = params->incoming_spike_buffer_size;
+    n_neurons = params->n_neurons;
+    *n_neurons_value = n_neurons;
+    n_synapse_types = params->n_synapse_types;
+    *n_synapse_types_value = n_synapse_types;
+
+    uint32_t log_n_neurons = params->log_n_neurons;
+    uint32_t log_n_synapse_types = params->log_n_synapse_types;
 
     // Set up ring buffer left shifts
     ring_buffer_to_input_left_shifts =
@@ -270,37 +288,15 @@ bool synapses_initialise(
         return false;
     }
 
-    // read bool flag about dropping packets that arrive too late
-    *clear_input_buffers_of_late_packets_init = synapse_params_address[0];
-    *incoming_spike_buffer_size = synapse_params_address[1];
-
-    // shift read by 2 words
-    synapse_params_address += 2;
-
     // read in ring buffer to input left shifts
     spin1_memcpy(
-            ring_buffer_to_input_left_shifts, synapse_params_address,
+            ring_buffer_to_input_left_shifts, params->ring_buffer_shifts,
             n_synapse_types * sizeof(uint32_t));
     *ring_buffer_to_input_buffer_left_shifts =
             ring_buffer_to_input_left_shifts;
 
     log_debug("synapses_initialise: completed successfully");
     print_synapse_parameters();
-
-    uint32_t n_neurons_power_2 = n_neurons;
-    uint32_t log_n_neurons = 1;
-    if (n_neurons != 1) {
-        if (!is_power_of_2(n_neurons)) {
-            n_neurons_power_2 = next_power_of_2(n_neurons);
-        }
-        log_n_neurons = ilog_2(n_neurons_power_2);
-    }
-
-    uint32_t n_synapse_types_power_2 = n_synapse_types;
-    if (!is_power_of_2(n_synapse_types)) {
-        n_synapse_types_power_2 = next_power_of_2(n_synapse_types);
-    }
-    uint32_t log_n_synapse_types = ilog_2(n_synapse_types_power_2);
 
     uint32_t n_ring_buffer_bits =
             log_n_neurons + log_n_synapse_types + SYNAPSE_DELAY_BITS;

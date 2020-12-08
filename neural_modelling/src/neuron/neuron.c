@@ -44,7 +44,6 @@ struct neuron_parameters {
     uint32_t has_key;
     uint32_t transmission_key;
     uint32_t n_neurons_to_simulate;
-    uint32_t n_synapse_types;
 };
 
 //! Offset of start of global parameters, in words.
@@ -76,7 +75,6 @@ bool neuron_resume(address_t address) { // EXPORTED
 
 bool neuron_initialise(
         address_t address, address_t recording_address, // EXPORTED
-        uint32_t *n_neurons_value, uint32_t *n_synapse_types_value,
         uint32_t *n_rec_regions_used) {
     log_debug("neuron_initialise: starting");
 
@@ -102,8 +100,6 @@ bool neuron_initialise(
 
     // Read the neuron details
     n_neurons = params->n_neurons_to_simulate;
-    *n_neurons_value = n_neurons;
-    *n_synapse_types_value = params->n_synapse_types;
 
     log_debug("\t n_neurons = %u", n_neurons);
 
