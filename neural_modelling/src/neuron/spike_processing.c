@@ -93,7 +93,7 @@ static uint32_t spike_processing_count;
 //! The number of successful rewires
 static uint32_t n_successful_rewires;
 
-//! \breif How many packets were lost from the input buffer because of
+//! \brief How many packets were lost from the input buffer because of
 //!     late arrival
 static uint32_t count_input_buffer_packets_late;
 

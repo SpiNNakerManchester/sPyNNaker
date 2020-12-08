@@ -90,20 +90,21 @@ static inline const char *get_type_char(uint32_t synapse_type) {
 //! Only does anything when debugging.
 //! \param[in] synaptic_row: The synaptic row to print
 static inline void print_synaptic_row(synaptic_row_t synaptic_row) {
-#if LOG_LEVEL >= LOG_DEBUG
-    log_debug("Synaptic row, at address %08x Num plastic words:%u\n",
+    log_debug("Synaptic row, at address %08x, Num plastic words:%u",
             (uint32_t) synaptic_row, synapse_row_plastic_size(synaptic_row));
     if (synaptic_row == NULL) {
         return;
     }
-    log_debug("----------------------------------------\n");
+#if LOG_LEVEL >= LOG_DEBUG
+    io_printf(IO_BUF, "----------------------------------------\n");
 
     // Get details of fixed region
     synapse_row_fixed_part_t *fixed_region =
             synapse_row_fixed_region(synaptic_row);
     address_t fixed_synapses = synapse_row_fixed_weight_controls(fixed_region);
     size_t n_fixed_synapses = synapse_row_num_fixed_synapses(fixed_region);
-    log_debug("Fixed region %u fixed synapses (%u plastic control words):\n",
+    io_printf(IO_BUF,
+            "Fixed region %u fixed synapses (%u plastic control words):\n",
             n_fixed_synapses, synapse_row_num_plastic_controls(fixed_region));
 
     for (uint32_t i = 0; i < n_fixed_synapses; i++) {
@@ -124,7 +125,7 @@ static inline void print_synaptic_row(synaptic_row_t synaptic_row) {
 
     // If there's a plastic region
     if (synapse_row_plastic_size(synaptic_row) > 0) {
-        log_debug("----------------------------------------\n");
+        io_printf(IO_BUF, "----------------------------------------\n");
         address_t plastic_region_address =
                 synapse_row_plastic_region(synaptic_row);
         synapse_dynamics_print_plastic_synapses(
@@ -132,9 +133,7 @@ static inline void print_synaptic_row(synaptic_row_t synaptic_row) {
                 ring_buffer_to_input_left_shifts);
     }
 
-    log_debug("----------------------------------------\n");
-#else
-    use(synaptic_row);
+    io_printf(IO_BUF, "----------------------------------------\n");
 #endif // LOG_LEVEL >= LOG_DEBUG
 }
 
@@ -142,9 +141,9 @@ static inline void print_synaptic_row(synaptic_row_t synaptic_row) {
 //! \details Only does anything when debugging.
 //! \param[in] time: The current timestamp
 static inline void print_ring_buffers(uint32_t time) {
+    log_debug("Ring Buffer at %u", time);
 #if LOG_LEVEL >= LOG_DEBUG
-    log_debug("Ring Buffer at %u\n", time);
-    log_debug("----------------------------------------\n");
+    io_printf(IO_BUF, "----------------------------------------\n");
     for (uint32_t n = 0; n < n_neurons; n++) {
         for (uint32_t t = 0; t < n_synapse_types; t++) {
             // Determine if this row can be omitted
@@ -158,21 +157,19 @@ static inline void print_ring_buffers(uint32_t time) {
             continue;
         doPrint:
             // Have to print the row
-            log_debug("%3d(%s):", n, get_type_char(t));
+            io_printf(IO_BUF, "%3d(%s):", n, get_type_char(t));
             for (uint32_t d = 0; d < (1 << SYNAPSE_DELAY_BITS); d++) {
-                log_debug(" ");
+                io_printf(IO_BUF, " ");
                 uint32_t ring_buffer_index = synapses_get_ring_buffer_index(
                         d + time, t, n, synapse_type_index_bits,
                         synapse_index_bits);
                 synapses_print_weight(ring_buffers[ring_buffer_index],
                         ring_buffer_to_input_left_shifts[t]);
             }
-            log_debug("\n");
+            io_printf(IO_BUF, "\n");
         }
     }
-    log_debug("----------------------------------------\n");
-#else
-    use(time);
+    io_printf(IO_BUF, "----------------------------------------\n");
 #endif // LOG_LEVEL >= LOG_DEBUG
 }
 
@@ -180,7 +177,7 @@ static inline void print_ring_buffers(uint32_t time) {
 //! \details Only does anything when debugging.
 static inline void print_inputs(void) {
 #if LOG_LEVEL >= LOG_DEBUG
-    log_debug("Inputs\n");
+    log_debug("Inputs");
     neuron_print_inputs();
 #endif // LOG_LEVEL >= LOG_DEBUG
 }
