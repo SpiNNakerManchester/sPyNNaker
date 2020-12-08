@@ -270,20 +270,63 @@ class PopulationMachineVertex(
         provenance_data = self._read_provenance_data(transceiver, placement)
         provenance_items = self._read_basic_provenance_items(
             provenance_data, placement)
-        prov_list = self._get_remaining_provenance_data_items(
+        prov_list_from_machine = self._get_remaining_provenance_data_items(
             provenance_data)
-        neuron_prov = NeuronProvenance(*prov_list[0:NeuronProvenance.N_ITEMS])
+
+        # translate into provenance data items
+        self._append_neuron_provenance(
+            provenance_items, prov_list_from_machine, 0, placement)
+        self._append_synapse_provenance(
+            provenance_items, prov_list_from_machine, NeuronProvenance.N_ITEMS,
+            placement)
+
+        return provenance_items
+
+    def _append_neuron_provenance(
+            self, provenance_items, prov_list_from_machine, offset, placement):
+        """ Extract and add neuron provenance to the list of provenance items
+
+        :param
+            list(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)\
+            provenance_items: The items already read, to append to
+        :param list(int) prov_list_from_machine:
+            The values read from the machine to be decoded
+        :param int offset: Where in the list from the machine to start reading
+        :param ~pacman.model.placements.Placement placement:
+            Which vertex are we retrieving from, and where was it
+        """
+        neuron_prov = NeuronProvenance(
+            *prov_list_from_machine[offset:NeuronProvenance.N_ITEMS + offset])
+        _, x, y, p, names = self._get_placement_details(placement)
+
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names, self.LAST_TIMER_TICK_NAME),
+            neuron_prov.current_timer_tick))
+        provenance_items.append(self._app_vertex.get_tdma_provenance_item(
+            names, x, y, p, neuron_prov.n_tdma_misses))
+
+    def _append_synapse_provenance(
+            self, provenance_items, prov_list_from_machine, offset, placement):
+        """ Extract and add synapse provenance to the list of provenance items
+
+        :param
+            list(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)\
+            provenance_items: The items already read, to append to
+        :param list(int) prov_list_from_machine:
+            The values read from the machine to be decoded
+        :param int offset: Where in the list from the machine to start reading
+        :param ~pacman.model.placements.Placement placement:
+            Which vertex are we retrieving from, and where was it
+        """
         synapse_prov = SynapseProvenance(
-            *prov_list[-SynapseProvenance.N_ITEMS:])
+            *prov_list_from_machine[offset:SynapseProvenance.N_ITEMS + offset])
+        label, x, y, p, names = self._get_placement_details(placement)
 
         times_timer_tic_overran = 0
         for item in provenance_items:
             if item.names[-1] == self._TIMER_TICK_OVERRUN:
                 times_timer_tic_overran = item.value
 
-        label, x, y, p, names = self._get_placement_details(placement)
-
-        # translate into provenance data items
         provenance_items.append(ProvenanceDataItem(
             self._add_name(names, self.SATURATION_COUNT_NAME),
             synapse_prov.n_saturations, report=synapse_prov.n_saturations > 0,
@@ -298,9 +341,6 @@ class PopulationMachineVertex(
         provenance_items.append(ProvenanceDataItem(
             self._add_name(names, self.TOTAL_PRE_SYNAPTIC_EVENT_NAME),
             synapse_prov.n_pre_synaptic_events))
-        provenance_items.append(ProvenanceDataItem(
-            self._add_name(names, self.LAST_TIMER_TICK_NAME),
-            neuron_prov.current_timer_tick))
         provenance_items.append(ProvenanceDataItem(
             self._add_name(names, self.SATURATED_PLASTIC_WEIGHTS_NAME),
             synapse_prov.n_plastic_saturations,
@@ -372,14 +412,9 @@ class PopulationMachineVertex(
             report=synapse_prov.n_late_packets > 0,
             message=late_message.format(
                 synapse_prov.n_late_packets, label, x, y, p)))
-
         provenance_items.append(ProvenanceDataItem(
             self._add_name(names, self._MAX_FILLED_SIZE_OF_INPUT_BUFFER_NAME),
             synapse_prov.max_size_input_buffer, report=False))
-
-        provenance_items.append(self._app_vertex.get_tdma_provenance_item(
-            names, x, y, p, neuron_prov.n_tdma_misses))
-        return provenance_items
 
     @overrides(AbstractReceiveBuffersToHost.get_recorded_region_ids)
     def get_recorded_region_ids(self):
