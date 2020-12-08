@@ -45,7 +45,6 @@ struct neuron_parameters {
     uint32_t transmission_key;
     uint32_t n_neurons_to_simulate;
     uint32_t n_synapse_types;
-    uint32_t incoming_spike_buffer_size;
 };
 
 //! Offset of start of global parameters, in words.
@@ -78,7 +77,7 @@ bool neuron_resume(address_t address) { // EXPORTED
 bool neuron_initialise(
         address_t address, address_t recording_address, // EXPORTED
         uint32_t *n_neurons_value, uint32_t *n_synapse_types_value,
-        uint32_t *incoming_spike_buffer_size, uint32_t *n_rec_regions_used) {
+        uint32_t *n_rec_regions_used) {
     log_debug("neuron_initialise: starting");
 
     // init the TDMA
@@ -106,11 +105,7 @@ bool neuron_initialise(
     *n_neurons_value = n_neurons;
     *n_synapse_types_value = params->n_synapse_types;
 
-    // Read the size of the incoming spike buffer to use
-    *incoming_spike_buffer_size = params->incoming_spike_buffer_size;
-
-    log_debug("\t n_neurons = %u, spike buffer size = %u", n_neurons,
-            *incoming_spike_buffer_size);
+    log_debug("\t n_neurons = %u", n_neurons);
 
     // Call the neuron implementation initialise function to setup DTCM etc.
     if (!neuron_impl_initialise(n_neurons)) {

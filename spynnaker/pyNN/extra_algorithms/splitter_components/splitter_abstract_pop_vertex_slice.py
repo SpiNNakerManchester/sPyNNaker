@@ -33,6 +33,8 @@ from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
 from spynnaker.pyNN.models.neuron import (
     AbstractPopulationVertex, PopulationMachineVertex)
 from spynnaker.pyNN.utilities import bit_field_utilities
+from spynnaker.pyNN.models.neuron.population_machine_vertex import (
+    NeuronProvenance, SynapseProvenance)
 
 
 class SplitterAbstractPopulationVertexSlice(
@@ -134,7 +136,7 @@ class SplitterAbstractPopulationVertexSlice(
             self._governed_app_vertex.neuron_recorder.get_static_sdram_usage(
                 vertex_slice) +
             PopulationMachineVertex.get_provenance_data_size(
-                len(PopulationMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES)) +
+                NeuronProvenance.N_ITEMS + SynapseProvenance.N_ITEMS) +
             self._governed_app_vertex.get_synapse_params_size() +
             self._governed_app_vertex.get_synapse_dynamics_size(vertex_slice) +
             self._governed_app_vertex.get_structural_dynamics_size(

@@ -55,8 +55,8 @@ _NEURON_BASE_DTCM_USAGE_IN_BYTES = 9 * BYTES_PER_WORD
 _NEURON_BASE_N_CPU_CYCLES_PER_NEURON = 22
 _NEURON_BASE_N_CPU_CYCLES = 10
 
-# 1 for drop late packets.
-_SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES = 1 * BYTES_PER_WORD
+# 1 for drop late packets, 1 for incoming spike buffer size
+_SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES = 2 * BYTES_PER_WORD
 
 
 class AbstractPopulationVertex(
@@ -105,8 +105,8 @@ class AbstractPopulationVertex(
 
     # 5 elements before the start of global parameters
     # 1. has key, 2. key, 3. n atoms,
-    # 4. n synapse types, 5. incoming spike buffer size.
-    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 5 * BYTES_PER_WORD
+    # 4. n synapse types
+    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 4 * BYTES_PER_WORD
 
     def __init__(
             self, n_neurons, label, constraints, max_atoms_per_core,

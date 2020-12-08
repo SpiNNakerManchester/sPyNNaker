@@ -33,16 +33,11 @@
  * @image html spynnaker_c_code_flow.png
  */
 
-#include <common/in_spikes.h>
+#include "c_main_neuron.h"
+#include "c_main_synapse.h"
 #include "regions.h"
 #include "neuron.h"
-#include "synapses.h"
-#include "spike_processing.h"
-#include "population_table/population_table.h"
-#include "plasticity/synapse_dynamics.h"
-#include "structural_plasticity/synaptogenesis_dynamics.h"
 #include "profile_tags.h"
-#include "direct_synapses.h"
 
 #include <data_specification.h>
 #include <simulation.h>
@@ -59,30 +54,10 @@
     constant
 #endif
 
-//! The provenance information written on application shutdown.
-struct neuron_provenance {
-    //! A count of presynaptic events.
-    uint32_t n_pre_synaptic_events;
-    //! A count of synaptic saturations.
-    uint32_t n_synaptic_weight_saturations;
-    //! A count of the times that the synaptic input circular buffers overflowed
-    uint32_t n_input_buffer_overflows;
-    //! The current time.
-    uint32_t current_timer_tick;
-    //! The number of STDP weight saturations.
-    uint32_t n_plastic_synaptic_weight_saturations;
-    uint32_t n_ghost_pop_table_searches;
-    uint32_t n_failed_bitfield_reads;
-    uint32_t n_dmas_complete;
-    uint32_t n_spikes_processed;
-    uint32_t n_invalid_master_pop_table_hits;
-    uint32_t n_filtered_by_bitfield;
-    //! The number of rewirings performed.
-    uint32_t n_rewires;
-    uint32_t n_packets_dropped_from_lateness;
-    uint32_t spike_processing_get_max_filled_input_buffer_size;
-    //! the number of times the TDMA fully missed its slots
-    uint32_t n_tdma_mises;
+//! The combined provenance from synapses and neurons
+struct combined_provenance {
+    struct neuron_provenance neuron_provenance;
+    struct synapse_provenance synapse_provenance;
 };
 
 //! values for the priority for each callback
@@ -129,30 +104,9 @@ static uint global_timer_count;
 //! \brief Callback to store provenance data (format: neuron_provenance).
 //! \param[out] provenance_region: Where to write the provenance data
 static void c_main_store_provenance_data(address_t provenance_region) {
-    log_debug("writing other provenance data");
-    struct neuron_provenance *prov = (void *) provenance_region;
-
-    // store the data into the provenance data region
-    prov->n_pre_synaptic_events = synapses_get_pre_synaptic_events();
-    prov->n_synaptic_weight_saturations = synapses_saturation_count;
-    prov->n_input_buffer_overflows = spike_processing_get_buffer_overflows();
-    prov->current_timer_tick = time;
-    prov->n_plastic_synaptic_weight_saturations =
-        synapse_dynamics_get_plastic_saturation_count();
-    prov->n_ghost_pop_table_searches = ghost_pop_table_searches;
-    prov->n_failed_bitfield_reads = failed_bit_field_reads;
-    prov->n_dmas_complete = spike_processing_get_dma_complete_count();
-    prov->n_spikes_processed = spike_processing_get_spike_processing_count();
-    prov->n_invalid_master_pop_table_hits = invalid_master_pop_hits;
-    prov->n_filtered_by_bitfield = bit_field_filtered_packets;
-    prov->n_rewires = spike_processing_get_successful_rewires();
-    prov->n_packets_dropped_from_lateness =
-        spike_processing_get_n_packets_dropped_from_lateness();
-    prov->spike_processing_get_max_filled_input_buffer_size =
-        spike_processing_get_max_filled_input_buffer_size();
-    prov->n_tdma_mises = tdma_processing_times_behind();
-
-    log_debug("finished other provenance data");
+    struct combined_provenance *prov = (void *) provenance_region;
+    store_neuron_provenance(&prov->neuron_provenance);
+    store_synapse_provenance(&prov->synapse_provenance);
 }
 
 //! \brief Initialises the model by reading in the regions and checking
@@ -183,24 +137,24 @@ static bool initialise(void) {
 
     // Set up the neurons
     uint32_t n_synapse_types;
-    uint32_t incoming_spike_buffer_size;
     uint32_t n_regions_used;
     if (!neuron_initialise(
             data_specification_get_region(NEURON_PARAMS_REGION, ds_regions),
             data_specification_get_region(NEURON_RECORDING_REGION, ds_regions),
-            &n_neurons, &n_synapse_types, &incoming_spike_buffer_size,
-            &n_regions_used)) {
+            &n_neurons, &n_synapse_types, &n_regions_used)) {
         return false;
     }
 
     // Set up the synapses
     uint32_t *ring_buffer_to_input_buffer_left_shifts;
     bool clear_input_buffers_of_late_packets_init;
+    uint32_t incoming_spike_buffer_size;
     if (!synapses_initialise(
             data_specification_get_region(SYNAPSE_PARAMS_REGION, ds_regions),
             n_neurons, n_synapse_types,
             &ring_buffer_to_input_buffer_left_shifts,
-            &clear_input_buffers_of_late_packets_init)) {
+            &clear_input_buffers_of_late_packets_init,
+            &incoming_spike_buffer_size)) {
         return false;
     }
 

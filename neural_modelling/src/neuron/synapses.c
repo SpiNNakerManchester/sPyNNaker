@@ -256,7 +256,8 @@ bool synapses_initialise(
         address_t synapse_params_address, uint32_t n_neurons_value,
         uint32_t n_synapse_types_value,
         uint32_t **ring_buffer_to_input_buffer_left_shifts,
-        bool* clear_input_buffers_of_late_packets_init) {
+        bool* clear_input_buffers_of_late_packets_init,
+        uint32_t *incoming_spike_buffer_size) {
     log_debug("synapses_initialise: starting");
     n_neurons = n_neurons_value;
     n_synapse_types = n_synapse_types_value;
@@ -271,9 +272,10 @@ bool synapses_initialise(
 
     // read bool flag about dropping packets that arrive too late
     *clear_input_buffers_of_late_packets_init = synapse_params_address[0];
+    *incoming_spike_buffer_size = synapse_params_address[1];
 
-    // shift read by 1 word.
-    synapse_params_address += 1;
+    // shift read by 2 words
+    synapse_params_address += 2;
 
     // read in ring buffer to input left shifts
     spin1_memcpy(
