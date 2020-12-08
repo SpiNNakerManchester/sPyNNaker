@@ -126,11 +126,10 @@ static inline void print_synaptic_row(synaptic_row_t synaptic_row) {
     // If there's a plastic region
     if (synapse_row_plastic_size(synaptic_row) > 0) {
         io_printf(IO_BUF, "----------------------------------------\n");
-        address_t plastic_region_address =
+        synapse_row_plastic_data_t *plastic_data =
                 synapse_row_plastic_region(synaptic_row);
         synapse_dynamics_print_plastic_synapses(
-                plastic_region_address, fixed_region,
-                ring_buffer_to_input_left_shifts);
+                plastic_data, fixed_region, ring_buffer_to_input_left_shifts);
     }
 
     io_printf(IO_BUF, "----------------------------------------\n");
@@ -362,12 +361,13 @@ bool synapses_process_synaptic_row(
     // If this row has a plastic region
     if (synapse_row_plastic_size(row) > 0) {
         // Get region's address
-        address_t plastic_region_address = synapse_row_plastic_region(row);
+        synapse_row_plastic_data_t *plastic_data =
+                synapse_row_plastic_region(row);
 
         // Process any plastic synapses
         profiler_write_entry_disable_fiq(
                 PROFILER_ENTER | PROFILER_PROCESS_PLASTIC_SYNAPSES);
-        if (!synapse_dynamics_process_plastic_synapses(plastic_region_address,
+        if (!synapse_dynamics_process_plastic_synapses(plastic_data,
                 fixed_region, ring_buffers, time)) {
             return false;
         }

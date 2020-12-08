@@ -131,6 +131,8 @@ typedef struct {
     uint32_t data[];            //!< The data, first the fixed then the plastic
 } synapse_row_fixed_part_t;
 
+typedef struct synapse_row_plastic_data_t synapse_row_plastic_data_t;
+
 //! \brief Get the size of the plastic region
 //! \param[in] row: The synaptic row
 //! \return The size of the plastic region of the row
@@ -142,10 +144,11 @@ static inline size_t synapse_row_plastic_size(const synaptic_row_t row) {
 
 //! \brief Get the address of the plastic region
 //! \param[in] row: The synaptic row
-//! \return Address of the plastic region of the row
-static inline void *synapse_row_plastic_region(synaptic_row_t row) {
+//! \return Pointer to the plastic region of the row
+static inline synapse_row_plastic_data_t *synapse_row_plastic_region(
+        synaptic_row_t row) {
     synapse_row_plastic_part_t *the_row = (synapse_row_plastic_part_t *) row;
-    return the_row->data;
+    return (synapse_row_plastic_data_t *) the_row->data;
 }
 
 //! \brief Get the address of the non-plastic (or fixed) region

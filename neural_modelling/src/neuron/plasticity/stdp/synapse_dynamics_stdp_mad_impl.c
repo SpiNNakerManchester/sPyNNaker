@@ -113,12 +113,12 @@ typedef struct {
 post_event_history_t *post_event_history;
 
 //! The format of the plastic data region of a synaptic row
-typedef struct {
+struct synapse_row_plastic_data_t {
     //! The pre-event history
     pre_event_history_t history;
     //! The per-synapse information
     plastic_synapse_t synapses[];
-} synapse_row_plastic_data_t;
+};
 
 /* PRIVATE FUNCTIONS */
 
@@ -205,19 +205,17 @@ static inline final_state_t plasticity_update_synapse(
 //---------------------------------------
 
 void synapse_dynamics_print_plastic_synapses(
-        address_t plastic_region_address,
+        synapse_row_plastic_data_t *plastic_region_data,
         synapse_row_fixed_part_t *fixed_region,
         uint32_t *ring_buffer_to_input_buffer_left_shifts) {
-    __use(plastic_region_address);
+    __use(plastic_region_data);
     __use(fixed_region);
     __use(ring_buffer_to_input_buffer_left_shifts);
 
 #if LOG_LEVEL >= LOG_DEBUG
-    synapse_row_plastic_data_t *data_ptr = plastic_region_address;
-
     // Extract separate arrays of weights (from plastic region),
     // Control words (from fixed region) and number of plastic synapses
-    const plastic_synapse_t *plastic_words = data_ptr->synapses;
+    const plastic_synapse_t *plastic_words = plastic_region_data->synapses;
     const control_t *control_words = synapse_row_plastic_controls(fixed_region);
     size_t plastic_synapse = synapse_row_num_plastic_controls(fixed_region);
 
@@ -318,27 +316,25 @@ bool synapse_dynamics_initialise(
 }
 
 bool synapse_dynamics_process_plastic_synapses(
-        address_t plastic_region_address,
+        synapse_row_plastic_data_t *plastic_region_address,
         synapse_row_fixed_part_t *fixed_region,
         weight_t *ring_buffers, uint32_t time) {
-    synapse_row_plastic_data_t *plastic_data =
-            (synapse_row_plastic_data_t *) plastic_region_address;
     // Extract separate arrays of plastic synapses (from plastic region),
     // Control words (from fixed region) and number of plastic synapses
-    plastic_synapse_t *plastic_words = plastic_data->synapses;
+    plastic_synapse_t *plastic_words = plastic_region_address->synapses;
     const control_t *control_words = synapse_row_plastic_controls(fixed_region);
     size_t plastic_synapse = synapse_row_num_plastic_controls(fixed_region);
 
     num_plastic_pre_synaptic_events += plastic_synapse;
 
     // Get last pre-synaptic event from event history
-    const uint32_t last_pre_time = plastic_data->history.prev_time;
-    const pre_trace_t last_pre_trace = plastic_data->history.prev_trace;
+    const uint32_t last_pre_time = plastic_region_address->history.prev_time;
+    const pre_trace_t last_pre_trace = plastic_region_address->history.prev_trace;
 
     // Update pre-synaptic trace
     log_debug("Adding pre-synaptic event to trace at time:%u", time);
-    plastic_data->history.prev_time = time;
-    plastic_data->history.prev_trace =
+    plastic_region_address->history.prev_time = time;
+    plastic_region_address->history.prev_trace =
             timing_add_pre_spike(time, last_pre_time, last_pre_trace);
 
     // Loop through plastic synapses
@@ -375,7 +371,7 @@ bool synapse_dynamics_process_plastic_synapses(
         }
         final_state_t final_state = plasticity_update_synapse(
                 time, last_pre_time, last_pre_trace,
-                plastic_data->history.prev_trace,
+                plastic_region_address->history.prev_trace,
                 post_delay, delay_axonal, current_state,
                 &post_event_history[index]);
 

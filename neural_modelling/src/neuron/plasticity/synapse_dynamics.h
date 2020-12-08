@@ -37,13 +37,13 @@ bool synapse_dynamics_initialise(
         uint32_t *ring_buffer_to_input_buffer_left_shifts);
 
 //! \brief Process the dynamics of the synapses
-//! \param[in,out] plastic_region_address: Where the plastic data is
+//! \param[in,out] plastic_region_data: Where the plastic data is
 //! \param[in] fixed_region: Where the fixed data is
 //! \param[in,out] ring_buffers: The ring buffers
 //! \param[in] time: The current simulation time
 //! \return ???
 bool synapse_dynamics_process_plastic_synapses(
-        address_t plastic_region_address,
+        synapse_row_plastic_data_t *plastic_region_data,
         synapse_row_fixed_part_t *fixed_region,
         weight_t *ring_buffers, uint32_t time);
 
@@ -61,12 +61,12 @@ input_t synapse_dynamics_get_intrinsic_bias(
         uint32_t time, index_t neuron_index);
 
 //! \brief Print the synapse dynamics
-//! \param[in] plastic_region_address: Where the plastic data is
+//! \param[in] plastic_region_data: Where the plastic data is
 //! \param[in] fixed_region: Where the fixed data is
 //! \param[in] ring_buffer_to_input_buffer_left_shifts:
 //!     How to interpret the values from the ring buffers
 void synapse_dynamics_print_plastic_synapses(
-        address_t plastic_region_address,
+        synapse_row_plastic_data_t *plastic_region_data,
         synapse_row_fixed_part_t *fixed_region,
         uint32_t *ring_buffer_to_input_buffer_left_shifts);
 

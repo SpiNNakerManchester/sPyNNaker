@@ -70,7 +70,7 @@ void synapse_dynamics_process_post_synaptic_event(
 
 //---------------------------------------
 bool synapse_dynamics_process_plastic_synapses(
-        UNUSED address_t plastic_region_address,
+        UNUSED synapse_row_plastic_data_t *plastic_region_data,
         UNUSED synapse_row_fixed_part_t *fixed_region,
         UNUSED weight_t *ring_buffer, UNUSED uint32_t time) {
     log_error("There should be no plastic synapses!");
@@ -84,7 +84,7 @@ input_t synapse_dynamics_get_intrinsic_bias(
 }
 
 void synapse_dynamics_print_plastic_synapses(
-        UNUSED address_t plastic_region_address,
+        UNUSED synapse_row_plastic_data_t *plastic_region_data,
         UNUSED synapse_row_fixed_part_t *fixed_region,
         UNUSED uint32_t *ring_buffer_to_input_left_shifts) {
 }
