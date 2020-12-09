@@ -134,57 +134,73 @@ static bool get_position_in_master_pop(uint32_t key, uint32_t* position) {
 //! \return: bool stating if the block contains plastic synapses.
 static inline bool synapses_are_plastic_or_structural_or_direct(
         uint32_t bit_field_index, address_list_entry entry,
-        uint32_t address_index) {
+        uint32_t address_index, bool* result) {
 
     // if a direct synapse do not cache
-    if (entry.addr.representation == SINGLE) {
+    if (entry.addr.representation == DIRECT) {
         log_info(
-            "rejected for caching as is a SINGLE connection on index %d",
+            "REJECTED for caching as is a DIRECT connection on index %d",
             address_index);
+        *result = true;
         return true;
     }
     else {
         log_info("current rep is %d", entry.addr.representation);
     }
 
-    uint32_t address = population_table_get_address(entry.addr);
-    uint32_t row_length = population_table_get_row_length(entry.addr);
-    uint32_t stride = (row_length + N_SYNAPSE_ROW_HEADER_WORDS);
+    // check for invalid master pop entries, coz they dont need caching coz
+    // they invalid.
+    if (entry.addr.address == INVALID_ADDRESS) {
+        log_info("REJECTED as entry is a invalid entry.");
+        *result = true;
+        return true;
+    }
 
+    address_t row_address;
+    uint32_t base_key = not_redundant_tracker->filter[bit_field_index].key;
+    size_t size;
     uint32_t n_atoms = not_redundant_tracker->filter[bit_field_index].n_atoms;
 
     // cycle through atoms looking for plastic and struct synapses
-    for (uint32_t atom_id = 0; atom_id < n_atoms; atom_id++) {
-        uint32_t atom_offset = atom_id * stride * sizeof(uint32_t);
-        address_t row_address = (address_t) (address + atom_offset);
+    for  (uint32_t atom_id = 0; atom_id < n_atoms; atom_id++) {
+        // set key
+        spike_t key = (spike_t) (base_key + atom_id);
+
+        // get address in sdram for the row
+        bool success = population_table_get_first_address(
+            key, &row_address, &size);
+        if (!success) {
+            log_info("failed to read row for key 0x%08x", key);
+            return false;
+        }
         synaptic_row_t row = (synaptic_row_t) row_address;
 
         // plastic
         if (synapse_row_plastic_size(row) > 0) {
             log_info(
-                "rejected for caching as it contains plastic synapses index %d",
+                "REJECTED for caching as it contains plastic synapses index %d",
                 address_index);
+            *result = true;
             return true;
         }
 
         // struct synapses
         bool bit_found = false;
         if (structural_matrix_region_base_address != NULL) {
-            uint32_t new_key =
-                not_redundant_tracker->filter[bit_field_index].key + atom_id;
             uint32_t dummy1 = 0, dummy2 = 0, dummy3 = 0, dummy4 = 0;
-            bit_found = sp_structs_find_by_spike(&pre_info, new_key,
+            bit_found = sp_structs_find_by_spike(&pre_info, key,
                     &dummy1, &dummy2, &dummy3, &dummy4);
         }
         if (bit_found) {
             log_info(
-                "rejected for caching as it contains a structural synapses at"
+                "REJECTED for caching as it contains a structural synapses at"
                 " index  %d", address_index);
+            *result = true;
             return true;
         }
     }
-
-    return false;
+    *result = false;
+    return true;
 }
 
 //! \brief returns the size of dtcm needed when using binary search rep
@@ -279,6 +295,7 @@ static inline uint32_t calculate_array_search_size(
 //! \brief Mark this process as failed.
 static void fail_shut_down(void) {
     vcpu()->user2 = 1;
+    rt_error(RTE_SWERR);
 }
 
 //! \brief Mark this process as succeeded.
@@ -370,10 +387,8 @@ static inline bool initialise(void) {
         return false;
     }
 
-    print_master_population_table();
-
-    log_info("Structural plastic if needed");
     if (structural_matrix_region_base_address != NULL) {
+        log_info("Structural plastic needed");
         if (! sp_structs_read_in_common(
                 structural_matrix_region_base_address, &rewiring_data,
                 &pre_info, &post_to_pre_table)) {
@@ -519,12 +534,13 @@ static inline void set_address_to_cache_reps(
     if (rep == DEFAULT) {
         log_info(
             "setting address entry %d to rep DEFAULT", address_entry_index);
-    } else if (rep == SINGLE) {
+    } else if (rep == DIRECT) {
         log_info(
-            "setting address entry %d to rep SINGLE", address_entry_index);
+            "setting address entry %d to rep DIRECT", address_entry_index);
     } else if (rep == BINARY_SEARCH) {
         log_info(
-            "setting address entry %d to rep BINARY_SEARCH", address_entry_index);
+            "setting address entry %d to rep BINARY_SEARCH",
+            address_entry_index);
     } else if (rep == ARRAY) {
         log_info(
             "setting address entry %d to rep ARRAY", address_entry_index);
@@ -558,19 +574,7 @@ static inline void set_reps_to_defaults(
             address_index ++) {
         address_list_entry address_entry =
                 population_table_get_address_entry(address_index);
-        log_info(
-            "setting rep %d to %d",
-            address_index - start, address_entry.addr.representation);
         reps[address_index - start] = address_entry.addr.representation;
-    }
-
-    // print for clarity
-    log_info("printing reps for clarity.");
-    for (uint32_t address_index = start; address_index < count + start;
-            address_index ++) {
-        log_info(
-            "rep %d is %d",
-            address_index - start, reps[address_index - start]);
     }
 }
 
@@ -657,8 +661,14 @@ static inline bool cache_blocks(void) {
                 population_table_get_address_entry(address_index);
 
             // if plastic or struct, wont cache during this impl.
-            if (synapses_are_plastic_or_structural_or_direct(
-                    bit_field_index, address_entry, address_index)) {
+            bool result;
+            bool success = synapses_are_plastic_or_structural_or_direct(
+                    bit_field_index, address_entry, address_index, &result);
+            if (!success) {
+                return false;
+            }
+
+            if (result) {
                 cache = false;
                 log_info(
                     "cant cache as it meets requirement to bypass for "

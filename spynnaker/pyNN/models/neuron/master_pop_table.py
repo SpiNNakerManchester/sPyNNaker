@@ -15,6 +15,8 @@
 from __future__ import division
 import logging
 import math
+from enum import Enum
+
 import numpy
 import ctypes
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
@@ -39,6 +41,8 @@ _BITS_PER_BYTES = 8
 
 # ctypes stores the number of bits in a bitfield in the top 16 bits
 _CTYPES_N_BITS_SHIFT = 16
+
+
 
 
 def _n_bits(field):
@@ -119,6 +123,14 @@ _MAX_N_NEURONS = (1 << _n_bits(_ExtraInfoCType.n_neurons)) - 1
 _MAX_CORE_MASK = (1 << _n_bits(_ExtraInfoCType.core_mask)) - 1
 
 
+class REPRESENTATION_VALUES(Enum):
+    """values for the different representations"""
+    DEFAULT = 0
+    DIRECT = 1
+    BINARY_SEARCH = 2
+    ARRAY = 3
+
+
 class _AddressAndRowLengthCType(ctypes.LittleEndianStructure):
     """ An Address and Row Length structure; matches the C struct
     """
@@ -126,15 +138,15 @@ class _AddressAndRowLengthCType(ctypes.LittleEndianStructure):
         # the length of the row
         ("row_length", ctypes.c_uint32, 8),
         # the address
-        ("address", ctypes.c_uint32, 23),
+        ("address", ctypes.c_uint32, 22),
         # whether this is a direct/single address
-        ("is_single", ctypes.c_uint32, 1)
+        ("representation", ctypes.c_uint32, 2)
     ]
 
 
 # An invalid address in the address and row length list
 _INVALID_ADDDRESS = (1 << _n_bits(_AddressAndRowLengthCType.address)) - 1
-# Address is 23 bits, but maximum value means invalid
+# Address is 22 bits, but maximum value means invalid
 _MAX_ADDRESS = (1 << _n_bits(_AddressAndRowLengthCType.address)) - 2
 
 
@@ -213,12 +225,12 @@ class _MasterPopEntry(object):
         self.__n_neurons = n_neurons
         self.__addresses_and_row_lengths = list()
 
-    def append(self, address, row_length, is_single):
+    def append(self, address, row_length, representation):
         """ Add a synaptic matrix pointer to the entry
 
         :param address: The address of the synaptic matrix
         :param row_length: The length of each row in the matrix
-        :param is_single: True if the address is to the direct matrix
+        :param representation: int for the rep
         :return: The index of the pointer within the entry
         :rtype: int
         """
@@ -228,7 +240,7 @@ class _MasterPopEntry(object):
                 "{} connections for the same source key (maximum {})".format(
                     index, _MAX_ADDRESS_COUNT))
         self.__addresses_and_row_lengths.append(
-            (address, row_length, is_single, True))
+            (address, row_length, representation, True))
         return index
 
     def append_invalid(self):
@@ -301,13 +313,13 @@ class _MasterPopEntry(object):
             next_addr += 1
             n_entries += 1
 
-        for j, (address, row_length, is_single, is_valid) in enumerate(
+        for j, (address, row_length, representation, is_valid) in enumerate(
                 self.__addresses_and_row_lengths):
             address_entry = address_list[next_addr + j].addr
             if not is_valid:
                 address_entry.address = _INVALID_ADDDRESS
             else:
-                address_entry.is_single = is_single
+                address_entry.representation = representation
                 address_entry.row_length = row_length
                 address_entry.address = address
         return n_entries
@@ -404,21 +416,24 @@ class MasterPopTableAsBinarySearch(object):
         self.__n_addresses = 0
 
     def add_machine_entry(
-            self, block_start_addr, row_length, key_and_mask, is_single=False):
+            self, block_start_addr, row_length, key_and_mask,
+            representation=REPRESENTATION_VALUES.DEFAULT.value):
         """ Add an entry for a machine-edge to the population table
 
         :param int block_start_addr: where the synaptic matrix block starts
         :param int row_length: how long in words each row is
         :param ~pacman.model.routing_info.BaseKeyAndMask key_and_mask:
             the key and mask for this master pop entry
-        :param bool is_single:
-            Flag that states if the entry is a direct entry for a single row.
+        :param int representation:
+            Flag that states if the entry is a default, direct, binary or
+            array store.
         :return: The index of the entry, to be used to retrieve it
         :rtype: int
         :raises SynapticConfigurationException: If a bad address is used.
         """
         return self.__update_master_population_table(
-            block_start_addr, row_length, key_and_mask, 0, 0, 0, is_single)
+            block_start_addr, row_length, key_and_mask, 0, 0, 0,
+            representation)
 
     def add_application_entry(
             self, block_start_addr, row_length, key_and_mask, core_mask,
@@ -456,7 +471,7 @@ class MasterPopTableAsBinarySearch(object):
 
     def __update_master_population_table(
             self, block_start_addr, row_length, key_and_mask, core_mask,
-            core_shift, n_neurons, is_single):
+            core_shift, n_neurons, representation):
         """ Add an entry in the binary search to deal with the synaptic matrix
 
         :param int block_start_addr: where the synaptic matrix block starts
@@ -468,8 +483,9 @@ class MasterPopTableAsBinarySearch(object):
         :param int core_shift: The shift of the mask to get to the core_mask
         :param int n_neurons:
             The number of neurons in each machine vertex (bar the last)
-        :param bool is_single:
-            Flag that states if the entry is a direct entry for a single row.
+        :param int representation:
+            Flag that states if the entry is a direct, default, binary
+            search, or array store.
         :return: The index of the entry, to be used to retrieve it
         :rtype: int
         :raises SynapticConfigurationException: If a bad address is used.
@@ -490,7 +506,7 @@ class MasterPopTableAsBinarySearch(object):
 
         # if not single, scale the address
         start_addr = block_start_addr
-        if not is_single:
+        if representation == REPRESENTATION_VALUES.DIRECT:
             if block_start_addr % _ADDRESS_SCALE != 0:
                 raise SynapticConfigurationException(
                     "Address {} is not compatible with this table".format(
@@ -502,7 +518,7 @@ class MasterPopTableAsBinarySearch(object):
                         block_start_addr))
         row_length = self.get_allowed_row_length(row_length)
         index = self.__entries[key_and_mask.key].append(
-            start_addr, row_length - 1, is_single)
+            start_addr, row_length - 1, representation)
         self.__n_addresses += 1
         return index
 

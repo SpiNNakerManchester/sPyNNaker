@@ -411,7 +411,7 @@ bool population_table_get_next_address(
 
             // If the row is a direct row, indicate this by specifying the
             // n_bytes_to_transfer is 0
-            if (item.representation == SINGLE) {
+            if (item.representation == DIRECT) {
                 *row_address = (address_t) (get_direct_address(item) +
                     (last_neuron_id * sizeof(uint32_t)));
                 *n_bytes_to_transfer = 0;

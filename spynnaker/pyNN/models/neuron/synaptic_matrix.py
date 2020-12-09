@@ -23,6 +23,7 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
     OneToOneConnector)
 
 from .generator_data import GeneratorData, SYN_REGION_UNUSED
+from .master_pop_table import REPRESENTATION_VALUES
 
 
 class SynapticMatrix(object):
@@ -52,13 +53,13 @@ class SynapticMatrix(object):
         "__weight_scales",
         # The maximum summed size of the synaptic matrices
         "__all_syn_block_sz",
-        # The maximum summed size of the "direct" or "single" matrices
+        # The maximum summed size of the "direct" or matrices
         "__all_single_syn_sz",
         # The expected size of a synaptic matrix
         "__matrix_size",
         # The expected size of a delayed synaptic matrix
         "__delay_matrix_size",
-        # The expected size of a "direct" or "single" matrix
+        # The expected size of a "direct" matrix
         "__single_matrix_size",
         # The index of the matrix in the master population table
         "__index",
@@ -68,7 +69,7 @@ class SynapticMatrix(object):
         "__syn_mat_offset",
         # The offset of the delayed matrix within the synaptic region
         "__delay_syn_mat_offset",
-        # Indicates if the matrix is a "direct" or "single" matrix
+        # Indicates if the matrix is a "direct" matrix
         "__is_single",
         # A cached version of a received synaptic matrix
         "__received_block",
@@ -102,7 +103,7 @@ class SynapticMatrix(object):
         :param all_syn_block_sz:
             The space available for all synaptic matrices
         :param int all_single_syn_sz:
-            The space available for "direct" or "single" synapses
+            The space available for "direct" synapses
         """
         self.__synapse_io = synapse_io
         self.__poptable = poptable
@@ -151,7 +152,7 @@ class SynapticMatrix(object):
 
         :param int single_addr: The current offset of the direct matrix
         :return: A tuple of a boolean indicating if the matrix is direct and
-            the next offset of the single matrix
+            the next offset of the direct matrix
         :rtype: (bool, int)
         """
         pre_vertex_slice = self.__machine_edge.pre_vertex.vertex_slice
@@ -209,11 +210,10 @@ class SynapticMatrix(object):
         :param int block_addr:
             The address in the synaptic matrix region to start writing at
         :param int single_addr:
-            The address in the "direct" or "single" matrix to start at
-        :param list single_synapses:
-            A list of "direct" or "single" synapses to write to
+            The address in the "direct" matrix to start at
+        :param list single_synapses: A list of "direct" synapses to write to
         :param ~numpy.ndarray row_data: The data to write
-        :return: The updated block and single addresses
+        :return: The updated block and direct addresses
         :rtype: tuple(int, int)
         """
         # We can't write anything if there isn't a key
@@ -283,13 +283,12 @@ class SynapticMatrix(object):
 
     def __write_single_machine_matrix(
             self, single_synapses, single_addr, row_data):
-        """ Write a direct (single synapse) matrix for an incoming machine\
-            vertex
+        """ Write a direct matrix for an incoming machine vertex
 
-        :param list single_synapses: A list of single synapses to add to
+        :param list single_synapses: A list of direct synapses to add to
         :param int single_addr: The initial address to write to
         :param ~numpy.ndarray row_data: The row data to write
-        :return: The updated single address
+        :return: The updated direct address
         :rtype: int
         """
         single_rows = row_data.reshape(-1, 4)[:, 3]
@@ -299,7 +298,8 @@ class SynapticMatrix(object):
                 data_size, self.__single_matrix_size))
         self.__index = self.__poptable.add_machine_entry(
             single_addr, self.__max_row_info.undelayed_max_words,
-            self.__routing_info.first_key_and_mask, is_single=True)
+            self.__routing_info.first_key_and_mask,
+            representation=REPRESENTATION_VALUES.DIRECT.value)
         single_synapses.append(single_rows)
         self.__syn_mat_offset = single_addr
         self.__is_single = True
@@ -505,7 +505,7 @@ class SynapticMatrix(object):
         :param int synapses_address:
             The base address of the synaptic matrix region
         :param int single_address:
-            The base address of the "direct" or "single" matrix region
+            The base address of the "direct" matrix region
         :return: A list of arrays of connections, each with dtype
             AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
         :rtype: ~numpy.ndarray
@@ -584,12 +584,12 @@ class SynapticMatrix(object):
         return block
 
     def __get_single_block(self, transceiver, placement, single_address):
-        """ Get a block of data for "direct" or "single" synapses
+        """ Get a block of data for "direct" synapses
 
         :param Transceiver transceiver: How to read the data from the machine
         :param Placement placement: Where the matrix is on the machine
         :param int single_address:
-            The base address of the "direct" or "single" matrix region
+            The base address of the "direct" matrix region
         :rtype: bytearray
         """
         if self.__received_block is not None:

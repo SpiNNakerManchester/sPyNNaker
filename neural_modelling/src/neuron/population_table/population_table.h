@@ -101,7 +101,7 @@ typedef enum representation_values {
     //! sdram store
     DEFAULT = 0,
     //! representation of a direct 1 to 1
-    SINGLE = 1,
+    DIRECT = 1,
     //! Binary Search
     BINARY_SEARCH = 2,
     //! 1d array
@@ -263,7 +263,7 @@ static inline void print_master_population_table(void) {
             address_and_row_length addr = address_list[j].addr;
             if (addr.address == INVALID_ADDRESS) {
                 log_info("    index %d: INVALID", j);
-            } else if (!(addr.representation == SINGLE)) {
+            } else if (!(addr.representation == DIRECT)) {
                 log_info(
                     "    index %d: offset: %u, address: 0x%08x, "
                     "row_length: %u, representation %d",
