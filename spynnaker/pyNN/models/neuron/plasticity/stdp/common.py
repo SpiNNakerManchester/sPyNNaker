@@ -135,13 +135,15 @@ def write_pfpc_lut(spec, peak_time, lut_size, shift, time_probe,
         plt.plot(t, out_float, label='float')
         # plt.plot(t,out_fixed, label='fixed')
         plt.legend()
-        plt.show()
+        plt.title("pf-PC LUT")
+        plt.savefig("figures/write_pfpc_lut.png")
+        # plt.show()
+        return t, out_float
     else:
         # exp_fix_array_int16 = numpy.asarray(
         #     final_exp_fix, dtype="uint16").view("uint32")
 
         spec.write_array(final_exp_fix, data_type=DataType.INT16)
-
 
 def write_mfvn_lut(spec, sigma, beta, lut_size, shift, time_probe,
                    fixed_point_one=STDP_FIXED_POINT_ONE):
@@ -196,7 +198,10 @@ def write_mfvn_lut(spec, sigma, beta, lut_size, shift, time_probe,
         plt.plot(plot_times, out_float, label='float')
         # plt.plot(t,out_fixed, label='fixed')
         plt.legend()
-        plt.show()
+        plt.title("mf-VN LUT")
+        plt.savefig("figures/write_mfvn_lut.png")
+        # plt.show()
+        return plot_times, out_float
     else:
         # exp_fix_array_int16 = numpy.asarray(
         #     final_exp_fix, dtype="uint16").view("uint32")
