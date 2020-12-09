@@ -24,7 +24,7 @@
 #include "synapse_row.h"
 #include "neuron.h"
 
-//! Count of the number of times the ring buffers have saturated
+//! Count of the number of times the synapses have saturated their weights.
 extern uint32_t synapses_saturation_count;
 
 
@@ -113,11 +113,6 @@ void synapses_do_timestep_update(timer_t time);
 //! \return True if successful
 bool synapses_process_synaptic_row(
         uint32_t time, synaptic_row_t row, bool *write_back);
-
-//! \brief returns the number of times the synapses have saturated their
-//!        weights.
-//! \return the number of times the synapses have saturated.
-uint32_t synapses_get_saturation_count(void);
 
 //! \brief returns the counters for plastic and fixed pre synaptic events based
 //!        on (if the model was compiled with SYNAPSE_BENCHMARK parameter) or
