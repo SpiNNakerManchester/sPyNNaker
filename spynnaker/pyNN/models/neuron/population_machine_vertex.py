@@ -39,6 +39,9 @@ from spinn_front_end_common.interface.profiling.profile_utils import (
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.utilities import helpful_functions
 from spinn_front_end_common.utilities.constants import SIMULATION_N_BYTES
+from spinn_front_end_common.interface.buffer_management\
+    .recording_utilities import (
+        get_recording_header_array, get_recording_header_size)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.utilities import constants, bit_field_utilities
@@ -111,7 +114,6 @@ class PopulationMachineVertex(
 
     __slots__ = [
         "__binary_file_name",
-        "__recorded_region_ids",
         "__resources",
         "__change_requires_neuron_parameters_reload",
         "__synaptic_matrices"]
@@ -133,6 +135,7 @@ class PopulationMachineVertex(
         BIT_FIELD_FILTER = 12
         BIT_FIELD_BUILDER = 13
         BIT_FIELD_KEY_MAP = 14
+        RECORDING = 15
 
     NEURON_REGIONS = NeuronRegions(
         neuron_params=REGIONS.NEURON_PARAMS.value,
@@ -217,8 +220,8 @@ class PopulationMachineVertex(
     LOST_INPUT_BUFFER_PACKETS = "Times_the_input_buffer_lost_packets"
 
     def __init__(
-            self, resources_required, recorded_region_ids, label, constraints,
-            app_vertex, vertex_slice, binary_file_name):
+            self, resources_required, label, constraints, app_vertex,
+            vertex_slice, binary_file_name):
         """
         :param ~pacman.model.resources.ResourceContainer resources_required:
         :param iterable(int) recorded_region_ids:
@@ -230,11 +233,9 @@ class PopulationMachineVertex(
             The slice of the population that this implements
         :param str binary_file_name: binary name to be run for this verte
         """
-        MachineVertex.__init__(
-            self, label, constraints, app_vertex, vertex_slice)
+        super(PopulationMachineVertex, self).__init__(
+            label, constraints, app_vertex, vertex_slice)
         self.__binary_file_name = binary_file_name
-        AbstractRecordable.__init__(self)
-        self.__recorded_region_ids = recorded_region_ids
         self.__resources = resources_required
         self.__change_requires_neuron_parameters_reload = False
 
@@ -293,7 +294,7 @@ class PopulationMachineVertex(
 
     @overrides(AbstractRecordable.is_recording)
     def is_recording(self):
-        return len(self.__recorded_region_ids) > 0
+        return len(self.get_recorded_region_ids()) > 0
 
     @overrides(ProvidesProvenanceDataFromMachineImpl.
                get_provenance_data_from_machine)
@@ -449,12 +450,16 @@ class PopulationMachineVertex(
 
     @overrides(AbstractReceiveBuffersToHost.get_recorded_region_ids)
     def get_recorded_region_ids(self):
-        return self.__recorded_region_ids
+        ids = self._app_vertex.neuron_recorder.recorded_ids_by_slice(
+            self.vertex_slice)
+        ids.extend(self._app_vertex.synapse_recorder.recorded_ids_by_slice(
+            self.vertex_slice))
+        return ids
 
     @overrides(AbstractReceiveBuffersToHost.get_recording_region_base_address)
     def get_recording_region_base_address(self, txrx, placement):
         return locate_memory_region_for_placement(
-            placement, self.NEURON_REGIONS.neuron_recording, txrx)
+            placement, self.REGIONS.RECORDING.value, txrx)
 
     @overrides(AbstractHasProfileData.get_profile_data)
     def get_profile_data(self, transceiver, placement):
@@ -499,7 +504,6 @@ class PopulationMachineVertex(
         :param n_key_map: (injected)
         """
         # pylint: disable=too-many-arguments, arguments-differ
-
         spec.comment("\n*** Spec for block of {} neurons ***\n".format(
             self._app_vertex.neuron_impl.model_name))
 
@@ -514,7 +518,7 @@ class PopulationMachineVertex(
         # Reserve memory for provenance
         self.reserve_provenance_data_region(spec)
 
-        # write profile data
+        # Write profile data
         profile_utils.reserve_profile_region(
             spec, self.REGIONS.PROFILING.value,
             self._app_vertex.n_profile_samples)
@@ -522,8 +526,19 @@ class PopulationMachineVertex(
             spec, self.REGIONS.PROFILING.value,
             self._app_vertex.n_profile_samples)
 
-        self._write_neuron_data_spec(
-            spec, routing_info, data_n_time_steps, self.NEURON_REGIONS)
+        # Set up for recording
+        rec_regions = self._app_vertex.neuron_recorder.get_region_sizes(
+            self.vertex_slice, data_n_time_steps)
+        rec_regions.extend(self._app_vertex.synapse_recorder.get_region_sizes(
+            self.vertex_slice, data_n_time_steps))
+        spec.reserve_memory_region(
+            region=self.REGIONS.RECORDING.value,
+            size=get_recording_header_size(len(rec_regions)),
+            label="Recording")
+        spec.switch_write_focus(self.REGIONS.RECORDING.value)
+        spec.write_array(get_recording_header_array(rec_regions))
+
+        self._write_neuron_data_spec(spec, routing_info, self.NEURON_REGIONS)
         self._write_synapse_data_spec(
             spec, machine_time_step, routing_info, machine_graph, n_key_map,
             self.SYNAPSE_REGIONS)
@@ -531,21 +546,20 @@ class PopulationMachineVertex(
         # End the writing of this specification:
         spec.end_specification()
 
-    def _write_neuron_data_spec(
-            self, spec, routing_info, data_n_time_steps, regions):
+    def _write_neuron_data_spec(self, spec, routing_info, regions):
         # Write the neuron parameters with the key
         self._write_neuron_parameters(
             spec, regions.neuron_params, routing_info)
 
         # Write the neuron recording region
+        neuron_recorder = self._app_vertex.neuron_recorder
         spec.reserve_memory_region(
             region=regions.neuron_recording,
-            size=self._app_vertex.neuron_recorder.get_static_sdram_usage(
+            size=neuron_recorder.get_metadata_sdram_usage_in_bytes(
                 self.vertex_slice),
             label="neuron recording")
-        self._app_vertex.neuron_recorder.write_neuron_recording_region(
-            spec, regions.neuron_recording, self.vertex_slice,
-            data_n_time_steps)
+        neuron_recorder.write_neuron_recording_region(
+            spec, regions.neuron_recording, self.vertex_slice)
 
     def _write_synapse_data_spec(
             self, spec, machine_time_step, routing_info, machine_graph,

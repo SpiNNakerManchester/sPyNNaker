@@ -16,7 +16,6 @@
 import math
 from pacman.utilities.constants import FULL_MASK
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.abstract_models import AbstractHasDelayStages
 
 #: number of elements
@@ -41,7 +40,7 @@ N_KEYS_DATA_SET_IN_WORDS = 1
 BIT_IN_A_WORD = 32.0
 
 
-def get_estimated_sdram_for_bit_field_region(app_graph, vertex):
+def get_estimated_sdram_for_bit_field_region(incoming_projections):
     """ estimates the SDRAM for the bit field region
 
     :param ~pacman.model.graphs.application.ApplicationGraph app_graph:
@@ -52,22 +51,22 @@ def get_estimated_sdram_for_bit_field_region(app_graph, vertex):
     :rtype: int
     """
     sdram = 0
-    for incoming_edge in app_graph.get_edges_ending_at_vertex(vertex):
-        if isinstance(incoming_edge, ProjectionApplicationEdge):
-            slices, _ = (
-                incoming_edge.pre_vertex.splitter.get_out_going_slices())
+    seen_app_edges = set()
+    for proj in incoming_projections:
+        app_edge = proj._projection_edge
+        if app_edge not in seen_app_edges:
+            seen_app_edges.add(app_edge)
+            slices, _ = app_edge.pre_vertex.splitter.get_out_going_slices()
             n_machine_vertices = len(slices)
 
             slice_atoms = list()
             for vertex_slice in slices:
                 slice_atoms.append(vertex_slice.n_atoms)
-            n_atoms_per_machine_vertex = max(slice_atoms)
+            atoms_per_core = max(slice_atoms)
 
-            if isinstance(incoming_edge.pre_vertex, AbstractHasDelayStages):
-                n_atoms_per_machine_vertex *= \
-                    incoming_edge.pre_vertex.n_delay_stages
-            n_words_for_atoms = int(math.ceil(
-                n_atoms_per_machine_vertex / BIT_IN_A_WORD))
+            if isinstance(app_edge.pre_vertex, AbstractHasDelayStages):
+                atoms_per_core *= app_edge.pre_vertex.n_delay_stages
+            n_words_for_atoms = int(math.ceil(atoms_per_core / BIT_IN_A_WORD))
             sdram += (
                 (ELEMENTS_USED_IN_EACH_BIT_FIELD + (
                     n_words_for_atoms * n_machine_vertices)) *
@@ -75,7 +74,7 @@ def get_estimated_sdram_for_bit_field_region(app_graph, vertex):
     return sdram
 
 
-def get_estimated_sdram_for_key_region(app_graph, vertex):
+def get_estimated_sdram_for_key_region(incoming_projections):
     """ gets an estimate of the bitfield builder region
 
     :param ~pacman.model.graphs.application.ApplicationGraph app_graph:
@@ -88,12 +87,16 @@ def get_estimated_sdram_for_key_region(app_graph, vertex):
 
     # basic sdram
     sdram = N_KEYS_DATA_SET_IN_WORDS * BYTES_PER_WORD
-    for in_edge in app_graph.get_edges_ending_at_vertex(vertex):
+    seen_app_edges = set()
+    for proj in incoming_projections:
+        in_edge = proj._projection_edge
+        if in_edge not in seen_app_edges:
+            seen_app_edges.add(in_edge)
 
-        # Get the number of likely vertices
-        slices, _ = in_edge.pre_vertex.splitter.get_out_going_slices()
-        sdram += (
-            len(slices) * N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP * BYTES_PER_WORD)
+            # Get the number of likely vertices
+            slices, _ = in_edge.pre_vertex.splitter.get_out_going_slices()
+            sdram += (len(slices) * N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP *
+                      BYTES_PER_WORD)
     return sdram
 
 

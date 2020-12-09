@@ -31,6 +31,7 @@ from spinn_front_end_common.utilities import (
     helpful_functions, globals_variables)
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, MICRO_TO_SECOND_CONVERSION)
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, AbstractNeuronRecordable, NeuronRecorder)
 from spynnaker.pyNN.models.abstract_models import (
@@ -43,6 +44,10 @@ from spynnaker.pyNN.utilities.constants import POSSION_SIGMA_SUMMATION_LIMIT
 from spynnaker.pyNN.utilities.running_stats import RunningStats
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamics, AbstractSynapseDynamicsStructural)
+from spynnaker.pyNN.utilities.bit_field_utilities import (
+    get_estimated_sdram_for_bit_field_region,
+    get_estimated_sdram_for_key_region,
+    exact_sdram_for_bit_field_builder_region)
 from .synapse_io import get_max_row_info
 from .master_pop_table import MasterPopTableAsBinarySearch
 from .generator_data import GeneratorData
@@ -84,6 +89,7 @@ class AbstractPopulationVertex(
         "__n_profile_samples",
         "__neuron_impl",
         "__neuron_recorder",
+        "__synapse_recorder",
         "_parameters",  # See AbstractPyNNModel
         "__pynn_model",
         "_state_variables",  # See AbstractPyNNModel
@@ -188,14 +194,18 @@ class AbstractPopulationVertex(
         self.__updated_state_variables = set()
 
         # Set up for recording
-        recordable_variables = list(
+        neuron_recordable_variables = list(
             self.__neuron_impl.get_recordable_variables())
         record_data_types = dict(
             self.__neuron_impl.get_recordable_data_types())
         self.__neuron_recorder = NeuronRecorder(
-            recordable_variables, record_data_types, [NeuronRecorder.SPIKES],
+            neuron_recordable_variables, record_data_types,
+            [NeuronRecorder.SPIKES], n_neurons, [], {})
+        self.__synapse_recorder = NeuronRecorder(
+            [], {}, [],
             n_neurons, [NeuronRecorder.PACKETS],
-            {NeuronRecorder.PACKETS: NeuronRecorder.PACKETS_TYPE})
+            {NeuronRecorder.PACKETS: NeuronRecorder.PACKETS_TYPE},
+            offset=len(neuron_recordable_variables))
 
         # bool for if state has changed.
         self.__change_requires_mapping = True
@@ -214,12 +224,6 @@ class AbstractPopulationVertex(
         # Prepare for dealing with STDP - there can only be one (non-static)
         # synapse dynamics per vertex at present
         self.__synapse_dynamics = None
-
-    @overrides(AbstractNeuronRecordable.get_expected_n_rows)
-    def get_expected_n_rows(
-            self, n_machine_time_steps, sampling_rate, vertex, variable):
-        return self.__neuron_recorder.expected_rows_for_a_run_time(
-            n_machine_time_steps, sampling_rate)
 
     @property
     def synapse_dynamics(self):
@@ -291,6 +295,10 @@ class AbstractPopulationVertex(
     @property
     def neuron_recorder(self):
         return self.__neuron_recorder
+
+    @property
+    def synapse_recorder(self):
+        return self.__synapse_recorder
 
     @property
     def drop_late_spikes(self):
@@ -381,30 +389,60 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractNeuronRecordable.get_recordable_variables)
     def get_recordable_variables(self):
-        return self.__neuron_recorder.get_recordable_variables()
+        variables = list()
+        variables.extend(self.__neuron_recorder.get_recordable_variables())
+        variables.extend(self.__synapse_recorder.get_recordable_variables())
+        return variables
+
+    def __raise_var_not_supported(self, variable):
+        msg = ("Variable {} is not supported. Supported variables are"
+               "{}".format(variable, self.get_recordable_variables()))
+        raise ConfigurationException(msg)
 
     @overrides(AbstractNeuronRecordable.is_recording)
     def is_recording(self, variable):
-        return self.__neuron_recorder.is_recording(variable)
+        if self.__neuron_recorder.is_recordable(variable):
+            return self.__neuron_recorder.is_recording(variable)
+        if self.__synapse_recorder.is_recordable(variable):
+            return self.__synapse_recorder.is_recording(variable)
+        self.__raise_var_not_supported(variable)
 
     @overrides(AbstractNeuronRecordable.set_recording)
     def set_recording(self, variable, new_state=True, sampling_interval=None,
                       indexes=None):
         self.__change_requires_mapping = not self.is_recording(variable)
-        self.__neuron_recorder.set_recording(
-            variable, new_state, sampling_interval, indexes)
+        if self.__neuron_recorder.is_recordable(variable):
+            self.__neuron_recorder.set_recording(
+                variable, new_state, sampling_interval, indexes)
+        elif self.__synapse_recorder.is_recordable(variable):
+            self.__synapse_recorder.set_recording(
+                variable, new_state, sampling_interval, indexes)
+        else:
+            self.__raise_var_not_supported(variable)
 
     @overrides(AbstractNeuronRecordable.get_data)
     def get_data(self, variable, n_machine_time_steps, placements,
                  buffer_manager, machine_time_step):
         # pylint: disable=too-many-arguments
-        return self.__neuron_recorder.get_matrix_data(
-            self.label, buffer_manager, placements, self, variable,
-            n_machine_time_steps)
+        if self.__neuron_recorder.is_recordable(variable):
+            return self.__neuron_recorder.get_matrix_data(
+                self.label, buffer_manager, placements, self, variable,
+                n_machine_time_steps)
+        elif self.__synapse_recorder.is_recordable(variable):
+            return self.__neuron_recorder.get_matrix_data(
+                self.label, buffer_manager, placements, self, variable,
+                n_machine_time_steps)
+        self.__raise_var_not_supported(variable)
 
     @overrides(AbstractNeuronRecordable.get_neuron_sampling_interval)
     def get_neuron_sampling_interval(self, variable):
-        return self.__neuron_recorder.get_neuron_sampling_interval(variable)
+        if self.__neuron_recorder.is_recordable(variable):
+            return self.__neuron_recorder.get_neuron_sampling_interval(
+                variable)
+        elif self.__synapse_recorder.is_recordable(variable):
+            return self.__synapse_recorder.get_neuron_sampling_interval(
+                variable)
+        self.__raise_var_not_supported(variable)
 
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
     def get_spikes_sampling_interval(self):
@@ -1027,3 +1065,37 @@ class AbstractPopulationVertex(
         if self.__synapse_dynamics is None:
             return ""
         return self.__synapse_dynamics.get_vertex_executable_suffix()
+
+    @property
+    def neuron_recordables(self):
+        return self.__neuron_recorder.get_recordable_variables()
+
+    @property
+    def synapse_recordables(self):
+        return self.__synapse_recorder.get_recordable_variables()
+
+    def get_neuron_variable_sdram(self, vertex_slice):
+        return self.__neuron_recorder.get_variable_sdram_usage(vertex_slice)
+
+    def get_synapse_variable_sdram(self, vertex_slice):
+        return self.__synapse_recorder.get_variable_sdram_usage(vertex_slice)
+
+    def get_neuron_constant_sdram(self, vertex_slice):
+        return (
+            self.get_sdram_usage_for_neuron_params(vertex_slice) +
+            self.__neuron_recorder.get_metadata_sdram_usage_in_bytes(
+                vertex_slice))
+
+    def get_synapse_constant_sdram(self, vertex_slice):
+        return (
+            self.get_synapse_params_size() +
+            self.get_synapse_dynamics_size(vertex_slice) +
+            self.get_structural_dynamics_size(vertex_slice) +
+            self.get_synapses_size(vertex_slice) +
+            self.get_pop_table_size() +
+            self.get_synapse_expander_size() +
+            get_estimated_sdram_for_bit_field_region(
+                self.__incoming_projections) +
+            get_estimated_sdram_for_key_region(
+                self.__incoming_projections) +
+            exact_sdram_for_bit_field_builder_region())

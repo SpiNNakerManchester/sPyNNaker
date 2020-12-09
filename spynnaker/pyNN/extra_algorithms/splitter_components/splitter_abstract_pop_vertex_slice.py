@@ -16,7 +16,6 @@ import os
 
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException
-from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint, FixedVertexAtomsConstraint,
     AbstractPartitionerConstraint)
@@ -32,9 +31,11 @@ from spinn_front_end_common.utilities.constants import (
 from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
 from spynnaker.pyNN.models.neuron import (
     AbstractPopulationVertex, PopulationMachineVertex)
-from spynnaker.pyNN.utilities import bit_field_utilities
 from spynnaker.pyNN.models.neuron.population_machine_vertex import (
     NeuronProvenance, SynapseProvenance)
+from spinn_front_end_common.interface.buffer_management\
+    .recording_utilities import (
+        get_recording_header_size, get_recording_data_constant_size)
 
 
 class SplitterAbstractPopulationVertexSlice(
@@ -81,18 +82,11 @@ class SplitterAbstractPopulationVertexSlice(
     def create_machine_vertex(
             self, vertex_slice, resources, label, remaining_constraints):
         return PopulationMachineVertex(
-            resources,
-            self._governed_app_vertex.neuron_recorder.recorded_ids_by_slice(
-                vertex_slice),
-            label, remaining_constraints, self._governed_app_vertex,
-            vertex_slice,
-            self.__get_binary_file_name())
+            resources, label, remaining_constraints, self._governed_app_vertex,
+            vertex_slice, self.__get_binary_file_name())
 
-    @inject_items({"graph": "MemoryApplicationGraph"})
-    @overrides(
-        AbstractSplitterSlice.get_resources_used_by_atoms,
-        additional_arguments=["graph"])
-    def get_resources_used_by_atoms(self, vertex_slice, graph):
+    @overrides(AbstractSplitterSlice.get_resources_used_by_atoms)
+    def get_resources_used_by_atoms(self, vertex_slice):
         """  Gets the resources of a slice of atoms from a given app vertex.
 
         :param Slice vertex_slice: the slice
@@ -100,7 +94,7 @@ class SplitterAbstractPopulationVertexSlice(
         :rtype: ResourceContainer
         """
         variable_sdram = self.get_variable_sdram(vertex_slice)
-        constant_sdram = self.constant_sdram(vertex_slice, graph)
+        constant_sdram = self.constant_sdram(vertex_slice)
 
         # set resources required from this object
         container = ResourceContainer(
@@ -119,39 +113,29 @@ class SplitterAbstractPopulationVertexSlice(
         :rtype: VariableSDRAM
         """
 
-        return self._governed_app_vertex.neuron_recorder.\
-            get_variable_sdram_usage(vertex_slice)
+        return (
+            self._governed_app_vertex.get_neuron_variable_sdram(vertex_slice) +
+            self._governed_app_vertex.get_synapse_variable_sdram(vertex_slice))
 
-    def constant_sdram(self, vertex_slice,  graph):
+    def constant_sdram(self, vertex_slice):
         """ returns the constant sdram used by the vertex slice.
 
         :param Slice vertex_slice: the atoms to get constant sdram of
-        :param ApplicationGraph graph: app graph
         :rtype: ConstantSDRAM
         """
-        sdram_requirement = (
+        n_record = (
+            len(self._governed_app_vertex.neuron_recordables) +
+            len(self._governed_app_vertex.synapse_recordables))
+        return ConstantSDRAM(
             SYSTEM_BYTES_REQUIREMENT +
-            self._governed_app_vertex.get_sdram_usage_for_neuron_params(
-                vertex_slice) +
-            self._governed_app_vertex.neuron_recorder.get_static_sdram_usage(
-                vertex_slice) +
+            get_recording_header_size(n_record) +
+            get_recording_data_constant_size(n_record) +
             PopulationMachineVertex.get_provenance_data_size(
                 NeuronProvenance.N_ITEMS + SynapseProvenance.N_ITEMS) +
-            self._governed_app_vertex.get_synapse_params_size() +
-            self._governed_app_vertex.get_synapse_dynamics_size(vertex_slice) +
-            self._governed_app_vertex.get_structural_dynamics_size(
-                vertex_slice) +
-            self._governed_app_vertex.get_synapses_size(vertex_slice) +
-            self._governed_app_vertex.get_pop_table_size() +
-            self._governed_app_vertex.get_synapse_expander_size() +
             profile_utils.get_profile_region_size(
                 self._governed_app_vertex.n_profile_samples) +
-            bit_field_utilities.get_estimated_sdram_for_bit_field_region(
-                graph, self._governed_app_vertex) +
-            bit_field_utilities.get_estimated_sdram_for_key_region(
-                graph, self._governed_app_vertex) +
-            bit_field_utilities.exact_sdram_for_bit_field_builder_region())
-        return ConstantSDRAM(sdram_requirement)
+            self._governed_app_vertex.get_neuron_constant_sdram(vertex_slice) +
+            self._governed_app_vertex.get_synapse_constant_sdram(vertex_slice))
 
     def dtcm_cost(self, vertex_slice):
         """ get the dtcm cost for the slice of atoms

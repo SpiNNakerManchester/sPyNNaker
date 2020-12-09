@@ -36,9 +36,6 @@ static bool use_key;
 //! The number of neurons on the core
 static uint32_t n_neurons;
 
-//! The recording flags
-static uint32_t recording_flags = 0;
-
 //! parameters that reside in the neuron_parameter_data_region
 struct neuron_parameters {
     uint32_t has_key;
@@ -115,7 +112,7 @@ bool neuron_initialise(
 
     // setup recording region
     if (!neuron_recording_initialise(
-            recording_address, &recording_flags, n_neurons, n_rec_regions_used)) {
+            recording_address, n_neurons, n_rec_regions_used)) {
         return false;
     }
 
@@ -123,12 +120,6 @@ bool neuron_initialise(
 }
 
 void neuron_pause(address_t address) { // EXPORTED
-    /* Finalise any recordings that are in progress, writing back the final
-     * amounts of samples recorded to SDRAM */
-    if (recording_flags > 0) {
-        log_debug("updating recording regions");
-        neuron_recording_finalise();
-    }
 
     // call neuron implementation function to do the work
     neuron_impl_store_neuron_parameters(

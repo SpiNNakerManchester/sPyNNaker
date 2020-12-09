@@ -29,10 +29,6 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, MICRO_TO_MILLISECOND_CONVERSION, BITS_PER_WORD)
-from spinn_front_end_common.interface.buffer_management.recording_utilities \
-    import (
-        get_recording_header_array, get_recording_header_size,
-        get_recording_data_constant_size)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -113,7 +109,8 @@ class NeuronRecorder(object):
 
     def __init__(
             self, allowed_variables, data_types, bitfield_variables,
-            n_neurons, per_timestep_variables, per_timestep_datatypes):
+            n_neurons, per_timestep_variables, per_timestep_datatypes,
+            offset=0):
         """
         :param list(str) allowed_variables:
         :param list(str) data_types:
@@ -134,9 +131,9 @@ class NeuronRecorder(object):
                 allowed_variables, bitfield_variables)):
             self.__sampling_rates[variable] = 0
             self.__indexes[variable] = None
-            self.__region_ids[variable] = region_id
+            self.__region_ids[variable] = region_id + offset
         for ts_region_id, variable in enumerate(
-                per_timestep_variables, start=region_id + 1):
+                per_timestep_variables, start=region_id + 1 + offset):
             self.__region_ids[variable] = ts_region_id
 
     def _count_recording_per_slice(self, variable, vertex_slice):
@@ -271,17 +268,6 @@ class NeuronRecorder(object):
             sampling_rate, label, placement_data)
         return placement_data
 
-    @staticmethod
-    def expected_rows_for_a_run_time(n_machine_time_steps, sampling_rate):
-        """ determines how many rows to see based off how long its ran for
-
-        :param int n_machine_time_steps: map of vertex to time steps
-        :param float sampling_rate: the sampling rate for a given variable
-        :return: how many rows there should be.
-        :rtype: int
-        """
-        return int(math.ceil(n_machine_time_steps / sampling_rate))
-
     def __read_data(
             self, label, buffer_manager, placements, application_vertex,
             sampling_rate, data_type, variable, n_machine_time_steps):
@@ -298,8 +284,8 @@ class NeuronRecorder(object):
 
         indexes = []
         for i, vertex in enumerate(progress.over(vertices)):
-            expected_rows = application_vertex.get_expected_n_rows(
-                n_machine_time_steps, sampling_rate, vertex, variable)
+            expected_rows = int(
+                math.ceil(n_machine_time_steps / sampling_rate))
 
             n_items_per_timestep = 1
             if variable in self.__sampling_rates:
@@ -473,10 +459,16 @@ class NeuronRecorder(object):
         except KeyError as e:
             if variable in self.__per_timestep_recording:
                 return True
-            elif variable not in self.__per_timestep_variables:
-                msg = ("Variable {} is not supported. Supported variables are"
-                       "{}".format(variable, self.get_recordable_variables()))
-                raise_from(ConfigurationException(msg), e)
+        return False
+
+    def is_recordable(self, variable):
+        """ Identify if the given variable can be recorded
+
+        :param str variable: The variable to check for
+        :rtype: bool
+        """
+        return (variable in self.__sampling_rates or
+                variable in self.__per_timestep_variables)
 
     @property
     def recording_variables(self):
@@ -529,6 +521,7 @@ class NeuronRecorder(object):
     def recorded_ids_by_slice(self, vertex_slice):
         """
         :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :param int offset: The offset to add to the region ids
         :rtype: list(int)
         """
         variables = [
@@ -737,8 +730,10 @@ class NeuronRecorder(object):
             raise ConfigurationException("Variable {} is not supported".format(
                 variable))
 
-    def _get_buffered_sdram(self, vertex_slice, n_machine_time_steps):
-        """
+    def get_region_sizes(self, vertex_slice, n_machine_time_steps):
+        """ Get the sizes of the regions for the variables, whether they are
+            recorded or not, with those that are not having a size of 0
+
         :param ~pacman.model.graphs.commmon.Slice vertex_slice:
         :param int n_machine_time_steps:
         :rtype: list(int)
@@ -751,20 +746,16 @@ class NeuronRecorder(object):
         return values
 
     def write_neuron_recording_region(
-            self, spec, neuron_recording_region, vertex_slice,
-            data_n_time_steps):
+            self, spec, neuron_recording_region, vertex_slice):
         """ recording data specification
 
         :param ~data_specification.DataSpecificationGenerator spec: dsg spec
         :param int neuron_recording_region: the recording region
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             the vertex slice
-        :param int data_n_time_steps: how many time steps to run this time
         :rtype: None
         """
         spec.switch_write_focus(neuron_recording_region)
-        spec.write_array(get_recording_header_array(
-            self._get_buffered_sdram(vertex_slice, data_n_time_steps)))
 
         # Write the number of variables and bitfields (ignore per-timestep)
         n_vars = len(self.__sampling_rates) - len(self.__bitfield_variables)
@@ -854,7 +845,7 @@ class NeuronRecorder(object):
         return overflow
 
     def get_buffered_sdram(self, variable, vertex_slice, n_machine_time_steps):
-        """ Returns the SDRAM used for this may time steps
+        """ Returns the SDRAM used for this many time steps for a variable
 
         If required the total is rounded up so the space will always fit
 
@@ -887,8 +878,9 @@ class NeuronRecorder(object):
         """
         return (n_bytes + (BYTES_PER_WORD - 1)) // BYTES_PER_WORD
 
-    def get_sdram_usage_in_bytes(self, vertex_slice):
-        """
+    def get_metadata_sdram_usage_in_bytes(self, vertex_slice):
+        """ Get the SDRAM usage of the metadata for recording
+
         :param ~pacman.model.graphs.common.Slice vertex_slice:
         :rtype: int
         """
@@ -921,18 +913,6 @@ class NeuronRecorder(object):
         # even if not recording as also act as a gate
         fixed_sdram += self._N_BYTES_PER_INDEX * vertex_slice.n_atoms
         return fixed_sdram
-
-    def get_static_sdram_usage(self, vertex_slice):
-        """
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-        :rtype: int
-        """
-        n_record = len(self.__sampling_rates)
-        sdram = (
-            get_recording_header_size(n_record) +
-            get_recording_data_constant_size(n_record) +
-            self.get_sdram_usage_in_bytes(vertex_slice))
-        return int(sdram)
 
     def get_variable_sdram_usage(self, vertex_slice):
         """
@@ -969,7 +949,7 @@ class NeuronRecorder(object):
         """
         # Note: Per-timestep variables uses no DTCM
         # *_rate + n_neurons_recording_* + *_indexes
-        usage = self.get_sdram_usage_in_bytes(vertex_slice)
+        usage = self.get_metadata_sdram_usage_in_bytes(vertex_slice)
 
         # *_count + *_increment
         usage += (len(self.__sampling_rates) * (

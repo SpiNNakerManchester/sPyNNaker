@@ -42,6 +42,7 @@
 #include <simulation.h>
 #include <profiler.h>
 #include <debug.h>
+#include <recording.h>
 
 /* validates that the model being compiled does indeed contain a application
  * magic number*/
@@ -111,6 +112,9 @@ static uint32_t count_rewire_attempts = 0;
 //! timer count for tdma of certain models
 static uint global_timer_count;
 
+//! The recording flags indicating if anything is recording
+static uint32_t recording_flags = 0;
+
 //! \brief Callback to store provenance data (format: neuron_provenance).
 //! \param[out] provenance_region: Where to write the provenance data
 static void c_main_store_provenance_data(address_t provenance_region) {
@@ -148,12 +152,20 @@ static bool initialise(void) {
     // Setup profiler
     profiler_init(data_specification_get_region(PROFILER_REGION, ds_regions));
 
+    // Setup recording
+    void *rec_addr = data_specification_get_region(RECORDING_REGION, ds_regions);
+    if (!recording_initialize(&rec_addr, &recording_flags)) {
+        return false;
+    }
+
+    // Setup neurons
     uint32_t n_rec_regions_used;
     if (!initialise_neuron_regions(
             ds_regions, NEURON_REGIONS,  &n_rec_regions_used)) {
         return false;
     }
 
+    // Setup synapses
     if (!initialise_synapse_regions(
             ds_regions, SYNAPSE_REGIONS, SYNAPSE_PRIORITIES,
             n_rec_regions_used)) {
@@ -219,6 +231,13 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
         data_specification_metadata_t *ds_regions =
                 data_specification_get_data_address();
         neuron_pause(data_specification_get_region(NEURON_PARAMS_REGION, ds_regions));
+
+        /* Finalise any recordings that are in progress, writing back the final
+         * amounts of samples recorded to SDRAM */
+        if (recording_flags > 0) {
+            log_debug("updating recording regions");
+            recording_finalise();
+        }
 
         profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 
