@@ -42,9 +42,6 @@
 #include <simulation.h>
 #include <profiler.h>
 #include <debug.h>
-#include <bit_field.h>
-#include <filter_info.h>
-#include <tdma_processing.h>
 
 /* validates that the model being compiled does indeed contain a application
  * magic number*/
