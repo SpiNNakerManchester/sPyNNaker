@@ -20,6 +20,7 @@
 
 #ifndef _BIT_FIELD_COMMON_H_
 #define _BIT_FIELD_COMMON_H_
+
 //! \brief Format of the builder region in SDRAM
 typedef struct builder_region_struct {
     //! What region to find master population table in

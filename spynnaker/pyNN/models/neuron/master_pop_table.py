@@ -43,8 +43,6 @@ _BITS_PER_BYTES = 8
 _CTYPES_N_BITS_SHIFT = 16
 
 
-
-
 def _n_bits(field):
     """ Get the number of bits in a field (ctypes doesn't do this)
 
@@ -506,7 +504,7 @@ class MasterPopTableAsBinarySearch(object):
 
         # if not single, scale the address
         start_addr = block_start_addr
-        if representation == REPRESENTATION_VALUES.DIRECT:
+        if representation == REPRESENTATION_VALUES.DIRECT.value:
             if block_start_addr % _ADDRESS_SCALE != 0:
                 raise SynapticConfigurationException(
                     "Address {} is not compatible with this table".format(
@@ -551,9 +549,6 @@ class MasterPopTableAsBinarySearch(object):
         index = self.__entries[key_and_mask.key].append_invalid()
         self.__n_addresses += 1
         return index
-
-    def read_back_master_pop(self, transceiver, placement):
-        pass
 
     def finish_master_pop_table(self, spec, master_pop_table_region):
         """ Complete the master pop table in the data specification.
