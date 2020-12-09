@@ -68,6 +68,7 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#nested-classes">Data Structures</a> &#124;
 <a href="#define-members">Macros</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
@@ -85,6 +86,12 @@ $(function() {
 </div>
 <p><a href="matrix__generator__static_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+Data Structures</h2></td></tr>
+<tr class="memitem:structstatic__row__t"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__static_8h.html#structstatic__row__t">static_row_t</a></td></tr>
+<tr class="memdesc:structstatic__row__t"><td class="mdescLeft">&#160;</td><td class="mdescRight">The layout of a purely static row of a synaptic matrix.  <a href="matrix__generator__static_8h.html#structstatic__row__t">More...</a><br /></td></tr>
+<tr class="separator:structstatic__row__t"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
 <tr class="memitem:a694a022e33e33cf62ed968fc3e61bfcd"><td class="memItemLeft" align="right" valign="top"><a id="a694a022e33e33cf62ed968fc3e61bfcd"></a>
@@ -99,22 +106,6 @@ Macros</h2></td></tr>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__static_8h.html#a9932d3e682ca42eb572c28a676e4e4b7">SYNAPSE_DELAY_MASK</a>&#160;&#160;&#160;0xFF</td></tr>
 <tr class="memdesc:a9932d3e682ca42eb572c28a676e4e4b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">The mask of a delay before shifting. <br /></td></tr>
 <tr class="separator:a9932d3e682ca42eb572c28a676e4e4b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aac7abdd039c56a26b832530725b1a809"><td class="memItemLeft" align="right" valign="top"><a id="aac7abdd039c56a26b832530725b1a809"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__static_8h.html#aac7abdd039c56a26b832530725b1a809">STATIC_PLASTIC_PLASTIC_SIZE</a>&#160;&#160;&#160;0</td></tr>
-<tr class="memdesc:aac7abdd039c56a26b832530725b1a809"><td class="mdescLeft">&#160;</td><td class="mdescRight">The position of the plastic-plastic size within a row. <br /></td></tr>
-<tr class="separator:aac7abdd039c56a26b832530725b1a809"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac2f71bc80cfc0fc31d9e701a7a3e2ea2"><td class="memItemLeft" align="right" valign="top"><a id="ac2f71bc80cfc0fc31d9e701a7a3e2ea2"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__static_8h.html#ac2f71bc80cfc0fc31d9e701a7a3e2ea2">STATIC_FIXED_PLASTIC_SIZE</a>&#160;&#160;&#160;2</td></tr>
-<tr class="memdesc:ac2f71bc80cfc0fc31d9e701a7a3e2ea2"><td class="mdescLeft">&#160;</td><td class="mdescRight">The position of the fixed-plastic size within a row. <br /></td></tr>
-<tr class="separator:ac2f71bc80cfc0fc31d9e701a7a3e2ea2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aed1da57790c33f7c33e253d438efe578"><td class="memItemLeft" align="right" valign="top"><a id="aed1da57790c33f7c33e253d438efe578"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__static_8h.html#aed1da57790c33f7c33e253d438efe578">STATIC_FIXED_FIXED_SIZE</a>&#160;&#160;&#160;1</td></tr>
-<tr class="memdesc:aed1da57790c33f7c33e253d438efe578"><td class="mdescLeft">&#160;</td><td class="mdescRight">The position of the fixed-fixed size within a row. <br /></td></tr>
-<tr class="separator:aed1da57790c33f7c33e253d438efe578"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af6d1d250fd4924c15ef742601752d066"><td class="memItemLeft" align="right" valign="top"><a id="af6d1d250fd4924c15ef742601752d066"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__static_8h.html#af6d1d250fd4924c15ef742601752d066">STATIC_FIXED_FIXED_OFFSET</a>&#160;&#160;&#160;3</td></tr>
-<tr class="memdesc:af6d1d250fd4924c15ef742601752d066"><td class="mdescLeft">&#160;</td><td class="mdescRight">The starting position of the fixed-fixed data within a row. <br /></td></tr>
-<tr class="separator:af6d1d250fd4924c15ef742601752d066"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -135,7 +126,52 @@ Functions</h2></td></tr>
 <div class="textblock"><p>Static synaptic matrix implementation. </p>
 
 <p class="definition">Definition in file <a class="el" href="matrix__generator__static_8h_source.html">matrix_generator_static.h</a>.</p>
-</div><h2 class="groupheader">Function Documentation</h2>
+</div><hr/><h2 class="groupheader">Data Structure Documentation</h2>
+<a name="structstatic__row__t" id="structstatic__row__t"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#structstatic__row__t">&#9670;&nbsp;</a></span>static_row_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">struct static_row_t</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="textblock"><p>The layout of a purely static row of a synaptic matrix. </p>
+
+<p class="definition">Definition at line <a class="el" href="matrix__generator__static_8h_source.html#l00062">62</a> of file <a class="el" href="matrix__generator__static_8h_source.html">matrix_generator_static.h</a>.</p>
+</div><table class="fieldtable">
+<tr><th colspan="3">Data Fields</th></tr>
+<tr><td class="fieldtype">
+<a id="a517f946e7eb90f3e7adaad0aad281bba"></a>uint32_t</td>
+<td class="fieldname">
+plastic_plastic_size</td>
+<td class="fielddoc">
+the plastic-plastic size within a row </td></tr>
+<tr><td class="fieldtype">
+<a id="a42b25ad87ad6746a462ba9ba0db13be4"></a>uint32_t</td>
+<td class="fieldname">
+fixed_fixed_size</td>
+<td class="fielddoc">
+the fixed-fixed size within a row </td></tr>
+<tr><td class="fieldtype">
+<a id="a478e204c92e1d085b8f6649bfac26abd"></a>uint32_t</td>
+<td class="fieldname">
+fixed_plastic_size</td>
+<td class="fielddoc">
+the fixed-plastic size within a row </td></tr>
+<tr><td class="fieldtype">
+<a id="a70c4dcee5d9f79d3d8d93e71816b28f1"></a>uint32_t</td>
+<td class="fieldname">
+fixed_fixed_data[]</td>
+<td class="fielddoc">
+the fixed-fixed data within a row </td></tr>
+</table>
+
+</div>
+</div>
+<h2 class="groupheader">Function Documentation</h2>
 <a id="a34e736f14eb0b8aa28b50e8b1d053acf"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a34e736f14eb0b8aa28b50e8b1d053acf">&#9670;&nbsp;</a></span>matrix_generator_static_initialize()</h2>
 
@@ -281,7 +317,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a synaptic word </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="matrix__generator__static_8h_source.html#l00091">91</a> of file <a class="el" href="matrix__generator__static_8h_source.html">matrix_generator_static.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="matrix__generator__static_8h_source.html#l00079">79</a> of file <a class="el" href="matrix__generator__static_8h_source.html">matrix_generator_static.h</a>.</p>
 
 </div>
 </div>
@@ -426,14 +462,14 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="matrix__generator__static_8h_source.html#l00128">128</a> of file <a class="el" href="matrix__generator__static_8h_source.html">matrix_generator_static.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="matrix__generator__static_8h_source.html#l00116">116</a> of file <a class="el" href="matrix__generator__static_8h_source.html">matrix_generator_static.h</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Dec 9 2020 08:34:41 for sPyNNaker neural_modelling by&#160;<a href="http://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.8.20
+Generated on Wed Dec 9 2020 13:28:19 for sPyNNaker neural_modelling by&#160;<a href="http://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.8.20
 </small></address>
 </body>
 </html>

@@ -103,12 +103,9 @@ Functions</h2></td></tr>
 <tr class="memitem:ad88a7e6b3773f1e0f334b7410f182987"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#ad88a7e6b3773f1e0f334b7410f182987">synapses_do_timestep_update</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#a3b72c02431c8c631ab35793169a96ca0">timer_t</a> <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>)</td></tr>
 <tr class="memdesc:ad88a7e6b3773f1e0f334b7410f182987"><td class="mdescLeft">&#160;</td><td class="mdescRight">Do all the synapse processing for a timestep.  <a href="synapses_8h.html#ad88a7e6b3773f1e0f334b7410f182987">More...</a><br /></td></tr>
 <tr class="separator:ad88a7e6b3773f1e0f334b7410f182987"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa1ceab23dea834d6189f496b5133d983"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#aa1ceab23dea834d6189f496b5133d983">synapses_process_synaptic_row</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, <a class="el" href="neuron-typedefs_8h.html#a883af5b0c4fbeeb762d784a8e162da64">synaptic_row_t</a> row, bool *write_back)</td></tr>
+<tr class="memitem:aa1ceab23dea834d6189f496b5133d983"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#aa1ceab23dea834d6189f496b5133d983">synapses_process_synaptic_row</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, <a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a> row, bool *write_back)</td></tr>
 <tr class="memdesc:aa1ceab23dea834d6189f496b5133d983"><td class="mdescLeft">&#160;</td><td class="mdescRight">process a synaptic row  <a href="synapses_8h.html#aa1ceab23dea834d6189f496b5133d983">More...</a><br /></td></tr>
 <tr class="separator:aa1ceab23dea834d6189f496b5133d983"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4e44cc55de4083bfb10edfcac1a57e50"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#a4e44cc55de4083bfb10edfcac1a57e50">synapses_get_saturation_count</a> (void)</td></tr>
-<tr class="memdesc:a4e44cc55de4083bfb10edfcac1a57e50"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns the number of times the synapses have saturated their weights.  <a href="synapses_8h.html#a4e44cc55de4083bfb10edfcac1a57e50">More...</a><br /></td></tr>
-<tr class="separator:a4e44cc55de4083bfb10edfcac1a57e50"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa95d63df3a6fbedaaf3a0d36f824df35"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#aa95d63df3a6fbedaaf3a0d36f824df35">synapses_get_pre_synaptic_events</a> (void)</td></tr>
 <tr class="memdesc:aa95d63df3a6fbedaaf3a0d36f824df35"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns the counters for plastic and fixed pre synaptic events based on (if the model was compiled with SYNAPSE_BENCHMARK parameter) or returns 0  <a href="synapses_8h.html#aa95d63df3a6fbedaaf3a0d36f824df35">More...</a><br /></td></tr>
 <tr class="separator:aa95d63df3a6fbedaaf3a0d36f824df35"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -122,9 +119,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syna
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:a8b7881a6d9caca38f2050656c652cf26"><td class="memItemLeft" align="right" valign="top"><a id="a8b7881a6d9caca38f2050656c652cf26"></a>
-uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#a8b7881a6d9caca38f2050656c652cf26">synapses_saturation_count</a></td></tr>
-<tr class="memdesc:a8b7881a6d9caca38f2050656c652cf26"><td class="mdescLeft">&#160;</td><td class="mdescRight">Count of the number of times the ring buffers have saturated. <br /></td></tr>
+<tr class="memitem:a8b7881a6d9caca38f2050656c652cf26"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#a8b7881a6d9caca38f2050656c652cf26">synapses_saturation_count</a></td></tr>
+<tr class="memdesc:a8b7881a6d9caca38f2050656c652cf26"><td class="mdescLeft">&#160;</td><td class="mdescRight">Count of the number of times the synapses have saturated their weights.  <a href="synapses_8h.html#a8b7881a6d9caca38f2050656c652cf26">More...</a><br /></td></tr>
 <tr class="separator:a8b7881a6d9caca38f2050656c652cf26"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -407,7 +403,7 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if successfully initialised. False otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00255">255</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00243">243</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
 
 </div>
 </div>
@@ -435,7 +431,7 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00325">325</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00313">313</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
 
 </div>
 </div>
@@ -454,7 +450,7 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="neuron-typedefs_8h.html#a883af5b0c4fbeeb762d784a8e162da64">synaptic_row_t</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a>&#160;</td>
           <td class="paramname"><em>row</em>, </td>
         </tr>
         <tr>
@@ -482,28 +478,7 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if successful </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00365">365</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
-
-</div>
-</div>
-<a id="a4e44cc55de4083bfb10edfcac1a57e50"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4e44cc55de4083bfb10edfcac1a57e50">&#9670;&nbsp;</a></span>synapses_get_saturation_count()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint32_t synapses_get_saturation_count </td>
-          <td>(</td>
-          <td class="paramtype">void&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>returns the number of times the synapses have saturated their weights. </p>
-<dl class="section return"><dt>Returns</dt><dd>the number of times the synapses have saturated. </dd></dl>
+<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00353">353</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
 
 </div>
 </div>
@@ -526,7 +501,7 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 <p>returns the counters for plastic and fixed pre synaptic events based on (if the model was compiled with SYNAPSE_BENCHMARK parameter) or returns 0 </p>
 <dl class="section return"><dt>Returns</dt><dd>the counter for plastic and fixed pre synaptic events or 0 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00405">405</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00390">390</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
 
 </div>
 </div>
@@ -547,18 +522,46 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 </div><div class="memdoc">
 
 <p>allows clearing of DTCM used by synapses </p>
-<dl class="section return"><dt>Returns</dt><dd>true if successful, false otherwise</dd>
-<dd>
-true if successful </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>true if successful, false otherwise</dd></dl>
+<p>allows clearing of DTCM used by synapses</p>
+<dl class="section return"><dt>Returns</dt><dd>true if successful </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00418">418</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00403">403</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="a8b7881a6d9caca38f2050656c652cf26"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8b7881a6d9caca38f2050656c652cf26">&#9670;&nbsp;</a></span>synapses_saturation_count</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t synapses_saturation_count</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Count of the number of times the synapses have saturated their weights. </p>
+<p>Count of the number of times the synapses have saturated their weights. </p>
+
+<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00074">74</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Dec 9 2020 08:34:41 for sPyNNaker neural_modelling by&#160;<a href="http://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.8.20
+Generated on Wed Dec 9 2020 13:28:19 for sPyNNaker neural_modelling by&#160;<a href="http://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.8.20
 </small></address>
 </body>
 </html>

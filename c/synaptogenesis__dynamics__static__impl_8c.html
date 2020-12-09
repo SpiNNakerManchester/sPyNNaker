@@ -86,23 +86,24 @@ Functions</h2></td></tr>
 <tr class="memitem:adba45d439e3c65751b2508e6ae744e15"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synaptogenesis__dynamics__static__impl_8c.html#adba45d439e3c65751b2508e6ae744e15">synaptogenesis_dynamics_initialise</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> sdram_sp_address)</td></tr>
 <tr class="memdesc:adba45d439e3c65751b2508e6ae744e15"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialisation of synaptic rewiring (synaptogenesis) parameters (random seed, spread of receptive field etc.)  <a href="synaptogenesis__dynamics__static__impl_8c.html#adba45d439e3c65751b2508e6ae744e15">More...</a><br /></td></tr>
 <tr class="separator:adba45d439e3c65751b2508e6ae744e15"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1a8123da1bd797e82cb3193a0ce43847"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synaptogenesis__dynamics__static__impl_8c.html#a1a8123da1bd797e82cb3193a0ce43847">synaptogenesis_dynamics_rewire</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, <a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> *spike, <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *synaptic_row_address, uint32_t *n_bytes)</td></tr>
-<tr class="memdesc:a1a8123da1bd797e82cb3193a0ce43847"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function called (usually on a timer from <a class="el" href="bit__field__expander_8c.html#aa14f4f1d4c84183b7bf7108bf930a23c" title="Entry point.">c_main()</a>) to trigger the process of synaptic rewiring.  <a href="synaptogenesis__dynamics__static__impl_8c.html#a1a8123da1bd797e82cb3193a0ce43847">More...</a><br /></td></tr>
-<tr class="separator:a1a8123da1bd797e82cb3193a0ce43847"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac08559ca2e23561471aebd3f4097e348"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synaptogenesis__dynamics__static__impl_8c.html#ac08559ca2e23561471aebd3f4097e348">synaptogenesis_row_restructure</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> row)</td></tr>
-<tr class="memdesc:ac08559ca2e23561471aebd3f4097e348"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs the actual restructuring of a row.  <a href="synaptogenesis__dynamics__static__impl_8c.html#ac08559ca2e23561471aebd3f4097e348">More...</a><br /></td></tr>
-<tr class="separator:ac08559ca2e23561471aebd3f4097e348"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5cdd3772a85bf8d042932b9ec4e57125"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synaptogenesis__dynamics__static__impl_8c.html#a5cdd3772a85bf8d042932b9ec4e57125">synaptogenesis_dynamics_rewire</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, <a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> *spike, <a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a> *synaptic_row, uint32_t *n_bytes)</td></tr>
+<tr class="memdesc:a5cdd3772a85bf8d042932b9ec4e57125"><td class="mdescLeft">&#160;</td><td class="mdescRight">Trigger the process of synaptic rewiring.  <a href="synaptogenesis__dynamics__static__impl_8c.html#a5cdd3772a85bf8d042932b9ec4e57125">More...</a><br /></td></tr>
+<tr class="separator:a5cdd3772a85bf8d042932b9ec4e57125"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac97a88bbadb38fa4d4a67aa86aa615c8"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synaptogenesis__dynamics__static__impl_8c.html#ac97a88bbadb38fa4d4a67aa86aa615c8">synaptogenesis_row_restructure</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, <a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a> row)</td></tr>
+<tr class="memdesc:ac97a88bbadb38fa4d4a67aa86aa615c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Perform the actual restructuring of a row.  <a href="synaptogenesis__dynamics__static__impl_8c.html#ac97a88bbadb38fa4d4a67aa86aa615c8">More...</a><br /></td></tr>
+<tr class="separator:ac97a88bbadb38fa4d4a67aa86aa615c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afa57eee149b8ef2c30e2239c22f0957e"><td class="memItemLeft" align="right" valign="top">int32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synaptogenesis__dynamics__static__impl_8c.html#afa57eee149b8ef2c30e2239c22f0957e">synaptogenesis_rewiring_period</a> (void)</td></tr>
-<tr class="memdesc:afa57eee149b8ef2c30e2239c22f0957e"><td class="mdescLeft">&#160;</td><td class="mdescRight">retrieve the period of rewiring  <a href="synaptogenesis__dynamics__static__impl_8c.html#afa57eee149b8ef2c30e2239c22f0957e">More...</a><br /></td></tr>
+<tr class="memdesc:afa57eee149b8ef2c30e2239c22f0957e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the period of rewiring.  <a href="synaptogenesis__dynamics__static__impl_8c.html#afa57eee149b8ef2c30e2239c22f0957e">More...</a><br /></td></tr>
 <tr class="separator:afa57eee149b8ef2c30e2239c22f0957e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0d2bd7f05bdc3f4c8ce1ccafc16feb4a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synaptogenesis__dynamics__static__impl_8c.html#a0d2bd7f05bdc3f4c8ce1ccafc16feb4a">synaptogenesis_is_fast</a> (void)</td></tr>
-<tr class="memdesc:a0d2bd7f05bdc3f4c8ce1ccafc16feb4a"><td class="mdescLeft">&#160;</td><td class="mdescRight">controls whether rewiring is attempted multiple times per timestep or after a number of timesteps.  <a href="synaptogenesis__dynamics__static__impl_8c.html#a0d2bd7f05bdc3f4c8ce1ccafc16feb4a">More...</a><br /></td></tr>
+<tr class="memdesc:a0d2bd7f05bdc3f4c8ce1ccafc16feb4a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get whether rewiring is attempted multiple times per timestep or after a number of timesteps.  <a href="synaptogenesis__dynamics__static__impl_8c.html#a0d2bd7f05bdc3f4c8ce1ccafc16feb4a">More...</a><br /></td></tr>
 <tr class="separator:a0d2bd7f05bdc3f4c8ce1ccafc16feb4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a51fae9acd15ca3ad50a61ce734de93c2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synaptogenesis__dynamics__static__impl_8c.html#a51fae9acd15ca3ad50a61ce734de93c2">synaptogenesis_spike_received</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, <a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> spike)</td></tr>
+<tr class="memdesc:a51fae9acd15ca3ad50a61ce734de93c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indicates that a spike has been received.  <a href="synaptogenesis__dynamics__static__impl_8c.html#a51fae9acd15ca3ad50a61ce734de93c2">More...</a><br /></td></tr>
 <tr class="separator:a51fae9acd15ca3ad50a61ce734de93c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa905464bd5cc1eb8fa5b1b16b0d9b263"><td class="memItemLeft" align="right" valign="top"><a id="aa905464bd5cc1eb8fa5b1b16b0d9b263"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synaptogenesis__dynamics__static__impl_8c.html#aa905464bd5cc1eb8fa5b1b16b0d9b263">print_post_to_pre_entry</a> (void)</td></tr>
-<tr class="memdesc:aa905464bd5cc1eb8fa5b1b16b0d9b263"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prints a certain data object. <br /></td></tr>
+<tr class="memdesc:aa905464bd5cc1eb8fa5b1b16b0d9b263"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print a certain data object. <br /></td></tr>
 <tr class="separator:aa905464bd5cc1eb8fa5b1b16b0d9b263"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -140,8 +141,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syna
 
 </div>
 </div>
-<a id="a1a8123da1bd797e82cb3193a0ce43847"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1a8123da1bd797e82cb3193a0ce43847">&#9670;&nbsp;</a></span>synaptogenesis_dynamics_rewire()</h2>
+<a id="a5cdd3772a85bf8d042932b9ec4e57125"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5cdd3772a85bf8d042932b9ec4e57125">&#9670;&nbsp;</a></span>synaptogenesis_dynamics_rewire()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -161,8 +162,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syna
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *&#160;</td>
-          <td class="paramname"><em>synaptic_row_address</em>, </td>
+          <td class="paramtype"><a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a> *&#160;</td>
+          <td class="paramname"><em>synaptic_row</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -178,12 +179,12 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syna
       </table>
 </div><div class="memdoc">
 
-<p>Function called (usually on a timer from <a class="el" href="bit__field__expander_8c.html#aa14f4f1d4c84183b7bf7108bf930a23c" title="Entry point.">c_main()</a>) to trigger the process of synaptic rewiring. </p>
-<dl class="params"><dt>Parameters</dt><dd>
+<p>Trigger the process of synaptic rewiring. </p>
+<p>Usually called on a timer registered in <a class="el" href="bit__field__expander_8c.html#aa14f4f1d4c84183b7bf7108bf930a23c" title="Entry point.">c_main()</a> </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">time</td><td>the current timestep </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">spike</td><td>variable to hold the spike </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">synaptic_row_address</td><td>variable to hold the address of the row </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">synaptic_row</td><td>variable to hold the address of the row </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">n_bytes</td><td>variable to hold the size of the row </td></tr>
   </table>
   </dd>
@@ -194,8 +195,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syna
 
 </div>
 </div>
-<a id="ac08559ca2e23561471aebd3f4097e348"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac08559ca2e23561471aebd3f4097e348">&#9670;&nbsp;</a></span>synaptogenesis_row_restructure()</h2>
+<a id="ac97a88bbadb38fa4d4a67aa86aa615c8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac97a88bbadb38fa4d4a67aa86aa615c8">&#9670;&nbsp;</a></span>synaptogenesis_row_restructure()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -209,7 +210,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syna
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a>&#160;</td>
           <td class="paramname"><em>row</em>&#160;</td>
         </tr>
         <tr>
@@ -220,7 +221,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syna
       </table>
 </div><div class="memdoc">
 
-<p>Performs the actual restructuring of a row. </p>
+<p>Perform the actual restructuring of a row. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">time</td><td>The time of the restructure </td></tr>
@@ -250,8 +251,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syna
       </table>
 </div><div class="memdoc">
 
-<p>retrieve the period of rewiring </p>
-<dl class="section return"><dt>Returns</dt><dd>Based on <a class="el" href="synaptogenesis__dynamics_8h.html#a0d2bd7f05bdc3f4c8ce1ccafc16feb4a" title="controls whether rewiring is attempted multiple times per timestep or after a number of timesteps.">synaptogenesis_is_fast()</a>, this can either be how many times rewiring happens in a timestep, or how many timesteps have to pass until rewiring happens. </dd></dl>
+<p>Get the period of rewiring. </p>
+<dl class="section return"><dt>Returns</dt><dd>Based on <a class="el" href="synaptogenesis__dynamics_8h.html#a0d2bd7f05bdc3f4c8ce1ccafc16feb4a" title="Get whether rewiring is attempted multiple times per timestep or after a number of timesteps.">synaptogenesis_is_fast()</a>, this can either be how many times rewiring happens in a timestep, or how many timesteps have to pass until rewiring happens. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="synaptogenesis__dynamics__static__impl_8c_source.html#l00041">41</a> of file <a class="el" href="synaptogenesis__dynamics__static__impl_8c_source.html">synaptogenesis_dynamics_static_impl.c</a>.</p>
 
@@ -273,8 +274,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syna
       </table>
 </div><div class="memdoc">
 
-<p>controls whether rewiring is attempted multiple times per timestep or after a number of timesteps. </p>
-<dl class="section return"><dt>Returns</dt><dd>true if the result of <a class="el" href="synaptogenesis__dynamics_8h.html#afa57eee149b8ef2c30e2239c22f0957e" title="retrieve the period of rewiring">synaptogenesis_rewiring_period()</a> is the number of attempts to try per timestep. </dd></dl>
+<p>Get whether rewiring is attempted multiple times per timestep or after a number of timesteps. </p>
+<dl class="section return"><dt>Returns</dt><dd>true if the result of <a class="el" href="synaptogenesis__dynamics_8h.html#afa57eee149b8ef2c30e2239c22f0957e" title="Get the period of rewiring.">synaptogenesis_rewiring_period()</a> is the number of attempts to try per timestep. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="synaptogenesis__dynamics__static__impl_8c_source.html#l00045">45</a> of file <a class="el" href="synaptogenesis__dynamics__static__impl_8c_source.html">synaptogenesis_dynamics_static_impl.c</a>.</p>
 
@@ -305,7 +306,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syna
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Indicates that a spike has been received </p><dl class="params"><dt>Parameters</dt><dd>
+
+<p>Indicates that a spike has been received. </p>
+<dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">time</td><td>The time that the spike was received at </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">spike</td><td>The received spike </td></tr>
@@ -320,7 +323,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syna
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Dec 9 2020 08:34:41 for sPyNNaker neural_modelling by&#160;<a href="http://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.8.20
+Generated on Wed Dec 9 2020 13:28:19 for sPyNNaker neural_modelling by&#160;<a href="http://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.8.20
 </small></address>
 </body>
 </html>

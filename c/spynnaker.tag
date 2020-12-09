@@ -76,8 +76,8 @@
       <type>static bool</type>
       <name>do_sdram_read_and_test</name>
       <anchorfile>bit__field__expander_8c.html</anchorfile>
-      <anchor>a21dbad8aad4a6f1e8ceaa3fa74e8a988</anchor>
-      <arglist>(address_t row_address, uint32_t n_bytes_to_transfer)</arglist>
+      <anchor>a5eadce86b92d6e5f04e21e7532745ade</anchor>
+      <arglist>(synaptic_row_t row, uint32_t n_bytes_to_transfer)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
@@ -192,10 +192,10 @@
       <arglist></arglist>
     </member>
     <member kind="variable">
-      <type>uint32_t *</type>
+      <type>synaptic_row_t</type>
       <name>row_data</name>
       <anchorfile>bit__field__expander_8c.html</anchorfile>
-      <anchor>aaf22062ead0b27184e006d45487af894</anchor>
+      <anchor>a7a0a788410818524ea425e5287922f92</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
@@ -1478,10 +1478,10 @@
       <arglist></arglist>
     </member>
     <member kind="typedef">
-      <type>address_t</type>
+      <type>struct synaptic_row *</type>
       <name>synaptic_row_t</name>
       <anchorfile>neuron-typedefs_8h.html</anchorfile>
-      <anchor>a883af5b0c4fbeeb762d784a8e162da64</anchor>
+      <anchor>a15c5afaa95cf67525970ec7c98d4a859</anchor>
       <arglist></arglist>
     </member>
     <member kind="typedef">
@@ -2171,33 +2171,28 @@
     <path>/github/workspace/neural_modelling/src/neuron/</path>
     <filename>direct__synapses_8c.html</filename>
     <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
-    <member kind="define">
-      <type>#define</type>
-      <name>SIZE_OF_SINGLE_FIXED_SYNAPSE</name>
-      <anchorfile>direct__synapses_8c.html</anchorfile>
-      <anchor>a0216bcfc656605aad717cf24eba2158e</anchor>
-      <arglist></arglist>
-    </member>
+    <class kind="struct">single_synaptic_row_t</class>
+    <class kind="struct">direct_matrix_data_t</class>
     <member kind="function">
       <type>bool</type>
       <name>direct_synapses_initialise</name>
       <anchorfile>direct__synapses_8c.html</anchorfile>
-      <anchor>a2e8e745d00d5ae6b43f52b577b492191</anchor>
-      <arglist>(address_t direct_matrix_address, address_t *direct_synapses_address)</arglist>
+      <anchor>a4f96698f7745cad8c8009298fb03da9b</anchor>
+      <arglist>(void *direct_matrix_address, address_t *direct_synapses_address)</arglist>
     </member>
     <member kind="function">
       <type>synaptic_row_t</type>
       <name>direct_synapses_get_direct_synapse</name>
       <anchorfile>direct__synapses_8c.html</anchorfile>
-      <anchor>a2c640fdb77e0858eaffe4fdb4b18e644</anchor>
-      <arglist>(address_t row_address)</arglist>
+      <anchor>a4e044c9a28f8428d353c90dbc0249482</anchor>
+      <arglist>(void *row_address)</arglist>
     </member>
     <member kind="variable" static="yes">
-      <type>static uint32_t</type>
+      <type>static single_synaptic_row_t</type>
       <name>single_fixed_synapse</name>
       <anchorfile>direct__synapses_8c.html</anchorfile>
-      <anchor>a7343f7e4c1be39fa1db9785bd59c54dc</anchor>
-      <arglist>[SIZE_OF_SINGLE_FIXED_SYNAPSE]</arglist>
+      <anchor>a5dd766c9e442321941ea5ccef7d32710</anchor>
+      <arglist></arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -2208,15 +2203,15 @@
       <type>bool</type>
       <name>direct_synapses_initialise</name>
       <anchorfile>direct__synapses_8h.html</anchorfile>
-      <anchor>a2e8e745d00d5ae6b43f52b577b492191</anchor>
-      <arglist>(address_t direct_matrix_address, address_t *direct_synapses_address)</arglist>
+      <anchor>a4f96698f7745cad8c8009298fb03da9b</anchor>
+      <arglist>(void *direct_matrix_address, address_t *direct_synapses_address)</arglist>
     </member>
     <member kind="function">
       <type>synaptic_row_t</type>
       <name>direct_synapses_get_direct_synapse</name>
       <anchorfile>direct__synapses_8h.html</anchorfile>
-      <anchor>a2c640fdb77e0858eaffe4fdb4b18e644</anchor>
-      <arglist>(address_t row_address)</arglist>
+      <anchor>a4e044c9a28f8428d353c90dbc0249482</anchor>
+      <arglist>(void *row_address)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -3785,8 +3780,8 @@
       <type>void</type>
       <name>synapse_dynamics_print_plastic_synapses</name>
       <anchorfile>synapse__dynamics__stdp__mad__impl_8c.html</anchorfile>
-      <anchor>a3b1ce651b5787830bfbd4ddd26e993f4</anchor>
-      <arglist>(address_t plastic_region_address, address_t fixed_region_address, uint32_t *ring_buffer_to_input_buffer_left_shifts)</arglist>
+      <anchor>ac0dc7f1b3f6348db279fbad8c8040b1c</anchor>
+      <arglist>(synapse_row_plastic_data_t *plastic_region_data, synapse_row_fixed_part_t *fixed_region, uint32_t *ring_buffer_to_input_buffer_left_shifts)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static index_t</type>
@@ -3806,8 +3801,8 @@
       <type>bool</type>
       <name>synapse_dynamics_process_plastic_synapses</name>
       <anchorfile>synapse__dynamics__stdp__mad__impl_8c.html</anchorfile>
-      <anchor>ab23d9244a75db91ab20874d4da0e5ef8</anchor>
-      <arglist>(address_t plastic_region_address, address_t fixed_region_address, weight_t *ring_buffers, uint32_t time)</arglist>
+      <anchor>af8856a6cc26be71631d24fc5eec3846e</anchor>
+      <arglist>(synapse_row_plastic_data_t *plastic_region_address, synapse_row_fixed_part_t *fixed_region, weight_t *ring_buffers, uint32_t time)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -3841,15 +3836,15 @@
       <type>bool</type>
       <name>synapse_dynamics_find_neuron</name>
       <anchorfile>synapse__dynamics__stdp__mad__impl_8c.html</anchorfile>
-      <anchor>a523b611e80cd9f9e0880f825a6adbe9f</anchor>
-      <arglist>(uint32_t id, address_t row, weight_t *weight, uint16_t *delay, uint32_t *offset, uint32_t *synapse_type)</arglist>
+      <anchor>a5893fd33bdac3b991ecb7cb61feb4188</anchor>
+      <arglist>(uint32_t id, synaptic_row_t row, weight_t *weight, uint16_t *delay, uint32_t *offset, uint32_t *synapse_type)</arglist>
     </member>
     <member kind="function">
       <type>bool</type>
       <name>synapse_dynamics_remove_neuron</name>
       <anchorfile>synapse__dynamics__stdp__mad__impl_8c.html</anchorfile>
-      <anchor>abc297b864cdfaa0cd6e7115cd064baef</anchor>
-      <arglist>(uint32_t offset, address_t row)</arglist>
+      <anchor>af3e517401d329d33f14b0ba70743e127</anchor>
+      <arglist>(uint32_t offset, synaptic_row_t row)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static control_t</type>
@@ -3862,15 +3857,15 @@
       <type>bool</type>
       <name>synapse_dynamics_add_neuron</name>
       <anchorfile>synapse__dynamics__stdp__mad__impl_8c.html</anchorfile>
-      <anchor>a30b01777aad5fef37adccffc7cbef483</anchor>
-      <arglist>(uint32_t id, address_t row, weight_t weight, uint32_t delay, uint32_t type)</arglist>
+      <anchor>ac877b6394f131f1944a720c387af6ac1</anchor>
+      <arglist>(uint32_t id, synaptic_row_t row, weight_t weight, uint32_t delay, uint32_t type)</arglist>
     </member>
     <member kind="function">
       <type>uint32_t</type>
       <name>synapse_dynamics_n_connections_in_row</name>
       <anchorfile>synapse__dynamics__stdp__mad__impl_8c.html</anchorfile>
-      <anchor>a9bc6d64da323d9f5b06333efae6ff107</anchor>
-      <arglist>(address_t fixed)</arglist>
+      <anchor>aca5fc1011c991013823ad76158bf57f3</anchor>
+      <arglist>(synapse_row_fixed_part_t *fixed)</arglist>
     </member>
     <member kind="variable" static="yes">
       <type>static uint32_t</type>
@@ -5213,8 +5208,8 @@
       <type>bool</type>
       <name>synapse_dynamics_process_plastic_synapses</name>
       <anchorfile>synapse__dynamics_8h.html</anchorfile>
-      <anchor>ab23d9244a75db91ab20874d4da0e5ef8</anchor>
-      <arglist>(address_t plastic_region_address, address_t fixed_region_address, weight_t *ring_buffers, uint32_t time)</arglist>
+      <anchor>a60af161f5a3ec5b77f236d4a5d6c2742</anchor>
+      <arglist>(synapse_row_plastic_data_t *plastic_region_data, synapse_row_fixed_part_t *fixed_region, weight_t *ring_buffers, uint32_t time)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -5234,8 +5229,8 @@
       <type>void</type>
       <name>synapse_dynamics_print_plastic_synapses</name>
       <anchorfile>synapse__dynamics_8h.html</anchorfile>
-      <anchor>a3b1ce651b5787830bfbd4ddd26e993f4</anchor>
-      <arglist>(address_t plastic_region_address, address_t fixed_region_address, uint32_t *ring_buffer_to_input_buffer_left_shifts)</arglist>
+      <anchor>ac0dc7f1b3f6348db279fbad8c8040b1c</anchor>
+      <arglist>(synapse_row_plastic_data_t *plastic_region_data, synapse_row_fixed_part_t *fixed_region, uint32_t *ring_buffer_to_input_buffer_left_shifts)</arglist>
     </member>
     <member kind="function">
       <type>uint32_t</type>
@@ -5255,29 +5250,29 @@
       <type>bool</type>
       <name>synapse_dynamics_find_neuron</name>
       <anchorfile>synapse__dynamics_8h.html</anchorfile>
-      <anchor>a523b611e80cd9f9e0880f825a6adbe9f</anchor>
-      <arglist>(uint32_t id, address_t row, weight_t *weight, uint16_t *delay, uint32_t *offset, uint32_t *synapse_type)</arglist>
+      <anchor>a5893fd33bdac3b991ecb7cb61feb4188</anchor>
+      <arglist>(uint32_t id, synaptic_row_t row, weight_t *weight, uint16_t *delay, uint32_t *offset, uint32_t *synapse_type)</arglist>
     </member>
     <member kind="function">
       <type>bool</type>
       <name>synapse_dynamics_remove_neuron</name>
       <anchorfile>synapse__dynamics_8h.html</anchorfile>
-      <anchor>abc297b864cdfaa0cd6e7115cd064baef</anchor>
-      <arglist>(uint32_t offset, address_t row)</arglist>
+      <anchor>af3e517401d329d33f14b0ba70743e127</anchor>
+      <arglist>(uint32_t offset, synaptic_row_t row)</arglist>
     </member>
     <member kind="function">
       <type>bool</type>
       <name>synapse_dynamics_add_neuron</name>
       <anchorfile>synapse__dynamics_8h.html</anchorfile>
-      <anchor>a30b01777aad5fef37adccffc7cbef483</anchor>
-      <arglist>(uint32_t id, address_t row, weight_t weight, uint32_t delay, uint32_t type)</arglist>
+      <anchor>ac877b6394f131f1944a720c387af6ac1</anchor>
+      <arglist>(uint32_t id, synaptic_row_t row, weight_t weight, uint32_t delay, uint32_t type)</arglist>
     </member>
     <member kind="function">
       <type>uint32_t</type>
       <name>synapse_dynamics_n_connections_in_row</name>
       <anchorfile>synapse__dynamics_8h.html</anchorfile>
-      <anchor>a9bc6d64da323d9f5b06333efae6ff107</anchor>
-      <arglist>(address_t fixed)</arglist>
+      <anchor>aca5fc1011c991013823ad76158bf57f3</anchor>
+      <arglist>(synapse_row_fixed_part_t *fixed)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -5303,8 +5298,8 @@
       <type>bool</type>
       <name>synapse_dynamics_process_plastic_synapses</name>
       <anchorfile>synapse__dynamics__static__impl_8c.html</anchorfile>
-      <anchor>ae17298b9e2265df9d88024a205cce082</anchor>
-      <arglist>(address_t plastic_region_address, address_t fixed_region_address, weight_t *ring_buffer, uint32_t time)</arglist>
+      <anchor>aed92420010ba63593b139d59263ee80e</anchor>
+      <arglist>(synapse_row_plastic_data_t *plastic_region_data, synapse_row_fixed_part_t *fixed_region, weight_t *ring_buffer, uint32_t time)</arglist>
     </member>
     <member kind="function">
       <type>input_t</type>
@@ -5317,8 +5312,8 @@
       <type>void</type>
       <name>synapse_dynamics_print_plastic_synapses</name>
       <anchorfile>synapse__dynamics__static__impl_8c.html</anchorfile>
-      <anchor>ad45502b91334101d086a2705404e36f0</anchor>
-      <arglist>(address_t plastic_region_address, address_t fixed_region_address, uint32_t *ring_buffer_to_input_left_shifts)</arglist>
+      <anchor>acb203e3c4f9b3e72bb69ce5033e83543</anchor>
+      <arglist>(synapse_row_plastic_data_t *plastic_region_data, synapse_row_fixed_part_t *fixed_region, uint32_t *ring_buffer_to_input_left_shifts)</arglist>
     </member>
     <member kind="function">
       <type>uint32_t</type>
@@ -5338,29 +5333,29 @@
       <type>bool</type>
       <name>synapse_dynamics_find_neuron</name>
       <anchorfile>synapse__dynamics__static__impl_8c.html</anchorfile>
-      <anchor>a523b611e80cd9f9e0880f825a6adbe9f</anchor>
-      <arglist>(uint32_t id, address_t row, weight_t *weight, uint16_t *delay, uint32_t *offset, uint32_t *synapse_type)</arglist>
+      <anchor>a5893fd33bdac3b991ecb7cb61feb4188</anchor>
+      <arglist>(uint32_t id, synaptic_row_t row, weight_t *weight, uint16_t *delay, uint32_t *offset, uint32_t *synapse_type)</arglist>
     </member>
     <member kind="function">
       <type>bool</type>
       <name>synapse_dynamics_remove_neuron</name>
       <anchorfile>synapse__dynamics__static__impl_8c.html</anchorfile>
-      <anchor>abc297b864cdfaa0cd6e7115cd064baef</anchor>
-      <arglist>(uint32_t offset, address_t row)</arglist>
+      <anchor>af3e517401d329d33f14b0ba70743e127</anchor>
+      <arglist>(uint32_t offset, synaptic_row_t row)</arglist>
     </member>
     <member kind="function">
       <type>bool</type>
       <name>synapse_dynamics_add_neuron</name>
       <anchorfile>synapse__dynamics__static__impl_8c.html</anchorfile>
-      <anchor>a30b01777aad5fef37adccffc7cbef483</anchor>
-      <arglist>(uint32_t id, address_t row, weight_t weight, uint32_t delay, uint32_t type)</arglist>
+      <anchor>ac877b6394f131f1944a720c387af6ac1</anchor>
+      <arglist>(uint32_t id, synaptic_row_t row, weight_t weight, uint32_t delay, uint32_t type)</arglist>
     </member>
     <member kind="function">
       <type>uint32_t</type>
       <name>synapse_dynamics_n_connections_in_row</name>
       <anchorfile>synapse__dynamics__static__impl_8c.html</anchorfile>
-      <anchor>a9bc6d64da323d9f5b06333efae6ff107</anchor>
-      <arglist>(address_t fixed)</arglist>
+      <anchor>aca5fc1011c991013823ad76158bf57f3</anchor>
+      <arglist>(synapse_row_fixed_part_t *fixed)</arglist>
     </member>
     <member kind="variable" static="yes">
       <type>static uint32_t</type>
@@ -5421,15 +5416,15 @@
       <type>bool</type>
       <name>population_table_get_first_address</name>
       <anchorfile>population__table_8h.html</anchorfile>
-      <anchor>a8bda7c27a3c9d52a2f95c4b6edd58944</anchor>
-      <arglist>(spike_t spike, address_t *row_address, size_t *n_bytes_to_transfer)</arglist>
+      <anchor>a511a4004e5621e6ec83228d4e4f94672</anchor>
+      <arglist>(spike_t spike, synaptic_row_t *row_address, size_t *n_bytes_to_transfer)</arglist>
     </member>
     <member kind="function">
       <type>bool</type>
       <name>population_table_get_next_address</name>
       <anchorfile>population__table_8h.html</anchorfile>
-      <anchor>a6ab19e2b1b4c0ed25d126d7cd7763ccf</anchor>
-      <arglist>(spike_t *spike, address_t *row_address, size_t *n_bytes_to_transfer)</arglist>
+      <anchor>a06008941811a064b8c67dcf3a5846cde</anchor>
+      <arglist>(spike_t *spike, synaptic_row_t *row_address, size_t *n_bytes_to_transfer)</arglist>
     </member>
     <member kind="variable">
       <type>uint32_t</type>
@@ -5470,6 +5465,7 @@
     <class kind="struct">extra_info</class>
     <class kind="struct">address_and_row_length</class>
     <class kind="union">address_list_entry</class>
+    <class kind="struct">pop_table_config_t</class>
     <member kind="define">
       <type>#define</type>
       <name>BITS_PER_WORD</name>
@@ -5614,15 +5610,15 @@
       <type>bool</type>
       <name>population_table_get_first_address</name>
       <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a8bda7c27a3c9d52a2f95c4b6edd58944</anchor>
-      <arglist>(spike_t spike, address_t *row_address, size_t *n_bytes_to_transfer)</arglist>
+      <anchor>a511a4004e5621e6ec83228d4e4f94672</anchor>
+      <arglist>(spike_t spike, synaptic_row_t *row_address, size_t *n_bytes_to_transfer)</arglist>
     </member>
     <member kind="function">
       <type>bool</type>
       <name>population_table_get_next_address</name>
       <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a6ab19e2b1b4c0ed25d126d7cd7763ccf</anchor>
-      <arglist>(spike_t *spike, address_t *row_address, size_t *n_bytes_to_transfer)</arglist>
+      <anchor>a06008941811a064b8c67dcf3a5846cde</anchor>
+      <arglist>(spike_t *spike, synaptic_row_t *row_address, size_t *n_bytes_to_transfer)</arglist>
     </member>
     <member kind="variable" static="yes">
       <type>static master_population_table_entry *</type>
@@ -5831,15 +5827,15 @@
       <type>bool</type>
       <name>population_table_get_first_address</name>
       <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a8bda7c27a3c9d52a2f95c4b6edd58944</anchor>
-      <arglist>(spike_t spike, address_t *row_address, size_t *n_bytes_to_transfer)</arglist>
+      <anchor>a511a4004e5621e6ec83228d4e4f94672</anchor>
+      <arglist>(spike_t spike, synaptic_row_t *row_address, size_t *n_bytes_to_transfer)</arglist>
     </member>
     <member kind="function">
       <type>bool</type>
       <name>population_table_get_next_address</name>
       <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a6ab19e2b1b4c0ed25d126d7cd7763ccf</anchor>
-      <arglist>(spike_t *spike, address_t *row_address, size_t *n_bytes_to_transfer)</arglist>
+      <anchor>a06008941811a064b8c67dcf3a5846cde</anchor>
+      <arglist>(spike_t *spike, synaptic_row_t *row_address, size_t *n_bytes_to_transfer)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -6040,15 +6036,15 @@
       <type>static void</type>
       <name>do_dma_read</name>
       <anchorfile>spike__processing_8c.html</anchorfile>
-      <anchor>acdf5b12f204b0f7f4656078d61d48761</anchor>
-      <arglist>(address_t row_address, size_t n_bytes_to_transfer, spike_t spike)</arglist>
+      <anchor>ab6d3068e1fb4b07be8e94d52ded9afa6</anchor>
+      <arglist>(synaptic_row_t row, size_t n_bytes_to_transfer, spike_t spike)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static bool</type>
       <name>is_something_to_do</name>
       <anchorfile>spike__processing_8c.html</anchorfile>
-      <anchor>a106193de929b229745d8ba1ff61c0868</anchor>
-      <arglist>(address_t *row_address, size_t *n_bytes_to_transfer, spike_t *spike, uint32_t *n_rewire, uint32_t *n_process_spike)</arglist>
+      <anchor>aad055cfcbe798048f28f1dfbce6d5296</anchor>
+      <arglist>(synaptic_row_t *row, size_t *n_bytes_to_transfer, spike_t *spike, uint32_t *n_rewire, uint32_t *n_process_spike)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
@@ -6347,8 +6343,8 @@
       <type>static bool</type>
       <name>synaptogenesis_elimination_rule</name>
       <anchorfile>elimination_8h.html</anchorfile>
-      <anchor>a11c1acd21176070029e0321a6ef4fdef</anchor>
-      <arglist>(current_state_t *current_state, const elimination_params_t *params, uint32_t time, address_t row)</arglist>
+      <anchor>afaf1f1ab83954b1d57383f2ed0161991</anchor>
+      <arglist>(current_state_t *current_state, const elimination_params_t *params, uint32_t time, synaptic_row_t row)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -6374,8 +6370,8 @@
       <type>static bool</type>
       <name>synaptogenesis_elimination_rule</name>
       <anchorfile>elimination__random__by__weight__impl_8h.html</anchorfile>
-      <anchor>aebdd410c59bc82135cc0011a7edf52c4</anchor>
-      <arglist>(current_state_t *restrict current_state, const elimination_params_t *params, uint32_t time, address_t restrict row)</arglist>
+      <anchor>aa3392daccad8ed0eafbe912bd88066b2</anchor>
+      <arglist>(current_state_t *restrict current_state, const elimination_params_t *params, uint32_t time, synaptic_row_t restrict row)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -6394,8 +6390,8 @@
       <type>static bool</type>
       <name>synaptogenesis_formation_rule</name>
       <anchorfile>formation_8h.html</anchorfile>
-      <anchor>a8d2fd5ae1cefb770aff4a25b50e83c76</anchor>
-      <arglist>(current_state_t *current_state, const formation_params_t *params, uint32_t time, address_t row)</arglist>
+      <anchor>a4652df6d90ca06028cef7743765fe313</anchor>
+      <arglist>(current_state_t *current_state, const formation_params_t *params, uint32_t time, synaptic_row_t row)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -6435,8 +6431,8 @@
       <type>static bool</type>
       <name>synaptogenesis_formation_rule</name>
       <anchorfile>formation__distance__dependent__impl_8h.html</anchorfile>
-      <anchor>a8d2fd5ae1cefb770aff4a25b50e83c76</anchor>
-      <arglist>(current_state_t *current_state, const formation_params_t *params, uint32_t time, address_t row)</arglist>
+      <anchor>a4652df6d90ca06028cef7743765fe313</anchor>
+      <arglist>(current_state_t *current_state, const formation_params_t *params, uint32_t time, synaptic_row_t row)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -6628,15 +6624,15 @@
       <type>static bool</type>
       <name>sp_structs_remove_synapse</name>
       <anchorfile>sp__structs_8h.html</anchorfile>
-      <anchor>a54852e3c438dc8a51a7a3d72a7448121</anchor>
-      <arglist>(current_state_t *restrict current_state, address_t restrict row)</arglist>
+      <anchor>a556a46199d62d23cdff354c53b2c7906</anchor>
+      <arglist>(current_state_t *restrict current_state, synaptic_row_t restrict row)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static bool</type>
       <name>sp_structs_add_synapse</name>
       <anchorfile>sp__structs_8h.html</anchorfile>
-      <anchor>a488618fc45d5bfbe0957600eb6ba3058</anchor>
-      <arglist>(current_state_t *restrict current_state, address_t restrict row)</arglist>
+      <anchor>a430fd8b92b5f0b7a6b523de8b692cc9d</anchor>
+      <arglist>(current_state_t *restrict current_state, synaptic_row_t restrict row)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static uint8_t *</type>
@@ -6676,15 +6672,22 @@
       <type>bool</type>
       <name>synaptogenesis_dynamics_rewire</name>
       <anchorfile>topographic__map__impl_8c.html</anchorfile>
-      <anchor>a1a8123da1bd797e82cb3193a0ce43847</anchor>
-      <arglist>(uint32_t time, spike_t *spike, address_t *synaptic_row_address, uint32_t *n_bytes)</arglist>
+      <anchor>a5cdd3772a85bf8d042932b9ec4e57125</anchor>
+      <arglist>(uint32_t time, spike_t *spike, synaptic_row_t *synaptic_row, uint32_t *n_bytes)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static bool</type>
+      <name>row_restructure</name>
+      <anchorfile>topographic__map__impl_8c.html</anchorfile>
+      <anchor>aa1038fc3912a348ccc5b2f3331181a98</anchor>
+      <arglist>(uint32_t time, synaptic_row_t restrict row, current_state_t *restrict current_state)</arglist>
     </member>
     <member kind="function">
       <type>bool</type>
       <name>synaptogenesis_row_restructure</name>
       <anchorfile>topographic__map__impl_8c.html</anchorfile>
-      <anchor>ac08559ca2e23561471aebd3f4097e348</anchor>
-      <arglist>(uint32_t time, address_t row)</arglist>
+      <anchor>ac97a88bbadb38fa4d4a67aa86aa615c8</anchor>
+      <arglist>(uint32_t time, synaptic_row_t row)</arglist>
     </member>
     <member kind="function">
       <type>int32_t</type>
@@ -6773,15 +6776,15 @@
       <type>bool</type>
       <name>synaptogenesis_dynamics_rewire</name>
       <anchorfile>synaptogenesis__dynamics_8h.html</anchorfile>
-      <anchor>a1a8123da1bd797e82cb3193a0ce43847</anchor>
-      <arglist>(uint32_t time, spike_t *spike, address_t *synaptic_row_address, uint32_t *n_bytes)</arglist>
+      <anchor>a5cdd3772a85bf8d042932b9ec4e57125</anchor>
+      <arglist>(uint32_t time, spike_t *spike, synaptic_row_t *synaptic_row, uint32_t *n_bytes)</arglist>
     </member>
     <member kind="function">
       <type>bool</type>
       <name>synaptogenesis_row_restructure</name>
       <anchorfile>synaptogenesis__dynamics_8h.html</anchorfile>
-      <anchor>ac08559ca2e23561471aebd3f4097e348</anchor>
-      <arglist>(uint32_t time, address_t row)</arglist>
+      <anchor>ac97a88bbadb38fa4d4a67aa86aa615c8</anchor>
+      <arglist>(uint32_t time, synaptic_row_t row)</arglist>
     </member>
     <member kind="function">
       <type>int32_t</type>
@@ -6828,15 +6831,15 @@
       <type>bool</type>
       <name>synaptogenesis_dynamics_rewire</name>
       <anchorfile>synaptogenesis__dynamics__static__impl_8c.html</anchorfile>
-      <anchor>a1a8123da1bd797e82cb3193a0ce43847</anchor>
-      <arglist>(uint32_t time, spike_t *spike, address_t *synaptic_row_address, uint32_t *n_bytes)</arglist>
+      <anchor>a5cdd3772a85bf8d042932b9ec4e57125</anchor>
+      <arglist>(uint32_t time, spike_t *spike, synaptic_row_t *synaptic_row, uint32_t *n_bytes)</arglist>
     </member>
     <member kind="function">
       <type>bool</type>
       <name>synaptogenesis_row_restructure</name>
       <anchorfile>synaptogenesis__dynamics__static__impl_8c.html</anchorfile>
-      <anchor>ac08559ca2e23561471aebd3f4097e348</anchor>
-      <arglist>(uint32_t time, address_t row)</arglist>
+      <anchor>ac97a88bbadb38fa4d4a67aa86aa615c8</anchor>
+      <arglist>(uint32_t time, synaptic_row_t row)</arglist>
     </member>
     <member kind="function">
       <type>int32_t</type>
@@ -6872,6 +6875,8 @@
     <path>/github/workspace/neural_modelling/src/neuron/</path>
     <filename>synapse__row_8h.html</filename>
     <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
+    <class kind="struct">synapse_row_plastic_part_t</class>
+    <class kind="struct">synapse_row_fixed_part_t</class>
     <member kind="define">
       <type>#define</type>
       <name>SYNAPSE_WEIGHT_BITS</name>
@@ -6911,50 +6916,50 @@
       <type>static size_t</type>
       <name>synapse_row_plastic_size</name>
       <anchorfile>synapse__row_8h.html</anchorfile>
-      <anchor>a392c5d735cea24b05dc4f09533216683</anchor>
-      <arglist>(address_t row)</arglist>
+      <anchor>ab9de8a1b79ad078f892038e4051781d0</anchor>
+      <arglist>(const synaptic_row_t row)</arglist>
     </member>
     <member kind="function" static="yes">
-      <type>static address_t</type>
+      <type>static synapse_row_plastic_data_t *</type>
       <name>synapse_row_plastic_region</name>
       <anchorfile>synapse__row_8h.html</anchorfile>
-      <anchor>adc6c789c206db13f271591b0ccc1e9ed</anchor>
-      <arglist>(address_t row)</arglist>
+      <anchor>ab4d844ff18533819cb6793bbe6fbacd9</anchor>
+      <arglist>(synaptic_row_t row)</arglist>
     </member>
     <member kind="function" static="yes">
-      <type>static address_t</type>
+      <type>static synapse_row_fixed_part_t *</type>
       <name>synapse_row_fixed_region</name>
       <anchorfile>synapse__row_8h.html</anchorfile>
-      <anchor>a551d18ff318c0f5ee3eed7af60ab37ce</anchor>
-      <arglist>(address_t row)</arglist>
+      <anchor>a3c97c04cad6ef6f8546f9a12ed296661</anchor>
+      <arglist>(synaptic_row_t row)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static size_t</type>
       <name>synapse_row_num_fixed_synapses</name>
       <anchorfile>synapse__row_8h.html</anchorfile>
-      <anchor>aa4e59f9f6e65f2adb38eda17266299e5</anchor>
-      <arglist>(address_t fixed)</arglist>
+      <anchor>a8c35d5f7f5f1cb6929f948549e91b47e</anchor>
+      <arglist>(const synapse_row_fixed_part_t *fixed)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static size_t</type>
       <name>synapse_row_num_plastic_controls</name>
       <anchorfile>synapse__row_8h.html</anchorfile>
-      <anchor>a5bb51090afe1fd0a7a8b58aecbd08b7d</anchor>
-      <arglist>(address_t fixed)</arglist>
+      <anchor>a1a67df8c1a740101c0a92eec74c26760</anchor>
+      <arglist>(const synapse_row_fixed_part_t *fixed)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static control_t *</type>
       <name>synapse_row_plastic_controls</name>
       <anchorfile>synapse__row_8h.html</anchorfile>
-      <anchor>a5ce445e106984aea0e11d4c423593594</anchor>
-      <arglist>(address_t fixed)</arglist>
+      <anchor>aa4cf1bbc1757f4668733006a24cd87b9</anchor>
+      <arglist>(synapse_row_fixed_part_t *fixed)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static uint32_t *</type>
       <name>synapse_row_fixed_weight_controls</name>
       <anchorfile>synapse__row_8h.html</anchorfile>
-      <anchor>a4eda772c550113c270945284e0cf1881</anchor>
-      <arglist>(address_t fixed)</arglist>
+      <anchor>a3155272454c2d645bad4291002b5a65e</anchor>
+      <arglist>(synapse_row_fixed_part_t *fixed)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static index_t</type>
@@ -7782,8 +7787,8 @@
       <type>static void</type>
       <name>process_fixed_synapses</name>
       <anchorfile>synapses_8c.html</anchorfile>
-      <anchor>acfa2aa93ceae2bfe1f57cbd66a30c130</anchor>
-      <arglist>(address_t fixed_region_address, uint32_t time)</arglist>
+      <anchor>a1d201e7f33249ba424c34d09b79e2be2</anchor>
+      <arglist>(synapse_row_fixed_part_t *fixed_region, uint32_t time)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
@@ -7981,13 +7986,6 @@
       <anchorfile>synapses_8h.html</anchorfile>
       <anchor>aa1ceab23dea834d6189f496b5133d983</anchor>
       <arglist>(uint32_t time, synaptic_row_t row, bool *write_back)</arglist>
-    </member>
-    <member kind="function">
-      <type>uint32_t</type>
-      <name>synapses_get_saturation_count</name>
-      <anchorfile>synapses_8h.html</anchorfile>
-      <anchor>a4e44cc55de4083bfb10edfcac1a57e50</anchor>
-      <arglist>(void)</arglist>
     </member>
     <member kind="function">
       <type>uint32_t</type>
@@ -9583,6 +9581,7 @@
     <includes id="delay__extension_8h" name="delay_extension.h" local="no" imported="no">delay_extension/delay_extension.h</includes>
     <includes id="matrix__generator__common_8h" name="matrix_generator_common.h" local="yes" imported="no">matrix_generator_common.h</includes>
     <includes id="generator__types_8h" name="generator_types.h" local="no" imported="no">synapse_expander/generator_types.h</includes>
+    <class kind="struct">static_row_t</class>
     <member kind="define">
       <type>#define</type>
       <name>SYNAPSE_WEIGHT_SHIFT</name>
@@ -9602,34 +9601,6 @@
       <name>SYNAPSE_DELAY_MASK</name>
       <anchorfile>matrix__generator__static_8h.html</anchorfile>
       <anchor>a9932d3e682ca42eb572c28a676e4e4b7</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="define">
-      <type>#define</type>
-      <name>STATIC_PLASTIC_PLASTIC_SIZE</name>
-      <anchorfile>matrix__generator__static_8h.html</anchorfile>
-      <anchor>aac7abdd039c56a26b832530725b1a809</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="define">
-      <type>#define</type>
-      <name>STATIC_FIXED_PLASTIC_SIZE</name>
-      <anchorfile>matrix__generator__static_8h.html</anchorfile>
-      <anchor>ac2f71bc80cfc0fc31d9e701a7a3e2ea2</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="define">
-      <type>#define</type>
-      <name>STATIC_FIXED_FIXED_SIZE</name>
-      <anchorfile>matrix__generator__static_8h.html</anchorfile>
-      <anchor>aed1da57790c33f7c33e253d438efe578</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="define">
-      <type>#define</type>
-      <name>STATIC_FIXED_FIXED_OFFSET</name>
-      <anchorfile>matrix__generator__static_8h.html</anchorfile>
-      <anchor>af6d1d250fd4924c15ef742601752d066</anchor>
       <arglist></arglist>
     </member>
     <member kind="function" static="yes">
@@ -9668,47 +9639,14 @@
     <includes id="delay__extension_8h" name="delay_extension.h" local="no" imported="no">delay_extension/delay_extension.h</includes>
     <includes id="matrix__generator__common_8h" name="matrix_generator_common.h" local="yes" imported="no">matrix_generator_common.h</includes>
     <includes id="generator__types_8h" name="generator_types.h" local="no" imported="no">synapse_expander/generator_types.h</includes>
+    <class kind="struct">row_plastic_t</class>
+    <class kind="struct">row_fixed_t</class>
     <class kind="struct">matrix_generator_stdp</class>
     <member kind="define">
       <type>#define</type>
       <name>SYNAPSE_DELAY_MASK</name>
       <anchorfile>matrix__generator__stdp_8h.html</anchorfile>
       <anchor>a9932d3e682ca42eb572c28a676e4e4b7</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="define">
-      <type>#define</type>
-      <name>STDP_PLASTIC_PLASTIC_SIZE</name>
-      <anchorfile>matrix__generator__stdp_8h.html</anchorfile>
-      <anchor>ac1f3ec8d3a8e527e2a3ab7696f0565d4</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="define">
-      <type>#define</type>
-      <name>STDP_PLASTIC_PLASTIC_OFFSET</name>
-      <anchorfile>matrix__generator__stdp_8h.html</anchorfile>
-      <anchor>a80f99e9f1f40cfe2b51d5d62b1146762</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="define">
-      <type>#define</type>
-      <name>STDP_FIXED_FIXED_SIZE</name>
-      <anchorfile>matrix__generator__stdp_8h.html</anchorfile>
-      <anchor>ad860c1a067bda44a54781479657cfe85</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="define">
-      <type>#define</type>
-      <name>STDP_FIXED_PLASTIC_SIZE</name>
-      <anchorfile>matrix__generator__stdp_8h.html</anchorfile>
-      <anchor>add3d2da7629ccb4fce3142d81cd78798</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="define">
-      <type>#define</type>
-      <name>STDP_FIXED_PLASTIC_OFFSET</name>
-      <anchorfile>matrix__generator__stdp_8h.html</anchorfile>
-      <anchor>acf00e84443ecc012c89dff0cef632313</anchor>
       <arglist></arglist>
     </member>
     <member kind="function">
@@ -10739,14 +10677,33 @@
     </member>
   </compound>
   <compound kind="struct">
+    <name>direct_matrix_data_t</name>
+    <filename>direct__synapses_8c.html</filename>
+    <anchor>structdirect__matrix__data__t</anchor>
+    <member kind="variable">
+      <type>const uint32_t</type>
+      <name>size</name>
+      <anchorfile>direct__synapses_8c.html</anchorfile>
+      <anchor>a7b6f1aa45c96e6dfe18c9863ced8982a</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>const uint32_t</type>
+      <name>data</name>
+      <anchorfile>direct__synapses_8c.html</anchorfile>
+      <anchor>acd4af094bcf79182ea98ef2185bf5568</anchor>
+      <arglist>[]</arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
     <name>dma_buffer</name>
     <filename>spike__processing_8c.html</filename>
     <anchor>structdma__buffer</anchor>
     <member kind="variable">
-      <type>address_t</type>
+      <type>synaptic_row_t</type>
       <name>sdram_writeback_address</name>
       <anchorfile>spike__processing_8c.html</anchorfile>
-      <anchor>a371d1adc84e7ae7e0272af5fc3baabeb</anchor>
+      <anchor>a7663f1eea61dda1540ac1a8641040d0b</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
@@ -10764,10 +10721,10 @@
       <arglist></arglist>
     </member>
     <member kind="variable">
-      <type>address_t</type>
+      <type>synaptic_row_t</type>
       <name>row</name>
       <anchorfile>spike__processing_8c.html</anchorfile>
-      <anchor>a9861968df19a075eac9fa7f507592fd0</anchor>
+      <anchor>a654a0761ac493ec478a88f2e266be543</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -12073,6 +12030,11 @@
     </member>
   </compound>
   <compound kind="struct">
+    <name>pop_table_config_t</name>
+    <filename>population__table__binary__search__impl_8c.html</filename>
+    <anchor>structpop__table__config__t</anchor>
+  </compound>
+  <compound kind="struct">
     <name>post_event_history_t</name>
     <filename>post__events_8h.html</filename>
     <anchor>structpost__event__history__t</anchor>
@@ -12227,6 +12189,84 @@
     </member>
   </compound>
   <compound kind="struct">
+    <name>row_fixed_t</name>
+    <filename>matrix__generator__stdp_8h.html</filename>
+    <anchor>structrow__fixed__t</anchor>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>fixed_fixed_size</name>
+      <anchorfile>matrix__generator__stdp_8h.html</anchorfile>
+      <anchor>a50513b263bb1530181ec2249d40876aa</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>fixed_plastic_size</name>
+      <anchorfile>matrix__generator__stdp_8h.html</anchorfile>
+      <anchor>aca679fca0fd0e98eb46d35a6e4ac339e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint16_t</type>
+      <name>fixed_plastic_data</name>
+      <anchorfile>matrix__generator__stdp_8h.html</anchorfile>
+      <anchor>a62f87e5f8fd8c442ad57b70a1ee4b82d</anchor>
+      <arglist>[]</arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>row_plastic_t</name>
+    <filename>matrix__generator__stdp_8h.html</filename>
+    <anchor>structrow__plastic__t</anchor>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>plastic_plastic_size</name>
+      <anchorfile>matrix__generator__stdp_8h.html</anchorfile>
+      <anchor>ab11ee202b7e36d36c7f6d51d6d18601e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint16_t</type>
+      <name>plastic_plastic_data</name>
+      <anchorfile>matrix__generator__stdp_8h.html</anchorfile>
+      <anchor>a1eaec93baa36091cabe09e821b0e60a1</anchor>
+      <arglist>[]</arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>single_synaptic_row_t</name>
+    <filename>direct__synapses_8c.html</filename>
+    <anchor>structsingle__synaptic__row__t</anchor>
+    <member kind="variable">
+      <type>const uint32_t</type>
+      <name>n_plastic</name>
+      <anchorfile>direct__synapses_8c.html</anchorfile>
+      <anchor>a1b6fa98c7e08a0ef08fc5211be5ae829</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>const uint32_t</type>
+      <name>n_fixed</name>
+      <anchorfile>direct__synapses_8c.html</anchorfile>
+      <anchor>a98e324626937fff9c6246c5fe23aa1a6</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>const uint32_t</type>
+      <name>n_plastic_controls</name>
+      <anchorfile>direct__synapses_8c.html</anchorfile>
+      <anchor>a3f71526e9df46b5cef9c3b485e15dd6c</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>synapse_datum</name>
+      <anchorfile>direct__synapses_8c.html</anchorfile>
+      <anchor>a009a320a0562e47977f8f408c72e2859</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
     <name>source_info</name>
     <filename>spike__source__poisson_8c.html</filename>
     <anchor>structsource__info</anchor>
@@ -12314,6 +12354,39 @@
     </member>
   </compound>
   <compound kind="struct">
+    <name>static_row_t</name>
+    <filename>matrix__generator__static_8h.html</filename>
+    <anchor>structstatic__row__t</anchor>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>plastic_plastic_size</name>
+      <anchorfile>matrix__generator__static_8h.html</anchorfile>
+      <anchor>a517f946e7eb90f3e7adaad0aad281bba</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>fixed_fixed_size</name>
+      <anchorfile>matrix__generator__static_8h.html</anchorfile>
+      <anchor>a42b25ad87ad6746a462ba9ba0db13be4</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>fixed_plastic_size</name>
+      <anchorfile>matrix__generator__static_8h.html</anchorfile>
+      <anchor>a478e204c92e1d085b8f6649bfac26abd</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>fixed_fixed_data</name>
+      <anchorfile>matrix__generator__static_8h.html</anchorfile>
+      <anchor>a70c4dcee5d9f79d3d8d93e71816b28f1</anchor>
+      <arglist>[]</arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
     <name>stdp_params</name>
     <filename>synapse__dynamics__stdp__mad__impl_8c.html</filename>
     <anchor>structstdp__params</anchor>
@@ -12394,6 +12467,32 @@
     </member>
   </compound>
   <compound kind="struct">
+    <name>synapse_row_fixed_part_t</name>
+    <filename>synapse__row_8h.html</filename>
+    <anchor>structsynapse__row__fixed__part__t</anchor>
+    <member kind="variable">
+      <type>size_t</type>
+      <name>num_fixed</name>
+      <anchorfile>synapse__row_8h.html</anchorfile>
+      <anchor>abcd7dcde31cc1360f88b1144ced8bb95</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>size_t</type>
+      <name>num_plastic</name>
+      <anchorfile>synapse__row_8h.html</anchorfile>
+      <anchor>ab3e10a5433e7d3f0d06c9441b8faa8b1</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>data</name>
+      <anchorfile>synapse__row_8h.html</anchorfile>
+      <anchor>a18bc3789fb8e08ce5623f8a2dde8fce8</anchor>
+      <arglist>[]</arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
     <name>synapse_row_plastic_data_t</name>
     <filename>synapse__dynamics__stdp__mad__impl_8c.html</filename>
     <anchor>structsynapse__row__plastic__data__t</anchor>
@@ -12409,6 +12508,25 @@
       <name>synapses</name>
       <anchorfile>synapse__dynamics__stdp__mad__impl_8c.html</anchorfile>
       <anchor>a8ca99776251ff7551be58b738b7d5380</anchor>
+      <arglist>[]</arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>synapse_row_plastic_part_t</name>
+    <filename>synapse__row_8h.html</filename>
+    <anchor>structsynapse__row__plastic__part__t</anchor>
+    <member kind="variable">
+      <type>size_t</type>
+      <name>size</name>
+      <anchorfile>synapse__row_8h.html</anchorfile>
+      <anchor>a5c73ad1ce7793ac1613afb98920fcf17</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>data</name>
+      <anchorfile>synapse__row_8h.html</anchorfile>
+      <anchor>afc071194a0530bc45311760c805ef761</anchor>
       <arglist>[]</arglist>
     </member>
   </compound>

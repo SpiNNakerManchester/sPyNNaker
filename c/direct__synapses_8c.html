@@ -68,7 +68,7 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#define-members">Macros</a> &#124;
+<a href="#nested-classes">Data Structures</a> &#124;
 <a href="#func-members">Functions</a> &#124;
 <a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
@@ -84,36 +84,116 @@ $(function() {
 </div>
 <p><a href="direct__synapses_8c_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
-Macros</h2></td></tr>
-<tr class="memitem:a0216bcfc656605aad717cf24eba2158e"><td class="memItemLeft" align="right" valign="top"><a id="a0216bcfc656605aad717cf24eba2158e"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="direct__synapses_8c.html#a0216bcfc656605aad717cf24eba2158e">SIZE_OF_SINGLE_FIXED_SYNAPSE</a>&#160;&#160;&#160;4</td></tr>
-<tr class="memdesc:a0216bcfc656605aad717cf24eba2158e"><td class="mdescLeft">&#160;</td><td class="mdescRight">The size of the fixed synapse buffer, in words. <br /></td></tr>
-<tr class="separator:a0216bcfc656605aad717cf24eba2158e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+Data Structures</h2></td></tr>
+<tr class="memitem:structsingle__synaptic__row__t"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="direct__synapses_8c.html#structsingle__synaptic__row__t">single_synaptic_row_t</a></td></tr>
+<tr class="memdesc:structsingle__synaptic__row__t"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type of a singleton synaptic row.  <a href="direct__synapses_8c.html#structsingle__synaptic__row__t">More...</a><br /></td></tr>
+<tr class="separator:structsingle__synaptic__row__t"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:structdirect__matrix__data__t"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="direct__synapses_8c.html#structdirect__matrix__data__t">direct_matrix_data_t</a></td></tr>
+<tr class="memdesc:structdirect__matrix__data__t"><td class="mdescLeft">&#160;</td><td class="mdescRight">The layout of the direct matrix region.  <a href="direct__synapses_8c.html#structdirect__matrix__data__t">More...</a><br /></td></tr>
+<tr class="separator:structdirect__matrix__data__t"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a2e8e745d00d5ae6b43f52b577b492191"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="direct__synapses_8c.html#a2e8e745d00d5ae6b43f52b577b492191">direct_synapses_initialise</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> direct_matrix_address, <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *<a class="el" href="bit__field__expander_8c.html#a7e8f73474622d82215423413dec84223">direct_synapses_address</a>)</td></tr>
-<tr class="memdesc:a2e8e745d00d5ae6b43f52b577b492191"><td class="mdescLeft">&#160;</td><td class="mdescRight">Setup for the direct synapses.  <a href="direct__synapses_8c.html#a2e8e745d00d5ae6b43f52b577b492191">More...</a><br /></td></tr>
-<tr class="separator:a2e8e745d00d5ae6b43f52b577b492191"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2c640fdb77e0858eaffe4fdb4b18e644"><td class="memItemLeft" align="right" valign="top"><a class="el" href="neuron-typedefs_8h.html#a883af5b0c4fbeeb762d784a8e162da64">synaptic_row_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="direct__synapses_8c.html#a2c640fdb77e0858eaffe4fdb4b18e644">direct_synapses_get_direct_synapse</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> row_address)</td></tr>
-<tr class="memdesc:a2c640fdb77e0858eaffe4fdb4b18e644"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the synapse for a given direct synaptic row.  <a href="direct__synapses_8c.html#a2c640fdb77e0858eaffe4fdb4b18e644">More...</a><br /></td></tr>
-<tr class="separator:a2c640fdb77e0858eaffe4fdb4b18e644"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4f96698f7745cad8c8009298fb03da9b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="direct__synapses_8c.html#a4f96698f7745cad8c8009298fb03da9b">direct_synapses_initialise</a> (void *direct_matrix_address, <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *<a class="el" href="bit__field__expander_8c.html#a7e8f73474622d82215423413dec84223">direct_synapses_address</a>)</td></tr>
+<tr class="memdesc:a4f96698f7745cad8c8009298fb03da9b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Setup for the direct synapses.  <a href="direct__synapses_8c.html#a4f96698f7745cad8c8009298fb03da9b">More...</a><br /></td></tr>
+<tr class="separator:a4f96698f7745cad8c8009298fb03da9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4e044c9a28f8428d353c90dbc0249482"><td class="memItemLeft" align="right" valign="top"><a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="direct__synapses_8c.html#a4e044c9a28f8428d353c90dbc0249482">direct_synapses_get_direct_synapse</a> (void *row_address)</td></tr>
+<tr class="memdesc:a4e044c9a28f8428d353c90dbc0249482"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the synapse for a given direct synaptic row.  <a href="direct__synapses_8c.html#a4e044c9a28f8428d353c90dbc0249482">More...</a><br /></td></tr>
+<tr class="separator:a4e044c9a28f8428d353c90dbc0249482"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:a7343f7e4c1be39fa1db9785bd59c54dc"><td class="memItemLeft" align="right" valign="top"><a id="a7343f7e4c1be39fa1db9785bd59c54dc"></a>
-static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="direct__synapses_8c.html#a7343f7e4c1be39fa1db9785bd59c54dc">single_fixed_synapse</a> [<a class="el" href="direct__synapses_8c.html#a0216bcfc656605aad717cf24eba2158e">SIZE_OF_SINGLE_FIXED_SYNAPSE</a>]</td></tr>
-<tr class="memdesc:a7343f7e4c1be39fa1db9785bd59c54dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Working buffer for direct synapse access. <br /></td></tr>
-<tr class="separator:a7343f7e4c1be39fa1db9785bd59c54dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5dd766c9e442321941ea5ccef7d32710"><td class="memItemLeft" align="right" valign="top"><a id="a5dd766c9e442321941ea5ccef7d32710"></a>
+static <a class="el" href="direct__synapses_8c.html#structsingle__synaptic__row__t">single_synaptic_row_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="direct__synapses_8c.html#a5dd766c9e442321941ea5ccef7d32710">single_fixed_synapse</a> = {0, 1, 0, 0}</td></tr>
+<tr class="memdesc:a5dd766c9e442321941ea5ccef7d32710"><td class="mdescLeft">&#160;</td><td class="mdescRight">Working buffer for direct synapse access. <br /></td></tr>
+<tr class="separator:a5dd766c9e442321941ea5ccef7d32710"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Implementation of <a class="el" href="direct__synapses_8h.html" title="API for accessing directly encoded synapses.">direct_synapses.h</a>. </p>
 
 <p class="definition">Definition in file <a class="el" href="direct__synapses_8c_source.html">direct_synapses.c</a>.</p>
-</div><h2 class="groupheader">Function Documentation</h2>
-<a id="a2e8e745d00d5ae6b43f52b577b492191"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2e8e745d00d5ae6b43f52b577b492191">&#9670;&nbsp;</a></span>direct_synapses_initialise()</h2>
+</div><hr/><h2 class="groupheader">Data Structure Documentation</h2>
+<a name="structsingle__synaptic__row__t" id="structsingle__synaptic__row__t"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#structsingle__synaptic__row__t">&#9670;&nbsp;</a></span>single_synaptic_row_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">struct single_synaptic_row_t</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="textblock"><p>The type of a singleton synaptic row. </p>
+<p>The counts are constant. See <a class="el" href="synapse__row_8h.html#structsynapse__row__plastic__part__t" title="The type of the plastic-plastic part of the row.">synapse_row_plastic_part_t</a> and <a class="el" href="synapse__row_8h.html#structsynapse__row__fixed__part__t" title="The type of the fixed part of the row. The fixed-plastic part follows.">synapse_row_fixed_part_t</a> for what this is a packed version of. </p>
+
+<p class="definition">Definition at line <a class="el" href="direct__synapses_8c_source.html#l00027">27</a> of file <a class="el" href="direct__synapses_8c_source.html">direct_synapses.c</a>.</p>
+</div><table class="fieldtable">
+<tr><th colspan="3">Data Fields</th></tr>
+<tr><td class="fieldtype">
+<a id="a1b6fa98c7e08a0ef08fc5211be5ae829"></a>const uint32_t</td>
+<td class="fieldname">
+n_plastic</td>
+<td class="fielddoc">
+Number of plastic synapses. Always zero. </td></tr>
+<tr><td class="fieldtype">
+<a id="a98e324626937fff9c6246c5fe23aa1a6"></a>const uint32_t</td>
+<td class="fieldname">
+n_fixed</td>
+<td class="fielddoc">
+Number of fixed synapses. Always one. </td></tr>
+<tr><td class="fieldtype">
+<a id="a3f71526e9df46b5cef9c3b485e15dd6c"></a>const uint32_t</td>
+<td class="fieldname">
+n_plastic_controls</td>
+<td class="fielddoc">
+Number of plastic controls. Always zero. </td></tr>
+<tr><td class="fieldtype">
+<a id="a009a320a0562e47977f8f408c72e2859"></a>uint32_t</td>
+<td class="fieldname">
+synapse_datum</td>
+<td class="fielddoc">
+The value of the single synapse. </td></tr>
+</table>
+
+</div>
+</div>
+<a name="structdirect__matrix__data__t" id="structdirect__matrix__data__t"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#structdirect__matrix__data__t">&#9670;&nbsp;</a></span>direct_matrix_data_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">struct direct_matrix_data_t</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="textblock"><p>The layout of the direct matrix region. </p>
+
+<p class="definition">Definition at line <a class="el" href="direct__synapses_8c_source.html#l00038">38</a> of file <a class="el" href="direct__synapses_8c_source.html">direct_synapses.c</a>.</p>
+</div><table class="fieldtable">
+<tr><th colspan="3">Data Fields</th></tr>
+<tr><td class="fieldtype">
+<a id="a7b6f1aa45c96e6dfe18c9863ced8982a"></a>const uint32_t</td>
+<td class="fieldname">
+size</td>
+<td class="fielddoc">
+Size of data, <em>not</em> number of elements. </td></tr>
+<tr><td class="fieldtype">
+<a id="acd4af094bcf79182ea98ef2185bf5568"></a>const uint32_t</td>
+<td class="fieldname">
+data[]</td>
+<td class="fielddoc">
+Direct matrix data. </td></tr>
+</table>
+
+</div>
+</div>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="a4f96698f7745cad8c8009298fb03da9b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4f96698f7745cad8c8009298fb03da9b">&#9670;&nbsp;</a></span>direct_synapses_initialise()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -121,7 +201,7 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
         <tr>
           <td class="memname">bool direct_synapses_initialise </td>
           <td>(</td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
+          <td class="paramtype">void *&#160;</td>
           <td class="paramname"><em>direct_matrix_address</em>, </td>
         </tr>
         <tr>
@@ -148,20 +228,20 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if successful, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="direct__synapses_8c_source.html#l00030">30</a> of file <a class="el" href="direct__synapses_8c_source.html">direct_synapses.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__synapses_8c_source.html#l00043">43</a> of file <a class="el" href="direct__synapses_8c_source.html">direct_synapses.c</a>.</p>
 
 </div>
 </div>
-<a id="a2c640fdb77e0858eaffe4fdb4b18e644"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2c640fdb77e0858eaffe4fdb4b18e644">&#9670;&nbsp;</a></span>direct_synapses_get_direct_synapse()</h2>
+<a id="a4e044c9a28f8428d353c90dbc0249482"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4e044c9a28f8428d353c90dbc0249482">&#9670;&nbsp;</a></span>direct_synapses_get_direct_synapse()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="neuron-typedefs_8h.html#a883af5b0c4fbeeb762d784a8e162da64">synaptic_row_t</a> direct_synapses_get_direct_synapse </td>
+          <td class="memname"><a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a> direct_synapses_get_direct_synapse </td>
           <td>(</td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
+          <td class="paramtype">void *&#160;</td>
           <td class="paramname"><em>row_address</em></td><td>)</td>
           <td></td>
         </tr>
@@ -177,14 +257,14 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the synaptic row synapse data. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="direct__synapses_8c_source.html#l00058">58</a> of file <a class="el" href="direct__synapses_8c_source.html">direct_synapses.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__synapses_8c_source.html#l00066">66</a> of file <a class="el" href="direct__synapses_8c_source.html">direct_synapses.c</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Dec 9 2020 08:34:41 for sPyNNaker neural_modelling by&#160;<a href="http://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.8.20
+Generated on Wed Dec 9 2020 13:28:19 for sPyNNaker neural_modelling by&#160;<a href="http://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.8.20
 </small></address>
 </body>
 </html>

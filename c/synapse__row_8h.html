@@ -68,6 +68,7 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#nested-classes">Data Structures</a> &#124;
 <a href="#define-members">Macros</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
 <a href="#func-members">Functions</a>  </div>
@@ -82,6 +83,15 @@ $(function() {
 </div>
 <p><a href="synapse__row_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+Data Structures</h2></td></tr>
+<tr class="memitem:structsynapse__row__plastic__part__t"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__row_8h.html#structsynapse__row__plastic__part__t">synapse_row_plastic_part_t</a></td></tr>
+<tr class="memdesc:structsynapse__row__plastic__part__t"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type of the plastic-plastic part of the row.  <a href="synapse__row_8h.html#structsynapse__row__plastic__part__t">More...</a><br /></td></tr>
+<tr class="separator:structsynapse__row__plastic__part__t"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:structsynapse__row__fixed__part__t"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__row_8h.html#structsynapse__row__fixed__part__t">synapse_row_fixed_part_t</a></td></tr>
+<tr class="memdesc:structsynapse__row__fixed__part__t"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type of the fixed part of the row. The fixed-plastic part follows.  <a href="synapse__row_8h.html#structsynapse__row__fixed__part__t">More...</a><br /></td></tr>
+<tr class="separator:structsynapse__row__fixed__part__t"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
 <tr class="memitem:a6e5ee3925245f54cf5f6c4312338c25c"><td class="memItemLeft" align="right" valign="top"><a id="a6e5ee3925245f54cf5f6c4312338c25c"></a>
@@ -110,27 +120,27 @@ typedef uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a392c5d735cea24b05dc4f09533216683"><td class="memItemLeft" align="right" valign="top">static <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a29d85914ddff32967d85ada69854206d">size_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__row_8h.html#a392c5d735cea24b05dc4f09533216683">synapse_row_plastic_size</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> row)</td></tr>
-<tr class="memdesc:a392c5d735cea24b05dc4f09533216683"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the plastic region.  <a href="synapse__row_8h.html#a392c5d735cea24b05dc4f09533216683">More...</a><br /></td></tr>
-<tr class="separator:a392c5d735cea24b05dc4f09533216683"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adc6c789c206db13f271591b0ccc1e9ed"><td class="memItemLeft" align="right" valign="top">static <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__row_8h.html#adc6c789c206db13f271591b0ccc1e9ed">synapse_row_plastic_region</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> row)</td></tr>
-<tr class="memdesc:adc6c789c206db13f271591b0ccc1e9ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the address of the plastic region.  <a href="synapse__row_8h.html#adc6c789c206db13f271591b0ccc1e9ed">More...</a><br /></td></tr>
-<tr class="separator:adc6c789c206db13f271591b0ccc1e9ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a551d18ff318c0f5ee3eed7af60ab37ce"><td class="memItemLeft" align="right" valign="top">static <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__row_8h.html#a551d18ff318c0f5ee3eed7af60ab37ce">synapse_row_fixed_region</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> row)</td></tr>
-<tr class="memdesc:a551d18ff318c0f5ee3eed7af60ab37ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the address of the non-plastic (or fixed) region.  <a href="synapse__row_8h.html#a551d18ff318c0f5ee3eed7af60ab37ce">More...</a><br /></td></tr>
-<tr class="separator:a551d18ff318c0f5ee3eed7af60ab37ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa4e59f9f6e65f2adb38eda17266299e5"><td class="memItemLeft" align="right" valign="top">static <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a29d85914ddff32967d85ada69854206d">size_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__row_8h.html#aa4e59f9f6e65f2adb38eda17266299e5">synapse_row_num_fixed_synapses</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> fixed)</td></tr>
-<tr class="memdesc:aa4e59f9f6e65f2adb38eda17266299e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of fixed synapses in the row.  <a href="synapse__row_8h.html#aa4e59f9f6e65f2adb38eda17266299e5">More...</a><br /></td></tr>
-<tr class="separator:aa4e59f9f6e65f2adb38eda17266299e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5bb51090afe1fd0a7a8b58aecbd08b7d"><td class="memItemLeft" align="right" valign="top">static <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a29d85914ddff32967d85ada69854206d">size_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__row_8h.html#a5bb51090afe1fd0a7a8b58aecbd08b7d">synapse_row_num_plastic_controls</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> fixed)</td></tr>
-<tr class="memdesc:a5bb51090afe1fd0a7a8b58aecbd08b7d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of plastic controls in the row.  <a href="synapse__row_8h.html#a5bb51090afe1fd0a7a8b58aecbd08b7d">More...</a><br /></td></tr>
-<tr class="separator:a5bb51090afe1fd0a7a8b58aecbd08b7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5ce445e106984aea0e11d4c423593594"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="synapse__row_8h.html#aeae1e8aa0c0095434ba488866ef21aa2">control_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__row_8h.html#a5ce445e106984aea0e11d4c423593594">synapse_row_plastic_controls</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> fixed)</td></tr>
-<tr class="memdesc:a5ce445e106984aea0e11d4c423593594"><td class="mdescLeft">&#160;</td><td class="mdescRight">The array of plastic controls in the row.  <a href="synapse__row_8h.html#a5ce445e106984aea0e11d4c423593594">More...</a><br /></td></tr>
-<tr class="separator:a5ce445e106984aea0e11d4c423593594"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4eda772c550113c270945284e0cf1881"><td class="memItemLeft" align="right" valign="top">static uint32_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__row_8h.html#a4eda772c550113c270945284e0cf1881">synapse_row_fixed_weight_controls</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> fixed)</td></tr>
-<tr class="memdesc:a4eda772c550113c270945284e0cf1881"><td class="mdescLeft">&#160;</td><td class="mdescRight">The array of fixed weights in the row.  <a href="synapse__row_8h.html#a4eda772c550113c270945284e0cf1881">More...</a><br /></td></tr>
-<tr class="separator:a4eda772c550113c270945284e0cf1881"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab9de8a1b79ad078f892038e4051781d0"><td class="memItemLeft" align="right" valign="top">static <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a29d85914ddff32967d85ada69854206d">size_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__row_8h.html#ab9de8a1b79ad078f892038e4051781d0">synapse_row_plastic_size</a> (const <a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a> row)</td></tr>
+<tr class="memdesc:ab9de8a1b79ad078f892038e4051781d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the size of the plastic region.  <a href="synapse__row_8h.html#ab9de8a1b79ad078f892038e4051781d0">More...</a><br /></td></tr>
+<tr class="separator:ab9de8a1b79ad078f892038e4051781d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab4d844ff18533819cb6793bbe6fbacd9"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#structsynapse__row__plastic__data__t">synapse_row_plastic_data_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__row_8h.html#ab4d844ff18533819cb6793bbe6fbacd9">synapse_row_plastic_region</a> (<a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a> row)</td></tr>
+<tr class="memdesc:ab4d844ff18533819cb6793bbe6fbacd9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the address of the plastic region.  <a href="synapse__row_8h.html#ab4d844ff18533819cb6793bbe6fbacd9">More...</a><br /></td></tr>
+<tr class="separator:ab4d844ff18533819cb6793bbe6fbacd9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3c97c04cad6ef6f8546f9a12ed296661"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="synapse__row_8h.html#structsynapse__row__fixed__part__t">synapse_row_fixed_part_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__row_8h.html#a3c97c04cad6ef6f8546f9a12ed296661">synapse_row_fixed_region</a> (<a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a> row)</td></tr>
+<tr class="memdesc:a3c97c04cad6ef6f8546f9a12ed296661"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the address of the non-plastic (or fixed) region.  <a href="synapse__row_8h.html#a3c97c04cad6ef6f8546f9a12ed296661">More...</a><br /></td></tr>
+<tr class="separator:a3c97c04cad6ef6f8546f9a12ed296661"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8c35d5f7f5f1cb6929f948549e91b47e"><td class="memItemLeft" align="right" valign="top">static <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a29d85914ddff32967d85ada69854206d">size_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__row_8h.html#a8c35d5f7f5f1cb6929f948549e91b47e">synapse_row_num_fixed_synapses</a> (const <a class="el" href="synapse__row_8h.html#structsynapse__row__fixed__part__t">synapse_row_fixed_part_t</a> *fixed)</td></tr>
+<tr class="memdesc:a8c35d5f7f5f1cb6929f948549e91b47e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of fixed synapses in the row.  <a href="synapse__row_8h.html#a8c35d5f7f5f1cb6929f948549e91b47e">More...</a><br /></td></tr>
+<tr class="separator:a8c35d5f7f5f1cb6929f948549e91b47e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1a67df8c1a740101c0a92eec74c26760"><td class="memItemLeft" align="right" valign="top">static <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a29d85914ddff32967d85ada69854206d">size_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__row_8h.html#a1a67df8c1a740101c0a92eec74c26760">synapse_row_num_plastic_controls</a> (const <a class="el" href="synapse__row_8h.html#structsynapse__row__fixed__part__t">synapse_row_fixed_part_t</a> *fixed)</td></tr>
+<tr class="memdesc:a1a67df8c1a740101c0a92eec74c26760"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of plastic controls in the row.  <a href="synapse__row_8h.html#a1a67df8c1a740101c0a92eec74c26760">More...</a><br /></td></tr>
+<tr class="separator:a1a67df8c1a740101c0a92eec74c26760"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa4cf1bbc1757f4668733006a24cd87b9"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="synapse__row_8h.html#aeae1e8aa0c0095434ba488866ef21aa2">control_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__row_8h.html#aa4cf1bbc1757f4668733006a24cd87b9">synapse_row_plastic_controls</a> (<a class="el" href="synapse__row_8h.html#structsynapse__row__fixed__part__t">synapse_row_fixed_part_t</a> *fixed)</td></tr>
+<tr class="memdesc:aa4cf1bbc1757f4668733006a24cd87b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the array of plastic controls in the row.  <a href="synapse__row_8h.html#aa4cf1bbc1757f4668733006a24cd87b9">More...</a><br /></td></tr>
+<tr class="separator:aa4cf1bbc1757f4668733006a24cd87b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3155272454c2d645bad4291002b5a65e"><td class="memItemLeft" align="right" valign="top">static uint32_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__row_8h.html#a3155272454c2d645bad4291002b5a65e">synapse_row_fixed_weight_controls</a> (<a class="el" href="synapse__row_8h.html#structsynapse__row__fixed__part__t">synapse_row_fixed_part_t</a> *fixed)</td></tr>
+<tr class="memdesc:a3155272454c2d645bad4291002b5a65e"><td class="mdescLeft">&#160;</td><td class="mdescRight">The array of fixed weights in the row.  <a href="synapse__row_8h.html#a3155272454c2d645bad4291002b5a65e">More...</a><br /></td></tr>
+<tr class="separator:a3155272454c2d645bad4291002b5a65e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9bbd252568935c8020f478dcdaff97b5"><td class="memItemLeft" align="right" valign="top">static <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#aab1410d3f3644ff465752cab5b56e420">index_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__row_8h.html#a9bbd252568935c8020f478dcdaff97b5">synapse_row_sparse_index</a> (uint32_t x, uint32_t <a class="el" href="synapses_8c.html#a84db6c41c7cf03558016d477d8df4d37">synapse_index_mask</a>)</td></tr>
 <tr class="memdesc:a9bbd252568935c8020f478dcdaff97b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the index.  <a href="synapse__row_8h.html#a9bbd252568935c8020f478dcdaff97b5">More...</a><br /></td></tr>
 <tr class="separator:a9bbd252568935c8020f478dcdaff97b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -157,13 +167,13 @@ Synapse Row Representation</h1>
 <div class="line">|                   |                  |       SYNAPSE_TYPE_INDEX_BITS      |</div>
 </div><!-- fragment --><p>The API interface supports:</p>
 <ul>
-<li><a class="el" href="synapse__row_8h.html#a392c5d735cea24b05dc4f09533216683" title="Returns the size of the plastic region.">synapse_row_plastic_size()</a></li>
-<li><a class="el" href="synapse__row_8h.html#adc6c789c206db13f271591b0ccc1e9ed" title="Returns the address of the plastic region.">synapse_row_plastic_region()</a></li>
-<li><a class="el" href="synapse__row_8h.html#a551d18ff318c0f5ee3eed7af60ab37ce" title="Returns the address of the non-plastic (or fixed) region.">synapse_row_fixed_region()</a></li>
-<li><a class="el" href="synapse__row_8h.html#aa4e59f9f6e65f2adb38eda17266299e5" title="The number of fixed synapses in the row.">synapse_row_num_fixed_synapses()</a></li>
-<li><a class="el" href="synapse__row_8h.html#a5bb51090afe1fd0a7a8b58aecbd08b7d" title="The number of plastic controls in the row.">synapse_row_num_plastic_controls()</a></li>
-<li><a class="el" href="synapse__row_8h.html#a5ce445e106984aea0e11d4c423593594" title="The array of plastic controls in the row.">synapse_row_plastic_controls()</a></li>
-<li><a class="el" href="synapse__row_8h.html#a4eda772c550113c270945284e0cf1881" title="The array of fixed weights in the row.">synapse_row_fixed_weight_controls()</a></li>
+<li><a class="el" href="synapse__row_8h.html#ab9de8a1b79ad078f892038e4051781d0" title="Get the size of the plastic region.">synapse_row_plastic_size()</a></li>
+<li><a class="el" href="synapse__row_8h.html#ab4d844ff18533819cb6793bbe6fbacd9" title="Get the address of the plastic region.">synapse_row_plastic_region()</a></li>
+<li><a class="el" href="synapse__row_8h.html#a3c97c04cad6ef6f8546f9a12ed296661" title="Get the address of the non-plastic (or fixed) region.">synapse_row_fixed_region()</a></li>
+<li><a class="el" href="synapse__row_8h.html#a8c35d5f7f5f1cb6929f948549e91b47e" title="Get the number of fixed synapses in the row.">synapse_row_num_fixed_synapses()</a></li>
+<li><a class="el" href="synapse__row_8h.html#a1a67df8c1a740101c0a92eec74c26760" title="Get the number of plastic controls in the row.">synapse_row_num_plastic_controls()</a></li>
+<li><a class="el" href="synapse__row_8h.html#aa4cf1bbc1757f4668733006a24cd87b9" title="Get the array of plastic controls in the row.">synapse_row_plastic_controls()</a></li>
+<li><a class="el" href="synapse__row_8h.html#a3155272454c2d645bad4291002b5a65e" title="The array of fixed weights in the row.">synapse_row_fixed_weight_controls()</a></li>
 <li><a class="el" href="synapse__row_8h.html#a9bbd252568935c8020f478dcdaff97b5" title="Get the index.">synapse_row_sparse_index()</a></li>
 <li><a class="el" href="synapse__row_8h.html#a8ac7fef74256d744079d84a638d2d5c7" title="Get the type code.">synapse_row_sparse_type()</a></li>
 <li><a class="el" href="synapse__row_8h.html#ab47a817128850c7fea9d755816040392" title="Get the type and index.">synapse_row_sparse_type_index()</a></li>
@@ -194,9 +204,80 @@ Fixed and Fixed-Plastic Regions</h1>
 </div><!-- fragment --><p>Note that <code>P</code> is effectively rounded up to a multiple of two for storage purposes. </p>
 
 <p class="definition">Definition in file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
-</div><h2 class="groupheader">Function Documentation</h2>
-<a id="a392c5d735cea24b05dc4f09533216683"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a392c5d735cea24b05dc4f09533216683">&#9670;&nbsp;</a></span>synapse_row_plastic_size()</h2>
+</div><hr/><h2 class="groupheader">Data Structure Documentation</h2>
+<a name="structsynapse__row__plastic__part__t" id="structsynapse__row__plastic__part__t"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#structsynapse__row__plastic__part__t">&#9670;&nbsp;</a></span>synapse_row_plastic_part_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">struct synapse_row_plastic_part_t</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="textblock"><p>The type of the plastic-plastic part of the row. </p>
+
+<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00122">122</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
+</div><table class="fieldtable">
+<tr><th colspan="3">Data Fields</th></tr>
+<tr><td class="fieldtype">
+<a id="a5c73ad1ce7793ac1613afb98920fcf17"></a><a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a29d85914ddff32967d85ada69854206d">size_t</a></td>
+<td class="fieldname">
+size</td>
+<td class="fielddoc">
+The number of plastic words in <code>data</code> </td></tr>
+<tr><td class="fieldtype">
+<a id="afc071194a0530bc45311760c805ef761"></a>uint32_t</td>
+<td class="fieldname">
+data[]</td>
+<td class="fielddoc">
+The plastic words, followed by the fixed part. </td></tr>
+</table>
+
+</div>
+</div>
+<a name="structsynapse__row__fixed__part__t" id="structsynapse__row__fixed__part__t"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#structsynapse__row__fixed__part__t">&#9670;&nbsp;</a></span>synapse_row_fixed_part_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">struct synapse_row_fixed_part_t</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="textblock"><p>The type of the fixed part of the row. The fixed-plastic part follows. </p>
+
+<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00128">128</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
+</div><table class="fieldtable">
+<tr><th colspan="3">Data Fields</th></tr>
+<tr><td class="fieldtype">
+<a id="abcd7dcde31cc1360f88b1144ced8bb95"></a><a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a29d85914ddff32967d85ada69854206d">size_t</a></td>
+<td class="fieldname">
+num_fixed</td>
+<td class="fielddoc">
+The number of fixed synapses in <code>data</code> </td></tr>
+<tr><td class="fieldtype">
+<a id="ab3e10a5433e7d3f0d06c9441b8faa8b1"></a><a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a29d85914ddff32967d85ada69854206d">size_t</a></td>
+<td class="fieldname">
+num_plastic</td>
+<td class="fielddoc">
+The number of plastic controls in <code>data</code> </td></tr>
+<tr><td class="fieldtype">
+<a id="a18bc3789fb8e08ce5623f8a2dde8fce8"></a>uint32_t</td>
+<td class="fieldname">
+data[]</td>
+<td class="fielddoc">
+The data, first the fixed then the plastic. </td></tr>
+</table>
+
+</div>
+</div>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="ab9de8a1b79ad078f892038e4051781d0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab9de8a1b79ad078f892038e4051781d0">&#9670;&nbsp;</a></span>synapse_row_plastic_size()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -207,7 +288,7 @@ Fixed and Fixed-Plastic Regions</h1>
         <tr>
           <td class="memname">static <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a29d85914ddff32967d85ada69854206d">size_t</a> synapse_row_plastic_size </td>
           <td>(</td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
+          <td class="paramtype">const <a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a>&#160;</td>
           <td class="paramname"><em>row</em></td><td>)</td>
           <td></td>
         </tr>
@@ -219,7 +300,7 @@ Fixed and Fixed-Plastic Regions</h1>
 </table>
 </div><div class="memdoc">
 
-<p>Returns the size of the plastic region. </p>
+<p>Get the size of the plastic region. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">row</td><td>The synaptic row </td></tr>
@@ -228,12 +309,12 @@ Fixed and Fixed-Plastic Regions</h1>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The size of the plastic region of the row </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00124">124</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00139">139</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
 
 </div>
 </div>
-<a id="adc6c789c206db13f271591b0ccc1e9ed"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adc6c789c206db13f271591b0ccc1e9ed">&#9670;&nbsp;</a></span>synapse_row_plastic_region()</h2>
+<a id="ab4d844ff18533819cb6793bbe6fbacd9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab4d844ff18533819cb6793bbe6fbacd9">&#9670;&nbsp;</a></span>synapse_row_plastic_region()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -242,9 +323,9 @@ Fixed and Fixed-Plastic Regions</h1>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> synapse_row_plastic_region </td>
+          <td class="memname">static <a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#structsynapse__row__plastic__data__t">synapse_row_plastic_data_t</a>* synapse_row_plastic_region </td>
           <td>(</td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a>&#160;</td>
           <td class="paramname"><em>row</em></td><td>)</td>
           <td></td>
         </tr>
@@ -256,21 +337,21 @@ Fixed and Fixed-Plastic Regions</h1>
 </table>
 </div><div class="memdoc">
 
-<p>Returns the address of the plastic region. </p>
+<p>Get the address of the plastic region. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">row</td><td>The synaptic row </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Address of the plastic region of the row </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Pointer to the plastic region of the row </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00131">131</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00148">148</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
 
 </div>
 </div>
-<a id="a551d18ff318c0f5ee3eed7af60ab37ce"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a551d18ff318c0f5ee3eed7af60ab37ce">&#9670;&nbsp;</a></span>synapse_row_fixed_region()</h2>
+<a id="a3c97c04cad6ef6f8546f9a12ed296661"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3c97c04cad6ef6f8546f9a12ed296661">&#9670;&nbsp;</a></span>synapse_row_fixed_region()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -279,9 +360,9 @@ Fixed and Fixed-Plastic Regions</h1>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> synapse_row_fixed_region </td>
+          <td class="memname">static <a class="el" href="synapse__row_8h.html#structsynapse__row__fixed__part__t">synapse_row_fixed_part_t</a>* synapse_row_fixed_region </td>
           <td>(</td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a>&#160;</td>
           <td class="paramname"><em>row</em></td><td>)</td>
           <td></td>
         </tr>
@@ -293,7 +374,7 @@ Fixed and Fixed-Plastic Regions</h1>
 </table>
 </div><div class="memdoc">
 
-<p>Returns the address of the non-plastic (or fixed) region. </p>
+<p>Get the address of the non-plastic (or fixed) region. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">row</td><td>The synaptic row </td></tr>
@@ -302,12 +383,12 @@ Fixed and Fixed-Plastic Regions</h1>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Address of the fixed region of the row </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00138">138</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00157">157</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
 
 </div>
 </div>
-<a id="aa4e59f9f6e65f2adb38eda17266299e5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa4e59f9f6e65f2adb38eda17266299e5">&#9670;&nbsp;</a></span>synapse_row_num_fixed_synapses()</h2>
+<a id="a8c35d5f7f5f1cb6929f948549e91b47e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8c35d5f7f5f1cb6929f948549e91b47e">&#9670;&nbsp;</a></span>synapse_row_num_fixed_synapses()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -318,7 +399,7 @@ Fixed and Fixed-Plastic Regions</h1>
         <tr>
           <td class="memname">static <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a29d85914ddff32967d85ada69854206d">size_t</a> synapse_row_num_fixed_synapses </td>
           <td>(</td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
+          <td class="paramtype">const <a class="el" href="synapse__row_8h.html#structsynapse__row__fixed__part__t">synapse_row_fixed_part_t</a> *&#160;</td>
           <td class="paramname"><em>fixed</em></td><td>)</td>
           <td></td>
         </tr>
@@ -330,7 +411,7 @@ Fixed and Fixed-Plastic Regions</h1>
 </table>
 </div><div class="memdoc">
 
-<p>The number of fixed synapses in the row. </p>
+<p>Get the number of fixed synapses in the row. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">fixed</td><td>The fixed region of the synaptic row </td></tr>
@@ -339,12 +420,12 @@ Fixed and Fixed-Plastic Regions</h1>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Size of the fixed region of the row (in words) </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00145">145</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00166">166</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
 
 </div>
 </div>
-<a id="a5bb51090afe1fd0a7a8b58aecbd08b7d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5bb51090afe1fd0a7a8b58aecbd08b7d">&#9670;&nbsp;</a></span>synapse_row_num_plastic_controls()</h2>
+<a id="a1a67df8c1a740101c0a92eec74c26760"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1a67df8c1a740101c0a92eec74c26760">&#9670;&nbsp;</a></span>synapse_row_num_plastic_controls()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -355,7 +436,7 @@ Fixed and Fixed-Plastic Regions</h1>
         <tr>
           <td class="memname">static <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a29d85914ddff32967d85ada69854206d">size_t</a> synapse_row_num_plastic_controls </td>
           <td>(</td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
+          <td class="paramtype">const <a class="el" href="synapse__row_8h.html#structsynapse__row__fixed__part__t">synapse_row_fixed_part_t</a> *&#160;</td>
           <td class="paramname"><em>fixed</em></td><td>)</td>
           <td></td>
         </tr>
@@ -367,7 +448,7 @@ Fixed and Fixed-Plastic Regions</h1>
 </table>
 </div><div class="memdoc">
 
-<p>The number of plastic controls in the row. </p>
+<p>Get the number of plastic controls in the row. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">fixed</td><td>The fixed region of the synaptic row </td></tr>
@@ -376,12 +457,12 @@ Fixed and Fixed-Plastic Regions</h1>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Size of the fixed-plastic region of the row (in <em>half</em> words) </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00152">152</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00174">174</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
 
 </div>
 </div>
-<a id="a5ce445e106984aea0e11d4c423593594"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5ce445e106984aea0e11d4c423593594">&#9670;&nbsp;</a></span>synapse_row_plastic_controls()</h2>
+<a id="aa4cf1bbc1757f4668733006a24cd87b9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa4cf1bbc1757f4668733006a24cd87b9">&#9670;&nbsp;</a></span>synapse_row_plastic_controls()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -392,7 +473,7 @@ Fixed and Fixed-Plastic Regions</h1>
         <tr>
           <td class="memname">static <a class="el" href="synapse__row_8h.html#aeae1e8aa0c0095434ba488866ef21aa2">control_t</a>* synapse_row_plastic_controls </td>
           <td>(</td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="synapse__row_8h.html#structsynapse__row__fixed__part__t">synapse_row_fixed_part_t</a> *&#160;</td>
           <td class="paramname"><em>fixed</em></td><td>)</td>
           <td></td>
         </tr>
@@ -404,7 +485,7 @@ Fixed and Fixed-Plastic Regions</h1>
 </table>
 </div><div class="memdoc">
 
-<p>The array of plastic controls in the row. </p>
+<p>Get the array of plastic controls in the row. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">fixed</td><td>The fixed region of the synaptic row </td></tr>
@@ -413,12 +494,12 @@ Fixed and Fixed-Plastic Regions</h1>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Address of the fixed-plastic region of the row </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00159">159</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00182">182</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
 
 </div>
 </div>
-<a id="a4eda772c550113c270945284e0cf1881"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4eda772c550113c270945284e0cf1881">&#9670;&nbsp;</a></span>synapse_row_fixed_weight_controls()</h2>
+<a id="a3155272454c2d645bad4291002b5a65e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3155272454c2d645bad4291002b5a65e">&#9670;&nbsp;</a></span>synapse_row_fixed_weight_controls()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -429,7 +510,7 @@ Fixed and Fixed-Plastic Regions</h1>
         <tr>
           <td class="memname">static uint32_t* synapse_row_fixed_weight_controls </td>
           <td>(</td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="synapse__row_8h.html#structsynapse__row__fixed__part__t">synapse_row_fixed_part_t</a> *&#160;</td>
           <td class="paramname"><em>fixed</em></td><td>)</td>
           <td></td>
         </tr>
@@ -450,7 +531,7 @@ Fixed and Fixed-Plastic Regions</h1>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Address of the fixed-fixed region of the row </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00166">166</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00190">190</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
 
 </div>
 </div>
@@ -498,7 +579,7 @@ Fixed and Fixed-Plastic Regions</h1>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the index </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00175">175</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00200">200</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
 
 </div>
 </div>
@@ -553,7 +634,7 @@ Fixed and Fixed-Plastic Regions</h1>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the type code </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00186">186</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00211">211</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
 
 </div>
 </div>
@@ -601,7 +682,7 @@ Fixed and Fixed-Plastic Regions</h1>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the type and index (packed in the low bits of a word) </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00196">196</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00221">221</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
 
 </div>
 </div>
@@ -649,7 +730,7 @@ Fixed and Fixed-Plastic Regions</h1>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the delay </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00206">206</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00231">231</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
 
 </div>
 </div>
@@ -686,7 +767,7 @@ Fixed and Fixed-Plastic Regions</h1>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the weight </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00214">214</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00239">239</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
 
 </div>
 </div>
@@ -698,7 +779,7 @@ Fixed and Fixed-Plastic Regions</h1>
 <div class="ttc" id="amaths-util_8h_html_a37c4c48ff47f0838f64b5a1fb3c803b2"><div class="ttname"><a href="maths-util_8h.html#a37c4c48ff47f0838f64b5a1fb3c803b2">HALF</a></div><div class="ttdeci">#define HALF</div><div class="ttdoc">A REAL 0.5.</div><div class="ttdef"><b>Definition:</b> <a href="maths-util_8h_source.html#l00120">maths-util.h:120</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Dec 9 2020 08:34:41 for sPyNNaker neural_modelling by&#160;<a href="http://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.8.20
+Generated on Wed Dec 9 2020 13:28:19 for sPyNNaker neural_modelling by&#160;<a href="http://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.8.20
 </small></address>
 </body>
 </html>
