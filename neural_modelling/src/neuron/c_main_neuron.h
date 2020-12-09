@@ -26,11 +26,15 @@
 struct neuron_provenance {
     //! The current time.
     uint32_t current_timer_tick;
+    //! The number of times a TDMA slot was missed
     uint32_t n_tdma_mises;
 };
 
+//! The region IDs used by the neuron processing
 struct neuron_regions {
+    //! The neuron parameters
     uint32_t neuron_params;
+    //! The neuron recording details
     uint32_t neuron_recording;
 };
 
@@ -44,6 +48,10 @@ static inline void store_neuron_provenance(struct neuron_provenance *prov) {
     prov->n_tdma_mises = tdma_processing_times_behind();
 }
 
+//! \brief Read data to set up neuron processing
+//! \param[in] ds_regions: Pointer to region position data
+//! \param[in] regions: The indices of the regions to be read
+//! \param[out] n_rec_regions_used: The number of recording regions used
 static inline bool initialise_neuron_regions(
         data_specification_metadata_t *ds_regions,
         struct neuron_regions regions, uint32_t *n_rec_regions_used) {
