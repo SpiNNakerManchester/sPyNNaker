@@ -174,10 +174,10 @@ class SynapseInformation(object):
         return self.__delays
 
     def may_generate_on_machine(self):
-        """ Do we describe a collection of synapses whose synaptic matrix may
-            be generated on SpiNNaker instead of needing to be calculated in
-            this process and uploaded? This depends on the connector, the
-            definitions of the weights and delays, and the dynamics of the
+        """ Do we describe a collection of synapses whose synaptic matrix may\
+            be generated on SpiNNaker instead of needing to be calculated in\
+            this process and uploaded? This depends on the connector, the\
+            definitions of the weights and delays, and the dynamics of the\
             synapses.
 
         :return: True if the synaptic matrix may be generated on machine (or

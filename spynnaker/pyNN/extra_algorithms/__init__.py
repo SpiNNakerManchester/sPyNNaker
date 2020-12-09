@@ -20,8 +20,9 @@ from .spynnaker_data_specification_writer import (
 from .spynnaker_machine_bit_field_router_compressor import (
     SpynnakerMachineBitFieldPairRouterCompressor,
     SpynnakerMachineBitFieldUnorderedRouterCompressor)
+from .delay_support_adder import DelaySupportAdder
 
-__all__ = ["GraphEdgeWeightUpdater", "OnChipBitFieldGenerator",
-           "SpynnakerDataSpecificationWriter",
+__all__ = ["DelaySupportAdder", "GraphEdgeWeightUpdater",
+           "OnChipBitFieldGenerator", "SpynnakerDataSpecificationWriter",
            "SpynnakerMachineBitFieldPairRouterCompressor",
            "SpynnakerMachineBitFieldUnorderedRouterCompressor"]

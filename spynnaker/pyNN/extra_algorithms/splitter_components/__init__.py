@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2020-2021 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,11 +13,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .delay_afferent_application_edge import DelayAfferentApplicationEdge
-from .delayed_application_edge import DelayedApplicationEdge
-from .projection_application_edge import ProjectionApplicationEdge
-from .synapse_information import SynapseInformation
+from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
+from .spynnaker_splitter_partitioner import SpynnakerSplitterPartitioner
+from .spynnaker_splitter_selector import SpynnakerSplitterSelector
+from .splitter_abstract_pop_vertex_slice import (
+    SplitterAbstractPopulationVertexSlice)
+from .splitter_delay_vertex_slice import SplitterDelayVertexSlice
 
 __all__ = [
-    "DelayAfferentApplicationEdge", "DelayedApplicationEdge",
-    "ProjectionApplicationEdge", "SynapseInformation", ]
+    'AbstractSpynnakerSplitterDelay', 'SplitterAbstractPopulationVertexSlice',
+    'SplitterDelayVertexSlice',
+    'SpynnakerSplitterPartitioner', 'SpynnakerSplitterSelector']
