@@ -44,6 +44,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 from spynnaker.pyNN.utilities import constants, bit_field_utilities
 from spynnaker.pyNN.models.abstract_models import (
     AbstractSynapseExpandable, AbstractReadParametersBeforeSet)
+from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from .synaptic_matrices import SynapticMatrices
 
 
@@ -680,8 +681,8 @@ class PopulationMachineVertex(
         spec.switch_write_focus(region_id)
         spec.write_value(n_neurons)
         spec.write_value(n_synapse_types)
-        spec.write_value(n_neurons.bit_length())
-        spec.write_value(n_synapse_types.bit_length())
+        spec.write_value(get_n_bits(n_neurons))
+        spec.write_value(get_n_bits(n_synapse_types))
         spec.write_value(int(self._app_vertex.drop_late_spikes))
         spec.write_value(self._app_vertex.incoming_spike_buffer_size)
         spec.write_array(self._app_vertex.get_ring_buffer_shifts(
