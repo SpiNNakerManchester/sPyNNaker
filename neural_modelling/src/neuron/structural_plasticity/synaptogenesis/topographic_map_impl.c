@@ -187,7 +187,7 @@ bool synaptogenesis_dynamics_initialise(address_t sdram_sp_address) {
 }
 
 bool synaptogenesis_dynamics_rewire(
-        uint32_t time, spike_t *spike, address_t *synaptic_row_address,
+        uint32_t time, spike_t *spike, synaptic_row_t *synaptic_row,
         uint32_t *n_bytes) {
 
     // Randomly choose a postsynaptic (application neuron)
@@ -204,7 +204,7 @@ bool synaptogenesis_dynamics_rewire(
     // Select an arbitrary synaptic element for the neurons
     uint32_t row_offset = post_id * rewiring_data.s_max;
     uint32_t column_offset = rand_int(rewiring_data.s_max,
-        rewiring_data.local_seed);
+            rewiring_data.local_seed);
     uint32_t total_offset = row_offset + column_offset;
     post_to_pre_entry entry = post_to_pre_table[total_offset];
     uint32_t pre_app_pop = 0, pre_sub_pop = 0, m_pop_index = 0, neuron_id = 0;
@@ -225,15 +225,13 @@ bool synaptogenesis_dynamics_rewire(
         m_pop_index = key_atom_info->m_pop_index;
     }
 
-    if (!population_table_get_first_address(
-            *spike, synaptic_row_address, n_bytes)) {
+    if (!population_table_get_first_address(*spike, synaptic_row, n_bytes)) {
         log_error("FAIL@key %d", *spike);
         rt_error(RTE_SWERR);
     }
     uint32_t index = 0;
     while (index < m_pop_index) {
-        if (!population_table_get_next_address(
-                spike, synaptic_row_address, n_bytes)) {
+        if (!population_table_get_next_address(spike, synaptic_row, n_bytes)) {
             log_error("FAIL@key %d, index %d (failed at %d)",
                     *spike, m_pop_index, index);
             rt_error(RTE_SWERR);
@@ -258,39 +256,46 @@ bool synaptogenesis_dynamics_rewire(
     return true;
 }
 
-bool synaptogenesis_row_restructure(uint32_t time, address_t row) {
-    current_state_t *current_state = _get_state();
-
+//! \brief Performs the actual restructuring of a row
+//! \details Supporting function for synaptogenesis_row_restructure()
+//! \param[in] time: The time of the restructure
+//! \param[in] row: The row to restructure
+//! \param[in] current_state: The current state of the world
+//! \return True if the row was changed and needs to be written back
+static inline bool row_restructure(
+        uint32_t time, synaptic_row_t restrict row,
+        current_state_t *restrict current_state) {
     // the selected pre- and postsynaptic IDs are in current_state
-    bool return_value;
     if (current_state->element_exists) {
         // find the offset of the neuron in the current row
-        if (synapse_dynamics_find_neuron(
+        if (!synapse_dynamics_find_neuron(
                 current_state->post_syn_id, row,
                 &current_state->weight, &current_state->delay,
                 &current_state->offset, &current_state->synapse_type)) {
-            return_value = synaptogenesis_elimination_rule(current_state,
-                    elimination_params[current_state->post_to_pre.pop_index],
-                    time, row);
-        } else {
             log_debug("Post neuron %d not in row",
                     current_state->post_syn_id);
-            return_value = false;
+            return false;
         }
+        return synaptogenesis_elimination_rule(current_state,
+                elimination_params[current_state->post_to_pre.pop_index],
+                time, row);
     } else {
         // Can't form if the row is full
         uint32_t no_elems = synapse_dynamics_n_connections_in_row(
                 synapse_row_fixed_region(row));
         if (no_elems >= rewiring_data.s_max) {
             log_debug("row is full");
-            return_value = false;
-        } else {
-            return_value = synaptogenesis_formation_rule(current_state,
-                    formation_params[current_state->post_to_pre.pop_index],
-                    time, row);
+            return false;
         }
+        return synaptogenesis_formation_rule(current_state,
+                formation_params[current_state->post_to_pre.pop_index],
+                time, row);
     }
+}
 
+bool synaptogenesis_row_restructure(uint32_t time, synaptic_row_t row) {
+    current_state_t *current_state = _get_state();
+    bool return_value = row_restructure(time, row, current_state);
     _free_state(current_state);
     return return_value;
 }
