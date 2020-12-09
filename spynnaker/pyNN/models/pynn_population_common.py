@@ -97,7 +97,6 @@ class PyNNPopulationCommon(object):
         if (additional_parameters is not None and
                 "rb_left_shifts" in additional_parameters.keys()):
             rb_left_shifts = additional_parameters['rb_left_shifts']
-            del additional_parameters['rb_left_shifts']
         else:
             rb_left_shifts = None
 
