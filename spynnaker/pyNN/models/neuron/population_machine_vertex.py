@@ -573,17 +573,16 @@ class PopulationMachineVertex(
             synapse_dynamics.write_parameters(
                 spec, regions.synapse_dynamics, machine_time_step,
                 weight_scales)
-
-            if isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural):
-                structural_sz = self._app_vertex.get_structural_dynamics_size(
-                    self.vertex_slice)
-                spec.reserve_memory_region(
-                    region=regions.structural_dynamics, size=structural_sz,
-                    label='synapseDynamicsStructuralParams')
-                synapse_dynamics.write_structural_parameters(
-                    spec, regions.structural_dynamics,
-                    machine_time_step, weight_scales, machine_graph, self,
-                    routing_info, self.__synaptic_matrices)
+        if isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural):
+            structural_sz = self._app_vertex.get_structural_dynamics_size(
+                self.vertex_slice)
+            spec.reserve_memory_region(
+                region=regions.structural_dynamics, size=structural_sz,
+                label='synapseDynamicsStructuralParams')
+            synapse_dynamics.write_structural_parameters(
+                spec, regions.structural_dynamics,
+                machine_time_step, weight_scales, machine_graph, self,
+                routing_info, self.__synaptic_matrices)
 
         # write up the bitfield builder data
         # reserve bit field region
