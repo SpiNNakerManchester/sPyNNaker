@@ -35,40 +35,40 @@
 bool synaptogenesis_dynamics_initialise(
         address_t sdram_sp_address);
 
-//! \brief Function called (usually on a timer from c_main()) to
-//!     trigger the process of synaptic rewiring
+//! \brief Trigger the process of synaptic rewiring
+//! \details Usually called on a timer registered in c_main()
 //! \param[in] time: the current timestep
 //! \param[out] spike: variable to hold the spike
-//! \param[out] synaptic_row_address: variable to hold the address of the row
+//! \param[out] synaptic_row: variable to hold the address of the row
 //! \param[out] n_bytes: variable to hold the size of the row
 //! \return True if a row is to be transferred, false otherwise
 bool synaptogenesis_dynamics_rewire(uint32_t time,
-        spike_t *spike, address_t *synaptic_row_address, uint32_t *n_bytes);
+        spike_t *spike, synaptic_row_t *synaptic_row, uint32_t *n_bytes);
 
-//! \brief Performs the actual restructuring of a row
+//! \brief Perform the actual restructuring of a row
 //! \param[in] time: The time of the restructure
 //! \param[in] row: The row to restructure
 //! \return True if the row was changed and needs to be written back
-bool synaptogenesis_row_restructure(uint32_t time, address_t row);
+bool synaptogenesis_row_restructure(uint32_t time, synaptic_row_t row);
 
-//! \brief retrieve the period of rewiring
+//! \brief Get the period of rewiring
 //! \return Based on synaptogenesis_is_fast(), this can either be how many times
 //!     rewiring happens in a timestep, or how many timesteps have to pass until
 //!     rewiring happens.
 int32_t synaptogenesis_rewiring_period(void);
 
-//! \brief controls whether rewiring is attempted multiple times per timestep
+//! \brief Get whether rewiring is attempted multiple times per timestep
 //!     or after a number of timesteps.
 //! \return true if the result of synaptogenesis_rewiring_period() is the number
 //!     of attempts to try per timestep.
 bool synaptogenesis_is_fast(void);
 
-//! Indicates that a spike has been received
+//! \brief Indicates that a spike has been received
 //! \param[in] time: The time that the spike was received at
 //! \param[in] spike: The received spike
 void synaptogenesis_spike_received(uint32_t time, spike_t spike);
 
-//! Prints a certain data object
+//! Print a certain data object
 void print_post_to_pre_entry(void);
 
 #endif // _SYNAPTOGENESIS_DYNAMICS_H_

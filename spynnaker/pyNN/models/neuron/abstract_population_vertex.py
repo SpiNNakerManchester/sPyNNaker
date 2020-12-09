@@ -121,7 +121,7 @@ class AbstractPopulationVertex(
         TDMAAwareApplicationVertex.__init__(
             self, label, constraints, max_atoms_per_core, splitter)
 
-        self.__n_atoms = n_neurons
+        self.__n_atoms = self.round_n_atoms(n_neurons, "n_neurons")
         self.__n_data_specs = 0
 
         # buffer data
