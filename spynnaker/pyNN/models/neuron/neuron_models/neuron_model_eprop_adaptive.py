@@ -178,7 +178,7 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
             DataType.S1615,   #  neuron_rate
             # DataType.S1615,   #  w_fb
             ]
-        datatype_list.extend([DataType.S1615 for i in range(10)])  # w_fb
+        datatype_list.extend([DataType.S1615] * 10)  # w_fb
 
         # Synapse states - always initialise to zero
         eprop_syn_state = [ # synaptic state, one per synapse (kept in DTCM)
@@ -254,12 +254,14 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
         parameters[TAU_A] = self.__tau_a
         parameters[BETA] = self.__beta
         parameters[SCALAR] = self.__scalar
-        parameters[W_FB] = self.__w_fb
         parameters[WINDOW_SIZE] = self.__window_size
         parameters[NUMBER_OF_CUES] = self.__number_of_cues
         parameters[INPUT_SYNAPSES] = self.__input_synapses
         parameters[REC_SYNAPSES] = self.__rec_synapses
         parameters[NEURON_RATE] = self.__neuron_rate
+#         print('w_fb: ', self.__w_fb)
+        for n in range(10):
+            parameters[W_FB+str(n)] = self.__w_fb[n].next()
 
 
     @overrides(AbstractNeuronModel.add_state_variables)
@@ -331,7 +333,8 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
                 parameters[REC_SYNAPSES],
                 parameters[NEURON_RATE]
                 ]
-        values.extend(self.__w_fb)
+        for n in range(10):
+            values.extend(parameters[W_FB+str(n)])
 
         # create synaptic state - init all state to zero
         for n in range(SYNAPSES_PER_NEURON):
