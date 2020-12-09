@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from enum import Enum
+from collections import namedtuple
 import ctypes
 
 from pacman.executor.injection_decorator import inject_items
@@ -44,7 +45,6 @@ from spynnaker.pyNN.utilities import constants, bit_field_utilities
 from spynnaker.pyNN.models.abstract_models import (
     AbstractSynapseExpandable, AbstractReadParametersBeforeSet)
 from .synaptic_matrices import SynapticMatrices
-import math
 
 
 class NeuronProvenance(ctypes.LittleEndianStructure):
@@ -88,6 +88,17 @@ class SynapseProvenance(ctypes.LittleEndianStructure):
     N_ITEMS = len(_fields_)
 
 
+NeuronRegions = namedtuple(
+    "NeuronRegions",
+    ["neuron_params", "neuron_recording"])
+
+SynapseRegions = namedtuple(
+    "SynapseRegions",
+    ["synapse_params", "direct_matrix", "pop_table", "synaptic_matrix",
+     "synapse_dynamics", "structural_dynamics", "bitfield_builder",
+     "bitfield_key_map", "bitfield_filter", "connection_builder"])
+
+
 class PopulationMachineVertex(
         MachineVertex, AbstractReceiveBuffersToHost,
         AbstractHasAssociatedBinary, ProvidesProvenanceDataFromMachineImpl,
@@ -121,6 +132,24 @@ class PopulationMachineVertex(
         BIT_FIELD_FILTER = 12
         BIT_FIELD_BUILDER = 13
         BIT_FIELD_KEY_MAP = 14
+
+    NEURON_REGIONS = NeuronRegions(
+        neuron_params=REGIONS.NEURON_PARAMS.value,
+        neuron_recording=REGIONS.NEURON_RECORDING.value
+    )
+
+    SYNAPSE_REGIONS = SynapseRegions(
+        synapse_params=REGIONS.SYNAPSE_PARAMS.value,
+        direct_matrix=REGIONS.DIRECT_MATRIX.value,
+        pop_table=REGIONS.POPULATION_TABLE.value,
+        synaptic_matrix=REGIONS.SYNAPTIC_MATRIX.value,
+        synapse_dynamics=REGIONS.SYNAPSE_DYNAMICS.value,
+        structural_dynamics=REGIONS.STRUCTURAL_DYNAMICS.value,
+        bitfield_builder=REGIONS.BIT_FIELD_BUILDER.value,
+        bitfield_key_map=REGIONS.BIT_FIELD_KEY_MAP.value,
+        bitfield_filter=REGIONS.BIT_FIELD_FILTER.value,
+        connection_builder=REGIONS.CONNECTOR_BUILDER.value
+    )
 
     SATURATION_COUNT_NAME = "Times_synaptic_weights_have_saturated"
     SATURATION_COUNT_MESSAGE = (
@@ -211,36 +240,36 @@ class PopulationMachineVertex(
         self.__synaptic_matrices = SynapticMatrices(
             vertex_slice, app_vertex.neuron_impl.get_n_synapse_types(),
             app_vertex.all_single_syn_size,
-            self.REGIONS.SYNAPTIC_MATRIX.value,
-            self.REGIONS.DIRECT_MATRIX.value,
-            self.REGIONS.POPULATION_TABLE.value,
-            self.REGIONS.CONNECTOR_BUILDER.value)
+            self.SYNAPSE_REGIONS.synaptic_matrix,
+            self.SYNAPSE_REGIONS.direct_matrix,
+            self.SYNAPSE_REGIONS.pop_table,
+            self.SYNAPSE_REGIONS.connection_builder)
 
     @overrides(AbstractSupportsBitFieldGeneration.bit_field_base_address)
     def bit_field_base_address(self, transceiver, placement):
         return locate_memory_region_for_placement(
             placement=placement, transceiver=transceiver,
-            region=self.REGIONS.BIT_FIELD_FILTER.value)
+            region=self.SYNAPSE_REGIONS.bitfield_filter)
 
     @overrides(AbstractSupportsBitFieldRoutingCompression.
                key_to_atom_map_region_base_address)
     def key_to_atom_map_region_base_address(self, transceiver, placement):
         return locate_memory_region_for_placement(
             placement=placement, transceiver=transceiver,
-            region=self.REGIONS.BIT_FIELD_KEY_MAP.value)
+            region=self.SYNAPSE_REGIONS.bitfield_key_map)
 
     @overrides(AbstractSupportsBitFieldGeneration.bit_field_builder_region)
     def bit_field_builder_region(self, transceiver, placement):
         return locate_memory_region_for_placement(
             placement=placement, transceiver=transceiver,
-            region=self.REGIONS.BIT_FIELD_BUILDER.value)
+            region=self.SYNAPSE_REGIONS.bitfield_builder)
 
     @overrides(AbstractSupportsBitFieldRoutingCompression.
                regeneratable_sdram_blocks_and_sizes)
     def regeneratable_sdram_blocks_and_sizes(self, transceiver, placement):
         synaptic_matrix_base_address = locate_memory_region_for_placement(
             placement=placement, transceiver=transceiver,
-            region=self.REGIONS.SYNAPTIC_MATRIX.value)
+            region=self.SYNAPSE_REGIONS.synaptic_matrix)
         return [(
             self.__synaptic_matrices.host_generated_block_addr +
             synaptic_matrix_base_address,
@@ -424,7 +453,7 @@ class PopulationMachineVertex(
     @overrides(AbstractReceiveBuffersToHost.get_recording_region_base_address)
     def get_recording_region_base_address(self, txrx, placement):
         return locate_memory_region_for_placement(
-            placement, self.REGIONS.NEURON_RECORDING.value, txrx)
+            placement, self.NEURON_REGIONS.neuron_recording, txrx)
 
     @overrides(AbstractHasProfileData.get_profile_data)
     def get_profile_data(self, transceiver, placement):
@@ -473,33 +502,57 @@ class PopulationMachineVertex(
         spec.comment("\n*** Spec for block of {} neurons ***\n".format(
             self._app_vertex.neuron_impl.model_name))
 
-        # Reserve memory regions
-        self._reserve_memory_regions(spec, machine_graph, n_key_map)
-
         # Write the setup region
+        spec.reserve_memory_region(
+            region=self.REGIONS.SYSTEM.value, size=SIMULATION_N_BYTES,
+            label='System')
         spec.switch_write_focus(self.REGIONS.SYSTEM.value)
         spec.write_array(simulation_utilities.get_simulation_header_array(
             self.__binary_file_name, machine_time_step, time_scale_factor))
 
-        # Write the neuron recording region
-        self._app_vertex.neuron_recorder.write_neuron_recording_region(
-            spec, self.REGIONS.NEURON_RECORDING.value,
-            self.vertex_slice, data_n_time_steps)
-
-        # Write the neuron parameters with the key
-        key = routing_info.get_first_key_from_pre_vertex(
-            self, constants.SPIKE_PARTITION_ID)
-        self._write_neuron_parameters(
-            spec, key, self.REGIONS.NEURON_PARAMS.value)
-
-        # Write the synapse parameters
-        self._write_synapse_parameters(
-            spec, self.REGIONS.SYNAPSE_PARAMS.value, machine_time_step)
+        # Reserve memory for provenance
+        self.reserve_provenance_data_region(spec)
 
         # write profile data
+        profile_utils.reserve_profile_region(
+            spec, self.REGIONS.PROFILING.value,
+            self._app_vertex.n_profile_samples)
         profile_utils.write_profile_region_data(
             spec, self.REGIONS.PROFILING.value,
             self._app_vertex.n_profile_samples)
+
+        self._write_neuron_data_spec(
+            spec, routing_info, data_n_time_steps, self.NEURON_REGIONS)
+        self._write_synapse_data_spec(
+            spec, machine_time_step, routing_info, machine_graph, n_key_map,
+            self.SYNAPSE_REGIONS)
+
+        # End the writing of this specification:
+        spec.end_specification()
+
+    def _write_neuron_data_spec(
+            self, spec, routing_info, data_n_time_steps, regions):
+        # Write the neuron parameters with the key
+        self._write_neuron_parameters(
+            spec, regions.neuron_params, routing_info)
+
+        # Write the neuron recording region
+        spec.reserve_memory_region(
+            region=regions.neuron_recording,
+            size=self._app_vertex.neuron_recorder.get_static_sdram_usage(
+                self.vertex_slice),
+            label="neuron recording")
+        self._app_vertex.neuron_recorder.write_neuron_recording_region(
+            spec, regions.neuron_recording, self.vertex_slice,
+            data_n_time_steps)
+
+    def _write_synapse_data_spec(
+            self, spec, machine_time_step, routing_info, machine_graph,
+            n_key_map, regions):
+
+        # Write the synapse parameters
+        self._write_synapse_parameters(
+            spec, regions.synapse_params, machine_time_step)
 
         # Write the synaptic matrices
         all_syn_block_sz = self._app_vertex.get_synapses_size(
@@ -511,31 +564,39 @@ class PopulationMachineVertex(
 
         # Write any synapse dynamics
         synapse_dynamics = self._app_vertex.synapse_dynamics
-        if synapse_dynamics is not None:
+        synapse_dynamics_sz = self._app_vertex.get_synapse_dynamics_size(
+            self.vertex_slice)
+        if synapse_dynamics_sz > 0:
+            spec.reserve_memory_region(
+                region=regions.synapse_dynamics, size=synapse_dynamics_sz,
+                label='synapseDynamicsParams')
             synapse_dynamics.write_parameters(
-                spec, self.REGIONS.SYNAPSE_DYNAMICS.value,
-                machine_time_step, weight_scales)
+                spec, regions.synapse_dynamics, machine_time_step,
+                weight_scales)
 
             if isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural):
+                structural_sz = self._app_vertex.get_structural_dynamics_size(
+                    self.vertex_slice)
+                spec.reserve_memory_region(
+                    region=regions.structural_dynamics, size=structural_sz,
+                    label='synapseDynamicsStructuralParams')
                 synapse_dynamics.write_structural_parameters(
-                    spec, self.REGIONS.STRUCTURAL_DYNAMICS.value,
+                    spec, regions.structural_dynamics,
                     machine_time_step, weight_scales, machine_graph, self,
                     routing_info, self.__synaptic_matrices)
 
         # write up the bitfield builder data
+        # reserve bit field region
+        bit_field_utilities.reserve_bit_field_regions(
+            spec, machine_graph, n_key_map, self, regions.bitfield_builder,
+            regions.bitfield_filter, regions.bitfield_key_map)
         bit_field_utilities.write_bitfield_init_data(
             spec, self, machine_graph, routing_info,
-            n_key_map, self.REGIONS.BIT_FIELD_BUILDER.value,
-            self.REGIONS.POPULATION_TABLE.value,
-            self.REGIONS.SYNAPTIC_MATRIX.value,
-            self.REGIONS.DIRECT_MATRIX.value,
-            self.REGIONS.BIT_FIELD_FILTER.value,
-            self.REGIONS.BIT_FIELD_KEY_MAP.value,
-            self.REGIONS.STRUCTURAL_DYNAMICS.value,
+            n_key_map, regions.bitfield_builder, regions.pop_table,
+            regions.synaptic_matrix, regions.direct_matrix,
+            regions.bitfield_filter, regions.bitfield_key_map,
+            regions.structural_dynamics,
             isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural))
-
-        # End the writing of this specification:
-        spec.end_specification()
 
     @inject_items({"routing_info": "MemoryRoutingInfos"})
     @overrides(
@@ -544,15 +605,9 @@ class PopulationMachineVertex(
     def regenerate_data_specification(self, spec, placement, routing_info):
         # pylint: disable=too-many-arguments, arguments-differ
 
-        # reserve the neuron parameters data region
-        self._reserve_neuron_params_data_region(spec)
-
         # write the neuron params into the new DSG region
         self._write_neuron_parameters(
-            key=routing_info.get_first_key_from_pre_vertex(
-                self, constants.SPIKE_PARTITION_ID),
-            spec=spec,
-            region_id=self.REGIONS.NEURON_PARAMS.value)
+            spec, self.NEURON_REGIONS.neuron_params, routing_info)
 
         # close spec
         spec.end_specification()
@@ -565,84 +620,13 @@ class PopulationMachineVertex(
     def set_reload_required(self, new_value):
         self.__change_requires_neuron_parameters_reload = new_value
 
-    def _reserve_memory_regions(self, spec, machine_graph, n_key_map):
-        """ Reserve the DSG data regions.
-
-        :param ~.DataSpecificationGenerator spec:
-            the spec to write the DSG region to
-        :param ~.MachineGraph machine_graph: machine graph
-        :param n_key_map: n key map
-        :return: None
-        """
-        spec.comment("\nReserving memory space for data regions:\n\n")
-
-        # Reserve memory:
-        spec.reserve_memory_region(
-            region=self.REGIONS.SYSTEM.value,
-            size=SIMULATION_N_BYTES,
-            label='System')
-
-        self._reserve_neuron_params_data_region(spec)
-
-        spec.reserve_memory_region(
-            region=self.REGIONS.NEURON_RECORDING.value,
-            size=self._app_vertex.neuron_recorder.get_static_sdram_usage(
-                self.vertex_slice),
-            label="neuron recording")
-
-        profile_utils.reserve_profile_region(
-            spec, self.REGIONS.PROFILING.value,
-            self._app_vertex.n_profile_samples)
-
-        # reserve bit field region
-        bit_field_utilities.reserve_bit_field_regions(
-            spec, machine_graph, n_key_map, self,
-            self.REGIONS.BIT_FIELD_BUILDER.value,
-            self.REGIONS.BIT_FIELD_FILTER.value,
-            self.REGIONS.BIT_FIELD_KEY_MAP.value)
-
-        self.reserve_provenance_data_region(spec)
-
-        spec.reserve_memory_region(
-            region=self.REGIONS.SYNAPSE_PARAMS.value,
-            size=self._app_vertex.get_synapse_params_size(),
-            label='SynapseParams')
-
-        synapse_dynamics_sz = self._app_vertex.get_synapse_dynamics_size(
-            self.vertex_slice)
-        if synapse_dynamics_sz != 0:
-            spec.reserve_memory_region(
-                region=self.REGIONS.SYNAPSE_DYNAMICS.value,
-                size=synapse_dynamics_sz, label='synapseDynamicsParams')
-
-        structural_dynamics_sz = self._app_vertex.get_structural_dynamics_size(
-            self.vertex_slice)
-        if structural_dynamics_sz != 0:
-            spec.reserve_memory_region(
-                region=self.REGIONS.STRUCTURAL_DYNAMICS.value,
-                size=structural_dynamics_sz,
-                label='synapseDynamicsStructuralParams')
-
     @staticmethod
     def neuron_region_sdram_address(placement, transceiver):
         return helpful_functions.locate_memory_region_for_placement(
                 placement, PopulationMachineVertex.REGIONS.NEURON_PARAMS.value,
                 transceiver)
 
-    def _reserve_neuron_params_data_region(self, spec):
-        """ Reserve the neuron parameter data region.
-
-        :param ~data_specification.DataSpecificationGenerator spec:
-            the spec to write the DSG region to
-        :return: None
-        """
-        params_size = self._app_vertex.get_sdram_usage_for_neuron_params(
-            self.vertex_slice)
-        spec.reserve_memory_region(
-            region=self.REGIONS.NEURON_PARAMS.value,
-            size=params_size, label='NeuronParams')
-
-    def _write_neuron_parameters(self, spec, key, region_id):
+    def _write_neuron_parameters(self, spec, region_id, routing_info):
 
         self._app_vertex.update_state_variables()
 
@@ -651,7 +635,11 @@ class PopulationMachineVertex(
         spec.comment("\nWriting Neuron Parameters for {} Neurons:\n".format(
             n_atoms))
 
-        # Set the focus to the memory region:
+        # Reserve and switch to the memory region
+        params_size = self._app_vertex.get_sdram_usage_for_neuron_params(
+            self.vertex_slice)
+        spec.reserve_memory_region(
+            region=region_id, size=params_size, label='NeuronParams')
         spec.switch_write_focus(region_id)
 
         # store the tdma data here for this slice.
@@ -661,6 +649,8 @@ class PopulationMachineVertex(
 
         # Write whether the key is to be used, and then the key, or 0 if it
         # isn't to be used
+        key = routing_info.get_first_key_from_pre_vertex(
+            self, constants.SPIKE_PARTITION_ID)
         if key is None:
             spec.write_value(data=0)
             spec.write_value(data=0)
@@ -678,6 +668,11 @@ class PopulationMachineVertex(
         spec.write_array(neuron_data)
 
     def _write_synapse_parameters(self, spec, region_id, machine_time_step):
+        # Reserve space
+        spec.reserve_memory_region(
+            region=region_id, size=self._app_vertex.get_synapse_params_size(),
+            label='SynapseParams')
+
         # Get values
         n_neurons = self.vertex_slice.n_atoms
         n_synapse_types = self._app_vertex.neuron_impl.get_n_synapse_types()
