@@ -35,21 +35,9 @@
 
 #include "c_main_neuron.h"
 #include "c_main_synapse.h"
+#include "c_main_common.h"
 #include "regions.h"
 #include "profile_tags.h"
-
-#include <data_specification.h>
-#include <simulation.h>
-#include <profiler.h>
-#include <debug.h>
-#include <recording.h>
-
-/* validates that the model being compiled does indeed contain a application
- * magic number*/
-#ifndef APPLICATION_NAME_HASH
-#error APPLICATION_NAME_HASH was undefined.  Make sure you define this\
-    constant
-#endif
 
 //! The combined provenance from synapses and neurons
 struct combined_provenance {
@@ -61,6 +49,19 @@ struct combined_provenance {
 typedef enum callback_priorities {
     MC = -1, DMA = 0, USER = 0, SDP = 1, TIMER = 2
 } callback_priorities;
+
+const struct common_regions COMMON_REGIONS = {
+    .system = SYSTEM_REGION,
+    .provenance = PROVENANCE_DATA_REGION,
+    .profiler = PROFILER_REGION,
+    .recording = RECORDING_REGION
+};
+
+const struct common_priorities COMMON_PRIORITIES = {
+    .sdp = SDP,
+    .dma = DMA,
+    .timer = TIMER
+};
 
 const struct neuron_regions NEURON_REGIONS = {
     .neuron_params = NEURON_PARAMS_REGION,
@@ -97,9 +98,6 @@ static uint32_t simulation_ticks = 0;
 //! Determines if this model should run for infinite time
 static uint32_t infinite_run;
 
-//! timer count for tdma of certain models
-static uint global_timer_count;
-
 //! The recording flags indicating if anything is recording
 static uint32_t recording_flags = 0;
 
@@ -109,59 +107,6 @@ static void c_main_store_provenance_data(address_t provenance_region) {
     struct combined_provenance *prov = (void *) provenance_region;
     store_neuron_provenance(&prov->neuron_provenance);
     store_synapse_provenance(&prov->synapse_provenance);
-}
-
-//! \brief Initialises the model by reading in the regions and checking
-//!        recording data.
-//! \return True if it successfully initialised, false otherwise
-static bool initialise(void) {
-    log_debug("Initialise: started");
-
-    // Get the address this core's DTCM data starts at from SRAM
-    data_specification_metadata_t *ds_regions =
-            data_specification_get_data_address();
-
-    // Read the header
-    if (!data_specification_read_header(ds_regions)) {
-        return false;
-    }
-
-    // Get the timing details and set up the simulation interface
-    if (!simulation_initialise(
-            data_specification_get_region(SYSTEM_REGION, ds_regions),
-            APPLICATION_NAME_HASH, &timer_period, &simulation_ticks,
-            &infinite_run, &time, SDP, DMA)) {
-        return false;
-    }
-    simulation_set_provenance_function(
-        c_main_store_provenance_data,
-        data_specification_get_region(PROVENANCE_DATA_REGION, ds_regions));
-
-    // Setup profiler
-    profiler_init(data_specification_get_region(PROFILER_REGION, ds_regions));
-
-    // Setup recording
-    void *rec_addr = data_specification_get_region(RECORDING_REGION, ds_regions);
-    if (!recording_initialize(&rec_addr, &recording_flags)) {
-        return false;
-    }
-
-    // Setup neurons
-    uint32_t n_rec_regions_used;
-    if (!initialise_neuron_regions(
-            ds_regions, NEURON_REGIONS,  &n_rec_regions_used)) {
-        return false;
-    }
-
-    // Setup synapses
-    if (!initialise_synapse_regions(
-            ds_regions, SYNAPSE_REGIONS, SYNAPSE_PRIORITIES,
-            n_rec_regions_used)) {
-        return false;
-    }
-
-    log_debug("Initialise: finished");
-    return true;
 }
 
 //! \brief the function to call when resuming a simulation
@@ -187,15 +132,10 @@ void resume_callback(void) {
 //! \param[in] unused: unused parameter kept for API consistency
 void timer_callback(uint timer_count, UNUSED uint unused) {
 
-    global_timer_count = timer_count;
     profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
 
     time++;
 
-    // This is the part where I save the input and output indices
-    //   from the circular buffer
-    // If time == 0 as well as output == input == 0  then no rewire is
-    //   supposed to happen. No spikes yet
     log_debug("Timer tick %u \n", time);
 
     /* if a fixed number of simulation ticks that were specified at startup
@@ -208,15 +148,10 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
         // Pause neuron processing
         neuron_pause();
 
-        // Finalise any recordings that are in progress
-        if (recording_flags > 0) {
-            log_debug("updating recording regions");
-            recording_finalise();
-        }
+        // Pause common functions
+        common_pause(recording_flags);
 
         profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
-
-        profiler_finalise();
 
         // Subtract 1 from the time so this tick gets done again on the next
         // run
@@ -235,23 +170,48 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
     profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 }
 
+//! \brief Initialises the model by reading in the regions and checking
+//!        recording data.
+//! \return True if it successfully initialised, false otherwise
+static bool initialise(void) {
+    log_debug("Initialise: started");
+
+    data_specification_metadata_t *ds_regions;
+    if (!initialise_common_regions(
+            &timer_period, &simulation_ticks, &infinite_run, &time,
+            &recording_flags, c_main_store_provenance_data, timer_callback,
+            COMMON_REGIONS, COMMON_PRIORITIES, &ds_regions)) {
+        return false;
+    }
+
+    // Setup neurons
+    uint32_t n_rec_regions_used;
+    if (!initialise_neuron_regions(
+            ds_regions, NEURON_REGIONS,  &n_rec_regions_used)) {
+        return false;
+    }
+
+    // Setup synapses
+    if (!initialise_synapse_regions(
+            ds_regions, SYNAPSE_REGIONS, SYNAPSE_PRIORITIES,
+            n_rec_regions_used)) {
+        return false;
+    }
+
+    log_debug("Initialise: finished");
+    return true;
+}
+
 //! \brief The entry point for this model.
 void c_main(void) {
+
+    // Start the time at "-1" so that the first tick will be 0
+    time = UINT32_MAX;
 
     // initialise the model
     if (!initialise()) {
         rt_error(RTE_API);
     }
-
-    // Start the time at "-1" so that the first tick will be 0
-    time = UINT32_MAX;
-
-    // Set timer tick (in microseconds)
-    log_debug("setting timer tick callback for %d microseconds", timer_period);
-    spin1_set_timer_tick(timer_period);
-
-    // Set up the timer tick callback (others are handled elsewhere)
-    spin1_callback_on(TIMER_TICK, timer_callback, TIMER);
 
     simulation_run();
 }

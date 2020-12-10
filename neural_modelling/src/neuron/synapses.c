@@ -71,15 +71,6 @@ static uint32_t synapse_type_bits;
 //! Mask to pick out the synapse type.
 static uint32_t synapse_type_mask;
 
-//! Timer callbacks since last rewiring
-static int32_t last_rewiring_time = 0;
-
-//! Rewiring period represented as an integer
-static int32_t rewiring_period = 0;
-
-//! Flag representing whether rewiring is enabled
-static bool rewiring = false;
-
 //! Count of the number of times the ring buffers have saturated
 uint32_t synapses_saturation_count = 0;
 
@@ -328,27 +319,7 @@ bool synapses_initialise(
     synapse_type_bits = log_n_synapse_types;
     synapse_type_mask = (1 << log_n_synapse_types) - 1;
 
-    rewiring_period = synaptogenesis_rewiring_period();
-    rewiring = rewiring_period != -1;
-
     return true;
-}
-
-static inline void do_rewiring(void) {
-    last_rewiring_time++;
-
-    // Then do rewiring
-    if (rewiring &&
-            ((last_rewiring_time >= rewiring_period && !synaptogenesis_is_fast())
-                || synaptogenesis_is_fast())) {
-        last_rewiring_time = 0;
-        // put flag in spike processing to do synaptic rewiring
-        if (synaptogenesis_is_fast()) {
-            spike_processing_do_rewiring(rewiring_period);
-        } else {
-            spike_processing_do_rewiring(1);
-        }
-    }
 }
 
 static inline void process_ring_buffers(timer_t time) {
@@ -398,7 +369,7 @@ void synapses_do_timestep_update(timer_t time) {
     process_ring_buffers(time);
 
     // Do rewiring as needed
-    do_rewiring();
+    synaptogenesis_do_timestep_update();
 }
 
 bool synapses_process_synaptic_row(

@@ -72,6 +72,9 @@ static circular_buffer current_state_queue;
 //! ::current_state_queue
 static circular_buffer free_states;
 
+//! Timer callbacks since last rewiring
+static uint32_t last_rewiring_time = 0;
+
 void print_post_to_pre_entry(void) {
     uint32_t n_elements =
             rewiring_data.s_max * rewiring_data.machine_no_atoms;
@@ -295,14 +298,18 @@ bool synaptogenesis_row_restructure(uint32_t time, address_t row) {
     return return_value;
 }
 
-int32_t synaptogenesis_rewiring_period(void) {
-    return rewiring_data.p_rew;
-}
-
-bool synaptogenesis_is_fast(void) {
-    return rewiring_data.fast == 1;
-}
-
 void synaptogenesis_spike_received(uint32_t time, spike_t spike) {
     partner_spike_received(time, spike);
+}
+
+void synaptogenesis_do_timestep_update(void) {
+    if (rewiring_data.fast) {
+        spike_processing_do_rewiring(rewiring_data.p_rew);
+    } else {
+        last_rewiring_time++;
+        if (last_rewiring_time >= rewiring_data.p_rew) {
+            last_rewiring_time = 0;
+            spike_processing_do_rewiring(1);
+        }
+    }
 }
