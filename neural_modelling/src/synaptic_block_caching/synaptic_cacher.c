@@ -347,7 +347,7 @@ static inline void read_in_addresses(void) {
             direct_matrix_region_base_address);
     log_debug("Structural matrix region base address = %0x",
             structural_matrix_region_base_address);
-    log_info("Finished reading in vertex data region addresses");
+    log_debug("Finished reading in vertex data region addresses");
 
     // read user 2 into store
     dtcm_to_use = vcpu()->user2;
@@ -551,7 +551,9 @@ static inline void set_address_to_cache_reps(
     address_list_entry* entry =
         population_table_get_address_entry_from_sdram(
             master_pop_base_address, address_entry_index);
+    log_info("a");
     entry->addr.representation = rep;
+    log_info("b");
     // set dtcm master pop just to allow printing changes
     population_table_set_address_to_rep(address_entry_index, rep);
 }

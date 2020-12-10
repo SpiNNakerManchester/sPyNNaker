@@ -504,7 +504,7 @@ class MasterPopTableAsBinarySearch(object):
 
         # if not single, scale the address
         start_addr = block_start_addr
-        if representation == REPRESENTATION_VALUES.DIRECT.value:
+        if not representation == REPRESENTATION_VALUES.DIRECT.value:
             if block_start_addr % _ADDRESS_SCALE != 0:
                 raise SynapticConfigurationException(
                     "Address {} is not compatible with this table".format(
