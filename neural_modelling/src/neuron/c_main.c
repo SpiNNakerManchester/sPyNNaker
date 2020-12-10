@@ -97,18 +97,6 @@ static uint32_t simulation_ticks = 0;
 //! Determines if this model should run for infinite time
 static uint32_t infinite_run;
 
-//! Timer callbacks since last rewiring
-static int32_t last_rewiring_time = 0;
-
-//! Rewiring period represented as an integer
-static int32_t rewiring_period = 0;
-
-//! Flag representing whether rewiring is enabled
-static bool rewiring = false;
-
-//! Count the number of rewiring attempts
-static uint32_t count_rewire_attempts = 0;
-
 //! timer count for tdma of certain models
 static uint global_timer_count;
 
@@ -172,32 +160,25 @@ static bool initialise(void) {
         return false;
     }
 
-    rewiring_period = synaptogenesis_rewiring_period();
-    rewiring = rewiring_period != -1;
-
     log_debug("Initialise: finished");
     return true;
 }
 
 //! \brief the function to call when resuming a simulation
 void resume_callback(void) {
-    data_specification_metadata_t *ds_regions =
-            data_specification_get_data_address();
+
+    // Reset recording
+    recording_reset();
 
     // try resuming neuron
-    if (!neuron_resume(
-            data_specification_get_region(NEURON_PARAMS_REGION, ds_regions))) {
+    if (!neuron_resume()) {
         log_error("failed to resume neuron.");
         rt_error(RTE_SWERR);
     }
 
-    // If the time has been reset to zero then the ring buffers need to be
-    // flushed in case there is a delayed spike left over from a previous run
+    // Resume synapses
     // NOTE: at reset, time is set to UINT_MAX ahead of timer_callback(...)
-    if ((time+1) == 0) {
-        synapses_flush_ring_buffers();
-    }
-
+    synapses_resume(time + 1);
 }
 
 //! \brief Timer interrupt callback
@@ -210,7 +191,6 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
     profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
 
     time++;
-    last_rewiring_time++;
 
     // This is the part where I save the input and output indices
     //   from the circular buffer
@@ -225,15 +205,10 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
         // Enter pause and resume state to avoid another tick
         simulation_handle_pause_resume(resume_callback);
 
-        log_debug("Completed a run");
+        // Pause neuron processing
+        neuron_pause();
 
-        // rewrite neuron params to SDRAM for reading out if needed
-        data_specification_metadata_t *ds_regions =
-                data_specification_get_data_address();
-        neuron_pause(data_specification_get_region(NEURON_PARAMS_REGION, ds_regions));
-
-        /* Finalise any recordings that are in progress, writing back the final
-         * amounts of samples recorded to SDRAM */
+        // Finalise any recordings that are in progress
         if (recording_flags > 0) {
             log_debug("updating recording regions");
             recording_finalise();
@@ -247,27 +222,12 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
         // run
         time--;
 
-        log_debug("Rewire tries = %d", count_rewire_attempts);
         simulation_ready_to_read();
         return;
     }
 
     // First do synapses timestep update, as this is time-critical
     synapses_do_timestep_update(time);
-
-    // Then do rewiring
-    if (rewiring &&
-            ((last_rewiring_time >= rewiring_period && !synaptogenesis_is_fast())
-                || synaptogenesis_is_fast())) {
-        last_rewiring_time = 0;
-        // put flag in spike processing to do synaptic rewiring
-        if (synaptogenesis_is_fast()) {
-            spike_processing_do_rewiring(rewiring_period);
-        } else {
-            spike_processing_do_rewiring(1);
-        }
-        count_rewire_attempts++;
-    }
 
     // Now do neuron time step update
     neuron_do_timestep_update(time, timer_count);

@@ -21,6 +21,7 @@
 #include "spike_processing.h"
 #include "neuron.h"
 #include "plasticity/synapse_dynamics.h"
+#include "structural_plasticity/synaptogenesis_dynamics.h"
 #include <profiler.h>
 #include <debug.h>
 #include <spin1_api.h>
@@ -69,6 +70,15 @@ static uint32_t synapse_index_mask;
 static uint32_t synapse_type_bits;
 //! Mask to pick out the synapse type.
 static uint32_t synapse_type_mask;
+
+//! Timer callbacks since last rewiring
+static int32_t last_rewiring_time = 0;
+
+//! Rewiring period represented as an integer
+static int32_t rewiring_period = 0;
+
+//! Flag representing whether rewiring is enabled
+static bool rewiring = false;
 
 //! Count of the number of times the ring buffers have saturated
 uint32_t synapses_saturation_count = 0;
@@ -317,10 +327,31 @@ bool synapses_initialise(
     synapse_index_mask = (1 << synapse_index_bits) - 1;
     synapse_type_bits = log_n_synapse_types;
     synapse_type_mask = (1 << log_n_synapse_types) - 1;
+
+    rewiring_period = synaptogenesis_rewiring_period();
+    rewiring = rewiring_period != -1;
+
     return true;
 }
 
-void synapses_do_timestep_update(timer_t time) {
+static inline void do_rewiring(void) {
+    last_rewiring_time++;
+
+    // Then do rewiring
+    if (rewiring &&
+            ((last_rewiring_time >= rewiring_period && !synaptogenesis_is_fast())
+                || synaptogenesis_is_fast())) {
+        last_rewiring_time = 0;
+        // put flag in spike processing to do synaptic rewiring
+        if (synaptogenesis_is_fast()) {
+            spike_processing_do_rewiring(rewiring_period);
+        } else {
+            spike_processing_do_rewiring(1);
+        }
+    }
+}
+
+static inline void process_ring_buffers(timer_t time) {
     print_ring_buffers(time);
 
     // Disable interrupts to stop DMAs interfering with the ring buffers
@@ -358,6 +389,16 @@ void synapses_do_timestep_update(timer_t time) {
 
     // Re-enable the interrupts
     spin1_mode_restore(state);
+
+}
+
+void synapses_do_timestep_update(timer_t time) {
+
+    // Process the ring buffers
+    process_ring_buffers(time);
+
+    // Do rewiring as needed
+    do_rewiring();
 }
 
 bool synapses_process_synaptic_row(
@@ -405,18 +446,12 @@ uint32_t synapses_get_pre_synaptic_events(void) {
             synapse_dynamics_get_plastic_pre_synaptic_events());
 }
 
-void synapses_flush_ring_buffers(void) {
-    for (uint32_t i = 0; i < ring_buffer_size; i++) {
-        ring_buffers[i] = 0;
+void synapses_resume(uint32_t time) {
+    // If the time has been reset to zero then the ring buffers need to be
+    // flushed in case there is a delayed spike left over from a previous run
+    if (time == 0) {
+        for (uint32_t i = 0; i < ring_buffer_size; i++) {
+            ring_buffers[i] = 0;
+        }
     }
-}
-
-//! \brief allows clearing of DTCM used by synapses
-//! \return true if successful
-bool synapses_shut_down(void) {
-    sark_free(ring_buffer_to_input_left_shifts);
-    sark_free(ring_buffers);
-    num_fixed_pre_synaptic_events = 0;
-    synapses_saturation_count = 0;
-    return true;
 }

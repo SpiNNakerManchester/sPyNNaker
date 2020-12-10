@@ -180,7 +180,6 @@ static bool neuron_recording_read_in_elements(
 }
 
 bool neuron_recording_reset(uint32_t n_neurons) {
-    recording_reset();
     if (!neuron_recording_read_in_elements(reset_address, n_neurons)) {
         log_error("failed to reread in the new elements after reset");
         return false;

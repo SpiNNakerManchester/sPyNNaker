@@ -36,6 +36,9 @@ static bool use_key;
 //! The number of neurons on the core
 static uint32_t n_neurons;
 
+//! The address of the params region
+static address_t saved_params_address;
+
 //! parameters that reside in the neuron_parameter_data_region
 struct neuron_parameters {
     uint32_t has_key;
@@ -60,14 +63,14 @@ static bool neuron_load_neuron_parameters(address_t address) {
     return true;
 }
 
-bool neuron_resume(address_t address) { // EXPORTED
+bool neuron_resume(void) { // EXPORTED
     if (!neuron_recording_reset(n_neurons)){
         log_error("failed to reload the neuron recording parameters");
         return false;
     }
 
     log_debug("neuron_reloading_neuron_parameters: starting");
-    return neuron_load_neuron_parameters(address);
+    return neuron_load_neuron_parameters(saved_params_address);
 }
 
 bool neuron_initialise(
@@ -76,6 +79,7 @@ bool neuron_initialise(
     log_debug("neuron_initialise: starting");
 
     // init the TDMA
+    saved_params_address = address;
     void *data_addr = address;
     tdma_processing_initialise(&data_addr);
 
@@ -119,11 +123,11 @@ bool neuron_initialise(
     return true;
 }
 
-void neuron_pause(address_t address) { // EXPORTED
+void neuron_pause(void) { // EXPORTED
 
     // call neuron implementation function to do the work
     neuron_impl_store_neuron_parameters(
-            address, START_OF_GLOBAL_PARAMETERS, n_neurons);
+            saved_params_address, START_OF_GLOBAL_PARAMETERS, n_neurons);
 }
 
 void neuron_do_timestep_update(timer_t time, uint timer_count) { // EXPORTED

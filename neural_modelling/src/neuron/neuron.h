@@ -54,16 +54,12 @@ bool neuron_initialise(
 void neuron_do_timestep_update(timer_t time, uint timer_count);
 
 //! \brief Prepare to resume simulation of the neurons
-//! \param[in] address: the address where the neuron parameters are stored
-//!                     in SDRAM
 //! \return bool which is true if the resume was successful or not
-bool neuron_resume(address_t address);
+bool neuron_resume(void);
 
 //! \brief Perform steps needed before pausing a simulation.
 //! \details Stores neuron parameters back into SDRAM.
-//! \param[in] address: the address where the neuron parameters are stored
-//!                     in SDRAM
-void neuron_pause(address_t address);
+void neuron_pause(void);
 
 //! \brief Add inputs to the neuron
 //! \param[in] synapse_type_index the synapse type (e.g. exc. or inh.)
