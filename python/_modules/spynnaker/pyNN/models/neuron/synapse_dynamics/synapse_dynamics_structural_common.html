@@ -1,34 +1,22 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<html lang="en">
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_structural_common &#8212; sPyNNaker  documentation</title>
-    
-    <link rel="stylesheet" href="../../../../../../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../../../../../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../../../../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../../../../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    <link rel="stylesheet" href="../../../../../../_static/sphinxdoc.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../../../../" src="../../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../../_static/jquery.js"></script>
+    <script src="../../../../../../_static/underscore.js"></script>
+    <script src="../../../../../../_static/doctools.js"></script>
+    <script src="../../../../../../_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     <link rel="index" title="Index" href="../../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../../search.html" /> 
-  </head>
-  <body role="document">
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -39,23 +27,10 @@
           <a href="../../../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../../../index.html">sPyNNaker  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="../../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_structural_common</a></li> 
       </ul>
-    </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../../../../../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
+    </div>  
 
     <div class="document">
       <div class="documentwrapper">
@@ -108,8 +83,8 @@
 <span class="n">DEFAULT_S_MAX</span> <span class="o">=</span> <span class="mi">32</span>
 
 
-<span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">AbstractBase</span><span class="p">)</span>
-<div class="viewcode-block" id="SynapseDynamicsStructuralCommon"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon">[docs]</a><span class="k">class</span> <span class="nc">SynapseDynamicsStructuralCommon</span><span class="p">(</span><span class="n">AbstractSynapseDynamicsStructural</span><span class="p">):</span>
+<div class="viewcode-block" id="SynapseDynamicsStructuralCommon"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon">[docs]</a><span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">AbstractBase</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">SynapseDynamicsStructuralCommon</span><span class="p">(</span><span class="n">AbstractSynapseDynamicsStructural</span><span class="p">):</span>
 
     <span class="c1"># 7 32-bit numbers (fast; p_rew; s_max; app_no_atoms; machine_no_atoms;</span>
     <span class="c1"># low_atom; high_atom) + 2 4-word RNG seeds (shared_seed; local_seed)</span>
@@ -153,9 +128,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="mf">1.</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_rew</span>
 
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseDynamicsStructural</span><span class="o">.</span><span class="n">write_structural_parameters</span><span class="p">,</span>
+<div class="viewcode-block" id="SynapseDynamicsStructuralCommon.write_structural_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.write_structural_parameters">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseDynamicsStructural</span><span class="o">.</span><span class="n">write_structural_parameters</span><span class="p">,</span>
                <span class="n">extend_doc</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<div class="viewcode-block" id="SynapseDynamicsStructuralCommon.write_structural_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.write_structural_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">write_structural_parameters</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">write_structural_parameters</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span>
             <span class="n">machine_graph</span><span class="p">,</span> <span class="n">machine_vertex</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span> <span class="n">synaptic_matrices</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Write structural plasticity parameters</span>
@@ -254,7 +229,7 @@
 
 <span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
 <span class="sd">            the data spec</span>
-<span class="sd">        :param MachineVertex machine_vertex:</span>
+<span class="sd">        :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:</span>
 <span class="sd">            the vertex for which data specs are being prepared</span>
 <span class="sd">        :param int machine_time_step: the duration of a machine time step (ms)</span>
 <span class="sd">        :param int n_pre_pops: the number of pre-populations</span>
@@ -300,12 +275,15 @@
             <span class="n">machine_time_step</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
-<span class="sd">        :param MachineVertex machine_vertex:</span>
+<span class="sd">        :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:</span>
 <span class="sd">            the vertex for which data specs are being prepared</span>
 <span class="sd">        :param list(tuple(ProjectionApplicationEdge,SynapseInformation)) \</span>
 <span class="sd">                structural_edges:</span>
-<span class="sd">        :param dict(AppEdge, list(MachineEdge) machine_edges_by_app: \</span>
-<span class="sd">                map of app edge to associated machine edges</span>
+<span class="sd">        :param machine_edges_by_app:</span>
+<span class="sd">            map of app edge to associated machine edges</span>
+<span class="sd">        :type machine_edges_by_app:</span>
+<span class="sd">            dict(~pacman.model.graphs.application.ApplicationEdge,</span>
+<span class="sd">            list(~pacman.model.graphs.machine.MachineEdge))</span>
 <span class="sd">        :param RoutingInfo routing_info:</span>
 <span class="sd">        :param dict(AbstractSynapseType,float) weight_scales:</span>
 <span class="sd">        :param SynapticMatrices synaptic_matrices:</span>
@@ -363,7 +341,7 @@
 <span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
 <span class="sd">        :param dict(tuple(AbstractPopulationVertex,SynapseInformation),int) \</span>
 <span class="sd">                pop_index:</span>
-<span class="sd">        :param MachineVertex machine_vertex:</span>
+<span class="sd">        :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:</span>
 <span class="sd">            the vertex for which data specs are being prepared</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=unsubscriptable-object</span>
@@ -414,9 +392,9 @@
             <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">padded_rows</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">formats</span><span class="o">=</span><span class="s2">&quot;u1, u1, u2&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="s2">&quot;u4&quot;</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">post_to_pre</span><span class="p">)</span>
 
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseDynamicsStructural</span><span class="o">.</span>
+<div class="viewcode-block" id="SynapseDynamicsStructuralCommon.get_structural_parameters_sdram_usage_in_bytes"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.get_structural_parameters_sdram_usage_in_bytes">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseDynamicsStructural</span><span class="o">.</span>
                <span class="n">get_structural_parameters_sdram_usage_in_bytes</span><span class="p">)</span>
-<div class="viewcode-block" id="SynapseDynamicsStructuralCommon.get_structural_parameters_sdram_usage_in_bytes"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.get_structural_parameters_sdram_usage_in_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">get_structural_parameters_sdram_usage_in_bytes</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">get_structural_parameters_sdram_usage_in_bytes</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span> <span class="n">vertex</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
         <span class="c1"># Work out how many sub-edges we will end up with, as this is used</span>
         <span class="c1"># for key_atom_info</span>
@@ -493,8 +471,8 @@
 <span class="sd">        :rtype: dict</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-    <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="SynapseDynamicsStructuralCommon.get_seeds"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.get_seeds">[docs]</a>    <span class="k">def</span> <span class="nf">get_seeds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_vertex</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="SynapseDynamicsStructuralCommon.get_seeds"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.get_seeds">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">get_seeds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_vertex</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Generate a seed for the RNG on chip that is the same for all\</span>
 <span class="sd">            of the cores that have perform structural updates.</span>
 
@@ -530,7 +508,22 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">initial_delay</span><span class="p">,</span> <span class="n">max_delay_ms</span><span class="p">))</span></div></div>
 </pre></div>
 
+            <div class="clearer"></div>
           </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -545,12 +538,13 @@
           <a href="../../../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../../../index.html">sPyNNaker  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../../../../index.html" >Module code</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="../../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_structural_common</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2017.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
     </div>
   </body>
 </html>

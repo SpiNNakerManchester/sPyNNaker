@@ -1,36 +1,24 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<html lang="en">
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>spynnaker.pyNN.protocols package &#8212; sPyNNaker  documentation</title>
-    
-    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="spynnaker.pyNN.utilities package" href="spynnaker.pyNN.utilities.html" />
     <link rel="prev" title="spynnaker.pyNN.models.utility_models.spike_injector package" href="spynnaker.pyNN.models.utility_models.spike_injector.html" /> 
-  </head>
-  <body role="document">
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -49,12 +37,819 @@
         <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker  documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >spynnaker</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
-          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.html" accesskey="U">spynnaker.pyNN package</a> &#187;</li> 
+          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.html" accesskey="U">spynnaker.pyNN package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.protocols package</a></li> 
       </ul>
-    </div>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="spynnaker-pynn-protocols-package">
+<h1>spynnaker.pyNN.protocols package<a class="headerlink" href="#spynnaker-pynn-protocols-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-spynnaker.pyNN.protocols">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.protocols" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="spynnaker.pyNN.protocols.MunichIoEthernetProtocol">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.protocols.</code><code class="sig-name descname">MunichIoEthernetProtocol</code><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_ethernet_protocol.html#MunichIoEthernetProtocol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoEthernetProtocol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Implementation of the Munich robot IO protocol, communicating over
+ethernet.</p>
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoEthernetProtocol.disable_motor">
+<em class="property">static </em><code class="sig-name descname">disable_motor</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_ethernet_protocol.html#MunichIoEthernetProtocol.disable_motor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoEthernetProtocol.disable_motor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoEthernetProtocol.disable_retina">
+<em class="property">static </em><code class="sig-name descname">disable_retina</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_ethernet_protocol.html#MunichIoEthernetProtocol.disable_retina"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoEthernetProtocol.disable_retina" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoEthernetProtocol.enable_motor">
+<em class="property">static </em><code class="sig-name descname">enable_motor</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_ethernet_protocol.html#MunichIoEthernetProtocol.enable_motor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoEthernetProtocol.enable_motor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoEthernetProtocol.enable_retina">
+<em class="property">static </em><code class="sig-name descname">enable_retina</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_ethernet_protocol.html#MunichIoEthernetProtocol.enable_retina"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoEthernetProtocol.enable_retina" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoEthernetProtocol.laser_active_time">
+<em class="property">static </em><code class="sig-name descname">laser_active_time</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">active_time</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_ethernet_protocol.html#MunichIoEthernetProtocol.laser_active_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoEthernetProtocol.laser_active_time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoEthernetProtocol.laser_frequency">
+<em class="property">static </em><code class="sig-name descname">laser_frequency</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">frequency</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_ethernet_protocol.html#MunichIoEthernetProtocol.laser_frequency"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoEthernetProtocol.laser_frequency" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoEthernetProtocol.laser_total_period">
+<em class="property">static </em><code class="sig-name descname">laser_total_period</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">total_period</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_ethernet_protocol.html#MunichIoEthernetProtocol.laser_total_period"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoEthernetProtocol.laser_total_period" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoEthernetProtocol.led_back_active_time">
+<em class="property">static </em><code class="sig-name descname">led_back_active_time</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">active_time</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_ethernet_protocol.html#MunichIoEthernetProtocol.led_back_active_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoEthernetProtocol.led_back_active_time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoEthernetProtocol.led_frequency">
+<em class="property">static </em><code class="sig-name descname">led_frequency</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">frequency</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_ethernet_protocol.html#MunichIoEthernetProtocol.led_frequency"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoEthernetProtocol.led_frequency" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoEthernetProtocol.led_front_active_time">
+<em class="property">static </em><code class="sig-name descname">led_front_active_time</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">active_time</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_ethernet_protocol.html#MunichIoEthernetProtocol.led_front_active_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoEthernetProtocol.led_front_active_time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoEthernetProtocol.led_total_period">
+<em class="property">static </em><code class="sig-name descname">led_total_period</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">total_period</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_ethernet_protocol.html#MunichIoEthernetProtocol.led_total_period"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoEthernetProtocol.led_total_period" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoEthernetProtocol.motor_0_leaky_velocity">
+<em class="property">static </em><code class="sig-name descname">motor_0_leaky_velocity</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">velocity</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_ethernet_protocol.html#MunichIoEthernetProtocol.motor_0_leaky_velocity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoEthernetProtocol.motor_0_leaky_velocity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoEthernetProtocol.motor_0_permanent_velocity">
+<em class="property">static </em><code class="sig-name descname">motor_0_permanent_velocity</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">velocity</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_ethernet_protocol.html#MunichIoEthernetProtocol.motor_0_permanent_velocity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoEthernetProtocol.motor_0_permanent_velocity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoEthernetProtocol.motor_1_leaky_velocity">
+<em class="property">static </em><code class="sig-name descname">motor_1_leaky_velocity</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">velocity</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_ethernet_protocol.html#MunichIoEthernetProtocol.motor_1_leaky_velocity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoEthernetProtocol.motor_1_leaky_velocity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoEthernetProtocol.motor_1_permanent_velocity">
+<em class="property">static </em><code class="sig-name descname">motor_1_permanent_velocity</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">velocity</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_ethernet_protocol.html#MunichIoEthernetProtocol.motor_1_permanent_velocity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoEthernetProtocol.motor_1_permanent_velocity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoEthernetProtocol.set_retina_transmission">
+<em class="property">static </em><code class="sig-name descname">set_retina_transmission</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">event_format</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_ethernet_protocol.html#MunichIoEthernetProtocol.set_retina_transmission"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoEthernetProtocol.set_retina_transmission" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoEthernetProtocol.speaker_active_time">
+<em class="property">static </em><code class="sig-name descname">speaker_active_time</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">active_time</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_ethernet_protocol.html#MunichIoEthernetProtocol.speaker_active_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoEthernetProtocol.speaker_active_time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoEthernetProtocol.speaker_frequency">
+<em class="property">static </em><code class="sig-name descname">speaker_frequency</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">frequency</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_ethernet_protocol.html#MunichIoEthernetProtocol.speaker_frequency"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoEthernetProtocol.speaker_frequency" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoEthernetProtocol.speaker_total_period">
+<em class="property">static </em><code class="sig-name descname">speaker_total_period</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">total_period</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_ethernet_protocol.html#MunichIoEthernetProtocol.speaker_total_period"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoEthernetProtocol.speaker_total_period" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.protocols.</code><code class="sig-name descname">MunichIoSpiNNakerLinkProtocol</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mode</span></em>, <em class="sig-param"><span class="n">instance_key</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">uart_id</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Provides Multicast commands for the Munich SpiNNaker-Link protocol</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mode</strong> (<a class="reference internal" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES" title="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES"><em>MODES</em></a>) – The mode of operation of the protocol</p></li>
+<li><p><strong>instance_key</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – The optional instance key to use</p></li>
+<li><p><strong>uart_id</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – The ID of the UART when needed</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py class">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES">
+<em class="property">class </em><code class="sig-name descname">MODES</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.MODES"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/enum.html#enum.Enum" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
+<p>types of modes supported by this protocol</p>
+<dl class="py attribute">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES.BALL_BALANCER">
+<code class="sig-name descname">BALL_BALANCER</code><em class="property"> = 3</em><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES.BALL_BALANCER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES.FREE">
+<code class="sig-name descname">FREE</code><em class="property"> = 5</em><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES.FREE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES.MY_ORO_BOTICS">
+<code class="sig-name descname">MY_ORO_BOTICS</code><em class="property"> = 4</em><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES.MY_ORO_BOTICS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES.PUSH_BOT">
+<code class="sig-name descname">PUSH_BOT</code><em class="property"> = 1</em><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES.PUSH_BOT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES.RESET_TO_DEFAULT">
+<code class="sig-name descname">RESET_TO_DEFAULT</code><em class="property"> = 0</em><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES.RESET_TO_DEFAULT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES.SPOMNIBOT">
+<code class="sig-name descname">SPOMNIBOT</code><em class="property"> = 2</em><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES.SPOMNIBOT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.add_payload_logic_to_current_output">
+<code class="sig-name descname">add_payload_logic_to_current_output</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">payload</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.add_payload_logic_to_current_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.add_payload_logic_to_current_output" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.add_payload_logic_to_current_output_key">
+<em class="property">property </em><code class="sig-name descname">add_payload_logic_to_current_output_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.add_payload_logic_to_current_output_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.bias_values">
+<code class="sig-name descname">bias_values</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bias_id</span></em>, <em class="sig-param"><span class="n">bias_value</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.bias_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.bias_values" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.bias_values_key">
+<em class="property">property </em><code class="sig-name descname">bias_values_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.bias_values_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.configure_master_key">
+<code class="sig-name descname">configure_master_key</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">new_key</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.configure_master_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.configure_master_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.configure_master_key_key">
+<em class="property">property </em><code class="sig-name descname">configure_master_key_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.configure_master_key_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.disable_retina">
+<code class="sig-name descname">disable_retina</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.disable_retina"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.disable_retina" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.disable_retina_key">
+<em class="property">property </em><code class="sig-name descname">disable_retina_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.disable_retina_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.enable_disable_motor_key">
+<em class="property">property </em><code class="sig-name descname">enable_disable_motor_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.enable_disable_motor_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor0_raw_output_leak_to_0">
+<code class="sig-name descname">generic_motor0_raw_output_leak_to_0</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pwm_signal</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.generic_motor0_raw_output_leak_to_0"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor0_raw_output_leak_to_0" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor0_raw_output_leak_to_0_key">
+<em class="property">property </em><code class="sig-name descname">generic_motor0_raw_output_leak_to_0_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor0_raw_output_leak_to_0_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor0_raw_output_permanent">
+<code class="sig-name descname">generic_motor0_raw_output_permanent</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pwm_signal</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.generic_motor0_raw_output_permanent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor0_raw_output_permanent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor0_raw_output_permanent_key">
+<em class="property">property </em><code class="sig-name descname">generic_motor0_raw_output_permanent_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor0_raw_output_permanent_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor1_raw_output_leak_to_0">
+<code class="sig-name descname">generic_motor1_raw_output_leak_to_0</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pwm_signal</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.generic_motor1_raw_output_leak_to_0"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor1_raw_output_leak_to_0" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor1_raw_output_leak_to_0_key">
+<em class="property">property </em><code class="sig-name descname">generic_motor1_raw_output_leak_to_0_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor1_raw_output_leak_to_0_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor1_raw_output_permanent">
+<code class="sig-name descname">generic_motor1_raw_output_permanent</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pwm_signal</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.generic_motor1_raw_output_permanent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor1_raw_output_permanent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor1_raw_output_permanent_key">
+<em class="property">property </em><code class="sig-name descname">generic_motor1_raw_output_permanent_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor1_raw_output_permanent_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor_disable">
+<code class="sig-name descname">generic_motor_disable</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.generic_motor_disable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor_disable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor_enable">
+<code class="sig-name descname">generic_motor_enable</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.generic_motor_enable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor_enable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor_total_period">
+<code class="sig-name descname">generic_motor_total_period</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">time_in_ms</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.generic_motor_total_period"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor_total_period" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor_total_period_key">
+<em class="property">property </em><code class="sig-name descname">generic_motor_total_period_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor_total_period_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.instance_key">
+<em class="property">property </em><code class="sig-name descname">instance_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.instance_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>The key of this instance of the protocol</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.master_slave_key">
+<em class="property">property </em><code class="sig-name descname">master_slave_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.master_slave_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.master_slave_set_master_clock_active">
+<code class="sig-name descname">master_slave_set_master_clock_active</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.master_slave_set_master_clock_active"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.master_slave_set_master_clock_active" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.master_slave_set_master_clock_not_started">
+<code class="sig-name descname">master_slave_set_master_clock_not_started</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.master_slave_set_master_clock_not_started"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.master_slave_set_master_clock_not_started" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.master_slave_set_slave">
+<code class="sig-name descname">master_slave_set_slave</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.master_slave_set_slave"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.master_slave_set_slave" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.master_slave_use_internal_counter">
+<code class="sig-name descname">master_slave_use_internal_counter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.master_slave_use_internal_counter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.master_slave_use_internal_counter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.mode">
+<em class="property">property </em><code class="sig-name descname">mode</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.mode" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES" title="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES">MODES</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.poll_individual_sensor_continuously">
+<code class="sig-name descname">poll_individual_sensor_continuously</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sensor_id</span></em>, <em class="sig-param"><span class="n">time_in_ms</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.poll_individual_sensor_continuously"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.poll_individual_sensor_continuously" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.poll_individual_sensor_continuously_key">
+<em class="property">property </em><code class="sig-name descname">poll_individual_sensor_continuously_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.poll_individual_sensor_continuously_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.poll_sensors_once">
+<code class="sig-name descname">poll_sensors_once</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sensor_id</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.poll_sensors_once"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.poll_sensors_once" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.poll_sensors_once_key">
+<em class="property">property </em><code class="sig-name descname">poll_sensors_once_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.poll_sensors_once_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.protocol_instance">
+<code class="sig-name descname">protocol_instance</code><em class="property"> = 0</em><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.protocol_instance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_laser_config_active_time">
+<code class="sig-name descname">push_bot_laser_config_active_time</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">active_time</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.push_bot_laser_config_active_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_laser_config_active_time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_laser_config_active_time_key">
+<em class="property">property </em><code class="sig-name descname">push_bot_laser_config_active_time_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_laser_config_active_time_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_laser_config_total_period">
+<code class="sig-name descname">push_bot_laser_config_total_period</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">total_period</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.push_bot_laser_config_total_period"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_laser_config_total_period" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_laser_config_total_period_key">
+<em class="property">property </em><code class="sig-name descname">push_bot_laser_config_total_period_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_laser_config_total_period_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_laser_set_frequency">
+<code class="sig-name descname">push_bot_laser_set_frequency</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">frequency</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.push_bot_laser_set_frequency"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_laser_set_frequency" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_laser_set_frequency_key">
+<em class="property">property </em><code class="sig-name descname">push_bot_laser_set_frequency_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_laser_set_frequency_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_led_back_active_time">
+<code class="sig-name descname">push_bot_led_back_active_time</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">active_time</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.push_bot_led_back_active_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_led_back_active_time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_led_back_active_time_key">
+<em class="property">property </em><code class="sig-name descname">push_bot_led_back_active_time_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_led_back_active_time_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_led_front_active_time">
+<code class="sig-name descname">push_bot_led_front_active_time</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">active_time</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.push_bot_led_front_active_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_led_front_active_time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_led_front_active_time_key">
+<em class="property">property </em><code class="sig-name descname">push_bot_led_front_active_time_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_led_front_active_time_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_led_set_frequency">
+<code class="sig-name descname">push_bot_led_set_frequency</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">frequency</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.push_bot_led_set_frequency"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_led_set_frequency" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_led_set_frequency_key">
+<em class="property">property </em><code class="sig-name descname">push_bot_led_set_frequency_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_led_set_frequency_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_led_total_period">
+<code class="sig-name descname">push_bot_led_total_period</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">total_period</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.push_bot_led_total_period"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_led_total_period" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_led_total_period_key">
+<em class="property">property </em><code class="sig-name descname">push_bot_led_total_period_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_led_total_period_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_motor_0_leaking_towards_zero">
+<code class="sig-name descname">push_bot_motor_0_leaking_towards_zero</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">velocity</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.push_bot_motor_0_leaking_towards_zero"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_motor_0_leaking_towards_zero" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_motor_0_leaking_towards_zero_key">
+<em class="property">property </em><code class="sig-name descname">push_bot_motor_0_leaking_towards_zero_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_motor_0_leaking_towards_zero_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_motor_0_permanent">
+<code class="sig-name descname">push_bot_motor_0_permanent</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">velocity</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.push_bot_motor_0_permanent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_motor_0_permanent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_motor_0_permanent_key">
+<em class="property">property </em><code class="sig-name descname">push_bot_motor_0_permanent_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_motor_0_permanent_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_motor_1_leaking_towards_zero">
+<code class="sig-name descname">push_bot_motor_1_leaking_towards_zero</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">velocity</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.push_bot_motor_1_leaking_towards_zero"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_motor_1_leaking_towards_zero" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_motor_1_leaking_towards_zero_key">
+<em class="property">property </em><code class="sig-name descname">push_bot_motor_1_leaking_towards_zero_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_motor_1_leaking_towards_zero_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_motor_1_permanent">
+<code class="sig-name descname">push_bot_motor_1_permanent</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">velocity</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.push_bot_motor_1_permanent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_motor_1_permanent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_motor_1_permanent_key">
+<em class="property">property </em><code class="sig-name descname">push_bot_motor_1_permanent_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_motor_1_permanent_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_speaker_config_active_time">
+<code class="sig-name descname">push_bot_speaker_config_active_time</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">active_time</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.push_bot_speaker_config_active_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_speaker_config_active_time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_speaker_config_active_time_key">
+<em class="property">property </em><code class="sig-name descname">push_bot_speaker_config_active_time_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_speaker_config_active_time_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_speaker_config_total_period">
+<code class="sig-name descname">push_bot_speaker_config_total_period</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">total_period</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.push_bot_speaker_config_total_period"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_speaker_config_total_period" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_speaker_config_total_period_key">
+<em class="property">property </em><code class="sig-name descname">push_bot_speaker_config_total_period_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_speaker_config_total_period_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_speaker_set_melody">
+<code class="sig-name descname">push_bot_speaker_set_melody</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">melody</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.push_bot_speaker_set_melody"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_speaker_set_melody" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_speaker_set_melody_key">
+<em class="property">property </em><code class="sig-name descname">push_bot_speaker_set_melody_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_speaker_set_melody_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_speaker_set_tone">
+<code class="sig-name descname">push_bot_speaker_set_tone</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">frequency</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.push_bot_speaker_set_tone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_speaker_set_tone" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_speaker_set_tone_key">
+<em class="property">property </em><code class="sig-name descname">push_bot_speaker_set_tone_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_speaker_set_tone_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_a_channel_0_ratio">
+<code class="sig-name descname">pwm_pin_output_timer_a_channel_0_ratio</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">timer_period</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_a_channel_0_ratio"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_a_channel_0_ratio" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_a_channel_0_ratio_key">
+<em class="property">property </em><code class="sig-name descname">pwm_pin_output_timer_a_channel_0_ratio_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_a_channel_0_ratio_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_a_channel_1_ratio">
+<code class="sig-name descname">pwm_pin_output_timer_a_channel_1_ratio</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">timer_period</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_a_channel_1_ratio"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_a_channel_1_ratio" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_a_channel_1_ratio_key">
+<em class="property">property </em><code class="sig-name descname">pwm_pin_output_timer_a_channel_1_ratio_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_a_channel_1_ratio_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_a_duration">
+<code class="sig-name descname">pwm_pin_output_timer_a_duration</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">timer_period</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_a_duration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_a_duration" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_a_duration_key">
+<em class="property">property </em><code class="sig-name descname">pwm_pin_output_timer_a_duration_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_a_duration_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_b_channel_0_ratio">
+<code class="sig-name descname">pwm_pin_output_timer_b_channel_0_ratio</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">timer_period</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_b_channel_0_ratio"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_b_channel_0_ratio" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_b_channel_0_ratio_key">
+<em class="property">property </em><code class="sig-name descname">pwm_pin_output_timer_b_channel_0_ratio_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_b_channel_0_ratio_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_b_channel_1_ratio">
+<code class="sig-name descname">pwm_pin_output_timer_b_channel_1_ratio</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">timer_period</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_b_channel_1_ratio"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_b_channel_1_ratio" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_b_channel_1_ratio_key">
+<em class="property">property </em><code class="sig-name descname">pwm_pin_output_timer_b_channel_1_ratio_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_b_channel_1_ratio_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_b_duration">
+<code class="sig-name descname">pwm_pin_output_timer_b_duration</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">timer_period</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_b_duration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_b_duration" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_b_duration_key">
+<em class="property">property </em><code class="sig-name descname">pwm_pin_output_timer_b_duration_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_b_duration_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_c_channel_0_ratio">
+<code class="sig-name descname">pwm_pin_output_timer_c_channel_0_ratio</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">timer_period</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_c_channel_0_ratio"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_c_channel_0_ratio" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_c_channel_0_ratio_key">
+<em class="property">property </em><code class="sig-name descname">pwm_pin_output_timer_c_channel_0_ratio_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_c_channel_0_ratio_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_c_channel_1_ratio">
+<code class="sig-name descname">pwm_pin_output_timer_c_channel_1_ratio</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">timer_period</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_c_channel_1_ratio"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_c_channel_1_ratio" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_c_channel_1_ratio_key">
+<em class="property">property </em><code class="sig-name descname">pwm_pin_output_timer_c_channel_1_ratio_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_c_channel_1_ratio_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_c_duration">
+<code class="sig-name descname">pwm_pin_output_timer_c_duration</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">timer_period</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_c_duration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_c_duration" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_c_duration_key">
+<em class="property">property </em><code class="sig-name descname">pwm_pin_output_timer_c_duration_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_c_duration_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.query_state_of_io_lines">
+<code class="sig-name descname">query_state_of_io_lines</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.query_state_of_io_lines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.query_state_of_io_lines" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.query_state_of_io_lines_key">
+<em class="property">property </em><code class="sig-name descname">query_state_of_io_lines_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.query_state_of_io_lines_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.remove_payload_logic_to_current_output">
+<code class="sig-name descname">remove_payload_logic_to_current_output</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">payload</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.remove_payload_logic_to_current_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.remove_payload_logic_to_current_output" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.remove_payload_logic_to_current_output_key">
+<em class="property">property </em><code class="sig-name descname">remove_payload_logic_to_current_output_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.remove_payload_logic_to_current_output_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.reset_retina">
+<code class="sig-name descname">reset_retina</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.reset_retina"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.reset_retina" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.reset_retina_key">
+<em class="property">property </em><code class="sig-name descname">reset_retina_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.reset_retina_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.sensor_transmission_key">
+<code class="sig-name descname">sensor_transmission_key</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sensor_id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.sensor_transmission_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.sensor_transmission_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.sent_mode_command">
+<em class="property">static </em><code class="sig-name descname">sent_mode_command</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.sent_mode_command"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.sent_mode_command" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if the mode command has ever been requested by any instance</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.set_mode">
+<code class="sig-name descname">set_mode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.set_mode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.set_mode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.set_mode_key">
+<em class="property">property </em><code class="sig-name descname">set_mode_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.set_mode_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.set_output_pattern_for_payload">
+<code class="sig-name descname">set_output_pattern_for_payload</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">payload</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.set_output_pattern_for_payload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.set_output_pattern_for_payload" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.set_output_pattern_for_payload_key">
+<em class="property">property </em><code class="sig-name descname">set_output_pattern_for_payload_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.set_output_pattern_for_payload_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.set_payload_pins_to_high_impedance">
+<code class="sig-name descname">set_payload_pins_to_high_impedance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">payload</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.set_payload_pins_to_high_impedance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.set_payload_pins_to_high_impedance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.set_payload_pins_to_high_impedance_key">
+<em class="property">property </em><code class="sig-name descname">set_payload_pins_to_high_impedance_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.set_payload_pins_to_high_impedance_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.set_retina_key">
+<code class="sig-name descname">set_retina_key</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">new_key</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.set_retina_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.set_retina_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.set_retina_key_key">
+<em class="property">property </em><code class="sig-name descname">set_retina_key_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.set_retina_key_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.set_retina_transmission">
+<code class="sig-name descname">set_retina_transmission</code><span class="sig-paren">(</span><em class="sig-param">retina_key=&lt;RetinaKey.NATIVE_128_X_128: 67108864&gt;</em>, <em class="sig-param">retina_payload=None</em>, <em class="sig-param">time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.set_retina_transmission"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.set_retina_transmission" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the retina transmission key</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>retina_key</strong> (<a class="reference internal" href="#spynnaker.pyNN.protocols.RetinaKey" title="spynnaker.pyNN.protocols.RetinaKey"><em>RetinaKey</em></a>) – the new key for the retina</p></li>
+<li><p><strong>retina_payload</strong> (<a class="reference internal" href="#spynnaker.pyNN.protocols.RetinaPayload" title="spynnaker.pyNN.protocols.RetinaPayload"><em>RetinaPayload</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – the new payload for the set retina key command packet</p></li>
+<li><p><strong>time</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – when to transmit this packet</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the command to send</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models.html#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon)">MultiCastCommand</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.set_retina_transmission_key">
+<em class="property">property </em><code class="sig-name descname">set_retina_transmission_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.set_retina_transmission_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.turn_off_sensor_reporting">
+<code class="sig-name descname">turn_off_sensor_reporting</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sensor_id</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.turn_off_sensor_reporting"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.turn_off_sensor_reporting" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.turn_off_sensor_reporting_key">
+<em class="property">property </em><code class="sig-name descname">turn_off_sensor_reporting_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.turn_off_sensor_reporting_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.uart_id">
+<em class="property">property </em><code class="sig-name descname">uart_id</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.uart_id" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker.pyNN.protocols.RetinaKey">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.protocols.</code><code class="sig-name descname">RetinaKey</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#RetinaKey"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.RetinaKey" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/enum.html#enum.Enum" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
+<p>An enumeration.</p>
+<dl class="py attribute">
+<dt id="spynnaker.pyNN.protocols.RetinaKey.DOWNSAMPLE_16_X_16">
+<code class="sig-name descname">DOWNSAMPLE_16_X_16</code><em class="property"> = 268435456</em><a class="headerlink" href="#spynnaker.pyNN.protocols.RetinaKey.DOWNSAMPLE_16_X_16" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="spynnaker.pyNN.protocols.RetinaKey.DOWNSAMPLE_32_X_32">
+<code class="sig-name descname">DOWNSAMPLE_32_X_32</code><em class="property"> = 201326592</em><a class="headerlink" href="#spynnaker.pyNN.protocols.RetinaKey.DOWNSAMPLE_32_X_32" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="spynnaker.pyNN.protocols.RetinaKey.DOWNSAMPLE_64_X_64">
+<code class="sig-name descname">DOWNSAMPLE_64_X_64</code><em class="property"> = 134217728</em><a class="headerlink" href="#spynnaker.pyNN.protocols.RetinaKey.DOWNSAMPLE_64_X_64" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="spynnaker.pyNN.protocols.RetinaKey.FIXED_KEY">
+<code class="sig-name descname">FIXED_KEY</code><em class="property"> = 0</em><a class="headerlink" href="#spynnaker.pyNN.protocols.RetinaKey.FIXED_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="spynnaker.pyNN.protocols.RetinaKey.NATIVE_128_X_128">
+<code class="sig-name descname">NATIVE_128_X_128</code><em class="property"> = 67108864</em><a class="headerlink" href="#spynnaker.pyNN.protocols.RetinaKey.NATIVE_128_X_128" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.RetinaKey.bits_per_coordinate">
+<em class="property">property </em><code class="sig-name descname">bits_per_coordinate</code><a class="headerlink" href="#spynnaker.pyNN.protocols.RetinaKey.bits_per_coordinate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.RetinaKey.n_neurons">
+<em class="property">property </em><code class="sig-name descname">n_neurons</code><a class="headerlink" href="#spynnaker.pyNN.protocols.RetinaKey.n_neurons" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.RetinaKey.pixels">
+<em class="property">property </em><code class="sig-name descname">pixels</code><a class="headerlink" href="#spynnaker.pyNN.protocols.RetinaKey.pixels" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker.pyNN.protocols.RetinaPayload">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.protocols.</code><code class="sig-name descname">RetinaPayload</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#RetinaPayload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.RetinaPayload" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/enum.html#enum.Enum" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
+<p>An enumeration.</p>
+<dl class="py attribute">
+<dt id="spynnaker.pyNN.protocols.RetinaPayload.ABSOLUTE_2_BYTE_TIMESTAMPS">
+<code class="sig-name descname">ABSOLUTE_2_BYTE_TIMESTAMPS</code><em class="property"> = 1073741824</em><a class="headerlink" href="#spynnaker.pyNN.protocols.RetinaPayload.ABSOLUTE_2_BYTE_TIMESTAMPS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="spynnaker.pyNN.protocols.RetinaPayload.ABSOLUTE_3_BYTE_TIMESTAMPS">
+<code class="sig-name descname">ABSOLUTE_3_BYTE_TIMESTAMPS</code><em class="property"> = 1610612736</em><a class="headerlink" href="#spynnaker.pyNN.protocols.RetinaPayload.ABSOLUTE_3_BYTE_TIMESTAMPS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="spynnaker.pyNN.protocols.RetinaPayload.ABSOLUTE_4_BYTE_TIMESTAMPS">
+<code class="sig-name descname">ABSOLUTE_4_BYTE_TIMESTAMPS</code><em class="property"> = 2147483648</em><a class="headerlink" href="#spynnaker.pyNN.protocols.RetinaPayload.ABSOLUTE_4_BYTE_TIMESTAMPS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="spynnaker.pyNN.protocols.RetinaPayload.DELTA_TIMESTAMPS">
+<code class="sig-name descname">DELTA_TIMESTAMPS</code><em class="property"> = 536870912</em><a class="headerlink" href="#spynnaker.pyNN.protocols.RetinaPayload.DELTA_TIMESTAMPS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="spynnaker.pyNN.protocols.RetinaPayload.EVENTS_IN_PAYLOAD">
+<code class="sig-name descname">EVENTS_IN_PAYLOAD</code><em class="property"> = 0</em><a class="headerlink" href="#spynnaker.pyNN.protocols.RetinaPayload.EVENTS_IN_PAYLOAD" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="spynnaker.pyNN.protocols.RetinaPayload.NO_PAYLOAD">
+<code class="sig-name descname">NO_PAYLOAD</code><em class="property"> = 0</em><a class="headerlink" href="#spynnaker.pyNN.protocols.RetinaPayload.NO_PAYLOAD" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.protocols.RetinaPayload.n_payload_bytes">
+<em class="property">property </em><code class="sig-name descname">n_payload_bytes</code><a class="headerlink" href="#spynnaker.pyNN.protocols.RetinaPayload.n_payload_bytes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
+  <h3><a href="index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.protocols package</a><ul>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.protocols">Module contents</a></li>
@@ -76,837 +871,15 @@
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
     </form>
+    </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
-            
-  <div class="section" id="spynnaker-pynn-protocols-package">
-<h1>spynnaker.pyNN.protocols package<a class="headerlink" href="#spynnaker-pynn-protocols-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="module-spynnaker.pyNN.protocols">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.protocols" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="spynnaker.pyNN.protocols.MunichIoEthernetProtocol">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.protocols.</code><code class="descname">MunichIoEthernetProtocol</code><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_ethernet_protocol.html#MunichIoEthernetProtocol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoEthernetProtocol" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>Implementation of the Munich robot IO protocol, communicating over
-ethernet.</p>
-<dl class="staticmethod">
-<dt id="spynnaker.pyNN.protocols.MunichIoEthernetProtocol.disable_motor">
-<em class="property">static </em><code class="descname">disable_motor</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_ethernet_protocol.html#MunichIoEthernetProtocol.disable_motor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoEthernetProtocol.disable_motor" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="staticmethod">
-<dt id="spynnaker.pyNN.protocols.MunichIoEthernetProtocol.disable_retina">
-<em class="property">static </em><code class="descname">disable_retina</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_ethernet_protocol.html#MunichIoEthernetProtocol.disable_retina"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoEthernetProtocol.disable_retina" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="staticmethod">
-<dt id="spynnaker.pyNN.protocols.MunichIoEthernetProtocol.enable_motor">
-<em class="property">static </em><code class="descname">enable_motor</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_ethernet_protocol.html#MunichIoEthernetProtocol.enable_motor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoEthernetProtocol.enable_motor" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="staticmethod">
-<dt id="spynnaker.pyNN.protocols.MunichIoEthernetProtocol.enable_retina">
-<em class="property">static </em><code class="descname">enable_retina</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_ethernet_protocol.html#MunichIoEthernetProtocol.enable_retina"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoEthernetProtocol.enable_retina" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="staticmethod">
-<dt id="spynnaker.pyNN.protocols.MunichIoEthernetProtocol.laser_active_time">
-<em class="property">static </em><code class="descname">laser_active_time</code><span class="sig-paren">(</span><em>active_time</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_ethernet_protocol.html#MunichIoEthernetProtocol.laser_active_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoEthernetProtocol.laser_active_time" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="staticmethod">
-<dt id="spynnaker.pyNN.protocols.MunichIoEthernetProtocol.laser_frequency">
-<em class="property">static </em><code class="descname">laser_frequency</code><span class="sig-paren">(</span><em>frequency</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_ethernet_protocol.html#MunichIoEthernetProtocol.laser_frequency"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoEthernetProtocol.laser_frequency" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="staticmethod">
-<dt id="spynnaker.pyNN.protocols.MunichIoEthernetProtocol.laser_total_period">
-<em class="property">static </em><code class="descname">laser_total_period</code><span class="sig-paren">(</span><em>total_period</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_ethernet_protocol.html#MunichIoEthernetProtocol.laser_total_period"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoEthernetProtocol.laser_total_period" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="staticmethod">
-<dt id="spynnaker.pyNN.protocols.MunichIoEthernetProtocol.led_back_active_time">
-<em class="property">static </em><code class="descname">led_back_active_time</code><span class="sig-paren">(</span><em>active_time</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_ethernet_protocol.html#MunichIoEthernetProtocol.led_back_active_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoEthernetProtocol.led_back_active_time" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="staticmethod">
-<dt id="spynnaker.pyNN.protocols.MunichIoEthernetProtocol.led_frequency">
-<em class="property">static </em><code class="descname">led_frequency</code><span class="sig-paren">(</span><em>frequency</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_ethernet_protocol.html#MunichIoEthernetProtocol.led_frequency"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoEthernetProtocol.led_frequency" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="staticmethod">
-<dt id="spynnaker.pyNN.protocols.MunichIoEthernetProtocol.led_front_active_time">
-<em class="property">static </em><code class="descname">led_front_active_time</code><span class="sig-paren">(</span><em>active_time</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_ethernet_protocol.html#MunichIoEthernetProtocol.led_front_active_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoEthernetProtocol.led_front_active_time" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="staticmethod">
-<dt id="spynnaker.pyNN.protocols.MunichIoEthernetProtocol.led_total_period">
-<em class="property">static </em><code class="descname">led_total_period</code><span class="sig-paren">(</span><em>total_period</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_ethernet_protocol.html#MunichIoEthernetProtocol.led_total_period"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoEthernetProtocol.led_total_period" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="staticmethod">
-<dt id="spynnaker.pyNN.protocols.MunichIoEthernetProtocol.motor_0_leaky_velocity">
-<em class="property">static </em><code class="descname">motor_0_leaky_velocity</code><span class="sig-paren">(</span><em>velocity</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_ethernet_protocol.html#MunichIoEthernetProtocol.motor_0_leaky_velocity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoEthernetProtocol.motor_0_leaky_velocity" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="staticmethod">
-<dt id="spynnaker.pyNN.protocols.MunichIoEthernetProtocol.motor_0_permanent_velocity">
-<em class="property">static </em><code class="descname">motor_0_permanent_velocity</code><span class="sig-paren">(</span><em>velocity</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_ethernet_protocol.html#MunichIoEthernetProtocol.motor_0_permanent_velocity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoEthernetProtocol.motor_0_permanent_velocity" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="staticmethod">
-<dt id="spynnaker.pyNN.protocols.MunichIoEthernetProtocol.motor_1_leaky_velocity">
-<em class="property">static </em><code class="descname">motor_1_leaky_velocity</code><span class="sig-paren">(</span><em>velocity</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_ethernet_protocol.html#MunichIoEthernetProtocol.motor_1_leaky_velocity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoEthernetProtocol.motor_1_leaky_velocity" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="staticmethod">
-<dt id="spynnaker.pyNN.protocols.MunichIoEthernetProtocol.motor_1_permanent_velocity">
-<em class="property">static </em><code class="descname">motor_1_permanent_velocity</code><span class="sig-paren">(</span><em>velocity</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_ethernet_protocol.html#MunichIoEthernetProtocol.motor_1_permanent_velocity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoEthernetProtocol.motor_1_permanent_velocity" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="staticmethod">
-<dt id="spynnaker.pyNN.protocols.MunichIoEthernetProtocol.set_retina_transmission">
-<em class="property">static </em><code class="descname">set_retina_transmission</code><span class="sig-paren">(</span><em>event_format</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_ethernet_protocol.html#MunichIoEthernetProtocol.set_retina_transmission"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoEthernetProtocol.set_retina_transmission" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="staticmethod">
-<dt id="spynnaker.pyNN.protocols.MunichIoEthernetProtocol.speaker_active_time">
-<em class="property">static </em><code class="descname">speaker_active_time</code><span class="sig-paren">(</span><em>active_time</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_ethernet_protocol.html#MunichIoEthernetProtocol.speaker_active_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoEthernetProtocol.speaker_active_time" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="staticmethod">
-<dt id="spynnaker.pyNN.protocols.MunichIoEthernetProtocol.speaker_frequency">
-<em class="property">static </em><code class="descname">speaker_frequency</code><span class="sig-paren">(</span><em>frequency</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_ethernet_protocol.html#MunichIoEthernetProtocol.speaker_frequency"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoEthernetProtocol.speaker_frequency" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="staticmethod">
-<dt id="spynnaker.pyNN.protocols.MunichIoEthernetProtocol.speaker_total_period">
-<em class="property">static </em><code class="descname">speaker_total_period</code><span class="sig-paren">(</span><em>total_period</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_ethernet_protocol.html#MunichIoEthernetProtocol.speaker_total_period"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoEthernetProtocol.speaker_total_period" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.protocols.</code><code class="descname">MunichIoSpiNNakerLinkProtocol</code><span class="sig-paren">(</span><em>mode</em>, <em>instance_key=None</em>, <em>uart_id=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>Provides Multicast commands for the Munich SpiNNaker-Link protocol</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>mode</strong> (<a class="reference internal" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES" title="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES"><em>MODES</em></a>) &#8211; The mode of operation of the protocol</li>
-<li><strong>instance_key</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; The optional instance key to use</li>
-<li><strong>uart_id</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The ID of the UART when needed</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="class">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES">
-<em class="property">class </em><code class="descname">MODES</code><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.MODES"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/enum.html#enum.Enum" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">enum.Enum</span></code></a></p>
-<p>types of modes supported by this protocol</p>
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES.BALL_BALANCER">
-<code class="descname">BALL_BALANCER</code><em class="property"> = 3</em><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES.BALL_BALANCER" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES.FREE">
-<code class="descname">FREE</code><em class="property"> = 5</em><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES.FREE" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES.MY_ORO_BOTICS">
-<code class="descname">MY_ORO_BOTICS</code><em class="property"> = 4</em><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES.MY_ORO_BOTICS" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES.PUSH_BOT">
-<code class="descname">PUSH_BOT</code><em class="property"> = 1</em><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES.PUSH_BOT" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES.RESET_TO_DEFAULT">
-<code class="descname">RESET_TO_DEFAULT</code><em class="property"> = 0</em><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES.RESET_TO_DEFAULT" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES.SPOMNIBOT">
-<code class="descname">SPOMNIBOT</code><em class="property"> = 2</em><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES.SPOMNIBOT" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.add_payload_logic_to_current_output">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">add_payload_logic_to_current_output</code><span class="sig-paren">(</span><em>payload</em>, <em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.add_payload_logic_to_current_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.add_payload_logic_to_current_output" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.add_payload_logic_to_current_output_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">add_payload_logic_to_current_output_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.add_payload_logic_to_current_output_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.bias_values">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">bias_values</code><span class="sig-paren">(</span><em>bias_id</em>, <em>bias_value</em>, <em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.bias_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.bias_values" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.bias_values_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">bias_values_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.bias_values_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.configure_master_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">configure_master_key</code><span class="sig-paren">(</span><em>new_key</em>, <em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.configure_master_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.configure_master_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.configure_master_key_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">configure_master_key_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.configure_master_key_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.disable_retina">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">disable_retina</code><span class="sig-paren">(</span><em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.disable_retina"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.disable_retina" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.disable_retina_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">disable_retina_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.disable_retina_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.enable_disable_motor_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">enable_disable_motor_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.enable_disable_motor_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor0_raw_output_leak_to_0">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">generic_motor0_raw_output_leak_to_0</code><span class="sig-paren">(</span><em>pwm_signal</em>, <em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.generic_motor0_raw_output_leak_to_0"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor0_raw_output_leak_to_0" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor0_raw_output_leak_to_0_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">generic_motor0_raw_output_leak_to_0_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor0_raw_output_leak_to_0_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor0_raw_output_permanent">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">generic_motor0_raw_output_permanent</code><span class="sig-paren">(</span><em>pwm_signal</em>, <em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.generic_motor0_raw_output_permanent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor0_raw_output_permanent" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor0_raw_output_permanent_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">generic_motor0_raw_output_permanent_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor0_raw_output_permanent_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor1_raw_output_leak_to_0">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">generic_motor1_raw_output_leak_to_0</code><span class="sig-paren">(</span><em>pwm_signal</em>, <em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.generic_motor1_raw_output_leak_to_0"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor1_raw_output_leak_to_0" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor1_raw_output_leak_to_0_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">generic_motor1_raw_output_leak_to_0_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor1_raw_output_leak_to_0_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor1_raw_output_permanent">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">generic_motor1_raw_output_permanent</code><span class="sig-paren">(</span><em>pwm_signal</em>, <em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.generic_motor1_raw_output_permanent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor1_raw_output_permanent" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor1_raw_output_permanent_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">generic_motor1_raw_output_permanent_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor1_raw_output_permanent_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor_disable">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">generic_motor_disable</code><span class="sig-paren">(</span><em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.generic_motor_disable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor_disable" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor_enable">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">generic_motor_enable</code><span class="sig-paren">(</span><em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.generic_motor_enable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor_enable" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor_total_period">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">generic_motor_total_period</code><span class="sig-paren">(</span><em>time_in_ms</em>, <em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.generic_motor_total_period"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor_total_period" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor_total_period_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">generic_motor_total_period_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.generic_motor_total_period_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.instance_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">instance_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.instance_key" title="Permalink to this definition">¶</a></dt>
-<dd><p>The key of this instance of the protocol</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.master_slave_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">master_slave_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.master_slave_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.master_slave_set_master_clock_active">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">master_slave_set_master_clock_active</code><span class="sig-paren">(</span><em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.master_slave_set_master_clock_active"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.master_slave_set_master_clock_active" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.master_slave_set_master_clock_not_started">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">master_slave_set_master_clock_not_started</code><span class="sig-paren">(</span><em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.master_slave_set_master_clock_not_started"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.master_slave_set_master_clock_not_started" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.master_slave_set_slave">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">master_slave_set_slave</code><span class="sig-paren">(</span><em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.master_slave_set_slave"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.master_slave_set_slave" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.master_slave_use_internal_counter">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">master_slave_use_internal_counter</code><span class="sig-paren">(</span><em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.master_slave_use_internal_counter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.master_slave_use_internal_counter" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.mode">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">mode</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.mode" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES" title="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES">MODES</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.poll_individual_sensor_continuously">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">poll_individual_sensor_continuously</code><span class="sig-paren">(</span><em>sensor_id</em>, <em>time_in_ms</em>, <em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.poll_individual_sensor_continuously"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.poll_individual_sensor_continuously" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.poll_individual_sensor_continuously_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">poll_individual_sensor_continuously_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.poll_individual_sensor_continuously_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.poll_sensors_once">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">poll_sensors_once</code><span class="sig-paren">(</span><em>sensor_id</em>, <em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.poll_sensors_once"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.poll_sensors_once" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.poll_sensors_once_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">poll_sensors_once_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.poll_sensors_once_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.protocol_instance">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">protocol_instance</code><em class="property"> = 0</em><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.protocol_instance" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_laser_config_active_time">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">push_bot_laser_config_active_time</code><span class="sig-paren">(</span><em>active_time</em>, <em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.push_bot_laser_config_active_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_laser_config_active_time" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_laser_config_active_time_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">push_bot_laser_config_active_time_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_laser_config_active_time_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_laser_config_total_period">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">push_bot_laser_config_total_period</code><span class="sig-paren">(</span><em>total_period</em>, <em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.push_bot_laser_config_total_period"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_laser_config_total_period" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_laser_config_total_period_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">push_bot_laser_config_total_period_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_laser_config_total_period_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_laser_set_frequency">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">push_bot_laser_set_frequency</code><span class="sig-paren">(</span><em>frequency</em>, <em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.push_bot_laser_set_frequency"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_laser_set_frequency" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_laser_set_frequency_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">push_bot_laser_set_frequency_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_laser_set_frequency_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_led_back_active_time">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">push_bot_led_back_active_time</code><span class="sig-paren">(</span><em>active_time</em>, <em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.push_bot_led_back_active_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_led_back_active_time" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_led_back_active_time_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">push_bot_led_back_active_time_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_led_back_active_time_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_led_front_active_time">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">push_bot_led_front_active_time</code><span class="sig-paren">(</span><em>active_time</em>, <em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.push_bot_led_front_active_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_led_front_active_time" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_led_front_active_time_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">push_bot_led_front_active_time_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_led_front_active_time_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_led_set_frequency">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">push_bot_led_set_frequency</code><span class="sig-paren">(</span><em>frequency</em>, <em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.push_bot_led_set_frequency"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_led_set_frequency" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_led_set_frequency_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">push_bot_led_set_frequency_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_led_set_frequency_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_led_total_period">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">push_bot_led_total_period</code><span class="sig-paren">(</span><em>total_period</em>, <em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.push_bot_led_total_period"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_led_total_period" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_led_total_period_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">push_bot_led_total_period_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_led_total_period_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_motor_0_leaking_towards_zero">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">push_bot_motor_0_leaking_towards_zero</code><span class="sig-paren">(</span><em>velocity</em>, <em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.push_bot_motor_0_leaking_towards_zero"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_motor_0_leaking_towards_zero" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_motor_0_leaking_towards_zero_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">push_bot_motor_0_leaking_towards_zero_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_motor_0_leaking_towards_zero_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_motor_0_permanent">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">push_bot_motor_0_permanent</code><span class="sig-paren">(</span><em>velocity</em>, <em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.push_bot_motor_0_permanent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_motor_0_permanent" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_motor_0_permanent_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">push_bot_motor_0_permanent_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_motor_0_permanent_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_motor_1_leaking_towards_zero">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">push_bot_motor_1_leaking_towards_zero</code><span class="sig-paren">(</span><em>velocity</em>, <em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.push_bot_motor_1_leaking_towards_zero"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_motor_1_leaking_towards_zero" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_motor_1_leaking_towards_zero_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">push_bot_motor_1_leaking_towards_zero_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_motor_1_leaking_towards_zero_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_motor_1_permanent">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">push_bot_motor_1_permanent</code><span class="sig-paren">(</span><em>velocity</em>, <em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.push_bot_motor_1_permanent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_motor_1_permanent" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_motor_1_permanent_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">push_bot_motor_1_permanent_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_motor_1_permanent_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_speaker_config_active_time">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">push_bot_speaker_config_active_time</code><span class="sig-paren">(</span><em>active_time</em>, <em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.push_bot_speaker_config_active_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_speaker_config_active_time" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_speaker_config_active_time_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">push_bot_speaker_config_active_time_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_speaker_config_active_time_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_speaker_config_total_period">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">push_bot_speaker_config_total_period</code><span class="sig-paren">(</span><em>total_period</em>, <em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.push_bot_speaker_config_total_period"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_speaker_config_total_period" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_speaker_config_total_period_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">push_bot_speaker_config_total_period_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_speaker_config_total_period_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_speaker_set_melody">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">push_bot_speaker_set_melody</code><span class="sig-paren">(</span><em>melody</em>, <em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.push_bot_speaker_set_melody"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_speaker_set_melody" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_speaker_set_melody_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">push_bot_speaker_set_melody_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_speaker_set_melody_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_speaker_set_tone">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">push_bot_speaker_set_tone</code><span class="sig-paren">(</span><em>frequency</em>, <em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.push_bot_speaker_set_tone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_speaker_set_tone" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_speaker_set_tone_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">push_bot_speaker_set_tone_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_speaker_set_tone_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_a_channel_0_ratio">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">pwm_pin_output_timer_a_channel_0_ratio</code><span class="sig-paren">(</span><em>timer_period</em>, <em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_a_channel_0_ratio"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_a_channel_0_ratio" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_a_channel_0_ratio_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">pwm_pin_output_timer_a_channel_0_ratio_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_a_channel_0_ratio_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_a_channel_1_ratio">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">pwm_pin_output_timer_a_channel_1_ratio</code><span class="sig-paren">(</span><em>timer_period</em>, <em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_a_channel_1_ratio"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_a_channel_1_ratio" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_a_channel_1_ratio_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">pwm_pin_output_timer_a_channel_1_ratio_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_a_channel_1_ratio_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_a_duration">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">pwm_pin_output_timer_a_duration</code><span class="sig-paren">(</span><em>timer_period</em>, <em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_a_duration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_a_duration" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_a_duration_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">pwm_pin_output_timer_a_duration_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_a_duration_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_b_channel_0_ratio">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">pwm_pin_output_timer_b_channel_0_ratio</code><span class="sig-paren">(</span><em>timer_period</em>, <em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_b_channel_0_ratio"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_b_channel_0_ratio" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_b_channel_0_ratio_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">pwm_pin_output_timer_b_channel_0_ratio_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_b_channel_0_ratio_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_b_channel_1_ratio">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">pwm_pin_output_timer_b_channel_1_ratio</code><span class="sig-paren">(</span><em>timer_period</em>, <em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_b_channel_1_ratio"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_b_channel_1_ratio" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_b_channel_1_ratio_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">pwm_pin_output_timer_b_channel_1_ratio_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_b_channel_1_ratio_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_b_duration">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">pwm_pin_output_timer_b_duration</code><span class="sig-paren">(</span><em>timer_period</em>, <em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_b_duration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_b_duration" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_b_duration_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">pwm_pin_output_timer_b_duration_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_b_duration_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_c_channel_0_ratio">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">pwm_pin_output_timer_c_channel_0_ratio</code><span class="sig-paren">(</span><em>timer_period</em>, <em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_c_channel_0_ratio"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_c_channel_0_ratio" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_c_channel_0_ratio_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">pwm_pin_output_timer_c_channel_0_ratio_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_c_channel_0_ratio_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_c_channel_1_ratio">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">pwm_pin_output_timer_c_channel_1_ratio</code><span class="sig-paren">(</span><em>timer_period</em>, <em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_c_channel_1_ratio"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_c_channel_1_ratio" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_c_channel_1_ratio_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">pwm_pin_output_timer_c_channel_1_ratio_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_c_channel_1_ratio_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_c_duration">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">pwm_pin_output_timer_c_duration</code><span class="sig-paren">(</span><em>timer_period</em>, <em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_c_duration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_c_duration" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_c_duration_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">pwm_pin_output_timer_c_duration_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_c_duration_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.query_state_of_io_lines">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">query_state_of_io_lines</code><span class="sig-paren">(</span><em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.query_state_of_io_lines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.query_state_of_io_lines" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.query_state_of_io_lines_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">query_state_of_io_lines_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.query_state_of_io_lines_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.remove_payload_logic_to_current_output">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">remove_payload_logic_to_current_output</code><span class="sig-paren">(</span><em>payload</em>, <em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.remove_payload_logic_to_current_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.remove_payload_logic_to_current_output" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.remove_payload_logic_to_current_output_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">remove_payload_logic_to_current_output_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.remove_payload_logic_to_current_output_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.reset_retina">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">reset_retina</code><span class="sig-paren">(</span><em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.reset_retina"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.reset_retina" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.reset_retina_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">reset_retina_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.reset_retina_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.sensor_transmission_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">sensor_transmission_key</code><span class="sig-paren">(</span><em>sensor_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.sensor_transmission_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.sensor_transmission_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="staticmethod">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.sent_mode_command">
-<em class="property">static </em><code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">sent_mode_command</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.sent_mode_command"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.sent_mode_command" title="Permalink to this definition">¶</a></dt>
-<dd><p>True if the mode command has ever been requested by any instance</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.set_mode">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">set_mode</code><span class="sig-paren">(</span><em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.set_mode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.set_mode" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.set_mode_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">set_mode_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.set_mode_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.set_output_pattern_for_payload">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">set_output_pattern_for_payload</code><span class="sig-paren">(</span><em>payload</em>, <em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.set_output_pattern_for_payload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.set_output_pattern_for_payload" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.set_output_pattern_for_payload_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">set_output_pattern_for_payload_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.set_output_pattern_for_payload_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.set_payload_pins_to_high_impedance">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">set_payload_pins_to_high_impedance</code><span class="sig-paren">(</span><em>payload</em>, <em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.set_payload_pins_to_high_impedance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.set_payload_pins_to_high_impedance" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.set_payload_pins_to_high_impedance_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">set_payload_pins_to_high_impedance_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.set_payload_pins_to_high_impedance_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.set_retina_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">set_retina_key</code><span class="sig-paren">(</span><em>new_key</em>, <em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.set_retina_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.set_retina_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.set_retina_key_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">set_retina_key_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.set_retina_key_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.set_retina_transmission">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">set_retina_transmission</code><span class="sig-paren">(</span><em>retina_key=&lt;RetinaKey.NATIVE_128_X_128: 67108864&gt;</em>, <em>retina_payload=None</em>, <em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.set_retina_transmission"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.set_retina_transmission" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the retina transmission key</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>retina_key</strong> (<a class="reference internal" href="#spynnaker.pyNN.protocols.RetinaKey" title="spynnaker.pyNN.protocols.RetinaKey"><em>RetinaKey</em></a>) &#8211; the new key for the retina</li>
-<li><strong>retina_payload</strong> (<a class="reference internal" href="#spynnaker.pyNN.protocols.RetinaPayload" title="spynnaker.pyNN.protocols.RetinaPayload"><em>RetinaPayload</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; the new payload for the set retina key command packet</li>
-<li><strong>time</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; when to transmit this packet</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the command to send</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models.html#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v)">MultiCastCommand</a></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.set_retina_transmission_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">set_retina_transmission_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.set_retina_transmission_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.turn_off_sensor_reporting">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">turn_off_sensor_reporting</code><span class="sig-paren">(</span><em>sensor_id</em>, <em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.turn_off_sensor_reporting"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.turn_off_sensor_reporting" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.turn_off_sensor_reporting_key">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">turn_off_sensor_reporting_key</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.turn_off_sensor_reporting_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.uart_id">
-<code class="descclassname">MunichIoSpiNNakerLinkProtocol.</code><code class="descname">uart_id</code><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.uart_id" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="spynnaker.pyNN.protocols.RetinaKey">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.protocols.</code><code class="descname">RetinaKey</code><span class="sig-paren">(</span><em>value</em>, <em>pixels</em>, <em>bits_per_coordinate</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#RetinaKey"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.RetinaKey" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/enum.html#enum.Enum" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">enum.Enum</span></code></a></p>
-<p>An enumeration.</p>
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.RetinaKey.DOWNSAMPLE_16_X_16">
-<code class="descname">DOWNSAMPLE_16_X_16</code><em class="property"> = 268435456</em><a class="headerlink" href="#spynnaker.pyNN.protocols.RetinaKey.DOWNSAMPLE_16_X_16" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.RetinaKey.DOWNSAMPLE_32_X_32">
-<code class="descname">DOWNSAMPLE_32_X_32</code><em class="property"> = 201326592</em><a class="headerlink" href="#spynnaker.pyNN.protocols.RetinaKey.DOWNSAMPLE_32_X_32" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.RetinaKey.DOWNSAMPLE_64_X_64">
-<code class="descname">DOWNSAMPLE_64_X_64</code><em class="property"> = 134217728</em><a class="headerlink" href="#spynnaker.pyNN.protocols.RetinaKey.DOWNSAMPLE_64_X_64" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.RetinaKey.FIXED_KEY">
-<code class="descname">FIXED_KEY</code><em class="property"> = 0</em><a class="headerlink" href="#spynnaker.pyNN.protocols.RetinaKey.FIXED_KEY" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.RetinaKey.NATIVE_128_X_128">
-<code class="descname">NATIVE_128_X_128</code><em class="property"> = 67108864</em><a class="headerlink" href="#spynnaker.pyNN.protocols.RetinaKey.NATIVE_128_X_128" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.RetinaKey.bits_per_coordinate">
-<code class="descname">bits_per_coordinate</code><a class="headerlink" href="#spynnaker.pyNN.protocols.RetinaKey.bits_per_coordinate" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.RetinaKey.n_neurons">
-<code class="descname">n_neurons</code><a class="headerlink" href="#spynnaker.pyNN.protocols.RetinaKey.n_neurons" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.RetinaKey.pixels">
-<code class="descname">pixels</code><a class="headerlink" href="#spynnaker.pyNN.protocols.RetinaKey.pixels" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="spynnaker.pyNN.protocols.RetinaPayload">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.protocols.</code><code class="descname">RetinaPayload</code><span class="sig-paren">(</span><em>value</em>, <em>n_payload_bytes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#RetinaPayload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.RetinaPayload" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/enum.html#enum.Enum" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">enum.Enum</span></code></a></p>
-<p>An enumeration.</p>
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.RetinaPayload.ABSOLUTE_2_BYTE_TIMESTAMPS">
-<code class="descname">ABSOLUTE_2_BYTE_TIMESTAMPS</code><em class="property"> = 1073741824</em><a class="headerlink" href="#spynnaker.pyNN.protocols.RetinaPayload.ABSOLUTE_2_BYTE_TIMESTAMPS" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.RetinaPayload.ABSOLUTE_3_BYTE_TIMESTAMPS">
-<code class="descname">ABSOLUTE_3_BYTE_TIMESTAMPS</code><em class="property"> = 1610612736</em><a class="headerlink" href="#spynnaker.pyNN.protocols.RetinaPayload.ABSOLUTE_3_BYTE_TIMESTAMPS" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.RetinaPayload.ABSOLUTE_4_BYTE_TIMESTAMPS">
-<code class="descname">ABSOLUTE_4_BYTE_TIMESTAMPS</code><em class="property"> = 2147483648</em><a class="headerlink" href="#spynnaker.pyNN.protocols.RetinaPayload.ABSOLUTE_4_BYTE_TIMESTAMPS" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.RetinaPayload.DELTA_TIMESTAMPS">
-<code class="descname">DELTA_TIMESTAMPS</code><em class="property"> = 536870912</em><a class="headerlink" href="#spynnaker.pyNN.protocols.RetinaPayload.DELTA_TIMESTAMPS" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.RetinaPayload.EVENTS_IN_PAYLOAD">
-<code class="descname">EVENTS_IN_PAYLOAD</code><em class="property"> = 0</em><a class="headerlink" href="#spynnaker.pyNN.protocols.RetinaPayload.EVENTS_IN_PAYLOAD" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.RetinaPayload.NO_PAYLOAD">
-<code class="descname">NO_PAYLOAD</code><em class="property"> = 0</em><a class="headerlink" href="#spynnaker.pyNN.protocols.RetinaPayload.NO_PAYLOAD" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.protocols.RetinaPayload.n_payload_bytes">
-<code class="descname">n_payload_bytes</code><a class="headerlink" href="#spynnaker.pyNN.protocols.RetinaPayload.n_payload_bytes" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-</div>
-</div>
-
-
-          </div>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -929,12 +902,13 @@ ethernet.</p>
         <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker  documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >spynnaker</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
-          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li> 
+          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.protocols package</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2017.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
     </div>
   </body>
 </html>

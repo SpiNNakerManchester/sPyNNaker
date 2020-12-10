@@ -1,36 +1,24 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<html lang="en">
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>spynnaker.pyNN.extra_algorithms package &#8212; sPyNNaker  documentation</title>
-    
-    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="spynnaker.pyNN.extra_algorithms.splitter_components package" href="spynnaker.pyNN.extra_algorithms.splitter_components.html" />
     <link rel="prev" title="spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link package" href="spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.html" /> 
-  </head>
-  <body role="document">
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -49,27 +37,353 @@
         <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker  documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >spynnaker</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
-          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.html" accesskey="U">spynnaker.pyNN package</a> &#187;</li> 
+          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.html" accesskey="U">spynnaker.pyNN package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.extra_algorithms package</a></li> 
       </ul>
-    </div>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="spynnaker-pynn-extra-algorithms-package">
+<h1>spynnaker.pyNN.extra_algorithms package<a class="headerlink" href="#spynnaker-pynn-extra-algorithms-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html">spynnaker.pyNN.extra_algorithms.splitter_components package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html#module-spynnaker.pyNN.extra_algorithms.splitter_components">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="module-spynnaker.pyNN.extra_algorithms">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.extra_algorithms" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="spynnaker.pyNN.extra_algorithms.AbstractMachineBitFieldRouterCompressor">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.extra_algorithms.</code><code class="sig-name descname">AbstractMachineBitFieldRouterCompressor</code><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/spynnaker_machine_bit_field_router_compressor.html#AbstractMachineBitFieldRouterCompressor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.AbstractMachineBitFieldRouterCompressor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Adds in regeneration of synaptic matrices to bitfield compression to    <a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.interface.interface_functions.html#spinn_front_end_common.interface.interface_functions.MachineBitFieldRouterCompressor" title="(in SpiNNFrontEndCommon)"><code class="xref py py-class docutils literal notranslate"><span class="pre">spinn_front_end_common.interface.interface_functions.MachineBitFieldRouterCompressor</span></code></a></p>
+<dl class="py method">
+<dt id="spynnaker.pyNN.extra_algorithms.AbstractMachineBitFieldRouterCompressor.__call__">
+<code class="sig-name descname">__call__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">routing_tables</span></em>, <em class="sig-param"><span class="n">transceiver</span></em>, <em class="sig-param"><span class="n">machine</span></em>, <em class="sig-param"><span class="n">app_id</span></em>, <em class="sig-param"><span class="n">provenance_file_path</span></em>, <em class="sig-param"><span class="n">machine_graph</span></em>, <em class="sig-param"><span class="n">placements</span></em>, <em class="sig-param"><span class="n">executable_finder</span></em>, <em class="sig-param"><span class="n">write_compressor_iobuf</span></em>, <em class="sig-param"><span class="n">produce_report</span></em>, <em class="sig-param"><span class="n">default_report_folder</span></em>, <em class="sig-param"><span class="n">target_length</span></em>, <em class="sig-param"><span class="n">routing_infos</span></em>, <em class="sig-param"><span class="n">time_to_try_for_each_iteration</span></em>, <em class="sig-param"><span class="n">use_timer_cut_off</span></em>, <em class="sig-param"><span class="n">machine_time_step</span></em>, <em class="sig-param"><span class="n">time_scale_factor</span></em>, <em class="sig-param"><span class="n">threshold_percentage</span></em>, <em class="sig-param"><span class="n">executable_targets</span></em>, <em class="sig-param"><span class="n">read_expander_iobuf</span></em>, <em class="sig-param"><span class="n">compress_as_much_as_possible</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">provenance_data_objects</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/spynnaker_machine_bit_field_router_compressor.html#AbstractMachineBitFieldRouterCompressor.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.AbstractMachineBitFieldRouterCompressor.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>entrance for routing table compression with bit field</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>routing_tables</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.routing_tables/#pacman.model.routing_tables.MulticastRoutingTables" title="(in PACMAN)"><em>MulticastRoutingTables</em></a>) – routing tables</p></li>
+<li><p><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan)"><em>Transceiver</em></a>) – spinnman instance</p></li>
+<li><p><strong>machine</strong> (<a class="reference external" href="https://spinnmachine.readthedocs.io/en/latest/spinn_machine/#spinn_machine.Machine" title="(in SpiNNMachine)"><em>Machine</em></a>) – spinnMachine instance</p></li>
+<li><p><strong>app_id</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – app id of the application</p></li>
+<li><p><strong>provenance_file_path</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – file path for prov data</p></li>
+<li><p><strong>machine_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineGraph" title="(in PACMAN)"><em>MachineGraph</em></a>) – machine graph</p></li>
+<li><p><strong>placements</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placements" title="(in PACMAN)"><em>Placements</em></a>) – placements on machine</p></li>
+<li><p><strong>executable_finder</strong> (<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utilities.utility_objs.html#spinn_front_end_common.utilities.utility_objs.ExecutableFinder" title="(in SpiNNFrontEndCommon)"><em>ExecutableFinder</em></a>) – where are binaries are located</p></li>
+<li><p><strong>write_compressor_iobuf</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – flag saying if read iobuf</p></li>
+<li><p><strong>produce_report</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – </p></li>
+<li><p><strong>default_report_folder</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – </p></li>
+<li><p><strong>target_length</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – </p></li>
+<li><p><strong>routing_infos</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.routing_info/#pacman.model.routing_info.RoutingInfo" title="(in PACMAN)"><em>RoutingInfo</em></a>) – </p></li>
+<li><p><strong>threshold_percentage</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – the percentage of bitfields to do on chip before its considered
+a success</p></li>
+<li><p><strong>read_algorithm_iobuf</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – flag saying if read iobuf</p></li>
+<li><p><strong>compress_as_much_as_possible</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – flag asking if should compress as much as possible</p></li>
+<li><p><strong>read_expander_iobuf</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – reads the synaptic expander iobuf.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utilities.utility_objs.html#spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem" title="(in SpiNNFrontEndCommon)">ProvenanceDataItem</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker.pyNN.extra_algorithms.DelaySupportAdder">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.extra_algorithms.</code><code class="sig-name descname">DelaySupportAdder</code><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/delay_support_adder.html#DelaySupportAdder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.DelaySupportAdder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>adds delay extension vertices into the APP graph as needed</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>app_graph</strong> (<em>ApplicationGraph</em>) – the app graph</p></li>
+<li><p><strong>machine_time_step</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – the machine time step</p></li>
+<li><p><strong>user_max_delay</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – the user defined max delay</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="spynnaker.pyNN.extra_algorithms.DelaySupportAdder.APP_DELAY_PROGRESS_BAR_TEXT">
+<code class="sig-name descname">APP_DELAY_PROGRESS_BAR_TEXT</code><em class="property"> = 'Adding delay extensions as required'</em><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.DelaySupportAdder.APP_DELAY_PROGRESS_BAR_TEXT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="spynnaker.pyNN.extra_algorithms.DelaySupportAdder.DELAYS_NOT_SUPPORTED_SPLITTER">
+<code class="sig-name descname">DELAYS_NOT_SUPPORTED_SPLITTER</code><em class="property"> = 'The app vertex {} with splitter {} does not support delays and yet requires a delay support for edge {}. Please use a Splitter which does not have accepts_edges_from_delay_vertex turned off.'</em><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.DelaySupportAdder.DELAYS_NOT_SUPPORTED_SPLITTER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="spynnaker.pyNN.extra_algorithms.DelaySupportAdder.END_USER_MAX_DELAY_DEFILING_ERROR_MESSAGE">
+<code class="sig-name descname">END_USER_MAX_DELAY_DEFILING_ERROR_MESSAGE</code><em class="property"> = 'The end user entered a max delay for which the projection breaks'</em><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.DelaySupportAdder.END_USER_MAX_DELAY_DEFILING_ERROR_MESSAGE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="spynnaker.pyNN.extra_algorithms.DelaySupportAdder.INVALID_SPLITTER_FOR_DELAYS_ERROR_MSG">
+<code class="sig-name descname">INVALID_SPLITTER_FOR_DELAYS_ERROR_MSG</code><em class="property"> = 'The app vertex {} with splitter {} does not support delays and yet requires a delay support for edge {}. Please use a Splitter which utilises the AbstractSpynnakerSplitterDelay interface.'</em><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.DelaySupportAdder.INVALID_SPLITTER_FOR_DELAYS_ERROR_MSG" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="spynnaker.pyNN.extra_algorithms.DelaySupportAdder.NOT_SUPPORTED_DELAY_ERROR_MSG">
+<code class="sig-name descname">NOT_SUPPORTED_DELAY_ERROR_MSG</code><em class="property"> = 'The maximum delay {} for projection {} is not supported by the splitter {} (max supported delay of the splitter is {} and a delay extension can add {} extra delay). either reduce the delay, or use a splitter which supports a larger delay, or finally implement the code to allow multiple delay extensions. good luck.'</em><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.DelaySupportAdder.NOT_SUPPORTED_DELAY_ERROR_MSG" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.extra_algorithms.DelaySupportAdder.__call__">
+<code class="sig-name descname">__call__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">app_graph</span></em>, <em class="sig-param"><span class="n">machine_time_step</span></em>, <em class="sig-param"><span class="n">user_max_delay</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/delay_support_adder.html#DelaySupportAdder.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.DelaySupportAdder.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>adds the delay extensions to the app graph, now that all the            splitter objects have been set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>app_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationGraph" title="(in PACMAN)"><em>ApplicationGraph</em></a>) – the app graph</p></li>
+<li><p><strong>machine_time_step</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – the machine time step</p></li>
+<li><p><strong>user_max_delay</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – the user defined max delay</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker.pyNN.extra_algorithms.GraphEdgeWeightUpdater">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.extra_algorithms.</code><code class="sig-name descname">GraphEdgeWeightUpdater</code><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/graph_edge_weight_updater.html#GraphEdgeWeightUpdater"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.GraphEdgeWeightUpdater" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Updates the weights of all edges.</p>
+<dl class="py method">
+<dt id="spynnaker.pyNN.extra_algorithms.GraphEdgeWeightUpdater.__call__">
+<code class="sig-name descname">__call__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">machine_graph</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/graph_edge_weight_updater.html#GraphEdgeWeightUpdater.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.GraphEdgeWeightUpdater.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>machine_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineGraph" title="(in PACMAN)"><em>MachineGraph</em></a>) – the machine_graph whose edges are to be updated</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker.pyNN.extra_algorithms.OnChipBitFieldGenerator">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.extra_algorithms.</code><code class="sig-name descname">OnChipBitFieldGenerator</code><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/on_chip_bit_field_generator.html#OnChipBitFieldGenerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.OnChipBitFieldGenerator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Executes bitfield and routing table entries for atom based routing.</p>
+<dl class="py method">
+<dt id="spynnaker.pyNN.extra_algorithms.OnChipBitFieldGenerator.__call__">
+<code class="sig-name descname">__call__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">placements</span></em>, <em class="sig-param"><span class="n">app_graph</span></em>, <em class="sig-param"><span class="n">executable_finder</span></em>, <em class="sig-param"><span class="n">provenance_file_path</span></em>, <em class="sig-param"><span class="n">transceiver</span></em>, <em class="sig-param"><span class="n">write_bit_field_generator_iobuf</span></em>, <em class="sig-param"><span class="n">generating_bitfield_report</span></em>, <em class="sig-param"><span class="n">default_report_folder</span></em>, <em class="sig-param"><span class="n">machine_graph</span></em>, <em class="sig-param"><span class="n">routing_infos</span></em>, <em class="sig-param"><span class="n">generating_bit_field_summary_report</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/on_chip_bit_field_generator.html#OnChipBitFieldGenerator.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.OnChipBitFieldGenerator.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads and runs the bit field generator on chip.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>placements</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placements" title="(in PACMAN)"><em>Placements</em></a>) – placements</p></li>
+<li><p><strong>app_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationGraph" title="(in PACMAN)"><em>ApplicationGraph</em></a>) – the app graph</p></li>
+<li><p><strong>executable_finder</strong> (<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utilities.utility_objs.html#spinn_front_end_common.utilities.utility_objs.ExecutableFinder" title="(in SpiNNFrontEndCommon)"><em>ExecutableFinder</em></a>) – the executable finder</p></li>
+<li><p><strong>provenance_file_path</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – the path to where provenance data items are written</p></li>
+<li><p><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan)"><em>Transceiver</em></a>) – the SpiNNMan instance</p></li>
+<li><p><strong>write_bit_field_generator_iobuf</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – flag for report</p></li>
+<li><p><strong>generating_bitfield_report</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – flag for report</p></li>
+<li><p><strong>default_report_folder</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – the file path for reports</p></li>
+<li><p><strong>machine_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineGraph" title="(in PACMAN)"><em>MachineGraph</em></a>) – the machine graph</p></li>
+<li><p><strong>routing_infos</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.routing_info/#pacman.model.routing_info.RoutingInfo" title="(in PACMAN)"><em>RoutingInfo</em></a>) – the key to edge map</p></li>
+<li><p><strong>generating_bit_field_summary_report</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – whether to make summary report</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker.pyNN.extra_algorithms.RedundantPacketCountReport">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.extra_algorithms.</code><code class="sig-name descname">RedundantPacketCountReport</code><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/redundant_packet_count_report.html#RedundantPacketCountReport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.RedundantPacketCountReport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="py method">
+<dt id="spynnaker.pyNN.extra_algorithms.RedundantPacketCountReport.__call__">
+<code class="sig-name descname">__call__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">provenance_items</span></em>, <em class="sig-param"><span class="n">report_default_directory</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/redundant_packet_count_report.html#RedundantPacketCountReport.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.RedundantPacketCountReport.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>provenance_items</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utilities.utility_objs.html#spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem" title="(in SpiNNFrontEndCommon)"><em>ProvenanceDataItem</em></a><em>)</em>) – </p></li>
+<li><p><strong>report_default_directory</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker.pyNN.extra_algorithms.SpYNNakerConnectionHolderGenerator">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.extra_algorithms.</code><code class="sig-name descname">SpYNNakerConnectionHolderGenerator</code><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/spynnaker_connection_holder_generations.html#SpYNNakerConnectionHolderGenerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.SpYNNakerConnectionHolderGenerator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Sets up connection holders for reports to use.</p>
+<dl class="py method">
+<dt id="spynnaker.pyNN.extra_algorithms.SpYNNakerConnectionHolderGenerator.__call__">
+<code class="sig-name descname">__call__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">application_graph</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/spynnaker_connection_holder_generations.html#SpYNNakerConnectionHolderGenerator.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.SpYNNakerConnectionHolderGenerator.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>application_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationGraph" title="(in PACMAN)"><em>ApplicationGraph</em></a>) – app graph</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the set of connection holders for after DSG generation</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a>(<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge" title="spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge">ProjectionApplicationEdge</a>, <a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation">SynapseInformation</a>),             <a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.ConnectionHolder" title="spynnaker.pyNN.models.neuron.ConnectionHolder">ConnectionHolder</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker.pyNN.extra_algorithms.SpYNNakerNeuronGraphNetworkSpecificationReport">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.extra_algorithms.</code><code class="sig-name descname">SpYNNakerNeuronGraphNetworkSpecificationReport</code><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/spynnaker_neuron_network_specification_report.html#SpYNNakerNeuronGraphNetworkSpecificationReport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.SpYNNakerNeuronGraphNetworkSpecificationReport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Produces a report describing the graph created from the neural         populations and projections.</p>
+<dl class="py method">
+<dt id="spynnaker.pyNN.extra_algorithms.SpYNNakerNeuronGraphNetworkSpecificationReport.__call__">
+<code class="sig-name descname">__call__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">report_folder</span></em>, <em class="sig-param"><span class="n">application_graph</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/spynnaker_neuron_network_specification_report.html#SpYNNakerNeuronGraphNetworkSpecificationReport.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.SpYNNakerNeuronGraphNetworkSpecificationReport.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>report_folder</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – the report folder to put figure into</p></li>
+<li><p><strong>application_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationGraph" title="(in PACMAN)"><em>ApplicationGraph</em></a>) – the app graph</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker.pyNN.extra_algorithms.SpYNNakerSynapticMatrixReport">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.extra_algorithms.</code><code class="sig-name descname">SpYNNakerSynapticMatrixReport</code><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/spynnaker_synaptic_matrix_report.html#SpYNNakerSynapticMatrixReport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.SpYNNakerSynapticMatrixReport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Generate the synaptic matrices for reporting purposes.</p>
+<dl class="py method">
+<dt id="spynnaker.pyNN.extra_algorithms.SpYNNakerSynapticMatrixReport.__call__">
+<code class="sig-name descname">__call__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">report_folder</span></em>, <em class="sig-param"><span class="n">connection_holder</span></em>, <em class="sig-param"><span class="n">dsg_targets</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/spynnaker_synaptic_matrix_report.html#SpYNNakerSynapticMatrixReport.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.SpYNNakerSynapticMatrixReport.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert synaptic matrix for every application edge.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>report_folder</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – where to write the report</p></li>
+<li><p><strong>connection_holder</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#tuple" title="(in Python v3.6)"><em>tuple</em></a><em>(</em><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge" title="spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge"><em>ProjectionApplicationEdge</em></a><em>, </em><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a><em>)</em><em>,             </em><a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.ConnectionHolder" title="spynnaker.pyNN.models.neuron.ConnectionHolder"><em>ConnectionHolder</em></a><em>)</em>) – where the synaptic matrices are stored             (possibly after retrieval from the machine)</p></li>
+<li><p><strong>dsg_targets</strong> – used to check if connection holders are populated</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker.pyNN.extra_algorithms.SpynnakerDataSpecificationWriter">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.extra_algorithms.</code><code class="sig-name descname">SpynnakerDataSpecificationWriter</code><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/spynnaker_data_specification_writer.html#SpynnakerDataSpecificationWriter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.SpynnakerDataSpecificationWriter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spinn_front_end_common.interface.interface_functions.graph_data_specification_writer.GraphDataSpecificationWriter</span></code></p>
+<p>Executes data specification generation for sPyNNaker</p>
+<dl class="py method">
+<dt id="spynnaker.pyNN.extra_algorithms.SpynnakerDataSpecificationWriter.__call__">
+<code class="sig-name descname">__call__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">placements</span></em>, <em class="sig-param"><span class="n">hostname</span></em>, <em class="sig-param"><span class="n">report_default_directory</span></em>, <em class="sig-param"><span class="n">write_text_specs</span></em>, <em class="sig-param"><span class="n">machine</span></em>, <em class="sig-param"><span class="n">data_n_timesteps</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/spynnaker_data_specification_writer.html#SpynnakerDataSpecificationWriter.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.SpynnakerDataSpecificationWriter.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>placements</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placements" title="(in PACMAN)"><em>Placements</em></a>) – placements of machine graph to cores</p></li>
+<li><p><strong>hostname</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – SpiNNaker machine name</p></li>
+<li><p><strong>report_default_directory</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – the location where reports are stored</p></li>
+<li><p><strong>write_text_specs</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – True if the textual version of the specification is to be written</p></li>
+<li><p><strong>machine</strong> (<a class="reference external" href="https://spinnmachine.readthedocs.io/en/latest/spinn_machine/#spinn_machine.Machine" title="(in SpiNNMachine)"><em>Machine</em></a>) – the python representation of the SpiNNaker machine</p></li>
+<li><p><strong>data_n_timesteps</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – The number of timesteps for which data space will been reserved</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>DSG targets (map of placement tuple and filename)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a>(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.interface.ds.html#spinn_front_end_common.interface.ds.DataSpecificationTargets" title="(in SpiNNFrontEndCommon)">DataSpecificationTargets</a>,
+<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>,<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>,<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>), <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>))</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ConfigurationException</strong> – If the DSG asks to use more SDRAM than is available.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker.pyNN.extra_algorithms.SpynnakerMachineBitFieldPairRouterCompressor">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.extra_algorithms.</code><code class="sig-name descname">SpynnakerMachineBitFieldPairRouterCompressor</code><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/spynnaker_machine_bit_field_router_compressor.html#SpynnakerMachineBitFieldPairRouterCompressor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.SpynnakerMachineBitFieldPairRouterCompressor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.AbstractMachineBitFieldRouterCompressor</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker.pyNN.extra_algorithms.SpynnakerMachineBitFieldUnorderedRouterCompressor">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.extra_algorithms.</code><code class="sig-name descname">SpynnakerMachineBitFieldUnorderedRouterCompressor</code><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/spynnaker_machine_bit_field_router_compressor.html#SpynnakerMachineBitFieldUnorderedRouterCompressor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.SpynnakerMachineBitFieldUnorderedRouterCompressor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.AbstractMachineBitFieldRouterCompressor</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spynnaker.pyNN.extra_algorithms.finish_connection_holders">
+<code class="sig-prename descclassname">spynnaker.pyNN.extra_algorithms.</code><code class="sig-name descname">finish_connection_holders</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">application_graph</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/connection_holder_finisher.html#finish_connection_holders"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.finish_connection_holders" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finishes the connection holders after data has been generated within        them, allowing any waiting callbacks to be called.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>application_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationGraph" title="(in PACMAN)"><em>ApplicationGraph</em></a>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spynnaker.pyNN.extra_algorithms.synapse_expander">
+<code class="sig-prename descclassname">spynnaker.pyNN.extra_algorithms.</code><code class="sig-name descname">synapse_expander</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">placements</span></em>, <em class="sig-param"><span class="n">transceiver</span></em>, <em class="sig-param"><span class="n">provenance_file_path</span></em>, <em class="sig-param"><span class="n">executable_finder</span></em>, <em class="sig-param"><span class="n">extract_iobuf</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/synapse_expander.html#synapse_expander"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.synapse_expander" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the synapse expander.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Needs to be done after data has been loaded.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>placements</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placements" title="(in PACMAN)"><em>Placements</em></a>) – Where all vertices are on the machine.</p></li>
+<li><p><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan)"><em>Transceiver</em></a>) – How to talk to the machine.</p></li>
+<li><p><strong>provenance_file_path</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Where provenance data should be written.</p></li>
+<li><p><strong>executable_finder</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.html#spinn_utilities.executable_finder.ExecutableFinder" title="(in SpiNNUtils)"><em>ExecutableFinder</em></a>) – How to find the synapse expander binaries.</p></li>
+<li><p><strong>extract_iobuf</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – flag for extracting iobuf</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
+  <h3><a href="index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.extra_algorithms package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
-<li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.extra_algorithms.connection_holder_finisher">spynnaker.pyNN.extra_algorithms.connection_holder_finisher module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.extra_algorithms.delay_support_adder">spynnaker.pyNN.extra_algorithms.delay_support_adder module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.extra_algorithms.graph_edge_weight_updater">spynnaker.pyNN.extra_algorithms.graph_edge_weight_updater module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.extra_algorithms.on_chip_bit_field_generator">spynnaker.pyNN.extra_algorithms.on_chip_bit_field_generator module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.extra_algorithms.redundant_packet_count_report">spynnaker.pyNN.extra_algorithms.redundant_packet_count_report module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.extra_algorithms.spynnaker_connection_holder_generations">spynnaker.pyNN.extra_algorithms.spynnaker_connection_holder_generations module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.extra_algorithms.spynnaker_data_specification_writer">spynnaker.pyNN.extra_algorithms.spynnaker_data_specification_writer module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor">spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.extra_algorithms.spynnaker_neuron_network_specification_report">spynnaker.pyNN.extra_algorithms.spynnaker_neuron_network_specification_report module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.extra_algorithms.spynnaker_synaptic_matrix_report">spynnaker.pyNN.extra_algorithms.spynnaker_synaptic_matrix_report module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.extra_algorithms.synapse_expander">spynnaker.pyNN.extra_algorithms.synapse_expander module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.extra_algorithms">Module contents</a></li>
 </ul>
 </li>
@@ -89,393 +403,15 @@
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
     </form>
+    </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
-            
-  <div class="section" id="spynnaker-pynn-extra-algorithms-package">
-<h1>spynnaker.pyNN.extra_algorithms package<a class="headerlink" href="#spynnaker-pynn-extra-algorithms-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="subpackages">
-<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html">spynnaker.pyNN.extra_algorithms.splitter_components package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html#module-spynnaker.pyNN.extra_algorithms.splitter_components.abstract_spynnaker_splitter_delay">spynnaker.pyNN.extra_algorithms.splitter_components.abstract_spynnaker_splitter_delay module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html#module-spynnaker.pyNN.extra_algorithms.splitter_components.splitter_abstract_pop_vertex_slice">spynnaker.pyNN.extra_algorithms.splitter_components.splitter_abstract_pop_vertex_slice module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html#module-spynnaker.pyNN.extra_algorithms.splitter_components.splitter_delay_vertex_slice">spynnaker.pyNN.extra_algorithms.splitter_components.splitter_delay_vertex_slice module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html#module-spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_partitioner">spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_partitioner module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html#module-spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_selector">spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_selector module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html#module-spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_slice_legacy">spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_slice_legacy module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html#module-spynnaker.pyNN.extra_algorithms.splitter_components">Module contents</a></li>
-</ul>
-</li>
-</ul>
-</div>
-</div>
-<div class="section" id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-spynnaker.pyNN.extra_algorithms.connection_holder_finisher">
-<span id="spynnaker-pynn-extra-algorithms-connection-holder-finisher-module"></span><h2>spynnaker.pyNN.extra_algorithms.connection_holder_finisher module<a class="headerlink" href="#module-spynnaker.pyNN.extra_algorithms.connection_holder_finisher" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="spynnaker.pyNN.extra_algorithms.connection_holder_finisher.finish_connection_holders">
-<code class="descclassname">spynnaker.pyNN.extra_algorithms.connection_holder_finisher.</code><code class="descname">finish_connection_holders</code><span class="sig-paren">(</span><em>application_graph</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/connection_holder_finisher.html#finish_connection_holders"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.connection_holder_finisher.finish_connection_holders" title="Permalink to this definition">¶</a></dt>
-<dd><p>Finishes the connection holders after data has been generated within
-them, allowing any waiting callbacks to be called</p>
-</dd></dl>
-
-</div>
-<div class="section" id="module-spynnaker.pyNN.extra_algorithms.delay_support_adder">
-<span id="spynnaker-pynn-extra-algorithms-delay-support-adder-module"></span><h2>spynnaker.pyNN.extra_algorithms.delay_support_adder module<a class="headerlink" href="#module-spynnaker.pyNN.extra_algorithms.delay_support_adder" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="spynnaker.pyNN.extra_algorithms.delay_support_adder.DelaySupportAdder">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.extra_algorithms.delay_support_adder.</code><code class="descname">DelaySupportAdder</code><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/delay_support_adder.html#DelaySupportAdder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.delay_support_adder.DelaySupportAdder" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>adds delay extension vertices into the APP graph as needed</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>app_graph</strong> (<em>ApplicationGraph</em>) &#8211; the app graph</li>
-<li><strong>machine_time_step</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; the machine time step</li>
-<li><strong>user_max_delay</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; the user defined max delay</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></p>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="attribute">
-<dt id="spynnaker.pyNN.extra_algorithms.delay_support_adder.DelaySupportAdder.APP_DELAY_PROGRESS_BAR_TEXT">
-<code class="descname">APP_DELAY_PROGRESS_BAR_TEXT</code><em class="property"> = 'Adding delay extensions as required'</em><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.delay_support_adder.DelaySupportAdder.APP_DELAY_PROGRESS_BAR_TEXT" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.extra_algorithms.delay_support_adder.DelaySupportAdder.DELAYS_NOT_SUPPORTED_SPLITTER">
-<code class="descname">DELAYS_NOT_SUPPORTED_SPLITTER</code><em class="property"> = 'The app vertex {} with splitter {} does not support delays and yet requires a delay support for edge {}. Please use a Splitter which does not have accepts_edges_from_delay_vertex turned off.'</em><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.delay_support_adder.DelaySupportAdder.DELAYS_NOT_SUPPORTED_SPLITTER" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.extra_algorithms.delay_support_adder.DelaySupportAdder.END_USER_MAX_DELAY_DEFILING_ERROR_MESSAGE">
-<code class="descname">END_USER_MAX_DELAY_DEFILING_ERROR_MESSAGE</code><em class="property"> = 'The end user entered a max delay for which the projection breaks'</em><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.delay_support_adder.DelaySupportAdder.END_USER_MAX_DELAY_DEFILING_ERROR_MESSAGE" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.extra_algorithms.delay_support_adder.DelaySupportAdder.INVALID_SPLITTER_FOR_DELAYS_ERROR_MSG">
-<code class="descname">INVALID_SPLITTER_FOR_DELAYS_ERROR_MSG</code><em class="property"> = 'The app vertex {} with splitter {} does not support delays and yet requires a delay support for edge {}. Please use a Splitter which utilises the AbstractSpynnakerSplitterDelay interface.'</em><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.delay_support_adder.DelaySupportAdder.INVALID_SPLITTER_FOR_DELAYS_ERROR_MSG" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.extra_algorithms.delay_support_adder.DelaySupportAdder.NOT_SUPPORTED_DELAY_ERROR_MSG">
-<code class="descname">NOT_SUPPORTED_DELAY_ERROR_MSG</code><em class="property"> = 'The maximum delay {} for projection {} is not supported by the splitter {} (max supported delay of the splitter is {} and a delay extension can add {} extra delay). either reduce the delay, or use a splitter which supports a larger delay, or finally implement the code to allow multiple delay extensions. good luck.'</em><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.delay_support_adder.DelaySupportAdder.NOT_SUPPORTED_DELAY_ERROR_MSG" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="module-spynnaker.pyNN.extra_algorithms.graph_edge_weight_updater">
-<span id="spynnaker-pynn-extra-algorithms-graph-edge-weight-updater-module"></span><h2>spynnaker.pyNN.extra_algorithms.graph_edge_weight_updater module<a class="headerlink" href="#module-spynnaker.pyNN.extra_algorithms.graph_edge_weight_updater" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="spynnaker.pyNN.extra_algorithms.graph_edge_weight_updater.GraphEdgeWeightUpdater">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.extra_algorithms.graph_edge_weight_updater.</code><code class="descname">GraphEdgeWeightUpdater</code><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/graph_edge_weight_updater.html#GraphEdgeWeightUpdater"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.graph_edge_weight_updater.GraphEdgeWeightUpdater" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>Updates the weights of all edges.</p>
-</dd></dl>
-
-</div>
-<div class="section" id="module-spynnaker.pyNN.extra_algorithms.on_chip_bit_field_generator">
-<span id="spynnaker-pynn-extra-algorithms-on-chip-bit-field-generator-module"></span><h2>spynnaker.pyNN.extra_algorithms.on_chip_bit_field_generator module<a class="headerlink" href="#module-spynnaker.pyNN.extra_algorithms.on_chip_bit_field_generator" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="spynnaker.pyNN.extra_algorithms.on_chip_bit_field_generator.OnChipBitFieldGenerator">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.extra_algorithms.on_chip_bit_field_generator.</code><code class="descname">OnChipBitFieldGenerator</code><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/on_chip_bit_field_generator.html#OnChipBitFieldGenerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.on_chip_bit_field_generator.OnChipBitFieldGenerator" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>Executes bitfield and routing table entries for atom based routing.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>placements</strong> (<em>placementsPlacements</em>) &#8211; placements</li>
-<li><strong>app_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationGraph" title="(in PACMAN v)"><em>ApplicationGraph</em></a>) &#8211; the app graph</li>
-<li><strong>executable_finder</strong> (<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utilities.utility_objs.html#spinn_front_end_common.utilities.utility_objs.ExecutableFinder" title="(in SpiNNFrontEndCommon v)"><em>ExecutableFinder</em></a>) &#8211; the executable finder</li>
-<li><strong>provenance_file_path</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; the path to where provenance data items is written</li>
-<li><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan v)"><em>Transceiver</em></a>) &#8211; the SpiNNMan instance</li>
-<li><strong>write_bit_field_generator_iobuf</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; flag for report</li>
-<li><strong>generating_bitfield_report</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; flag for report</li>
-<li><strong>default_report_folder</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; the file path for reports</li>
-<li><strong>machine_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineGraph" title="(in PACMAN v)"><em>MachineGraph</em></a>) &#8211; the machine graph</li>
-<li><strong>routing_infos</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.routing_info/#pacman.model.routing_info.RoutingInfo" title="(in PACMAN v)"><em>RoutingInfo</em></a>) &#8211; the key to edge map</li>
-<li><strong>generating_bit_field_summary_report</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; flag for making summary report</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</div>
-<div class="section" id="module-spynnaker.pyNN.extra_algorithms.redundant_packet_count_report">
-<span id="spynnaker-pynn-extra-algorithms-redundant-packet-count-report-module"></span><h2>spynnaker.pyNN.extra_algorithms.redundant_packet_count_report module<a class="headerlink" href="#module-spynnaker.pyNN.extra_algorithms.redundant_packet_count_report" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="spynnaker.pyNN.extra_algorithms.redundant_packet_count_report.RedundantPacketCountReport">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.extra_algorithms.redundant_packet_count_report.</code><code class="descname">RedundantPacketCountReport</code><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/redundant_packet_count_report.html#RedundantPacketCountReport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.redundant_packet_count_report.RedundantPacketCountReport" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-</dd></dl>
-
-</div>
-<div class="section" id="module-spynnaker.pyNN.extra_algorithms.spynnaker_connection_holder_generations">
-<span id="spynnaker-pynn-extra-algorithms-spynnaker-connection-holder-generations-module"></span><h2>spynnaker.pyNN.extra_algorithms.spynnaker_connection_holder_generations module<a class="headerlink" href="#module-spynnaker.pyNN.extra_algorithms.spynnaker_connection_holder_generations" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="spynnaker.pyNN.extra_algorithms.spynnaker_connection_holder_generations.SpYNNakerConnectionHolderGenerator">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.extra_algorithms.spynnaker_connection_holder_generations.</code><code class="descname">SpYNNakerConnectionHolderGenerator</code><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/spynnaker_connection_holder_generations.html#SpYNNakerConnectionHolderGenerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.spynnaker_connection_holder_generations.SpYNNakerConnectionHolderGenerator" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>Sets up connection holders for reports to use.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>application_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationGraph" title="(in PACMAN v)"><em>ApplicationGraph</em></a>) &#8211; app graph</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the set of connection holders for after DSG generation</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a>(<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge" title="spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge">ProjectionApplicationEdge</a>, <a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation">SynapseInformation</a>),         <a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.ConnectionHolder" title="spynnaker.pyNN.models.neuron.ConnectionHolder">ConnectionHolder</a>)</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</div>
-<div class="section" id="module-spynnaker.pyNN.extra_algorithms.spynnaker_data_specification_writer">
-<span id="spynnaker-pynn-extra-algorithms-spynnaker-data-specification-writer-module"></span><h2>spynnaker.pyNN.extra_algorithms.spynnaker_data_specification_writer module<a class="headerlink" href="#module-spynnaker.pyNN.extra_algorithms.spynnaker_data_specification_writer" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="spynnaker.pyNN.extra_algorithms.spynnaker_data_specification_writer.SpynnakerDataSpecificationWriter">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.extra_algorithms.spynnaker_data_specification_writer.</code><code class="descname">SpynnakerDataSpecificationWriter</code><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/spynnaker_data_specification_writer.html#SpynnakerDataSpecificationWriter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.spynnaker_data_specification_writer.SpynnakerDataSpecificationWriter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.interface.interface_functions.graph_data_specification_writer.GraphDataSpecificationWriter</span></code></p>
-<p>Executes data specification generation for sPyNNaker</p>
-</dd></dl>
-
-</div>
-<div class="section" id="module-spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor">
-<span id="spynnaker-pynn-extra-algorithms-spynnaker-machine-bit-field-router-compressor-module"></span><h2>spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor module<a class="headerlink" href="#module-spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.AbstractMachineBitFieldRouterCompressor">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.</code><code class="descname">AbstractMachineBitFieldRouterCompressor</code><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/spynnaker_machine_bit_field_router_compressor.html#AbstractMachineBitFieldRouterCompressor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.AbstractMachineBitFieldRouterCompressor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>Adds in regeneration of synaptic matrices to bitfield compression.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.SpynnakerMachineBitFieldPairRouterCompressor">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.</code><code class="descname">SpynnakerMachineBitFieldPairRouterCompressor</code><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/spynnaker_machine_bit_field_router_compressor.html#SpynnakerMachineBitFieldPairRouterCompressor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.SpynnakerMachineBitFieldPairRouterCompressor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.AbstractMachineBitFieldRouterCompressor" title="spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.AbstractMachineBitFieldRouterCompressor"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.AbstractMachineBitFieldRouterCompressor</span></code></a></p>
-</dd></dl>
-
-<dl class="class">
-<dt id="spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.SpynnakerMachineBitFieldUnorderedRouterCompressor">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.</code><code class="descname">SpynnakerMachineBitFieldUnorderedRouterCompressor</code><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/spynnaker_machine_bit_field_router_compressor.html#SpynnakerMachineBitFieldUnorderedRouterCompressor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.SpynnakerMachineBitFieldUnorderedRouterCompressor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.AbstractMachineBitFieldRouterCompressor" title="spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.AbstractMachineBitFieldRouterCompressor"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.AbstractMachineBitFieldRouterCompressor</span></code></a></p>
-</dd></dl>
-
-</div>
-<div class="section" id="module-spynnaker.pyNN.extra_algorithms.spynnaker_neuron_network_specification_report">
-<span id="spynnaker-pynn-extra-algorithms-spynnaker-neuron-network-specification-report-module"></span><h2>spynnaker.pyNN.extra_algorithms.spynnaker_neuron_network_specification_report module<a class="headerlink" href="#module-spynnaker.pyNN.extra_algorithms.spynnaker_neuron_network_specification_report" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="spynnaker.pyNN.extra_algorithms.spynnaker_neuron_network_specification_report.SpYNNakerNeuronGraphNetworkSpecificationReport">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.extra_algorithms.spynnaker_neuron_network_specification_report.</code><code class="descname">SpYNNakerNeuronGraphNetworkSpecificationReport</code><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/spynnaker_neuron_network_specification_report.html#SpYNNakerNeuronGraphNetworkSpecificationReport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.spynnaker_neuron_network_specification_report.SpYNNakerNeuronGraphNetworkSpecificationReport" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>Produces a report describing the graph created from the neural         populations and projections.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>report_folder</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; the report folder to put figure into</li>
-<li><strong>application_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationGraph" title="(in PACMAN v)"><em>ApplicationGraph</em></a>) &#8211; the app graph</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</div>
-<div class="section" id="module-spynnaker.pyNN.extra_algorithms.spynnaker_synaptic_matrix_report">
-<span id="spynnaker-pynn-extra-algorithms-spynnaker-synaptic-matrix-report-module"></span><h2>spynnaker.pyNN.extra_algorithms.spynnaker_synaptic_matrix_report module<a class="headerlink" href="#module-spynnaker.pyNN.extra_algorithms.spynnaker_synaptic_matrix_report" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="spynnaker.pyNN.extra_algorithms.spynnaker_synaptic_matrix_report.SpYNNakerSynapticMatrixReport">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.extra_algorithms.spynnaker_synaptic_matrix_report.</code><code class="descname">SpYNNakerSynapticMatrixReport</code><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/spynnaker_synaptic_matrix_report.html#SpYNNakerSynapticMatrixReport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.spynnaker_synaptic_matrix_report.SpYNNakerSynapticMatrixReport" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>Generate the synaptic matrices for reporting purposes.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>report_folder</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; where to write the report</li>
-<li><strong>connection_holder</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#tuple" title="(in Python v3.6)"><em>tuple</em></a><em>(</em><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge" title="spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge"><em>ProjectionApplicationEdge</em></a><em>, </em><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a><em>)</em><em></em><em>,         </em><a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.ConnectionHolder" title="spynnaker.pyNN.models.neuron.ConnectionHolder"><em>ConnectionHolder</em></a><em>)</em><em></em>) &#8211; where the synaptic matrices are stored         (possibly after retrieval from the machine)</li>
-<li><strong>dsg_targets</strong> &#8211; used to check if connection holders are populated</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</div>
-<div class="section" id="module-spynnaker.pyNN.extra_algorithms.synapse_expander">
-<span id="spynnaker-pynn-extra-algorithms-synapse-expander-module"></span><h2>spynnaker.pyNN.extra_algorithms.synapse_expander module<a class="headerlink" href="#module-spynnaker.pyNN.extra_algorithms.synapse_expander" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="spynnaker.pyNN.extra_algorithms.synapse_expander.synapse_expander">
-<code class="descclassname">spynnaker.pyNN.extra_algorithms.synapse_expander.</code><code class="descname">synapse_expander</code><span class="sig-paren">(</span><em>placements</em>, <em>transceiver</em>, <em>provenance_file_path</em>, <em>executable_finder</em>, <em>extract_iobuf</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/synapse_expander.html#synapse_expander"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.synapse_expander.synapse_expander" title="Permalink to this definition">¶</a></dt>
-<dd><p>Run the synapse expander.</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Needs to be done after data has been loaded.</p>
-</div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>placements</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placements" title="(in PACMAN v)"><em>Placements</em></a>) &#8211; Where all vertices are on the machine.</li>
-<li><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan v)"><em>Transceiver</em></a>) &#8211; How to talk to the machine.</li>
-<li><strong>provenance_file_path</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Where provenance data should be written.</li>
-<li><strong>executable_finder</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.html#spinn_utilities.executable_finder.ExecutableFinder" title="(in SpiNNUtils v)"><em>ExecutableFinder</em></a>) &#8211; How to find the synapse expander binaries.</li>
-<li><strong>extract_iobuf</strong> &#8211; bool flag for extracting iobuf</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</div>
-<div class="section" id="module-spynnaker.pyNN.extra_algorithms">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.extra_algorithms" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="spynnaker.pyNN.extra_algorithms.DelaySupportAdder">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.extra_algorithms.</code><code class="descname">DelaySupportAdder</code><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/delay_support_adder.html#DelaySupportAdder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.DelaySupportAdder" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>adds delay extension vertices into the APP graph as needed</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>app_graph</strong> (<em>ApplicationGraph</em>) &#8211; the app graph</li>
-<li><strong>machine_time_step</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; the machine time step</li>
-<li><strong>user_max_delay</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; the user defined max delay</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></p>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="attribute">
-<dt id="spynnaker.pyNN.extra_algorithms.DelaySupportAdder.APP_DELAY_PROGRESS_BAR_TEXT">
-<code class="descname">APP_DELAY_PROGRESS_BAR_TEXT</code><em class="property"> = 'Adding delay extensions as required'</em><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.DelaySupportAdder.APP_DELAY_PROGRESS_BAR_TEXT" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.extra_algorithms.DelaySupportAdder.DELAYS_NOT_SUPPORTED_SPLITTER">
-<code class="descname">DELAYS_NOT_SUPPORTED_SPLITTER</code><em class="property"> = 'The app vertex {} with splitter {} does not support delays and yet requires a delay support for edge {}. Please use a Splitter which does not have accepts_edges_from_delay_vertex turned off.'</em><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.DelaySupportAdder.DELAYS_NOT_SUPPORTED_SPLITTER" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.extra_algorithms.DelaySupportAdder.END_USER_MAX_DELAY_DEFILING_ERROR_MESSAGE">
-<code class="descname">END_USER_MAX_DELAY_DEFILING_ERROR_MESSAGE</code><em class="property"> = 'The end user entered a max delay for which the projection breaks'</em><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.DelaySupportAdder.END_USER_MAX_DELAY_DEFILING_ERROR_MESSAGE" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.extra_algorithms.DelaySupportAdder.INVALID_SPLITTER_FOR_DELAYS_ERROR_MSG">
-<code class="descname">INVALID_SPLITTER_FOR_DELAYS_ERROR_MSG</code><em class="property"> = 'The app vertex {} with splitter {} does not support delays and yet requires a delay support for edge {}. Please use a Splitter which utilises the AbstractSpynnakerSplitterDelay interface.'</em><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.DelaySupportAdder.INVALID_SPLITTER_FOR_DELAYS_ERROR_MSG" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.extra_algorithms.DelaySupportAdder.NOT_SUPPORTED_DELAY_ERROR_MSG">
-<code class="descname">NOT_SUPPORTED_DELAY_ERROR_MSG</code><em class="property"> = 'The maximum delay {} for projection {} is not supported by the splitter {} (max supported delay of the splitter is {} and a delay extension can add {} extra delay). either reduce the delay, or use a splitter which supports a larger delay, or finally implement the code to allow multiple delay extensions. good luck.'</em><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.DelaySupportAdder.NOT_SUPPORTED_DELAY_ERROR_MSG" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="spynnaker.pyNN.extra_algorithms.GraphEdgeWeightUpdater">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.extra_algorithms.</code><code class="descname">GraphEdgeWeightUpdater</code><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/graph_edge_weight_updater.html#GraphEdgeWeightUpdater"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.GraphEdgeWeightUpdater" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>Updates the weights of all edges.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="spynnaker.pyNN.extra_algorithms.OnChipBitFieldGenerator">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.extra_algorithms.</code><code class="descname">OnChipBitFieldGenerator</code><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/on_chip_bit_field_generator.html#OnChipBitFieldGenerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.OnChipBitFieldGenerator" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>Executes bitfield and routing table entries for atom based routing.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>placements</strong> (<em>placementsPlacements</em>) &#8211; placements</li>
-<li><strong>app_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationGraph" title="(in PACMAN v)"><em>ApplicationGraph</em></a>) &#8211; the app graph</li>
-<li><strong>executable_finder</strong> (<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utilities.utility_objs.html#spinn_front_end_common.utilities.utility_objs.ExecutableFinder" title="(in SpiNNFrontEndCommon v)"><em>ExecutableFinder</em></a>) &#8211; the executable finder</li>
-<li><strong>provenance_file_path</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; the path to where provenance data items is written</li>
-<li><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan v)"><em>Transceiver</em></a>) &#8211; the SpiNNMan instance</li>
-<li><strong>write_bit_field_generator_iobuf</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; flag for report</li>
-<li><strong>generating_bitfield_report</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; flag for report</li>
-<li><strong>default_report_folder</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; the file path for reports</li>
-<li><strong>machine_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineGraph" title="(in PACMAN v)"><em>MachineGraph</em></a>) &#8211; the machine graph</li>
-<li><strong>routing_infos</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.routing_info/#pacman.model.routing_info.RoutingInfo" title="(in PACMAN v)"><em>RoutingInfo</em></a>) &#8211; the key to edge map</li>
-<li><strong>generating_bit_field_summary_report</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; flag for making summary report</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="class">
-<dt id="spynnaker.pyNN.extra_algorithms.SpynnakerDataSpecificationWriter">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.extra_algorithms.</code><code class="descname">SpynnakerDataSpecificationWriter</code><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/spynnaker_data_specification_writer.html#SpynnakerDataSpecificationWriter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.SpynnakerDataSpecificationWriter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.interface.interface_functions.graph_data_specification_writer.GraphDataSpecificationWriter</span></code></p>
-<p>Executes data specification generation for sPyNNaker</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="spynnaker.pyNN.extra_algorithms.SpynnakerMachineBitFieldPairRouterCompressor">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.extra_algorithms.</code><code class="descname">SpynnakerMachineBitFieldPairRouterCompressor</code><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/spynnaker_machine_bit_field_router_compressor.html#SpynnakerMachineBitFieldPairRouterCompressor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.SpynnakerMachineBitFieldPairRouterCompressor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.AbstractMachineBitFieldRouterCompressor" title="spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.AbstractMachineBitFieldRouterCompressor"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.AbstractMachineBitFieldRouterCompressor</span></code></a></p>
-</dd></dl>
-
-<dl class="class">
-<dt id="spynnaker.pyNN.extra_algorithms.SpynnakerMachineBitFieldUnorderedRouterCompressor">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.extra_algorithms.</code><code class="descname">SpynnakerMachineBitFieldUnorderedRouterCompressor</code><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/spynnaker_machine_bit_field_router_compressor.html#SpynnakerMachineBitFieldUnorderedRouterCompressor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.SpynnakerMachineBitFieldUnorderedRouterCompressor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.AbstractMachineBitFieldRouterCompressor" title="spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.AbstractMachineBitFieldRouterCompressor"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor.AbstractMachineBitFieldRouterCompressor</span></code></a></p>
-</dd></dl>
-
-</div>
-</div>
-
-
-          </div>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -498,12 +434,13 @@ them, allowing any waiting callbacks to be called</p>
         <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker  documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >spynnaker</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
-          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li> 
+          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.extra_algorithms package</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2017.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
     </div>
   </body>
 </html>

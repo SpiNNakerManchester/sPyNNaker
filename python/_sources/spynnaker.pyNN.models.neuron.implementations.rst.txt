@@ -5,6 +5,6 @@ Module contents
 ---------------
 
 .. automodule:: spynnaker.pyNN.models.neuron.implementations
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

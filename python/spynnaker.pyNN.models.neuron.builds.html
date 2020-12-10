@@ -1,36 +1,24 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<html lang="en">
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>spynnaker.pyNN.models.neuron.builds package &#8212; sPyNNaker  documentation</title>
-    
-    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="spynnaker.pyNN.models.neuron.implementations package" href="spynnaker.pyNN.models.neuron.implementations.html" />
     <link rel="prev" title="spynnaker.pyNN.models.neuron.additional_inputs package" href="spynnaker.pyNN.models.neuron.additional_inputs.html" /> 
-  </head>
-  <body role="document">
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -51,12 +39,381 @@
           <li class="nav-item nav-item-2"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
           <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
           <li class="nav-item nav-item-4"><a href="spynnaker.pyNN.models.html" >spynnaker.pyNN.models package</a> &#187;</li>
-          <li class="nav-item nav-item-5"><a href="spynnaker.pyNN.models.neuron.html" accesskey="U">spynnaker.pyNN.models.neuron package</a> &#187;</li> 
+          <li class="nav-item nav-item-5"><a href="spynnaker.pyNN.models.neuron.html" accesskey="U">spynnaker.pyNN.models.neuron package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.models.neuron.builds package</a></li> 
       </ul>
-    </div>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="spynnaker-pynn-models-neuron-builds-package">
+<h1>spynnaker.pyNN.models.neuron.builds package<a class="headerlink" href="#spynnaker-pynn-models-neuron-builds-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-spynnaker.pyNN.models.neuron.builds">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.models.neuron.builds" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="spynnaker.pyNN.models.neuron.builds.EIFConductanceAlphaPopulation">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neuron.builds.</code><code class="sig-name descname">EIFConductanceAlphaPopulation</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/builds/eif_cond_alpha_isfa_ista.html#EIFConductanceAlphaPopulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.EIFConductanceAlphaPopulation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Exponential integrate and fire neuron with spike triggered and         sub-threshold adaptation currents (isfa, ista reps.)</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Not currently supported by the tool chain.</p>
+</div>
+<dl class="py attribute">
+<dt id="spynnaker.pyNN.models.neuron.builds.EIFConductanceAlphaPopulation.default_initial_values">
+<code class="sig-name descname">default_initial_values</code><em class="property"> = {'gsyn_exc': 0.0, 'gsyn_inh': 0.0, 'v': -70.6, 'w': 0.0}</em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.EIFConductanceAlphaPopulation.default_initial_values" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="spynnaker.pyNN.models.neuron.builds.EIFConductanceAlphaPopulation.default_parameters">
+<code class="sig-name descname">default_parameters</code><em class="property"> = {'a': 4.0, 'b': 0.0805, 'cm': 0.281, 'delta_T': 2.0, 'e_rev_E': 0.0, 'e_rev_I': -80.0, 'i_offset': 0.0, 'tau_m': 9.3667, 'tau_refrac': 0.1, 'tau_syn_E': 5.0, 'tau_syn_I': 0.5, 'tau_w': 144.0, 'v_reset': -70.6, 'v_rest': -70.6, 'v_spike': -40.0, 'v_thresh': -50.4}</em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.EIFConductanceAlphaPopulation.default_parameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker.pyNN.models.neuron.builds.HHCondExp">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neuron.builds.</code><code class="sig-name descname">HHCondExp</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/builds/hh_cond_exp.html#HHCondExp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.HHCondExp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Single-compartment Hodgkin-Huxley model with exponentially decaying         current input.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Not currently supported by the tool chain.</p>
+</div>
+<dl class="py attribute">
+<dt id="spynnaker.pyNN.models.neuron.builds.HHCondExp.default_initial_values">
+<code class="sig-name descname">default_initial_values</code><em class="property"> = {'gsyn_exc': 0.0, 'gsyn_inh': 0.0, 'v': -65.0}</em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.HHCondExp.default_initial_values" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="spynnaker.pyNN.models.neuron.builds.HHCondExp.default_parameters">
+<code class="sig-name descname">default_parameters</code><em class="property"> = {'cm': 0.2, 'e_rev_E': 0.0, 'e_rev_I': -80, 'e_rev_K': -90.0, 'e_rev_Na': 50.0, 'e_rev_leak': -65.0, 'g_leak': 0.01, 'gbar_K': 6.0, 'gbar_Na': 20.0, 'i_offset': 0.0, 'tau_syn_E': 0.2, 'tau_syn_I': 2.0, 'v_offset': -63}</em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.HHCondExp.default_parameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker.pyNN.models.neuron.builds.IFCondAlpha">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neuron.builds.</code><code class="sig-name descname">IFCondAlpha</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/builds/if_cond_alpha.html#IFCondAlpha"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCondAlpha" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Leaky integrate and fire neuron with an alpha-shaped current input.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Not currently supported by the tool chain.</p>
+</div>
+<dl class="py attribute">
+<dt id="spynnaker.pyNN.models.neuron.builds.IFCondAlpha.default_initial_values">
+<code class="sig-name descname">default_initial_values</code><em class="property"> = {'gsyn_exc': 0.0, 'gsyn_inh': 0.0, 'v': -65.0}</em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCondAlpha.default_initial_values" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="spynnaker.pyNN.models.neuron.builds.IFCondAlpha.default_parameters">
+<code class="sig-name descname">default_parameters</code><em class="property"> = {'cm': 1.0, 'e_rev_E': 0.0, 'e_rev_I': -70.0, 'i_offset': 0, 'tau_m': 20, 'tau_refrac': 0.1, 'tau_syn_E': 0.3, 'tau_syn_I': 0.5, 'v_reset': -65.0, 'v_rest': -65.0, 'v_thresh': -50.0}</em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCondAlpha.default_parameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker.pyNN.models.neuron.builds.IFCondExpBase">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neuron.builds.</code><code class="sig-name descname">IFCondExpBase</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/builds/if_cond_exp_base.html#IFCondExpBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCondExpBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model_standard.AbstractPyNNNeuronModelStandard</span></code></p>
+<p>Leaky integrate and fire neuron with an exponentially decaying         conductance input.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tau_m</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau_m\)</span></p></li>
+<li><p><strong>cm</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(C_m\)</span></p></li>
+<li><p><strong>v_rest</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(V_{rest}\)</span></p></li>
+<li><p><strong>v_reset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(V_{reset}\)</span></p></li>
+<li><p><strong>v_thresh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(V_{thresh}\)</span></p></li>
+<li><p><strong>tau_syn_E</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau^{syn}_e\)</span></p></li>
+<li><p><strong>tau_syn_I</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau^{syn}_i\)</span></p></li>
+<li><p><strong>tau_refrac</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau_{refrac}\)</span></p></li>
+<li><p><strong>i_offset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(I_{offset}\)</span></p></li>
+<li><p><strong>e_rev_E</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(E^{rev}_e\)</span></p></li>
+<li><p><strong>e_rev_I</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(E^{rev}_i\)</span></p></li>
+<li><p><strong>v</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(V_{init}\)</span></p></li>
+<li><p><strong>isyn_exc</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(I^{syn}_e\)</span></p></li>
+<li><p><strong>isyn_inh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(I^{syn}_i\)</span></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker.pyNN.models.neuron.builds.IFCondExpStoc">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neuron.builds.</code><code class="sig-name descname">IFCondExpStoc</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/builds/if_cond_exp_stoc.html#IFCondExpStoc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCondExpStoc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model_standard.AbstractPyNNNeuronModelStandard</span></code></p>
+<p>Leaky integrate and fire neuron with a stochastic threshold.</p>
+<p>Habenschuss S, Jonke Z, Maass W. Stochastic computations in cortical     microcircuit models. <em>PLoS Computational Biology.</em> 2013;9(11):e1003311.     <a class="reference external" href="https://doi.org/10.1371/journal.pcbi.1003311">doi:10.1371/journal.pcbi.1003311</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tau_m</strong> – <span class="math notranslate nohighlight">\(\tau_m\)</span></p></li>
+<li><p><strong>cm</strong> – <span class="math notranslate nohighlight">\(C_m\)</span></p></li>
+<li><p><strong>v_rest</strong> – <span class="math notranslate nohighlight">\(V_{rest}\)</span></p></li>
+<li><p><strong>v_reset</strong> – <span class="math notranslate nohighlight">\(V_{reset}\)</span></p></li>
+<li><p><strong>v_thresh</strong> – <span class="math notranslate nohighlight">\(V_{thresh}\)</span></p></li>
+<li><p><strong>tau_syn_E</strong> – <span class="math notranslate nohighlight">\(\tau^{syn}_e\)</span></p></li>
+<li><p><strong>tau_syn_I</strong> – <span class="math notranslate nohighlight">\(\tau^{syn}_i\)</span></p></li>
+<li><p><strong>tau_refrac</strong> – <span class="math notranslate nohighlight">\(\tau_{refrac}\)</span></p></li>
+<li><p><strong>i_offset</strong> – <span class="math notranslate nohighlight">\(I_{offset}\)</span></p></li>
+<li><p><strong>e_rev_E</strong> – <span class="math notranslate nohighlight">\(E^{rev}_e\)</span></p></li>
+<li><p><strong>e_rev_I</strong> – <span class="math notranslate nohighlight">\(E^{rev}_i\)</span></p></li>
+<li><p><strong>du_th</strong> – <span class="math notranslate nohighlight">\(du_{thresh}\)</span></p></li>
+<li><p><strong>tau_th</strong> – <span class="math notranslate nohighlight">\(\tau_{thresh}\)</span></p></li>
+<li><p><strong>v</strong> – <span class="math notranslate nohighlight">\(V_{init}\)</span></p></li>
+<li><p><strong>isyn_exc</strong> – <span class="math notranslate nohighlight">\(I^{syn}_e\)</span></p></li>
+<li><p><strong>isyn_inh</strong> – <span class="math notranslate nohighlight">\(I^{syn}_i\)</span></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker.pyNN.models.neuron.builds.IFCurrAlpha">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neuron.builds.</code><code class="sig-name descname">IFCurrAlpha</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/builds/if_curr_alpha.html#IFCurrAlpha"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCurrAlpha" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model_standard.AbstractPyNNNeuronModelStandard</span></code></p>
+<p>Leaky integrate and fire neuron with an alpha-shaped current-based        input.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tau_m</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau_m\)</span></p></li>
+<li><p><strong>cm</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(C_m\)</span></p></li>
+<li><p><strong>v_rest</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(V_{rest}\)</span></p></li>
+<li><p><strong>v_reset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(V_{reset}\)</span></p></li>
+<li><p><strong>v_thresh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(V_{thresh}\)</span></p></li>
+<li><p><strong>tau_syn_E</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau^{syn}_e\)</span></p></li>
+<li><p><strong>tau_syn_I</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau^{syn}_i\)</span></p></li>
+<li><p><strong>tau_refrac</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau_{refrac}\)</span></p></li>
+<li><p><strong>i_offset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(I_{offset}\)</span></p></li>
+<li><p><strong>v</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(V_{init}\)</span></p></li>
+<li><p><strong>exc_response</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(response^\mathrm{linear}_e\)</span></p></li>
+<li><p><strong>exc_exp_response</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(response^\mathrm{exponential}_e\)</span></p></li>
+<li><p><strong>inh_response</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(response^\mathrm{linear}_i\)</span></p></li>
+<li><p><strong>inh_exp_response</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(response^\mathrm{exponential}_i\)</span></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker.pyNN.models.neuron.builds.IFCurrDelta">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neuron.builds.</code><code class="sig-name descname">IFCurrDelta</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/builds/if_curr_delta.html#IFCurrDelta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCurrDelta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model_standard.AbstractPyNNNeuronModelStandard</span></code></p>
+<p>Leaky integrate and fire neuron with an instantaneous current input.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tau_m</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau_m\)</span></p></li>
+<li><p><strong>cm</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(C_m\)</span></p></li>
+<li><p><strong>v_rest</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(V_{rest}\)</span></p></li>
+<li><p><strong>v_reset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(V_{reset}\)</span></p></li>
+<li><p><strong>v_thresh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(V_{thresh}\)</span></p></li>
+<li><p><strong>tau_refrac</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau_{refrac}\)</span></p></li>
+<li><p><strong>i_offset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(I_{offset}\)</span></p></li>
+<li><p><strong>v</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(V_{init}\)</span></p></li>
+<li><p><strong>isyn_exc</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(I^{syn}_e\)</span></p></li>
+<li><p><strong>isyn_inh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(I^{syn}_i\)</span></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker.pyNN.models.neuron.builds.IFCurrDualExpBase">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neuron.builds.</code><code class="sig-name descname">IFCurrDualExpBase</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/builds/if_curr_dual_exp_base.html#IFCurrDualExpBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCurrDualExpBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model_standard.AbstractPyNNNeuronModelStandard</span></code></p>
+<p>Leaky integrate and fire neuron with two exponentially decaying         excitatory current inputs, and one exponentially decaying inhibitory         current input.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tau_m</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau_m\)</span></p></li>
+<li><p><strong>cm</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(C_m\)</span></p></li>
+<li><p><strong>v_rest</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(V_{rest}\)</span></p></li>
+<li><p><strong>v_reset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(V_{reset}\)</span></p></li>
+<li><p><strong>v_thresh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(V_{thresh}\)</span></p></li>
+<li><p><strong>tau_syn_E</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau^{syn}_{e_1}\)</span></p></li>
+<li><p><strong>tau_syn_E2</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau^{syn}_{e_2}\)</span></p></li>
+<li><p><strong>tau_syn_I</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau^{syn}_i\)</span></p></li>
+<li><p><strong>tau_refrac</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau_{refrac}\)</span></p></li>
+<li><p><strong>i_offset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(I_{offset}\)</span></p></li>
+<li><p><strong>v</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(V_{init}\)</span></p></li>
+<li><p><strong>isyn_exc</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(I^{syn}_{e_1}\)</span></p></li>
+<li><p><strong>isyn_inh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(I^{syn}_i\)</span></p></li>
+<li><p><strong>isyn_exc2</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(I^{syn}_{e_2}\)</span></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker.pyNN.models.neuron.builds.IFCurrExpBase">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neuron.builds.</code><code class="sig-name descname">IFCurrExpBase</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/builds/if_curr_exp_base.html#IFCurrExpBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCurrExpBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model_standard.AbstractPyNNNeuronModelStandard</span></code></p>
+<p>Leaky integrate and fire neuron with an exponentially decaying         current input.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tau_m</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau_m\)</span></p></li>
+<li><p><strong>cm</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(C_m\)</span></p></li>
+<li><p><strong>v_rest</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(V_{rest}\)</span></p></li>
+<li><p><strong>v_reset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(V_{reset}\)</span></p></li>
+<li><p><strong>v_thresh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(V_{thresh}\)</span></p></li>
+<li><p><strong>tau_syn_E</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau^{syn}_e\)</span></p></li>
+<li><p><strong>tau_syn_I</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau^{syn}_i\)</span></p></li>
+<li><p><strong>tau_refrac</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau_{refrac}\)</span></p></li>
+<li><p><strong>i_offset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(I_{offset}\)</span></p></li>
+<li><p><strong>v</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(V_{init}\)</span></p></li>
+<li><p><strong>isyn_exc</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(I^{syn}_e\)</span></p></li>
+<li><p><strong>isyn_inh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(I^{syn}_i\)</span></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker.pyNN.models.neuron.builds.IFCurrExpCa2Adaptive">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neuron.builds.</code><code class="sig-name descname">IFCurrExpCa2Adaptive</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/builds/if_curr_exp_ca2_adaptive.html#IFCurrExpCa2Adaptive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCurrExpCa2Adaptive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model_standard.AbstractPyNNNeuronModelStandard</span></code></p>
+<p>Model from Liu, Y. H., &amp; Wang, X. J. (2001). Spike-frequency        adaptation of a generalized leaky integrate-and-fire model neuron.         <em>Journal of Computational Neuroscience</em>, 10(1), 25-45.         <a class="reference external" href="https://doi.org/10.1023/A:1008916026143">doi:10.1023/A:1008916026143</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tau_m</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau_m\)</span></p></li>
+<li><p><strong>cm</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(C_m\)</span></p></li>
+<li><p><strong>v_rest</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(V_{rest}\)</span></p></li>
+<li><p><strong>v_reset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(V_{reset}\)</span></p></li>
+<li><p><strong>v_thresh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(V_{thresh}\)</span></p></li>
+<li><p><strong>tau_syn_E</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau^{syn}_e\)</span></p></li>
+<li><p><strong>tau_syn_I</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau^{syn}_i\)</span></p></li>
+<li><p><strong>tau_refrac</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau_{refrac}\)</span></p></li>
+<li><p><strong>i_offset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(I_{offset}\)</span></p></li>
+<li><p><strong>tau_ca2</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau_{\mathrm{Ca}^{+2}}\)</span></p></li>
+<li><p><strong>i_ca2</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(I_{\mathrm{Ca}^{+2}}\)</span></p></li>
+<li><p><strong>i_alpha</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau_\alpha\)</span></p></li>
+<li><p><strong>v</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(V_{init}\)</span></p></li>
+<li><p><strong>isyn_exc</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(I^{syn}_e\)</span></p></li>
+<li><p><strong>isyn_inh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(I^{syn}_i\)</span></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker.pyNN.models.neuron.builds.IFCurrExpSEMDBase">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neuron.builds.</code><code class="sig-name descname">IFCurrExpSEMDBase</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/builds/if_curr_exp_semd_base.html#IFCurrExpSEMDBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCurrExpSEMDBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model_standard.AbstractPyNNNeuronModelStandard</span></code></p>
+<p>Leaky integrate and fire neuron with an exponentially decaying        current input, where the excitatory input depends upon the inhibitory        input (see <a class="reference external" href="https://www.cit-ec.de/en/nbs/spiking-insect-vision">https://www.cit-ec.de/en/nbs/spiking-insect-vision</a>)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tau_m</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau_m\)</span></p></li>
+<li><p><strong>cm</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(C_m\)</span></p></li>
+<li><p><strong>v_rest</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(V_{rest}\)</span></p></li>
+<li><p><strong>v_reset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(V_{reset}\)</span></p></li>
+<li><p><strong>v_thresh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(V_{thresh}\)</span></p></li>
+<li><p><strong>tau_syn_E</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau^{syn}_{e_1}\)</span></p></li>
+<li><p><strong>tau_syn_E2</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau^{syn}_{e_2}\)</span></p></li>
+<li><p><strong>tau_syn_I</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau^{syn}_i\)</span></p></li>
+<li><p><strong>tau_refrac</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau_{refrac}\)</span></p></li>
+<li><p><strong>i_offset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(I_{offset}\)</span></p></li>
+<li><p><strong>v</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(V_{init}\)</span></p></li>
+<li><p><strong>isyn_exc</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(I^{syn}_{e_1}\)</span></p></li>
+<li><p><strong>isyn_exc2</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(I^{syn}_{e_2}\)</span></p></li>
+<li><p><strong>isyn_inh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(I^{syn}_i\)</span></p></li>
+<li><p><strong>multiplicator</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – </p></li>
+<li><p><strong>exc2_old</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker.pyNN.models.neuron.builds.IFFacetsConductancePopulation">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neuron.builds.</code><code class="sig-name descname">IFFacetsConductancePopulation</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/builds/if_facets_hardware1.html#IFFacetsConductancePopulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFFacetsConductancePopulation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Leaky integrate and fire neuron with conductance-based synapses and        fixed threshold as it is resembled by the FACETS Hardware Stage 1</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Not currently supported by the tool chain.</p>
+</div>
+<dl class="py attribute">
+<dt id="spynnaker.pyNN.models.neuron.builds.IFFacetsConductancePopulation.default_initial_values">
+<code class="sig-name descname">default_initial_values</code><em class="property"> = {'v': -65.0}</em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFFacetsConductancePopulation.default_initial_values" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="spynnaker.pyNN.models.neuron.builds.IFFacetsConductancePopulation.default_parameters">
+<code class="sig-name descname">default_parameters</code><em class="property"> = {'e_rev_I': -80, 'g_leak': 40.0, 'tau_syn_E': 30.0, 'tau_syn_I': 30.0, 'v_reset': -80.0, 'v_rest': -65.0, 'v_thresh': -55.0}</em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFFacetsConductancePopulation.default_parameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker.pyNN.models.neuron.builds.IzkCondExpBase">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neuron.builds.</code><code class="sig-name descname">IzkCondExpBase</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/builds/izk_cond_exp_base.html#IzkCondExpBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IzkCondExpBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model_standard.AbstractPyNNNeuronModelStandard</span></code></p>
+<p>Izhikevich neuron model with conductance inputs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>a</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(a\)</span></p></li>
+<li><p><strong>b</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(b\)</span></p></li>
+<li><p><strong>c</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(c\)</span></p></li>
+<li><p><strong>d</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(d\)</span></p></li>
+<li><p><strong>i_offset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(I_{offset}\)</span></p></li>
+<li><p><strong>u</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(u_{init} = \delta V_{init}\)</span></p></li>
+<li><p><strong>v</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(v_{init} = V_{init}\)</span></p></li>
+<li><p><strong>tau_syn_E</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau^{syn}_e\)</span></p></li>
+<li><p><strong>tau_syn_I</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau^{syn}_i\)</span></p></li>
+<li><p><strong>e_rev_E</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(E^{rev}_e\)</span></p></li>
+<li><p><strong>e_rev_I</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(E^{rev}_i\)</span></p></li>
+<li><p><strong>isyn_exc</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(I^{syn}_e\)</span></p></li>
+<li><p><strong>isyn_inh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(I^{syn}_i\)</span></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker.pyNN.models.neuron.builds.IzkCurrExpBase">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neuron.builds.</code><code class="sig-name descname">IzkCurrExpBase</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/builds/izk_curr_exp_base.html#IzkCurrExpBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IzkCurrExpBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model_standard.AbstractPyNNNeuronModelStandard</span></code></p>
+<p>Izhikevich neuron model with current inputs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>a</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(a\)</span></p></li>
+<li><p><strong>b</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(b\)</span></p></li>
+<li><p><strong>c</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(c\)</span></p></li>
+<li><p><strong>d</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(d\)</span></p></li>
+<li><p><strong>i_offset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(I_{offset}\)</span></p></li>
+<li><p><strong>u</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(u_{init} = \delta V_{init}\)</span></p></li>
+<li><p><strong>v</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(v_{init} = V_{init}\)</span></p></li>
+<li><p><strong>tau_syn_E</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau^{syn}_e\)</span></p></li>
+<li><p><strong>tau_syn_I</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau^{syn}_i\)</span></p></li>
+<li><p><strong>isyn_exc</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(I^{syn}_e\)</span></p></li>
+<li><p><strong>isyn_inh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(I^{syn}_i\)</span></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
+  <h3><a href="index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.models.neuron.builds package</a><ul>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.builds">Module contents</a></li>
@@ -78,422 +435,15 @@
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
     </form>
+    </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
-            
-  <div class="section" id="spynnaker-pynn-models-neuron-builds-package">
-<h1>spynnaker.pyNN.models.neuron.builds package<a class="headerlink" href="#spynnaker-pynn-models-neuron-builds-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="module-spynnaker.pyNN.models.neuron.builds">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.models.neuron.builds" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="spynnaker.pyNN.models.neuron.builds.EIFConductanceAlphaPopulation">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.builds.</code><code class="descname">EIFConductanceAlphaPopulation</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/builds/eif_cond_alpha_isfa_ista.html#EIFConductanceAlphaPopulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.EIFConductanceAlphaPopulation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>Exponential integrate and fire neuron with spike triggered and         sub-threshold adaptation currents (isfa, ista reps.)</p>
-<div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last">Not currently supported by the tool chain.</p>
-</div>
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.builds.EIFConductanceAlphaPopulation.default_initial_values">
-<code class="descname">default_initial_values</code><em class="property"> = {'v': -70.6, 'w': 0.0, 'gsyn_exc': 0.0, 'gsyn_inh': 0.0}</em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.EIFConductanceAlphaPopulation.default_initial_values" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.builds.EIFConductanceAlphaPopulation.default_parameters">
-<code class="descname">default_parameters</code><em class="property"> = {'tau_m': 9.3667, 'cm': 0.281, 'v_rest': -70.6, 'v_reset': -70.6, 'v_thresh': -50.4, 'tau_syn_E': 5.0, 'tau_syn_I': 0.5, 'tau_refrac': 0.1, 'i_offset': 0.0, 'a': 4.0, 'b': 0.0805, 'v_spike': -40.0, 'tau_w': 144.0, 'e_rev_E': 0.0, 'e_rev_I': -80.0, 'delta_T': 2.0}</em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.EIFConductanceAlphaPopulation.default_parameters" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="spynnaker.pyNN.models.neuron.builds.HHCondExp">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.builds.</code><code class="descname">HHCondExp</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/builds/hh_cond_exp.html#HHCondExp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.HHCondExp" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>Single-compartment Hodgkin-Huxley model with exponentially decaying         current input.</p>
-<div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last">Not currently supported by the tool chain.</p>
-</div>
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.builds.HHCondExp.default_initial_values">
-<code class="descname">default_initial_values</code><em class="property"> = {'v': -65.0, 'gsyn_exc': 0.0, 'gsyn_inh': 0.0}</em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.HHCondExp.default_initial_values" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.builds.HHCondExp.default_parameters">
-<code class="descname">default_parameters</code><em class="property"> = {'gbar_K': 6.0, 'cm': 0.2, 'e_rev_Na': 50.0, 'tau_syn_E': 0.2, 'tau_syn_I': 2.0, 'i_offset': 0.0, 'g_leak': 0.01, 'e_rev_E': 0.0, 'gbar_Na': 20.0, 'e_rev_leak': -65.0, 'e_rev_I': -80, 'e_rev_K': -90.0, 'v_offset': -63}</em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.HHCondExp.default_parameters" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="spynnaker.pyNN.models.neuron.builds.IFCondAlpha">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.builds.</code><code class="descname">IFCondAlpha</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/builds/if_cond_alpha.html#IFCondAlpha"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCondAlpha" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>Leaky integrate and fire neuron with an alpha-shaped current input.</p>
-<div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last">Not currently supported by the tool chain.</p>
-</div>
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.builds.IFCondAlpha.default_initial_values">
-<code class="descname">default_initial_values</code><em class="property"> = {'v': -65.0, 'gsyn_exc': 0.0, 'gsyn_inh': 0.0}</em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCondAlpha.default_initial_values" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.builds.IFCondAlpha.default_parameters">
-<code class="descname">default_parameters</code><em class="property"> = {'tau_m': 20, 'cm': 1.0, 'e_rev_E': 0.0, 'e_rev_I': -70.0, 'v_rest': -65.0, 'v_reset': -65.0, 'v_thresh': -50.0, 'tau_syn_E': 0.3, 'tau_syn_I': 0.5, 'tau_refrac': 0.1, 'i_offset': 0}</em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCondAlpha.default_parameters" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="spynnaker.pyNN.models.neuron.builds.IFCondExpBase">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.builds.</code><code class="descname">IFCondExpBase</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/builds/if_cond_exp_base.html#IFCondExpBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCondExpBase" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model_standard.AbstractPyNNNeuronModelStandard</span></code></p>
-<p>Leaky integrate and fire neuron with an exponentially decaying         conductance input.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>tau_m</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau_m\)</span></li>
-<li><strong>cm</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(C_m\)</span></li>
-<li><strong>v_rest</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(V_{rest}\)</span></li>
-<li><strong>v_reset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(V_{reset}\)</span></li>
-<li><strong>v_thresh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(V_{thresh}\)</span></li>
-<li><strong>tau_syn_E</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau^{syn}_e\)</span></li>
-<li><strong>tau_syn_I</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau^{syn}_i\)</span></li>
-<li><strong>tau_refrac</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau_{refrac}\)</span></li>
-<li><strong>i_offset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(I_{offset}\)</span></li>
-<li><strong>e_rev_E</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(E^{rev}_e\)</span></li>
-<li><strong>e_rev_I</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(E^{rev}_i\)</span></li>
-<li><strong>v</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(V_{init}\)</span></li>
-<li><strong>isyn_exc</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(I^{syn}_e\)</span></li>
-<li><strong>isyn_inh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(I^{syn}_i\)</span></li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="class">
-<dt id="spynnaker.pyNN.models.neuron.builds.IFCurrAlpha">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.builds.</code><code class="descname">IFCurrAlpha</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/builds/if_curr_alpha.html#IFCurrAlpha"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCurrAlpha" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model_standard.AbstractPyNNNeuronModelStandard</span></code></p>
-<p>Leaky integrate and fire neuron with an alpha-shaped current-based        input.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>tau_m</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau_m\)</span></li>
-<li><strong>cm</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(C_m\)</span></li>
-<li><strong>v_rest</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(V_{rest}\)</span></li>
-<li><strong>v_reset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(V_{reset}\)</span></li>
-<li><strong>v_thresh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(V_{thresh}\)</span></li>
-<li><strong>tau_syn_E</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau^{syn}_e\)</span></li>
-<li><strong>tau_syn_I</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau^{syn}_i\)</span></li>
-<li><strong>tau_refrac</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau_{refrac}\)</span></li>
-<li><strong>i_offset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(I_{offset}\)</span></li>
-<li><strong>v</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(V_{init}\)</span></li>
-<li><strong>exc_response</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(response^\mathrm{linear}_e\)</span></li>
-<li><strong>exc_exp_response</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(response^\mathrm{exponential}_e\)</span></li>
-<li><strong>inh_response</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(response^\mathrm{linear}_i\)</span></li>
-<li><strong>inh_exp_response</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(response^\mathrm{exponential}_i\)</span></li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="class">
-<dt id="spynnaker.pyNN.models.neuron.builds.IFCurrDualExpBase">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.builds.</code><code class="descname">IFCurrDualExpBase</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/builds/if_curr_dual_exp_base.html#IFCurrDualExpBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCurrDualExpBase" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model_standard.AbstractPyNNNeuronModelStandard</span></code></p>
-<p>Leaky integrate and fire neuron with two exponentially decaying         excitatory current inputs, and one exponentially decaying inhibitory         current input.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>tau_m</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau_m\)</span></li>
-<li><strong>cm</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(C_m\)</span></li>
-<li><strong>v_rest</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(V_{rest}\)</span></li>
-<li><strong>v_reset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(V_{reset}\)</span></li>
-<li><strong>v_thresh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(V_{thresh}\)</span></li>
-<li><strong>tau_syn_E</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau^{syn}_{e_1}\)</span></li>
-<li><strong>tau_syn_E2</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau^{syn}_{e_2}\)</span></li>
-<li><strong>tau_syn_I</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau^{syn}_i\)</span></li>
-<li><strong>tau_refrac</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau_{refrac}\)</span></li>
-<li><strong>i_offset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(I_{offset}\)</span></li>
-<li><strong>v</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(V_{init}\)</span></li>
-<li><strong>isyn_exc</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(I^{syn}_{e_1}\)</span></li>
-<li><strong>isyn_inh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(I^{syn}_i\)</span></li>
-<li><strong>isyn_exc2</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(I^{syn}_{e_2}\)</span></li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="class">
-<dt id="spynnaker.pyNN.models.neuron.builds.IFCurrExpBase">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.builds.</code><code class="descname">IFCurrExpBase</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/builds/if_curr_exp_base.html#IFCurrExpBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCurrExpBase" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model_standard.AbstractPyNNNeuronModelStandard</span></code></p>
-<p>Leaky integrate and fire neuron with an exponentially decaying         current input.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>tau_m</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau_m\)</span></li>
-<li><strong>cm</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(C_m\)</span></li>
-<li><strong>v_rest</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(V_{rest}\)</span></li>
-<li><strong>v_reset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(V_{reset}\)</span></li>
-<li><strong>v_thresh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(V_{thresh}\)</span></li>
-<li><strong>tau_syn_E</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau^{syn}_e\)</span></li>
-<li><strong>tau_syn_I</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau^{syn}_i\)</span></li>
-<li><strong>tau_refrac</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau_{refrac}\)</span></li>
-<li><strong>i_offset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(I_{offset}\)</span></li>
-<li><strong>v</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(V_{init}\)</span></li>
-<li><strong>isyn_exc</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(I^{syn}_e\)</span></li>
-<li><strong>isyn_inh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(I^{syn}_i\)</span></li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="class">
-<dt id="spynnaker.pyNN.models.neuron.builds.IFFacetsConductancePopulation">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.builds.</code><code class="descname">IFFacetsConductancePopulation</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/builds/if_facets_hardware1.html#IFFacetsConductancePopulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFFacetsConductancePopulation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>Leaky integrate and fire neuron with conductance-based synapses and        fixed threshold as it is resembled by the FACETS Hardware Stage 1</p>
-<div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last">Not currently supported by the tool chain.</p>
-</div>
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.builds.IFFacetsConductancePopulation.default_initial_values">
-<code class="descname">default_initial_values</code><em class="property"> = {'v': -65.0}</em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFFacetsConductancePopulation.default_initial_values" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.builds.IFFacetsConductancePopulation.default_parameters">
-<code class="descname">default_parameters</code><em class="property"> = {'g_leak': 40.0, 'tau_syn_E': 30.0, 'tau_syn_I': 30.0, 'v_thresh': -55.0, 'v_rest': -65.0, 'e_rev_I': -80, 'v_reset': -80.0}</em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFFacetsConductancePopulation.default_parameters" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="spynnaker.pyNN.models.neuron.builds.IzkCondExpBase">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.builds.</code><code class="descname">IzkCondExpBase</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/builds/izk_cond_exp_base.html#IzkCondExpBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IzkCondExpBase" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model_standard.AbstractPyNNNeuronModelStandard</span></code></p>
-<p>Izhikevich neuron model with conductance inputs.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>a</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(a\)</span></li>
-<li><strong>b</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(b\)</span></li>
-<li><strong>c</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(c\)</span></li>
-<li><strong>d</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(d\)</span></li>
-<li><strong>i_offset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(I_{offset}\)</span></li>
-<li><strong>u</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(u_{init} = \delta V_{init}\)</span></li>
-<li><strong>v</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(v_{init} = V_{init}\)</span></li>
-<li><strong>tau_syn_E</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau^{syn}_e\)</span></li>
-<li><strong>tau_syn_I</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau^{syn}_i\)</span></li>
-<li><strong>e_rev_E</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(E^{rev}_e\)</span></li>
-<li><strong>e_rev_I</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(E^{rev}_i\)</span></li>
-<li><strong>isyn_exc</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(I^{syn}_e\)</span></li>
-<li><strong>isyn_inh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(I^{syn}_i\)</span></li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="class">
-<dt id="spynnaker.pyNN.models.neuron.builds.IzkCurrExpBase">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.builds.</code><code class="descname">IzkCurrExpBase</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/builds/izk_curr_exp_base.html#IzkCurrExpBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IzkCurrExpBase" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model_standard.AbstractPyNNNeuronModelStandard</span></code></p>
-<p>Izhikevich neuron model with current inputs.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>a</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(a\)</span></li>
-<li><strong>b</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(b\)</span></li>
-<li><strong>c</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(c\)</span></li>
-<li><strong>d</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(d\)</span></li>
-<li><strong>i_offset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(I_{offset}\)</span></li>
-<li><strong>u</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(u_{init} = \delta V_{init}\)</span></li>
-<li><strong>v</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(v_{init} = V_{init}\)</span></li>
-<li><strong>tau_syn_E</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau^{syn}_e\)</span></li>
-<li><strong>tau_syn_I</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau^{syn}_i\)</span></li>
-<li><strong>isyn_exc</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(I^{syn}_e\)</span></li>
-<li><strong>isyn_inh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(I^{syn}_i\)</span></li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="class">
-<dt id="spynnaker.pyNN.models.neuron.builds.IFCondExpStoc">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.builds.</code><code class="descname">IFCondExpStoc</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/builds/if_cond_exp_stoc.html#IFCondExpStoc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCondExpStoc" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model_standard.AbstractPyNNNeuronModelStandard</span></code></p>
-<p>Leaky integrate and fire neuron with a stochastic threshold.</p>
-<p>Habenschuss S, Jonke Z, Maass W. Stochastic computations in cortical     microcircuit models. <em>PLoS Computational Biology.</em> 2013;9(11):e1003311.     <a class="reference external" href="https://doi.org/10.1371/journal.pcbi.1003311">doi:10.1371/journal.pcbi.1003311</a></p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>tau_m</strong> &#8211; <span class="math">\(\tau_m\)</span></li>
-<li><strong>cm</strong> &#8211; <span class="math">\(C_m\)</span></li>
-<li><strong>v_rest</strong> &#8211; <span class="math">\(V_{rest}\)</span></li>
-<li><strong>v_reset</strong> &#8211; <span class="math">\(V_{reset}\)</span></li>
-<li><strong>v_thresh</strong> &#8211; <span class="math">\(V_{thresh}\)</span></li>
-<li><strong>tau_syn_E</strong> &#8211; <span class="math">\(\tau^{syn}_e\)</span></li>
-<li><strong>tau_syn_I</strong> &#8211; <span class="math">\(\tau^{syn}_i\)</span></li>
-<li><strong>tau_refrac</strong> &#8211; <span class="math">\(\tau_{refrac}\)</span></li>
-<li><strong>i_offset</strong> &#8211; <span class="math">\(I_{offset}\)</span></li>
-<li><strong>e_rev_E</strong> &#8211; <span class="math">\(E^{rev}_e\)</span></li>
-<li><strong>e_rev_I</strong> &#8211; <span class="math">\(E^{rev}_i\)</span></li>
-<li><strong>du_th</strong> &#8211; <span class="math">\(du_{thresh}\)</span></li>
-<li><strong>tau_th</strong> &#8211; <span class="math">\(\tau_{thresh}\)</span></li>
-<li><strong>v</strong> &#8211; <span class="math">\(V_{init}\)</span></li>
-<li><strong>isyn_exc</strong> &#8211; <span class="math">\(I^{syn}_e\)</span></li>
-<li><strong>isyn_inh</strong> &#8211; <span class="math">\(I^{syn}_i\)</span></li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="class">
-<dt id="spynnaker.pyNN.models.neuron.builds.IFCurrDelta">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.builds.</code><code class="descname">IFCurrDelta</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/builds/if_curr_delta.html#IFCurrDelta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCurrDelta" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model_standard.AbstractPyNNNeuronModelStandard</span></code></p>
-<p>Leaky integrate and fire neuron with an instantaneous current input.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>tau_m</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau_m\)</span></li>
-<li><strong>cm</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(C_m\)</span></li>
-<li><strong>v_rest</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(V_{rest}\)</span></li>
-<li><strong>v_reset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(V_{reset}\)</span></li>
-<li><strong>v_thresh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(V_{thresh}\)</span></li>
-<li><strong>tau_refrac</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau_{refrac}\)</span></li>
-<li><strong>i_offset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(I_{offset}\)</span></li>
-<li><strong>v</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(V_{init}\)</span></li>
-<li><strong>isyn_exc</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(I^{syn}_e\)</span></li>
-<li><strong>isyn_inh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(I^{syn}_i\)</span></li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="class">
-<dt id="spynnaker.pyNN.models.neuron.builds.IFCurrExpCa2Adaptive">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.builds.</code><code class="descname">IFCurrExpCa2Adaptive</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/builds/if_curr_exp_ca2_adaptive.html#IFCurrExpCa2Adaptive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCurrExpCa2Adaptive" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model_standard.AbstractPyNNNeuronModelStandard</span></code></p>
-<p>Model from Liu, Y. H., &amp; Wang, X. J. (2001). Spike-frequency        adaptation of a generalized leaky integrate-and-fire model neuron.         <em>Journal of Computational Neuroscience</em>, 10(1), 25-45.         <a class="reference external" href="https://doi.org/10.1023/A:1008916026143">doi:10.1023/A:1008916026143</a></p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>tau_m</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau_m\)</span></li>
-<li><strong>cm</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(C_m\)</span></li>
-<li><strong>v_rest</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(V_{rest}\)</span></li>
-<li><strong>v_reset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(V_{reset}\)</span></li>
-<li><strong>v_thresh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(V_{thresh}\)</span></li>
-<li><strong>tau_syn_E</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau^{syn}_e\)</span></li>
-<li><strong>tau_syn_I</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau^{syn}_i\)</span></li>
-<li><strong>tau_refrac</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau_{refrac}\)</span></li>
-<li><strong>i_offset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(I_{offset}\)</span></li>
-<li><strong>tau_ca2</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau_{\mathrm{Ca}^{+2}}\)</span></li>
-<li><strong>i_ca2</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(I_{\mathrm{Ca}^{+2}}\)</span></li>
-<li><strong>i_alpha</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau_\alpha\)</span></li>
-<li><strong>v</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(V_{init}\)</span></li>
-<li><strong>isyn_exc</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(I^{syn}_e\)</span></li>
-<li><strong>isyn_inh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(I^{syn}_i\)</span></li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="class">
-<dt id="spynnaker.pyNN.models.neuron.builds.IFCurrExpSEMDBase">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.builds.</code><code class="descname">IFCurrExpSEMDBase</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/builds/if_curr_exp_semd_base.html#IFCurrExpSEMDBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCurrExpSEMDBase" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model_standard.AbstractPyNNNeuronModelStandard</span></code></p>
-<p>Leaky integrate and fire neuron with an exponentially decaying        current input, where the excitatory input depends upon the inhibitory        input (see <a class="reference external" href="https://www.cit-ec.de/en/nbs/spiking-insect-vision">https://www.cit-ec.de/en/nbs/spiking-insect-vision</a>)</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>tau_m</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau_m\)</span></li>
-<li><strong>cm</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(C_m\)</span></li>
-<li><strong>v_rest</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(V_{rest}\)</span></li>
-<li><strong>v_reset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(V_{reset}\)</span></li>
-<li><strong>v_thresh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(V_{thresh}\)</span></li>
-<li><strong>tau_syn_E</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau^{syn}_{e_1}\)</span></li>
-<li><strong>tau_syn_E2</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau^{syn}_{e_2}\)</span></li>
-<li><strong>tau_syn_I</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau^{syn}_i\)</span></li>
-<li><strong>tau_refrac</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau_{refrac}\)</span></li>
-<li><strong>i_offset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(I_{offset}\)</span></li>
-<li><strong>v</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(V_{init}\)</span></li>
-<li><strong>isyn_exc</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(I^{syn}_{e_1}\)</span></li>
-<li><strong>isyn_exc2</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(I^{syn}_{e_2}\)</span></li>
-<li><strong>isyn_inh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(I^{syn}_i\)</span></li>
-<li><strong>multiplicator</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; </li>
-<li><strong>exc2_old</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; </li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</div>
-</div>
-
-
-          </div>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -518,12 +468,13 @@
           <li class="nav-item nav-item-2"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
           <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
           <li class="nav-item nav-item-4"><a href="spynnaker.pyNN.models.html" >spynnaker.pyNN.models package</a> &#187;</li>
-          <li class="nav-item nav-item-5"><a href="spynnaker.pyNN.models.neuron.html" >spynnaker.pyNN.models.neuron package</a> &#187;</li> 
+          <li class="nav-item nav-item-5"><a href="spynnaker.pyNN.models.neuron.html" >spynnaker.pyNN.models.neuron package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.models.neuron.builds package</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2017.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
     </div>
   </body>
 </html>

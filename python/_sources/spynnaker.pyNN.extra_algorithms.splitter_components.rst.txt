@@ -1,62 +1,10 @@
-spynnaker.pyNN.extra_algorithms.splitter_components package
-===========================================================
-
-Submodules
-----------
-
-spynnaker.pyNN.extra_algorithms.splitter_components.abstract_spynnaker_splitter_delay module
---------------------------------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.extra_algorithms.splitter_components.abstract_spynnaker_splitter_delay
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.extra_algorithms.splitter_components.splitter_abstract_pop_vertex_slice module
----------------------------------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.extra_algorithms.splitter_components.splitter_abstract_pop_vertex_slice
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.extra_algorithms.splitter_components.splitter_delay_vertex_slice module
---------------------------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.extra_algorithms.splitter_components.splitter_delay_vertex_slice
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_partitioner module
------------------------------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_partitioner
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_selector module
---------------------------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_selector
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_slice_legacy module
-------------------------------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_slice_legacy
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
+spynnaker.pyNN.extra\_algorithms.splitter\_components package
+=============================================================
 
 Module contents
 ---------------
 
 .. automodule:: spynnaker.pyNN.extra_algorithms.splitter_components
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,34 +1,22 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<html lang="en">
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential &#8212; sPyNNaker  documentation</title>
-    
-    <link rel="stylesheet" href="../../../../../../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../../../../../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../../../../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../../../../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    <link rel="stylesheet" href="../../../../../../_static/sphinxdoc.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../../../../" src="../../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../../_static/jquery.js"></script>
+    <script src="../../../../../../_static/underscore.js"></script>
+    <script src="../../../../../../_static/doctools.js"></script>
+    <script src="../../../../../../_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     <link rel="index" title="Index" href="../../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../../search.html" /> 
-  </head>
-  <body role="document">
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -39,23 +27,10 @@
           <a href="../../../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../../../index.html">sPyNNaker  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="../../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential</a></li> 
       </ul>
-    </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../../../../../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
+    </div>  
 
     <div class="document">
       <div class="documentwrapper">
@@ -122,30 +97,30 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__isyn_exc</span> <span class="o">=</span> <span class="n">isyn_exc</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__isyn_inh</span> <span class="o">=</span> <span class="n">isyn_inh</span>
 
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">get_n_cpu_cycles</span><span class="p">)</span>
-<div class="viewcode-block" id="SynapseTypeExponential.get_n_cpu_cycles"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.get_n_cpu_cycles">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_cpu_cycles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
+<div class="viewcode-block" id="SynapseTypeExponential.get_n_cpu_cycles"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.get_n_cpu_cycles">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">get_n_cpu_cycles</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_n_cpu_cycles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
         <span class="k">return</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">n_neurons</span></div>
 
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">add_parameters</span><span class="p">)</span>
-<div class="viewcode-block" id="SynapseTypeExponential.add_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.add_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">add_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
+<div class="viewcode-block" id="SynapseTypeExponential.add_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.add_parameters">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">add_parameters</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">add_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
         <span class="n">parameters</span><span class="p">[</span><span class="n">TAU_SYN_E</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tau_syn_E</span>
         <span class="n">parameters</span><span class="p">[</span><span class="n">TAU_SYN_I</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tau_syn_I</span></div>
 
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">add_state_variables</span><span class="p">)</span>
-<div class="viewcode-block" id="SynapseTypeExponential.add_state_variables"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.add_state_variables">[docs]</a>    <span class="k">def</span> <span class="nf">add_state_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">):</span>
+<div class="viewcode-block" id="SynapseTypeExponential.add_state_variables"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.add_state_variables">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">add_state_variables</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">add_state_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">):</span>
         <span class="n">state_variables</span><span class="p">[</span><span class="n">ISYN_EXC</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__isyn_exc</span>
         <span class="n">state_variables</span><span class="p">[</span><span class="n">ISYN_INH</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__isyn_inh</span></div>
 
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">get_units</span><span class="p">)</span>
-<div class="viewcode-block" id="SynapseTypeExponential.get_units"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.get_units">[docs]</a>    <span class="k">def</span> <span class="nf">get_units</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
+<div class="viewcode-block" id="SynapseTypeExponential.get_units"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.get_units">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">get_units</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_units</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">UNITS</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span></div>
 
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">has_variable</span><span class="p">)</span>
-<div class="viewcode-block" id="SynapseTypeExponential.has_variable"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.has_variable">[docs]</a>    <span class="k">def</span> <span class="nf">has_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
+<div class="viewcode-block" id="SynapseTypeExponential.has_variable"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.has_variable">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">has_variable</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">has_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">UNITS</span></div>
 
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">get_values</span><span class="p">)</span>
-<div class="viewcode-block" id="SynapseTypeExponential.get_values"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.get_values">[docs]</a>    <span class="k">def</span> <span class="nf">get_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
+<div class="viewcode-block" id="SynapseTypeExponential.get_values"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.get_values">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">get_values</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param int ts: machine time step</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -163,8 +138,8 @@
                 <span class="n">parameters</span><span class="p">[</span><span class="n">TAU_SYN_I</span><span class="p">]</span><span class="o">.</span><span class="n">apply_operation</span><span class="p">(</span><span class="n">init</span><span class="p">),</span>
                 <span class="n">state_variables</span><span class="p">[</span><span class="n">ISYN_INH</span><span class="p">]]</span></div>
 
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">update_values</span><span class="p">)</span>
-<div class="viewcode-block" id="SynapseTypeExponential.update_values"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.update_values">[docs]</a>    <span class="k">def</span> <span class="nf">update_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">):</span>
+<div class="viewcode-block" id="SynapseTypeExponential.update_values"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.update_values">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">update_values</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">update_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">):</span>
 
         <span class="c1"># Read the data</span>
         <span class="p">(</span><span class="n">_decay_E</span><span class="p">,</span> <span class="n">_init_E</span><span class="p">,</span> <span class="n">isyn_exc</span><span class="p">,</span> <span class="n">_decay_I</span><span class="p">,</span> <span class="n">_init_I</span><span class="p">,</span> <span class="n">isyn_inh</span><span class="p">)</span> <span class="o">=</span> <span class="n">values</span>
@@ -172,20 +147,20 @@
         <span class="n">state_variables</span><span class="p">[</span><span class="n">ISYN_EXC</span><span class="p">]</span> <span class="o">=</span> <span class="n">isyn_exc</span>
         <span class="n">state_variables</span><span class="p">[</span><span class="n">ISYN_INH</span><span class="p">]</span> <span class="o">=</span> <span class="n">isyn_inh</span></div>
 
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">get_n_synapse_types</span><span class="p">)</span>
-<div class="viewcode-block" id="SynapseTypeExponential.get_n_synapse_types"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.get_n_synapse_types">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_synapse_types</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SynapseTypeExponential.get_n_synapse_types"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.get_n_synapse_types">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">get_n_synapse_types</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_n_synapse_types</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="mi">2</span></div>
 
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">get_synapse_id_by_target</span><span class="p">)</span>
-<div class="viewcode-block" id="SynapseTypeExponential.get_synapse_id_by_target"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.get_synapse_id_by_target">[docs]</a>    <span class="k">def</span> <span class="nf">get_synapse_id_by_target</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+<div class="viewcode-block" id="SynapseTypeExponential.get_synapse_id_by_target"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.get_synapse_id_by_target">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">get_synapse_id_by_target</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_synapse_id_by_target</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">target</span> <span class="o">==</span> <span class="s2">&quot;excitatory&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="mi">0</span>
         <span class="k">elif</span> <span class="n">target</span> <span class="o">==</span> <span class="s2">&quot;inhibitory&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="mi">1</span>
         <span class="k">return</span> <span class="kc">None</span></div>
 
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">get_synapse_targets</span><span class="p">)</span>
-<div class="viewcode-block" id="SynapseTypeExponential.get_synapse_targets"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.get_synapse_targets">[docs]</a>    <span class="k">def</span> <span class="nf">get_synapse_targets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SynapseTypeExponential.get_synapse_targets"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.get_synapse_targets">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">get_synapse_targets</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_synapse_targets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;excitatory&quot;</span><span class="p">,</span> <span class="s2">&quot;inhibitory&quot;</span></div>
 
     <span class="nd">@property</span>
@@ -221,7 +196,22 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__isyn_inh</span> <span class="o">=</span> <span class="n">isyn_inh</span></div>
 </pre></div>
 
+            <div class="clearer"></div>
           </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -236,12 +226,13 @@
           <a href="../../../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../../../index.html">sPyNNaker  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../../../../index.html" >Module code</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="../../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2017.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
     </div>
   </body>
 </html>

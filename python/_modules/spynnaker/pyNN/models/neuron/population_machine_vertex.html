@@ -1,34 +1,22 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<html lang="en">
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>spynnaker.pyNN.models.neuron.population_machine_vertex &#8212; sPyNNaker  documentation</title>
-    
-    <link rel="stylesheet" href="../../../../../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../../../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    <link rel="stylesheet" href="../../../../../_static/sphinxdoc.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" /> 
-  </head>
-  <body role="document">
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -39,23 +27,10 @@
           <a href="../../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../../index.html">sPyNNaker  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.models.neuron.population_machine_vertex</a></li> 
       </ul>
-    </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../../../../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
+    </div>  
 
     <div class="document">
       <div class="documentwrapper">
@@ -254,28 +229,28 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__on_chip_generatable_offset</span> <span class="o">=</span> <span class="n">offset</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__on_chip_generatable_size</span> <span class="o">=</span> <span class="n">size</span></div>
 
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSupportsBitFieldGeneration</span><span class="o">.</span><span class="n">bit_field_base_address</span><span class="p">)</span>
-<div class="viewcode-block" id="PopulationMachineVertex.bit_field_base_address"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.bit_field_base_address">[docs]</a>    <span class="k">def</span> <span class="nf">bit_field_base_address</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
+<div class="viewcode-block" id="PopulationMachineVertex.bit_field_base_address"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.bit_field_base_address">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSupportsBitFieldGeneration</span><span class="o">.</span><span class="n">bit_field_base_address</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">bit_field_base_address</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">locate_memory_region_for_placement</span><span class="p">(</span>
             <span class="n">placement</span><span class="o">=</span><span class="n">placement</span><span class="p">,</span> <span class="n">transceiver</span><span class="o">=</span><span class="n">transceiver</span><span class="p">,</span>
             <span class="n">region</span><span class="o">=</span><span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">BIT_FIELD_FILTER</span><span class="o">.</span><span class="n">value</span><span class="p">)</span></div>
 
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSupportsBitFieldRoutingCompression</span><span class="o">.</span>
+<div class="viewcode-block" id="PopulationMachineVertex.key_to_atom_map_region_base_address"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.key_to_atom_map_region_base_address">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSupportsBitFieldRoutingCompression</span><span class="o">.</span>
                <span class="n">key_to_atom_map_region_base_address</span><span class="p">)</span>
-<div class="viewcode-block" id="PopulationMachineVertex.key_to_atom_map_region_base_address"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.key_to_atom_map_region_base_address">[docs]</a>    <span class="k">def</span> <span class="nf">key_to_atom_map_region_base_address</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">key_to_atom_map_region_base_address</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">locate_memory_region_for_placement</span><span class="p">(</span>
             <span class="n">placement</span><span class="o">=</span><span class="n">placement</span><span class="p">,</span> <span class="n">transceiver</span><span class="o">=</span><span class="n">transceiver</span><span class="p">,</span>
             <span class="n">region</span><span class="o">=</span><span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">BIT_FIELD_KEY_MAP</span><span class="o">.</span><span class="n">value</span><span class="p">)</span></div>
 
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSupportsBitFieldGeneration</span><span class="o">.</span><span class="n">bit_field_builder_region</span><span class="p">)</span>
-<div class="viewcode-block" id="PopulationMachineVertex.bit_field_builder_region"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.bit_field_builder_region">[docs]</a>    <span class="k">def</span> <span class="nf">bit_field_builder_region</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
+<div class="viewcode-block" id="PopulationMachineVertex.bit_field_builder_region"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.bit_field_builder_region">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSupportsBitFieldGeneration</span><span class="o">.</span><span class="n">bit_field_builder_region</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">bit_field_builder_region</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">locate_memory_region_for_placement</span><span class="p">(</span>
             <span class="n">placement</span><span class="o">=</span><span class="n">placement</span><span class="p">,</span> <span class="n">transceiver</span><span class="o">=</span><span class="n">transceiver</span><span class="p">,</span>
             <span class="n">region</span><span class="o">=</span><span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">BIT_FIELD_BUILDER</span><span class="o">.</span><span class="n">value</span><span class="p">)</span></div>
 
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSupportsBitFieldRoutingCompression</span><span class="o">.</span>
+<div class="viewcode-block" id="PopulationMachineVertex.regeneratable_sdram_blocks_and_sizes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.regeneratable_sdram_blocks_and_sizes">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSupportsBitFieldRoutingCompression</span><span class="o">.</span>
                <span class="n">regeneratable_sdram_blocks_and_sizes</span><span class="p">)</span>
-<div class="viewcode-block" id="PopulationMachineVertex.regeneratable_sdram_blocks_and_sizes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.regeneratable_sdram_blocks_and_sizes">[docs]</a>    <span class="k">def</span> <span class="nf">regeneratable_sdram_blocks_and_sizes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">regeneratable_sdram_blocks_and_sizes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
         <span class="n">synaptic_matrix_base_address</span> <span class="o">=</span> <span class="n">locate_memory_region_for_placement</span><span class="p">(</span>
             <span class="n">placement</span><span class="o">=</span><span class="n">placement</span><span class="p">,</span> <span class="n">transceiver</span><span class="o">=</span><span class="n">transceiver</span><span class="p">,</span>
             <span class="n">region</span><span class="o">=</span><span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">SYNAPTIC_MATRIX</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
@@ -298,13 +273,13 @@
     <span class="k">def</span> <span class="nf">_n_additional_data_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="p">)</span>
 
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractRecordable</span><span class="o">.</span><span class="n">is_recording</span><span class="p">)</span>
-<div class="viewcode-block" id="PopulationMachineVertex.is_recording"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.is_recording">[docs]</a>    <span class="k">def</span> <span class="nf">is_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="PopulationMachineVertex.is_recording"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.is_recording">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractRecordable</span><span class="o">.</span><span class="n">is_recording</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">is_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__recorded_region_ids</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span></div>
 
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="o">.</span>
+<div class="viewcode-block" id="PopulationMachineVertex.get_provenance_data_from_machine"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.get_provenance_data_from_machine">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="o">.</span>
                <span class="n">get_provenance_data_from_machine</span><span class="p">)</span>
-<div class="viewcode-block" id="PopulationMachineVertex.get_provenance_data_from_machine"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.get_provenance_data_from_machine">[docs]</a>    <span class="k">def</span> <span class="nf">get_provenance_data_from_machine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_provenance_data_from_machine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
         <span class="n">provenance_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_provenance_data</span><span class="p">(</span><span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">)</span>
         <span class="n">provenance_items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_basic_provenance_items</span><span class="p">(</span>
             <span class="n">provenance_data</span><span class="p">,</span> <span class="n">placement</span><span class="p">)</span>
@@ -440,30 +415,30 @@
                 <span class="n">names</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">tdma_misses</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">provenance_items</span></div>
 
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractReceiveBuffersToHost</span><span class="o">.</span><span class="n">get_recorded_region_ids</span><span class="p">)</span>
-<div class="viewcode-block" id="PopulationMachineVertex.get_recorded_region_ids"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.get_recorded_region_ids">[docs]</a>    <span class="k">def</span> <span class="nf">get_recorded_region_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="PopulationMachineVertex.get_recorded_region_ids"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.get_recorded_region_ids">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractReceiveBuffersToHost</span><span class="o">.</span><span class="n">get_recorded_region_ids</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_recorded_region_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__recorded_region_ids</span></div>
 
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractReceiveBuffersToHost</span><span class="o">.</span><span class="n">get_recording_region_base_address</span><span class="p">)</span>
-<div class="viewcode-block" id="PopulationMachineVertex.get_recording_region_base_address"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.get_recording_region_base_address">[docs]</a>    <span class="k">def</span> <span class="nf">get_recording_region_base_address</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">txrx</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
+<div class="viewcode-block" id="PopulationMachineVertex.get_recording_region_base_address"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.get_recording_region_base_address">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractReceiveBuffersToHost</span><span class="o">.</span><span class="n">get_recording_region_base_address</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_recording_region_base_address</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">txrx</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">locate_memory_region_for_placement</span><span class="p">(</span>
             <span class="n">placement</span><span class="p">,</span> <span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">NEURON_RECORDING</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">txrx</span><span class="p">)</span></div>
 
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractHasProfileData</span><span class="o">.</span><span class="n">get_profile_data</span><span class="p">)</span>
-<div class="viewcode-block" id="PopulationMachineVertex.get_profile_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.get_profile_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_profile_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
+<div class="viewcode-block" id="PopulationMachineVertex.get_profile_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.get_profile_data">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractHasProfileData</span><span class="o">.</span><span class="n">get_profile_data</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_profile_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">get_profiling_data</span><span class="p">(</span>
             <span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">PROFILING</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_PROFILE_TAG_LABELS</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">)</span></div>
 
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractHasAssociatedBinary</span><span class="o">.</span><span class="n">get_binary_file_name</span><span class="p">)</span>
-<div class="viewcode-block" id="PopulationMachineVertex.get_binary_file_name"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.get_binary_file_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_binary_file_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="PopulationMachineVertex.get_binary_file_name"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.get_binary_file_name">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractHasAssociatedBinary</span><span class="o">.</span><span class="n">get_binary_file_name</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_binary_file_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__binary_file_name</span></div>
 
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractHasAssociatedBinary</span><span class="o">.</span><span class="n">get_binary_start_type</span><span class="p">)</span>
-<div class="viewcode-block" id="PopulationMachineVertex.get_binary_start_type"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.get_binary_start_type">[docs]</a>    <span class="k">def</span> <span class="nf">get_binary_start_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="PopulationMachineVertex.get_binary_start_type"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.get_binary_start_type">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractHasAssociatedBinary</span><span class="o">.</span><span class="n">get_binary_start_type</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_binary_start_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">ExecutableType</span><span class="o">.</span><span class="n">USES_SIMULATION_INTERFACE</span></div>
 
-    <span class="nd">@inject_items</span><span class="p">({</span>
+<div class="viewcode-block" id="PopulationMachineVertex.generate_data_specification"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.generate_data_specification">[docs]</a>    <span class="nd">@inject_items</span><span class="p">({</span>
         <span class="s2">&quot;machine_time_step&quot;</span><span class="p">:</span> <span class="s2">&quot;MachineTimeStep&quot;</span><span class="p">,</span>
         <span class="s2">&quot;time_scale_factor&quot;</span><span class="p">:</span> <span class="s2">&quot;TimeScaleFactor&quot;</span><span class="p">,</span>
         <span class="s2">&quot;application_graph&quot;</span><span class="p">:</span> <span class="s2">&quot;MemoryApplicationGraph&quot;</span><span class="p">,</span>
@@ -479,7 +454,7 @@
             <span class="s2">&quot;application_graph&quot;</span><span class="p">,</span> <span class="s2">&quot;machine_graph&quot;</span><span class="p">,</span> <span class="s2">&quot;routing_info&quot;</span><span class="p">,</span>
             <span class="s2">&quot;data_n_time_steps&quot;</span><span class="p">,</span> <span class="s2">&quot;n_key_map&quot;</span>
         <span class="p">})</span>
-<div class="viewcode-block" id="PopulationMachineVertex.generate_data_specification"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.generate_data_specification">[docs]</a>    <span class="k">def</span> <span class="nf">generate_data_specification</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">generate_data_specification</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="p">,</span>
             <span class="n">application_graph</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span> <span class="n">data_n_time_steps</span><span class="p">,</span>
             <span class="n">n_key_map</span><span class="p">):</span>
@@ -557,11 +532,11 @@
         <span class="c1"># End the writing of this specification:</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">end_specification</span><span class="p">()</span></div>
 
-    <span class="nd">@inject_items</span><span class="p">({</span><span class="s2">&quot;routing_info&quot;</span><span class="p">:</span> <span class="s2">&quot;MemoryRoutingInfos&quot;</span><span class="p">})</span>
+<div class="viewcode-block" id="PopulationMachineVertex.regenerate_data_specification"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.regenerate_data_specification">[docs]</a>    <span class="nd">@inject_items</span><span class="p">({</span><span class="s2">&quot;routing_info&quot;</span><span class="p">:</span> <span class="s2">&quot;MemoryRoutingInfos&quot;</span><span class="p">})</span>
     <span class="nd">@overrides</span><span class="p">(</span>
         <span class="n">AbstractRewritesDataSpecification</span><span class="o">.</span><span class="n">regenerate_data_specification</span><span class="p">,</span>
         <span class="n">additional_arguments</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;routing_info&quot;</span><span class="p">})</span>
-<div class="viewcode-block" id="PopulationMachineVertex.regenerate_data_specification"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.regenerate_data_specification">[docs]</a>    <span class="k">def</span> <span class="nf">regenerate_data_specification</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">regenerate_data_specification</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">):</span>
         <span class="c1"># pylint: disable=too-many-arguments, arguments-differ</span>
 
         <span class="c1"># reserve the neuron parameters data region</span>
@@ -577,12 +552,12 @@
         <span class="c1"># close spec</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">end_specification</span><span class="p">()</span></div>
 
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractRewritesDataSpecification</span><span class="o">.</span><span class="n">reload_required</span><span class="p">)</span>
-<div class="viewcode-block" id="PopulationMachineVertex.reload_required"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.reload_required">[docs]</a>    <span class="k">def</span> <span class="nf">reload_required</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="PopulationMachineVertex.reload_required"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.reload_required">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractRewritesDataSpecification</span><span class="o">.</span><span class="n">reload_required</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">reload_required</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_neuron_parameters_reload</span></div>
 
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractRewritesDataSpecification</span><span class="o">.</span><span class="n">set_reload_required</span><span class="p">)</span>
-<div class="viewcode-block" id="PopulationMachineVertex.set_reload_required"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.set_reload_required">[docs]</a>    <span class="k">def</span> <span class="nf">set_reload_required</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_value</span><span class="p">):</span>
+<div class="viewcode-block" id="PopulationMachineVertex.set_reload_required"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.set_reload_required">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractRewritesDataSpecification</span><span class="o">.</span><span class="n">set_reload_required</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">set_reload_required</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_value</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_neuron_parameters_reload</span> <span class="o">=</span> <span class="n">new_value</span></div>
 
     <span class="k">def</span> <span class="nf">_reserve_memory_regions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span> <span class="n">n_key_map</span><span class="p">):</span>
@@ -623,8 +598,8 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">reserve_provenance_data_region</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="PopulationMachineVertex.neuron_region_sdram_address"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.neuron_region_sdram_address">[docs]</a>    <span class="k">def</span> <span class="nf">neuron_region_sdram_address</span><span class="p">(</span><span class="n">placement</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">):</span>
+<div class="viewcode-block" id="PopulationMachineVertex.neuron_region_sdram_address"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.neuron_region_sdram_address">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">neuron_region_sdram_address</span><span class="p">(</span><span class="n">placement</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">helpful_functions</span><span class="o">.</span><span class="n">locate_memory_region_for_placement</span><span class="p">(</span>
                 <span class="n">placement</span><span class="p">,</span> <span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">NEURON_PARAMS</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
                 <span class="n">transceiver</span><span class="p">)</span></div>
@@ -684,18 +659,18 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">neuron_data</span><span class="p">)</span>
 
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseExpandable</span><span class="o">.</span><span class="n">gen_on_machine</span><span class="p">)</span>
-<div class="viewcode-block" id="PopulationMachineVertex.gen_on_machine"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.gen_on_machine">[docs]</a>    <span class="k">def</span> <span class="nf">gen_on_machine</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="PopulationMachineVertex.gen_on_machine"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.gen_on_machine">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseExpandable</span><span class="o">.</span><span class="n">gen_on_machine</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">gen_on_machine</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">app_vertex</span><span class="o">.</span><span class="n">synapse_manager</span><span class="o">.</span><span class="n">gen_on_machine</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">)</span></div>
 
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseExpandable</span><span class="o">.</span><span class="n">read_generated_connection_holders</span><span class="p">)</span>
-<div class="viewcode-block" id="PopulationMachineVertex.read_generated_connection_holders"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.read_generated_connection_holders">[docs]</a>    <span class="k">def</span> <span class="nf">read_generated_connection_holders</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
+<div class="viewcode-block" id="PopulationMachineVertex.read_generated_connection_holders"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.read_generated_connection_holders">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseExpandable</span><span class="o">.</span><span class="n">read_generated_connection_holders</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">read_generated_connection_holders</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">synapse_manager</span><span class="o">.</span><span class="n">read_generated_connection_holders</span><span class="p">(</span>
             <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">)</span></div>
 
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractReadParametersBeforeSet</span><span class="o">.</span><span class="n">read_parameters_from_machine</span><span class="p">)</span>
-<div class="viewcode-block" id="PopulationMachineVertex.read_parameters_from_machine"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.read_parameters_from_machine">[docs]</a>    <span class="k">def</span> <span class="nf">read_parameters_from_machine</span><span class="p">(</span>
+<div class="viewcode-block" id="PopulationMachineVertex.read_parameters_from_machine"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.read_parameters_from_machine">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractReadParametersBeforeSet</span><span class="o">.</span><span class="n">read_parameters_from_machine</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">read_parameters_from_machine</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
 
         <span class="c1"># locate SDRAM address to where the neuron parameters are stored</span>
@@ -727,7 +702,22 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">state_variables</span><span class="p">)</span></div></div>
 </pre></div>
 
+            <div class="clearer"></div>
           </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -742,12 +732,13 @@
           <a href="../../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../../index.html">sPyNNaker  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.models.neuron.population_machine_vertex</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2017.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
     </div>
   </body>
 </html>

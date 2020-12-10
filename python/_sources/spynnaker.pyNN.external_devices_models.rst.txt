@@ -1,17 +1,18 @@
-spynnaker.pyNN.external_devices_models package
-==============================================
+spynnaker.pyNN.external\_devices\_models package
+================================================
 
 Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
-    spynnaker.pyNN.external_devices_models.push_bot
+   spynnaker.pyNN.external_devices_models.push_bot
 
 Module contents
 ---------------
 
 .. automodule:: spynnaker.pyNN.external_devices_models
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

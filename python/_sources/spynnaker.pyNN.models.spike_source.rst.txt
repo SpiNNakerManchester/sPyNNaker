@@ -1,38 +1,37 @@
-spynnaker.pyNN.models.spike_source package
-==========================================
+spynnaker.pyNN.models.spike\_source package
+===========================================
 
 Submodules
 ----------
 
-spynnaker.pyNN.models.spike_source.spike_source_array_vertex module
--------------------------------------------------------------------
+spynnaker.pyNN.models.spike\_source.spike\_source\_array\_vertex module
+-----------------------------------------------------------------------
 
 .. automodule:: spynnaker.pyNN.models.spike_source.spike_source_array_vertex
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
-spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex module
------------------------------------------------------------------------------
+spynnaker.pyNN.models.spike\_source.spike\_source\_poisson\_machine\_vertex module
+----------------------------------------------------------------------------------
 
 .. automodule:: spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
-spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex module
----------------------------------------------------------------------
+spynnaker.pyNN.models.spike\_source.spike\_source\_poisson\_vertex module
+-------------------------------------------------------------------------
 
 .. automodule:: spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 Module contents
 ---------------
 
 .. automodule:: spynnaker.pyNN.models.spike_source
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,109 +1,18 @@
-spynnaker.pyNN.extra_algorithms package
-=======================================
+spynnaker.pyNN.extra\_algorithms package
+========================================
 
 Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
-    spynnaker.pyNN.extra_algorithms.splitter_components
-
-Submodules
-----------
-
-spynnaker.pyNN.extra_algorithms.connection_holder_finisher module
------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.extra_algorithms.connection_holder_finisher
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.extra_algorithms.delay_support_adder module
-----------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.extra_algorithms.delay_support_adder
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.extra_algorithms.graph_edge_weight_updater module
-----------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.extra_algorithms.graph_edge_weight_updater
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.extra_algorithms.on_chip_bit_field_generator module
-------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.extra_algorithms.on_chip_bit_field_generator
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.extra_algorithms.redundant_packet_count_report module
---------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.extra_algorithms.redundant_packet_count_report
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.extra_algorithms.spynnaker_connection_holder_generations module
-------------------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.extra_algorithms.spynnaker_connection_holder_generations
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.extra_algorithms.spynnaker_data_specification_writer module
---------------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.extra_algorithms.spynnaker_data_specification_writer
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor module
-------------------------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.extra_algorithms.spynnaker_neuron_network_specification_report module
-------------------------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.extra_algorithms.spynnaker_neuron_network_specification_report
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.extra_algorithms.spynnaker_synaptic_matrix_report module
------------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.extra_algorithms.spynnaker_synaptic_matrix_report
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.extra_algorithms.synapse_expander module
--------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.extra_algorithms.synapse_expander
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
+   spynnaker.pyNN.extra_algorithms.splitter_components
 
 Module contents
 ---------------
 
 .. automodule:: spynnaker.pyNN.extra_algorithms
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

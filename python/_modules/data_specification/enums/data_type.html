@@ -1,0 +1,546 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>data_specification.enums.data_type &#8212; sPyNNaker  documentation</title>
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/sphinxdoc.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">data_specification.enums.data_type</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for data_specification.enums.data_type</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2017-2019 The University of Manchester</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+
+<span class="kn">import</span> <span class="nn">decimal</span>
+<span class="kn">import</span> <span class="nn">struct</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<span class="k">class</span> <span class="nc">DataType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Supported data types.</span>
+<span class="sd">    Internally, these are actually tuples.</span>
+
+<span class="sd">    #. an identifier for the enum class;</span>
+<span class="sd">    #. the size in bytes of the type;</span>
+<span class="sd">    #. the minimum possible value for the type;</span>
+<span class="sd">    #. the maximum possible value for the type;</span>
+<span class="sd">    #. the scale of the input value to convert it in integer;</span>
+<span class="sd">    #. the pattern to use following the struct package encodings to convert</span>
+<span class="sd">       the data in binary format;</span>
+<span class="sd">    #. is whether to apply the scaling when converting to SpiNNaker&#39;s binary</span>
+<span class="sd">       format.</span>
+<span class="sd">    #. the corresponding numpy type (or None to inhibit direct conversion via</span>
+<span class="sd">       numpy, scaled conversion still supported);</span>
+<span class="sd">    #. the text description of the type.</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">        Some types (notably 64-bit fixed-point and floating-point types) are</span>
+<span class="sd">        not recommended for use on SpiNNaker due to complications with</span>
+<span class="sd">        representability and lack of hardware/library support.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#: 8-bit unsigned integer</span>
+    <span class="n">UINT8</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span>
+             <span class="mi">1</span><span class="p">,</span>
+             <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;0&quot;</span><span class="p">),</span>
+             <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;255&quot;</span><span class="p">),</span>
+             <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">),</span>
+             <span class="s2">&quot;B&quot;</span><span class="p">,</span>
+             <span class="kc">False</span><span class="p">,</span>
+             <span class="nb">int</span><span class="p">,</span>
+             <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">,</span>
+             <span class="s2">&quot;8-bit unsigned integer&quot;</span><span class="p">)</span>
+    <span class="c1">#: 16-bit unsigned integer</span>
+    <span class="n">UINT16</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span>
+              <span class="mi">2</span><span class="p">,</span>
+              <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;0&quot;</span><span class="p">),</span>
+              <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;65535&quot;</span><span class="p">),</span>
+              <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">),</span>
+              <span class="s2">&quot;H&quot;</span><span class="p">,</span>
+              <span class="kc">False</span><span class="p">,</span>
+              <span class="nb">int</span><span class="p">,</span>
+              <span class="n">np</span><span class="o">.</span><span class="n">uint16</span><span class="p">,</span>
+              <span class="s2">&quot;16-bit unsigned integer&quot;</span><span class="p">)</span>
+    <span class="c1">#: 32-bit unsigned integer</span>
+    <span class="n">UINT32</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span>
+              <span class="mi">4</span><span class="p">,</span>
+              <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;0&quot;</span><span class="p">),</span>
+              <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;4294967295&quot;</span><span class="p">),</span>
+              <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">),</span>
+              <span class="s2">&quot;I&quot;</span><span class="p">,</span>
+              <span class="kc">False</span><span class="p">,</span>
+              <span class="nb">int</span><span class="p">,</span>
+              <span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">,</span>
+              <span class="s2">&quot;32-bit unsigned integer&quot;</span><span class="p">)</span>
+    <span class="c1">#: 64-bit unsigned integer</span>
+    <span class="n">UINT64</span> <span class="o">=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span>
+              <span class="mi">8</span><span class="p">,</span>
+              <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;0&quot;</span><span class="p">),</span>
+              <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;18446744073709551615&quot;</span><span class="p">),</span>
+              <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">),</span>
+              <span class="s2">&quot;Q&quot;</span><span class="p">,</span>
+              <span class="kc">False</span><span class="p">,</span>
+              <span class="nb">int</span><span class="p">,</span>
+              <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">,</span>
+              <span class="s2">&quot;64-bit unsigned integer&quot;</span><span class="p">)</span>
+    <span class="c1">#: 8-bit signed integer</span>
+    <span class="n">INT8</span> <span class="o">=</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span>
+            <span class="mi">1</span><span class="p">,</span>
+            <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;-128&quot;</span><span class="p">),</span>
+            <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;127&quot;</span><span class="p">),</span>
+            <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;b&quot;</span><span class="p">,</span>
+            <span class="kc">False</span><span class="p">,</span>
+            <span class="nb">int</span><span class="p">,</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">,</span>
+            <span class="s2">&quot;8-bit signed integer&quot;</span><span class="p">)</span>
+    <span class="c1">#: 16-bit signed integer</span>
+    <span class="n">INT16</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span>
+             <span class="mi">2</span><span class="p">,</span>
+             <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;-32768&quot;</span><span class="p">),</span>
+             <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;32767&quot;</span><span class="p">),</span>
+             <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">),</span>
+             <span class="s2">&quot;h&quot;</span><span class="p">,</span>
+             <span class="kc">False</span><span class="p">,</span>
+             <span class="nb">int</span><span class="p">,</span>
+             <span class="n">np</span><span class="o">.</span><span class="n">int16</span><span class="p">,</span>
+             <span class="s2">&quot;16-bit signed integer&quot;</span><span class="p">)</span>
+    <span class="c1">#: 32-bit signed integer</span>
+    <span class="n">INT32</span> <span class="o">=</span> <span class="p">(</span><span class="mi">6</span><span class="p">,</span>
+             <span class="mi">4</span><span class="p">,</span>
+             <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;-2147483648&quot;</span><span class="p">),</span>
+             <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;2147483647&quot;</span><span class="p">),</span>
+             <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">),</span>
+             <span class="s2">&quot;i&quot;</span><span class="p">,</span>
+             <span class="kc">False</span><span class="p">,</span>
+             <span class="nb">int</span><span class="p">,</span>
+             <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span>
+             <span class="s2">&quot;32-bit signed integer&quot;</span><span class="p">)</span>
+    <span class="c1">#: 64-bit signed integer</span>
+    <span class="n">INT64</span> <span class="o">=</span> <span class="p">(</span><span class="mi">7</span><span class="p">,</span>
+             <span class="mi">8</span><span class="p">,</span>
+             <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;-9223372036854775808&quot;</span><span class="p">),</span>
+             <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;9223372036854775807&quot;</span><span class="p">),</span>
+             <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">),</span>
+             <span class="s2">&quot;q&quot;</span><span class="p">,</span>
+             <span class="kc">False</span><span class="p">,</span>
+             <span class="nb">int</span><span class="p">,</span>
+             <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span>
+             <span class="s2">&quot;64-bit signed integer&quot;</span><span class="p">)</span>
+    <span class="c1">#: 8.8 unsigned fixed point number</span>
+    <span class="n">U88</span> <span class="o">=</span> <span class="p">(</span><span class="mi">8</span><span class="p">,</span>
+           <span class="mi">2</span><span class="p">,</span>
+           <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;0&quot;</span><span class="p">),</span>
+           <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;255.99609375&quot;</span><span class="p">),</span>
+           <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;256&quot;</span><span class="p">),</span>
+           <span class="s2">&quot;H&quot;</span><span class="p">,</span>
+           <span class="kc">True</span><span class="p">,</span>
+           <span class="kc">None</span><span class="p">,</span>
+           <span class="n">np</span><span class="o">.</span><span class="n">uint16</span><span class="p">,</span>
+           <span class="s2">&quot;8.8 unsigned fixed point number&quot;</span><span class="p">)</span>
+    <span class="c1">#: 16.16 unsigned fixed point number</span>
+    <span class="n">U1616</span> <span class="o">=</span> <span class="p">(</span><span class="mi">9</span><span class="p">,</span>
+             <span class="mi">4</span><span class="p">,</span>
+             <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;0&quot;</span><span class="p">),</span>
+             <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;65535.9999847&quot;</span><span class="p">),</span>
+             <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;65536&quot;</span><span class="p">),</span>
+             <span class="s2">&quot;I&quot;</span><span class="p">,</span>
+             <span class="kc">True</span><span class="p">,</span>
+             <span class="kc">None</span><span class="p">,</span>
+             <span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">,</span>
+             <span class="s2">&quot;16.16 unsigned fixed point number&quot;</span><span class="p">)</span>
+    <span class="c1">#: 32.32 unsigned fixed point number</span>
+    <span class="c1">#: (use *not* recommended: representability)</span>
+    <span class="n">U3232</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span>
+             <span class="mi">8</span><span class="p">,</span>
+             <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;0&quot;</span><span class="p">),</span>
+             <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;4294967295.99999999976716935634613037109375&quot;</span><span class="p">),</span>
+             <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;4294967296&quot;</span><span class="p">),</span>
+             <span class="s2">&quot;Q&quot;</span><span class="p">,</span>
+             <span class="kc">True</span><span class="p">,</span>
+             <span class="kc">None</span><span class="p">,</span>
+             <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">,</span>
+             <span class="s2">&quot;32.32 unsigned fixed point number&quot;</span><span class="p">)</span>  <span class="c1"># rounding problem for max</span>
+    <span class="c1">#: 8.7 signed fixed point number</span>
+    <span class="n">S87</span> <span class="o">=</span> <span class="p">(</span><span class="mi">11</span><span class="p">,</span>
+           <span class="mi">2</span><span class="p">,</span>
+           <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;-256&quot;</span><span class="p">),</span>
+           <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;255.9921875&quot;</span><span class="p">),</span>
+           <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;128&quot;</span><span class="p">),</span>
+           <span class="s2">&quot;h&quot;</span><span class="p">,</span>
+           <span class="kc">True</span><span class="p">,</span>
+           <span class="kc">None</span><span class="p">,</span>
+           <span class="n">np</span><span class="o">.</span><span class="n">int16</span><span class="p">,</span>
+           <span class="s2">&quot;8.7 signed fixed point number&quot;</span><span class="p">)</span>
+    <span class="c1">#: 16.15 signed fixed point number</span>
+    <span class="n">S1615</span> <span class="o">=</span> <span class="p">(</span><span class="mi">12</span><span class="p">,</span>
+             <span class="mi">4</span><span class="p">,</span>
+             <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;-65536&quot;</span><span class="p">),</span>
+             <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;65535.999969482421875&quot;</span><span class="p">),</span>
+             <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;32768&quot;</span><span class="p">),</span>
+             <span class="s2">&quot;i&quot;</span><span class="p">,</span>
+             <span class="kc">True</span><span class="p">,</span>
+             <span class="kc">None</span><span class="p">,</span>
+             <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span>
+             <span class="s2">&quot;16.15 signed fixed point number&quot;</span><span class="p">)</span>
+    <span class="c1">#: 32.31 signed fixed point number</span>
+    <span class="c1">#: (use *not* recommended: representability)</span>
+    <span class="n">S3231</span> <span class="o">=</span> <span class="p">(</span><span class="mi">13</span><span class="p">,</span>
+             <span class="mi">8</span><span class="p">,</span>
+             <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;-4294967296&quot;</span><span class="p">),</span>
+             <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;4294967295.9999999995343387126922607421875&quot;</span><span class="p">),</span>
+             <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;2147483648&quot;</span><span class="p">),</span>
+             <span class="s2">&quot;q&quot;</span><span class="p">,</span>
+             <span class="kc">True</span><span class="p">,</span>
+             <span class="kc">None</span><span class="p">,</span>
+             <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span>
+             <span class="s2">&quot;32.31 signed fixed point number&quot;</span><span class="p">)</span>  <span class="c1"># rounding problem for max</span>
+    <span class="c1">#: 32-bit floating point number</span>
+    <span class="n">FLOAT_32</span> <span class="o">=</span> <span class="p">(</span><span class="mi">14</span><span class="p">,</span>
+                <span class="mi">4</span><span class="p">,</span>
+                <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;-3.4028234e38&quot;</span><span class="p">),</span>
+                <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;3.4028234e38&quot;</span><span class="p">),</span>
+                <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;f&quot;</span><span class="p">,</span>
+                <span class="kc">False</span><span class="p">,</span>
+                <span class="nb">float</span><span class="p">,</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
+                <span class="s2">&quot;32-bit floating point number&quot;</span><span class="p">)</span>
+    <span class="c1">#: 64-bit floating point number</span>
+    <span class="c1">#: (use *not* recommended: hardware/library support inadequate)</span>
+    <span class="n">FLOAT_64</span> <span class="o">=</span> <span class="p">(</span><span class="mi">15</span><span class="p">,</span>
+                <span class="mi">8</span><span class="p">,</span>
+                <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;-1.7976931348623157e+308&quot;</span><span class="p">),</span>
+                <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;1.7976931348623157e+308&quot;</span><span class="p">),</span>
+                <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;d&quot;</span><span class="p">,</span>
+                <span class="kc">False</span><span class="p">,</span>
+                <span class="nb">float</span><span class="p">,</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
+                <span class="s2">&quot;64-bit floating point number&quot;</span><span class="p">)</span>
+    <span class="c1">#: 0.8 unsigned fixed point number</span>
+    <span class="n">U08</span> <span class="o">=</span> <span class="p">(</span><span class="mi">16</span><span class="p">,</span>
+           <span class="mi">1</span><span class="p">,</span>
+           <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;0&quot;</span><span class="p">),</span>
+           <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;0.99609375&quot;</span><span class="p">),</span>
+           <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;256&quot;</span><span class="p">),</span>
+           <span class="s2">&quot;B&quot;</span><span class="p">,</span>
+           <span class="kc">True</span><span class="p">,</span>
+           <span class="kc">None</span><span class="p">,</span>
+           <span class="n">np</span><span class="o">.</span><span class="n">uint16</span><span class="p">,</span>
+           <span class="s2">&quot;0.8 unsigned fixed point number&quot;</span><span class="p">)</span>
+    <span class="c1">#: 0.16 unsigned fixed point number</span>
+    <span class="n">U016</span> <span class="o">=</span> <span class="p">(</span><span class="mi">17</span><span class="p">,</span>
+            <span class="mi">2</span><span class="p">,</span>
+            <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;0&quot;</span><span class="p">),</span>
+            <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;0.999984741211&quot;</span><span class="p">),</span>
+            <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;65536&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;H&quot;</span><span class="p">,</span>
+            <span class="kc">True</span><span class="p">,</span>
+            <span class="kc">None</span><span class="p">,</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">uint16</span><span class="p">,</span>
+            <span class="s2">&quot;0.16 unsigned fixed point number&quot;</span><span class="p">)</span>
+    <span class="c1">#: 0.32 unsigned fixed point number</span>
+    <span class="n">U032</span> <span class="o">=</span> <span class="p">(</span><span class="mi">18</span><span class="p">,</span>
+            <span class="mi">4</span><span class="p">,</span>
+            <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;0&quot;</span><span class="p">),</span>
+            <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;0.99999999976716935634613037109375&quot;</span><span class="p">),</span>
+            <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;4294967296&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;I&quot;</span><span class="p">,</span>
+            <span class="kc">True</span><span class="p">,</span>
+            <span class="kc">None</span><span class="p">,</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">,</span>
+            <span class="s2">&quot;0.32 unsigned fixed point number&quot;</span><span class="p">)</span>
+    <span class="c1">#: 0.64 unsigned fixed point number</span>
+    <span class="c1">#: (use *not* recommended: representability)</span>
+    <span class="n">U064</span> <span class="o">=</span> <span class="p">(</span><span class="mi">19</span><span class="p">,</span>
+            <span class="mi">8</span><span class="p">,</span>
+            <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;0&quot;</span><span class="p">),</span>
+            <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span>
+                <span class="s2">&quot;0.9999999999999999999457898913757247782996273599565029&quot;</span><span class="p">),</span>
+            <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;18446744073709551616&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;Q&quot;</span><span class="p">,</span>
+            <span class="kc">True</span><span class="p">,</span>
+            <span class="kc">None</span><span class="p">,</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">,</span>
+            <span class="s2">&quot;0.64 unsigned fixed point number&quot;</span><span class="p">)</span>  <span class="c1"># rounding problem for max</span>
+    <span class="c1">#: 0.7 signed fixed point number</span>
+    <span class="n">S07</span> <span class="o">=</span> <span class="p">(</span><span class="mi">20</span><span class="p">,</span>
+           <span class="mi">1</span><span class="p">,</span>
+           <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;-1&quot;</span><span class="p">),</span>
+           <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;0.9921875&quot;</span><span class="p">),</span>
+           <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;128&quot;</span><span class="p">),</span>
+           <span class="s2">&quot;b&quot;</span><span class="p">,</span>
+           <span class="kc">True</span><span class="p">,</span>
+           <span class="kc">None</span><span class="p">,</span>
+           <span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">,</span>
+           <span class="s2">&quot;0.7 signed fixed point number&quot;</span><span class="p">)</span>
+    <span class="c1">#: 0.15 signed fixed point number</span>
+    <span class="n">S015</span> <span class="o">=</span> <span class="p">(</span><span class="mi">21</span><span class="p">,</span>
+            <span class="mi">2</span><span class="p">,</span>
+            <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;-1&quot;</span><span class="p">),</span>
+            <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;0.999969482421875&quot;</span><span class="p">),</span>
+            <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;32768&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;h&quot;</span><span class="p">,</span>
+            <span class="kc">True</span><span class="p">,</span>
+            <span class="kc">None</span><span class="p">,</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">int16</span><span class="p">,</span>
+            <span class="s2">&quot;0.15 signed fixed point number&quot;</span><span class="p">)</span>
+    <span class="c1">#: 0.32 signed fixed point number</span>
+    <span class="n">S031</span> <span class="o">=</span> <span class="p">(</span><span class="mi">22</span><span class="p">,</span>
+            <span class="mi">4</span><span class="p">,</span>
+            <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;-1&quot;</span><span class="p">),</span>
+            <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;0.99999999976716935634613037109375&quot;</span><span class="p">),</span>
+            <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;2147483648&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;i&quot;</span><span class="p">,</span>
+            <span class="kc">True</span><span class="p">,</span>
+            <span class="kc">None</span><span class="p">,</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span>
+            <span class="s2">&quot;0.32 signed fixed point number&quot;</span><span class="p">)</span>
+    <span class="c1">#: 0.63 signed fixed point number</span>
+    <span class="c1">#: (use *not* recommended: representability)</span>
+    <span class="n">S063</span> <span class="o">=</span> <span class="p">(</span><span class="mi">23</span><span class="p">,</span>
+            <span class="mi">8</span><span class="p">,</span>
+            <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;-1&quot;</span><span class="p">),</span>
+            <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span>
+                <span class="s2">&quot;0.9999999999999999998915797827514495565992547199130058&quot;</span><span class="p">),</span>
+            <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;9223372036854775808&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;q&quot;</span><span class="p">,</span>
+            <span class="kc">True</span><span class="p">,</span>
+            <span class="kc">None</span><span class="p">,</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span>
+            <span class="s2">&quot;0.63 signed fixed point number&quot;</span><span class="p">)</span>  <span class="c1"># rounding problem for max</span>
+
+    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">min_val</span><span class="p">,</span> <span class="n">max_val</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">struct_encoding</span><span class="p">,</span>
+                <span class="n">apply_scale</span><span class="p">,</span> <span class="n">force_cast</span><span class="p">,</span> <span class="n">numpy_typename</span><span class="p">,</span> <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+        <span class="c1"># pylint: disable=protected-access, too-many-arguments</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">_value_</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="n">obj</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">doc</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">_size</span> <span class="o">=</span> <span class="n">size</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">_min</span> <span class="o">=</span> <span class="n">min_val</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">_max</span> <span class="o">=</span> <span class="n">max_val</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">_scale</span> <span class="o">=</span> <span class="n">scale</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">_struct_encoding</span> <span class="o">=</span> <span class="n">struct_encoding</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">_numpy_typename</span> <span class="o">=</span> <span class="n">numpy_typename</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">_apply_scale</span> <span class="o">=</span> <span class="n">apply_scale</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">_force_cast</span> <span class="o">=</span> <span class="n">force_cast</span>
+        <span class="k">if</span> <span class="n">size</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">struct_encoding</span> <span class="o">+=</span> <span class="s2">&quot;xxx&quot;</span>
+        <span class="k">elif</span> <span class="n">size</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">struct_encoding</span> <span class="o">+=</span> <span class="s2">&quot;xx&quot;</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">_struct</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">Struct</span><span class="p">(</span><span class="s2">&quot;&lt;&quot;</span> <span class="o">+</span> <span class="n">struct_encoding</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">obj</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The size in bytes of the type.</span>
+
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_size</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">min</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The minimum possible value for the type.</span>
+
+<span class="sd">        :rtype: ~decimal.Decimal</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_min</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">max</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The maximum possible value for the type.</span>
+
+<span class="sd">        :rtype: ~decimal.Decimal</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">scale</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The scale of the input value to convert it in integer.</span>
+
+<span class="sd">        :rtype: ~decimal.Decimal</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">struct_encoding</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The encoding string used for struct. Scaling may also be required.</span>
+
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_struct_encoding</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">numpy_typename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The corresponding numpy type, if one exists.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_numpy_typename</span>
+
+    <span class="k">def</span> <span class="nf">encode_as_int</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Returns the value as an integer, according to this type.</span>
+
+<span class="sd">        :param value:</span>
+<span class="sd">        :type value: float or int</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_scale</span><span class="p">:</span>
+            <span class="c1"># Deal with the cases that return np.int64  or np.int32</span>
+            <span class="c1"># (e.g. RandomDistribution when using &#39;poisson&#39;, &#39;binomial&#39; etc.)</span>
+            <span class="c1"># The less than raises TypeError even with int32 on some numpy</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">):</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_min</span> <span class="o">&lt;=</span> <span class="n">value</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;value </span><span class="si">{:f}</span><span class="s2"> cannot be converted to </span><span class="si">{:s}</span><span class="s2">: out of range&quot;</span>
+                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">))</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">))</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_force_cast</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_force_cast</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">value</span>
+
+    <span class="k">def</span> <span class="nf">encode_as_numpy_int</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Returns the value as a numpy integer, according to this type.</span>
+
+<span class="sd">        .. note:</span>
+<span class="sd">            Only works with integer and fixed point data types.</span>
+
+<span class="sd">        :param value:</span>
+<span class="sd">        :type value: float or int</span>
+<span class="sd">        :rtype: ~numpy.uint32</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">encode_as_int</span><span class="p">(</span><span class="n">value</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">struct_encoding</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">encode_as_numpy_int_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Returns the numpy array as an integer numpy array, according to \</span>
+<span class="sd">            this type.</span>
+
+<span class="sd">        :param ~numpy.ndarray array:</span>
+<span class="sd">        :rtype: ~numpy.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_scale</span><span class="p">:</span>
+            <span class="c1"># pylint: disable=assignment-from-no-return</span>
+            <span class="n">where</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span><span class="n">array</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_min</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max</span> <span class="o">&lt;</span> <span class="n">array</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">where</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;value </span><span class="si">{:f}</span><span class="s2"> cannot be converted to </span><span class="si">{:s}</span><span class="s2">: out of range&quot;</span>
+                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">array</span><span class="p">[</span><span class="n">where</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">array</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scale</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;uint32&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_force_cast</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_force_cast</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">array</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
+                <span class="s2">&quot;uint32&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Encode the Python value for SpiNNaker according to this type.</span>
+
+<span class="sd">        :param value:</span>
+<span class="sd">        :type value: float or int</span>
+<span class="sd">        :rtype: bytes</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">encode_as_int</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">decode_numpy_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Decode the numpy array of SpiNNaker values according to this type.</span>
+
+<span class="sd">        :param ~numpy.ndarray(~numpy.uint32) array:</span>
+<span class="sd">        :rtype: ~numpy.ndarray(~numpy.uint32 or ~numpy.float64)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">array</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scale</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">decode_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Decodes a byte array into iterable of this type.</span>
+
+<span class="sd">        :param values: the bytes to decode into this given data type</span>
+<span class="sd">        :rtype: numpy array</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint8&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">numpy_typename</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_scale</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">array</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">array</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">data_specification.enums.data_type</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2017.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

@@ -1,36 +1,24 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<html lang="en">
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination package &#8212; sPyNNaker  documentation</title>
-    
-    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation package" href="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation.html" />
     <link rel="prev" title="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis package" href="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.html" /> 
-  </head>
-  <body role="document">
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -53,12 +41,152 @@
           <li class="nav-item nav-item-4"><a href="spynnaker.pyNN.models.html" >spynnaker.pyNN.models package</a> &#187;</li>
           <li class="nav-item nav-item-5"><a href="spynnaker.pyNN.models.neuron.html" >spynnaker.pyNN.models.neuron package</a> &#187;</li>
           <li class="nav-item nav-item-6"><a href="spynnaker.pyNN.models.neuron.structural_plasticity.html" >spynnaker.pyNN.models.neuron.structural_plasticity package</a> &#187;</li>
-          <li class="nav-item nav-item-7"><a href="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.html" accesskey="U">spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis package</a> &#187;</li> 
+          <li class="nav-item nav-item-7"><a href="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.html" accesskey="U">spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination package</a></li> 
       </ul>
-    </div>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="spynnaker-pynn-models-neuron-structural-plasticity-synaptogenesis-elimination-package">
+<h1>spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination package<a class="headerlink" href="#spynnaker-pynn-models-neuron-structural-plasticity-synaptogenesis-elimination-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.AbstractElimination">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.</code><code class="sig-name descname">AbstractElimination</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/structural_plasticity/synaptogenesis/elimination/abstract_elimination.html#AbstractElimination"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.AbstractElimination" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>An elimination rule</p>
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.AbstractElimination.get_parameter_names">
+<em class="property">abstract </em><code class="sig-name descname">get_parameter_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/structural_plasticity/synaptogenesis/elimination/abstract_elimination.html#AbstractElimination.get_parameter_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.AbstractElimination.get_parameter_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the names of the parameters supported by this rule</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.AbstractElimination.get_parameters_sdram_usage_in_bytes">
+<em class="property">abstract </em><code class="sig-name descname">get_parameters_sdram_usage_in_bytes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/structural_plasticity/synaptogenesis/elimination/abstract_elimination.html#AbstractElimination.get_parameters_sdram_usage_in_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.AbstractElimination.get_parameters_sdram_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the amount of SDRAM used by the parameters of this rule</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.AbstractElimination.vertex_executable_suffix">
+<em class="property">abstract property </em><code class="sig-name descname">vertex_executable_suffix</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.AbstractElimination.vertex_executable_suffix" title="Permalink to this definition">¶</a></dt>
+<dd><p>The suffix to be appended to the vertex executable for this rule</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.AbstractElimination.write_parameters">
+<em class="property">abstract </em><code class="sig-name descname">write_parameters</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">spec</span></em>, <em class="sig-param"><span class="n">weight_scale</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/structural_plasticity/synaptogenesis/elimination/abstract_elimination.html#AbstractElimination.write_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.AbstractElimination.write_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the parameters of the rule to the spec</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification)"><em>DataSpecificationGenerator</em></a>) – </p></li>
+<li><p><strong>weight_scale</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.RandomByWeightElimination">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.</code><code class="sig-name descname">RandomByWeightElimination</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">threshold</span></em>, <em class="sig-param"><span class="n">prob_elim_depressed</span><span class="o">=</span><span class="default_value">0.0245</span></em>, <em class="sig-param"><span class="n">prob_elim_potentiated</span><span class="o">=</span><span class="default_value">0.00013600000000000003</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/structural_plasticity/synaptogenesis/elimination/random_by_weight_elimination.html#RandomByWeightElimination"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.RandomByWeightElimination" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.abstract_elimination.AbstractElimination</span></code></p>
+<p>Elimination Rule that depends on the weight of a synapse</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>threshold</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Below this weight is considered depression, above or equal to this
+weight is considered potentiation (or the static weight of the
+connection on static weight connections)</p></li>
+<li><p><strong>prob_elim_depressed</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – The probability of elimination if the weight has been depressed
+(ignored on static weight connections)</p></li>
+<li><p><strong>prob_elim_potentiated</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – The probability of elimination of the weight has been potentiated
+or has not changed (and also used on static weight connections)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.RandomByWeightElimination.get_parameter_names">
+<code class="sig-name descname">get_parameter_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/structural_plasticity/synaptogenesis/elimination/random_by_weight_elimination.html#RandomByWeightElimination.get_parameter_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.RandomByWeightElimination.get_parameter_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the names of the parameters supported by this rule</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.RandomByWeightElimination.get_parameters_sdram_usage_in_bytes">
+<code class="sig-name descname">get_parameters_sdram_usage_in_bytes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/structural_plasticity/synaptogenesis/elimination/random_by_weight_elimination.html#RandomByWeightElimination.get_parameters_sdram_usage_in_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.RandomByWeightElimination.get_parameters_sdram_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the amount of SDRAM used by the parameters of this rule</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.RandomByWeightElimination.vertex_executable_suffix">
+<em class="property">property </em><code class="sig-name descname">vertex_executable_suffix</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.RandomByWeightElimination.vertex_executable_suffix" title="Permalink to this definition">¶</a></dt>
+<dd><p>The suffix to be appended to the vertex executable for this rule</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.RandomByWeightElimination.write_parameters">
+<code class="sig-name descname">write_parameters</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">spec</span></em>, <em class="sig-param"><span class="n">weight_scale</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/structural_plasticity/synaptogenesis/elimination/random_by_weight_elimination.html#RandomByWeightElimination.write_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.RandomByWeightElimination.write_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the parameters of the rule to the spec</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification)"><em>DataSpecificationGenerator</em></a>) – </p></li>
+<li><p><strong>weight_scale</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
+  <h3><a href="index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination package</a><ul>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination">Module contents</a></li>
@@ -80,183 +208,15 @@
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
     </form>
+    </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
-            
-  <div class="section" id="spynnaker-pynn-models-neuron-structural-plasticity-synaptogenesis-elimination-package">
-<h1>spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination package<a class="headerlink" href="#spynnaker-pynn-models-neuron-structural-plasticity-synaptogenesis-elimination-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="module-spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.AbstractElimination">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.</code><code class="descname">AbstractElimination</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/structural_plasticity/synaptogenesis/elimination/abstract_elimination.html#AbstractElimination"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.AbstractElimination" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>An elimination rule</p>
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.AbstractElimination.get_parameter_names">
-<code class="descname">get_parameter_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/structural_plasticity/synaptogenesis/elimination/abstract_elimination.html#AbstractElimination.get_parameter_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.AbstractElimination.get_parameter_names" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the names of the parameters supported by this rule</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">iterable(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>)</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.AbstractElimination.get_parameters_sdram_usage_in_bytes">
-<code class="descname">get_parameters_sdram_usage_in_bytes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/structural_plasticity/synaptogenesis/elimination/abstract_elimination.html#AbstractElimination.get_parameters_sdram_usage_in_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.AbstractElimination.get_parameters_sdram_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the amount of SDRAM used by the parameters of this rule</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.AbstractElimination.vertex_executable_suffix">
-<code class="descname">vertex_executable_suffix</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.AbstractElimination.vertex_executable_suffix" title="Permalink to this definition">¶</a></dt>
-<dd><p>The suffix to be appended to the vertex executable for this rule</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.AbstractElimination.write_parameters">
-<code class="descname">write_parameters</code><span class="sig-paren">(</span><em>spec</em>, <em>weight_scale</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/structural_plasticity/synaptogenesis/elimination/abstract_elimination.html#AbstractElimination.write_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.AbstractElimination.write_parameters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Write the parameters of the rule to the spec</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v)"><em>DataSpecificationGenerator</em></a>) &#8211; </li>
-<li><strong>weight_scale</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; </li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.RandomByWeightElimination">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.</code><code class="descname">RandomByWeightElimination</code><span class="sig-paren">(</span><em>threshold</em>, <em>prob_elim_depressed=0.0245</em>, <em>prob_elim_potentiated=0.00013600000000000003</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/structural_plasticity/synaptogenesis/elimination/random_by_weight_elimination.html#RandomByWeightElimination"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.RandomByWeightElimination" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.abstract_elimination.AbstractElimination</span></code></p>
-<p>Elimination Rule that depends on the weight of a synapse</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>threshold</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; Below this weight is considered depression, above or equal to this
-weight is considered potentiation (or the static weight of the
-connection on static weight connections)</li>
-<li><strong>prob_elim_depressed</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; The probability of elimination if the weight has been depressed
-(ignored on static weight connections)</li>
-<li><strong>prob_elim_potentiated</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; The probability of elimination of the weight has been potentiated
-or has not changed (and also used on static weight connections)</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.RandomByWeightElimination.get_parameter_names">
-<code class="descname">get_parameter_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/structural_plasticity/synaptogenesis/elimination/random_by_weight_elimination.html#RandomByWeightElimination.get_parameter_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.RandomByWeightElimination.get_parameter_names" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the names of the parameters supported by this rule</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">iterable(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>)</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.RandomByWeightElimination.get_parameters_sdram_usage_in_bytes">
-<code class="descname">get_parameters_sdram_usage_in_bytes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/structural_plasticity/synaptogenesis/elimination/random_by_weight_elimination.html#RandomByWeightElimination.get_parameters_sdram_usage_in_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.RandomByWeightElimination.get_parameters_sdram_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the amount of SDRAM used by the parameters of this rule</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.RandomByWeightElimination.vertex_executable_suffix">
-<code class="descname">vertex_executable_suffix</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.RandomByWeightElimination.vertex_executable_suffix" title="Permalink to this definition">¶</a></dt>
-<dd><p>The suffix to be appended to the vertex executable for this rule</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.RandomByWeightElimination.write_parameters">
-<code class="descname">write_parameters</code><span class="sig-paren">(</span><em>spec</em>, <em>weight_scale</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/structural_plasticity/synaptogenesis/elimination/random_by_weight_elimination.html#RandomByWeightElimination.write_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.RandomByWeightElimination.write_parameters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Write the parameters of the rule to the spec</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v)"><em>DataSpecificationGenerator</em></a>) &#8211; </li>
-<li><strong>weight_scale</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; </li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-</div>
-
-
-          </div>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -283,12 +243,13 @@ or has not changed (and also used on static weight connections)</li>
           <li class="nav-item nav-item-4"><a href="spynnaker.pyNN.models.html" >spynnaker.pyNN.models package</a> &#187;</li>
           <li class="nav-item nav-item-5"><a href="spynnaker.pyNN.models.neuron.html" >spynnaker.pyNN.models.neuron package</a> &#187;</li>
           <li class="nav-item nav-item-6"><a href="spynnaker.pyNN.models.neuron.structural_plasticity.html" >spynnaker.pyNN.models.neuron.structural_plasticity package</a> &#187;</li>
-          <li class="nav-item nav-item-7"><a href="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.html" >spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis package</a> &#187;</li> 
+          <li class="nav-item nav-item-7"><a href="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.html" >spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination package</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2017.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
     </div>
   </body>
 </html>

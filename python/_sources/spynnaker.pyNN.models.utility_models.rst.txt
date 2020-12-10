@@ -1,18 +1,19 @@
-spynnaker.pyNN.models.utility_models package
-============================================
+spynnaker.pyNN.models.utility\_models package
+=============================================
 
 Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
-    spynnaker.pyNN.models.utility_models.delays
-    spynnaker.pyNN.models.utility_models.spike_injector
+   spynnaker.pyNN.models.utility_models.delays
+   spynnaker.pyNN.models.utility_models.spike_injector
 
 Module contents
 ---------------
 
 .. automodule:: spynnaker.pyNN.models.utility_models
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

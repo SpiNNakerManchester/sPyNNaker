@@ -1,34 +1,22 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<html lang="en">
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl &#8212; sPyNNaker  documentation</title>
-    
-    <link rel="stylesheet" href="../../../../../../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../../../../../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../../../../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../../../../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    <link rel="stylesheet" href="../../../../../../_static/sphinxdoc.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../../../../" src="../../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../../_static/jquery.js"></script>
+    <script src="../../../../../../_static/underscore.js"></script>
+    <script src="../../../../../../_static/doctools.js"></script>
+    <script src="../../../../../../_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     <link rel="index" title="Index" href="../../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../../search.html" /> 
-  </head>
-  <body role="document">
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -39,23 +27,10 @@
           <a href="../../../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../../../index.html">sPyNNaker  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="../../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl</a></li> 
       </ul>
-    </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../../../../../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
+    </div>  
 
     <div class="document">
       <div class="documentwrapper">
@@ -83,8 +58,8 @@
     <span class="n">AbstractBase</span><span class="p">,</span> <span class="n">abstractmethod</span><span class="p">,</span> <span class="n">abstractproperty</span><span class="p">)</span>
 
 
-<span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">AbstractBase</span><span class="p">)</span>
-<div class="viewcode-block" id="AbstractNeuronImpl"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl">[docs]</a><span class="k">class</span> <span class="nc">AbstractNeuronImpl</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractNeuronImpl"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl">[docs]</a><span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">AbstractBase</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">AbstractNeuronImpl</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; An abstraction of a whole neuron model including all parts</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -104,90 +79,90 @@
 <span class="sd">        :rtype str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-    <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractNeuronImpl.get_n_cpu_cycles"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.get_n_cpu_cycles">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_cpu_cycles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractNeuronImpl.get_n_cpu_cycles"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.get_n_cpu_cycles">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">get_n_cpu_cycles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the number of CPU cycles required to update the state</span>
 
 <span class="sd">        :param int n_neurons: The number of neurons to get the cycles for</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
-    <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractNeuronImpl.get_dtcm_usage_in_bytes"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.get_dtcm_usage_in_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">get_dtcm_usage_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractNeuronImpl.get_dtcm_usage_in_bytes"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.get_dtcm_usage_in_bytes">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">get_dtcm_usage_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the DTCM memory usage required</span>
 
 <span class="sd">        :param int n_neurons: The number of neurons to get the usage for</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
-    <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractNeuronImpl.get_sdram_usage_in_bytes"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.get_sdram_usage_in_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">get_sdram_usage_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractNeuronImpl.get_sdram_usage_in_bytes"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.get_sdram_usage_in_bytes">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">get_sdram_usage_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the SDRAM memory usage required</span>
 
 <span class="sd">        :param int n_neurons: The number of neurons to get the usage for</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
-    <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractNeuronImpl.get_global_weight_scale"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.get_global_weight_scale">[docs]</a>    <span class="k">def</span> <span class="nf">get_global_weight_scale</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractNeuronImpl.get_global_weight_scale"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.get_global_weight_scale">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">get_global_weight_scale</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the weight scaling required by this model</span>
 
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
-    <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractNeuronImpl.get_n_synapse_types"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.get_n_synapse_types">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_synapse_types</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractNeuronImpl.get_n_synapse_types"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.get_n_synapse_types">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">get_n_synapse_types</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the number of synapse types supported by the model</span>
 
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
-    <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractNeuronImpl.get_synapse_id_by_target"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.get_synapse_id_by_target">[docs]</a>    <span class="k">def</span> <span class="nf">get_synapse_id_by_target</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractNeuronImpl.get_synapse_id_by_target"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.get_synapse_id_by_target">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">get_synapse_id_by_target</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the ID of a synapse given the name</span>
 
 <span class="sd">        :param str target: The name of the synapse</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
-    <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractNeuronImpl.get_synapse_targets"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.get_synapse_targets">[docs]</a>    <span class="k">def</span> <span class="nf">get_synapse_targets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractNeuronImpl.get_synapse_targets"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.get_synapse_targets">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">get_synapse_targets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the target names of the synapse type</span>
 
 <span class="sd">        :rtype: list(str)</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
-    <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractNeuronImpl.get_recordable_variables"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.get_recordable_variables">[docs]</a>    <span class="k">def</span> <span class="nf">get_recordable_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractNeuronImpl.get_recordable_variables"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.get_recordable_variables">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">get_recordable_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the names of the variables that can be recorded in this model</span>
 
 <span class="sd">        :rtype: list(str)</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
-    <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractNeuronImpl.get_recordable_units"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.get_recordable_units">[docs]</a>    <span class="k">def</span> <span class="nf">get_recordable_units</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractNeuronImpl.get_recordable_units"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.get_recordable_units">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">get_recordable_units</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the units of the given variable that can be recorded</span>
 
 <span class="sd">        :param str variable: The name of the variable</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
-    <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractNeuronImpl.get_recordable_data_types"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.get_recordable_data_types">[docs]</a>    <span class="k">def</span> <span class="nf">get_recordable_data_types</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractNeuronImpl.get_recordable_data_types"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.get_recordable_data_types">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">get_recordable_data_types</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the data type of the variables that can be recorded</span>
 
 <span class="sd">        :return: dict of name of variable to DataType of variable</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
-    <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractNeuronImpl.is_recordable"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.is_recordable">[docs]</a>    <span class="k">def</span> <span class="nf">is_recordable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractNeuronImpl.is_recordable"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.is_recordable">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">is_recordable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Determine if the given variable can be recorded</span>
 
 <span class="sd">        :param str variable: The name of the variable</span>
 <span class="sd">        :rtype: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
-    <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractNeuronImpl.get_recordable_variable_index"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.get_recordable_variable_index">[docs]</a>    <span class="k">def</span> <span class="nf">get_recordable_variable_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractNeuronImpl.get_recordable_variable_index"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.get_recordable_variable_index">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">get_recordable_variable_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the index of the variable in the list of variables that can be\</span>
 <span class="sd">            recorded</span>
 
@@ -195,16 +170,16 @@
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
-    <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractNeuronImpl.add_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.add_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">add_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractNeuronImpl.add_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.add_parameters">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">add_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Add the initial values of the parameters to the parameter holder</span>
 
 <span class="sd">        :param ~spinn_utilities.ranged.RangeDictionary parameters:</span>
 <span class="sd">            A holder of the parameters</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
-    <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractNeuronImpl.add_state_variables"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.add_state_variables">[docs]</a>    <span class="k">def</span> <span class="nf">add_state_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractNeuronImpl.add_state_variables"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.add_state_variables">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">add_state_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Add the initial values of the state variables to the state\</span>
 <span class="sd">            variables holder</span>
 
@@ -212,8 +187,8 @@
 <span class="sd">            A holder of the state variables</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
-    <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractNeuronImpl.get_data"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.get_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractNeuronImpl.get_data"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.get_data">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the data *to be written to the machine* for this model</span>
 
 <span class="sd">        :param ~spinn_utilities.ranged.RangeDictionary parameters:</span>
@@ -225,8 +200,8 @@
 <span class="sd">        :rtype: ~numpy.ndarray(~numpy.uint32)</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
-    <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractNeuronImpl.read_data"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.read_data">[docs]</a>    <span class="k">def</span> <span class="nf">read_data</span><span class="p">(</span>
+<div class="viewcode-block" id="AbstractNeuronImpl.read_data"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.read_data">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">read_data</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Read the parameters and state variables of the model\</span>
 <span class="sd">            *from the given data* (read from the machine)</span>
@@ -242,8 +217,8 @@
 <span class="sd">            The holder of the state variables to update</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
-    <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractNeuronImpl.get_units"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.get_units">[docs]</a>    <span class="k">def</span> <span class="nf">get_units</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractNeuronImpl.get_units"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.get_units">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">get_units</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the units of the given variable</span>
 
 <span class="sd">        :param str variable: The name of the variable</span>
@@ -257,7 +232,22 @@
 <span class="sd">        &quot;&quot;&quot;</span></div>
 </pre></div>
 
+            <div class="clearer"></div>
           </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -272,12 +262,13 @@
           <a href="../../../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../../../index.html">sPyNNaker  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../../../../index.html" >Module code</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="../../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2017.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
     </div>
   </body>
 </html>

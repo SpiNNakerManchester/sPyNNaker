@@ -1,36 +1,24 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<html lang="en">
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>spynnaker.pyNN.models.neuron.plasticity.stdp package &#8212; sPyNNaker  documentation</title>
-    
-    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure package" href="spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.html" />
     <link rel="prev" title="spynnaker.pyNN.models.neuron.plasticity package" href="spynnaker.pyNN.models.neuron.plasticity.html" /> 
-  </head>
-  <body role="document">
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -52,47 +40,10 @@
           <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
           <li class="nav-item nav-item-4"><a href="spynnaker.pyNN.models.html" >spynnaker.pyNN.models package</a> &#187;</li>
           <li class="nav-item nav-item-5"><a href="spynnaker.pyNN.models.neuron.html" >spynnaker.pyNN.models.neuron package</a> &#187;</li>
-          <li class="nav-item nav-item-6"><a href="spynnaker.pyNN.models.neuron.plasticity.html" accesskey="U">spynnaker.pyNN.models.neuron.plasticity package</a> &#187;</li> 
+          <li class="nav-item nav-item-6"><a href="spynnaker.pyNN.models.neuron.plasticity.html" accesskey="U">spynnaker.pyNN.models.neuron.plasticity package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.models.neuron.plasticity.stdp package</a></li> 
       </ul>
-    </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">spynnaker.pyNN.models.neuron.plasticity.stdp package</a><ul>
-<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
-<li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.plasticity.stdp.common">spynnaker.pyNN.models.neuron.plasticity.stdp.common module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.plasticity.stdp">Module contents</a></li>
-</ul>
-</li>
-</ul>
-
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="spynnaker.pyNN.models.neuron.plasticity.html"
-                        title="previous chapter">spynnaker.pyNN.models.neuron.plasticity package</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.html"
-                        title="next chapter">spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure package</a></p>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/spynnaker.pyNN.models.neuron.plasticity.stdp.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
+    </div>  
 
     <div class="document">
       <div class="documentwrapper">
@@ -125,40 +76,34 @@
 </div>
 <div class="section" id="module-spynnaker.pyNN.models.neuron.plasticity.stdp.common">
 <span id="spynnaker-pynn-models-neuron-plasticity-stdp-common-module"></span><h2>spynnaker.pyNN.models.neuron.plasticity.stdp.common module<a class="headerlink" href="#module-spynnaker.pyNN.models.neuron.plasticity.stdp.common" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
+<dl class="py function">
 <dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.common.float_to_fixed">
-<code class="descclassname">spynnaker.pyNN.models.neuron.plasticity.stdp.common.</code><code class="descname">float_to_fixed</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/plasticity/stdp/common.html#float_to_fixed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.common.float_to_fixed" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; </td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
-</tr>
-</tbody>
-</table>
+<code class="sig-prename descclassname">spynnaker.pyNN.models.neuron.plasticity.stdp.common.</code><code class="sig-name descname">float_to_fixed</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/plasticity/stdp/common.html#float_to_fixed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.common.float_to_fixed" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – </p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.common.get_exp_lut_array">
-<code class="descclassname">spynnaker.pyNN.models.neuron.plasticity.stdp.common.</code><code class="descname">get_exp_lut_array</code><span class="sig-paren">(</span><em>time_step</em>, <em>time_constant</em>, <em>shift=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/plasticity/stdp/common.html#get_exp_lut_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.common.get_exp_lut_array" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>time_step</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
-<li><strong>time_constant</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; </li>
-<li><strong>shift</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
+<code class="sig-prename descclassname">spynnaker.pyNN.models.neuron.plasticity.stdp.common.</code><code class="sig-name descname">get_exp_lut_array</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">time_step</span></em>, <em class="sig-param"><span class="n">time_constant</span></em>, <em class="sig-param"><span class="n">shift</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/plasticity/stdp/common.html#get_exp_lut_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.common.get_exp_lut_array" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>time_step</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – </p></li>
+<li><p><strong>time_constant</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – </p></li>
+<li><p><strong>shift</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – </p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://numpy.org/doc/1.19/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/1.19/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -168,7 +113,46 @@
 </div>
 
 
+            <div class="clearer"></div>
           </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">spynnaker.pyNN.models.neuron.plasticity.stdp package</a><ul>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.plasticity.stdp.common">spynnaker.pyNN.models.neuron.plasticity.stdp.common module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.plasticity.stdp">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="spynnaker.pyNN.models.neuron.plasticity.html"
+                        title="previous chapter">spynnaker.pyNN.models.neuron.plasticity package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.html"
+                        title="next chapter">spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure package</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/spynnaker.pyNN.models.neuron.plasticity.stdp.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -194,12 +178,13 @@
           <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
           <li class="nav-item nav-item-4"><a href="spynnaker.pyNN.models.html" >spynnaker.pyNN.models package</a> &#187;</li>
           <li class="nav-item nav-item-5"><a href="spynnaker.pyNN.models.neuron.html" >spynnaker.pyNN.models.neuron package</a> &#187;</li>
-          <li class="nav-item nav-item-6"><a href="spynnaker.pyNN.models.neuron.plasticity.html" >spynnaker.pyNN.models.neuron.plasticity package</a> &#187;</li> 
+          <li class="nav-item nav-item-6"><a href="spynnaker.pyNN.models.neuron.plasticity.html" >spynnaker.pyNN.models.neuron.plasticity package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.models.neuron.plasticity.stdp package</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2017.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
     </div>
   </body>
 </html>

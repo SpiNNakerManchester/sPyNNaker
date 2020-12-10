@@ -5,41 +5,41 @@ Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
-    spynnaker.pyNN
+   spynnaker.pyNN
 
 Submodules
 ----------
 
-spynnaker.gsyn_tools module
----------------------------
+spynnaker.gsyn\_tools module
+----------------------------
 
 .. automodule:: spynnaker.gsyn_tools
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
-spynnaker.plot_utils module
----------------------------
+spynnaker.plot\_utils module
+----------------------------
 
 .. automodule:: spynnaker.plot_utils
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
-spynnaker.spike_checker module
-------------------------------
+spynnaker.spike\_checker module
+-------------------------------
 
 .. automodule:: spynnaker.spike_checker
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 Module contents
 ---------------
 
 .. automodule:: spynnaker
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

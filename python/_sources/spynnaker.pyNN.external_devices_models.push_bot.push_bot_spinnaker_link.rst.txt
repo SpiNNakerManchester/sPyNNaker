@@ -1,10 +1,10 @@
-spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link package
-===============================================================================
+spynnaker.pyNN.external\_devices\_models.push\_bot.push\_bot\_spinnaker\_link package
+=====================================================================================
 
 Module contents
 ---------------
 
 .. automodule:: spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

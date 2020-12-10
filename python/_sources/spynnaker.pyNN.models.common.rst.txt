@@ -4,19 +4,18 @@ spynnaker.pyNN.models.common package
 Submodules
 ----------
 
-spynnaker.pyNN.models.common.recording_utils module
----------------------------------------------------
+spynnaker.pyNN.models.common.recording\_utils module
+----------------------------------------------------
 
 .. automodule:: spynnaker.pyNN.models.common.recording_utils
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 Module contents
 ---------------
 
 .. automodule:: spynnaker.pyNN.models.common
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

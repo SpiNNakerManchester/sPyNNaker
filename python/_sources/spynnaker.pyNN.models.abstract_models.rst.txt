@@ -1,10 +1,10 @@
-spynnaker.pyNN.models.abstract_models package
-=============================================
+spynnaker.pyNN.models.abstract\_models package
+==============================================
 
 Module contents
 ---------------
 
 .. automodule:: spynnaker.pyNN.models.abstract_models
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

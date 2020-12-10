@@ -1,10 +1,10 @@
-spynnaker.pyNN.models.neural_properties package
-===============================================
+spynnaker.pyNN.models.neural\_properties package
+================================================
 
 Module contents
 ---------------
 
 .. automodule:: spynnaker.pyNN.models.neural_properties
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

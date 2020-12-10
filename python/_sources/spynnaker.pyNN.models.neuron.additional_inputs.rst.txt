@@ -1,10 +1,10 @@
-spynnaker.pyNN.models.neuron.additional_inputs package
-======================================================
+spynnaker.pyNN.models.neuron.additional\_inputs package
+=======================================================
 
 Module contents
 ---------------
 
 .. automodule:: spynnaker.pyNN.models.neuron.additional_inputs
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

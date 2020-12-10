@@ -1,10 +1,10 @@
-spynnaker.pyNN.utilities.random_stats package
-=============================================
+spynnaker.pyNN.utilities.random\_stats package
+==============================================
 
 Module contents
 ---------------
 
 .. automodule:: spynnaker.pyNN.utilities.random_stats
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

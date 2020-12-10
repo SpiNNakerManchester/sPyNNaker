@@ -1,20 +1,21 @@
-spynnaker.pyNN.external_devices_models.push_bot package
-=======================================================
+spynnaker.pyNN.external\_devices\_models.push\_bot package
+==========================================================
 
 Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
-    spynnaker.pyNN.external_devices_models.push_bot.push_bot_control_modules
-    spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet
-    spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters
-    spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link
+   spynnaker.pyNN.external_devices_models.push_bot.push_bot_control_modules
+   spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet
+   spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters
+   spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link
 
 Module contents
 ---------------
 
 .. automodule:: spynnaker.pyNN.external_devices_models.push_bot
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

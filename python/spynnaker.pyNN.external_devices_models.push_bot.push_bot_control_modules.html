@@ -1,36 +1,24 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<html lang="en">
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>spynnaker.pyNN.external_devices_models.push_bot.push_bot_control_modules package &#8212; sPyNNaker  documentation</title>
-    
-    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet package" href="spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.html" />
     <link rel="prev" title="spynnaker.pyNN.external_devices_models.push_bot package" href="spynnaker.pyNN.external_devices_models.push_bot.html" /> 
-  </head>
-  <body role="document">
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -51,12 +39,85 @@
           <li class="nav-item nav-item-2"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
           <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
           <li class="nav-item nav-item-4"><a href="spynnaker.pyNN.external_devices_models.html" >spynnaker.pyNN.external_devices_models package</a> &#187;</li>
-          <li class="nav-item nav-item-5"><a href="spynnaker.pyNN.external_devices_models.push_bot.html" accesskey="U">spynnaker.pyNN.external_devices_models.push_bot package</a> &#187;</li> 
+          <li class="nav-item nav-item-5"><a href="spynnaker.pyNN.external_devices_models.push_bot.html" accesskey="U">spynnaker.pyNN.external_devices_models.push_bot package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.external_devices_models.push_bot.push_bot_control_modules package</a></li> 
       </ul>
-    </div>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="spynnaker-pynn-external-devices-models-push-bot-push-bot-control-modules-package">
+<h1>spynnaker.pyNN.external_devices_models.push_bot.push_bot_control_modules package<a class="headerlink" href="#spynnaker-pynn-external-devices-models-push-bot-push-bot-control-modules-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-spynnaker.pyNN.external_devices_models.push_bot.push_bot_control_modules">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.external_devices_models.push_bot.push_bot_control_modules" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="spynnaker.pyNN.external_devices_models.push_bot.push_bot_control_modules.PushBotLifEthernet">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.external_devices_models.push_bot.push_bot_control_modules.</code><code class="sig-name descname">PushBotLifEthernet</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/push_bot_control_modules/push_bot_lif_ethernet.html#PushBotLifEthernet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.push_bot_control_modules.PushBotLifEthernet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.external_devices_models.external_device_lif_control.ExternalDeviceLifControl</span></code></p>
+<p>Leaky integrate and fire neuron with an exponentially decaying         current input</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>protocol</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoEthernetProtocol" title="spynnaker.pyNN.protocols.MunichIoEthernetProtocol"><em>MunichIoEthernetProtocol</em></a>) – How to talk to the bot.</p></li>
+<li><p><strong>devices</strong> (<em>iterable</em><em>(</em><a class="reference internal" href="spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice" title="spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice"><em>AbstractMulticastControllableDevice</em></a><em>)</em>) – The devices on the bot that we are interested in.</p></li>
+<li><p><strong>pushbot_ip_address</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Where is the pushbot?</p></li>
+<li><p><strong>pushbot_port</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – (defaulted)</p></li>
+<li><p><strong>tau_m</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – LIF neuron parameter (defaulted)</p></li>
+<li><p><strong>cm</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – LIF neuron parameter (defaulted)</p></li>
+<li><p><strong>v_rest</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – LIF neuron parameter (defaulted)</p></li>
+<li><p><strong>v_reset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – LIF neuron parameter (defaulted)</p></li>
+<li><p><strong>tau_syn_E</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – LIF neuron parameter (defaulted)</p></li>
+<li><p><strong>tau_syn_I</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – LIF neuron parameter (defaulted)</p></li>
+<li><p><strong>tau_refrac</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – LIF neuron parameter (defaulted)</p></li>
+<li><p><strong>i_offset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – LIF neuron parameter (defaulted)</p></li>
+<li><p><strong>v</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – LIF neuron parameter (defaulted)</p></li>
+<li><p><strong>isyn_exc</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – LIF neuron parameter (defaulted)</p></li>
+<li><p><strong>isyn_inh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – LIF neuron parameter (defaulted)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker.pyNN.external_devices_models.push_bot.push_bot_control_modules.PushBotLifSpinnakerLink">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.external_devices_models.push_bot.push_bot_control_modules.</code><code class="sig-name descname">PushBotLifSpinnakerLink</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/push_bot_control_modules/push_bot_lif_spinnaker_link.html#PushBotLifSpinnakerLink"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.push_bot_control_modules.PushBotLifSpinnakerLink" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.external_devices_models.external_device_lif_control.ExternalDeviceLifControl</span></code></p>
+<p>Control module for a PushBot connected to a SpiNNaker Link</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>protocol</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol" title="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol"><em>MunichIoSpiNNakerLinkProtocol</em></a>) – How to talk to the bot.</p></li>
+<li><p><strong>devices</strong> (<em>iterable</em><em>(</em><a class="reference internal" href="spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice" title="spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice"><em>AbstractMulticastControllableDevice</em></a><em>)</em>) – The devices on the bot that we are interested in.</p></li>
+<li><p><strong>tau_m</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – LIF neuron parameter (defaulted)</p></li>
+<li><p><strong>cm</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – LIF neuron parameter (defaulted)</p></li>
+<li><p><strong>v_rest</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – LIF neuron parameter (defaulted)</p></li>
+<li><p><strong>v_reset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – LIF neuron parameter (defaulted)</p></li>
+<li><p><strong>tau_syn_E</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – LIF neuron parameter (defaulted)</p></li>
+<li><p><strong>tau_syn_I</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – LIF neuron parameter (defaulted)</p></li>
+<li><p><strong>tau_refrac</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – LIF neuron parameter (defaulted)</p></li>
+<li><p><strong>i_offset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – LIF neuron parameter (defaulted)</p></li>
+<li><p><strong>v</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – LIF neuron parameter (defaulted)</p></li>
+<li><p><strong>isyn_exc</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – LIF neuron parameter (defaulted)</p></li>
+<li><p><strong>isyn_inh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – LIF neuron parameter (defaulted)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
+  <h3><a href="index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.external_devices_models.push_bot.push_bot_control_modules package</a><ul>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.external_devices_models.push_bot.push_bot_control_modules">Module contents</a></li>
@@ -78,94 +139,15 @@
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
     </form>
+    </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
-            
-  <div class="section" id="spynnaker-pynn-external-devices-models-push-bot-push-bot-control-modules-package">
-<h1>spynnaker.pyNN.external_devices_models.push_bot.push_bot_control_modules package<a class="headerlink" href="#spynnaker-pynn-external-devices-models-push-bot-push-bot-control-modules-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="module-spynnaker.pyNN.external_devices_models.push_bot.push_bot_control_modules">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.external_devices_models.push_bot.push_bot_control_modules" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="spynnaker.pyNN.external_devices_models.push_bot.push_bot_control_modules.PushBotLifEthernet">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.external_devices_models.push_bot.push_bot_control_modules.</code><code class="descname">PushBotLifEthernet</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/push_bot_control_modules/push_bot_lif_ethernet.html#PushBotLifEthernet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.push_bot_control_modules.PushBotLifEthernet" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.external_devices_models.external_device_lif_control.ExternalDeviceLifControl</span></code></p>
-<p>Leaky integrate and fire neuron with an exponentially decaying         current input</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>protocol</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoEthernetProtocol" title="spynnaker.pyNN.protocols.MunichIoEthernetProtocol"><em>MunichIoEthernetProtocol</em></a>) &#8211; How to talk to the bot.</li>
-<li><strong>devices</strong> (<em>iterable</em><em>(</em><a class="reference internal" href="spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice" title="spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice"><em>AbstractMulticastControllableDevice</em></a><em>)</em><em></em>) &#8211; The devices on the bot that we are interested in.</li>
-<li><strong>pushbot_ip_address</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Where is the pushbot?</li>
-<li><strong>pushbot_port</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; (defaulted)</li>
-<li><strong>tau_m</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; LIF neuron parameter (defaulted)</li>
-<li><strong>cm</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; LIF neuron parameter (defaulted)</li>
-<li><strong>v_rest</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; LIF neuron parameter (defaulted)</li>
-<li><strong>v_reset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; LIF neuron parameter (defaulted)</li>
-<li><strong>tau_syn_E</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; LIF neuron parameter (defaulted)</li>
-<li><strong>tau_syn_I</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; LIF neuron parameter (defaulted)</li>
-<li><strong>tau_refrac</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; LIF neuron parameter (defaulted)</li>
-<li><strong>i_offset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; LIF neuron parameter (defaulted)</li>
-<li><strong>v</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; LIF neuron parameter (defaulted)</li>
-<li><strong>isyn_exc</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; LIF neuron parameter (defaulted)</li>
-<li><strong>isyn_inh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; LIF neuron parameter (defaulted)</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="class">
-<dt id="spynnaker.pyNN.external_devices_models.push_bot.push_bot_control_modules.PushBotLifSpinnakerLink">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.external_devices_models.push_bot.push_bot_control_modules.</code><code class="descname">PushBotLifSpinnakerLink</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/push_bot_control_modules/push_bot_lif_spinnaker_link.html#PushBotLifSpinnakerLink"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.push_bot_control_modules.PushBotLifSpinnakerLink" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.external_devices_models.external_device_lif_control.ExternalDeviceLifControl</span></code></p>
-<p>Control module for a PushBot connected to a SpiNNaker Link</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>protocol</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol" title="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol"><em>MunichIoSpiNNakerLinkProtocol</em></a>) &#8211; How to talk to the bot.</li>
-<li><strong>devices</strong> (<em>iterable</em><em>(</em><a class="reference internal" href="spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice" title="spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice"><em>AbstractMulticastControllableDevice</em></a><em>)</em><em></em>) &#8211; The devices on the bot that we are interested in.</li>
-<li><strong>tau_m</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; LIF neuron parameter (defaulted)</li>
-<li><strong>cm</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; LIF neuron parameter (defaulted)</li>
-<li><strong>v_rest</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; LIF neuron parameter (defaulted)</li>
-<li><strong>v_reset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; LIF neuron parameter (defaulted)</li>
-<li><strong>tau_syn_E</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; LIF neuron parameter (defaulted)</li>
-<li><strong>tau_syn_I</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; LIF neuron parameter (defaulted)</li>
-<li><strong>tau_refrac</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; LIF neuron parameter (defaulted)</li>
-<li><strong>i_offset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; LIF neuron parameter (defaulted)</li>
-<li><strong>v</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; LIF neuron parameter (defaulted)</li>
-<li><strong>isyn_exc</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; LIF neuron parameter (defaulted)</li>
-<li><strong>isyn_inh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; LIF neuron parameter (defaulted)</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</div>
-</div>
-
-
-          </div>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -190,12 +172,13 @@
           <li class="nav-item nav-item-2"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
           <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
           <li class="nav-item nav-item-4"><a href="spynnaker.pyNN.external_devices_models.html" >spynnaker.pyNN.external_devices_models package</a> &#187;</li>
-          <li class="nav-item nav-item-5"><a href="spynnaker.pyNN.external_devices_models.push_bot.html" >spynnaker.pyNN.external_devices_models.push_bot package</a> &#187;</li> 
+          <li class="nav-item nav-item-5"><a href="spynnaker.pyNN.external_devices_models.push_bot.html" >spynnaker.pyNN.external_devices_models.push_bot package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.external_devices_models.push_bot.push_bot_control_modules package</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2017.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
     </div>
   </body>
 </html>

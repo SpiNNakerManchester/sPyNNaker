@@ -1,34 +1,22 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<html lang="en">
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>spynnaker.pyNN.models.neuron.master_pop_table &#8212; sPyNNaker  documentation</title>
-    
-    <link rel="stylesheet" href="../../../../../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../../../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    <link rel="stylesheet" href="../../../../../_static/sphinxdoc.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" /> 
-  </head>
-  <body role="document">
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -39,23 +27,10 @@
           <a href="../../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../../index.html">sPyNNaker  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.models.neuron.master_pop_table</a></li> 
       </ul>
-    </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../../../../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
+    </div>  
 
     <div class="document">
       <div class="documentwrapper">
@@ -278,9 +253,9 @@
     <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">row_length</span><span class="p">,</span> <span class="n">is_single</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Add a synaptic matrix pointer to the entry</span>
 
-<span class="sd">        :param address: The address of the synaptic matrix</span>
-<span class="sd">        :param row_length: The length of each row in the matrix</span>
-<span class="sd">        :param is_single: True if the address is to the direct matrix</span>
+<span class="sd">        :param int address: The address of the synaptic matrix</span>
+<span class="sd">        :param int row_length: The length of each row in the matrix</span>
+<span class="sd">        :param bool is_single: True if the address is to the direct matrix</span>
 <span class="sd">        :return: The index of the pointer within the entry</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -335,7 +310,8 @@
 <span class="sd">        :param _MasterPopEntryCType entry: The entry to write to</span>
 <span class="sd">        :param _AddressListEntryCType_Array address_list:</span>
 <span class="sd">            The address_list to write to</span>
-<span class="sd">        :param start: The index of the entry of the address list to start at</span>
+<span class="sd">        :param int start:</span>
+<span class="sd">            The index of the entry of the address list to start at</span>
 <span class="sd">        :return: The number of entries written to the address list</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -444,7 +420,7 @@
         <span class="k">return</span> <span class="n">row_length</span></div>
 
 <div class="viewcode-block" id="MasterPopTableAsBinarySearch.get_next_allowed_address"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.get_next_allowed_address">[docs]</a>    <span class="k">def</span> <span class="nf">get_next_allowed_address</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">next_address</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the next allowed address</span>
+        <span class="sd">&quot;&quot;&quot; Get the next allowed address.</span>
 
 <span class="sd">        :param int next_address: The next address that would be used</span>
 <span class="sd">        :return: The next address that can be used following next_address</span>
@@ -466,7 +442,7 @@
 
 <div class="viewcode-block" id="MasterPopTableAsBinarySearch.add_machine_entry"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.add_machine_entry">[docs]</a>    <span class="k">def</span> <span class="nf">add_machine_entry</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">block_start_addr</span><span class="p">,</span> <span class="n">row_length</span><span class="p">,</span> <span class="n">key_and_mask</span><span class="p">,</span> <span class="n">is_single</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Add an entry for a machine-edge to the population table</span>
+        <span class="sd">&quot;&quot;&quot; Add an entry for a machine-edge to the population table.</span>
 
 <span class="sd">        :param int block_start_addr: where the synaptic matrix block starts</span>
 <span class="sd">        :param int row_length: how long in words each row is</span>
@@ -484,7 +460,7 @@
 <div class="viewcode-block" id="MasterPopTableAsBinarySearch.add_application_entry"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.add_application_entry">[docs]</a>    <span class="k">def</span> <span class="nf">add_application_entry</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">block_start_addr</span><span class="p">,</span> <span class="n">row_length</span><span class="p">,</span> <span class="n">key_and_mask</span><span class="p">,</span> <span class="n">core_mask</span><span class="p">,</span>
             <span class="n">core_shift</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Add an entry for an application-edge to the population table</span>
+        <span class="sd">&quot;&quot;&quot; Add an entry for an application-edge to the population table.</span>
 
 <span class="sd">        :param int block_start_addr: where the synaptic matrix block starts</span>
 <span class="sd">        :param int row_length: how long in words each row is</span>
@@ -573,7 +549,7 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">key_and_mask</span><span class="p">,</span> <span class="n">core_mask</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">core_shift</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_neurons</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Add an entry to the table that doesn&#39;t point to anywhere.  Used</span>
 <span class="sd">            to keep indices in synchronisation between e.g. normal and delay</span>
-<span class="sd">            entries and between entries on different cores</span>
+<span class="sd">            entries and between entries on different cores.</span>
 
 <span class="sd">        :param ~pacman.model.routing_info.BaseKeyAndMask key_and_mask:</span>
 <span class="sd">            a key_and_mask object used as part of describing</span>
@@ -645,7 +621,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">max_n_neurons_per_core</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The maximum number of neurons per core supported when a core-mask</span>
+        <span class="sd">&quot;&quot;&quot; The maximum number of neurons per core supported when a core-mask\</span>
 <span class="sd">            is &gt; 0.</span>
 
 <span class="sd">        :rtype: int</span>
@@ -654,8 +630,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">max_core_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The maximum core mask supported when n_neurons is &gt; 0; this is the</span>
-<span class="sd">            maximum number of cores that can be supported in a joined mask</span>
+        <span class="sd">&quot;&quot;&quot; The maximum core mask supported when n_neurons is &gt; 0; this is the\</span>
+<span class="sd">            maximum number of cores that can be supported in a joined mask.</span>
 
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -670,8 +646,8 @@
         <span class="k">return</span> <span class="n">_MAX_ADDRESS_COUNT</span>
 
 <div class="viewcode-block" id="MasterPopTableAsBinarySearch.write_padding"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.write_padding">[docs]</a>    <span class="k">def</span> <span class="nf">write_padding</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">next_block_start_address</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Write padding to the data spec needed between blocks to align</span>
-<span class="sd">            addresses correctly</span>
+        <span class="sd">&quot;&quot;&quot; Write padding to the data spec needed between blocks to align\</span>
+<span class="sd">            addresses correctly.</span>
 
 <span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
 <span class="sd">            The spec to write to</span>
@@ -692,7 +668,22 @@
         <span class="k">return</span> <span class="n">next_allowed</span></div></div>
 </pre></div>
 
+            <div class="clearer"></div>
           </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -707,12 +698,13 @@
           <a href="../../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../../index.html">sPyNNaker  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.models.neuron.master_pop_table</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2017.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
     </div>
   </body>
 </html>

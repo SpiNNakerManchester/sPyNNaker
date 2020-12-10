@@ -1,36 +1,24 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<html lang="en">
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>spynnaker.pyNN.models.abstract_models package &#8212; sPyNNaker  documentation</title>
-    
-    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="spynnaker.pyNN.models.common package" href="spynnaker.pyNN.models.common.html" />
     <link rel="prev" title="spynnaker.pyNN.models package" href="spynnaker.pyNN.models.html" /> 
-  </head>
-  <body role="document">
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -50,12 +38,463 @@
           <li class="nav-item nav-item-1"><a href="modules.html" >spynnaker</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
           <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
-          <li class="nav-item nav-item-4"><a href="spynnaker.pyNN.models.html" accesskey="U">spynnaker.pyNN.models package</a> &#187;</li> 
+          <li class="nav-item nav-item-4"><a href="spynnaker.pyNN.models.html" accesskey="U">spynnaker.pyNN.models package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.models.abstract_models package</a></li> 
       </ul>
-    </div>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="spynnaker-pynn-models-abstract-models-package">
+<h1>spynnaker.pyNN.models.abstract_models package<a class="headerlink" href="#spynnaker-pynn-models-abstract-models-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-spynnaker.pyNN.models.abstract_models">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.models.abstract_models" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.abstract_models.</code><code class="sig-name descname">AbstractAcceptsIncomingSynapses</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_accepts_incoming_synapses.html#AbstractAcceptsIncomingSynapses"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Indicates an object that can be a post-vertex in a PyNN projection.</p>
+<p>Note: See verify_splitter</p>
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.clear_connection_cache">
+<em class="property">abstract </em><code class="sig-name descname">clear_connection_cache</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_accepts_incoming_synapses.html#AbstractAcceptsIncomingSynapses.clear_connection_cache"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.clear_connection_cache" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clear the connection data stored in the vertex so far.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.get_connections_from_machine">
+<em class="property">abstract </em><code class="sig-name descname">get_connections_from_machine</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">transceiver</span></em>, <em class="sig-param"><span class="n">placements</span></em>, <em class="sig-param"><span class="n">app_edge</span></em>, <em class="sig-param"><span class="n">synapse_info</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_accepts_incoming_synapses.html#AbstractAcceptsIncomingSynapses.get_connections_from_machine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.get_connections_from_machine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the connections from the machine post-run.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan)"><em>Transceiver</em></a>) – How to read the connection data</p></li>
+<li><p><strong>placements</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placements" title="(in PACMAN)"><em>Placements</em></a>) – Where the connection data is on the machine</p></li>
+<li><p><strong>app_edge</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge" title="spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge"><em>ProjectionApplicationEdge</em></a>) – The edge for which the data is being read</p></li>
+<li><p><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) – The specific projection within the edge</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.get_synapse_id_by_target">
+<em class="property">abstract </em><code class="sig-name descname">get_synapse_id_by_target</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">target</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_accepts_incoming_synapses.html#AbstractAcceptsIncomingSynapses.get_synapse_id_by_target"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.get_synapse_id_by_target" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the ID of a synapse given the name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>target</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name of the synapse</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.set_synapse_dynamics">
+<em class="property">abstract </em><code class="sig-name descname">set_synapse_dynamics</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">synapse_dynamics</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_accepts_incoming_synapses.html#AbstractAcceptsIncomingSynapses.set_synapse_dynamics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.set_synapse_dynamics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the synapse dynamics of this vertex.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>synapse_dynamics</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics" title="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics"><em>AbstractSynapseDynamics</em></a>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.verify_splitter">
+<code class="sig-name descname">verify_splitter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">splitter</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_accepts_incoming_synapses.html#AbstractAcceptsIncomingSynapses.verify_splitter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.verify_splitter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that the splitter implements the API(s) expected by the        SynapticMatrices</p>
+<p>Any Vertex that implements this api should override
+ApplicationVertex.splitter method to also call this function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>splitter</strong> (<a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay" title="spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay"><em>AbstractSpynnakerSplitterDelay</em></a>) – the splitter</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>PacmanConfigurationException</strong> – is the splitter is not an             instance of AbstractSpynnakerSplitterDelay</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker.pyNN.models.abstract_models.AbstractContainsUnits">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.abstract_models.</code><code class="sig-name descname">AbstractContainsUnits</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_contains_units.html#AbstractContainsUnits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractContainsUnits" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Indicates a class that can describe the units of some of its variables</p>
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.abstract_models.AbstractContainsUnits.get_units">
+<em class="property">abstract </em><code class="sig-name descname">get_units</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">variable</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_contains_units.html#AbstractContainsUnits.get_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractContainsUnits.get_units" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get units for a given variable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – the variable to find units from</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the units as a string.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker.pyNN.models.abstract_models.AbstractHasDelayStages">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.abstract_models.</code><code class="sig-name descname">AbstractHasDelayStages</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_has_delay_stages.html#AbstractHasDelayStages"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractHasDelayStages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Indicates that this object (a vertex) has delay stages that are used         to increase the space required for bitfields in         <a class="reference internal" href="spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_bit_field_region" title="spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_bit_field_region"><code class="xref py py-func docutils literal notranslate"><span class="pre">spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_bit_field_region()</span></code></a></p>
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.abstract_models.AbstractHasDelayStages.n_delay_stages">
+<em class="property">abstract property </em><code class="sig-name descname">n_delay_stages</code><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractHasDelayStages.n_delay_stages" title="Permalink to this definition">¶</a></dt>
+<dd><p>The maximum number of delay stages required by any connection            out of this delay extension vertex</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker.pyNN.models.abstract_models.AbstractMaxSpikes">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.abstract_models.</code><code class="sig-name descname">AbstractMaxSpikes</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_max_spikes.html#AbstractMaxSpikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractMaxSpikes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Indicates a class (most likely a         <a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineVertex" title="(in PACMAN)"><code class="xref py py-class docutils literal notranslate"><span class="pre">MachineVertex</span></code></a>)         that can describe the maximum rate that it sends spikes.</p>
+<p>The <a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.SynapticManager" title="spynnaker.pyNN.models.neuron.SynapticManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">SynapticManager</span></code></a> assumes that all machine vertexes
+share the same synapse_information will have the same rates.</p>
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.abstract_models.AbstractMaxSpikes.max_spikes_per_second">
+<em class="property">abstract </em><code class="sig-name descname">max_spikes_per_second</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_max_spikes.html#AbstractMaxSpikes.max_spikes_per_second"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractMaxSpikes.max_spikes_per_second" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get maximum expected number of spikes per second</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – the variable to find units from</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the units as a string.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.abstract_models.AbstractMaxSpikes.max_spikes_per_ts">
+<em class="property">abstract </em><code class="sig-name descname">max_spikes_per_ts</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">machine_time_step</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_max_spikes.html#AbstractMaxSpikes.max_spikes_per_ts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractMaxSpikes.max_spikes_per_ts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get maximum expected number of spikes per timestep</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>machine_time_step</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – The timestime used in ms</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.abstract_models.</code><code class="sig-name descname">AbstractPopulationInitializable</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_population_initializable.html#AbstractPopulationInitializable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Indicates that this object has properties that can be initialised by a        PyNN Population</p>
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.get_initial_value">
+<em class="property">abstract </em><code class="sig-name descname">get_initial_value</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">variable</span></em>, <em class="sig-param"><span class="n">selector</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_population_initializable.html#AbstractPopulationInitializable.get_initial_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.get_initial_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the value for any variable whose in initialize_parameters.keys</p>
+<p>Should return the current value not the default one.</p>
+<p>Must support the variable as listed in initialize_parameters.keys,         ideally also with <code class="docutils literal notranslate"><span class="pre">_init</span></code> removed or added.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – variable name with or without <code class="docutils literal notranslate"><span class="pre">_init</span></code></p></li>
+<li><p><strong>selector</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#slice" title="(in Python v3.6)"><em>slice</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em>) – a description of the subrange to accept, or None for
+all. See:
+<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.AbstractSized.selector_to_ids" title="(in SpiNNUtils)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">selector_to_ids()</span></code></a></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A list or an Object which act like a list</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>iterable</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.get_initial_values">
+<code class="sig-name descname">get_initial_values</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">selector</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_population_initializable.html#AbstractPopulationInitializable.get_initial_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.get_initial_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>A dict containing the initial values of the state variables.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>selector</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#slice" title="(in Python v3.6)"><em>slice</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em>) – a description of the subrange to accept, or None for
+all. See:
+<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.AbstractSized.selector_to_ids" title="(in SpiNNUtils)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">selector_to_ids()</span></code></a></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>,Any)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.initial_values">
+<em class="property">property </em><code class="sig-name descname">initial_values</code><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.initial_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>A dict containing the initial values of the state variables.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>,Any)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.initialize">
+<em class="property">abstract </em><code class="sig-name descname">initialize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">variable</span></em>, <em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_population_initializable.html#AbstractPopulationInitializable.initialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.initialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the initial value of one of the state variables of the neurons            in this population.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name of the variable to set</p></li>
+<li><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><em>Any</em>) – The value of the variable to set</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.initialize_parameters">
+<em class="property">abstract property </em><code class="sig-name descname">initialize_parameters</code><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.initialize_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>List the parameters that are initializable.</p>
+<p>If “foo” is initializable there should be a setter <code class="docutils literal notranslate"><span class="pre">initialize_foo</span></code>        and a getter property <code class="docutils literal notranslate"><span class="pre">foo_init</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>list of property names</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>iterable(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.set_initial_value">
+<em class="property">abstract </em><code class="sig-name descname">set_initial_value</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">variable</span></em>, <em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">selector</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_population_initializable.html#AbstractPopulationInitializable.set_initial_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.set_initial_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the value for any variable whose in             initialize_parameters.keys</p>
+<p>Must support the variable as listed in initialize_parameters.keys,        ideally also with <code class="docutils literal notranslate"><span class="pre">_init</span></code> removed or added</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – variable name with or without <code class="docutils literal notranslate"><span class="pre">_init</span></code></p></li>
+<li><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em>) – New value for the variable</p></li>
+<li><p><strong>selector</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#slice" title="(in Python v3.6)"><em>slice</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em>) – a description of the subrange to accept, or None for
+all. See:
+<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.AbstractSized.selector_to_ids" title="(in SpiNNUtils)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">selector_to_ids()</span></code></a></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A list or an Object which act like a list</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>iterable</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker.pyNN.models.abstract_models.AbstractPopulationSettable">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.abstract_models.</code><code class="sig-name descname">AbstractPopulationSettable</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_population_settable.html#AbstractPopulationSettable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationSettable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.abstract_models.abstract_settable.AbstractSettable</span></code></p>
+<p>Indicates that some properties of this object can be accessed from        the PyNN population set and get methods.</p>
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.abstract_models.AbstractPopulationSettable.get_value_by_selector">
+<code class="sig-name descname">get_value_by_selector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">selector</span></em>, <em class="sig-param"><span class="n">key</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_population_settable.html#AbstractPopulationSettable.get_value_by_selector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationSettable.get_value_by_selector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the value for a particular key but only for the selected            subset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>selector</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#slice" title="(in Python v3.6)"><em>slice</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em>) – See             <code class="xref py py-meth docutils literal notranslate"><span class="pre">get_value_by_selector()</span></code>            as this is just a pass through method</p></li>
+<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – the name of the parameter to change</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a> or <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.abstract_models.AbstractPopulationSettable.n_atoms">
+<em class="property">abstract property </em><code class="sig-name descname">n_atoms</code><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationSettable.n_atoms" title="Permalink to this definition">¶</a></dt>
+<dd><p>” See             <code class="xref py py-meth docutils literal notranslate"><span class="pre">n_atoms()</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.abstract_models.AbstractPopulationSettable.set_value_by_selector">
+<code class="sig-name descname">set_value_by_selector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">selector</span></em>, <em class="sig-param"><span class="n">key</span></em>, <em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_population_settable.html#AbstractPopulationSettable.set_value_by_selector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationSettable.set_value_by_selector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the value for a particular key but only for the selected             subset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>selector</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#slice" title="(in Python v3.6)"><em>slice</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em>) – See             <a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangedList" title="(in SpiNNUtils)"><code class="xref py py-class docutils literal notranslate"><span class="pre">RangedList</span></code></a>.set_value_by_selector            as this is just a pass through method</p></li>
+<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – the name of the parameter to change</p></li>
+<li><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em>) – the new value of the parameter to assign</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker.pyNN.models.abstract_models.AbstractReadParametersBeforeSet">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.abstract_models.</code><code class="sig-name descname">AbstractReadParametersBeforeSet</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_read_parameters_before_set.html#AbstractReadParametersBeforeSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractReadParametersBeforeSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>A vertex whose parameters must be read before any can be set.</p>
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.abstract_models.AbstractReadParametersBeforeSet.read_parameters_from_machine">
+<em class="property">abstract </em><code class="sig-name descname">read_parameters_from_machine</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">transceiver</span></em>, <em class="sig-param"><span class="n">placement</span></em>, <em class="sig-param"><span class="n">vertex_slice</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_read_parameters_before_set.html#AbstractReadParametersBeforeSet.read_parameters_from_machine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractReadParametersBeforeSet.read_parameters_from_machine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the parameters from the machine before any are changed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan)"><em>Transceiver</em></a>) – the SpinnMan interface</p></li>
+<li><p><strong>placement</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placement" title="(in PACMAN)"><em>Placement</em></a>) – the placement of a vertex</p></li>
+<li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN)"><em>Slice</em></a>) – the slice of atoms for this vertex</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker.pyNN.models.abstract_models.AbstractSettable">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.abstract_models.</code><code class="sig-name descname">AbstractSettable</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_settable.html#AbstractSettable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractSettable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Indicates that some properties of this object can be accessed from        the PyNN population set and get methods.</p>
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.abstract_models.AbstractSettable.get_value">
+<em class="property">abstract </em><code class="sig-name descname">get_value</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_settable.html#AbstractSettable.get_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractSettable.get_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a property</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – the name of the property</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>Any or <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a> or <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a>) or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.abstract_models.AbstractSettable.set_value">
+<em class="property">abstract </em><code class="sig-name descname">set_value</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span></em>, <em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_settable.html#AbstractSettable.set_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractSettable.set_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set a property</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – the name of the parameter to change</p></li>
+<li><p><strong>value</strong> (<em>Any</em><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em>) – the new value of the parameter to assign</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker.pyNN.models.abstract_models.AbstractSynapseExpandable">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.abstract_models.</code><code class="sig-name descname">AbstractSynapseExpandable</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_synapse_expandable.html#AbstractSynapseExpandable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractSynapseExpandable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Indicates a class (most likely a         <a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineVertex" title="(in PACMAN)"><code class="xref py py-class docutils literal notranslate"><span class="pre">MachineVertex</span></code></a>)         that has may need to run the SYNAPSE_EXPANDER aplx</p>
+<p>Cores that do not use the synapse_manager should not implement this
+API even though their app vertex may hold a synapse_manager.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is <em>not</em> implemented by the
+<a class="reference internal" href="spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex" title="spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex"><code class="xref py py-class docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex</span></code></a>,
+which needs a different expander aplx</p>
+</div>
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.abstract_models.AbstractSynapseExpandable.gen_on_machine">
+<em class="property">abstract </em><code class="sig-name descname">gen_on_machine</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_synapse_expandable.html#AbstractSynapseExpandable.gen_on_machine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractSynapseExpandable.gen_on_machine" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if the synapses of a the slice of this vertex should be             generated on the machine.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The typical implementation for this method will be to ask the
+app_vertex’s synapse_manager</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.abstract_models.AbstractSynapseExpandable.read_generated_connection_holders">
+<em class="property">abstract </em><code class="sig-name descname">read_generated_connection_holders</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">transceiver</span></em>, <em class="sig-param"><span class="n">placement</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_synapse_expandable.html#AbstractSynapseExpandable.read_generated_connection_holders"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractSynapseExpandable.read_generated_connection_holders" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fill in the connection holders</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The typical implementation for this method will be to ask the
+app_vertex’s synapse_manager</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan)"><em>Transceiver</em></a>) – How the data is to be read</p></li>
+<li><p><strong>placement</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placement" title="(in PACMAN)"><em>Placement</em></a>) – Where the data is on the machine</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker.pyNN.models.abstract_models.AbstractWeightUpdatable">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.abstract_models.</code><code class="sig-name descname">AbstractWeightUpdatable</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_weight_updatable.html#AbstractWeightUpdatable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractWeightUpdatable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>An object whose weight can be updated.</p>
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.abstract_models.AbstractWeightUpdatable.update_weight">
+<em class="property">abstract </em><code class="sig-name descname">update_weight</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_weight_updatable.html#AbstractWeightUpdatable.update_weight"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractWeightUpdatable.update_weight" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the weight.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
+  <h3><a href="index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.models.abstract_models package</a><ul>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.models.abstract_models">Module contents</a></li>
@@ -77,510 +516,15 @@
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
     </form>
+    </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
-            
-  <div class="section" id="spynnaker-pynn-models-abstract-models-package">
-<h1>spynnaker.pyNN.models.abstract_models package<a class="headerlink" href="#spynnaker-pynn-models-abstract-models-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="module-spynnaker.pyNN.models.abstract_models">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.models.abstract_models" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.abstract_models.</code><code class="descname">AbstractAcceptsIncomingSynapses</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_accepts_incoming_synapses.html#AbstractAcceptsIncomingSynapses"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>Indicates an object that can be a post-vertex in a PyNN projection.</p>
-<p>Note: See verify_splitter</p>
-<dl class="method">
-<dt id="spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.clear_connection_cache">
-<code class="descname">clear_connection_cache</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_accepts_incoming_synapses.html#AbstractAcceptsIncomingSynapses.clear_connection_cache"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.clear_connection_cache" title="Permalink to this definition">¶</a></dt>
-<dd><p>Clear the connection data stored in the vertex so far.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.get_connections_from_machine">
-<code class="descname">get_connections_from_machine</code><span class="sig-paren">(</span><em>transceiver</em>, <em>placements</em>, <em>app_edge</em>, <em>synapse_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_accepts_incoming_synapses.html#AbstractAcceptsIncomingSynapses.get_connections_from_machine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.get_connections_from_machine" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the connections from the machine post-run.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan v)"><em>Transceiver</em></a>) &#8211; How to read the connection data</li>
-<li><strong>placements</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placements" title="(in PACMAN v)"><em>Placements</em></a>) &#8211; Where the connection data is on the machine</li>
-<li><strong>app_edge</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge" title="spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge"><em>ProjectionApplicationEdge</em></a>) &#8211; The edge for which the data is being read</li>
-<li><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) &#8211; The specific projection within the edge</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.get_synapse_id_by_target">
-<code class="descname">get_synapse_id_by_target</code><span class="sig-paren">(</span><em>target</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_accepts_incoming_synapses.html#AbstractAcceptsIncomingSynapses.get_synapse_id_by_target"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.get_synapse_id_by_target" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the ID of a synapse given the name.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>target</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the synapse</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.set_synapse_dynamics">
-<code class="descname">set_synapse_dynamics</code><span class="sig-paren">(</span><em>synapse_dynamics</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_accepts_incoming_synapses.html#AbstractAcceptsIncomingSynapses.set_synapse_dynamics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.set_synapse_dynamics" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the synapse dynamics of this vertex.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>synapse_dynamics</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics" title="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics"><em>AbstractSynapseDynamics</em></a>) &#8211; </td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.verify_splitter">
-<code class="descname">verify_splitter</code><span class="sig-paren">(</span><em>splitter</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_accepts_incoming_synapses.html#AbstractAcceptsIncomingSynapses.verify_splitter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.verify_splitter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Check that the splitter implements the API(s) expected by the        SynapticMatrices</p>
-<p>Any Vertex that implements this api should override
-ApplicationVertex.splitter method to also call this function</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>splitter</strong> (<a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay" title="spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay"><em>AbstractSpynnakerSplitterDelay</em></a>) &#8211; the splitter</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>PacmanConfigurationException</strong> &#8211; is the splitter is not an             instance of AbstractSpynnakerSplitterDelay</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="spynnaker.pyNN.models.abstract_models.AbstractContainsUnits">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.abstract_models.</code><code class="descname">AbstractContainsUnits</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_contains_units.html#AbstractContainsUnits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractContainsUnits" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>Indicates a class that can describe the units of some of its variables</p>
-<dl class="method">
-<dt id="spynnaker.pyNN.models.abstract_models.AbstractContainsUnits.get_units">
-<code class="descname">get_units</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_contains_units.html#AbstractContainsUnits.get_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractContainsUnits.get_units" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get units for a given variable.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; the variable to find units from</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the units as a string.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="spynnaker.pyNN.models.abstract_models.AbstractHasDelayStages">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.abstract_models.</code><code class="descname">AbstractHasDelayStages</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_has_delay_stages.html#AbstractHasDelayStages"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractHasDelayStages" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>Indicates that this object (a vertex) has delay stages that are used         to increase the space required for bitfields in         <a class="reference internal" href="spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_bit_field_region" title="spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_bit_field_region"><code class="xref py py-func docutils literal"><span class="pre">spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_bit_field_region()</span></code></a></p>
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.abstract_models.AbstractHasDelayStages.n_delay_stages">
-<code class="descname">n_delay_stages</code><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractHasDelayStages.n_delay_stages" title="Permalink to this definition">¶</a></dt>
-<dd><p>The maximum number of delay stages required by any connection            out of this delay extension vertex</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="spynnaker.pyNN.models.abstract_models.AbstractMaxSpikes">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.abstract_models.</code><code class="descname">AbstractMaxSpikes</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_max_spikes.html#AbstractMaxSpikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractMaxSpikes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>Indicates a class (most likely a MachineVertex) that can describe the
-maximun rate that it sends spikes.</p>
-<p>The SynapticManager assumes that all machine vertexes share the same
-synapse_information will have the same rates</p>
-<dl class="method">
-<dt id="spynnaker.pyNN.models.abstract_models.AbstractMaxSpikes.max_spikes_per_second">
-<code class="descname">max_spikes_per_second</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_max_spikes.html#AbstractMaxSpikes.max_spikes_per_second"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractMaxSpikes.max_spikes_per_second" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get maximum expected number of spikes per second</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; the variable to find units from</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the units as a string.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.abstract_models.AbstractMaxSpikes.max_spikes_per_ts">
-<code class="descname">max_spikes_per_ts</code><span class="sig-paren">(</span><em>machine_time_step</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_max_spikes.html#AbstractMaxSpikes.max_spikes_per_ts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractMaxSpikes.max_spikes_per_ts" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get maximum expected number of spikes per timestep
-:param int machine_time_step: The timestime used in ms</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.abstract_models.</code><code class="descname">AbstractPopulationInitializable</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_population_initializable.html#AbstractPopulationInitializable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>Indicates that this object has properties that can be initialised by a        PyNN Population</p>
-<dl class="method">
-<dt id="spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.get_initial_value">
-<code class="descname">get_initial_value</code><span class="sig-paren">(</span><em>variable</em>, <em>selector=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_population_initializable.html#AbstractPopulationInitializable.get_initial_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.get_initial_value" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets the value for any variable whose in initialize_parameters.keys</p>
-<p>Should return the current value not the default one.</p>
-<p>Must support the variable as listed in initialize_parameters.keys,         ideally also with <code class="docutils literal"><span class="pre">_init</span></code> removed or added.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; variable name with or without <code class="docutils literal"><span class="pre">_init</span></code></li>
-<li><strong>selector</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#slice" title="(in Python v3.6)"><em>slice</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em><em></em>) &#8211; a description of the subrange to accept, or None for
-all. See:
-<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.AbstractSized.selector_to_ids" title="(in SpiNNUtils v)"><code class="xref py py-meth docutils literal"><span class="pre">selector_to_ids()</span></code></a></li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A list or an Object which act like a list</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">iterable</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.get_initial_values">
-<code class="descname">get_initial_values</code><span class="sig-paren">(</span><em>selector=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_population_initializable.html#AbstractPopulationInitializable.get_initial_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.get_initial_values" title="Permalink to this definition">¶</a></dt>
-<dd><p>A dict containing the initial values of the state variables.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>selector</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#slice" title="(in Python v3.6)"><em>slice</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em><em></em>) &#8211; a description of the subrange to accept, or None for
-all. See:
-<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.AbstractSized.selector_to_ids" title="(in SpiNNUtils v)"><code class="xref py py-meth docutils literal"><span class="pre">selector_to_ids()</span></code></a></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>,Any)</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.initial_values">
-<code class="descname">initial_values</code><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.initial_values" title="Permalink to this definition">¶</a></dt>
-<dd><p>A dict containing the initial values of the state variables.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>,Any)</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.initialize">
-<code class="descname">initialize</code><span class="sig-paren">(</span><em>variable</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_population_initializable.html#AbstractPopulationInitializable.initialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.initialize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the initial value of one of the state variables of the neurons            in this population.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the variable to set</li>
-<li><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><em>Any</em>) &#8211; The value of the variable to set</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.initialize_parameters">
-<code class="descname">initialize_parameters</code><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.initialize_parameters" title="Permalink to this definition">¶</a></dt>
-<dd><p>List the parameters that are initializable.</p>
-<p>If &#8220;foo&#8221; is initializable there should be a setter <code class="docutils literal"><span class="pre">initialize_foo</span></code>        and a getter property <code class="docutils literal"><span class="pre">foo_init</span></code></p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list of property names</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">iterable(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>)</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.set_initial_value">
-<code class="descname">set_initial_value</code><span class="sig-paren">(</span><em>variable</em>, <em>value</em>, <em>selector=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_population_initializable.html#AbstractPopulationInitializable.set_initial_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.set_initial_value" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets the value for any variable whose in             initialize_parameters.keys</p>
-<p>Must support the variable as listed in initialize_parameters.keys,        ideally also with <code class="docutils literal"><span class="pre">_init</span></code> removed or added</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; variable name with or without <code class="docutils literal"><span class="pre">_init</span></code></li>
-<li><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em></em>) &#8211; New value for the variable</li>
-<li><strong>selector</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#slice" title="(in Python v3.6)"><em>slice</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em><em></em>) &#8211; a description of the subrange to accept, or None for
-all. See:
-<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.AbstractSized.selector_to_ids" title="(in SpiNNUtils v)"><code class="xref py py-meth docutils literal"><span class="pre">selector_to_ids()</span></code></a></li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A list or an Object which act like a list</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">iterable</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="spynnaker.pyNN.models.abstract_models.AbstractPopulationSettable">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.abstract_models.</code><code class="descname">AbstractPopulationSettable</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_population_settable.html#AbstractPopulationSettable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationSettable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.abstract_models.abstract_settable.AbstractSettable</span></code></p>
-<p>Indicates that some properties of this object can be accessed from        the PyNN population set and get methods.</p>
-<dl class="method">
-<dt id="spynnaker.pyNN.models.abstract_models.AbstractPopulationSettable.get_value_by_selector">
-<code class="descname">get_value_by_selector</code><span class="sig-paren">(</span><em>selector</em>, <em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_population_settable.html#AbstractPopulationSettable.get_value_by_selector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationSettable.get_value_by_selector" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets the value for a particular key but only for the selected            subset.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>selector</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#slice" title="(in Python v3.6)"><em>slice</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em><em></em>) &#8211; See             <code class="xref py py-meth docutils literal"><span class="pre">get_value_by_selector()</span></code>            as this is just a pass through method</li>
-<li><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; the name of the parameter to change</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a> or <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>)</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.abstract_models.AbstractPopulationSettable.n_atoms">
-<code class="descname">n_atoms</code><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationSettable.n_atoms" title="Permalink to this definition">¶</a></dt>
-<dd><p>&#8221; See             <code class="xref py py-meth docutils literal"><span class="pre">n_atoms()</span></code></p>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.abstract_models.AbstractPopulationSettable.set_value_by_selector">
-<code class="descname">set_value_by_selector</code><span class="sig-paren">(</span><em>selector</em>, <em>key</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_population_settable.html#AbstractPopulationSettable.set_value_by_selector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationSettable.set_value_by_selector" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets the value for a particular key but only for the selected             subset.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>selector</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#slice" title="(in Python v3.6)"><em>slice</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em><em></em>) &#8211; See             <a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangedList" title="(in SpiNNUtils v)"><code class="xref py py-class docutils literal"><span class="pre">RangedList</span></code></a>.set_value_by_selector            as this is just a pass through method</li>
-<li><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; the name of the parameter to change</li>
-<li><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em><em></em>) &#8211; the new value of the parameter to assign</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="spynnaker.pyNN.models.abstract_models.AbstractReadParametersBeforeSet">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.abstract_models.</code><code class="descname">AbstractReadParametersBeforeSet</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_read_parameters_before_set.html#AbstractReadParametersBeforeSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractReadParametersBeforeSet" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>A vertex whose parameters must be read before any can be set.</p>
-<dl class="method">
-<dt id="spynnaker.pyNN.models.abstract_models.AbstractReadParametersBeforeSet.read_parameters_from_machine">
-<code class="descname">read_parameters_from_machine</code><span class="sig-paren">(</span><em>transceiver</em>, <em>placement</em>, <em>vertex_slice</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_read_parameters_before_set.html#AbstractReadParametersBeforeSet.read_parameters_from_machine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractReadParametersBeforeSet.read_parameters_from_machine" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read the parameters from the machine before any are changed.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan v)"><em>Transceiver</em></a>) &#8211; the SpinnMan interface</li>
-<li><strong>placement</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placement" title="(in PACMAN v)"><em>Placement</em></a>) &#8211; the placement of a vertex</li>
-<li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; the slice of atoms for this vertex</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="spynnaker.pyNN.models.abstract_models.AbstractSettable">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.abstract_models.</code><code class="descname">AbstractSettable</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_settable.html#AbstractSettable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractSettable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>Indicates that some properties of this object can be accessed from        the PyNN population set and get methods.</p>
-<dl class="method">
-<dt id="spynnaker.pyNN.models.abstract_models.AbstractSettable.get_value">
-<code class="descname">get_value</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_settable.html#AbstractSettable.get_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractSettable.get_value" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get a property</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; the name of the property</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">Any or <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a> or <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a>) or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>)</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.abstract_models.AbstractSettable.set_value">
-<code class="descname">set_value</code><span class="sig-paren">(</span><em>key</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_settable.html#AbstractSettable.set_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractSettable.set_value" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set a property</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; the name of the parameter to change</li>
-<li><strong>value</strong> (<em>Any</em><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em><em></em>) &#8211; the new value of the parameter to assign</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="spynnaker.pyNN.models.abstract_models.AbstractSynapseExpandable">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.abstract_models.</code><code class="descname">AbstractSynapseExpandable</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_synapse_expandable.html#AbstractSynapseExpandable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractSynapseExpandable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>Indicates a class (most likely a MachineVertex) that has may need to        run the SYNAPSE_EXPANDER aplx</p>
-<p>Cores that do not use the synapse_manager should not implement this
-API even though their app vertex may hold a synapse_manager</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">This is NOT implemented by the DelayExtensionMachineVertex
-which needs a different expander aplx</p>
-</div>
-<dl class="method">
-<dt id="spynnaker.pyNN.models.abstract_models.AbstractSynapseExpandable.gen_on_machine">
-<code class="descname">gen_on_machine</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_synapse_expandable.html#AbstractSynapseExpandable.gen_on_machine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractSynapseExpandable.gen_on_machine" title="Permalink to this definition">¶</a></dt>
-<dd><p>True if the synapses of a the slice of this vertex should be generated
-on the machine.</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">The typical implementation for this method will be to ask the
-app_vertex&#8217;s synapse_manager</p>
-</div>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.abstract_models.AbstractSynapseExpandable.read_generated_connection_holders">
-<code class="descname">read_generated_connection_holders</code><span class="sig-paren">(</span><em>transceiver</em>, <em>placement</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_synapse_expandable.html#AbstractSynapseExpandable.read_generated_connection_holders"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractSynapseExpandable.read_generated_connection_holders" title="Permalink to this definition">¶</a></dt>
-<dd><p>Fill in the connection holders</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">The typical implementation for this method will be to ask the
-app_vertex&#8217;s synapse_manager</p>
-</div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan v)"><em>Transceiver</em></a>) &#8211; How the data is to be read</li>
-<li><strong>placement</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placement" title="(in PACMAN v)"><em>Placement</em></a>) &#8211; Where the data is on the machine</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="spynnaker.pyNN.models.abstract_models.AbstractWeightUpdatable">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.abstract_models.</code><code class="descname">AbstractWeightUpdatable</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_weight_updatable.html#AbstractWeightUpdatable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractWeightUpdatable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>An object whose weight can be updated.</p>
-<dl class="method">
-<dt id="spynnaker.pyNN.models.abstract_models.AbstractWeightUpdatable.update_weight">
-<code class="descname">update_weight</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_weight_updatable.html#AbstractWeightUpdatable.update_weight"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractWeightUpdatable.update_weight" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the weight.</p>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-</div>
-
-
-          </div>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -604,12 +548,13 @@ app_vertex&#8217;s synapse_manager</p>
           <li class="nav-item nav-item-1"><a href="modules.html" >spynnaker</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
           <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
-          <li class="nav-item nav-item-4"><a href="spynnaker.pyNN.models.html" >spynnaker.pyNN.models package</a> &#187;</li> 
+          <li class="nav-item nav-item-4"><a href="spynnaker.pyNN.models.html" >spynnaker.pyNN.models package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.models.abstract_models package</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2017.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
     </div>
   </body>
 </html>

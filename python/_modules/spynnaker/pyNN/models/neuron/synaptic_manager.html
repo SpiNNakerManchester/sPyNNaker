@@ -1,34 +1,22 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<html lang="en">
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>spynnaker.pyNN.models.neuron.synaptic_manager &#8212; sPyNNaker  documentation</title>
-    
-    <link rel="stylesheet" href="../../../../../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../../../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    <link rel="stylesheet" href="../../../../../_static/sphinxdoc.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" /> 
-  </head>
-  <body role="document">
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -39,23 +27,10 @@
           <a href="../../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../../index.html">sPyNNaker  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.models.neuron.synaptic_manager</a></li> 
       </ul>
-    </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../../../../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
+    </div>  
 
     <div class="document">
       <div class="documentwrapper">
@@ -262,7 +237,7 @@
         <span class="k">return</span> <span class="n">matrices</span>
 
 <div class="viewcode-block" id="SynapticManager.host_written_matrix_size"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.SynapticManager.host_written_matrix_size">[docs]</a>    <span class="k">def</span> <span class="nf">host_written_matrix_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The size of the matrix written by the host for a given</span>
+        <span class="sd">&quot;&quot;&quot; The size of the matrix written by the host for a given\</span>
 <span class="sd">            machine vertex</span>
 
 <span class="sd">        :param post_vertex_slice: The slice of the vertex to get the size of</span>
@@ -272,7 +247,7 @@
         <span class="k">return</span> <span class="n">matrices</span><span class="o">.</span><span class="n">host_generated_block_addr</span></div>
 
 <div class="viewcode-block" id="SynapticManager.on_chip_written_matrix_size"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.SynapticManager.on_chip_written_matrix_size">[docs]</a>    <span class="k">def</span> <span class="nf">on_chip_written_matrix_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The size of the matrix that will be written on the machine for a</span>
+        <span class="sd">&quot;&quot;&quot; The size of the matrix that will be written on the machine for a\</span>
 <span class="sd">            given machine vertex</span>
 
 <span class="sd">        :param post_vertex_slice: The slice of the vertex to get the size of</span>
@@ -284,7 +259,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">synapse_dynamics</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The synapse dynamics used by the synapses e.g. plastic or static.</span>
+        <span class="sd">&quot;&quot;&quot; The synapse dynamics used by the synapses e.g. plastic or static.\</span>
 <span class="sd">            Settable.</span>
 
 <span class="sd">        :rtype: AbstractSynapseDynamics or None</span>
@@ -297,8 +272,8 @@
 
     <span class="nd">@synapse_dynamics</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">synapse_dynamics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_dynamics</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Set the synapse dynamics.  Note that after setting, the dynamics</span>
-<span class="sd">            might not be the type set as it can be combined with the existing</span>
+        <span class="sd">&quot;&quot;&quot; Set the synapse dynamics.  Note that after setting, the dynamics\</span>
+<span class="sd">            might not be the type set as it can be combined with the existing\</span>
 <span class="sd">            dynamics in exciting ways.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_dynamics</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -309,7 +284,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ring_buffer_sigma</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The sigma in the estimation of the maximum summed ring buffer</span>
+        <span class="sd">&quot;&quot;&quot; The sigma in the estimation of the maximum summed ring buffer\</span>
 <span class="sd">            weights.  Settable.</span>
 
 <span class="sd">        :rtype: float</span>
@@ -322,7 +297,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">spikes_per_second</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The assumed maximum spikes per second of an incoming population.</span>
+        <span class="sd">&quot;&quot;&quot; The assumed maximum spikes per second of an incoming population.\</span>
 <span class="sd">            Used when calculating the ring buffer weight scaling. Settable.</span>
 
 <span class="sd">        :rtype: float</span>
@@ -416,8 +391,10 @@
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
 <span class="sd">            The slice of the vertex to allocate for</span>
 <span class="sd">        :param int all_syn_block_sz: The memory to reserve for synapses</span>
-<span class="sd">        :param ~.MachineGraph machine_graph: The machine graph</span>
-<span class="sd">        :param ~.MachineVertex machine_vertex: The machine vertex</span>
+<span class="sd">        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:</span>
+<span class="sd">            The machine graph</span>
+<span class="sd">        :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:</span>
+<span class="sd">            The machine vertex</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
             <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_synapse_params_region</span><span class="p">,</span>
@@ -465,20 +442,20 @@
 
 <span class="sd">        Requires an assessment of maximum Poisson input rate.</span>
 
-<span class="sd">        Assumes knowledge of mean and SD of weight distribution, fan-in\</span>
+<span class="sd">        Assumes knowledge of mean and SD of weight distribution, fan-in</span>
 <span class="sd">        and timestep.</span>
 
-<span class="sd">        All arguments should be assumed real values except n_synapses_in\</span>
+<span class="sd">        All arguments should be assumed real values except n_synapses_in</span>
 <span class="sd">        which will be an integer.</span>
 
-<span class="sd">        :param float weight_mean: Mean of weight distribution (in either nA or\</span>
+<span class="sd">        :param float weight_mean: Mean of weight distribution (in either nA or</span>
 <span class="sd">            microSiemens as required)</span>
 <span class="sd">        :param float weight_std_dev: SD of weight distribution</span>
 <span class="sd">        :param float spikes_per_second: Maximum expected Poisson rate in Hz</span>
 <span class="sd">        :param int machine_timestep: in us</span>
 <span class="sd">        :param int n_synapses_in: No of connected synapses</span>
-<span class="sd">        :param float sigma: How many SD above the mean to go for upper bound;\</span>
-<span class="sd">            a good starting choice is 5.0. Given length of simulation we can\</span>
+<span class="sd">        :param float sigma: How many SD above the mean to go for upper bound;</span>
+<span class="sd">            a good starting choice is 5.0. Given length of simulation we can</span>
 <span class="sd">            set this for approximate number of saturation events.</span>
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -534,8 +511,8 @@
         <span class="sd">&quot;&quot;&quot; Get the scaling of the ring buffer to provide as much accuracy as\</span>
 <span class="sd">            possible without too much overflow</span>
 
-<span class="sd">        :param .MachineVertex machine_vertex:</span>
-<span class="sd">        :param .MachineGraph machine_graph:</span>
+<span class="sd">        :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:</span>
+<span class="sd">        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:</span>
 <span class="sd">        :param int machine_timestep:</span>
 <span class="sd">        :param float weight_scale:</span>
 <span class="sd">        :rtype: list(int)</span>
@@ -655,8 +632,8 @@
             <span class="n">weight_scale</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Update the ring buffer shifts and weight scales for this vertex</span>
 
-<span class="sd">        :param .MachineVertex machine_vertex:</span>
-<span class="sd">        :param .MachineGraph machine_graph:</span>
+<span class="sd">        :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:</span>
+<span class="sd">        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:</span>
 <span class="sd">        :param float machine_time_step:</span>
 <span class="sd">        :param float weight_scale:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -676,15 +653,11 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
 <span class="sd">            The data specification to write to</span>
-<span class="sd">        :param ~pacman.model.graphs.application_graph.ApplicationGraph \</span>
-<span class="sd">        application_graph: the app graph</span>
 <span class="sd">        :param AbstractPopulationVertex application_vertex:</span>
 <span class="sd">            The vertex owning the synapses</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice post_vertex_slice:</span>
 <span class="sd">            The part of the vertex we&#39;re dealing with</span>
 <span class="sd">        :param PopulationMachineVertex machine_vertex: The machine vertex</span>
-<span class="sd">        :param ~pacman.model.placements.Placement placement:</span>
-<span class="sd">            Where the vertex is placed</span>
 <span class="sd">        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:</span>
 <span class="sd">            The graph containing the machine vertex</span>
 <span class="sd">        :param ~pacman.model.graphs.application.ApplicationGraph \</span>
@@ -706,8 +679,7 @@
             <span class="n">machine_vertex</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__update_ring_buffer_shifts_and_weight_scales</span><span class="p">(</span>
-            <span class="n">machine_vertex</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span>
-            <span class="n">weight_scale</span><span class="p">)</span>
+            <span class="n">machine_vertex</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">weight_scale</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_synapse_params_region</span><span class="p">)</span>
         <span class="c1"># write the bool for deleting packets that were too late for a timer</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__drop_late_spikes</span><span class="p">))</span>
@@ -865,7 +837,22 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__synaptic_matrices</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span></div></div>
 </pre></div>
 
+            <div class="clearer"></div>
           </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -880,12 +867,13 @@
           <a href="../../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../../index.html">sPyNNaker  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.models.neuron.synaptic_manager</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2017.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
     </div>
   </body>
 </html>

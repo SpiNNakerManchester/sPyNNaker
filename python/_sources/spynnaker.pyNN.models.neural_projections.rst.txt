@@ -1,17 +1,18 @@
-spynnaker.pyNN.models.neural_projections package
-================================================
+spynnaker.pyNN.models.neural\_projections package
+=================================================
 
 Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
-    spynnaker.pyNN.models.neural_projections.connectors
+   spynnaker.pyNN.models.neural_projections.connectors
 
 Module contents
 ---------------
 
 .. automodule:: spynnaker.pyNN.models.neural_projections
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

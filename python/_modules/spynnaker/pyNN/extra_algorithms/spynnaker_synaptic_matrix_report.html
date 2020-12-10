@@ -1,34 +1,22 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<html lang="en">
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>spynnaker.pyNN.extra_algorithms.spynnaker_synaptic_matrix_report &#8212; sPyNNaker  documentation</title>
-    
-    <link rel="stylesheet" href="../../../../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    <link rel="stylesheet" href="../../../../_static/sphinxdoc.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
-  </head>
-  <body role="document">
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -39,23 +27,10 @@
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../index.html">sPyNNaker  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.extra_algorithms.spynnaker_synaptic_matrix_report</a></li> 
       </ul>
-    </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../../../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
+    </div>  
 
     <div class="document">
       <div class="documentwrapper">
@@ -90,20 +65,20 @@
 <span class="n">_TMPL_FILENAME</span> <span class="o">=</span> <span class="s2">&quot;synaptic_matrix_for_application_edge_</span><span class="si">{}</span><span class="s2">&quot;</span>
 
 
-<div class="viewcode-block" id="SpYNNakerSynapticMatrixReport"><a class="viewcode-back" href="../../../../spynnaker.pyNN.extra_algorithms.html#spynnaker.pyNN.extra_algorithms.spynnaker_synaptic_matrix_report.SpYNNakerSynapticMatrixReport">[docs]</a><span class="k">class</span> <span class="nc">SpYNNakerSynapticMatrixReport</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="SpYNNakerSynapticMatrixReport"><a class="viewcode-back" href="../../../../spynnaker.pyNN.extra_algorithms.html#spynnaker.pyNN.extra_algorithms.SpYNNakerSynapticMatrixReport">[docs]</a><span class="k">class</span> <span class="nc">SpYNNakerSynapticMatrixReport</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Generate the synaptic matrices for reporting purposes.</span>
-
-<span class="sd">    :param str report_folder: where to write the report</span>
-<span class="sd">    :param connection_holder: where the synaptic matrices are stored \</span>
-<span class="sd">        (possibly after retrieval from the machine)</span>
-<span class="sd">    :type connection_holder:</span>
-<span class="sd">        dict(tuple(ProjectionApplicationEdge, SynapseInformation), \</span>
-<span class="sd">        ConnectionHolder)</span>
-<span class="sd">    :param dsg_targets: used to check if connection holders are populated</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">report_folder</span><span class="p">,</span> <span class="n">connection_holder</span><span class="p">,</span> <span class="n">dsg_targets</span><span class="p">):</span>
+<div class="viewcode-block" id="SpYNNakerSynapticMatrixReport.__call__"><a class="viewcode-back" href="../../../../spynnaker.pyNN.extra_algorithms.html#spynnaker.pyNN.extra_algorithms.SpYNNakerSynapticMatrixReport.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">report_folder</span><span class="p">,</span> <span class="n">connection_holder</span><span class="p">,</span> <span class="n">dsg_targets</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Convert synaptic matrix for every application edge.</span>
+
+<span class="sd">        :param str report_folder: where to write the report</span>
+<span class="sd">        :param connection_holder: where the synaptic matrices are stored \</span>
+<span class="sd">            (possibly after retrieval from the machine)</span>
+<span class="sd">        :type connection_holder:</span>
+<span class="sd">            dict(tuple(ProjectionApplicationEdge, SynapseInformation), \</span>
+<span class="sd">            ConnectionHolder)</span>
+<span class="sd">        :param dsg_targets: used to check if connection holders are populated</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># Update the print options to display everything</span>
@@ -134,7 +109,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_write_file</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">connection_holder</span><span class="p">,</span> <span class="n">edge</span><span class="p">)</span>
 
         <span class="c1"># Reset the print options</span>
-        <span class="n">numpy</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="o">**</span><span class="n">print_opts</span><span class="p">)</span>
+        <span class="n">numpy</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="o">**</span><span class="n">print_opts</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_write_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">connection_holder</span><span class="p">,</span> <span class="n">edge</span><span class="p">):</span>
         <span class="c1"># open writer</span>
@@ -148,7 +123,22 @@
                              <span class="s2">&quot; </span><span class="si">%s</span><span class="s2"> for writing.&quot;</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span></div>
 </pre></div>
 
+            <div class="clearer"></div>
           </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -163,12 +153,13 @@
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../index.html">sPyNNaker  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.extra_algorithms.spynnaker_synaptic_matrix_report</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2017.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
     </div>
   </body>
 </html>

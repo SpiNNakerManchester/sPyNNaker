@@ -5,55 +5,55 @@ Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
-    spynnaker.pyNN.connections
-    spynnaker.pyNN.external_devices_models
-    spynnaker.pyNN.extra_algorithms
-    spynnaker.pyNN.model_binaries
-    spynnaker.pyNN.models
-    spynnaker.pyNN.protocols
-    spynnaker.pyNN.utilities
+   spynnaker.pyNN.connections
+   spynnaker.pyNN.external_devices_models
+   spynnaker.pyNN.extra_algorithms
+   spynnaker.pyNN.model_binaries
+   spynnaker.pyNN.models
+   spynnaker.pyNN.protocols
+   spynnaker.pyNN.utilities
 
 Submodules
 ----------
 
-spynnaker.pyNN.abstract_spinnaker_common module
------------------------------------------------
+spynnaker.pyNN.abstract\_spinnaker\_common module
+-------------------------------------------------
 
 .. automodule:: spynnaker.pyNN.abstract_spinnaker_common
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 spynnaker.pyNN.exceptions module
 --------------------------------
 
 .. automodule:: spynnaker.pyNN.exceptions
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
-spynnaker.pyNN.spynnaker_external_device_plugin_manager module
---------------------------------------------------------------
+spynnaker.pyNN.spynnaker\_external\_device\_plugin\_manager module
+------------------------------------------------------------------
 
 .. automodule:: spynnaker.pyNN.spynnaker_external_device_plugin_manager
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
-spynnaker.pyNN.spynnaker_simulator_interface module
----------------------------------------------------
+spynnaker.pyNN.spynnaker\_simulator\_interface module
+-----------------------------------------------------
 
 .. automodule:: spynnaker.pyNN.spynnaker_simulator_interface
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 Module contents
 ---------------
 
 .. automodule:: spynnaker.pyNN
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:
