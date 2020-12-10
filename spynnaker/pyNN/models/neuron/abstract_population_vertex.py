@@ -30,8 +30,16 @@ from spinn_front_end_common.abstract_models.impl import (
 from spinn_front_end_common.utilities import (
     helpful_functions, globals_variables)
 from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, MICRO_TO_SECOND_CONVERSION)
+    BYTES_PER_WORD, MICRO_TO_SECOND_CONVERSION, SYSTEM_BYTES_REQUIREMENT)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+from spinn_front_end_common.interface.profiling.profile_utils import (
+    get_profile_region_size)
+from spinn_front_end_common.interface.buffer_management\
+    .recording_utilities import (
+       get_recording_header_size, get_recording_data_constant_size)
+from spinn_front_end_common.interface.provenance import (
+    ProvidesProvenanceDataFromMachineImpl)
+
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, AbstractNeuronRecordable, NeuronRecorder)
 from spynnaker.pyNN.models.abstract_models import (
@@ -113,6 +121,12 @@ class AbstractPopulationVertex(
 
     #: The Buffer traffic type
     _TRAFFIC_IDENTIFIER = "BufferTraffic"
+
+    _C_MAIN_BASE_N_CPU_CYCLES = 0
+    _NEURON_BASE_N_CPU_CYCLES_PER_NEURON = 22
+    _NEURON_BASE_N_CPU_CYCLES = 10
+    _SYNAPSE_BASE_N_CPU_CYCLES_PER_NEURON = 22
+    _SYNAPSE_BASE_N_CPU_CYCLES = 10
 
     # 5 elements before the start of global parameters
     # 1. has key, 2. key, 3. n atoms
@@ -1057,7 +1071,7 @@ class AbstractPopulationVertex(
         return gen_size
 
     @property
-    def vertex_executable_suffix(self):
+    def synapse_executable_suffix(self):
         """ The suffix of the executable name due to the type of synapses \
             in use.
         :rtype: str
@@ -1073,6 +1087,15 @@ class AbstractPopulationVertex(
     @property
     def synapse_recordables(self):
         return self.__synapse_recorder.get_recordable_variables()
+
+    def get_common_constant_sdram(self, n_record, n_provenance):
+        return (
+            SYSTEM_BYTES_REQUIREMENT +
+            get_recording_header_size(n_record) +
+            get_recording_data_constant_size(n_record) +
+            ProvidesProvenanceDataFromMachineImpl.get_provenance_data_size(
+                n_provenance) +
+            get_profile_region_size(self.__n_profile_samples))
 
     def get_neuron_variable_sdram(self, vertex_slice):
         return self.__neuron_recorder.get_variable_sdram_usage(vertex_slice)
@@ -1099,3 +1122,34 @@ class AbstractPopulationVertex(
             get_estimated_sdram_for_key_region(
                 self.__incoming_projections) +
             exact_sdram_for_bit_field_builder_region())
+
+    def get_common_dtcm(self):
+        # TODO: Get some real numbers here
+        return 0
+
+    def get_neuron_dtcm(self, vertex_slice):
+        return (
+            self.__neuron_impl.get_dtcm_usage_in_bytes(vertex_slice.n_atoms) +
+            self.__neuron_recorder.get_dtcm_usage_in_bytes(vertex_slice)
+        )
+
+    def get_synapse_dtcm(self, vertex_slice):
+        return self.__synapse_recorder.get_dtcm_usage_in_bytes(vertex_slice)
+
+    def get_common_cpu(self):
+        return self._C_MAIN_BASE_N_CPU_CYCLES
+
+    def get_neuron_cpu(self, vertex_slice):
+        return (
+            self._NEURON_BASE_N_CPU_CYCLES +
+            (self._NEURON_BASE_N_CPU_CYCLES_PER_NEURON *
+             vertex_slice.n_atoms) +
+            self.__neuron_recorder.get_n_cpu_cycles(vertex_slice.n_atoms) +
+            self.__neuron_impl.get_n_cpu_cycles(vertex_slice.n_atoms))
+
+    def get_synapse_cpu(self, vertex_slice):
+        return (
+            self._SYNAPSE_BASE_N_CPU_CYCLES +
+            (self._SYNAPSE_BASE_N_CPU_CYCLES_PER_NEURON *
+             vertex_slice.n_atoms) +
+            self.__synapse_recorder.get_n_cpu_cycles(vertex_slice.n_atoms))

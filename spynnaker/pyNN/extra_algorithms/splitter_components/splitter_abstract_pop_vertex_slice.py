@@ -12,8 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import os
-
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.constraints.partitioner_constraints import (
@@ -25,17 +23,11 @@ from pacman.model.resources import (
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterSlice)
 from pacman.utilities import utility_calls
-from spinn_front_end_common.interface.profiling import profile_utils
-from spinn_front_end_common.utilities.constants import (
-    SYSTEM_BYTES_REQUIREMENT)
-from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
 from spynnaker.pyNN.models.neuron import (
     AbstractPopulationVertex, PopulationMachineVertex)
 from spynnaker.pyNN.models.neuron.population_machine_vertex import (
     NeuronProvenance, SynapseProvenance)
-from spinn_front_end_common.interface.buffer_management\
-    .recording_utilities import (
-        get_recording_header_size, get_recording_data_constant_size)
+from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
 
 
 class SplitterAbstractPopulationVertexSlice(
@@ -44,10 +36,6 @@ class SplitterAbstractPopulationVertexSlice(
     """
 
     __slots__ = []
-
-    _NEURON_BASE_N_CPU_CYCLES_PER_NEURON = 22
-    _NEURON_BASE_N_CPU_CYCLES = 10
-    _C_MAIN_BASE_N_CPU_CYCLES = 0
 
     SPLITTER_NAME = "SplitterAbstractPopulationVertexSlice"
 
@@ -83,7 +71,7 @@ class SplitterAbstractPopulationVertexSlice(
             self, vertex_slice, resources, label, remaining_constraints):
         return PopulationMachineVertex(
             resources, label, remaining_constraints, self._governed_app_vertex,
-            vertex_slice, self.__get_binary_file_name())
+            vertex_slice)
 
     @overrides(AbstractSplitterSlice.get_resources_used_by_atoms)
     def get_resources_used_by_atoms(self, vertex_slice):
@@ -93,19 +81,19 @@ class SplitterAbstractPopulationVertexSlice(
         :param MachineGraph graph: app graph
         :rtype: ResourceContainer
         """
-        variable_sdram = self.get_variable_sdram(vertex_slice)
-        constant_sdram = self.constant_sdram(vertex_slice)
+        variable_sdram = self.__get_variable_sdram(vertex_slice)
+        constant_sdram = self.__get_constant_sdram(vertex_slice)
 
         # set resources required from this object
         container = ResourceContainer(
             sdram=variable_sdram + constant_sdram,
-            dtcm=self.dtcm_cost(vertex_slice),
-            cpu_cycles=self.cpu_cost(vertex_slice))
+            dtcm=self.__get_dtcm_cost(vertex_slice),
+            cpu_cycles=self.__get_cpu_cost(vertex_slice))
 
         # return the total resources.
         return container
 
-    def get_variable_sdram(self, vertex_slice):
+    def __get_variable_sdram(self, vertex_slice):
         """ returns the variable sdram from the recorder.
 
         :param Slice vertex_slice: the atom slice for recording sdram
@@ -117,7 +105,7 @@ class SplitterAbstractPopulationVertexSlice(
             self._governed_app_vertex.get_neuron_variable_sdram(vertex_slice) +
             self._governed_app_vertex.get_synapse_variable_sdram(vertex_slice))
 
-    def constant_sdram(self, vertex_slice):
+    def __get_constant_sdram(self, vertex_slice):
         """ returns the constant sdram used by the vertex slice.
 
         :param Slice vertex_slice: the atoms to get constant sdram of
@@ -126,59 +114,34 @@ class SplitterAbstractPopulationVertexSlice(
         n_record = (
             len(self._governed_app_vertex.neuron_recordables) +
             len(self._governed_app_vertex.synapse_recordables))
+        n_provenance = NeuronProvenance.N_ITEMS + SynapseProvenance.N_ITEMS
         return ConstantSDRAM(
-            SYSTEM_BYTES_REQUIREMENT +
-            get_recording_header_size(n_record) +
-            get_recording_data_constant_size(n_record) +
-            PopulationMachineVertex.get_provenance_data_size(
-                NeuronProvenance.N_ITEMS + SynapseProvenance.N_ITEMS) +
-            profile_utils.get_profile_region_size(
-                self._governed_app_vertex.n_profile_samples) +
+            self._governed_app_vertex.get_common_constant_sdram(
+                n_record, n_provenance) +
             self._governed_app_vertex.get_neuron_constant_sdram(vertex_slice) +
             self._governed_app_vertex.get_synapse_constant_sdram(vertex_slice))
 
-    def dtcm_cost(self, vertex_slice):
+    def __get_dtcm_cost(self, vertex_slice):
         """ get the dtcm cost for the slice of atoms
 
         :param Slice vertex_slice: atom slice for dtcm calc.
         :rtype: DTCMResource
         """
         return DTCMResource(
-            self._governed_app_vertex.neuron_impl.get_dtcm_usage_in_bytes(
-                vertex_slice.n_atoms) +
-            self._governed_app_vertex.neuron_recorder.get_dtcm_usage_in_bytes(
-                vertex_slice))
+            self._governed_app_vertex.get_common_dtcm() +
+            self._governed_app_vertex.get_neuron_dtcm(vertex_slice) +
+            self._governed_app_vertex.get_synapse_dtcm(vertex_slice))
 
-    def cpu_cost(self, vertex_slice):
+    def __get_cpu_cost(self, vertex_slice):
         """ get cpu cost for a slice of atoms
 
         :param Slice vertex_slice: slice of atoms
         :rtype: CPUCyclesPerTickResourcer
         """
         return CPUCyclesPerTickResource(
-            self._NEURON_BASE_N_CPU_CYCLES + self._C_MAIN_BASE_N_CPU_CYCLES +
-            (self._NEURON_BASE_N_CPU_CYCLES_PER_NEURON *
-             vertex_slice.n_atoms) +
-            self._governed_app_vertex.neuron_recorder.get_n_cpu_cycles(
-                vertex_slice.n_atoms) +
-            self._governed_app_vertex.neuron_impl.get_n_cpu_cycles(
-                vertex_slice.n_atoms))
-
-    def __get_binary_file_name(self):
-        """ returns the binary name for the machine vertices.
-
-        :rtype: str
-        """
-
-        # Split binary name into title and extension
-        binary_title, binary_extension = os.path.splitext(
-            self._governed_app_vertex.neuron_impl.binary_name)
-
-        # Reunite title and extension and return
-        return (
-            binary_title +
-            self._governed_app_vertex.vertex_executable_suffix +
-            binary_extension)
+            self._governed_app_vertex.get_common_cpu() +
+            self._governed_app_vertex.get_neuron_cpu(vertex_slice) +
+            self._governed_app_vertex.get_synapse_cpu(vertex_slice))
 
     @overrides(AbstractSplitterSlice.check_supported_constraints)
     def check_supported_constraints(self):

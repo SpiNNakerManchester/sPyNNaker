@@ -15,6 +15,7 @@
 from enum import Enum
 from collections import namedtuple
 import ctypes
+import os
 
 from pacman.executor.injection_decorator import inject_items
 from spinn_front_end_common.interface.simulation import simulation_utilities
@@ -221,7 +222,7 @@ class PopulationMachineVertex(
 
     def __init__(
             self, resources_required, label, constraints, app_vertex,
-            vertex_slice, binary_file_name):
+            vertex_slice):
         """
         :param ~pacman.model.resources.ResourceContainer resources_required:
         :param iterable(int) recorded_region_ids:
@@ -235,7 +236,6 @@ class PopulationMachineVertex(
         """
         super(PopulationMachineVertex, self).__init__(
             label, constraints, app_vertex, vertex_slice)
-        self.__binary_file_name = binary_file_name
         self.__resources = resources_required
         self.__change_requires_neuron_parameters_reload = False
 
@@ -469,7 +469,15 @@ class PopulationMachineVertex(
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
     def get_binary_file_name(self):
-        return self.__binary_file_name
+        # Split binary name into title and extension
+        binary_title, binary_extension = os.path.splitext(
+            self._app_vertex.neuron_impl.binary_name)
+
+        # Reunite title and extension and return
+        return (
+            binary_title +
+            self._app_vertex.synapse_executable_suffix +
+            binary_extension)
 
     @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
     def get_binary_start_type(self):
