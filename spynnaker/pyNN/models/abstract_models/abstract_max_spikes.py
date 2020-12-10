@@ -19,20 +19,22 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 @add_metaclass(AbstractBase)
 class AbstractMaxSpikes(object):
-    """ Indicates a class (most likely a MachineVertex) that can describe the
-        maximun rate that it sends spikes.
+    """ Indicates a class (most likely a \
+        :py:class:`~pacman.model.graphs.machine.MachineVertex`) \
+        that can describe the maximum rate that it sends spikes.
 
-        The SynapticManager assumes that all machine vertexes share the same
-        synapse_information will have the same rates
+        The :py:class:`~.SynapticManager` assumes that all machine vertexes
+        share the same synapse_information will have the same rates.
     """
 
     __slots__ = ()
 
     @abstractmethod
     def max_spikes_per_ts(self, machine_time_step):
-        """
-        Get maximum expected number of spikes per timestep
+        """ Get maximum expected number of spikes per timestep
+
         :param int machine_time_step: The timestime used in ms
+        :rtype: int
         """
 
     @abstractmethod
