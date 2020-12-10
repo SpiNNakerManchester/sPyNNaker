@@ -35,6 +35,7 @@ STDP_FIXED_POINT_ONE = (1 << 11)
 def float_to_fixed(value, fixed_point_one):
     return int(round(float(value) * float(fixed_point_one)))
 
+
 def get_lut_provenance(
         pre_population_label, post_population_label, rule_name, entry_name,
         param_name, last_entry):
@@ -54,6 +55,7 @@ def get_lut_provenance(
             " increasing the timestep".format(
                 param_name, rule_name, pre_population_label,
                 post_population_label, last_entry)))
+
 
 def get_exp_lut_array(time_step, time_constant, shift=0):
     """
@@ -137,13 +139,29 @@ def write_pfpc_lut(spec, peak_time, lut_size, shift, time_probe,
         plt.legend()
         plt.title("pf-PC LUT")
         plt.savefig("figures/write_pfpc_lut.png")
+
+        plt.plot(t, out_fixed, label='fixed int16')
+        plt.legend()
+        plt.title("pf-PC LUT")
+        plt.savefig("figures/write_pfpc_lut_final_exp_fix.png")
         # plt.show()
+
+        out_fixed = numpy.array(out_fixed)
+        out_float = numpy.array(out_float)
+        compare_t_values = numpy.array([15, 20, 30, 35, 45, 47,
+                                        99, 115, 135, 140, 150])
+        print("LUT VALUES TO COMPARE TO SPINNAKER:")
+        print("TIME DELTAS | FIXED MULTIPLIERS | FLOAT MULTIPLIERS")
+        for x, y, z, in zip(compare_t_values, out_fixed[compare_t_values], out_float[compare_t_values]):
+            print("{:8} | {:8} | {:8.4f}".format(x, y, z))
+
         return t, out_float
     else:
         # exp_fix_array_int16 = numpy.asarray(
         #     final_exp_fix, dtype="uint16").view("uint32")
-
+        # spec.write_array(exp_fix_array_int16)
         spec.write_array(final_exp_fix, data_type=DataType.INT16)
+
 
 def write_mfvn_lut(spec, sigma, beta, lut_size, shift, time_probe,
                    fixed_point_one=STDP_FIXED_POINT_ONE):

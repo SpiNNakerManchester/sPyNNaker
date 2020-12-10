@@ -103,6 +103,16 @@ static inline int32_t maths_lut_exponential_decay(
     return (lut_index < lut->size) ? lut->values[lut_index] : 0;
 }
 
+static inline int32_t maths_lut_exponential_decay_time_shifted(
+        uint32_t time, const uint32_t time_shift, const uint32_t lut_size,
+        const int16_t *lut) {
+    // Calculate lut index
+    uint32_t lut_index = time >> time_shift;
+
+    // Return value from LUT
+    return (lut_index < lut_size) ? lut[lut_index] : 0;
+}
+
 //! \brief Clamp to fit in number of bits
 //! \param[in] x: The value to clamp
 //! \param[in] shift: Width of the field to clamp the value to fit in

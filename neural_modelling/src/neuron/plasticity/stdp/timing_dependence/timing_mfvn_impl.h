@@ -27,8 +27,8 @@ typedef int16_t pre_trace_t;
 
 // Helper macros for looking up decays
 #define EXP_COS_LOOKUP(time) \
-    maths_lut_exponential_decay( \
-        time, exp_cos_lookup)
+    maths_lut_exponential_decay_time_shifted( \
+        time, TAU_PLUS_TIME_SHIFT, EXP_COS_LUT_SIZE, exp_cos_lookup)
 //#define DECAY_LOOKUP_TAU_MINUS(time) \
 //    maths_lut_exponential_decay( \
 //        time, TAU_MINUS_TIME_SHIFT, TAU_MINUS_SIZE, tau_minus_lookup)
