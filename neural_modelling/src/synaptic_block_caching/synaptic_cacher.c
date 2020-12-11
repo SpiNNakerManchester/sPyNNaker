@@ -114,7 +114,7 @@ static bool get_position_in_master_pop(uint32_t key, uint32_t* position) {
     bool success  = population_table_position_in_the_master_pop_array(
         key, position);
     if (!success) {
-        log_info("WTF how did this happen. cant find the position");
+        log_error("WTF how did this happen. cant find the position");
         return false;
     }
     return true;
@@ -132,20 +132,20 @@ static inline bool synapses_are_plastic_or_structural_or_direct(
 
     // if a direct synapse do not cache
     if (entry.addr.representation == DIRECT) {
-        log_info(
+        log_debug(
             "REJECTED for caching as is a DIRECT connection on index %d",
             address_index);
         *result = true;
         return true;
     }
     else {
-        log_info("current rep is %d", entry.addr.representation);
+        log_debug("current rep is %d", entry.addr.representation);
     }
 
     // check for invalid master pop entries, coz they dont need caching coz
     // they invalid.
     if (entry.addr.address == INVALID_ADDRESS) {
-        log_info("REJECTED as entry is a invalid entry.");
+        log_debug("REJECTED as entry is a invalid entry.");
         *result = true;
         return true;
     }
@@ -164,14 +164,14 @@ static inline bool synapses_are_plastic_or_structural_or_direct(
         bool success = population_table_get_first_address(
             key, &row_address, &size);
         if (!success) {
-            log_info("failed to read row for key 0x%08x", key);
+            log_error("failed to read row for key 0x%08x", key);
             return false;
         }
         synaptic_row_t row = (synaptic_row_t) row_address;
 
         // plastic
         if (synapse_row_plastic_size(row) > 0) {
-            log_info(
+            log_debug(
                 "REJECTED for caching as it contains plastic synapses index %d",
                 address_index);
             *result = true;
@@ -186,7 +186,7 @@ static inline bool synapses_are_plastic_or_structural_or_direct(
                     &dummy1, &dummy2, &dummy3, &dummy4);
         }
         if (bit_found) {
-            log_info(
+            log_debug(
                 "REJECTED for caching as it contains a structural synapses at"
                 " index  %d", address_index);
             *result = true;
@@ -240,7 +240,7 @@ static inline int calculate_binary_search_size(
         n_valid_entries * sizeof(binary_search_element*) + malloc_cost;
 
     // return dtcm used
-    log_info("dtcm used for binary search is %d", dtcm_used);
+    log_debug("dtcm used for binary search is %d", dtcm_used);
     return dtcm_used;
 }
 
@@ -281,7 +281,7 @@ static inline uint32_t calculate_array_search_size(
     }
 
     // return dtcm used
-    log_info("dtcm used for array is %d", dtcm_used);
+    log_debug("dtcm used for array is %d", dtcm_used);
     return dtcm_used;
 }
 
@@ -325,7 +325,7 @@ static inline void read_in_addresses(void) {
     direct_matrix_region_base_address = data_specification_get_region(
             builder_data->direct_matrix_region_id, dsg_metadata);
 
-    log_info("structural matrix region id = %d",
+    log_debug("structural matrix region id = %d",
             builder_data->structural_matrix_region_id);
     if (builder_data->structural_matrix_region_id != FAILED_REGION_ID) {
         structural_matrix_region_base_address = data_specification_get_region(
@@ -412,15 +412,15 @@ static inline bool initialise(void) {
 //! \brief prints the store
 static void print_store(void) {
     // print for debug purposes
-    log_info("start print");
+    log_debug("start print");
     for (uint32_t bit_field = 0; bit_field < bit_field_base_address->n_filters;
             bit_field++) {
-        log_info(
+        log_debug(
             "bitfield with index %d has key %d and has none redundant count of %d",
             bit_field, not_redundant_tracker[bit_field].filter->key,
             not_redundant_tracker[bit_field].not_redundant_count);
     }
-    log_info("fin");
+    log_debug("fin");
 }
 
 //! \brief reads in the bitfields
@@ -472,14 +472,10 @@ static inline bool sort_out_bitfields(void) {
         log_error("failed to read in bitfields");
         return false;
     }
-    // debug
-    log_info("before sort");
-    print_store();
 
     // sort so that most not redundant at front
     sort();
 
-    log_info("after sort");
     print_store();
     return true;
 }
@@ -508,7 +504,7 @@ static bool set_master_pop_sdram_entry_to_cache(uint32_t bit_field_index) {
         return false;
     }
 
-    log_info("setting master pop entry %d to cache in DTCM", position);
+    log_debug("setting master pop entry %d to cache in DTCM", position);
 
     // set dtcm master pop for printing
     population_table_entry_set_to_cache(position);
@@ -529,20 +525,20 @@ static bool set_master_pop_sdram_entry_to_cache(uint32_t bit_field_index) {
 static inline void set_address_to_cache_reps(
         uint32_t address_entry_index, uint32_t rep) {
     if (rep == DEFAULT) {
-        log_info(
+        log_debug(
             "setting address entry %d to rep DEFAULT", address_entry_index);
     } else if (rep == DIRECT) {
-        log_info(
+        log_debug(
             "setting address entry %d to rep DIRECT", address_entry_index);
     } else if (rep == BINARY_SEARCH) {
-        log_info(
+        log_debug(
             "setting address entry %d to rep BINARY_SEARCH",
             address_entry_index);
     } else if (rep == ARRAY) {
-        log_info(
+        log_debug(
             "setting address entry %d to rep ARRAY", address_entry_index);
     } else {
-        log_info("WTF unrecognised rep");
+        log_error("WTF unrecognised rep");
     }
 
     // set dtcm master pop just to allow bulk transfer
@@ -597,7 +593,7 @@ static inline bool set_start_and_count(
                 &position)) {
             return false;
         }
-        log_info("found extra info at index %d. skipping", position);
+        log_debug("found extra info at index %d. skipping", position);
         *start += 1;
         *count -= 1;
     }
@@ -607,7 +603,7 @@ static inline bool set_start_and_count(
                 &position)) {
             return false;
         }
-        log_info("basic entry at master pop array at index %d", position);
+        log_debug("basic entry at master pop array at index %d", position);
     }
     return true;
 }
@@ -640,7 +636,7 @@ static inline bool cache_blocks(void) {
         bool success = set_start_and_count(
             master_entry, bit_field_index, &start, &count);
         if (!success) {
-            log_info("failed to set start and count");
+            log_error("failed to set start and count");
             return false;
         }
 
@@ -671,7 +667,7 @@ static inline bool cache_blocks(void) {
 
             if (result) {
                 cache = false;
-                log_info(
+                log_debug(
                     "cant cache as it meets requirement to bypass for "
                     "address entry at %d", address_index);
             }
@@ -686,19 +682,16 @@ static inline bool cache_blocks(void) {
                 if (binary_search_size < array_search_size) {
                     // check if can be cached
                     if (dtcm_to_use_tmp + binary_search_size <= dtcm_to_use) {
-                        log_info(
+                        log_debug(
                             "setting reps %d to BINARY_SEARCH",
                             address_index - start);
                         reps[address_index - start] = BINARY_SEARCH;
-                        log_info(
-                            "set reps %d to %d",
-                            address_index - start, reps[address_index - start]);
                         dtcm_to_use_tmp += binary_search_size;
                         used_binary_rep = true;
                     }
                     else {
                         cache = false;
-                        log_info(
+                        log_debug(
                             "failed to cache as binary size %d plus current "
                             "cost %d is greater than %d.",
                             binary_search_size, dtcm_to_use_tmp, dtcm_to_use);
@@ -706,19 +699,16 @@ static inline bool cache_blocks(void) {
                 }
                 else{  // array rep better. check if can be cached
                     if(dtcm_to_use_tmp + array_search_size <= dtcm_to_use) {
-                        log_info(
+                        log_debug(
                             "setting rep %d to ARRAY",
                             address_index - start);
                         reps[address_index - start] = ARRAY;
-                        log_info(
-                            "set reps %d to %d",
-                            address_index - start, reps[address_index - start]);
                         dtcm_to_use_tmp += binary_search_size;
                         used_array_rep = true;
                     }
                     else {
                         cache = false;
-                        log_info(
+                        log_debug(
                             "failed to cache as binary size %d plus current "
                             "cost %d is greater than %d.",
                             array_search_size, dtcm_to_use_tmp, dtcm_to_use);
@@ -737,7 +727,7 @@ static inline bool cache_blocks(void) {
 
                 // final check before caching.
                 if(dtcm_to_use_tmp >= dtcm_to_use) {
-                    log_info(
+                    log_debug(
                         "failed to cache as dtcm cost of %d is greater than %d",
                         dtcm_to_use_tmp, dtcm_to_use);
                     cache = false;
@@ -749,7 +739,7 @@ static inline bool cache_blocks(void) {
         if (!cache) {
             for (uint32_t address_index = 0; address_index < count;
                     address_index ++) {
-                log_info("wont cache address index %d", address_index);
+                log_debug("wont cache address index %d", address_index);
             }
         } else {
             // set master pop table to cache. and remove dtcm usage.
@@ -761,11 +751,10 @@ static inline bool cache_blocks(void) {
             for (uint32_t address_index = 0; address_index < count;
                     address_index ++) {
                 // set addresses to cached reps.
-                log_info("start is %d, index %d", start, address_index);
                 set_address_to_cache_reps(
                     address_index + start, reps[address_index]);
             }
-            log_info("removing %d bytes from %d", dtcm_to_use_tmp, dtcm_to_use);
+            log_debug("removing %d bytes from %d", dtcm_to_use_tmp, dtcm_to_use);
             dtcm_to_use -= dtcm_to_use_tmp;
         }
     }
@@ -800,7 +789,8 @@ void c_main(void) {
             fail_shut_down();
         }
 
-        log_info("printing resulting master pop table");
+        log_info(
+            "printing resulting master pop table after caching has occured");
         print_master_population_table();
     }
     success_shut_down();
