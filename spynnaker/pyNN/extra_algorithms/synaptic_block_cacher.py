@@ -12,6 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import logging
 import os
 import struct
 
@@ -25,6 +26,8 @@ from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_utilities.progress_bar import ProgressBar
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
+
+logger = logging.getLogger(__name__)
 
 
 class SynapticBlockCacher(object):
@@ -237,7 +240,7 @@ class SynapticBlockCacher(object):
         # debug
         user2_content = self.__txrx.read_user_2(
             placement.x, placement.y, placement.p)
-        print(
+        logger.debug(
             "dtcm for core {}:{}:{} is {}".format(
                 placement.x, placement.y, placement.p, user2_content))
 
