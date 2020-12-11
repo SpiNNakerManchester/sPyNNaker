@@ -106,6 +106,33 @@ static not_redundant_tracker_t* not_redundant_tracker = NULL;
 
 /***************************************************************/
 
+//! \brief checks heuristics for if its worth caching or should use
+//! bitfields instead
+//! \param[in] bit_field_index: index in bitfield store.
+//! \return bool that states if caching is worthwhile.
+static inline bool heuristic_worth_caching(uint32_t bit_field_index) {
+    // TODO fill in heuristic as needed / determined
+    use(bit_field_index);
+    return true;
+}
+
+//! \brief checks if bitfield should be set to merged if the blocks are
+//! going to be cached.
+//! \param[in] bit_field_index: index in bitfield store.
+//! \return bool that states if the bitfield should be set to merged.
+static inline bool heuristic_worth_flagging_merged_bitfield(
+        uint32_t bit_field_index) {
+    // TODO fill in heuristic as needed / determined
+    use(bit_field_index);
+    return true;
+}
+
+//! \brief sets a bitfield merged flag if required
+//! \param[in] bit_field_index: index in bitfield store.
+static inline void set_bitfield_to_merged_in_sdram(uint32_t bit_field_index) {
+    use(bit_field_index);
+}
+
 //! \brief finds position in master pop table
 //! \param[in] key: master pop key
 //! \param[out] position: the position in the array where this key entry lives.
@@ -735,6 +762,11 @@ static inline bool cache_blocks(void) {
             }
         }
 
+        // check heuristic over bitfields alone
+        if (cache) {
+            cache = heuristic_worth_caching(bit_field_index);
+        }
+
         // update data structs to reflect caching
         if (!cache) {
             for (uint32_t address_index = 0; address_index < count;
@@ -748,12 +780,20 @@ static inline bool cache_blocks(void) {
                 return false;
             }
 
+            // set addresses to cached reps.
             for (uint32_t address_index = 0; address_index < count;
                     address_index ++) {
-                // set addresses to cached reps.
                 set_address_to_cache_reps(
                     address_index + start, reps[address_index]);
             }
+
+            // set bitfield associated with this to merged. avoiding it
+            // getting loaded in if considered worthwhile
+            if (heuristic_worth_flagging_merged_bitfield(bit_field_index)) {
+                set_bitfield_to_merged_in_sdram(bit_field_index);
+            }
+
+
             log_debug("removing %d bytes from %d", dtcm_to_use_tmp, dtcm_to_use);
             dtcm_to_use -= dtcm_to_use_tmp;
         }
