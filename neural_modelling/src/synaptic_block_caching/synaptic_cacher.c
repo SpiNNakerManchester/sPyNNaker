@@ -147,20 +147,6 @@ static inline void update_master_pop_counters(void) {
     store->n_binary_search_blocks = n_binary_search_blocks;
 }
 
-//! \brief finds position in master pop table
-//! \param[in] key: master pop key
-//! \param[out] position: the position in the array where this key entry lives.
-//! \return bool stating if finding was successful or not
-static bool get_position_in_master_pop(uint32_t key, uint32_t* position) {
-    bool success  = population_table_position_in_the_master_pop_array(
-        key, position);
-    if (!success) {
-        log_error("WTF how did this happen. cant find the position");
-        return false;
-    }
-    return true;
-}
-
 //! \brief checks if the synapses in the block are plastic or structural or
 //! not direct. If plastic then currently they wont be cached in the first impl.
 //! \param[in] bit_field_index: index in bitfields.
@@ -528,7 +514,7 @@ static inline bool sort_out_bitfields(void) {
 static inline bool find_master_pop_entry(
         uint32_t bit_field_index, master_population_table_entry* entry) {
     uint32_t position = 0;
-    if (!get_position_in_master_pop(
+    if (!population_table_get_position_in_master_pop(
             not_redundant_tracker[bit_field_index].filter->key, &position)){
         return false;
     }
@@ -540,7 +526,7 @@ static inline bool find_master_pop_entry(
 static bool set_master_pop_sdram_entry_to_cache(uint32_t bit_field_index) {
     // position in the array table.
     uint32_t position = 0;
-    if (!get_position_in_master_pop(
+    if (!population_table_get_position_in_master_pop(
             not_redundant_tracker[bit_field_index].filter->key, &position)) {
         return false;
     }
@@ -623,39 +609,6 @@ static inline void set_reps_to_defaults(
     }
 }
 
-//! \brief ensures we only deal with basic addresses and not the extra ones.
-//! \param[in] master_entry: master pop entry.
-//! \param[in] bit_field_index: bitfield index.
-//! \param[out] start: the start point in the address array
-//! \param[out] count: the number of entries to iterate over in address array.
-static inline bool set_start_and_count(
-        master_population_table_entry master_entry, uint32_t bit_field_index,
-        uint32_t* start, uint32_t* count) {
-    // if an extra info flag is set, skip it as that is not cachable.
-    *start = master_entry.start;
-    *count = master_entry.count;
-    uint32_t position = 0;
-    if (master_entry.extra_info_flag) {
-        if (!get_position_in_master_pop(
-                not_redundant_tracker[bit_field_index].filter->key,
-                &position)) {
-            return false;
-        }
-        log_debug("found extra info at index %d. skipping", position);
-        *start += 1;
-        *count -= 1;
-    }
-    else {
-        if (!get_position_in_master_pop(
-                not_redundant_tracker[bit_field_index].filter->key,
-                &position)) {
-            return false;
-        }
-        log_debug("basic entry at master pop array at index %d", position);
-    }
-    return true;
-}
-
 //! \brief determines which blocks can be DTCM'ed.
 //! \return bool saying if was successful or not
 static inline bool cache_blocks(void) {
@@ -681,8 +634,8 @@ static inline bool cache_blocks(void) {
         // if an extra info flag is set, skip it as that is not cachable.
         uint32_t start = 0;
         uint32_t count = 0;
-        bool success = set_start_and_count(
-            master_entry, bit_field_index, &start, &count);
+        bool success = population_table_set_start_and_count(
+            master_entry, &start, &count);
         if (!success) {
             log_error("failed to set start and count");
             return false;

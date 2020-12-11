@@ -252,6 +252,81 @@ static inline address_list_entry* population_table_get_address_entry_from_sdram(
 }
 
 
+//! \brief Get the position in the master population table.
+//! \param[in] spike: The spike received
+//! \param[out] position: The position found (only if returns true)
+//! \return True if there is a matching entry, False otherwise
+static inline bool population_table_position_in_the_master_pop_array(
+        spike_t spike, uint32_t *position) {
+    uint32_t imin = 0;
+    uint32_t imax = master_population_table_length;
+
+    while (imin < imax) {
+        uint32_t imid = (imax + imin) >> 1;
+        master_population_table_entry entry = master_population_table[imid];
+        if ((spike & entry.mask) == entry.key) {
+            *position = imid;
+            return true;
+        } else if (entry.key < spike) {
+
+            // Entry must be in upper part of the table
+            imin = imid + 1;
+        } else {
+            // Entry must be in lower part of the table
+            imax = imid;
+        }
+    }
+    return false;
+}
+
+
+//! \brief finds position in master pop table
+//! \param[in] key: master pop key
+//! \param[out] position: the position in the array where this key entry lives.
+//! \return bool stating if finding was successful or not
+static bool population_table_get_position_in_master_pop(
+        uint32_t key, uint32_t* position) {
+    bool success  = population_table_position_in_the_master_pop_array(
+        key, position);
+    if (!success) {
+        log_error("WTF how did this happen. cant find the position");
+        return false;
+    }
+    return true;
+}
+
+//! \brief ensures we only deal with basic addresses and not the extra ones.
+//! \param[in] master_entry: master pop entry.
+//! \param[out] start: the start point in the address array
+//! \param[out] count: the number of entries to iterate over in address array.
+static inline bool population_table_set_start_and_count(
+        master_population_table_entry master_entry, uint32_t* start,
+        uint32_t* count) {
+    // if an extra info flag is set, skip it as that is not cachable.
+    *start = master_entry.start;
+    *count = master_entry.count;
+    uint32_t position = 0;
+    if (master_entry.extra_info_flag) {
+        if (!population_table_get_position_in_master_pop(
+                master_entry.key, &position)) {
+            return false;
+        }
+        log_debug("found extra info at index %d. skipping", position);
+        *start += 1;
+        *count -= 1;
+    }
+    else {
+        if (!population_table_get_position_in_master_pop(
+                master_entry.key, &position)) {
+            return false;
+        }
+        log_debug("basic entry at master pop array at index %d", position);
+    }
+    return true;
+}
+
+
+
 //! \brief Prints the master pop table.
 //!
 //! For debugging
@@ -327,32 +402,5 @@ bool population_table_get_first_address(
 //! \return True if there is a row to read, False if not
 bool population_table_get_next_address(
         spike_t *spike, address_t* row_address, size_t* n_bytes_to_transfer);
-
-//! \brief Get the position in the master population table.
-//! \param[in] spike: The spike received
-//! \param[out] position: The position found (only if returns true)
-//! \return True if there is a matching entry, False otherwise
-static inline bool population_table_position_in_the_master_pop_array(
-        spike_t spike, uint32_t *position) {
-    uint32_t imin = 0;
-    uint32_t imax = master_population_table_length;
-
-    while (imin < imax) {
-        uint32_t imid = (imax + imin) >> 1;
-        master_population_table_entry entry = master_population_table[imid];
-        if ((spike & entry.mask) == entry.key) {
-            *position = imid;
-            return true;
-        } else if (entry.key < spike) {
-
-            // Entry must be in upper part of the table
-            imin = imid + 1;
-        } else {
-            // Entry must be in lower part of the table
-            imax = imid;
-        }
-    }
-    return false;
-}
 
 #endif // _POPULATION_TABLE_H_

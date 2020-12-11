@@ -264,14 +264,33 @@ bool population_table_load_bitfields(filter_region_t *filter_region) {
 }
 
 //! \brief caches synaptic blocks into DTCM as required.
-void cache_synaptic_blocks(address_t table_address) {
+static inline bool cache_synaptic_blocks(address_t table_address) {
     // build stores.
     master_pop_top_counters_t* store =
         (master_pop_top_counters_t*) table_address;
     array_blocks = spin1_malloc(sizeof(uint32_t*) * store->n_array_blocks);
     binary_blocks = spin1_malloc(
         sizeof(binary_search_element) * store->n_binary_search_blocks);
+
     // locate blocks to put into these blocks.
+    for (uint32_t pop_entry_index = 0;
+            pop_entry_index < master_population_table_length;
+            pop_entry_index++) {
+        master_population_table_entry pop_entry =
+            population_table_entry(pop_entry_index);
+        if (pop_entry.cache_in_dtcm) {
+            // if an extra info flag is set, skip it as that is not cachable.
+            uint32_t start = 0;
+            uint32_t count = 0;
+            bool success = population_table_set_start_and_count(
+                pop_entry, &start, &count);
+            if (!success) {
+                log_error("failed to set start and count");
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 //! \}
@@ -331,7 +350,10 @@ bool population_table_initialise(
         n_address_list_bytes);
 
     // start the caching process.
-    cache_synaptic_blocks(table_address);
+    if(!cache_synaptic_blocks(table_address)) {
+        log_error("failed to cache into DTCM");
+        return false;
+    }
 
     // Store the base address
     log_info("The stored synaptic matrix base address is located at: 0x%08x",
