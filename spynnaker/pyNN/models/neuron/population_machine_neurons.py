@@ -60,7 +60,7 @@ class PopulationMachineNeurons(AbstractReadParametersBeforeSet):
     def _neuron_regions(self):
         pass
 
-    def append_neuron_provenance(
+    def _append_neuron_provenance(
             self, provenance_items, prov_list_from_machine, offset, placement):
         """ Extract and add neuron provenance to the list of provenance items
 
@@ -87,13 +87,13 @@ class PopulationMachineNeurons(AbstractReadParametersBeforeSet):
 
         return NeuronProvenance.N_ITEMS
 
-    def write_neuron_data_spec(self, spec, routing_info):
+    def _write_neuron_data_spec(self, spec, routing_info):
         # Get and store the key
         self._set_key(routing_info.get_first_key_from_pre_vertex(
             self, SPIKE_PARTITION_ID))
 
         # Write the neuron parameters
-        self.write_neuron_parameters(spec)
+        self._write_neuron_parameters(spec)
 
         # Write the neuron recording region
         neuron_recorder = self._app_vertex.neuron_recorder
@@ -105,7 +105,7 @@ class PopulationMachineNeurons(AbstractReadParametersBeforeSet):
         neuron_recorder.write_neuron_recording_region(
             spec, self._neuron_regions.neuron_recording, self._vertex_slice)
 
-    def write_neuron_parameters(self, spec):
+    def _write_neuron_parameters(self, spec):
 
         self._app_vertex.update_state_variables()
 

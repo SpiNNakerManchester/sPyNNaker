@@ -34,7 +34,8 @@ class PopulationMachineCommon(
         ProvidesProvenanceDataFromMachineImpl,
         AbstractRecordable,
         AbstractReceiveBuffersToHost,
-        AbstractHasProfileData):
+        AbstractHasProfileData,
+        AbstractHasAssociatedBinary):
 
     __slots__ = [
         "__resources",
@@ -78,13 +79,13 @@ class PopulationMachineCommon(
             provenance_data, placement)
         prov_list_from_machine = self._get_remaining_provenance_data_items(
             provenance_data)
-        self.append_additional_provenance(
+        self._append_additional_provenance(
             provenance_items, prov_list_from_machine, placement)
 
         return provenance_items
 
     @abstractmethod
-    def append_additional_provenance(
+    def _append_additional_provenance(
             self, provenance_items, prov_list_from_machine, placement):
         pass
 
@@ -110,7 +111,7 @@ class PopulationMachineCommon(
     def get_binary_start_type(self):
         return ExecutableType.USES_SIMULATION_INTERFACE
 
-    def write_common_data_spec(
+    def _write_common_data_spec(
             self, spec, machine_time_step, time_scale_factor, rec_regions):
         # Write the setup region
         spec.reserve_memory_region(

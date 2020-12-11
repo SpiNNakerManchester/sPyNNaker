@@ -181,7 +181,7 @@ class PopulationMachineSynapses(
             synaptic_matrix_base_address,
             self._synaptic_matrices.on_chip_generated_matrix_size)]
 
-    def append_synapse_provenance(
+    def _append_synapse_provenance(
             self, provenance_items, prov_list_from_machine, offset, placement):
         """ Extract and add synapse provenance to the list of provenance items
 
@@ -296,12 +296,12 @@ class PopulationMachineSynapses(
 
         return SynapseProvenance.N_ITEMS
 
-    def write_synapse_data_spec(
+    def _write_synapse_data_spec(
             self, spec, machine_time_step, routing_info, machine_graph,
             n_key_map):
 
         # Write the synapse parameters
-        self.write_synapse_parameters(spec, machine_time_step)
+        self._write_synapse_parameters(spec, machine_time_step)
 
         # Write the synaptic matrices
         all_syn_block_sz = self._app_vertex.get_synapses_size(
@@ -351,7 +351,7 @@ class PopulationMachineSynapses(
             self._synapse_regions.structural_dynamics,
             isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural))
 
-    def write_synapse_parameters(self, spec, machine_time_step):
+    def _write_synapse_parameters(self, spec, machine_time_step):
         # Reserve space
         spec.reserve_memory_region(
             region=self._synapse_regions.synapse_params,

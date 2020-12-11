@@ -141,8 +141,8 @@ class PopulationMachineVertex(
         # Reunite title and extension and return
         return name + app_vertex.synapse_executable_suffix + ext
 
-    @overrides(PopulationMachineCommon.append_additional_provenance)
-    def append_additional_provenance(
+    @overrides(PopulationMachineCommon._append_additional_provenance)
+    def _append_additional_provenance(
             self, provenance_items, prov_list_from_machine, placement):
         # translate into provenance data items
         offset = self._append_neuron_provenance(
@@ -191,12 +191,12 @@ class PopulationMachineVertex(
             self.vertex_slice, data_n_time_steps)
         rec_regions.extend(self._app_vertex.synapse_recorder.get_region_sizes(
             self.vertex_slice, data_n_time_steps))
-        self.write_common_data_spec(
+        self._write_common_data_spec(
             spec, machine_time_step, time_scale_factor, rec_regions)
 
-        self.write_neuron_data_spec(spec, routing_info)
+        self._write_neuron_data_spec(spec, routing_info)
 
-        self.write_synapse_data_spec(
+        self._write_synapse_data_spec(
             spec, machine_time_step, routing_info, machine_graph, n_key_map)
 
         # End the writing of this specification:
