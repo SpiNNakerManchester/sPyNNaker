@@ -42,12 +42,6 @@
 //! The minimum synapse types to sort out DTCM and get though the synapse init
 #define N_SYNAPSE_TYPES 1
 
-//! key rep for using bianry
-#define USE_BINARY 0
-
-//! key rep for using array
-#define USE_ARRAY 1
-
 //! random number for malloc cost calc
 #define ALANS_RANDOM 4
 
@@ -514,15 +508,18 @@ static bool set_master_pop_sdram_entry_to_cache(uint32_t bit_field_index) {
         return false;
     }
 
-    // set to cache in sdram
-    master_population_table_entry* entry =
-        population_table_get_master_pop_entry_from_sdram(
-            master_pop_base_address, position);
-    entry->cache_in_dtcm = 1;
     log_info("setting master pop entry %d to cache in DTCM", position);
 
     // set dtcm master pop for printing
     population_table_entry_set_to_cache(position);
+
+    master_population_table_entry dtcm_entry = population_table_entry(position);
+
+    // set to cache in sdram
+    master_population_table_entry* sdram_entry =
+        population_table_get_master_pop_entry_from_sdram(
+            master_pop_base_address, position);
+    spin1_memcpy(sdram_entry, &dtcm_entry, sizeof(master_population_table_entry));
     return true;
 }
 
@@ -548,21 +545,23 @@ static inline void set_address_to_cache_reps(
         log_info("WTF unrecognised rep");
     }
 
-    address_list_entry* entry =
+    // set dtcm master pop just to allow bulk transfer
+    population_table_set_address_to_rep(address_entry_index, rep);
+
+    address_list_entry* sdram_entry =
         population_table_get_address_entry_from_sdram(
             master_pop_base_address, address_entry_index);
-    log_info("a");
-    entry->addr.representation = rep;
-    log_info("b");
-    // set dtcm master pop just to allow printing changes
-    population_table_set_address_to_rep(address_entry_index, rep);
+    address_list_entry dtcm_entry =
+        population_table_get_address_entry(address_entry_index);
+
+    spin1_memcpy(sdram_entry, &dtcm_entry, sizeof(address_list_entry));
 }
 
 //! \brief sets resp to whats in the master pop table currently
 //! \param[in] master_entry: the master pop entry
 //! \param[in] reps: the array of reps
 static inline void set_reps_to_defaults(
-        master_population_table_entry master_entry, uint32_t * reps) {
+        master_population_table_entry master_entry, uint32_t* reps) {
     uint32_t start = master_entry.start;
     uint32_t count = master_entry.count;
     if (master_entry.extra_info_flag) {
@@ -646,7 +645,7 @@ static inline bool cache_blocks(void) {
         }
 
         // set up reps
-        uint32_t * reps = sark_xalloc(
+        uint32_t* reps = sark_xalloc(
             sv->sdram_heap, sizeof(uint32_t) * count, 0, ALLOC_LOCK);
         if (reps == NULL) {
             log_error("cannot allocate sdram for the reps.");
@@ -688,9 +687,9 @@ static inline bool cache_blocks(void) {
                     // check if can be cached
                     if (dtcm_to_use_tmp + binary_search_size <= dtcm_to_use) {
                         log_info(
-                            "setting reps %d to use binary",
+                            "setting reps %d to BINARY_SEARCH",
                             address_index - start);
-                        reps[address_index - start] = USE_BINARY;
+                        reps[address_index - start] = BINARY_SEARCH;
                         log_info(
                             "set reps %d to %d",
                             address_index - start, reps[address_index - start]);
@@ -707,7 +706,13 @@ static inline bool cache_blocks(void) {
                 }
                 else{  // array rep better. check if can be cached
                     if(dtcm_to_use_tmp + array_search_size <= dtcm_to_use) {
-                        reps[address_index - start] = USE_ARRAY;
+                        log_info(
+                            "setting rep %d to ARRAY",
+                            address_index - start);
+                        reps[address_index - start] = ARRAY;
+                        log_info(
+                            "set reps %d to %d",
+                            address_index - start, reps[address_index - start]);
                         dtcm_to_use_tmp += binary_search_size;
                         used_array_rep = true;
                     }
@@ -756,6 +761,7 @@ static inline bool cache_blocks(void) {
             for (uint32_t address_index = 0; address_index < count;
                     address_index ++) {
                 // set addresses to cached reps.
+                log_info("start is %d, index %d", start, address_index);
                 set_address_to_cache_reps(
                     address_index + start, reps[address_index]);
             }

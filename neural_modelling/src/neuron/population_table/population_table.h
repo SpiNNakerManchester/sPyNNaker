@@ -162,7 +162,7 @@ static inline void population_table_set_address_to_rep(
 //! \brief sets a population table entry to be cached.
 //! \param[in] position: the position in the master table to set to cache
 static inline void population_table_entry_set_to_cache(uint32_t position) {
-    master_population_table[position].cache_in_dtcm = 1;
+    master_population_table[position].cache_in_dtcm = 0;
 }
 
 //! =============================================================
@@ -249,7 +249,11 @@ static inline void print_master_population_table(void) {
     log_info("Master_population\n");
     for (uint32_t i = 0; i < master_population_table_length; i++) {
         master_population_table_entry entry = master_population_table[i];
-        log_info("key: 0x%08x, mask: 0x%08x", entry.key, entry.mask);
+        log_info(
+            "key: 0x%08x, mask: 0x%08x, start:%d, extra_info_flag:%d, "
+            "count:%d, cache_in_dtcm:%d",
+            entry.key, entry.mask, entry.start, entry.extra_info_flag,
+            entry.count, entry.cache_in_dtcm);
         int count = entry.count;
         int start = entry.start;
         if (entry.extra_info_flag) {
