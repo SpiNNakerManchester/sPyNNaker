@@ -91,6 +91,12 @@ int dtcm_to_use = 0;
 //! malloc cost
 int malloc_cost = 0;
 
+//! number of blocks stored in array format
+uint32_t n_array_blocks = 0;
+
+//! number of blocks in binary search format
+uint32_t n_binary_search_blocks = 0;
+
 /*****************************stuff needed for structural stuff to work*/
 
 //! The instantiation of the rewiring data
@@ -131,6 +137,14 @@ static inline bool heuristic_worth_flagging_merged_bitfield(
 //! \param[in] bit_field_index: index in bitfield store.
 static inline void set_bitfield_to_merged_in_sdram(uint32_t bit_field_index) {
     use(bit_field_index);
+}
+
+//! \brief updates the counters in master pop SDRAM
+static inline void update_master_pop_counters(void) {
+    master_pop_top_counters_t* store =
+        (master_pop_top_counters_t*) master_pop_base_address;
+    store->n_array_blocks = n_array_blocks;
+    store->n_binary_search_blocks = n_binary_search_blocks;
 }
 
 //! \brief finds position in master pop table
@@ -578,6 +592,13 @@ static inline void set_address_to_cache_reps(
         population_table_get_address_entry(address_entry_index);
 
     spin1_memcpy(sdram_entry, &dtcm_entry, sizeof(address_list_entry));
+
+    // update counters as required
+    if (rep == ARRAY) {
+        n_array_blocks += 1;
+    } else if (rep == BINARY_SEARCH) {
+        n_binary_search_blocks += 1;
+    }
 }
 
 //! \brief sets resp to whats in the master pop table currently
@@ -828,6 +849,9 @@ void c_main(void) {
         if (!success) {
             fail_shut_down();
         }
+
+        // update counters in SDRAM
+        update_master_pop_counters();
 
         log_info(
             "printing resulting master pop table after caching has occured");

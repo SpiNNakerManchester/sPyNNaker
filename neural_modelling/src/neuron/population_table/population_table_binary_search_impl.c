@@ -62,6 +62,12 @@ master_population_table_entry *master_population_table;
 //! The array of information that points into the synaptic matrix
 address_list_entry *address_list;
 
+//! store of array dtcm blocks
+uint32_t** array_blocks;
+
+//! store of binary search blocks
+binary_search_element* binary_blocks;
+
 //! \brief the number of times a DMA resulted in 0 entries
 uint32_t ghost_pop_table_searches = 0;
 
@@ -257,6 +263,17 @@ bool population_table_load_bitfields(filter_region_t *filter_region) {
     return true;
 }
 
+//! \brief caches synaptic blocks into DTCM as required.
+void cache_synaptic_blocks(address_t table_address) {
+    // build stores.
+    master_pop_top_counters_t* store =
+        (master_pop_top_counters_t*) table_address;
+    array_blocks = spin1_malloc(sizeof(uint32_t*) * store->n_array_blocks);
+    binary_blocks = spin1_malloc(
+        sizeof(binary_search_element) * store->n_binary_search_blocks);
+    // locate blocks to put into these blocks.
+}
+
 //! \}
 
 //! \name API functions
@@ -266,8 +283,10 @@ bool population_table_initialise(
         address_t table_address, address_t synapse_rows_address,
         address_t direct_rows_address, uint32_t *row_max_n_words) {
     log_debug("Population_table_initialise: starting");
+    master_pop_top_counters_t* store =
+        (master_pop_top_counters_t*) table_address;
 
-    master_population_table_length = table_address[0];
+    master_population_table_length = store->master_population_table_length;
     log_debug("Master pop table length is %d\n", master_population_table_length);
     log_debug("Master pop table entry size is %d\n",
             sizeof(master_population_table_entry));
@@ -285,7 +304,7 @@ bool population_table_initialise(
         }
     }
 
-    uint32_t address_list_length = table_address[1];
+    uint32_t address_list_length = store->address_list_length;
     uint32_t n_address_list_bytes =
             address_list_length * sizeof(address_list_entry);
 
@@ -304,11 +323,15 @@ bool population_table_initialise(
             address_list_length, n_address_list_bytes);
 
     // Copy the master population table
-    spin1_memcpy(master_population_table, &table_address[SKIP_COUNTERS],
+    uint32_t past_counters = sizeof(master_pop_top_counters_t) >> 2;
+    spin1_memcpy(master_population_table, &table_address[past_counters],
             n_master_pop_bytes);
     spin1_memcpy(address_list,
-        &table_address[SKIP_COUNTERS + n_master_pop_words],
+        &table_address[past_counters + n_master_pop_words],
         n_address_list_bytes);
+
+    // start the caching process.
+    cache_synaptic_blocks(table_address);
 
     // Store the base address
     log_info("The stored synaptic matrix base address is located at: 0x%08x",

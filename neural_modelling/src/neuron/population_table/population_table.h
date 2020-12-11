@@ -42,6 +42,18 @@
 
 //!================================================
 
+//! \brief struct for counters
+typedef struct master_pop_top_counters_t {
+    // length of master_population_table_entry array.
+    uint32_t master_population_table_length;
+    // length of address_list_entry array.
+    uint32_t address_list_length;
+    // length of array_blocks array.
+    uint32_t n_array_blocks;
+    // length of binary_blocks array.
+    uint32_t n_binary_search_blocks;
+} master_pop_top_counters_t;
+
 // \brief struct for holding a binary search element
 typedef struct binary_search_element {
     // the src neuron id
@@ -117,9 +129,6 @@ typedef union {
 
 //! ===========================================
 
-//! \brief the jump in the global data structure to get to the master pop entries.
-#define SKIP_COUNTERS 2
-
 //! \brief the number of times a DMA resulted in 0 entries
 extern uint32_t ghost_pop_table_searches;
 
@@ -177,8 +186,9 @@ static inline uint32_t get_direct_address(address_and_row_length entry) {
 static inline master_population_table_entry*
         population_table_get_master_pop_entry_from_sdram(
             address_t table_address, uint32_t position) {
+    uint32_t start = sizeof(master_pop_top_counters_t) >> 2;
     master_population_table_entry* start_of_entry_list =
-        (master_population_table_entry*) table_address[SKIP_COUNTERS];
+        (master_population_table_entry*) table_address[start];
     uint32_t bytes_in = position * sizeof(master_population_table_entry);
     uint32_t words_in = bytes_in >> 2;
     return &start_of_entry_list[words_in];
@@ -230,15 +240,15 @@ static inline address_list_entry population_table_get_address_entry(
 
 static inline address_list_entry* population_table_get_address_entry_from_sdram(
         address_t master_pop_table_base_address, uint32_t address_entry_index) {
-    uint32_t master_population_table_length = master_pop_table_base_address[0];
     uint32_t n_master_pop_bytes =
-            master_population_table_length * sizeof(master_population_table_entry);
+        master_population_table_length * sizeof(master_population_table_entry);
     uint32_t n_master_pop_words = n_master_pop_bytes >> 2;
     uint32_t skip_to_correct_entry_bytes =
         address_entry_index * sizeof(address_list_entry);
     uint32_t skip_to_correct_entry_words = skip_to_correct_entry_bytes >> 2;
+    uint32_t counters_skip_words = sizeof(master_pop_top_counters_t) >> 2;
     return (address_list_entry*) &master_pop_table_base_address[
-        skip_to_correct_entry_words + n_master_pop_words + SKIP_COUNTERS];
+        skip_to_correct_entry_words + n_master_pop_words + counters_skip_words];
 }
 
 

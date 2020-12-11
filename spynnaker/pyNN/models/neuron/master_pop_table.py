@@ -162,8 +162,9 @@ _MASTER_POP_ENTRY_SIZE_BYTES = ctypes.sizeof(_MasterPopEntryCType)
 _ADDRESS_LIST_ENTRY_SIZE_BYTES = ctypes.sizeof(_AddressListEntryCType)
 _EXTRA_INFO_ENTRY_SIZE_BYTES = ctypes.sizeof(_ExtraInfoCType)
 
-# Base size - 2 words for size of table and address list
-_BASE_SIZE_BYTES = 8
+# Base size - 4 words for : 1. size of table 2. address list 3. n array blocks
+# 4. n binary search blocks
+_BASE_SIZE_BYTES = 4 * BYTES_PER_WORD
 
 # Over-scale of estimate for safety
 _OVERSCALE = 2
@@ -577,6 +578,10 @@ class MasterPopTableAsBinarySearch(object):
         # write no master pop entries and the address list size
         spec.write_value(n_entries)
         spec.write_value(self.__n_addresses)
+
+        # add trackers for DMA caching
+        spec.write_value(0)
+        spec.write_value(0)
 
         # Generate the table and list as arrays
         pop_table = _make_array(_MasterPopEntryCType, n_entries)
