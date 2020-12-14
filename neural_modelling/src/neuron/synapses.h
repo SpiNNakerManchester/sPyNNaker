@@ -95,6 +95,8 @@ static inline void synapses_print_weight(
 //! \param[out] ring_buffer_to_input_buffer_left_shifts:
 //!     Array of shifts to use when converting from ring buffer values to input
 //!     buffer values
+//! \param[out] clear_input_buffers_of_late_packets:
+//!     Inicates whether to clear the input buffers each time step
 //! \param[out] incoming_spike_buffer_size:
 //!     The number of spikes to support in the incoming spike circular buffer
 //! \return True if successfully initialised. False otherwise.
@@ -129,6 +131,7 @@ uint32_t synapses_get_saturation_count(void);
 uint32_t synapses_get_pre_synaptic_events(void);
 
 //! \brief Resume processing of synapses after a pause
+//! \param[in] time: The time at which the simulation is to start
 void synapses_resume(timer_t time);
 
 #endif // _SYNAPSES_H_

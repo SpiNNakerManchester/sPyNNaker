@@ -534,8 +534,8 @@ class SynapticMatrices(object):
                 app_edge.pre_vertex.n_atoms, pre_slices):
             return None
 
-        return self.__get_app_key_and_mask(keys, mask, app_edge.n_delay_stages,
-                                           key_space_tracker)
+        return self.__get_app_key_and_mask(
+            keys, mask, app_edge.n_delay_stages, key_space_tracker)
 
     def get_connections_from_machine(
             self, transceiver, placement, app_edge, synapse_info):

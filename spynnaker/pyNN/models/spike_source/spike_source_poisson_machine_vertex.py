@@ -228,8 +228,9 @@ class SpikeSourcePoissonMachineVertex(
 
         _, x, y, p, names = self._get_placement_details(placement)
 
-        provenance_items.append(self._app_vertex.get_tdma_provenance_item(
-            names, x, y, p, n_times_tdma_fell_behind))
+        provenance_items.append(
+            self._app_vertex.get_tdma_provenance_item(
+                names, x, y, p, n_times_tdma_fell_behind))
         return provenance_items
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)

@@ -322,9 +322,8 @@ class MasterPopTableAsBinarySearch(object):
     def get_master_population_table_size(incoming_projections):
         """ Get the size of the master population table in SDRAM.
 
-        :param iterable(~pacman.model.graphs.application.ApplicationEdge) \
-                in_edges:
-            The edges arriving at the vertex that are to be handled by this
+        :param iterable(PyNNProjectionCommon) incoming_projections:
+            The projections arriving at the vertex that are to be handled by this
             table
         :return: the size the master pop table will take in SDRAM (in bytes)
         :rtype: int

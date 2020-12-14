@@ -36,16 +36,50 @@ struct synapse_provenance {
     uint32_t n_input_buffer_overflows;
     //! The number of STDP weight saturations.
     uint32_t n_plastic_synaptic_weight_saturations;
+    //! The number of population table searches that had no match
     uint32_t n_ghost_pop_table_searches;
+    //! The number of bit field reads that couldn't be read in due to DTCM limits
     uint32_t n_failed_bitfield_reads;
+    //! The number of DMAs performed
     uint32_t n_dmas_complete;
+    //! The number of spikes received and processed
     uint32_t n_spikes_processed;
+    //! The number of population table searches that found an "invalid" entry
     uint32_t n_invalid_master_pop_table_hits;
+    //! The number of spikes that a bit field filtered, stopping a DMA
     uint32_t n_filtered_by_bitfield;
     //! The number of rewirings performed.
     uint32_t n_rewires;
+    //! The number of packets that were cleared at the end of timesteps
     uint32_t n_packets_dropped_from_lateness;
+    //! The maximum size of the input buffer
     uint32_t spike_processing_get_max_filled_input_buffer_size;
+};
+
+//! The region IDs used by synapse processing
+struct synapse_regions {
+    //! The parameters of the synapse processing
+    uint32_t synapse_params;
+    //! The direct or single matrix to be copied to DTCM
+    uint32_t direct_matrix;
+    //! The table to map from keys to memory addresses
+    uint32_t pop_table;
+    //! The SDRAM-based matrix of source spikes to target neurons
+    uint32_t synaptic_matrix;
+    //! Configuration for STDP
+    uint32_t synapse_dynamics;
+    //! Configuration for structural plasticity
+    uint32_t structural_dynamics;
+    //! The filters to avoid DMA transfers of empty rows
+    uint32_t bitfield_filter;
+};
+
+//! The priorities used by synapse processing
+struct synapse_priorities {
+    //! Receive a multicast packet
+    uint32_t receive_packet;
+    //! Start processing synapses
+    uint32_t process_synapses;
 };
 
 //! \brief Callback to store synapse provenance data (format: synapse_provenance).
@@ -71,21 +105,12 @@ static inline void store_synapse_provenance(struct synapse_provenance *prov) {
         spike_processing_get_max_filled_input_buffer_size();
 }
 
-struct synapse_regions {
-    uint32_t synapse_params;
-    uint32_t direct_matrix;
-    uint32_t pop_table;
-    uint32_t synaptic_matrix;
-    uint32_t synapse_dynamics;
-    uint32_t structural_dynamics;
-    uint32_t bitfield_filter;
-};
-
-struct synapse_priorities {
-    uint32_t receive_packet;
-    uint32_t process_synapses;
-};
-
+//! \brief Read data to set up synapse processing
+//! \param[in] ds_regions: Pointer to region position data
+//! \param[in] regions: The indices of the regions to be read
+//! \param[in] pkts_per_ts_rec_region:
+//!    The *recording* region to use for packets per time step
+//! \return a boolean indicating success (True) or failure (False)
 static inline bool initialise_synapse_regions(
         data_specification_metadata_t *ds_regions,
         struct synapse_regions regions, struct synapse_priorities priorities,

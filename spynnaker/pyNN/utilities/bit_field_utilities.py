@@ -43,10 +43,9 @@ BIT_IN_A_WORD = 32.0
 def get_estimated_sdram_for_bit_field_region(incoming_projections):
     """ estimates the SDRAM for the bit field region
 
-    :param ~pacman.model.graphs.application.ApplicationGraph app_graph:
-        the app graph
-    :param ~pacman.model.graphs.application.ApplicationVertex vertex:
-        app vertex
+    :param iterable(~spynnaker.pyNN.models.pynn_projection_common\
+            .PyNNProjectionCommon) incoming_projections:
+        The projections that target the vertex in question
     :return: the estimated number of bytes used by the bit field region
     :rtype: int
     """
@@ -77,10 +76,9 @@ def get_estimated_sdram_for_bit_field_region(incoming_projections):
 def get_estimated_sdram_for_key_region(incoming_projections):
     """ gets an estimate of the bitfield builder region
 
-    :param ~pacman.model.graphs.application.ApplicationGraph app_graph:
-        the app graph
-    :param ~pacman.model.graphs.application.ApplicationVertex vertex:
-        app vertex
+    :param iterable(~spynnaker.pyNN.models.pynn_projection_common\
+            .PyNNProjectionCommon) incoming_projections:
+        The projections that target the vertex in question
     :return: SDRAM needed
     :rtype: int
     """

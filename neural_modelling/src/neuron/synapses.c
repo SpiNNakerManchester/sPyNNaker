@@ -252,6 +252,7 @@ static inline void print_synapse_parameters(void) {
 #endif // LOG_LEVEL >= LOG_DEBUG
 }
 
+//! The layout of the synapse parameters region
 struct synapse_params {
     uint32_t n_neurons;
     uint32_t n_synapse_types;
@@ -322,6 +323,9 @@ bool synapses_initialise(
     return true;
 }
 
+//! \brief Transfer out the front of the ring buffers
+//         and cycle around.
+//! \param[in] time: The current time step
 static inline void process_ring_buffers(timer_t time) {
     print_ring_buffers(time);
 

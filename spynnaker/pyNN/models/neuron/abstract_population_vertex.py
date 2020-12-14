@@ -253,6 +253,9 @@ class AbstractPopulationVertex(
         """ Set the synapse dynamics.  Note that after setting, the dynamics
             might not be the type set as it can be combined with the existing
             dynamics in exciting ways.
+
+        :param AbstractSynapseDynamics synapse_dynamics:
+            The synapse dynamics to set
         """
         if self.__synapse_dynamics is None:
             self.__synapse_dynamics = synapse_dynamics
@@ -262,6 +265,9 @@ class AbstractPopulationVertex(
 
     def add_incoming_projection(self, projection):
         """ Add a projection incoming to this vertex
+
+        :param PyNNProjectionCommon projection:
+            The new projection to add
         """
         # Reset the ring buffer shifts as a projection has been added
         self.__change_requires_mapping = True
@@ -276,6 +282,10 @@ class AbstractPopulationVertex(
 
     @property
     def size(self):
+        """ The number of neurons in the vertex
+
+        :rtype: int
+        """
         return self.__n_atoms
 
     @property
@@ -288,38 +298,70 @@ class AbstractPopulationVertex(
 
     @property
     def incoming_spike_buffer_size(self):
+        """ The size of the incoming spike buffer to be used on the cores
+
+        :rtype: int
+        """
         return self.__incoming_spike_buffer_size
 
     @property
     def parameters(self):
+        """ The parameters of the neurons in the population
+
+        :rtype: SpyNNakerRangeDictionary
+        """
         return self._parameters
 
     @property
     def state_variables(self):
+        """ The state variables of the neuron in the population
+
+        :rtype: SpyNNakerRangeDicationary
+        """
         return self._state_variables
 
     @property
     def neuron_impl(self):
+        """ The neuron implementation
+
+        :rtype: AbstractNeuronImpl
+        """
         return self.__neuron_impl
 
     @property
     def n_profile_samples(self):
+        """ The maximum number of profile samples to report
+
+        :rtype: int
+        """
         return self.__n_profile_samples
 
     @property
     def neuron_recorder(self):
+        """ The recorder for neurons
+
+        :rtype: NeuronRecorder
+        """
         return self.__neuron_recorder
 
     @property
     def synapse_recorder(self):
+        """ The recorder for synapses
+
+        :rtype: SynapseRecorder
+        """
         return self.__synapse_recorder
 
     @property
     def drop_late_spikes(self):
+        """ Whether spikes should be dropped if not processed in a timestep
+
+        :rtype: bool
+        """
         return self.__drop_late_spikes
 
     def update_state_variables(self):
-        """ processes any changes since init
+        """ Process any changes since init
 
         :rtype: None
         """
@@ -370,6 +412,12 @@ class AbstractPopulationVertex(
 
     @staticmethod
     def __copy_ranged_dict(source, merge=None, merge_keys=None):
+        """ Copy a dictionary of parameters
+
+        :param SpynnakerRangeDictionary source: The source dictionary
+        :param SpynnakerRangeDictionary merge: Optional dictionary to add in
+        :param set merge_keys: Optional keys to merge from merge
+        """
         target = SpynnakerRangeDictionary(len(source))
         for key in source.keys():
             copy_list = SpynnakerRangedList(len(source))
@@ -409,6 +457,10 @@ class AbstractPopulationVertex(
         return variables
 
     def __raise_var_not_supported(self, variable):
+        """ Helper to indicate that recording a variable is not supported
+
+        :param str variable: The variable to report as unsupported
+        """
         msg = ("Variable {} is not supported. Supported variables are"
                "{}".format(variable, self.get_recordable_variables()))
         raise ConfigurationException(msg)
@@ -487,6 +539,10 @@ class AbstractPopulationVertex(
         return self.__pynn_model.default_initial_values.keys()
 
     def _get_parameter(self, variable):
+        """ Get a neuron parameter value
+
+        :param str variable: The variable to get the value of
+        """
         if variable.endswith("_init"):
             # method called with "V_init"
             key = variable[:-5]
@@ -586,8 +642,10 @@ class AbstractPopulationVertex(
         self.__spikes_per_second = spikes_per_second
 
     def set_synapse_dynamics(self, synapse_dynamics):
-        """
+        """ Set the synapse dynamics of this population
+
         :param AbstractSynapseDynamics synapse_dynamics:
+            The synapse dynamics to set
         """
         self.synapse_dynamics = synapse_dynamics
 
@@ -675,6 +733,10 @@ class AbstractPopulationVertex(
         return context
 
     def get_synapse_id_by_target(self, target):
+        """ Get the id of synapse using its target name
+
+        :param str target: The synapse to get the id of
+        """
         return self.__neuron_impl.get_synapse_id_by_target(target)
 
     def __str__(self):
@@ -874,6 +936,11 @@ class AbstractPopulationVertex(
         return list(max_weight_powers)
 
     def get_ring_buffer_shifts(self, machine_timestep):
+        """ Get the shift of the ring buffers for transfer of values into the
+            input buffers for this model.
+
+        :param int machine_timestep: The time step of the simulation
+        """
         if self.__ring_buffer_shifts is None:
             self.__ring_buffer_shifts = \
                 self._get_ring_buffer_to_input_left_shifts(machine_timestep)
@@ -892,6 +959,10 @@ class AbstractPopulationVertex(
         return float(math.pow(2, 16 - (ring_buffer_to_input_left_shift + 1)))
 
     def get_weight_scales(self, machine_timestep):
+        """ Get the weight scaling to apply to weights in synapses
+
+        :param int machine_time_step: The simulation time step
+        """
         if self.__weight_scales is None:
             ring_buffer_shifts = self.get_ring_buffer_shifts(machine_timestep)
             weight_scale = self.__neuron_impl.get_global_weight_scale()
@@ -935,7 +1006,8 @@ class AbstractPopulationVertex(
         return numpy.concatenate(connections)
 
     def get_synapse_params_size(self):
-        """
+        """ Get the size of the synapse parameters in bytes
+
         :rtype: int
         """
         return (_SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES +
@@ -1074,6 +1146,7 @@ class AbstractPopulationVertex(
     def synapse_executable_suffix(self):
         """ The suffix of the executable name due to the type of synapses \
             in use.
+
         :rtype: str
         """
         if self.__synapse_dynamics is None:
@@ -1082,13 +1155,28 @@ class AbstractPopulationVertex(
 
     @property
     def neuron_recordables(self):
+        """ Get the names of variables that can be recorded by the neuron
+
+        :rtype: list(str)
+        """
         return self.__neuron_recorder.get_recordable_variables()
 
     @property
     def synapse_recordables(self):
+        """ Get the names of variables that can be recorded by the synapses
+
+        :rtype: list(str)
+        """
         return self.__synapse_recorder.get_recordable_variables()
 
     def get_common_constant_sdram(self, n_record, n_provenance):
+        """ Get the amount of SDRAM used by common parts
+
+        :param int n_record: The number of recording regions
+        :param int n_provenance: The number of provenance items
+
+        :rtype: int
+        """
         return (
             SYSTEM_BYTES_REQUIREMENT +
             get_recording_header_size(n_record) +
@@ -1098,18 +1186,49 @@ class AbstractPopulationVertex(
             get_profile_region_size(self.__n_profile_samples))
 
     def get_neuron_variable_sdram(self, vertex_slice):
+        """ Get the amount of SDRAM per timestep used by neuron parts
+
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The slice of neurons to get the size of
+
+        :rtype: int
+        """
         return self.__neuron_recorder.get_variable_sdram_usage(vertex_slice)
 
     def get_synapse_variable_sdram(self, vertex_slice):
+
+        """ Get the amount of SDRAM per timestep used by synapse parts
+
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The slice of neurons to get the size of
+
+        :rtype: int
+        """
         return self.__synapse_recorder.get_variable_sdram_usage(vertex_slice)
 
     def get_neuron_constant_sdram(self, vertex_slice):
+
+        """ Get the amount of fixed SDRAM used by neuron parts
+
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The slice of neurons to get the size of
+
+        :rtype: int
+        """
         return (
             self.get_sdram_usage_for_neuron_params(vertex_slice) +
             self.__neuron_recorder.get_metadata_sdram_usage_in_bytes(
                 vertex_slice))
 
     def get_synapse_constant_sdram(self, vertex_slice):
+
+        """ Get the amount of fixed SDRAM used by synapse parts
+
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The slice of neurons to get the size of
+
+        :rtype: int
+        """
         return (
             self.get_synapse_params_size() +
             self.get_synapse_dynamics_size(vertex_slice) +
@@ -1124,22 +1243,51 @@ class AbstractPopulationVertex(
             exact_sdram_for_bit_field_builder_region())
 
     def get_common_dtcm(self):
+        """ Get the amount of DTCM used by common parts
+
+        :rtype: int
+        """
         # TODO: Get some real numbers here
         return 0
 
     def get_neuron_dtcm(self, vertex_slice):
+        """ Get the amount of DTCM used by neuron parts
+
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The slice of neurons to get the size of
+
+        :rtype: int
+        """
         return (
             self.__neuron_impl.get_dtcm_usage_in_bytes(vertex_slice.n_atoms) +
             self.__neuron_recorder.get_dtcm_usage_in_bytes(vertex_slice)
         )
 
     def get_synapse_dtcm(self, vertex_slice):
+        """ Get the amount of DTCM used by synapse parts
+
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The slice of neurons to get the size of
+
+        :rtype: int
+        """
         return self.__synapse_recorder.get_dtcm_usage_in_bytes(vertex_slice)
 
     def get_common_cpu(self):
+        """ Get the amount of CPU used by common parts
+
+        :rtype: int
+        """
         return self._C_MAIN_BASE_N_CPU_CYCLES
 
     def get_neuron_cpu(self, vertex_slice):
+        """ Get the amount of CPU used by neuron parts
+
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The slice of neurons to get the size of
+
+        :rtype: int
+        """
         return (
             self._NEURON_BASE_N_CPU_CYCLES +
             (self._NEURON_BASE_N_CPU_CYCLES_PER_NEURON *
@@ -1148,6 +1296,13 @@ class AbstractPopulationVertex(
             self.__neuron_impl.get_n_cpu_cycles(vertex_slice.n_atoms))
 
     def get_synapse_cpu(self, vertex_slice):
+        """ Get the amount of CPU used by synapse parts
+
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The slice of neurons to get the size of
+
+        :rtype: int
+        """
         return (
             self._SYNAPSE_BASE_N_CPU_CYCLES +
             (self._SYNAPSE_BASE_N_CPU_CYCLES_PER_NEURON *

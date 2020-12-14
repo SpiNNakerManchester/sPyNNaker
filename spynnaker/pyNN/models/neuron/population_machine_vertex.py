@@ -32,6 +32,8 @@ class PopulationMachineVertex(
         PopulationMachineSynapses,
         AbstractGeneratesDataSpecification,
         AbstractRewritesDataSpecification):
+    """ A machine vertex for PyNN Populations
+    """
 
     __slots__ = [
         "__change_requires_neuron_parameters_reload",
@@ -57,17 +59,20 @@ class PopulationMachineVertex(
         BIT_FIELD_KEY_MAP = 14
         RECORDING = 15
 
+    # Regions for this vertex used by common parts
     COMMON_REGIONS = CommonRegions(
         system=REGIONS.SYSTEM.value,
         provenance=REGIONS.PROVENANCE_DATA.value,
         profile=REGIONS.PROFILING.value,
         recording=REGIONS.RECORDING.value)
 
+    # Regions for this vertex used by neuron parts
     NEURON_REGIONS = NeuronRegions(
         neuron_params=REGIONS.NEURON_PARAMS.value,
         neuron_recording=REGIONS.NEURON_RECORDING.value
     )
 
+    # Regions for this vertex used by synapse parts
     SYNAPSE_REGIONS = SynapseRegions(
         synapse_params=REGIONS.SYNAPSE_PARAMS.value,
         direct_matrix=REGIONS.DIRECT_MATRIX.value,
@@ -93,9 +98,10 @@ class PopulationMachineVertex(
             vertex_slice):
         """
         :param ~pacman.model.resources.ResourceContainer resources_required:
-        :param iterable(int) recorded_region_ids:
-        :param str label:
+            The resources used by the vertex
+        :param str label: The label of the vertex
         :param list(~pacman.model.constraints.AbstractConstraint) constraints:
+            Constraints for the vertex
         :param AbstractPopulationVertex app_vertex:
             The associated application vertex
         :param ~pacman.model.graphs.common.Slice vertex_slice:
@@ -134,7 +140,15 @@ class PopulationMachineVertex(
     def _synaptic_matrices(self):
         return self.__synaptic_matrices
 
-    def __get_binary_file_name(self, app_vertex):
+    @staticmethod
+    def __get_binary_file_name(app_vertex):
+        """ Get the local binary filename for this vertex.  Static because at
+            the time this is needed, the local app_vertex is not set.
+
+        :param AbstractPopulationVertex app_vertex:
+            The associated application vertex
+        :rtype: str
+        """
         # Split binary name into title and extension
         name, ext = os.path.splitext(app_vertex.neuron_impl.binary_name)
 
@@ -169,18 +183,15 @@ class PopulationMachineVertex(
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={
-            "machine_time_step", "time_scale_factor",
-            "machine_graph", "routing_info",
-            "data_n_time_steps", "n_key_map"
+            "machine_time_step", "time_scale_factor", "machine_graph",
+            "routing_info", "data_n_time_steps", "n_key_map"
         })
     def generate_data_specification(
             self, spec, placement, machine_time_step, time_scale_factor,
-            machine_graph, routing_info, data_n_time_steps,
-            n_key_map):
+            machine_graph, routing_info, data_n_time_steps, n_key_map):
         """
         :param machine_time_step: (injected)
         :param time_scale_factor: (injected)
-        :param application_graph: (injected)
         :param machine_graph: (injected)
         :param routing_info: (injected)
         :param data_n_time_steps: (injected)

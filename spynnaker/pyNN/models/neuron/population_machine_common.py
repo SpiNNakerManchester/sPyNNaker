@@ -1,3 +1,17 @@
+# Copyright (c) 2017-2020The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from collections import namedtuple
 from spinn_utilities.overrides import overrides
 from spinn_utilities.abstract_base import abstractmethod
@@ -24,6 +38,7 @@ from spinn_front_end_common.interface.profiling import AbstractHasProfileData
 from spinn_front_end_common.utilities.constants import SIMULATION_N_BYTES
 
 
+# Identifiers for common regions
 CommonRegions = namedtuple(
     "CommonRegions",
     ["system", "provenance", "profile", "recording"])
@@ -36,6 +51,8 @@ class PopulationMachineCommon(
         AbstractReceiveBuffersToHost,
         AbstractHasProfileData,
         AbstractHasAssociatedBinary):
+    """ A common machine vertex for all population binaries
+    """
 
     __slots__ = [
         "__resources",
@@ -48,6 +65,22 @@ class PopulationMachineCommon(
     def __init__(
             self, label, constraints, app_vertex, vertex_slice, resources,
             regions, n_provenance_items, profile_tags, binary_file_name):
+        """
+        :param str label: The label of the vertex
+        :param list(~pacman.model.constraints.AbstractConstraint) constraints:
+            Constraints for the vertex
+        :param AbstractPopulationVertex app_vertex:
+            The associated application vertex
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The slice of the population that this implements
+        :param ~pacman.model.resources.ResourceContainer resources:
+            The resources used by the vertex
+        :param .CommonRegions regions: The regions to be assigned
+        :param int n_provenance_items:
+            The number of additional provenance items to be read
+        :param dict(int-->str): A mapping of profile identifiers to names
+        :param str binary_file_name: The name of the binary file
+        """
         super(PopulationMachineCommon, self).__init__(
             label, constraints, app_vertex, vertex_slice)
         self.__resources = resources
@@ -87,7 +120,15 @@ class PopulationMachineCommon(
     @abstractmethod
     def _append_additional_provenance(
             self, provenance_items, prov_list_from_machine, placement):
-        pass
+        """ Append the additional provenance items to the set gathered for this
+            vertex.
+
+        :param list(ProvenanceDataItem) provenance_items:
+            List of provenance items gathered so far to append to
+        :param list(int): List of provenance values from the machine to be read
+        :param :param ~pacman.model.placements.Placement placement:
+            the placement from which the data was read
+        """
 
     @overrides(AbstractRecordable.is_recording)
     def is_recording(self):
@@ -113,6 +154,15 @@ class PopulationMachineCommon(
 
     def _write_common_data_spec(
             self, spec, machine_time_step, time_scale_factor, rec_regions):
+        """ Write the data specification for the common regions
+
+        :param ~data_specification.DataSpecificationGenerator spec:
+            The data specification to write to
+        :param int machine_time_step: The time step of the simulation
+        :param int time_scale_factor: The time scaling of the simulation
+        :param list(int) rec_regions:
+            A list of sizes of each recording region (including empty ones)
+        """
         # Write the setup region
         spec.reserve_memory_region(
             region=self.__regions.system, size=SIMULATION_N_BYTES,

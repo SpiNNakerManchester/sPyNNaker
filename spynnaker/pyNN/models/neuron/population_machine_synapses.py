@@ -1,3 +1,17 @@
+# Copyright (c) 2017-2020The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import ctypes
 from collections import namedtuple
 
@@ -40,21 +54,30 @@ class SynapseProvenance(ctypes.LittleEndianStructure):
         ("n_buffer_overflows", ctypes.c_uint32),
         # The number of STDP weight saturations.
         ("n_plastic_saturations", ctypes.c_uint32),
+        # The number of searches of the population table that hit nothing
         ("n_ghost_searches", ctypes.c_uint32),
+        # The number of bitfields that couldn't fit in DTCM
         ("n_failed_bitfield_reads", ctypes.c_uint32),
+        # The number of DMA transfers done
         ("n_dmas_complete", ctypes.c_uint32),
+        # The number of spikes successfully processed
         ("n_spikes_processed", ctypes.c_uint32),
+        # The number of population table hits on INVALID entries
         ("n_invalid_pop_table_hits", ctypes.c_uint32),
+        # The number of spikes that didn't transfer empty rows
         ("n_filtered_by_bitfield", ctypes.c_uint32),
         # The number of rewirings performed.
         ("n_rewires", ctypes.c_uint32),
+        # The number of packets that were dropped due to being late
         ("n_late_packets", ctypes.c_uint32),
+        # The maximum size of the spike input buffer during simulation
         ("max_size_input_buffer", ctypes.c_uint32)
     ]
 
     N_ITEMS = len(_fields_)
 
 
+# Identifiers for synapse regions
 SynapseRegions = namedtuple(
     "SynapseRegions",
     ["synapse_params", "direct_matrix", "pop_table", "synaptic_matrix",
@@ -66,7 +89,10 @@ class PopulationMachineSynapses(
         AbstractSupportsBitFieldGeneration,
         AbstractSupportsBitFieldRoutingCompression,
         AbstractSynapseExpandable):
+    """ Mix-in for machine vertices that contain synapses
+    """
 
+    # This MUST stay empty to allow mixing with other things with slots
     __slots__ = []
 
     SATURATION_COUNT_NAME = "Times_synaptic_weights_have_saturated"
@@ -127,21 +153,46 @@ class PopulationMachineSynapses(
 
     @abstractproperty
     def _app_vertex(self):
-        pass
+        """ The application vertex of the machine vertex.
+
+        :note: This is likely to be available via the MachineVertex.
+
+        :rtype: AbstractPopulationVertex
+        """
 
     @abstractproperty
     def _vertex_slice(self):
-        pass
+        """ The slice of the application vertex atoms on this machine vertex.
+
+        :note: This is likely to be available via the MachineVertex.
+
+        :rtype: ~pacman.model.graphs.common.Slice
+        """
 
     @abstractproperty
     def _synaptic_matrices(self):
-        pass
+        """ The object holding synaptic matrices.
+
+        :note: This can be created by calling the _create_synaptic_matrices
+               method defined below.
+
+        :rtype: SynapticMatrices
+        """
 
     @abstractproperty
     def _synapse_regions(self):
-        pass
+        """ The identifiers of synaptic regions
+
+        :rtype: .SynapseRegions
+        """
 
     def _create_synaptic_matrices(self):
+        """ Creates the synaptic matrices object.
+
+        :note: This is required because this object cannot have any storage
+
+        :rtype: SynapticMatrices
+        """
         return SynapticMatrices(
             self._vertex_slice,
             self._app_vertex.neuron_impl.get_n_synapse_types(),
@@ -299,6 +350,18 @@ class PopulationMachineSynapses(
     def _write_synapse_data_spec(
             self, spec, machine_time_step, routing_info, machine_graph,
             n_key_map):
+        """ Write the data specification for the synapse data
+
+        :param ~data_specification.DataSpecificationGenerator spec:
+            The data specification to write to
+        :param int machine_time_step: The time step of the simulation
+        :param ~pacman.model.routing_info.RoutingInfo routing_info:
+            The routing information to read the key from
+        :param ~pacman.model.graphs.MachineGraph machine_graph:
+            The machine graph containing this vertex
+        :param ~pacman.model.routing_info.AbstractMachinePartitionNKeysMap\
+            n_keys_map: The map of partitions to number of keys sent
+        """
 
         # Write the synapse parameters
         self._write_synapse_parameters(spec, machine_time_step)
@@ -352,6 +415,12 @@ class PopulationMachineSynapses(
             isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural))
 
     def _write_synapse_parameters(self, spec, machine_time_step):
+        """ Write the synapse parameters data region
+
+        :param ~data_specification.DataSpecificationGenerator spec:
+            The data specification to write to
+        :param int machine_time_step: The time step of the simulation
+        """
         # Reserve space
         spec.reserve_memory_region(
             region=self._synapse_regions.synapse_params,

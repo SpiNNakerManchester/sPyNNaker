@@ -41,7 +41,7 @@ bool synaptogenesis_row_restructure(
 void synaptogenesis_spike_received(UNUSED uint32_t time, UNUSED spike_t spike) {
 }
 
-void synaptogenesis_do_timestep_update(void){
+void synaptogenesis_do_timestep_update(void) {
 }
 
 void print_post_to_pre_entry(void) {

@@ -1,3 +1,17 @@
+# Copyright (c) 2017-2020The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import ctypes
 from collections import namedtuple
 
@@ -31,34 +45,59 @@ class NeuronProvenance(ctypes.LittleEndianStructure):
     N_ITEMS = len(_fields_)
 
 
+# Identifiers for neuron regions
 NeuronRegions = namedtuple(
     "NeuronRegions",
     ["neuron_params", "neuron_recording"])
 
 
 class PopulationMachineNeurons(AbstractReadParametersBeforeSet):
+    """ Mix-in for machine vertices that have neurons in them
+    """
 
+    # This MUST stay empty to allow mixing with other things with slots
     __slots__ = []
 
     @abstractproperty
     def _app_vertex(self):
-        pass
+        """ The application vertex of the machine vertex.
+
+        :note: This is likely to be available via the MachineVertex.
+
+        :rtype: AbstractPopulationVertex
+        """
 
     @abstractproperty
     def _vertex_slice(self):
-        pass
+        """ The slice of the application vertex atoms on this machine vertex.
+
+        :note: This is likely to be available via the MachineVertex.
+
+        :rtype: ~pacman.model.graphs.common.Slice
+        """
 
     @abstractproperty
     def _key(self):
-        pass
+        """ The key for spikes.
+
+        :rtype: int
+        """
 
     @abstractmethod
     def _set_key(self, key):
-        pass
+        """ Set the key for spikes.
+
+        :note: This is required because this class cannot have any storage.
+
+        :param int key: The key to be set
+        """
 
     @abstractproperty
     def _neuron_regions(self):
-        pass
+        """ The region identifiers for the neuron regions
+
+        :rtype: .NeuronRegions
+        """
 
     def _append_neuron_provenance(
             self, provenance_items, prov_list_from_machine, offset, placement):
@@ -88,6 +127,13 @@ class PopulationMachineNeurons(AbstractReadParametersBeforeSet):
         return NeuronProvenance.N_ITEMS
 
     def _write_neuron_data_spec(self, spec, routing_info):
+        """ Write the data specification of the neuron data
+
+        :param ~data_specification.DataSpecificationGenerator spec:
+            The data specification to write to
+        :param ~pacman.model.routing_info.RoutingInfo routing_info:
+            The routing information to read the key from
+        """
         # Get and store the key
         self._set_key(routing_info.get_first_key_from_pre_vertex(
             self, SPIKE_PARTITION_ID))
@@ -106,7 +152,11 @@ class PopulationMachineNeurons(AbstractReadParametersBeforeSet):
             spec, self._neuron_regions.neuron_recording, self._vertex_slice)
 
     def _write_neuron_parameters(self, spec):
+        """ Write the neuron parameters region
 
+        :param ~data_specification.DataSpecificationGenerator spec:
+            The data specification to write to
+        """
         self._app_vertex.update_state_variables()
 
         # pylint: disable=too-many-arguments
