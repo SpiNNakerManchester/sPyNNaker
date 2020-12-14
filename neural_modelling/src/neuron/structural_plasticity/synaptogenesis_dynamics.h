@@ -35,31 +35,31 @@
 bool synaptogenesis_dynamics_initialise(
         address_t sdram_sp_address);
 
-//! \brief Function called (usually on a timer from c_main()) to
-//!     trigger the process of synaptic rewiring
+//! \brief Trigger the process of synaptic rewiring
+//! \details Usually called on a timer registered in c_main()
 //! \param[in] time: the current timestep
 //! \param[out] spike: variable to hold the spike
-//! \param[out] synaptic_row_address: variable to hold the address of the row
+//! \param[out] synaptic_row: variable to hold the address of the row
 //! \param[out] n_bytes: variable to hold the size of the row
 //! \return True if a row is to be transferred, false otherwise
 bool synaptogenesis_dynamics_rewire(uint32_t time,
-        spike_t *spike, address_t *synaptic_row_address, uint32_t *n_bytes);
+        spike_t *spike, synaptic_row_t *synaptic_row, uint32_t *n_bytes);
 
-//! \brief Performs the actual restructuring of a row
+//! \brief Perform the actual restructuring of a row
 //! \param[in] time: The time of the restructure
 //! \param[in] row: The row to restructure
 //! \return True if the row was changed and needs to be written back
-bool synaptogenesis_row_restructure(uint32_t time, address_t row);
+bool synaptogenesis_row_restructure(uint32_t time, synaptic_row_t row);
 
-//! Indicates that a spike has been received
+//! \brief Indicates that a spike has been received
 //! \param[in] time: The time that the spike was received at
 //! \param[in] spike: The received spike
 void synaptogenesis_spike_received(uint32_t time, spike_t spike);
 
-//! Do a timestep of synaptogenesis
+//! \brief Do a timestep of synaptogenesis
 void synaptogenesis_do_timestep_update(void);
 
-//! Prints a certain data object
+//! \brief Print a certain data object
 void print_post_to_pre_entry(void);
 
 #endif // _SYNAPTOGENESIS_DYNAMICS_H_

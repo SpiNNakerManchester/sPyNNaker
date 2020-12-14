@@ -313,7 +313,8 @@ class SynapticMatrices(object):
         """ Convert a list of machine edges to a dict of
             application edge -> list of machine edges, and a key tracker
 
-        :param list(MachineEdge) in_machine_edges: The incoming machine edges
+        :param list(~pacman.model.graphs.machine.MachineEdge) in_machine_edges:
+            The incoming machine edges
         :param RoutingInfo routing_info: Routing information for all edges
         :rtype: tuple(dict, KeySpaceTracker)
         """
@@ -591,7 +592,7 @@ class SynapticMatrices(object):
             The application edge of the projection
         :param SynapseInformation synapse_info:
             The synapse information of the projection
-        :param MachineEdge machine_edge:
+        :param ~pacman.model.graphs.machine.MachineEdge machine_edge:
             The machine edge to get the index of
         """
         matrix = self.__app_matrix(app_edge, synapse_info)

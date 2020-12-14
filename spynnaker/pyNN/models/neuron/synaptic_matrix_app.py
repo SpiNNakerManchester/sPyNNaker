@@ -156,8 +156,8 @@ class SynapticMatrixApp(object):
     def __get_matrix(self, machine_edge):
         """ Get or create a matrix object
 
-        :param ~pacman.model.graph.machine.machine_edge.MachineEdge
-            machine_edge: The machine edge to get the matrix for
+        :param ~pacman.model.graph.machine.MachineEdge machine_edge:
+            The machine edge to get the matrix for
         :rtype: SynapticMatrix
         """
         if machine_edge in self.__matrices:
@@ -223,7 +223,7 @@ class SynapticMatrixApp(object):
             Routing key information for all incoming edges
         :param list(float) weight_scales:
             Weight scale for each synapse edge
-        :param list(MachineEdge) m_edges:
+        :param list(~pacman.model.graphs.machine.MachineEdge) m_edges:
             The machine edges incoming to this vertex
         """
         self.__all_syn_block_sz = all_syn_block_sz
@@ -296,8 +296,10 @@ class SynapticMatrixApp(object):
             The specification to write to
         :param int block_addr:
             The address in the synaptic matrix region to start writing at
-        :param list(MachineEdge, ~numpy.ndarray) matrix_data:
+        :param matrix_data:
             The data for each machine edge to be combined into a single matrix
+        :type matrix_data:
+            list(~pacman.model.graphs.machine.MachineEdge, ~numpy.ndarray)
         :return: The updated block address
         :rtype: int
         """
@@ -343,8 +345,10 @@ class SynapticMatrixApp(object):
             The specification to write to
         :param int block_addr:
             The address in the synaptic matrix region to start writing at
-        :param list(MachineEdge, ~numpy.ndarray) matrix_data:
+        :param matrix_data:
             The data for each machine edge to be combined into a single matrix
+        :type matrix_data:
+            list(~pacman.model.graphs.machine.MachineEdge, ~numpy.ndarray)
         :return: The updated block address
         :rtype: int
         """
@@ -516,7 +520,7 @@ class SynapticMatrixApp(object):
 
         :param ~numpy.ndarray data: The row data created
         :param ~numpy.ndarray delayed_data: The delayed row data created
-        :param MachineEdge machine_edge:
+        :param ~pacman.model.graphs.machine.MachineEdge machine_edge:
             The machine edge the connections are for
         """
         for conn_holder in self.__synapse_info.pre_run_connection_holders:

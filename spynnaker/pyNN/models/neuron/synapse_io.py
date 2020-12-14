@@ -264,7 +264,7 @@ def get_synapses(
         The number of synapse types in total to be represented
     :param list(float) weight_scales:
         The scaling of the weights for each synapse type
-    :param ProjectionMachineEdge machine_edge:
+    :param ~pacman.model.graphs.machine.MachineEdge machine_edge:
         The incoming machine edge that the synapses are on
     :param MaxRowInfo max_row_info:
         The maximum row information for the synapses

@@ -186,7 +186,7 @@ static inline bool sp_structs_get_sub_pop_info(
 //! \param[in,out] row: The row of the synaptic matrix to be updated
 //! \return True if the synapse was removed
 static inline bool sp_structs_remove_synapse(
-        current_state_t *restrict current_state, address_t restrict row) {
+        current_state_t *restrict current_state, synaptic_row_t restrict row) {
     if (!synapse_dynamics_remove_neuron(current_state->offset, row)) {
         return false;
     }
@@ -199,7 +199,7 @@ static inline bool sp_structs_remove_synapse(
 //! \param[in,out] row: The row of the synaptic matrix to be updated
 //! \return True if the synapse was added
 static inline bool sp_structs_add_synapse(
-        current_state_t *restrict current_state, address_t restrict row) {
+        current_state_t *restrict current_state, synaptic_row_t restrict row) {
     uint32_t appr_scaled_weight = current_state->pre_population_info->weight;
 
     uint32_t actual_delay;

@@ -38,7 +38,8 @@ logger = logging.getLogger(__name__)
 
 @add_metaclass(AbstractBase)
 class AbstractMachineBitFieldRouterCompressor(object):
-    """ Adds in regeneration of synaptic matrices to bitfield compression.
+    """ Adds in regeneration of synaptic matrices to bitfield compression to\
+    :py:class:`spinn_front_end_common.interface.interface_functions.MachineBitFieldRouterCompressor`
     """
 
     _RERUN_IOBUF_NAME_PATTERN = "rerun_of_synaptic_expander_on_{}_{}_{}.txt"
@@ -54,21 +55,34 @@ class AbstractMachineBitFieldRouterCompressor(object):
             compress_as_much_as_possible=False, provenance_data_objects=None):
         """ entrance for routing table compression with bit field
 
-        :param ~.RoutingTables routing_tables: routing tables
-        :param ~.Transceiver transceiver: spinnman instance
-        :param ~.Machine machine: spinnMachine instance
+        :param routing_tables: routing tables
+        :type routing_tables:
+            ~pacman.model.routing_tables.MulticastRoutingTables
+        :param ~spinnman.transceiver.Transceiver transceiver: spinnman instance
+        :param ~spinn_machine.Machine machine: spinnMachine instance
         :param int app_id: app id of the application
         :param str provenance_file_path: file path for prov data
-        :param ~.MachineGraph machine_graph: machine graph
-        :param ~.Placements placements: placements on machine
+        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
+            machine graph
+        :param ~pacman.model.placements.Placements placements:
+            placements on machine
+        :param executable_finder: where are binaries are located
+        :type executable_finder:
+            ~spinn_front_end_common.utilities.utility_objs.ExecutableFinder
+        :param bool write_compressor_iobuf: flag saying if read iobuf
+        :param bool produce_report:
+        :param str default_report_folder:
+        :param int target_length:
+        :param ~pacman.model.routing_info.RoutingInfo routing_infos:
         :param int threshold_percentage:
             the percentage of bitfields to do on chip before its considered
             a success
-        :param executable_finder: where are binaries are located
         :param bool read_algorithm_iobuf: flag saying if read iobuf
         :param bool compress_as_much_as_possible:
-            whether to compress as much as possible
+            flag asking if should compress as much as possible
         :param bool read_expander_iobuf: reads the synaptic expander iobuf.
+        :rtype:
+            list(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)
         """
 
         # build machine compressor

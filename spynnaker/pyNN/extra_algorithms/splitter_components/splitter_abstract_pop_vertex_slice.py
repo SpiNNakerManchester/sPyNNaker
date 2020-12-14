@@ -77,9 +77,9 @@ class SplitterAbstractPopulationVertexSlice(
     def get_resources_used_by_atoms(self, vertex_slice):
         """  Gets the resources of a slice of atoms from a given app vertex.
 
-        :param Slice vertex_slice: the slice
-        :param MachineGraph graph: app graph
-        :rtype: ResourceContainer
+        :param ~pacman.model.graphs.common.Slice vertex_slice: the slice
+        :param ~pacman.model.graphs.machine.MachineGraph graph: app graph
+        :rtype: ~pacman.model.resources.ResourceContainer
         """
         variable_sdram = self.__get_variable_sdram(vertex_slice)
         constant_sdram = self.__get_constant_sdram(vertex_slice)
@@ -96,7 +96,8 @@ class SplitterAbstractPopulationVertexSlice(
     def __get_variable_sdram(self, vertex_slice):
         """ returns the variable sdram from the recorder.
 
-        :param Slice vertex_slice: the atom slice for recording sdram
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            the atom slice for recording sdram
         :return: the variable sdram used by the neuron recorder
         :rtype: VariableSDRAM
         """
@@ -108,7 +109,8 @@ class SplitterAbstractPopulationVertexSlice(
     def __get_constant_sdram(self, vertex_slice):
         """ returns the constant sdram used by the vertex slice.
 
-        :param Slice vertex_slice: the atoms to get constant sdram of
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            the atoms to get constant sdram of
         :rtype: ConstantSDRAM
         """
         n_record = (
