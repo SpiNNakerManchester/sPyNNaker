@@ -221,8 +221,7 @@ class PopulationMachineVertex(
         # pylint: disable=too-many-arguments, arguments-differ
 
         # write the neuron params into the new DSG region
-        self._write_neuron_parameters(
-            spec, self.NEURON_REGIONS.neuron_params, routing_info)
+        self._write_neuron_parameters(spec)
 
         # close spec
         spec.end_specification()
