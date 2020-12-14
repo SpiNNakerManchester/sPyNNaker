@@ -197,7 +197,7 @@ class PopulationMachineVertex(
         :param data_n_time_steps: (injected)
         :param n_key_map: (injected)
         """
-
+        # pylint: disable=arguments-differ
         rec_regions = self._app_vertex.neuron_recorder.get_region_sizes(
             self.vertex_slice, data_n_time_steps)
         rec_regions.extend(self._app_vertex.synapse_recorder.get_region_sizes(

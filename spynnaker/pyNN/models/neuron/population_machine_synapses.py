@@ -253,7 +253,8 @@ class PopulationMachineSynapses(
 
         times_timer_tic_overran = 0
         for item in provenance_items:
-            if item.names[-1] == self._TIMER_TICK_OVERRUN:
+            if (item.names[-1] ==
+                    ProvidesProvenanceDataFromMachineImpl._TIMER_TICK_OVERRUN):
                 times_timer_tic_overran = item.value
 
         provenance_items.append(ProvenanceDataItem(

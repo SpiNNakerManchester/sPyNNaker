@@ -166,7 +166,7 @@ class PopulationMachineNeurons(AbstractReadParametersBeforeSet):
 
         # Reserve and switch to the memory region
         params_size = self._app_vertex.get_sdram_usage_for_neuron_params(
-            self.vertex_slice)
+            self._vertex_slice)
         spec.reserve_memory_region(
             region=self._neuron_regions.neuron_params, size=params_size,
             label='NeuronParams')
@@ -174,7 +174,7 @@ class PopulationMachineNeurons(AbstractReadParametersBeforeSet):
 
         # store the tdma data here for this slice.
         data = self._app_vertex.generate_tdma_data_specification_data(
-            self._app_vertex.vertex_slices.index(self.vertex_slice))
+            self._app_vertex.vertex_slices.index(self._vertex_slice))
         spec.write_array(data)
 
         # Write whether the key is to be used, and then the key, or 0 if it
