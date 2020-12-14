@@ -117,12 +117,12 @@ static inline final_state_t _plasticity_update_synapse(
     post_event_window_t post_window = post_events_get_window_delayed(
             post_event_history, window_begin_time, window_end_time);
 
-    log_info("\tPerforming deferred synapse update at time:%u", time);
-    log_info("\t\tbegin_time:%u, end_time:%u - prev_time:%u, num_events:%u",
-        window_begin_time, window_end_time, post_window.prev_time,
-        post_window.num_events);
 
     if (print_plasticity){
+        log_info("\tPerforming deferred synapse update at time:%u", time);
+        log_info("\t\tbegin_time:%u, end_time:%u - prev_time:%u, num_events:%u",
+            window_begin_time, window_end_time, post_window.prev_time,
+            post_window.num_events);
     	io_printf(IO_BUF, "    Printing CF history\n");
     	print_event_history(post_event_history);
     }
