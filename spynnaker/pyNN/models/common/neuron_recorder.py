@@ -19,7 +19,7 @@ import itertools
 import logging
 import math
 import numpy
-from six import raise_from, iteritems
+from six import iteritems
 from six.moves import range, xrange
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
@@ -456,7 +456,7 @@ class NeuronRecorder(object):
         """
         try:
             return self.__sampling_rates[variable] > 0
-        except KeyError as e:
+        except KeyError:
             if variable in self.__per_timestep_recording:
                 return True
         return False
