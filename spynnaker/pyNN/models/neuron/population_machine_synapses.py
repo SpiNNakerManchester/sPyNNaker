@@ -451,6 +451,11 @@ class PopulationMachineSynapses(
         self._synaptic_matrices.read_generated_connection_holders(
             transceiver, placement)
 
+    @property
+    @overrides(AbstractSynapseExpandable.connection_generator_region)
+    def connection_generator_region(self):
+        return self._synapse_regions.connection_builder
+
     def get_connections_from_machine(
             self, transceiver, placement, app_edge, synapse_info):
         """ Get the connections from the machine for this vertex.

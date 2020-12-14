@@ -24,6 +24,8 @@ from spinn_front_end_common.abstract_models import (
 from spinn_front_end_common.utilities import system_control_logic
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
+from spinn_front_end_common.utilities.helpful_functions import (
+    write_address_to_user1)
 
 _ONE_WORD = struct.Struct("<I")
 _THREE_WORDS = struct.Struct("<III")
@@ -324,11 +326,9 @@ class OnChipBitFieldGenerator(object):
         bit_field_builder_region = placement.vertex.bit_field_builder_region(
             self.__txrx, placement)
         # update user 1 with location
-        user_1_base_address = \
-            self.__txrx.get_user_1_register_address_from_core(placement.p)
-        self.__txrx.write_memory(
-            placement.x, placement.y, user_1_base_address,
-            _ONE_WORD.pack(bit_field_builder_region), _ONE_WORD.size)
+        write_address_to_user1(
+            self.__txrx, placement.x, placement.y, placement.p,
+            bit_field_builder_region)
 
     def __check_for_success(self, executable_targets, transceiver):
         """ Goes through the cores checking for cores that have failed to\

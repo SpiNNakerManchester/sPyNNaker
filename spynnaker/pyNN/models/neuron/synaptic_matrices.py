@@ -35,13 +35,14 @@ from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from .key_space_tracker import KeySpaceTracker
 from .synaptic_matrix_app import SynapticMatrixApp
 
+# 1 for synaptic matrix region
 # 1 for n_edges
 # 2 for post_vertex_slice.lo_atom, post_vertex_slice.n_atoms
 # 1 for n_synapse_types
 # 1 for n_synapse_type_bits
 # 1 for n_synapse_index_bits
 SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES = (
-    1 + 2 + 1 + 1 + 1) * BYTES_PER_WORD
+    1 + 1 + 2 + 1 + 1 + 1) * BYTES_PER_WORD
 
 
 class SynapticMatrices(object):
@@ -289,6 +290,7 @@ class SynapticMatrices(object):
             size=n_bytes, label="ConnectorBuilderRegion")
         spec.switch_write_focus(self.__connection_builder_region)
 
+        spec.write_value(self.__synaptic_matrix_region)
         spec.write_value(len(generator_data))
         spec.write_value(self.__post_vertex_slice.lo_atom)
         spec.write_value(self.__post_vertex_slice.n_atoms)

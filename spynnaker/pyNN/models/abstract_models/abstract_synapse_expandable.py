@@ -14,7 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from six import add_metaclass
-from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_utilities.abstract_base import (
+    AbstractBase, abstractmethod, abstractproperty)
 
 SYNAPSE_EXPANDER_APLX = "synapse_expander.aplx"
 
@@ -33,9 +34,17 @@ class AbstractSynapseExpandable(object):
 
     @abstractmethod
     def gen_on_machine(self):
+        """ True if the synapses of a the slice of this vertex should be
+            generated on the machine.
+
+        :rtype: bool
         """
-        True if the synapses of a the slice of this vertex should be generated
-        on the machine.
+
+    @abstractproperty
+    def connection_generator_region(self):
+        """ The region containing the parameters of synaptic expansion
+
+        :rtype: int
         """
 
     @abstractmethod
