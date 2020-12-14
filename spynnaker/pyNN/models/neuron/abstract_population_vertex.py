@@ -495,7 +495,7 @@ class AbstractPopulationVertex(
                 self.label, buffer_manager, placements, self, variable,
                 n_machine_time_steps)
         elif self.__synapse_recorder.is_recordable(variable):
-            return self.__neuron_recorder.get_matrix_data(
+            return self.__synapse_recorder.get_matrix_data(
                 self.label, buffer_manager, placements, self, variable,
                 n_machine_time_steps)
         self.__raise_var_not_supported(variable)
