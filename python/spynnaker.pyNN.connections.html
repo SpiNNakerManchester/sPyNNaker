@@ -191,7 +191,11 @@ by default)</p></li>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The label of the vertex to be notified about. Must be one of the
 vertices listed in the constructor</p></li>
-<li><p><strong>init_callback</strong> (<em>callable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>) </em><em>-&gt; None</em>) – A function to be called to initialise the            vertex. This should take as parameters the label of the vertex,            the number of neurons in the population, the run time of the            simulation in milliseconds, and the simulation timestep in            milliseconds</p></li>
+<li><p><strong>init_callback</strong> (<em>callable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>) </em><em>-&gt; None</em>) – A function to be called to initialise the
+vertex. This should take as parameters the label of the vertex,
+the number of neurons in the population, the run time of the
+simulation in milliseconds, and the simulation timestep in
+milliseconds</p></li>
 </ul>
 </dd>
 </dl>
@@ -205,7 +209,10 @@ vertices listed in the constructor</p></li>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – the label of the function to be sent</p></li>
-<li><p><strong>pause_stop_callback</strong> (<em>callable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>LiveEventConnection</em><em>) </em><em>-&gt; None</em>) – A function to be called when the pause            or stop message has been received. This function should take the            label of the referenced  vertex, and an instance of this class,            which can be used to send events.</p></li>
+<li><p><strong>pause_stop_callback</strong> (<em>callable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>LiveEventConnection</em><em>) </em><em>-&gt; None</em>) – A function to be called when the pause
+or stop message has been received. This function should take the
+label of the referenced  vertex, and an instance of this class,
+which can be used to send events.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
@@ -233,7 +240,10 @@ vertices listed in the constructor</p></li>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The label of the vertex to be notified about.
 Must be one of the vertices listed in the constructor</p></li>
-<li><p><strong>live_event_callback</strong> (<em>callable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em><em>) </em><em>-&gt; None</em>) – A function to be called when events are            received. This should take as parameters the label of the vertex,            the simulation timestep when the event occurred, and an            array-like of atom IDs.</p></li>
+<li><p><strong>live_event_callback</strong> (<em>callable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em><em>) </em><em>-&gt; None</em>) – A function to be called when events are
+received. This should take as parameters the label of the vertex,
+the simulation timestep when the event occurred, and an
+array-like of atom IDs.</p></li>
 <li><p><strong>translate_key</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – True if the key is to be converted to an atom ID, False if the
 key should stay a key</p></li>
 </ul>
@@ -248,7 +258,10 @@ key should stay a key</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>start_callback</strong> (<em>callable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>LiveEventConnection</em><em>) </em><em>-&gt; None</em>) – A function to be called when the start            message has been received. This function should take the label of            the referenced vertex, and an instance of this class, which can            be used to send events</p></li>
+<li><p><strong>start_callback</strong> (<em>callable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>LiveEventConnection</em><em>) </em><em>-&gt; None</em>) – A function to be called when the start
+message has been received. This function should take the label of
+the referenced vertex, and an instance of this class, which can
+be used to send events</p></li>
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – the label of the function to be sent</p></li>
 </ul>
 </dd>
@@ -263,7 +276,10 @@ key should stay a key</p></li>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – the label of the function to be sent</p></li>
-<li><p><strong>start_resume_callback</strong> (<em>callable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>LiveEventConnection</em><em>) </em><em>-&gt; None</em>) – A function to be called when the start            or resume message has been received. This function should take             the label of the referenced vertex, and an instance of this             class, which can be used to send events.</p></li>
+<li><p><strong>start_resume_callback</strong> (<em>callable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>LiveEventConnection</em><em>) </em><em>-&gt; None</em>) – A function to be called when the start
+or resume message has been received. This function should take
+the label of the referenced vertex, and an instance of this
+class, which can be used to send events.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>

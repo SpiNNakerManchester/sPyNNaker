@@ -526,8 +526,7 @@
         <span class="k">for</span> <span class="n">m_edge</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__m_edges</span><span class="p">:</span>
             <span class="n">matrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_matrix</span><span class="p">(</span><span class="n">m_edge</span><span class="p">)</span>
             <span class="n">max_delay_per_stage</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="n">m_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">app_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span>
-                <span class="n">max_support_delay</span><span class="p">())</span>
+                <span class="n">m_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">app_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">max_support_delay</span><span class="p">())</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__use_app_keys</span><span class="p">:</span>
                 <span class="n">syn_addr</span><span class="p">,</span> <span class="n">syn_mat_offset</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">next_app_on_chip_address</span><span class="p">(</span>

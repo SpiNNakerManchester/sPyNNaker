@@ -89,7 +89,8 @@ sending (default False)</p></li>
 <li><p><strong>send_buffer_times</strong> (<a class="reference external" href="https://numpy.org/doc/1.19/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a><em>(</em><a class="reference external" href="https://numpy.org/doc/1.19/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a><em>(</em><em>numpy.int32</em><em>)</em><em>) or
 </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://numpy.org/doc/1.19/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a><em>(</em><em>int32</em><em>)</em><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – An array of arrays of times at which keys
 should be sent (one array for each key, default disabled)</p></li>
-<li><p><strong>send_buffer_partition_id</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – The ID of the partition containing            the edges down which the events are to be sent</p></li>
+<li><p><strong>send_buffer_partition_id</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – The ID of the partition containing
+the edges down which the events are to be sent</p></li>
 <li><p><strong>reserve_reverse_ip_tag</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Extra flag for input without a reserved port</p></li>
 <li><p><strong>enable_injection</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Flag to indicate that data will be received to inject</p></li>
 <li><p><strong>splitter</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a><em> or </em><em>AbstractSplitterCommon</em>) – the splitter object needed for this vertex</p></li>
@@ -711,7 +712,7 @@ implements.</p></li>
 <dd><p>Get constraints to be added to the given edge partition that comes            out of this vertex.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>partition</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs/#pacman.model.graphs.OutgoingEdgePartition" title="(in PACMAN)"><em>OutgoingEdgePartition</em></a>) – An edge that comes out of this vertex</p>
+<dd class="field-odd"><p><strong>partition</strong> (<em>AbstractOutgoingEdgePartition</em>) – An edge that comes out of this vertex</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>A list of constraints</p>

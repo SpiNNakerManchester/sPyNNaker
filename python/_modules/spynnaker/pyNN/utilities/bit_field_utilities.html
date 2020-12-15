@@ -276,10 +276,8 @@
         <span class="nb">len</span><span class="p">(</span><span class="n">machine_graph</span><span class="o">.</span><span class="n">get_edges_ending_at_vertex</span><span class="p">(</span><span class="n">machine_vertex</span><span class="p">)))</span>
 
     <span class="c1"># load in key to max atoms map</span>
-    <span class="k">for</span> <span class="n">in_coming_edge</span> <span class="ow">in</span> <span class="n">machine_graph</span><span class="o">.</span><span class="n">get_edges_ending_at_vertex</span><span class="p">(</span>
-            <span class="n">machine_vertex</span><span class="p">):</span>
-        <span class="n">out_going_partition</span> <span class="o">=</span> \
-            <span class="n">machine_graph</span><span class="o">.</span><span class="n">get_outgoing_partition_for_edge</span><span class="p">(</span><span class="n">in_coming_edge</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">out_going_partition</span> <span class="ow">in</span> <span class="n">machine_graph</span><span class="o">.</span>\
+            <span class="n">get_multicast_edge_partitions_ending_at_vertex</span><span class="p">(</span><span class="n">machine_vertex</span><span class="p">):</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span>
             <span class="n">routing_info</span><span class="o">.</span><span class="n">get_first_key_from_partition</span><span class="p">(</span><span class="n">out_going_partition</span><span class="p">))</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span>
