@@ -18,6 +18,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include <data_specification.h>
 #include <common/in_spikes.h>
 #include "synapses.h"
 #include "spike_processing.h"
