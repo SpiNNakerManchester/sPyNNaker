@@ -16,6 +16,7 @@
 import logging
 from threading import RLock
 import numpy
+from spinn_utilities.log import FormatAdapter
 from spinnman.connections import ConnectionListener
 from spinn_front_end_common.utilities.constants import BYTES_PER_SHORT
 from spynnaker.pyNN.connections import SpynnakerLiveSpikesConnection
@@ -23,7 +24,7 @@ from spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters \
     import (
         PushBotRetinaResolution)
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 _RETINA_PACKET_SIZE = BYTES_PER_SHORT
 
 

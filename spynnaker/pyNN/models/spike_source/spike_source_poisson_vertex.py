@@ -17,6 +17,7 @@ import logging
 import math
 import numpy
 import scipy.stats
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
 from pacman.executor.injection_decorator import inject_items
@@ -46,7 +47,7 @@ from spynnaker.pyNN.utilities.ranged.spynnaker_ranged_dict \
 from spynnaker.pyNN.utilities.ranged.spynnaker_ranged_list \
     import SpynnakerRangedList
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 # uint32_t n_rates; uint32_t index
 PARAMS_WORDS_PER_NEURON = 2

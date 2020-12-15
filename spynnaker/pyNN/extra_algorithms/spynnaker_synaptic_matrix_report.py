@@ -16,11 +16,12 @@
 import logging
 import os
 import numpy
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 _DIRNAME = "synaptic_matrix_reports"
 _TMPL_FILENAME = "synaptic_matrix_for_application_edge_{}"
 
