@@ -217,7 +217,9 @@ static bool initialise(void) {
     if (!population_table_initialise(
             data_specification_get_region(POPULATION_TABLE_REGION, ds_regions),
             data_specification_get_region(SYNAPTIC_MATRIX_REGION, ds_regions),
-            direct_synapses_address, &row_max_n_words)) {
+            direct_synapses_address,
+            data_specification_get_region(BIT_FIELD_FILTER_REGION, ds_regions),
+            &row_max_n_words)) {
         return false;
     }
     // Set up the synapse dynamics

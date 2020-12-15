@@ -263,8 +263,84 @@ bool population_table_load_bitfields(filter_region_t *filter_region) {
     return true;
 }
 
+//! \brief locates the n atoms based off the filter
+//! \param[in] key: master pop key.
+//! \param[in] filter_region: base address of the bitfield region.
+//! \param[out] atoms: the number of atoms, as defined by the filter.
+//! \return bool stating if successful or not
+static inline bool find_n_atoms(
+        uint32_t key, filter_region_t *filter_region, uint32_t* atoms) {
+    for (uint32_t filter_id = 0; filter_id < filter_region->n_filters;
+            filter_id++) {
+        if (filter_region->filters[filter_id].key == key) {
+            *atoms = filter_region->filters[filter_id].n_atoms;
+            return true;
+        }
+    }
+    return false;
+}
+
+//! \brief process a pop entry for caching in dtcm.
+//! \param[in] pop_entry: the master pop entry
+//! \param[in] filter_region: the bitfield region base address.
+//! \return bool which states if successful or not.
+static inline bool process_pop_entry(
+        master_population_table_entry pop_entry,
+        filter_region_t * filter_region) {
+    // if an extra info flag is set, skip it as that is not cachable.
+    uint32_t start = 0;
+    uint32_t count = 0;
+    bool success = population_table_set_start_and_count(
+        pop_entry, &start, &count);
+    if (!success) {
+        log_error("failed to set start and count");
+        return false;
+    }
+    // search blocks and put in correct rep store
+    for (uint32_t address_index = start; address_index < count + start;
+            address_index ++) {
+        address_list_entry address_entry =
+            population_table_get_address_entry(address_index);
+
+        // find size of block in terms of atoms
+        uint32_t atoms = 0;
+        bool success = find_n_atoms(pop_entry.key, filter_region, *atoms);
+        if (!success) {
+            log_error("failed to find the n atoms for key %d.", pop_entry.key);
+            return false;
+        }
+
+        // process each rep correctly
+        if (address_entry.addr.representation == BINARY_SEARCH) {
+            log_info(
+                "caching address entry %d into binary search", address_index);
+        } else if (address_entry.addr.representation == ARRAY) {
+            log_info("caching address entry %d into array", address_index);
+            // malloc space for array
+            uint32_t * block = spin1_malloc(atoms * sizeof(uint32_t*));
+            if (block == NULL) {
+                log_error(
+                    "failed to allocate DTCM for block with key %d", pop_entry.key);
+            }
+            for (uint32_t atom_id = 0; atom_id < atoms; atom_id ++) {
+
+            }
+        }
+        else {
+            log_error(
+                "dont recognise the rep %d", address_entry.addr.representation);
+            return false;
+        }
+    }
+    return true;
+}
+
 //! \brief caches synaptic blocks into DTCM as required.
-static inline bool cache_synaptic_blocks(address_t table_address) {
+//! \param[in] table_address: master pop base address
+//! \param[in] filter_region: bitfield region base address.
+//! \return bool stating if successful or not
+static inline bool cache_synaptic_blocks(
+        address_t table_address, filter_region_t *filter_region) {
     // build stores.
     master_pop_top_counters_t* store =
         (master_pop_top_counters_t*) table_address;
@@ -279,13 +355,11 @@ static inline bool cache_synaptic_blocks(address_t table_address) {
         master_population_table_entry pop_entry =
             population_table_entry(pop_entry_index);
         if (pop_entry.cache_in_dtcm) {
-            // if an extra info flag is set, skip it as that is not cachable.
-            uint32_t start = 0;
-            uint32_t count = 0;
-            bool success = population_table_set_start_and_count(
-                pop_entry, &start, &count);
+            bool success = process_pop_entry(pop_entry, filter_region);
             if (!success) {
-                log_error("failed to set start and count");
+                log_error(
+                    "failed to process entry with index %d with key %d",
+                    pop_entry_index, pop_entry.key);
                 return false;
             }
         }
@@ -300,7 +374,8 @@ static inline bool cache_synaptic_blocks(address_t table_address) {
 
 bool population_table_initialise(
         address_t table_address, address_t synapse_rows_address,
-        address_t direct_rows_address, uint32_t *row_max_n_words) {
+        address_t direct_rows_address, filter_region_t *filter_region,
+        uint32_t *row_max_n_words) {
     log_debug("Population_table_initialise: starting");
     master_pop_top_counters_t* store =
         (master_pop_top_counters_t*) table_address;
@@ -350,7 +425,7 @@ bool population_table_initialise(
         n_address_list_bytes);
 
     // start the caching process.
-    if(!cache_synaptic_blocks(table_address)) {
+    if(!cache_synaptic_blocks(table_address, filter_region)) {
         log_error("failed to cache into DTCM");
         return false;
     }
