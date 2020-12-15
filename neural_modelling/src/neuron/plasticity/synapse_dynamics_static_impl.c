@@ -77,12 +77,6 @@ bool synapse_dynamics_process_plastic_synapses(
     return false;
 }
 
-//---------------------------------------
-input_t synapse_dynamics_get_intrinsic_bias(
-        UNUSED uint32_t time, UNUSED index_t neuron_index) {
-    return ZERO;
-}
-
 void synapse_dynamics_print_plastic_synapses(
         UNUSED synapse_row_plastic_data_t *plastic_region_data,
         UNUSED synapse_row_fixed_part_t *fixed_region,

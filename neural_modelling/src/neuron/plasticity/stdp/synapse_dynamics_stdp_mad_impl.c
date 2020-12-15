@@ -410,11 +410,6 @@ void synapse_dynamics_process_post_synaptic_event(
             timing_add_post_spike(time, last_post_time, last_post_trace));
 }
 
-input_t synapse_dynamics_get_intrinsic_bias(
-        UNUSED uint32_t time, UNUSED index_t neuron_index) {
-    return ZERO;
-}
-
 uint32_t synapse_dynamics_get_plastic_pre_synaptic_events(void) {
     return num_plastic_pre_synaptic_events;
 }

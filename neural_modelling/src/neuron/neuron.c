@@ -141,13 +141,8 @@ void neuron_do_timestep_update(timer_t time, uint timer_count) { // EXPORTED
     // update each neuron individually
     for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
 
-        // Get external bias from any source of intrinsic plasticity
-        input_t external_bias =
-                synapse_dynamics_get_intrinsic_bias(time, neuron_index);
-
         // call the implementation function (boolean for spike)
-        bool spike = neuron_impl_do_timestep_update(
-            neuron_index, external_bias);
+        bool spike = neuron_impl_do_timestep_update(neuron_index, 0);
 
         // If the neuron has spiked
         if (spike) {
