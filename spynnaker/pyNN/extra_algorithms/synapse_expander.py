@@ -43,7 +43,7 @@ def synapse_expander(
     :param str provenance_file_path: Where provenance data should be written.
     :param executable_finder:
         How to find the synapse expander binaries.
-    :param extract_iobuf: bool flag for extracting iobuf
+    :param bool extract_iobuf: flag for extracting iobuf
     :type executable_finder:
         ~spinn_utilities.executable_finder.ExecutableFinder
     """
