@@ -101,7 +101,8 @@ class AbstractNeuronRecordable(object):
 
         :param int n_machine_time_steps: map of vertex to steps.
         :param int sampling_rate: the sampling rate for this vertex
-        :param MachineVertex vertex: the machine vertex
+        :param ~pacman.model.graphs.machine.MachineVertex vertex:
+            the machine vertex
         :param str variable: the variable being recorded
         :return: int the number of rows expected.
         """
