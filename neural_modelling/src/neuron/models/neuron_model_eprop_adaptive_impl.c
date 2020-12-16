@@ -166,7 +166,7 @@ state_t neuron_model_state_update(
 //        io_printf(IO_BUF, "L:%k, rL:%k, cL:%k, nL:%k\n", learning_signal, reg_learning_signal, learning_signal + reg_learning_signal, new_learning_signal);
 //    if (reg_learning_signal > 0.5k || reg_learning_signal < -0.5k){
     new_learning_signal =  v_mem_error + (reg_learning_signal);
-    for (uint32_t syn_ind=0; syn_ind < 20; syn_ind++){
+    for (uint32_t syn_ind=0; syn_ind < 10; syn_ind++){
         new_learning_signal += (learning_signal[syn_ind] * neuron->w_fb[syn_ind]);
     }
 //    new_learning_signal = reg_learning_signal;

@@ -31,7 +31,7 @@ COUNT_REFRAC = "count_refrac"
 TARGET_DATA = "target_data"
 # Learning signal
 L = "learning_signal"
-W_FB = "feedback_weight"
+# W_FB = "feedback_weight"
 
 UNITS = {
     V: 'mV',
@@ -58,7 +58,7 @@ class NeuronModelLeakyIntegrateAndFireSHDReadout(AbstractNeuronModel):
 
         # learning signal
         "_l",
-        "_w_fb",
+        # "_w_fb",
         "_eta",
         "_update_ready"
         ]
@@ -68,7 +68,7 @@ class NeuronModelLeakyIntegrateAndFireSHDReadout(AbstractNeuronModel):
 #             mean_isi_ticks, time_to_spike_ticks, rate_update_threshold,
             target_data,
             l,
-            w_fb,
+            # w_fb,
             eta,
             update_ready):
 
@@ -83,7 +83,7 @@ class NeuronModelLeakyIntegrateAndFireSHDReadout(AbstractNeuronModel):
             DataType.INT32,  # tau_refrac
             # Learning signal
             DataType.S1615,  # L
-            DataType.S1615  # w_fb
+            # DataType.S1615  # w_fb
         ]
 
         # Synapse states - always initialise to zero
@@ -123,7 +123,7 @@ class NeuronModelLeakyIntegrateAndFireSHDReadout(AbstractNeuronModel):
 
         # learning signal
         self._l = l
-        self._w_fb = w_fb
+        # self._w_fb = w_fb
 
         self._eta = eta
 
@@ -136,16 +136,17 @@ class NeuronModelLeakyIntegrateAndFireSHDReadout(AbstractNeuronModel):
 
     @overrides(AbstractNeuronModel.add_parameters)
     def add_parameters(self, parameters):
+        parameters[V] = self._v_init
         parameters[V_REST] = self._v_rest
         parameters[TAU_M] = self._tau_m
         parameters[CM] = self._cm
         parameters[I_OFFSET] = self._i_offset
         parameters[V_RESET] = self._v_reset
         parameters[TAU_REFRAC] = self._tau_refrac
-        parameters[TARGET_DATA] = 0.0
+        # parameters[TARGET_DATA] = 0.0
 
         #learning params
-        parameters[W_FB] = self._w_fb
+        # parameters[W_FB] = self._w_fb
         
 
     @overrides(AbstractNeuronModel.add_state_variables)
@@ -180,8 +181,8 @@ class NeuronModelLeakyIntegrateAndFireSHDReadout(AbstractNeuronModel):
                 parameters[TAU_REFRAC].apply_operation(
                     operation=lambda x: int(numpy.ceil(x / (ts / 1000.0)))),
 
-                state_variables[L],
-                parameters[W_FB]
+                state_variables[L]
+                # parameters[W_FB]
                 ]
 
         # create synaptic state - init all state to zero
@@ -203,7 +204,9 @@ class NeuronModelLeakyIntegrateAndFireSHDReadout(AbstractNeuronModel):
         # Read the data
         (_v, _v_rest, _r_membrane, _exp_tc, _i_offset, _count_refrac,
         _v_reset, _tau_refrac,
-        _l, _w_fb) = values  # Not sure this will work with the new array of synapse!!!
+        _l
+         # _w_fb
+         ) = values  # Not sure this will work with the new array of synapse!!!
         # todo check alignment on this
 
         # Copy the changed data only
@@ -287,11 +290,11 @@ class NeuronModelLeakyIntegrateAndFireSHDReadout(AbstractNeuronModel):
     def tau_refrac(self, tau_refrac):
         self._tau_refrac = tau_refrac
 
-    @property
-    def w_fb(self):
-        return self._w_fb
-
-    @w_fb.setter
-    def w_fb(self, new_value):
-        self._w_fb = new_value
+    # @property
+    # def w_fb(self):
+    #     return self._w_fb
+    #
+    # @w_fb.setter
+    # def w_fb(self, new_value):
+    #     self._w_fb = new_value
 

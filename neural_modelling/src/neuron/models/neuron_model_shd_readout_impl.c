@@ -3,7 +3,7 @@
 #include <debug.h>
 
 extern uint32_t time;
-extern REAL learning_signal;
+extern REAL learning_signal[20];
 REAL local_eta;
 
 // simple Leaky I&F ODE
@@ -62,7 +62,10 @@ state_t neuron_model_state_update(
 
     uint32_t total_synapses_per_neuron = 100; //todo should this be fixed?
 
-    neuron->L = learning_signal * neuron->w_fb;
+    neuron->L = 0.k;
+    for (uint32_t n_ind=0; n_ind < 10; n_ind++){
+        neuron->L += learning_signal[n_ind];// * neuron->w_fb[n_ind];
+    }
 
     // All operations now need doing once per eprop synapse
     for (uint32_t syn_ind=0; syn_ind < total_synapses_per_neuron; syn_ind++){
@@ -162,7 +165,7 @@ void neuron_model_print_parameters(restrict neuron_pointer_t neuron) {
 
     io_printf(IO_BUF, "learning      = %k n/a\n", neuron->L);
 
-    io_printf(IO_BUF, "feedback w    = %k n/a\n\n", neuron->w_fb);
+//    io_printf(IO_BUF, "feedback w    = %k n/a\n\n", neuron->w_fb);
 
 //    io_printf(IO_BUF, "T refract     = %u timesteps\n", neuron->T_refract);
 //    io_printf(IO_BUF, "mean_isi_ticks  = %k\n", neuron->mean_isi_ticks);

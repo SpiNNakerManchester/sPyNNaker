@@ -4,7 +4,7 @@
 #include "neuron_model.h"
 #include "random.h"
 
-#define SYNAPSES_PER_NEURON 250
+#define SYNAPSES_PER_NEURON 100
 
 
 typedef struct eprop_syn_state_t {
@@ -46,7 +46,7 @@ typedef struct neuron_t {
     int32_t  T_refract;
 
     REAL    L; // learning signal
-    REAL w_fb; // feedback weight
+//    REAL w_fb; // feedback weight
 
     // array of synaptic states - peak fan-in of >250 for this case
     eprop_syn_state_t syn_state[SYNAPSES_PER_NEURON];

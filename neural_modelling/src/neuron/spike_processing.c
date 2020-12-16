@@ -245,7 +245,7 @@ static void dma_complete_callback(uint unused, uint tag) {
 
 static void multicast_packet_wpayload_received_callback(uint key, uint payload){
 
-    int id = (key && 31) % 20;
+    int id = (key && 15) % 10;
 	learning_signal[id] = kbits(payload);
 
 	// Print payload to test transmission of error

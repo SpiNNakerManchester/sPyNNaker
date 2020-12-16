@@ -287,7 +287,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     if (neuron_index == 9){
 
         // Calculate error
-        for (uint32_t n_ind=0; n_ind < 20; n_ind++){
+        for (uint32_t n_ind=0; n_ind < 10; n_ind++){  // set to 20 when english and german
             output_errors[n_ind] /= accumulated_softmax;
             REAL correct_output = 0.k;
             if (n_ind == global_parameters->target_V[target_ind]){
