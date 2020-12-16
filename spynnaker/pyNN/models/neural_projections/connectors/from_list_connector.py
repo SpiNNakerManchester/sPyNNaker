@@ -15,6 +15,7 @@
 
 import logging
 import numpy
+from pyNN.random import RandomDistribution
 
 from spinn_front_end_common.utilities.constants import \
     MICRO_TO_MILLISECOND_CONVERSION
@@ -83,7 +84,10 @@ class FromListConnector(AbstractConnector):
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
         if self.__delays is None:
-            return numpy.max(synapse_info.delays)
+            if isinstance(synapse_info.delays, RandomDistribution):
+                return synapse_info.delays.parameters['high']
+            else:
+                return numpy.max(synapse_info.delays)
         else:
             return numpy.max(self.__delays)
 
