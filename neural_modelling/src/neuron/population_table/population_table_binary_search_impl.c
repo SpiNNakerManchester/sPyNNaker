@@ -284,7 +284,7 @@ static inline bool find_n_atoms(
 //! \param[in] pop_entry: the master pop entry
 //! \param[in] filter_region: the bitfield region base address.
 //! \return bool which states if successful or not.
-static inline bool process_pop_entry(
+static inline bool process_pop_entry_for_caching(
         master_population_table_entry pop_entry,
         filter_region_t * filter_region) {
     // if an extra info flag is set, skip it as that is not cachable.
@@ -323,6 +323,17 @@ static inline bool process_pop_entry(
                     "failed to allocate DTCM for block with key %d", pop_entry.key);
             }
             for (uint32_t atom_id = 0; atom_id < atoms; atom_id ++) {
+                last_neuron_id = pop_entry.key + atom_id;
+                address_t* row_address;
+                uint32_t local_spike_id;
+                uint32_t size_to_read;
+                bool get_next = population_table_get_next_address(
+                    &local_spike_id, &row_address, &size_to_read);
+                uint32_t size_in_words =
+                    synapse_row_num_fixed_synapses(row_address);
+                size_in_words += synapse_row_num_plastic_controls(row_address);
+                size_in_words += N_SYNAPSE_ROW_HEADER_WORDS;
+
 
             }
         }
@@ -355,7 +366,7 @@ static inline bool cache_synaptic_blocks(
         master_population_table_entry pop_entry =
             population_table_entry(pop_entry_index);
         if (pop_entry.cache_in_dtcm) {
-            bool success = process_pop_entry(pop_entry, filter_region);
+            bool success = process_pop_entry_for_caching(pop_entry, filter_region);
             if (!success) {
                 log_error(
                     "failed to process entry with index %d with key %d",
