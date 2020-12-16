@@ -546,7 +546,7 @@ class SynapticMatrices(object):
 
         :param ~spinnman.transceiver.Transceiver transceiver:
             Used to read the data from the machine
-        :param ~pacman.model.placements.Placements placements:
+        :param ~pacman.model.placements.Placement placement:
             Where the vertices are on the machine
         :param ProjectionApplicationEdge app_edge:
             The application edge of the projection
