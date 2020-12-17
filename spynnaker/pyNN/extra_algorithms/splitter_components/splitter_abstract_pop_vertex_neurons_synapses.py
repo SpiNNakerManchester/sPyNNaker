@@ -15,17 +15,15 @@
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.resources import (
-    ResourceContainer, DTCMResource, CPUCyclesPerTickResource)
+    ResourceContainer, ConstantSDRAM, DTCMResource, CPUCyclesPerTickResource)
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
-from spynnaker.pyNN.models.neuron import (
-    AbstractPopulationVertex)
-from spynnaker.pyNN.models.neuron.population_machine_vertex import (
-    NeuronProvenance, SynapseProvenance)
-from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
-from spynnaker.pyNN.models.neuron.population_neurons_machine_vertex import PopulationNeuronsMachineVertex
 from pacman.model.graphs.common.slice import Slice
-from spynnaker.pyNN.models.neuron.population_synapses_machine_vertex import PopulationSynapsesMachineVertex
+from spynnaker.pyNN.models.neuron import (
+    PopulationNeuronsMachineVertex, PopulationSynapsesMachineVertex,
+    NeuronProvenance, SynapseProvenance, AbstractPopulationVertex)
+from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
+from pacman.model.graphs.machine.machine_edge import MachineEdge
 
 
 class SplitterAbstractPopulationVertexNeuronsSynapses(
@@ -33,7 +31,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
     """ handles the splitting of the AbstractPopulationVertex via slice logic.
     """
 
-    __slots__ = []
+    __slots__ = ["__neuron_vertices", "__synapse_vertices"]
 
     SPLITTER_NAME = "SplitterAbstractPopulationVertexNeuronsSynapses"
 
@@ -45,6 +43,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         "your vertex and try again.")
 
     def __init__(self):
+        super(SplitterAbstractPopulationVertexNeuronsSynapses, self).__init__(
+            self.SPLITTER_NAME)
         AbstractSpynnakerSplitterDelay.__init__(self)
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
@@ -56,55 +56,66 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, resource_tracker, machine_graph):
-        atoms_per_core = self._governed_app_vertex.get_max_atoms_per_core()
-        n_atoms = self._govered_app_vertex.n_atoms
+        self.__neuron_vertices = list()
+        self.__synapse_vertices = list()
         label = self._governed_app_vertex.label
-        for low in range(0, n_atoms, atoms_per_core):
-            high = min(low + atoms_per_core - 1, n_atoms - 1)
-            vertex_slice = Slice(low, high)
+        for vertex_slice in self.__get_fixed_slices():
             neuron_resources = self.__get_neuron_resources(vertex_slice)
             synapse_resources = self.__get_synapse_resources(vertex_slice)
-            resource_tracker.allocate_group_resources([
-                neuron_resources, synapse_resources])
+            resource_tracker.allocate_constrained_group_resources(
+                [(neuron_resources, []), (synapse_resources, [])])
             resource_tracker.allocate_resources(neuron_resources)
-            neuron_label = "{}_Neurons:{}-{}".format(label, low, high)
+            neuron_label = "{}_Neurons:{}-{}".format(
+                label, vertex_slice.lo_atom, vertex_slice.hi_atom)
             neuron_vertex = PopulationNeuronsMachineVertex(
                 neuron_resources, neuron_label, None,
                 self._governed_app_vertex, vertex_slice)
-            machine_graph.add_machine_vertex(neuron_vertex)
-            synapse_label = "{}_Synapses:{}-{}".format(label, low, high)
+            machine_graph.add_vertex(neuron_vertex)
+            self.__neuron_vertices.append(neuron_vertex)
+            synapse_label = "{}_Synapses:{}-{}".format(
+                label, vertex_slice.lo_atom, vertex_slice.hi_atom)
             synapse_vertex = PopulationSynapsesMachineVertex(
-                neuron_resources, synapse_label, None,
+                synapse_resources, synapse_label, None,
                 self._governed_app_vertex, vertex_slice)
-            machine_graph.add_machine_vertex(synapse_vertex)
+            machine_graph.add_vertex(synapse_vertex)
+            self.__synapse_vertices.append(synapse_vertex)
 
-        self._called = True
         return True
+
+    def __get_fixed_slices(self):
+        atoms_per_core = self._governed_app_vertex.get_max_atoms_per_core()
+        n_atoms = self._governed_app_vertex.n_atoms
+        return [Slice(low, min(low + atoms_per_core - 1, n_atoms - 1))
+                for low in range(0, n_atoms, atoms_per_core)]
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
     def get_in_coming_slices(self):
-        AbstractSplitterCommon.get_in_coming_slices(self)
+        return self.__get_fixed_slices(), True
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
     def get_out_going_slices(self):
-        AbstractSplitterCommon.get_out_going_slices(self)
+        return self.__get_fixed_slices(), True
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
     def get_out_going_vertices(self, edge, outgoing_edge_partition):
-        pass
+        return {v: [MachineEdge] for v in self.__neuron_vertices}
 
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
     def get_in_coming_vertices(
             self, edge, outgoing_edge_partition, src_machine_vertex):
-        pass
+        return {v: [MachineEdge] for v in self.__synapse_vertices}
 
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
     def machine_vertices_for_recording(self, variable_to_record):
-        pass
+        if self._governed_app_vertex.neuron_recorder.is_recordable(
+                variable_to_record):
+            return self.__neuron_vertices
+        return self.__synapse_vertices
 
     @overrides(AbstractSplitterCommon.reset_called)
     def reset_called(self):
-        AbstractSplitterCommon.reset_called(self)
+        self.__neuron_vertices = None
+        self.__synapse_vertices = None
 
     def __get_neuron_resources(self, vertex_slice):
         """  Gets the resources of the neurons of a slice of atoms from a given
@@ -127,7 +138,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
         # set resources required from this object
         container = ResourceContainer(
-            sdram=variable_sdram + constant_sdram, dtcm=DTCMResource(dtcm),
+            sdram=variable_sdram + ConstantSDRAM(constant_sdram),
+            dtcm=DTCMResource(dtcm),
             cpu_cycles=CPUCyclesPerTickResource(cpu_cycles))
 
         # return the total resources.
@@ -154,8 +166,9 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
         # set resources required from this object
         container = ResourceContainer(
-            sdram=variable_sdram + constant_sdram, dtcm=dtcm,
-            cpu_cycles=cpu_cycles)
+            sdram=variable_sdram + ConstantSDRAM(constant_sdram),
+            dtcm=DTCMResource(dtcm),
+            cpu_cycles=CPUCyclesPerTickResource(cpu_cycles))
 
         # return the total resources.
         return container

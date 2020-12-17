@@ -81,7 +81,6 @@ class PopulationNeuronsMachineVertex(
             NeuronProvenance.N_ITEMS,
             self._PROFILE_TAG_LABELS, self.__get_binary_file_name(app_vertex))
         self.__key = None
-        self.__synaptic_matrices = self._create_synaptic_matrices()
         self.__change_requires_neuron_parameters_reload = False
 
     @property

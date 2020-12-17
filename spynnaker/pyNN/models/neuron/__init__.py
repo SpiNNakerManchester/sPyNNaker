@@ -16,10 +16,16 @@
 from .abstract_population_vertex import AbstractPopulationVertex
 from .connection_holder import ConnectionHolder
 from .population_machine_vertex import PopulationMachineVertex
+from .population_neurons_machine_vertex import PopulationNeuronsMachineVertex
+from .population_machine_neurons import NeuronProvenance
+from .population_synapses_machine_vertex import PopulationSynapsesMachineVertex
+from .population_machine_synapses import SynapseProvenance
 from .abstract_pynn_neuron_model import AbstractPyNNNeuronModel
 from .abstract_pynn_neuron_model_standard import (
     AbstractPyNNNeuronModelStandard)
 
 __all__ = ["AbstractPopulationVertex", "AbstractPyNNNeuronModel",
            "AbstractPyNNNeuronModelStandard", "ConnectionHolder",
-           "PopulationMachineVertex"]
+           "PopulationMachineVertex", "PopulationNeuronsMachineVertex",
+           "NeuronProvenance", "PopulationSynapsesMachineVertex",
+           "SynapseProvenance"]
