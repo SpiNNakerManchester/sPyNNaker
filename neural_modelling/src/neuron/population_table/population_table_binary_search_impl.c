@@ -292,7 +292,9 @@ static inline bool find_n_atoms(
 static inline bool cached_in_array(
         uint32_t atoms, uint32_t address_index, uint32_t key,
         uint32_t* array_index) {
-    log_info("caching address entry %d into array", address_index);
+    log_info(
+        "caching address entry %d into array with atoms %d",
+        address_index, atoms);
 
     // malloc space for array
     uint32_t** block = spin1_malloc(atoms * sizeof(uint32_t*));
@@ -301,22 +303,29 @@ static inline bool cached_in_array(
     }
 
     // update and move marker
+    log_info("update and move");
     array_blocks[*array_index] = block;
     *array_index = *array_index + 1;
 
     // store
     for (uint32_t atom_id = 0; atom_id < atoms; atom_id ++) {
+        log_info("doing atom %d", atom_id);
         // find row address
-        last_neuron_id = key + atom_id;
+        spike_t spike = key + atom_id;
         address_t row_address;
-        uint32_t local_spike_id;
         uint32_t size_to_read;
-        population_table_get_next_address(
-            &local_spike_id, &row_address, &size_to_read);
+        population_table_get_first_address(
+            spike, &row_address, &size_to_read);
+        log_info("get next address done");
 
         // find real row size
         uint32_t size_in_bytes = (
             synapse_row_size_in_words(row_address) * BYTE_TO_WORD_CONVERSION);
+        uint32_t fixed = synapse_row_num_fixed_synapses(synapse_row_fixed_region(row_address));
+        uint32_t plastic = ((synapse_row_num_plastic_controls(
+                synapse_row_fixed_region(row_address)) + 1) > 1);
+        uint32_t plastic_fixed = synapse_row_plastic_size(row_address);
+        log_info("sizes %u, %u, %u", fixed, plastic, plastic_fixed);
 
         // allocate dtcm for this row
         block[atom_id] = (uint32_t*) spin1_malloc(size_in_bytes);
@@ -327,8 +336,11 @@ static inline bool cached_in_array(
         }
 
         // move the sdram into dtcm
+        log_info("write %d memory", size_in_bytes);
         spin1_memcpy(block[atom_id], row_address, size_in_bytes);
+        log_info("mem write");
     }
+    log_info("fin for entry");
     return true;
 }
 
@@ -347,12 +359,11 @@ static inline bool cached_in_binary_search(
     // find elements total
     for (uint32_t atom_id = 0; atom_id < atoms; atom_id ++) {
         // find row address
-        last_neuron_id = key + atom_id;
+        spike_t spike = key + atom_id;
         address_t row_address;
-        uint32_t local_spike_id;
         uint32_t size_to_read;
-        population_table_get_next_address(
-            &local_spike_id, &row_address, &size_to_read);
+        population_table_get_first_address(
+            spike, &row_address, &size_to_read);
 
         // find real row size
         uint32_t size_in_words = synapse_row_size_in_words(row_address);
