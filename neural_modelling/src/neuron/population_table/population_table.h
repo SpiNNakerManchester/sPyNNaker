@@ -59,7 +59,7 @@ typedef struct binary_search_element {
     // the src neuron id
     uint32_t src_neuron_id;
     // row linked
-    uint32_t* rows;
+    uint32_t** rows;
 } binary_search_element;
 
 // stores binary search components

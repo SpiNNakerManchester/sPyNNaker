@@ -19,11 +19,12 @@ import struct
 from spinn_front_end_common.abstract_models import (
     AbstractSupportsBitFieldGeneration)
 from spinn_front_end_common.interface.interface_functions import \
-    LoadExecutableImages
+    LoadExecutableImages, ChipIOBufExtractor
 from spinn_front_end_common.utilities import system_control_logic
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_utilities.progress_bar import ProgressBar
+from spinnman.exceptions import SpiNNManCoresNotInStateException
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
 
@@ -92,7 +93,8 @@ class SynapticBlockCacher(object):
 
         # set the user 2 with left over DTCM before bitfields
         self._load_application_binaries(
-            app_executable_targets, app_executable_types, machine_graph)
+            app_executable_targets, app_executable_types, machine_graph,
+            provenance_file_path, executable_finder)
 
         # load the synaptic block cacher.
         self._load_dma_caching_binary(
@@ -101,7 +103,8 @@ class SynapticBlockCacher(object):
             machine_graph, write_synaptic_block_cacher_report)
 
     def _load_application_binaries(
-            self, app_executable_targets, app_executable_types, machine_graph):
+            self, app_executable_targets, app_executable_types, machine_graph,
+            provenance_file_path, executable_finder):
         """ loads and inits the application code. This will ensure that the \
         application code has set user 2 with the available DTCM.
 
@@ -134,10 +137,30 @@ class SynapticBlockCacher(object):
         new_app_id = self.__txrx.app_id_tracker.get_new_id()
         loader.load_app_images(
             app_executable_targets, new_app_id, self.__txrx)
-        for executable_type in app_executable_types:
-            self.__txrx.wait_for_cores_to_be_in_state(
-                app_executable_types[executable_type], new_app_id,
-                executable_type.start_state)
+        try:
+            for executable_type in app_executable_types:
+                self.__txrx.wait_for_cores_to_be_in_state(
+                    app_executable_types[executable_type], new_app_id,
+                    executable_type.start_state)
+        except SpiNNManCoresNotInStateException as e:
+            iobuf_reader = ChipIOBufExtractor(
+                filename_template="first_app_run_on_failed_{}:{}:{}",
+                suppress_progress=False)
+            iobuf_reader(
+                self.__txrx, app_executable_targets, executable_finder,
+                app_provenance_file_path=provenance_file_path,
+                system_provenance_file_path=provenance_file_path)
+            raise e
+
+        # read iobuf
+        iobuf_reader = ChipIOBufExtractor(
+            filename_template="first_app_run_on_{}:{}:{}",
+            suppress_progress=False)
+        iobuf_reader(
+            self.__txrx, app_executable_targets, executable_finder,
+            app_provenance_file_path=provenance_file_path,
+            system_provenance_file_path=provenance_file_path)
+
         self.__txrx.stop_application(new_app_id)
 
     def _load_dma_caching_binary(

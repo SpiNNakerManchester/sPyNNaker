@@ -22,6 +22,9 @@
 #include <debug.h>
 #include <stdbool.h>
 
+//! Byte to word conversion
+#define BYTE_TO_WORD_CONVERSION 4
+
 //! bits in a word
 #define BITS_PER_WORD 32
 
@@ -63,10 +66,10 @@ master_population_table_entry *master_population_table;
 address_list_entry *address_list;
 
 //! store of array dtcm blocks
-uint32_t** array_blocks;
+uint32_t*** array_blocks;
 
 //! store of binary search blocks
-binary_search_element* binary_blocks;
+binary_search_top* binary_blocks;
 
 //! \brief the number of times a DMA resulted in 0 entries
 uint32_t ghost_pop_table_searches = 0;
@@ -280,13 +283,142 @@ static inline bool find_n_atoms(
     return false;
 }
 
+//! \brief caches into the array store
+//! \param[in] atoms: the number of atoms in this block
+//! \param[in] address_index: the index of this address
+//! \param[in] key: the base routing key.
+//! \param[in/out] array_index: the array index for this block
+//! \return bool stating if successful or not.
+static inline bool cached_in_array(
+        uint32_t atoms, uint32_t address_index, uint32_t key,
+        uint32_t* array_index) {
+    log_info("caching address entry %d into array", address_index);
+
+    // malloc space for array
+    uint32_t** block = spin1_malloc(atoms * sizeof(uint32_t*));
+    if (block == NULL) {
+        log_error("failed to allocate DTCM for block with key %d", key);
+    }
+
+    // update and move marker
+    array_blocks[*array_index] = block;
+    *array_index = *array_index + 1;
+
+    // store
+    for (uint32_t atom_id = 0; atom_id < atoms; atom_id ++) {
+        // find row address
+        last_neuron_id = key + atom_id;
+        address_t row_address;
+        uint32_t local_spike_id;
+        uint32_t size_to_read;
+        population_table_get_next_address(
+            &local_spike_id, &row_address, &size_to_read);
+
+        // find real row size
+        uint32_t size_in_bytes = (
+            synapse_row_size_in_words(row_address) * BYTE_TO_WORD_CONVERSION);
+
+        // allocate dtcm for this row
+        block[atom_id] = (uint32_t*) spin1_malloc(size_in_bytes);
+        if (array_blocks[*array_index] == NULL) {
+            log_error(
+                "failed to malloc dtcm for block at index %d", address_index);
+            return false;
+        }
+
+        // move the sdram into dtcm
+        spin1_memcpy(block[atom_id], row_address, size_in_bytes);
+    }
+    return true;
+}
+
+//! \brief caches into the binary store
+//! \param[in] atoms: the number of atoms in this block
+//! \param[in] address_index: the index of this address
+//! \param[in] key: the base routing key.
+//! \param[in/out] binary_index: the binary index for this block
+//! \return bool stating if successful or not.
+static inline bool cached_in_binary_search(
+        uint32_t atoms, uint32_t address_index, uint32_t key,
+        uint32_t* binary_index) {
+    log_info("caching address entry %d into binary search", address_index);
+    uint32_t elements_to_store = 0;
+
+    // find elements total
+    for (uint32_t atom_id = 0; atom_id < atoms; atom_id ++) {
+        // find row address
+        last_neuron_id = key + atom_id;
+        address_t row_address;
+        uint32_t local_spike_id;
+        uint32_t size_to_read;
+        population_table_get_next_address(
+            &local_spike_id, &row_address, &size_to_read);
+
+        // find real row size
+        uint32_t size_in_words = synapse_row_size_in_words(row_address);
+
+        if (size_in_words != N_SYNAPSE_ROW_HEADER_WORDS) {
+            elements_to_store += 1;
+        }
+    }
+
+    // malloc space for array
+    binary_search_element * block = spin1_malloc(
+        sizeof(binary_search_element) * elements_to_store);
+    if (block == NULL) {
+        log_error("failed to allocate DTCM for block with key %d", key);
+    }
+
+    // update trackers
+    binary_blocks[*binary_index].elements = block;
+    binary_blocks[*binary_index].len_of_array = elements_to_store;
+    *binary_index = *binary_index + 1;
+
+    // store
+    uint32_t binary_block_index = 0;
+    for (uint32_t atom_id = 0; atom_id < atoms; atom_id ++) {
+        // find row address
+        last_neuron_id = key + atom_id;
+        address_t row_address;
+        uint32_t local_spike_id;
+        uint32_t size_to_read;
+        population_table_get_next_address(
+            &local_spike_id, &row_address, &size_to_read);
+
+        // find real row size
+        uint32_t size_in_words = synapse_row_size_in_words(row_address);
+
+        if (size_in_words != N_SYNAPSE_ROW_HEADER_WORDS) {
+            uint32_t size_in_bytes = size_in_words * BYTE_TO_WORD_CONVERSION;
+            block[binary_block_index].src_neuron_id = atom_id;
+            block[binary_block_index].rows = spin1_malloc(size_in_bytes);
+
+            if (block[binary_block_index].rows == NULL) {
+                log_error(
+                    "failed to allocate DTCM for binary index %d for "
+                    "block index %d", binary_index, binary_block_index);
+                return false;
+            }
+
+            // move the sdram into dtcm
+            spin1_memcpy(
+                block[binary_block_index].rows, row_address, size_in_bytes);
+        }
+    }
+    return true;
+}
+
 //! \brief process a pop entry for caching in dtcm.
 //! \param[in] pop_entry: the master pop entry
 //! \param[in] filter_region: the bitfield region base address.
+//! \param[in/out] array_index: the current index in the array store.
+//! \param[in/out] binary_index: the current index in the binary store.
 //! \return bool which states if successful or not.
 static inline bool process_pop_entry_for_caching(
         master_population_table_entry pop_entry,
-        filter_region_t * filter_region) {
+        filter_region_t * filter_region, uint32_t* array_index,
+        uint32_t* binary_index) {
+
     // if an extra info flag is set, skip it as that is not cachable.
     uint32_t start = 0;
     uint32_t count = 0;
@@ -296,53 +428,44 @@ static inline bool process_pop_entry_for_caching(
         log_error("failed to set start and count");
         return false;
     }
+
+    // find size of block in terms of atoms
+    uint32_t atoms = 0;
+    success = find_n_atoms(pop_entry.key, filter_region, &atoms);
+    if (!success) {
+        log_error("failed to find the n atoms for key %d.", pop_entry.key);
+        return false;
+    }
+
     // search blocks and put in correct rep store
     for (uint32_t address_index = start; address_index < count + start;
             address_index ++) {
         address_list_entry address_entry =
             population_table_get_address_entry(address_index);
 
-        // find size of block in terms of atoms
-        uint32_t atoms = 0;
-        bool success = find_n_atoms(pop_entry.key, filter_region, *atoms);
-        if (!success) {
-            log_error("failed to find the n atoms for key %d.", pop_entry.key);
-            return false;
-        }
-
         // process each rep correctly
         if (address_entry.addr.representation == BINARY_SEARCH) {
-            log_info(
-                "caching address entry %d into binary search", address_index);
+            success = cached_in_binary_search(
+                atoms, address_index, pop_entry.key, binary_index);
         } else if (address_entry.addr.representation == ARRAY) {
-            log_info("caching address entry %d into array", address_index);
-            // malloc space for array
-            uint32_t * block = spin1_malloc(atoms * sizeof(uint32_t*));
-            if (block == NULL) {
-                log_error(
-                    "failed to allocate DTCM for block with key %d", pop_entry.key);
-            }
-            for (uint32_t atom_id = 0; atom_id < atoms; atom_id ++) {
-                last_neuron_id = pop_entry.key + atom_id;
-                address_t* row_address;
-                uint32_t local_spike_id;
-                uint32_t size_to_read;
-                bool get_next = population_table_get_next_address(
-                    &local_spike_id, &row_address, &size_to_read);
-                uint32_t size_in_words =
-                    synapse_row_num_fixed_synapses(row_address);
-                size_in_words += synapse_row_num_plastic_controls(row_address);
-                size_in_words += N_SYNAPSE_ROW_HEADER_WORDS;
-
-
-            }
-        }
-        else {
+            success = cached_in_array(
+                atoms, address_index, pop_entry.key, array_index);
+        } else if (address_entry.addr.representation == DEFAULT ||
+              address_entry.addr.representation == DIRECT) {
+            // ignore, as these are not cacheable
+        } else {
             log_error(
                 "dont recognise the rep %d", address_entry.addr.representation);
             return false;
         }
+
+        // if it failed to cache return false
+        if(!success) {
+            return false;
+        }
     }
+
+    // successfully cached all things
     return true;
 }
 
@@ -355,9 +478,35 @@ static inline bool cache_synaptic_blocks(
     // build stores.
     master_pop_top_counters_t* store =
         (master_pop_top_counters_t*) table_address;
-    array_blocks = spin1_malloc(sizeof(uint32_t*) * store->n_array_blocks);
-    binary_blocks = spin1_malloc(
-        sizeof(binary_search_element) * store->n_binary_search_blocks);
+
+    // safety check to bypass work
+    //if (store->n_array_blocks == 0 && store->n_binary_search_blocks == 0) {
+    //    log_info("no need to try to cache, nothing to cache");
+    //    return true;
+    //}
+
+    // try malloc array blocks
+    if (store->n_array_blocks != 0) {
+        array_blocks = spin1_malloc(sizeof(uint32_t*) * store->n_array_blocks);
+        if (array_blocks == NULL) {
+            log_error("failed to malloc array blocks");
+            return false;
+        }
+    }
+
+    // try to malloc binary blocks
+    if (store->n_binary_search_blocks != 0) {
+        binary_blocks = spin1_malloc(
+            sizeof(binary_search_top) * store->n_binary_search_blocks);
+        if (binary_blocks == NULL) {
+            log_error("failed to malloc binary blocks");
+            return false;
+        }
+    }
+
+    // set params
+    uint32_t array_index = 0;
+    uint32_t binary_index = 0;
 
     // locate blocks to put into these blocks.
     for (uint32_t pop_entry_index = 0;
@@ -366,7 +515,8 @@ static inline bool cache_synaptic_blocks(
         master_population_table_entry pop_entry =
             population_table_entry(pop_entry_index);
         if (pop_entry.cache_in_dtcm) {
-            bool success = process_pop_entry_for_caching(pop_entry, filter_region);
+            bool success = process_pop_entry_for_caching(
+                pop_entry, filter_region, &array_index, &binary_index);
             if (!success) {
                 log_error(
                     "failed to process entry with index %d with key %d",
@@ -399,6 +549,8 @@ bool population_table_initialise(
             master_population_table_length * sizeof(master_population_table_entry);
     uint32_t n_master_pop_words = n_master_pop_bytes >> 2;
     log_debug("Pop table size is %d\n", n_master_pop_bytes);
+    log_info("n cached array blocks = %d", store->n_array_blocks);
+    log_info("n cached binary blocks = %d", store->n_binary_search_blocks);
 
     // only try to malloc if there's stuff to malloc.
     if (n_master_pop_bytes != 0) {

@@ -244,15 +244,14 @@ static inline int calculate_binary_search_size(
     for (uint32_t atom_id = 0; atom_id < n_atoms; atom_id++) {
         uint32_t atom_offset = atom_id * stride * sizeof(uint32_t);
         address_t row_address = (address_t) (address + atom_offset);
-        // process static synapses
-        uint32_t n_targets_in_words = synapse_row_num_fixed_synapses(
-            synapse_row_fixed_region(row_address));
 
-        if (n_targets_in_words != 0) {
+        // get size
+        uint32_t n_targets_in_words = synapse_row_size_in_words(row_address);
+
+        if (n_targets_in_words != N_SYNAPSE_ROW_HEADER_WORDS) {
             // TODO FIX WHEN STAGE 2.5 HAS HAPPENED
-            uint32_t overall_bytes =
-                (N_SYNAPSE_ROW_HEADER_WORDS + n_targets_in_words) *
-                BYTE_TO_WORD_CONVERSION;
+            uint32_t overall_bytes = (
+                n_targets_in_words * BYTE_TO_WORD_CONVERSION);
             dtcm_used += overall_bytes + malloc_cost;
             n_valid_entries += 1;
         } else {
@@ -291,19 +290,16 @@ static inline uint32_t calculate_array_search_size(
     for (uint32_t atom_id = 0; atom_id < n_atoms; atom_id++) {
         uint32_t atom_offset = atom_id * stride * sizeof(uint32_t);
         address_t row_address = (address_t) (address + atom_offset);
-        // process static synapses
-        uint32_t n_targets_in_words = synapse_row_num_fixed_synapses(
-            synapse_row_fixed_region(row_address));
+        // acquire real size in words of the row
+        uint32_t n_targets_in_words = synapse_row_size_in_words(row_address);
 
-        if (n_targets_in_words != 0) {
+        // if its just the header, then its empty
+        if (n_targets_in_words != N_SYNAPSE_ROW_HEADER_WORDS) {
             // TODO FIX WHEN STAGE 2.5 HAS HAPPENED
-            uint32_t overall_bytes =
-                (N_SYNAPSE_ROW_HEADER_WORDS + n_targets_in_words) *
-                BYTE_TO_WORD_CONVERSION;
+            uint32_t overall_bytes = n_targets_in_words * BYTE_TO_WORD_CONVERSION;
             dtcm_used += overall_bytes + malloc_cost;
         } else {
-            log_debug(
-                "row for atom %d has no targets, so not caching", atom_id);
+            log_debug("row for atom %d has no targets, so not caching", atom_id);
         }
     }
 
@@ -403,7 +399,8 @@ static inline bool initialise(void) {
     log_info("Pop table init");
     if (!population_table_initialise(
             master_pop_base_address, synaptic_matrix_base_address,
-            direct_synapses_address, &row_max_n_words)) {
+            direct_synapses_address, bit_field_base_address,
+            &row_max_n_words)) {
         log_error("Failed to init the master pop table. failing");
         return false;
     }

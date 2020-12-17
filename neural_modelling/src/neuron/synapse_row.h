@@ -40,6 +40,7 @@
  * - synapse_row_sparse_type_index()
  * - synapse_row_sparse_delay()
  * - synapse_row_sparse_weight()
+ * - synapse_row_size_in_words()
  *
  * \section matrix Data Structure
  *
@@ -120,7 +121,7 @@ typedef uint16_t control_t;
 
 //! \brief Returns the size of the plastic region
 //! \param[in] row: The synaptic row
-//! \return The size of the plastic region of the row
+//! \return The size of the plastic region of the row (words)
 static inline size_t synapse_row_plastic_size(address_t row) {
     return (size_t) row[0];
 }
@@ -213,6 +214,17 @@ static inline index_t synapse_row_sparse_delay(
 //! \return the weight
 static inline weight_t synapse_row_sparse_weight(uint32_t x) {
     return x >> (32 - SYNAPSE_WEIGHT_BITS);
+}
+
+//! \brief get the size in bytes for the synapse row
+//! \param[in] row: The synaptic row
+//! \return the number of bytes needed for this synaptic row in memory.
+static inline size_t synapse_row_size_in_words(address_t row_address) {
+    return (
+        synapse_row_num_fixed_synapses(synapse_row_fixed_region(row_address)) +
+        ((synapse_row_num_plastic_controls(
+            synapse_row_fixed_region(row_address)) + 1) > 1) +
+        synapse_row_plastic_size(row_address) + N_SYNAPSE_ROW_HEADER_WORDS);
 }
 
 #endif  // SYNAPSE_ROW_H
