@@ -39,7 +39,6 @@ jobs:
         with:
           repository: SpiNNakerManchester/SupportScripts
           path: support
-          ref: actions
       - name: Set dynamic environment variables
         run: |
           echo "SPINN_DIRS=$PWD/spinnaker_tools" >> $GITHUB_ENV

@@ -35,7 +35,6 @@ jobs:
       with:
         repository: SpiNNakerManchester/SupportScripts
         path: support
-        ref: actions
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
@@ -82,7 +81,6 @@ jobs:
       with:
         repository: SpiNNakerManchester/SupportScripts
         path: support
-        ref: actions
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2

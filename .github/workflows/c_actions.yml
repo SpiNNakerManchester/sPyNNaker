@@ -44,7 +44,6 @@ jobs:
       with:
         repository: SpiNNakerManchester/SupportScripts
         path: support
-        ref: actions
 
     - name: Checkout SpiNNaker Dependencies
       uses: ./support/actions/checkout-spinn-deps
