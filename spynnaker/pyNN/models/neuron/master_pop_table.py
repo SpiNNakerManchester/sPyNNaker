@@ -293,7 +293,7 @@ class _MasterPopEntry(object):
         entry.start = start
         count = len(self.__addresses_and_row_lengths)
         entry.count = count
-        entry.cache_in_dtcm = 1
+        entry.cache_in_dtcm = 0
 
         # Mark where the next entry starts and the number added; this might
         # change if there is extra info

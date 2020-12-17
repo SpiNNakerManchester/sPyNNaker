@@ -515,6 +515,7 @@ static inline bool cache_synaptic_blocks(
         master_population_table_entry pop_entry =
             population_table_entry(pop_entry_index);
         if (pop_entry.cache_in_dtcm) {
+            log_info("attempting to cach entry at %d", pop_entry_index);
             bool success = process_pop_entry_for_caching(
                 pop_entry, filter_region, &array_index, &binary_index);
             if (!success) {
@@ -538,6 +539,16 @@ bool population_table_initialise(
         address_t direct_rows_address, filter_region_t *filter_region,
         uint32_t *row_max_n_words) {
     log_debug("Population_table_initialise: starting");
+
+    // Store the base address
+    log_info("The stored synaptic matrix base address is located at: 0x%08x",
+            synapse_rows_address);
+    log_info("The direct synaptic matrix base address is located at: 0x%08x",
+            direct_rows_address);
+    synaptic_rows_base_address = (uint32_t) synapse_rows_address;
+    direct_rows_base_address = (uint32_t) direct_rows_address;
+
+    // cast to correct store
     master_pop_top_counters_t* store =
         (master_pop_top_counters_t*) table_address;
 
@@ -587,23 +598,16 @@ bool population_table_initialise(
         &table_address[past_counters + n_master_pop_words],
         n_address_list_bytes);
 
+    // print to ensure every looks ok before caching
+    print_master_population_table();
+
     // start the caching process.
     if(!cache_synaptic_blocks(table_address, filter_region)) {
         log_error("failed to cache into DTCM");
         return false;
     }
 
-    // Store the base address
-    log_info("The stored synaptic matrix base address is located at: 0x%08x",
-            synapse_rows_address);
-    log_info("The direct synaptic matrix base address is located at: 0x%08x",
-            direct_rows_address);
-    synaptic_rows_base_address = (uint32_t) synapse_rows_address;
-    direct_rows_base_address = (uint32_t) direct_rows_address;
-
     *row_max_n_words = 0xFF + N_SYNAPSE_ROW_HEADER_WORDS;
-
-    print_master_population_table();
     return true;
 }
 

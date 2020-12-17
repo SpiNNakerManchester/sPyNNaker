@@ -42,6 +42,23 @@
 
 //!================================================
 
+
+//! \brief An entry in the master population table.
+typedef struct master_population_table_entry {
+    //! The key to match against the incoming message
+    uint32_t key;
+    //! The mask to select the relevant bits of \p key for matching
+    uint32_t mask;
+    //! The index into ::address_list for this entry
+    uint32_t start: 15;
+    //! Flag to indicate if an extra_info struct is present
+    uint32_t extra_info_flag: 1;
+    //! The number of entries in ::address_list for this entry
+    uint32_t count: 15;
+    //! Flag to indicate if the synaptic block should be cached in DTCM.
+    uint32_t cache_in_dtcm: 1;
+} master_population_table_entry;
+
 //! \brief struct for counters
 typedef struct master_pop_top_counters_t {
     // length of master_population_table_entry array.
@@ -52,6 +69,8 @@ typedef struct master_pop_top_counters_t {
     uint32_t n_array_blocks;
     // length of binary_blocks array.
     uint32_t n_binary_search_blocks;
+    // start of pop array
+    master_population_table_entry data[];
 } master_pop_top_counters_t;
 
 // \brief struct for holding a binary search element
@@ -69,22 +88,6 @@ typedef struct binary_search_top {
     // pointer to the array store of none empty rows.
     binary_search_element* elements;
 } binary_search_top;
-
-//! \brief An entry in the master population table.
-typedef struct master_population_table_entry {
-    //! The key to match against the incoming message
-    uint32_t key;
-    //! The mask to select the relevant bits of \p key for matching
-    uint32_t mask;
-    //! The index into ::address_list for this entry
-    uint32_t start: 15;
-    //! Flag to indicate if an extra_info struct is present
-    uint32_t extra_info_flag: 1;
-    //! The number of entries in ::address_list for this entry
-    uint32_t count: 15;
-    //! Flag to indicate if the synaptic block should be cached in DTCM.
-    uint32_t cache_in_dtcm: 1;
-} master_population_table_entry;
 
 //! \brief A packed extra info (note: same size as address and row length)
 typedef struct extra_info {
@@ -171,7 +174,7 @@ static inline void population_table_set_address_to_rep(
 //! \brief sets a population table entry to be cached.
 //! \param[in] position: the position in the master table to set to cache
 static inline void population_table_entry_set_to_cache(uint32_t position) {
-    master_population_table[position].cache_in_dtcm = 0;
+    master_population_table[position].cache_in_dtcm = 1;
 }
 
 //! =============================================================
@@ -186,12 +189,9 @@ static inline uint32_t get_direct_address(address_and_row_length entry) {
 static inline master_population_table_entry*
         population_table_get_master_pop_entry_from_sdram(
             address_t table_address, uint32_t position) {
-    uint32_t start = sizeof(master_pop_top_counters_t) >> 2;
-    master_population_table_entry* start_of_entry_list =
-        (master_population_table_entry*) table_address[start];
-    uint32_t bytes_in = position * sizeof(master_population_table_entry);
-    uint32_t words_in = bytes_in >> 2;
-    return &start_of_entry_list[words_in];
+    master_pop_top_counters_t* store =
+        (master_pop_top_counters_t*) table_address;
+    return &store->data[position];
 }
 
 //! \brief get a master pop entry from array
@@ -239,16 +239,12 @@ static inline address_list_entry population_table_get_address_entry(
 }
 
 static inline address_list_entry* population_table_get_address_entry_from_sdram(
-        address_t master_pop_table_base_address, uint32_t address_entry_index) {
-    uint32_t n_master_pop_bytes =
-        master_population_table_length * sizeof(master_population_table_entry);
-    uint32_t n_master_pop_words = n_master_pop_bytes >> 2;
-    uint32_t skip_to_correct_entry_bytes =
-        address_entry_index * sizeof(address_list_entry);
-    uint32_t skip_to_correct_entry_words = skip_to_correct_entry_bytes >> 2;
-    uint32_t counters_skip_words = sizeof(master_pop_top_counters_t) >> 2;
-    return (address_list_entry*) &master_pop_table_base_address[
-        skip_to_correct_entry_words + n_master_pop_words + counters_skip_words];
+        address_t table_address, uint32_t address_entry_index) {
+    master_pop_top_counters_t* store =
+        (master_pop_top_counters_t*) table_address;
+    address_list_entry* addresses = (address_list_entry*) (
+        &store->data[store->master_population_table_length]);
+    return &addresses[address_entry_index];
 }
 
 

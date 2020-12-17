@@ -528,14 +528,14 @@ static bool set_master_pop_sdram_entry_to_cache(uint32_t bit_field_index) {
         return false;
     }
 
-    log_debug("setting master pop entry %d to cache in DTCM", position);
+    log_info("setting master pop entry %d to cache in DTCM", position);
 
     // set dtcm master pop for printing
     population_table_entry_set_to_cache(position);
 
     master_population_table_entry dtcm_entry = population_table_entry(position);
-
     // set to cache in sdram
+    log_info("setting master pop entry %d to cache in SDRAM", position);
     master_population_table_entry* sdram_entry =
         population_table_get_master_pop_entry_from_sdram(
             master_pop_base_address, position);
