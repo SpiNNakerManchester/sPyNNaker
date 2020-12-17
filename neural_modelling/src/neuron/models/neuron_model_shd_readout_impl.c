@@ -62,7 +62,7 @@ state_t neuron_model_state_update(
 
     uint32_t total_synapses_per_neuron = 100; //todo should this be fixed?
 
-    neuron->L = 0.k;
+    neuron->L = 0.0k;
     for (uint32_t n_ind=0; n_ind < 10; n_ind++){
         neuron->L += learning_signal[n_ind];// * neuron->w_fb[n_ind];
     }

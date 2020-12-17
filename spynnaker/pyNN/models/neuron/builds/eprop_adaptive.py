@@ -46,7 +46,7 @@ class EPropAdaptive(AbstractPyNNNeuronModelStandard):
             target_rate=10, tau_err=1000,  #  fits with 1 ms timestep
 
             # Threshold parameters
-            B=10, small_b=0, small_b_0=10, tau_a=500, beta=1.8,
+            B=10, small_b=0, small_b_0=10, tau_a=500, beta=1.8, scalar=1000,
 
             # Learning signal and weight update constants
             l=0, eta=1.0, window_size=13000, number_of_cues=0,
@@ -66,8 +66,9 @@ class EPropAdaptive(AbstractPyNNNeuronModelStandard):
             small_b_0,
             tau_a,
             beta,
+            scalar,
             # Regularisation params
-            target_rate, tau_err, 
+            target_rate, tau_err,
             # Learning signal params
             l, eta, window_size, number_of_cues,
             input_synapses,

@@ -13,8 +13,8 @@ class SHDReadout(AbstractPyNNNeuronModelStandard):
     """
 
     @default_initial_values({"v", "isyn_exc", "isyn_exc2", "isyn_inh",
-                             "isyn_inh2",
-                             "l", "w_fb", "eta", "update_ready"})
+                             "isyn_inh2", "target_data",
+                             "l", "eta", "update_ready"})
     def __init__(
             self, tau_m=20.0, cm=1.0, v_rest=0.0, v_reset=0.0,
             v_thresh=100, tau_refrac=0.1, i_offset=0.0, v=50,

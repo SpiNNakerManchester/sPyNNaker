@@ -41,11 +41,10 @@ SMALL_B = "small_b"
 SMALL_B_0 = "small_b_0"
 TAU_A = "tau_a"
 BETA = "beta"
-ADPT = "adpt"
 SCALAR = "scalar"
 # Learning signal
 L = "learning_signal"
-W_FB = "feedback_weight"
+W_FB = "w_fb"
 WINDOW_SIZE = "window_size"
 NUMBER_OF_CUES = "number_of_cues"
 INPUT_SYNAPSES = "input_synapses"
@@ -75,7 +74,6 @@ UNITS = {
     SMALL_B_0: "mV",
     TAU_A: "ms",
     BETA: "N/A",
-#          ADPT: "mV"
     SCALAR: "dimensionless"
 }
 
@@ -99,7 +97,6 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
         "__small_b_0",
         "__tau_a",
         "__beta",
-        # "_adpt"
         "__scalar",
 
         # reg params
@@ -134,6 +131,7 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
             small_b_0,
             tau_a,
             beta,
+            scalar,
 
             # regularisation params
             target_rate,
@@ -162,13 +160,13 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
             DataType.S1615,   #  A
             DataType.S1615,   #  psi, pseuo_derivative
             # threshold params
-            DataType.S1615,
-            DataType.S1615,
-            DataType.S1615,
-            DataType.UINT32,
-            DataType.S1615,
-            DataType.UINT32,
-            DataType.S1615,
+            DataType.S1615,   # B
+            DataType.S1615,   # b
+            DataType.S1615,   # b_0
+            DataType.U032,    # tau_a (apply operation to input val giving UFRACT)
+            DataType.S1615,   # beta
+            DataType.U032,    # adpt (apply operation to input val giving UFRACT)
+            DataType.S1615,   # scalar
             # Learning signal
             DataType.S1615,   #  L
             DataType.UINT32,   #  window_size
@@ -219,7 +217,7 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
         self.__small_b_0 = small_b_0
         self.__tau_a = tau_a
         self.__beta = beta
-        self.__scalar = 1000
+        self.__scalar = scalar
 
         # Regularisation params
         self.__target_rate = target_rate
@@ -319,7 +317,7 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
                 parameters[SMALL_B_0],
                 parameters[TAU_A].apply_operation(
                     operation=lambda
-                    x: numpy.exp(float(-ts) / (1000.0 * x)) * ulfract),
+                    x: numpy.exp(float(-ts) / (1000.0 * x)) * ulfract), # TAU_A
                 parameters[BETA],
                 parameters[TAU_A].apply_operation(
                     operation=lambda x: (1 - numpy.exp(
@@ -334,7 +332,8 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
                 parameters[NEURON_RATE]
                 ]
         for n in range(10):
-            values.extend(parameters[W_FB+str(n)])
+            feedback_weight = [parameters[W_FB+str(n)]]
+            values.extend(feedback_weight)
 
         # create synaptic state - init all state to zero
         for n in range(SYNAPSES_PER_NEURON):
@@ -380,7 +379,7 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
         # Read the data
         (v, _v_rest, _r_membrane, _exp_tc, _i_offset, count_refrac,
          _v_reset, _tau_refrac, psi,
-         big_b, small_b, _small_b_0, _e_to_dt_on_tau_a, _beta, adpt, scalar,
+         big_b, small_b, _small_b_0, _e_to_dt_on_tau_a, _beta, _adpt, _scalar,
          l, __w_fb, window_size, number_of_cues, input_synapses, rec_synapses, neuron_rate,
          delta_w, z_bar_old, z_bar, ep_a, e_bar, update_ready) = values
 

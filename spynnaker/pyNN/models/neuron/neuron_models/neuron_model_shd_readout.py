@@ -5,7 +5,7 @@ from pacman.executor.injection_decorator import inject_items
 from .abstract_neuron_model import AbstractNeuronModel
 
 # constants
-SYNAPSES_PER_NEURON = 250   # around 415 with only 3 in syn_state
+SYNAPSES_PER_NEURON = 100  # 250   # around 415 with only 3 in syn_state
 
 MICROSECONDS_PER_SECOND = 1000000.0
 MICROSECONDS_PER_MILLISECOND = 1000.0
@@ -28,10 +28,17 @@ COUNT_REFRAC = "count_refrac"
 # TIME_SINCE_LAST_SPIKE = "time_since_last_spike"
 # RATE_AT_LAST_SETTING = "rate_at_last_setting"
 # RATE_UPDATE_THRESHOLD = "rate_update_threshold"
-TARGET_DATA = "target_data"
+# TARGET_DATA = "target_data"
 # Learning signal
 L = "learning_signal"
 # W_FB = "feedback_weight"
+
+DELTA_W = "delta_w"
+Z_BAR_OLD = "z_bar_old"
+Z_BAR = "z_bar"
+# EP_A = "ep_a"
+# E_BAR = "e_bar"
+UPDATE_READY = "update_ready"
 
 UNITS = {
     V: 'mV',
@@ -136,18 +143,18 @@ class NeuronModelLeakyIntegrateAndFireSHDReadout(AbstractNeuronModel):
 
     @overrides(AbstractNeuronModel.add_parameters)
     def add_parameters(self, parameters):
-        parameters[V] = self._v_init
+#         parameters[V] = self._v_init
         parameters[V_REST] = self._v_rest
         parameters[TAU_M] = self._tau_m
         parameters[CM] = self._cm
         parameters[I_OFFSET] = self._i_offset
         parameters[V_RESET] = self._v_reset
         parameters[TAU_REFRAC] = self._tau_refrac
-        # parameters[TARGET_DATA] = 0.0
+#         parameters[L] = self._l
 
         #learning params
         # parameters[W_FB] = self._w_fb
-        
+
 
     @overrides(AbstractNeuronModel.add_state_variables)
     def add_state_variables(self, state_variables):
@@ -157,6 +164,13 @@ class NeuronModelLeakyIntegrateAndFireSHDReadout(AbstractNeuronModel):
         #learning params
         state_variables[L] = self._l
 
+        for n in range(SYNAPSES_PER_NEURON):
+            state_variables[DELTA_W+str(n)] = 0
+            state_variables[Z_BAR_OLD+str(n)] = 0
+            state_variables[Z_BAR+str(n)] = 0
+            # state_variables[EP_A+str(n)] = 0
+            # state_variables[E_BAR+str(n)] = 0
+            state_variables[UPDATE_READY+str(n)] = self._update_ready
 
     @overrides(AbstractNeuronModel.get_units)
     def get_units(self, variable):
@@ -169,6 +183,8 @@ class NeuronModelLeakyIntegrateAndFireSHDReadout(AbstractNeuronModel):
     @inject_items({"ts": "MachineTimeStep"})
     @overrides(AbstractNeuronModel.get_values, additional_arguments={'ts'})
     def get_values(self, parameters, state_variables, vertex_slice, ts):
+
+        print("\n get_values \n\n")
 
         # Add the rest of the data
         values = [state_variables[V],
@@ -186,25 +202,39 @@ class NeuronModelLeakyIntegrateAndFireSHDReadout(AbstractNeuronModel):
                 ]
 
         # create synaptic state - init all state to zero
-        eprop_syn_init = [0,    # delta w
-                          0,    # z_bar_inp
-                          0,#,    # z_bar
-                          # 0,    # el_a
-                          # 0]    # e_bar
-                          self._update_ready, #int(numpy.random.rand()*1024)      # update_ready
-                          ]
-        # extend to appropriate fan-in
-        values.extend(eprop_syn_init * SYNAPSES_PER_NEURON)
+        for n in range(SYNAPSES_PER_NEURON):
+            eprop_syn_init = [state_variables[DELTA_W+str(n)],
+                              state_variables[Z_BAR_OLD+str(n)],
+                              state_variables[Z_BAR+str(n)],
+#                               state_variables[EP_A+str(n)],
+#                               state_variables[E_BAR+str(n)],
+                              state_variables[UPDATE_READY+str(n)]
+                              ]
+            # extend to appropriate fan-in
+            values.extend(eprop_syn_init)  # * SYNAPSES_PER_NEURON)
+
+        # create synaptic state - init all state to zero
+#         eprop_syn_init = [0,    # delta w
+#                           0,    # z_bar_inp
+#                           0,#,    # z_bar
+#                           # 0,    # el_a
+#                           # 0]    # e_bar
+#                           self._update_ready, #int(numpy.random.rand()*1024)      # update_ready
+#                           ]
+#         # extend to appropriate fan-in
+#         values.extend(eprop_syn_init * SYNAPSES_PER_NEURON)
 
         return values
 
     @overrides(AbstractNeuronModel.update_values)
     def update_values(self, values, parameters, state_variables):
 
+        print("\n update_values \n\n")
+
         # Read the data
         (_v, _v_rest, _r_membrane, _exp_tc, _i_offset, _count_refrac,
         _v_reset, _tau_refrac,
-        _l
+        _l, delta_w, z_bar_old, z_bar, update_ready
          # _w_fb
          ) = values  # Not sure this will work with the new array of synapse!!!
         # todo check alignment on this
@@ -214,6 +244,13 @@ class NeuronModelLeakyIntegrateAndFireSHDReadout(AbstractNeuronModel):
 
         state_variables[L] = _l
 
+        for n in range(SYNAPSES_PER_NEURON):
+            state_variables[DELTA_W+str(n)] = delta_w[n]
+            state_variables[Z_BAR_OLD+str(n)] = z_bar_old[n]
+            state_variables[Z_BAR+str(n)] = z_bar[n]
+            # state_variables[EP_A+str(n)] = ep_a[n]
+            # state_variables[E_BAR+str(n)] = e_bar[n]
+            state_variables[UPDATE_READY] = update_ready[n]
 
     # Global params
     @inject_items({"machine_time_step": "MachineTimeStep"})
