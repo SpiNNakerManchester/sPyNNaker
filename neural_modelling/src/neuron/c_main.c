@@ -164,6 +164,9 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
     // First do synapses timestep update, as this is time-critical
     synapses_do_timestep_update(time);
 
+    // Do rewiring as needed
+    synaptogenesis_do_timestep_update();
+
     // Now do neuron time step update
     neuron_do_timestep_update(time, timer_count);
 

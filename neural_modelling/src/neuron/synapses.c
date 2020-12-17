@@ -311,10 +311,7 @@ bool synapses_initialise(
     return true;
 }
 
-//! \brief Transfer out the front of the ring buffers
-//         and cycle around.
-//! \param[in] time: The current time step
-static inline void process_ring_buffers(timer_t time) {
+void synapses_do_timestep_update(timer_t time) {
     print_ring_buffers(time);
 
     // Disable interrupts to stop DMAs interfering with the ring buffers
@@ -353,15 +350,6 @@ static inline void process_ring_buffers(timer_t time) {
     // Re-enable the interrupts
     spin1_mode_restore(state);
 
-}
-
-void synapses_do_timestep_update(timer_t time) {
-
-    // Process the ring buffers
-    process_ring_buffers(time);
-
-    // Do rewiring as needed
-    synaptogenesis_do_timestep_update();
 }
 
 bool synapses_process_synaptic_row(

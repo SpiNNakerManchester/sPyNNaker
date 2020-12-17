@@ -19,11 +19,13 @@ from pacman.model.resources import (
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
 from pacman.model.graphs.common.slice import Slice
+from pacman.model.graphs.machine import (
+    MachineEdge, SourceSegmentedSDRAMMachinePartition, SDRAMMachineEdge)
 from spynnaker.pyNN.models.neuron import (
     PopulationNeuronsMachineVertex, PopulationSynapsesMachineVertex,
     NeuronProvenance, SynapseProvenance, AbstractPopulationVertex)
+from spynnaker.pyNN.utilities.constants import SYNAPSE_SDRAM_PARTITION_ID
 from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
-from pacman.model.graphs.machine.machine_edge import MachineEdge
 
 
 class SplitterAbstractPopulationVertexNeuronsSynapses(
@@ -60,11 +62,10 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         self.__synapse_vertices = list()
         label = self._governed_app_vertex.label
         for vertex_slice in self.__get_fixed_slices():
+
+            # Create the neuron an synapse vertices
             neuron_resources = self.__get_neuron_resources(vertex_slice)
             synapse_resources = self.__get_synapse_resources(vertex_slice)
-            resource_tracker.allocate_constrained_group_resources(
-                [(neuron_resources, []), (synapse_resources, [])])
-            resource_tracker.allocate_resources(neuron_resources)
             neuron_label = "{}_Neurons:{}-{}".format(
                 label, vertex_slice.lo_atom, vertex_slice.hi_atom)
             neuron_vertex = PopulationNeuronsMachineVertex(
@@ -79,6 +80,23 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 self._governed_app_vertex, vertex_slice)
             machine_graph.add_vertex(synapse_vertex)
             self.__synapse_vertices.append(synapse_vertex)
+
+            # Create the SDRAM edge between the parts
+            sdram_label = "SDRAM {}-->{}".format(synapse_label, neuron_label)
+            sdram_partition = SourceSegmentedSDRAMMachinePartition(
+                SYNAPSE_SDRAM_PARTITION_ID, sdram_label, [synapse_vertex])
+            machine_graph.add_outgoing_edge_partition(sdram_partition)
+            machine_graph.add_edge(
+                SDRAMMachineEdge(synapse_vertex, neuron_vertex, sdram_label),
+                SYNAPSE_SDRAM_PARTITION_ID)
+            neuron_vertex.set_sdram_partition(sdram_partition)
+            synapse_vertex.set_sdram_partition(sdram_partition)
+
+            # Allocate all the resources to ensure they all fit
+            sdram_resources = ResourceContainer(sdram=ConstantSDRAM(
+                sdram_partition.total_sdram_requirements()))
+            resource_tracker.allocate_group_resources(
+                [neuron_resources, synapse_resources, sdram_resources])
 
         return True
 

@@ -19,22 +19,32 @@ from pacman.executor.injection_decorator import inject_items
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification)
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spynnaker.pyNN.exceptions import SynapticConfigurationException
+from spynnaker.pyNN.models.abstract_models import (
+    ReceivesSynapticInputsOverSDRAM, SendsSynapticInputsOverSDRAM)
 from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .population_machine_neurons import (
     NeuronRegions, PopulationMachineNeurons, NeuronProvenance)
+
+# Size of SDRAM params = 1 word for address + 1 word for size
+# + 1 word for n_neurons
+SDRAM_PARAMS_SIZE = 3 * BYTES_PER_WORD
 
 
 class PopulationNeuronsMachineVertex(
         PopulationMachineCommon,
         PopulationMachineNeurons,
         AbstractGeneratesDataSpecification,
-        AbstractRewritesDataSpecification):
+        AbstractRewritesDataSpecification,
+        ReceivesSynapticInputsOverSDRAM):
     """ A machine vertex for the Neurons of PyNN Populations
     """
 
     __slots__ = [
         "__change_requires_neuron_parameters_reload",
-        "__key"]
+        "__key",
+        "__sdram_partition"]
 
     class REGIONS(Enum):
         """Regions for populations."""
@@ -44,6 +54,7 @@ class PopulationNeuronsMachineVertex(
         RECORDING = 3
         NEURON_PARAMS = 4
         NEURON_RECORDING = 5
+        SDRAM_EDGE_PARAMS = 6
 
     # Regions for this vertex used by common parts
     COMMON_REGIONS = CommonRegions(
@@ -82,6 +93,7 @@ class PopulationNeuronsMachineVertex(
             self._PROFILE_TAG_LABELS, self.__get_binary_file_name(app_vertex))
         self.__key = None
         self.__change_requires_neuron_parameters_reload = False
+        self.__sdram_partition = None
 
     @property
     @overrides(PopulationMachineNeurons._key)
@@ -96,6 +108,18 @@ class PopulationNeuronsMachineVertex(
     @overrides(PopulationMachineNeurons._neuron_regions)
     def _neuron_regions(self):
         return self.NEURON_REGIONS
+
+    def set_sdram_partition(self, sdram_partition):
+        """ Set the SDRAM partition.  Must only be called once per instance
+
+        :param ~pacman.model.graphs.machine\
+                .SourceSegmentedSDRAMMachinePartition sdram_partition:
+            The SDRAM partition to receive synapses from
+        """
+        if self.__sdram_partition is not None:
+            raise SynapticConfigurationException(
+                "Trying to set SDRAM partition more than once")
+        self.__sdram_partition = sdram_partition
 
     @staticmethod
     def __get_binary_file_name(app_vertex):
@@ -156,6 +180,17 @@ class PopulationNeuronsMachineVertex(
 
         self._write_neuron_data_spec(spec, routing_info)
 
+        # Write information about SDRAM
+        spec.reserve_memory_region(
+            region=self.REGIONS.SDRAM_EDGE_PARAMS.value,
+            size=SDRAM_PARAMS_SIZE, label="SDRAM Params")
+        spec.switch_write_focus(self.REGIONS.SDRAM_EDGE_PARAMS.value)
+        spec.write_value(
+            self.__sdram_partition.get_sdram_base_address_for(self))
+        spec.write_value(
+            self.__sdram_partition.get_sdram_size_of_region_for(self))
+        spec.write_value(self._vertex_slice.n_atoms)
+
         # End the writing of this specification:
         spec.end_specification()
 
@@ -179,3 +214,12 @@ class PopulationNeuronsMachineVertex(
     @overrides(AbstractRewritesDataSpecification.set_reload_required)
     def set_reload_required(self, new_value):
         self.__change_requires_neuron_parameters_reload = new_value
+
+    @overrides(ReceivesSynapticInputsOverSDRAM.sdram_requirement)
+    def sdram_requirement(self, sdram_machine_edge):
+        if isinstance(sdram_machine_edge.pre_vertex,
+                      SendsSynapticInputsOverSDRAM):
+            return sdram_machine_edge.pre_vertex.sdram_requirement(
+                sdram_machine_edge)
+        raise SynapticConfigurationException(
+            "Unknown pre vertex type in edge {}".format(sdram_machine_edge))

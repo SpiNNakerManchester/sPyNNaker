@@ -168,7 +168,6 @@ SOURCES = neuron/c_main_synapses.c \
           neuron/synapses.c \
           neuron/direct_synapses.c \
           neuron/spike_processing.c \
-          neuron/neuron_remote.c \
           neuron/population_table/population_table_$(POPULATION_TABLE_IMPL)_impl.c \
           $(SYNAPSE_DYNAMICS) $(WEIGHT_DEPENDENCE) \
           $(TIMING_DEPENDENCE) $(SYNAPTOGENESIS_DYNAMICS) \

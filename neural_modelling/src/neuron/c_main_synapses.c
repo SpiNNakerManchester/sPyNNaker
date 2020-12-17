@@ -52,7 +52,8 @@ enum regions {
     POPULATION_TABLE_REGION,
     SYNAPSE_DYNAMICS_REGION,
     STRUCTURAL_DYNAMICS_REGION,
-    BIT_FIELD_FILTER_REGION
+    BIT_FIELD_FILTER_REGION,
+    SDRAM_PARAMS_REGION
 };
 
 const struct common_regions COMMON_REGIONS = {
@@ -83,6 +84,13 @@ const struct synapse_priorities SYNAPSE_PRIORITIES = {
     .receive_packet = MC
 };
 
+//! A region of SDRAM used to transfer synapses
+struct sdram_config {
+    input_t *address;
+    uint32_t size_in_bytes;
+    uint32_t n_neurons;
+};
+
 // Globals
 
 //! The current timer tick value.
@@ -100,6 +108,12 @@ static uint32_t infinite_run;
 
 //! The recording flags indicating if anything is recording
 static uint32_t recording_flags = 0;
+
+//! Where synaptic input is to be written
+static struct sdram_config sdram_inputs;
+
+//! A local copy of the front of the ring buffers
+static input_t *synaptic_inputs;
 
 //! \brief Callback to store provenance data (format: neuron_provenance).
 //! \param[out] provenance_region: Where to write the provenance data
@@ -151,10 +165,23 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
         return;
     }
 
-    // First do synapses timestep update, as this is time-critical
-    synapses_do_timestep_update(time);
+    // TODO:
+    // Setup to call back enough before the end of the timestep to transfer
+    // synapses to SDRAM for the next timestep
+
+    // Do rewiring as needed
+    synaptogenesis_do_timestep_update();
 
     profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
+}
+
+void send_synapses_callback(uint32_t unused0, uint32_t unused1) {
+    // TODO: Throw away anything that is happening now and stop DMAs
+
+    // Copy things out of DTCM
+    synapses_do_timestep_update(time);
+
+    // TODO: Do the transfer of synapses to SDRAM
 }
 
 //! \brief Initialises the model by reading in the regions and checking
@@ -177,9 +204,28 @@ static bool initialise(void) {
         return false;
     }
 
+    // Setup for writing synaptic inputs at the end of each run
+    struct sdram_config * sdram_config = data_specification_get_region(
+            SDRAM_PARAMS_REGION, ds_regions);
+    spin1_memcpy(&sdram_inputs, sdram_config, sizeof(struct sdram_config));
+    synaptic_inputs = spin1_malloc(sdram_inputs.size_in_bytes);
+    if (synaptic_inputs == NULL) {
+        log_error("Could not allocate %u bytes for synaptic inputs",
+                sdram_inputs.size_in_bytes);
+        return false;
+    }
+
     log_debug("Initialise: finished");
     return true;
 }
+
+void neuron_add_inputs(
+        index_t synapse_type_index, index_t neuron_index,
+        input_t weights_this_timestep) {
+    uint32_t index = (synapse_type_index * sdram_inputs.n_neurons) + neuron_index;
+    synaptic_inputs[index] = weights_this_timestep;
+}
+
 
 //! \brief The entry point for this model.
 void c_main(void) {
