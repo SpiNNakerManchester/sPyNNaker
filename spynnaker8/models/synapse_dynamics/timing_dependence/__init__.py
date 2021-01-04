@@ -13,17 +13,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
-import unittest
-import spinn_utilities.package_loader as package_loader
+from .timing_dependence_spike_pair import TimingDependenceSpikePair
+from .timing_dependence_pfister_spike_triplet import (
+    TimingDependencePfisterSpikeTriplet)
+from .timing_dependence_recurrent import TimingDependenceRecurrent
+from .timing_dependence_spike_nearest_pair import (
+    TimingDependenceSpikeNearestPair)
+from .timing_dependence_vogels_2011 import TimingDependenceVogels2011
 
-
-class ImportAllModule(unittest.TestCase):
-
-    def test_import_all(self):
-        if os.environ.get('CONTINUOUS_INTEGRATION', 'false').lower() == 'true':
-            package_loader.load_module("spynnaker", remove_pyc_files=False)
-            package_loader.load_module("spynnaker8", remove_pyc_files=False)
-        else:
-            package_loader.load_module("spynnaker", remove_pyc_files=True)
-            package_loader.load_module("spynnaker8", remove_pyc_files=True)
+__all__ = ["TimingDependenceSpikePair",
+           "TimingDependencePfisterSpikeTriplet", "TimingDependenceRecurrent",
+           "TimingDependenceSpikeNearestPair", "TimingDependenceVogels2011"]

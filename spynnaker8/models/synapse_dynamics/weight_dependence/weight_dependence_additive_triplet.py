@@ -13,17 +13,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
-import unittest
-import spinn_utilities.package_loader as package_loader
+from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
+    WeightDependenceAdditiveTriplet as
+    _BaseClass)
 
 
-class ImportAllModule(unittest.TestCase):
+class WeightDependenceAdditiveTriplet(_BaseClass):
 
-    def test_import_all(self):
-        if os.environ.get('CONTINUOUS_INTEGRATION', 'false').lower() == 'true':
-            package_loader.load_module("spynnaker", remove_pyc_files=False)
-            package_loader.load_module("spynnaker8", remove_pyc_files=False)
-        else:
-            package_loader.load_module("spynnaker", remove_pyc_files=True)
-            package_loader.load_module("spynnaker8", remove_pyc_files=True)
+    # noinspection PyPep8Naming
+    def __init__(
+            self, w_min=0.0, w_max=1.0, A3_plus=0.01, A3_minus=0.01):
+        r"""
+        :param float w_min: :math:`w_\mathrm{min}`
+        :param float w_max: :math:`w_\mathrm{max}`
+        :param float A3_plus: :math:`A_3^+`
+        :param float A3_minus: :math:`A_3^-`
+        """
+        super(WeightDependenceAdditiveTriplet, self).__init__(
+            w_max=w_max, w_min=w_min, A3_plus=A3_plus, A3_minus=A3_minus)

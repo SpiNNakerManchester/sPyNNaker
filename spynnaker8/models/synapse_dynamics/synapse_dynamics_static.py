@@ -13,17 +13,25 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
-import unittest
-import spinn_utilities.package_loader as package_loader
+from pyNN.standardmodels.synapses import StaticSynapse as PyNNStaticSynapse
+from spinn_front_end_common.utilities import globals_variables
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    SynapseDynamicsStatic as
+    _BaseClass)
 
 
-class ImportAllModule(unittest.TestCase):
+class SynapseDynamicsStatic(_BaseClass):
 
-    def test_import_all(self):
-        if os.environ.get('CONTINUOUS_INTEGRATION', 'false').lower() == 'true':
-            package_loader.load_module("spynnaker", remove_pyc_files=False)
-            package_loader.load_module("spynnaker8", remove_pyc_files=False)
-        else:
-            package_loader.load_module("spynnaker", remove_pyc_files=True)
-            package_loader.load_module("spynnaker8", remove_pyc_files=True)
+    __slots__ = []
+
+    def __init__(
+            self, weight=PyNNStaticSynapse.default_parameters['weight'],
+            delay=None):
+        """
+        :param float weight:
+        :param delay:
+        :type delay: float or None
+        """
+        if delay is None:
+            delay = globals_variables.get_simulator().min_delay
+        super(SynapseDynamicsStatic, self).__init__(weight, delay)

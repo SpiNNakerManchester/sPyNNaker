@@ -14,3 +14,7 @@ MANIFEST
 .DS_Store
 .coverage
 /.pytest_cache
+*.pkl
+*.connections
+*.npy
+simple_example.png

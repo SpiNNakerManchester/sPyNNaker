@@ -13,17 +13,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
-import unittest
-import spinn_utilities.package_loader as package_loader
+from pyNN import common as PyNNCommon
 
 
-class ImportAllModule(unittest.TestCase):
+class ID(int, PyNNCommon.IDMixin):
+    """ A filter container for allowing random setters of values
+    """
 
-    def test_import_all(self):
-        if os.environ.get('CONTINUOUS_INTEGRATION', 'false').lower() == 'true':
-            package_loader.load_module("spynnaker", remove_pyc_files=False)
-            package_loader.load_module("spynnaker8", remove_pyc_files=False)
-        else:
-            package_loader.load_module("spynnaker", remove_pyc_files=True)
-            package_loader.load_module("spynnaker8", remove_pyc_files=True)
+    def __init__(self, n):
+        """ Create an ID object with numerical value ``n``.
+
+        :param int n: The value of the object.
+        """
+        int.__init__(n)
+        PyNNCommon.IDMixin.__init__(self)

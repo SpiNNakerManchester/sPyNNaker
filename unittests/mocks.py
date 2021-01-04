@@ -18,7 +18,6 @@ import numpy
 from spinn_front_end_common.utilities import globals_variables
 from spynnaker.pyNN.utilities.spynnaker_failed_state import (
     SpynnakerFailedState)
-from builtins import property
 
 
 class MockPopulation(object):

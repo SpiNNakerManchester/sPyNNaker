@@ -13,17 +13,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
-import unittest
-import spinn_utilities.package_loader as package_loader
+from pyNN import common as pynn_common
+from spinn_front_end_common.utilities import globals_variables
 
 
-class ImportAllModule(unittest.TestCase):
+class Assembly(pynn_common.Assembly):
+    """
+    A group of neurons, may be heterogeneous, in contrast to a Population
+    where all the neurons are of the same type.
 
-    def test_import_all(self):
-        if os.environ.get('CONTINUOUS_INTEGRATION', 'false').lower() == 'true':
-            package_loader.load_module("spynnaker", remove_pyc_files=False)
-            package_loader.load_module("spynnaker8", remove_pyc_files=False)
-        else:
-            package_loader.load_module("spynnaker", remove_pyc_files=True)
-            package_loader.load_module("spynnaker8", remove_pyc_files=True)
+    :param populations: the populations or views to form the assembly out of
+    :type populations: ~spynnaker8.models.populations.Population or \
+        ~spynnaker8.models.populations.PopulationView
+    :param kwargs: may contain `label` (a string describing the assembly)
+    """
+
+    @property
+    def _simulator(self):
+        return globals_variables.get_simulator()

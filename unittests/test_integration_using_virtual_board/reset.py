@@ -13,17 +13,24 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
-import unittest
-import spinn_utilities.package_loader as package_loader
+import spynnaker8 as p
+from p8_integration_tests.base_test_case import BaseTestCase
 
 
-class ImportAllModule(unittest.TestCase):
+class SynfireIfCurrExp(BaseTestCase):
 
-    def test_import_all(self):
-        if os.environ.get('CONTINUOUS_INTEGRATION', 'false').lower() == 'true':
-            package_loader.load_module("spynnaker", remove_pyc_files=False)
-            package_loader.load_module("spynnaker8", remove_pyc_files=False)
-        else:
-            package_loader.load_module("spynnaker", remove_pyc_files=True)
-            package_loader.load_module("spynnaker8", remove_pyc_files=True)
+    def test_run(self):
+        p.setup()
+        cell_params_lif = {'cm': 0.25, 'i_offset': 0.0, 'tau_m': 20.0,
+                           'tau_refrac': 2.0, 'tau_syn_E': 5.0,
+                           'tau_syn_I': 5.0, 'v_reset': -70.0, 'v_rest': -65.0,
+                           'v_thresh': -50.0}
+
+        pop = p.Population(10, p.IF_curr_exp(**cell_params_lif), label='test')
+        p.run(100)
+        pop.set(cm=0.30)
+
+
+if __name__ == '__main__':
+    x = SynfireIfCurrExp()
+    x.test_run()

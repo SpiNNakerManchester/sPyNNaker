@@ -13,17 +13,18 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
-import unittest
-import spinn_utilities.package_loader as package_loader
+from pyNN.random import RandomDistribution
+from spynnaker.pyNN.utilities.ranged import SpynnakerRangeDictionary
+import spynnaker8 as p
+from p8_integration_tests.base_test_case import BaseTestCase
 
 
-class ImportAllModule(unittest.TestCase):
+class TestRanged(BaseTestCase):
 
-    def test_import_all(self):
-        if os.environ.get('CONTINUOUS_INTEGRATION', 'false').lower() == 'true':
-            package_loader.load_module("spynnaker", remove_pyc_files=False)
-            package_loader.load_module("spynnaker8", remove_pyc_files=False)
-        else:
-            package_loader.load_module("spynnaker", remove_pyc_files=True)
-            package_loader.load_module("spynnaker8", remove_pyc_files=True)
+    def test_uniform(self):
+        # Need to do setup to get a pynn version
+        p.setup(10)
+        rd = SpynnakerRangeDictionary(10)
+        rd["a"] = RandomDistribution("uniform", parameters_pos=[-65.0, -55.0])
+        ranges = rd["a"].get_ranges()
+        assert 10 == len(ranges)
