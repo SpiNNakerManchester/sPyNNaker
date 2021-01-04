@@ -54,26 +54,6 @@ def _percent(amount, total):
 
 class OnChipBitFieldGenerator(object):
     """ Executes bitfield and routing table entries for atom based routing.
-
-    :param ~pacman.model.placementsPlacements placements: placements
-    :param ~pacman.model.graphs.application.ApplicationGraph app_graph:
-        the app graph
-    :param executable_finder: the executable finder
-    :type executable_finder:
-        ~spinn_front_end_common.utilities.utility_objs.ExecutableFinder
-    :param str provenance_file_path:
-        the path to where provenance data items is written
-    :param ~spinnman.transceiver.Transceiver transceiver:
-        the SpiNNMan instance
-    :param bool write_bit_field_generator_iobuf: flag for report
-    :param bool generating_bitfield_report: flag for report
-    :param str default_report_folder: the file path for reports
-    :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
-        the machine graph
-    :param ~pacman.model.routing_info.RoutingInfo routing_infos:
-        the key to edge map
-    :param bool generating_bit_field_summary_report:
-        flag for making summary report
     """
 
     __slots__ = ("__aplx", "__placements", "__txrx")
@@ -114,17 +94,23 @@ class OnChipBitFieldGenerator(object):
             routing_infos, generating_bit_field_summary_report):
         """ Loads and runs the bit field generator on chip.
 
-        :param ~.Placements placements: placements
-        :param ~.ApplicationGraph app_graph: the app graph
-        :param ~.ExecutableFinder executable_finder: the executable finder
+        :param ~pacman.model.placements.Placements placements: placements
+        :param ~pacman.model.graphs.application.ApplicationGraph app_graph:
+            the app graph
+        :param executable_finder: the executable finder
+        :type executable_finder:
+            ~spinn_front_end_common.utilities.utility_objs.ExecutableFinder
         :param str provenance_file_path:
-            the path to where provenance data items is written
-        :param ~.Transceiver transceiver: the SpiNNMan instance
-        :param bool write_bit_field_generator_iobuf: write iobuf
-        :param bool generating_bitfield_report: write report
+            the path to where provenance data items are written
+        :param ~spinnman.transceiver.Transceiver transceiver:
+            the SpiNNMan instance
+        :param bool write_bit_field_generator_iobuf: flag for report
+        :param bool generating_bitfield_report: flag for report
         :param str default_report_folder: the file path for reports
-        :param ~.MachineGraph machine_graph: the machine graph
-        :param routing_infos: the key to edge map
+        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
+            the machine graph
+        :param ~pacman.model.routing_info.RoutingInfo routing_infos:
+            the key to edge map
         :param bool generating_bit_field_summary_report:
             whether to make summary report
         """

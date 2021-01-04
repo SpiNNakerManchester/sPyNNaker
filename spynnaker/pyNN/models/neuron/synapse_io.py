@@ -360,7 +360,7 @@ class SynapseIORowBased(object):
             The number of synapse types in total to be represented
         :param list(float) weight_scales:
             The scaling of the weights for each synapse type
-        :param MachineEdge machine_edge:
+        :param ~pacman.model.graphs.machine.MachineEdge machine_edge:
             The incoming machine edge that the synapses are on
         :param int machine_time_step: The machine time step of the sim.
         :param ProjectionApplicationEdge app_edge:
@@ -520,9 +520,9 @@ class SynapseIORowBased(object):
             The raw data containing the synapses
         :param int machine_time_step:
             The time step of the simulation
+        :param bool delayed: True if the data should be considered delayed
         :param int post_vertex_max_delay_ticks:
             max delayed ticks supported from post vertex
-        :param bool delayed: True if the data should be considered delayed
         :return: The connections read from the data; the dtype is
             AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
         :rtype: ~numpy.ndarray

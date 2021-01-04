@@ -19,11 +19,11 @@ from pacman.model.constraints.key_allocator_constraints import (
     FixedMaskConstraint)
 from pacman.model.graphs.application import (
     ApplicationSpiNNakerLinkVertex)
+from pacman.model.graphs.application.abstract import (
+    AbstractOneAppOneMachineVertex)
 from spinn_front_end_common.abstract_models import (
     AbstractProvidesOutgoingPartitionConstraints,
     AbstractVertexWithEdgeToDependentVertices)
-from pacman.model.graphs.application.abstract import (
-    AbstractOneAppOneMachineVertex)
 from spynnaker.pyNN.models.defaults import defaults
 from .machine_munich_motor_device import MachineMunichMotorDevice
 
