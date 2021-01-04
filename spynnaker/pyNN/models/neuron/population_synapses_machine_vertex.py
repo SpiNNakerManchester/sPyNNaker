@@ -18,7 +18,8 @@ from pacman.executor.injection_decorator import inject_items
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification)
-from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_front_end_common.utilities.constants import (
+    BYTES_PER_WORD, BYTES_PER_SHORT)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.abstract_models import (
     ReceivesSynapticInputsOverSDRAM, SendsSynapticInputsOverSDRAM)
@@ -31,7 +32,7 @@ from .population_machine_synapses import (
 SDRAM_PARAMS_SIZE = 3 * BYTES_PER_WORD
 
 # Number of bytes per synaptic input
-SYNAPTIC_INPUT_BYTES = BYTES_PER_WORD
+SYNAPTIC_INPUT_BYTES = BYTES_PER_SHORT
 
 
 class PopulationSynapsesMachineVertex(
@@ -215,6 +216,11 @@ class PopulationSynapsesMachineVertex(
         n_bytes = (self._vertex_slice.n_atoms *
                    self._app_vertex.neuron_impl.get_n_synapse_types() *
                    SYNAPTIC_INPUT_BYTES)
+        # May need to add some padding if not a round number of words
+        extra_bytes = n_bytes % BYTES_PER_WORD
+        if extra_bytes:
+            n_bytes += BYTES_PER_WORD - extra_bytes
+
         if isinstance(sdram_machine_edge.post_vertex,
                       ReceivesSynapticInputsOverSDRAM):
             return n_bytes
