@@ -71,7 +71,7 @@ class AbstractSynapseDynamicsStructural(object):
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         :param ProjectionApplicationEdge app_edge:
         :param SynapseInformation synapse_info:
-        :param MachineEdge machine_edge:
+        :param ~pacman.model.graphs.machine.MachineEdge machine_edge:
         """
 
     @abstractproperty

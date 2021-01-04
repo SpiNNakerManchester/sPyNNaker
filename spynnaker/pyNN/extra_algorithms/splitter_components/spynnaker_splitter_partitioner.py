@@ -39,7 +39,7 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
         :param pre_allocated_resources: any pre allocated res to account for\
             before doing any splitting.
         :type pre_allocated_resources: PreAllocatedResourceContainer or None
-        :rtype: tuple(MachineGraph, int)
+        :rtype: tuple(~pacman.model.graphs.machine.MachineGraph, int)
         :raise PacmanPartitionException: when it cant partition
         """
 

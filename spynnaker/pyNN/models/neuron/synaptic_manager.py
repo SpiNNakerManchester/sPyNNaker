@@ -193,7 +193,7 @@ class SynapticManager(object):
         return matrices
 
     def host_written_matrix_size(self, post_vertex_slice):
-        """ The size of the matrix written by the host for a given
+        """ The size of the matrix written by the host for a given\
             machine vertex
 
         :param post_vertex_slice: The slice of the vertex to get the size of
@@ -203,7 +203,7 @@ class SynapticManager(object):
         return matrices.host_generated_block_addr
 
     def on_chip_written_matrix_size(self, post_vertex_slice):
-        """ The size of the matrix that will be written on the machine for a
+        """ The size of the matrix that will be written on the machine for a\
             given machine vertex
 
         :param post_vertex_slice: The slice of the vertex to get the size of
@@ -215,7 +215,7 @@ class SynapticManager(object):
 
     @property
     def synapse_dynamics(self):
-        """ The synapse dynamics used by the synapses e.g. plastic or static.
+        """ The synapse dynamics used by the synapses e.g. plastic or static.\
             Settable.
 
         :rtype: AbstractSynapseDynamics or None
@@ -228,8 +228,8 @@ class SynapticManager(object):
 
     @synapse_dynamics.setter
     def synapse_dynamics(self, synapse_dynamics):
-        """ Set the synapse dynamics.  Note that after setting, the dynamics
-            might not be the type set as it can be combined with the existing
+        """ Set the synapse dynamics.  Note that after setting, the dynamics\
+            might not be the type set as it can be combined with the existing\
             dynamics in exciting ways.
         """
         if self.__synapse_dynamics is None:
@@ -240,7 +240,7 @@ class SynapticManager(object):
 
     @property
     def ring_buffer_sigma(self):
-        """ The sigma in the estimation of the maximum summed ring buffer
+        """ The sigma in the estimation of the maximum summed ring buffer\
             weights.  Settable.
 
         :rtype: float
@@ -253,7 +253,7 @@ class SynapticManager(object):
 
     @property
     def spikes_per_second(self):
-        """ The assumed maximum spikes per second of an incoming population.
+        """ The assumed maximum spikes per second of an incoming population.\
             Used when calculating the ring buffer weight scaling. Settable.
 
         :rtype: float
@@ -347,8 +347,10 @@ class SynapticManager(object):
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of the vertex to allocate for
         :param int all_syn_block_sz: The memory to reserve for synapses
-        :param ~.MachineGraph machine_graph: The machine graph
-        :param ~.MachineVertex machine_vertex: The machine vertex
+        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
+            The machine graph
+        :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:
+            The machine vertex
         """
         spec.reserve_memory_region(
             region=self._synapse_params_region,
@@ -396,20 +398,20 @@ class SynapticManager(object):
 
         Requires an assessment of maximum Poisson input rate.
 
-        Assumes knowledge of mean and SD of weight distribution, fan-in\
+        Assumes knowledge of mean and SD of weight distribution, fan-in
         and timestep.
 
-        All arguments should be assumed real values except n_synapses_in\
+        All arguments should be assumed real values except n_synapses_in
         which will be an integer.
 
-        :param float weight_mean: Mean of weight distribution (in either nA or\
+        :param float weight_mean: Mean of weight distribution (in either nA or
             microSiemens as required)
         :param float weight_std_dev: SD of weight distribution
         :param float spikes_per_second: Maximum expected Poisson rate in Hz
         :param int machine_timestep: in us
         :param int n_synapses_in: No of connected synapses
-        :param float sigma: How many SD above the mean to go for upper bound;\
-            a good starting choice is 5.0. Given length of simulation we can\
+        :param float sigma: How many SD above the mean to go for upper bound;
+            a good starting choice is 5.0. Given length of simulation we can
             set this for approximate number of saturation events.
         :rtype: float
         """
@@ -465,8 +467,8 @@ class SynapticManager(object):
         """ Get the scaling of the ring buffer to provide as much accuracy as\
             possible without too much overflow
 
-        :param .MachineVertex machine_vertex:
-        :param .MachineGraph machine_graph:
+        :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:
+        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
         :param int machine_timestep:
         :param float weight_scale:
         :rtype: list(int)
@@ -586,8 +588,8 @@ class SynapticManager(object):
             weight_scale):
         """ Update the ring buffer shifts and weight scales for this vertex
 
-        :param .MachineVertex machine_vertex:
-        :param .MachineGraph machine_graph:
+        :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:
+        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
         :param float machine_time_step:
         :param float weight_scale:
         """
@@ -607,15 +609,11 @@ class SynapticManager(object):
         """
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to
-        :param ~pacman.model.graphs.application_graph.ApplicationGraph \
-        application_graph: the app graph
         :param AbstractPopulationVertex application_vertex:
             The vertex owning the synapses
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
             The part of the vertex we're dealing with
         :param PopulationMachineVertex machine_vertex: The machine vertex
-        :param ~pacman.model.placements.Placement placement:
-            Where the vertex is placed
         :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
             The graph containing the machine vertex
         :param ~pacman.model.graphs.application.ApplicationGraph \
@@ -637,8 +635,7 @@ class SynapticManager(object):
             machine_vertex)
 
         self.__update_ring_buffer_shifts_and_weight_scales(
-            machine_vertex, machine_graph, machine_time_step,
-            weight_scale)
+            machine_vertex, machine_graph, machine_time_step, weight_scale)
         spec.switch_write_focus(self._synapse_params_region)
         # write the bool for deleting packets that were too late for a timer
         spec.write_value(int(self.__drop_late_spikes))
