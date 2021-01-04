@@ -77,8 +77,9 @@ static REAL v_rest;
 // Structures
 //---------------------------------------
 typedef struct {
-    pre_trace_t prev_trace;
+
     REAL prev_time;
+
 } pre_event_history_t;
 
 post_event_history_t *post_event_history;
@@ -126,15 +127,9 @@ static inline final_state_t plasticity_update_apical_synapse(
 //---------------------------------------
 static inline plastic_synapse_t* plastic_synapses(
         address_t plastic_region_address) {
-    const uint32_t pre_event_history_size_words =
-            sizeof(pre_event_history_t) / sizeof(uint32_t);
-    static_assert(
-            pre_event_history_size_words * sizeof(uint32_t) == sizeof(pre_event_history_t),
-            "Size of pre_event_history_t structure should be a multiple"
-            " of 32-bit words");
 
     return (plastic_synapse_t *)
-            &plastic_region_address[pre_event_history_size_words];
+            &plastic_region_address[1];
 }
 
 //---------------------------------------
@@ -266,6 +261,7 @@ bool synapse_dynamics_process_plastic_synapses(
         REAL *ring_buffers, uint32_t time, uint32_t rate) {
     // Extract separate arrays of plastic synapses (from plastic region),
     // Control words (from fixed region) and number of plastic synapses
+    // plastic_synapse_t is same type as weight_t, which is accum!
     plastic_synapse_t *plastic_words =
             plastic_synapses(plastic_region_address);
     const control_t *control_words =
@@ -306,13 +302,13 @@ bool synapse_dynamics_process_plastic_synapses(
 
         // Synapse type
         uint32_t type = synapse_row_sparse_type(
-                control_word, synapse_index_bits, synapse_type_mask);
+                control_word, synapse_index_bits);
         // Neuron index
         uint32_t index =
                 synapse_row_sparse_index(control_word, synapse_index_mask);
         // Neuron index and Synapse type combined
         uint32_t type_index = synapse_row_sparse_type_index(
-                control_word, synapse_type_index_mask);
+                control_word);
 
         //io_printf(IO_BUF, "index %d\n", index);
 
@@ -346,12 +342,12 @@ bool synapse_dynamics_process_plastic_synapses(
             return false;
         }
 
+        // THE FUNCTION SHFITS TO INCLUDE THE DELAY. MAYBE STRIP OFF FOR US MODEL EXTREME PERFORMANCE GAIN
         uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
                 0, type_index, synapse_type_index_bits);
 
-        REAL curr_weight = synapses_convert_weight_to_input(
-                           synapse_structure_get_final_weight(final_state),
-                           weight_get_shift(current_state));
+        // EDIT THIS TO BE *plastic_words ONCE THE WEIGHT UPDATE IS ADAPTED
+        REAL curr_weight = synapse_structure_get_final_weight(final_state);
 
         io_printf(IO_BUF, "%k t %d\n", curr_weight, time);
 
@@ -380,7 +376,7 @@ bool synapse_dynamics_process_plastic_synapses(
 
         //io_printf(IO_BUF, "weight %k\n", synapse_structure_get_final_weight(final_state));
 
-        // Write back updated synaptic word to plastic region
+        // Write back updated synaptic word to plastic region REMOVE THIS WHEN WEIGHT UPDATE IS ADAPTED
         *plastic_words++ =
                 synapse_structure_get_final_synaptic_word(final_state);
     }

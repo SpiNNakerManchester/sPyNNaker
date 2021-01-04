@@ -162,7 +162,7 @@ static void matrix_generator_write_row(
         uint32_t max_row_n_words, uint32_t max_delayed_row_n_words,
         uint32_t n_synapse_type_bits, uint32_t n_synapse_index_bits,
         uint32_t synapse_type, uint32_t n_synapses,
-        uint16_t *indices, uint16_t *delays, uint16_t *weights,
+        uint16_t *indices, uint16_t *delays, accum *weights,
         uint32_t max_stage) {
     generator->type->write_row(
             generator->data, synaptic_matrix, delayed_synaptic_matrix,
@@ -186,16 +186,14 @@ static inline uint16_t rescale_delay(accum delay, accum timestep_per_delay) {
     return delay_int;
 }
 
-static inline uint16_t rescale_weight(accum weight, uint32_t weight_scale) {
+static inline accum rescale_weight(accum weight, uint32_t weight_scale) {
+
+    // DOES THIS NEED TO DISAPPEAR SINCE WE HAVE SIGNED WEIGHTS?
     if (weight < 0) {
         weight = -weight;
     }
-    weight = weight * weight_scale;
-    uint16_t weight_int = (uint16_t) weight;
-    if (weight != weight_int) {
-        log_debug("Rounded weight %k to %u", weight, weight_int);
-    }
-    return weight;
+
+    return weight * weight_scale;
 }
 
 bool matrix_generator_generate(
@@ -226,7 +224,8 @@ bool matrix_generator_generate(
         log_debug("Generated %u synapses", n_indices);
 
         accum params[n_indices];
-        uint16_t delays[n_indices], weights[n_indices];
+        uint16_t delays[n_indices];
+        accum weights[n_indices];
 
         // Generate delays for each index
         param_generator_generate(

@@ -84,18 +84,16 @@ static void matrix_generator_static_free(void *data) {
  *! \param[in] synapse_index_bits The number of bits for the target neuron id
  *! \return a synaptic word
  */
-static uint32_t build_static_word(
-        uint16_t weight, uint16_t delay, uint32_t type,
-        uint16_t post_index, uint32_t synapse_type_bits,
+static uint8_t build_static_word(
+        uint32_t type, uint16_t post_index, uint32_t synapse_type_bits,
         uint32_t synapse_index_bits) {
-    uint32_t synapse_index_mask = (1 << synapse_index_bits) - 1;
-    uint32_t synapse_type_mask = (1 << synapse_type_bits) - 1;
 
-    uint32_t wrd  = post_index & synapse_index_mask;
-    wrd |= (type & synapse_type_mask) << synapse_index_bits;
-    wrd |= (delay & SYNAPSE_DELAY_MASK) <<
-            (synapse_index_bits + synapse_type_bits);
-    wrd |= (weight & SYNAPSE_WEIGHT_MASK) << SYNAPSE_WEIGHT_SHIFT;
+    uint8_t synapse_index_mask = (1 << synapse_index_bits) - 1;
+    uint8_t synapse_type_mask = (1 << synapse_type_bits) - 1;
+
+    uint8_t wrd = post_index & synapse_index_mask;
+    wrd |= ((uint8_t) type & synapse_type_mask) << synapse_index_bits;
+
     return wrd;
 }
 
@@ -106,7 +104,7 @@ static void matrix_generator_static_write_row(
         uint32_t max_row_n_words, uint32_t max_delayed_row_n_words,
         uint32_t synapse_type_bits, uint32_t synapse_index_bits,
         uint32_t synapse_type, uint32_t n_synapses,
-        uint16_t *indices, uint16_t *delays, uint16_t *weights,
+        uint16_t *indices, uint16_t *delays, accum *weights,
         uint32_t max_stage) {
     use(data);
 
@@ -146,7 +144,6 @@ static void matrix_generator_static_write_row(
             log_debug("row[%u] = 0x%08x", i, row_address[i]);
         }
     }
-
     // The address to write synapses to on each stage
     address_t write_address[max_stage];
     for (uint32_t i = 0; i < max_stage; i++) {
@@ -170,7 +167,52 @@ static void matrix_generator_static_write_row(
         uint32_t post_index = indices[synapse];
 
         // Weight
-        uint16_t weight = weights[synapse];
+        accum weight = weights[synapse];
+
+        // Work out the delay stage and final value
+        struct delay_value delay = get_delay(delays[synapse], max_stage);
+        if (write_address[delay.stage] == NULL) {
+            log_error("Delay stage %u has not been initialised; raw delay = %u,"
+                    " delay = %u, max stage = %u", delay.stage, delays[synapse],
+                    delay.delay, max_stage);
+            rt_error(RTE_SWERR);
+        }
+
+        // Avoid errors when rows are full
+        if (space[delay.stage] == 0) {
+            log_warning("Row for delay stage %u is full - word not added!",
+                    delay.stage);
+            continue;
+        }
+
+        *write_address[delay.stage] = weight;
+        write_address[delay.stage]++;
+
+        // Increment the size of the current row
+        row_address[delay.stage][STATIC_FIXED_FIXED_SIZE]++;
+        space[delay.stage]--;
+    }
+
+    uint8_t *fixed[max_stage];
+    uint16_t id_words_per_row[max_stage];
+
+    for (uint8_t i = 0; i < max_stage; i++) {
+
+        id_words_per_row[i] = 0;
+
+        if(write_address[i] != NULL) {
+
+            fixed[i] = (uint8_t *) write_address[i];
+        }
+        else {
+
+            fixed[i] = NULL;
+        }
+    }
+
+    for (uint32_t synapse = 0; synapse < n_synapses; synapse++) {
+        // Post-neuron index
+        uint32_t post_index = indices[synapse];
 
         // Work out the delay stage and final value
         struct delay_value delay = get_delay(delays[synapse], max_stage);
@@ -189,17 +231,41 @@ static void matrix_generator_static_write_row(
         }
 
         // Build synaptic word
-        uint32_t word = build_static_word(
-                weight, delay.delay, synapse_type, post_index, synapse_type_bits,
+        uint8_t word = build_static_word(
+                synapse_type, post_index, synapse_type_bits,
                 synapse_index_bits);
 
         // Write the word
         log_debug("Writing word to 0x%08x", &write_address[delay.stage][0]);
-        write_address[delay.stage][0] = word;
-        write_address[delay.stage] = &write_address[delay.stage][1];
+        *fixed[delay.stage] = word;
+        fixed[delay.stage]++;
 
-        // Increment the size of the current row
-        row_address[delay.stage][STATIC_FIXED_FIXED_SIZE]++;
-        space[delay.stage]--;
+        id_words_per_row[delay.stage]++;
     }
+
+    for(uint32_t i = 0; i < max_stage; i++) {
+
+        if(row_address[i] != NULL) {
+
+            // Compute the padding for the fixed part
+            uint32_t fixed_padding = id_words_per_row[i] % 4;
+
+            if(fixed_padding > 0) {
+
+                // Number of slots missing to complete a word
+                fixed_padding = 4 - fixed_padding;
+
+                for(uint32_t j = 0; j < fixed_padding; j++) {
+
+                    *fixed[i] = 0;
+                    fixed[i]++;
+                    id_words_per_row[i]++;
+                }
+            }
+
+            // Save the fixed size (n of written bytes / 4)
+            row_address[i][STATIC_FIXED_PLASTIC_SIZE] = id_words_per_row[i] >> 2;
+        }
+    }
+
 }

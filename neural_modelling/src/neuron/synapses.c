@@ -168,10 +168,12 @@ static inline void print_inputs(void) {
 // be put into the ring buffer.
 static inline void process_fixed_synapses(
         address_t fixed_region_address, uint32_t time, uint32_t somatic_voltage) {
-    register uint32_t *synaptic_words =
+    register accum *synaptic_weights =
             synapse_row_fixed_weight_controls(fixed_region_address);
     register uint32_t fixed_synapse =
             synapse_row_num_fixed_synapses(fixed_region_address);
+    register uint8_t *synaptic_data =
+            synapse_row_fixed_data(fixed_region_address, fixed_synapse);
 
     num_fixed_pre_synaptic_events += fixed_synapse;
 
@@ -182,25 +184,23 @@ static inline void process_fixed_synapses(
     for (; fixed_synapse > 0; fixed_synapse--) {
         // Get the next 32 bit word from the synaptic_row
         // (should auto increment pointer in single instruction)
-        uint32_t synaptic_word = *synaptic_words++;
+        accum synaptic_weight = *synaptic_weights++;
+        uint8_t synaptic_info = *synaptic_data++;
 
 //        // Extract components from this word
 //        uint32_t delay =
 //                synapse_row_sparse_delay(synaptic_word, synapse_type_index_bits);
         uint32_t combined_synapse_neuron_index = synapse_row_sparse_type_index(
-                synaptic_word, synapse_type_index_mask);
+                synaptic_info);
 
         // Convert into ring buffer offset. The time & 1 mask is used to write in the safe ring buffer
+        // THE FUNCTION SHFITS TO INCLUDE THE DELAY. MAYBE STRIP OFF FOR US MODEL EXTREME PERFORMANCE GAIN
         uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
                 0, combined_synapse_neuron_index,
                 synapse_type_index_bits);
 
-        REAL weight = synapses_convert_weight_to_input(
-                            synapse_row_sparse_weight(synaptic_word),
-                            ring_buffer_to_input_left_shifts[combined_synapse_neuron_index >> synapse_index_bits]);
-
         // Add weight to current ring buffer value
-        REAL accumulation = ring_buffers[ring_buffer_index] + get_input_current(rate, weight);
+        REAL accumulation = ring_buffers[ring_buffer_index] + get_input_current(rate, synaptic_weight);
 
         // Saturation check, MAYBE WE SHOULD CAP THE MAX INCOMING VALUES?
 //        s3231 sat_test = accumulation & 0x100000000;
@@ -213,9 +213,9 @@ static inline void process_fixed_synapses(
 
         //io_printf(IO_BUF,"acc %k, t%d\n", accumulation, time);
 
-        //io_printf(IO_BUF, "acc %k index %d\n", accumulation, ring_buffer_index);
+        io_printf(IO_BUF, "acc %k index %d\n", accumulation, ring_buffer_index);
 
-        io_printf(IO_BUF, "weight %k in rate %k\n", weight, rate);
+        io_printf(IO_BUF, "weight %k in rate %k\n", synaptic_weight, rate);
     }
 }
 

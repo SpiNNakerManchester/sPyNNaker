@@ -179,19 +179,18 @@ class SynapseDynamicsSTDP(
         return int(math.ceil(float(n_bytes) / 4.0)) * 4
 
     def get_n_words_for_plastic_connections(self, n_connections):
+        # Adapted for syn matrix in DTCM
+        # pp region has 1 word per conn for the weights, plus 1 word per row
+        # for the pre_syn buffer; fp region has 1 byte per connection to
+        # store neuron ID and synapse ID
+
         synapse_structure = self.__timing_dependence.synaptic_structure
         if self.__pad_to_length is not None:
             n_connections = max(n_connections, self.__pad_to_length)
         if n_connections == 0:
             return 0
-        fp_size_words = (
-            n_connections // 2 if n_connections % 2 == 0
-            else (n_connections + 1) // 2)
-        pp_size_bytes = (
-            self._n_header_bytes +
-            (synapse_structure.get_n_half_words_per_connection() *
-             2 * n_connections))
-        pp_size_words = int(math.ceil(float(pp_size_bytes) / 4.0))
+        fp_size_words = int(math.ceil(float(n_connections) / 4.0))
+        pp_size_words = n_connections + 1
 
         return fp_size_words + pp_size_words
 
