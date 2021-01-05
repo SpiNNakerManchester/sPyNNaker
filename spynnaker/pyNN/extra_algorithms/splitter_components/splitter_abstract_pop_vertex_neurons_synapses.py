@@ -12,6 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from collections import defaultdict
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.resources import (
@@ -33,7 +34,12 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
     """ handles the splitting of the AbstractPopulationVertex via slice logic.
     """
 
-    __slots__ = ["__neuron_vertices", "__synapse_vertices"]
+    __slots__ = [
+        "__neuron_vertices",
+        "__synapse_vertices",
+        "__synapse_verts_by_neuron",
+        "__n_synapse_vertices",
+        "__index"]
 
     SPLITTER_NAME = "SplitterAbstractPopulationVertexNeuronsSynapses"
 
@@ -44,10 +50,11 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         "AbstractPopulationVertex. Please use the correct splitter for "
         "your vertex and try again.")
 
-    def __init__(self):
+    def __init__(self, n_synapse_vertices=1):
         super(SplitterAbstractPopulationVertexNeuronsSynapses, self).__init__(
             self.SPLITTER_NAME)
         AbstractSpynnakerSplitterDelay.__init__(self)
+        self.__n_synapse_vertices = n_synapse_vertices
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
@@ -60,6 +67,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
     def create_machine_vertices(self, resource_tracker, machine_graph):
         self.__neuron_vertices = list()
         self.__synapse_vertices = list()
+        self.__synapse_verts_by_neuron = defaultdict(list)
+        self.__index = 0
         label = self._governed_app_vertex.label
         for vertex_slice in self.__get_fixed_slices():
 
@@ -73,24 +82,30 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 self._governed_app_vertex, vertex_slice)
             machine_graph.add_vertex(neuron_vertex)
             self.__neuron_vertices.append(neuron_vertex)
-            synapse_label = "{}_Synapses:{}-{}".format(
-                label, vertex_slice.lo_atom, vertex_slice.hi_atom)
-            synapse_vertex = PopulationSynapsesMachineVertex(
-                synapse_resources, synapse_label, None,
-                self._governed_app_vertex, vertex_slice)
-            machine_graph.add_vertex(synapse_vertex)
-            self.__synapse_vertices.append(synapse_vertex)
+            synapse_vertices = list()
+            self.__synapse_verts_by_neuron[neuron_vertex] = synapse_vertices
+            for i in range(self.__n_synapse_vertices):
+                synapse_label = "{}_Synapses:{}-{}({})".format(
+                    label, vertex_slice.lo_atom, vertex_slice.hi_atom, i)
+                synapse_vertex = PopulationSynapsesMachineVertex(
+                    synapse_resources, synapse_label, None,
+                    self._governed_app_vertex, vertex_slice)
+                machine_graph.add_vertex(synapse_vertex)
+                self.__synapse_vertices.append(synapse_vertex)
+                synapse_vertices.append(synapse_vertex)
 
             # Create the SDRAM edge between the parts
             sdram_label = "SDRAM {}-->{}".format(synapse_label, neuron_label)
             sdram_partition = SourceSegmentedSDRAMMachinePartition(
-                SYNAPSE_SDRAM_PARTITION_ID, sdram_label, [synapse_vertex])
+                SYNAPSE_SDRAM_PARTITION_ID, sdram_label, synapse_vertices)
             machine_graph.add_outgoing_edge_partition(sdram_partition)
-            machine_graph.add_edge(
-                SDRAMMachineEdge(synapse_vertex, neuron_vertex, sdram_label),
-                SYNAPSE_SDRAM_PARTITION_ID)
             neuron_vertex.set_sdram_partition(sdram_partition)
-            synapse_vertex.set_sdram_partition(sdram_partition)
+            for synapse_vertex in synapse_vertices:
+                machine_graph.add_edge(
+                    SDRAMMachineEdge(
+                        synapse_vertex, neuron_vertex, sdram_label),
+                    SYNAPSE_SDRAM_PARTITION_ID)
+                synapse_vertex.set_sdram_partition(sdram_partition)
 
             # Allocate all the resources to ensure they all fit
             sdram_resources = ResourceContainer(sdram=ConstantSDRAM(
@@ -121,7 +136,9 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
     def get_in_coming_vertices(
             self, edge, outgoing_edge_partition, src_machine_vertex):
-        return {v: [MachineEdge] for v in self.__synapse_vertices}
+        self.__index = (self.__index + 1) % self.__n_synapse_vertices
+        return {v[self.__index]: [MachineEdge]
+                for v in self.__synapse_verts_by_neuron.values()}
 
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
     def machine_vertices_for_recording(self, variable_to_record):
@@ -134,6 +151,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
     def reset_called(self):
         self.__neuron_vertices = None
         self.__synapse_vertices = None
+        self.__synapse_verts_by_neuron = None
 
     def __get_neuron_resources(self, vertex_slice):
         """  Gets the resources of the neurons of a slice of atoms from a given
