@@ -15,6 +15,12 @@ MANIFEST
 .coverage
 /.pytest_cache
 *.pkl
+*.pickle
 *.connections
 *.npy
 simple_example.png
+*.log
+*.dat
+*.data
+*.data2
+*.csv
