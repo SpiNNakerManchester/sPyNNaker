@@ -144,10 +144,12 @@ static inline void do_dma_read(
 //! \param[out] spike: The spike being processed
 //! \param[in,out] n_rewire: Accumulator of number of rewirings
 //! \param[in,out] n_process_spike: Accumulator of number of processed spikes
+//! \param[in,out] representation: the representation of this read
 //! \return True if there's something to do
 static inline bool is_something_to_do(
         address_t *row_address, size_t *n_bytes_to_transfer,
-        spike_t *spike, uint32_t *n_rewire, uint32_t *n_process_spike) {
+        spike_t *spike, uint32_t *n_rewire, uint32_t *n_process_spike,
+        uint32_t* representation) {
     // Disable interrupts here as dma_busy modification is a critical section
     uint cpsr = spin1_int_disable();
 
@@ -166,7 +168,7 @@ static inline bool is_something_to_do(
     // Is there another address in the population table?
     spin1_mode_restore(cpsr);
     if (population_table_get_next_address(
-            spike, row_address, n_bytes_to_transfer)) {
+            spike, row_address, n_bytes_to_transfer, representation)) {
         *n_process_spike += 1;
         return true;
     }
@@ -184,7 +186,7 @@ static inline bool is_something_to_do(
         // as this can be slow
         spin1_mode_restore(cpsr);
         if (population_table_get_first_address(
-                *spike, row_address, n_bytes_to_transfer)) {
+                *spike, row_address, n_bytes_to_transfer, representation)) {
             synaptogenesis_spike_received(time, *spike);
             *n_process_spike += 1;
             return true;
@@ -222,11 +224,14 @@ static void setup_synaptic_dma_read(dma_buffer *current_buffer,
     spike_t spike;
     dma_n_spikes = 0;
     dma_n_rewires = 0;
+    uint32_t representation;
 
     // Keep looking if there is something to do until a DMA can be done
     bool setup_done = false;
     while (!setup_done && is_something_to_do(&row_address,
-            &n_bytes_to_transfer, &spike, &dma_n_rewires, &dma_n_spikes)) {
+            &n_bytes_to_transfer, &spike, &dma_n_rewires, &dma_n_spikes,
+            &representation)) {
+
         if (current_buffer != NULL &&
                 current_buffer->sdram_writeback_address == row_address) {
             // If we can reuse the row, add on what we can use it for
@@ -236,8 +241,13 @@ static void setup_synaptic_dma_read(dma_buffer *current_buffer,
             *n_synapse_processes += dma_n_spikes;
             dma_n_rewires = 0;
             dma_n_spikes = 0;
-        } else if (n_bytes_to_transfer == 0) {
-            // If the row is in DTCM, process the row now
+        } else if (representation == DEFAULT) {
+            // If the row is in SDRAM, set up the transfer and we are done
+            do_dma_read(row_address, n_bytes_to_transfer, spike);
+            setup_done = true;
+        } else if (representation == DIRECT) {
+            // If the row is in DTCM as direct convert to direct and process
+            // the row now
             synaptic_row_t single_fixed_synapse =
                     direct_synapses_get_direct_synapse(row_address);
             bool write_back;
@@ -245,10 +255,14 @@ static void setup_synaptic_dma_read(dma_buffer *current_buffer,
                     time, single_fixed_synapse, &write_back);
             dma_n_rewires = 0;
             dma_n_spikes = 0;
+        } else if (representation == BINARY_SEARCH || representation == ARRAY) {
+            // if the row is in DTCM as either cached form, just process row now.
+            bool write_back;
+            synapses_process_synaptic_row(time, row_address, &write_back);
+            dma_n_rewires = 0;
+            dma_n_spikes = 0;
         } else {
-            // If the row is in SDRAM, set up the transfer and we are done
-            do_dma_read(row_address, n_bytes_to_transfer, spike);
-            setup_done = true;
+            log_error("failed to recognise representation");
         }
 
         // needs to be here to ensure that its only recording actual spike

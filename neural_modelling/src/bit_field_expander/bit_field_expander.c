@@ -365,38 +365,56 @@ bool generate_bit_field(void) {
             // used to store the row from the master pop / synaptic matrix,
             // not going to be used in reality.
             address_t row_address;
+
+            // used to track data representation. Should currently only be
+            // defaults or directs at this point. Anything else needs
+            // modifications. ARRAY and BINARY searches shouldn't exist at
+            // moment, as they are decided based upon this work!
+            uint32_t representation;
+
             if (!bit_found) {
                 if (population_table_get_first_address(
-                        new_key, &row_address, &n_bytes_to_transfer)) {
+                        new_key, &row_address, &n_bytes_to_transfer,
+                        &representation)) {
                     log_debug("%d", neuron_id);
 
                     // This is a direct row to process, so will have 1 target,
                     // so no need to go further
-                    if (n_bytes_to_transfer == 0) {
+                    if (representation == DIRECT) {
                         log_debug("Direct synapse");
                         bit_found = true;
-                    } else {
+                    } else if (representation == DEFAULT) {
                         // sdram read (faking dma transfer)
                         log_debug("DMA read synapse");
                         bit_found = do_sdram_read_and_test(
                                 row_address, n_bytes_to_transfer);
+                    } else {
+                        log_error(
+                            "do not know how to process representation %d",
+                            representation);
                     }
 
                     while (!bit_found && population_table_get_next_address(
-                            &new_key, &row_address, &n_bytes_to_transfer)){
+                            &new_key, &row_address, &n_bytes_to_transfer,
+                            &representation)) {
                         log_debug("%d", neuron_id);
 
                         // This is a direct row to process, so will have 1
                         // target, so no need to go further
-                        if (n_bytes_to_transfer == 0) {
+                        if (representation == DIRECT) {
                             log_debug("Direct synapse");
                             bit_found = true;
-                        } else {
+                        } else if (representation == DEFAULT) {
                             // sdram read (faking dma transfer)
                             log_debug("DMA read synapse");
                             bit_found = do_sdram_read_and_test(
                                     row_address, n_bytes_to_transfer);
+                        } else {
+                            log_error(
+                                "do not know how to process representation %d",
+                                representation);
                         }
+
                     }
                 }
             }

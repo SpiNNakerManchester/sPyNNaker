@@ -178,6 +178,7 @@ static inline bool synapses_are_plastic_or_structural_or_direct(
     }
 
     address_t row_address;
+    uint32_t representation;
     uint32_t base_key = not_redundant_tracker->filter[bit_field_index].key;
     size_t size;
     uint32_t n_atoms = not_redundant_tracker->filter[bit_field_index].n_atoms;
@@ -189,7 +190,7 @@ static inline bool synapses_are_plastic_or_structural_or_direct(
 
         // get address in sdram for the row
         bool success = population_table_get_first_address(
-            key, &row_address, &size);
+            key, &row_address, &size, &representation);
         if (!success) {
             log_error("failed to read row for key 0x%08x", key);
             return false;

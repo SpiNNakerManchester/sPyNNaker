@@ -304,7 +304,6 @@ static inline bool cached_in_array(
 
     // update and move marker
     array_blocks[*array_index] = block;
-    *array_index = *array_index + 1;
 
     // store
     for (uint32_t atom_id = 0; atom_id < atoms; atom_id ++) {
@@ -312,12 +311,18 @@ static inline bool cached_in_array(
         spike_t spike = key + atom_id;
         address_t row_address;
         uint32_t size_to_read;
+        uint32_t representation;
         population_table_get_first_address(
-            spike, &row_address, &size_to_read);
+            spike, &row_address, &size_to_read, &representation);
 
         // find real row size
         uint32_t size_in_bytes = (
             synapse_row_size_in_words(row_address) * BYTE_TO_WORD_CONVERSION);
+
+        // if no data, nullify the holder
+        if (size_in_bytes == N_SYNAPSE_ROW_HEADER_WORDS) {
+            block[atom_id] = NULL;
+        }
 
         // allocate dtcm for this row
         block[atom_id] = (uint32_t*) spin1_malloc(size_in_bytes);
@@ -351,8 +356,9 @@ static inline bool cached_in_binary_search(
         spike_t spike = key + atom_id;
         address_t row_address;
         uint32_t size_to_read;
+        uint32_t representation;
         population_table_get_first_address(
-            spike, &row_address, &size_to_read);
+            spike, &row_address, &size_to_read, &representation);
 
         // find real row size
         uint32_t size_in_words = synapse_row_size_in_words(row_address);
@@ -372,7 +378,6 @@ static inline bool cached_in_binary_search(
     // update trackers
     binary_blocks[*binary_index].elements = block;
     binary_blocks[*binary_index].len_of_array = elements_to_store;
-    *binary_index = *binary_index + 1;
 
     // store
     uint32_t binary_block_index = 0;
@@ -381,8 +386,9 @@ static inline bool cached_in_binary_search(
         spike_t spike = key + atom_id;
         address_t row_address;
         uint32_t size_to_read;
+        uint32_t representation;
         population_table_get_first_address(
-            spike, &row_address, &size_to_read);
+            spike, &row_address, &size_to_read, &representation);
 
         // find real row size
         uint32_t size_in_words = synapse_row_size_in_words(row_address);
@@ -390,9 +396,9 @@ static inline bool cached_in_binary_search(
         if (size_in_words != N_SYNAPSE_ROW_HEADER_WORDS) {
             uint32_t size_in_bytes = size_in_words * BYTE_TO_WORD_CONVERSION;
             block[binary_block_index].src_neuron_id = atom_id;
-            block[binary_block_index].rows = spin1_malloc(size_in_bytes);
+            block[binary_block_index].row = spin1_malloc(size_in_bytes);
 
-            if (block[binary_block_index].rows == NULL) {
+            if (block[binary_block_index].row == NULL) {
                 log_error(
                     "failed to allocate DTCM for binary index %d for "
                     "block index %d of size %d as left over memory is %d",
@@ -403,7 +409,7 @@ static inline bool cached_in_binary_search(
 
             // move the sdram into dtcm
             spin1_memcpy(
-                block[binary_block_index].rows, row_address, size_in_bytes);
+                block[binary_block_index].row, row_address, size_in_bytes);
         }
     }
     return true;
@@ -448,9 +454,17 @@ static inline bool process_pop_entry_for_caching(
         if (address_entry.addr.representation == BINARY_SEARCH) {
             success = cached_in_binary_search(
                 atoms, address_index, pop_entry.key, binary_index);
+            if (success) {
+                address_entry.addr.address = *binary_index;
+                *binary_index = *binary_index + 1;
+            }
         } else if (address_entry.addr.representation == ARRAY) {
             success = cached_in_array(
                 atoms, address_index, pop_entry.key, array_index);
+            if (success) {
+                address_entry.addr.address = *array_index;
+                *array_index = *array_index + 1;
+            }
         } else if (address_entry.addr.representation == DEFAULT ||
               address_entry.addr.representation == DIRECT) {
             // ignore, as these are not cacheable
@@ -481,10 +495,10 @@ static inline bool cache_synaptic_blocks(
         (master_pop_top_counters_t*) table_address;
 
     // safety check to bypass work
-    //if (store->n_array_blocks == 0 && store->n_binary_search_blocks == 0) {
-    //    log_info("no need to try to cache, nothing to cache");
-    //    return true;
-    //}
+    if (store->n_array_blocks == 0 && store->n_binary_search_blocks == 0) {
+        log_info("no need to try to cache, nothing to cache");
+        return true;
+    }
 
     // try malloc array blocks
     if (store->n_array_blocks != 0) {
@@ -612,8 +626,36 @@ bool population_table_initialise(
     return true;
 }
 
+//! \brief search the dma cache for the correct element.
+//! \param[in] binary_search_point: the top store for this block for searching.
+//! \param[in] src_neuron_id: the src neuron id.
+//! \return the synaptic row data as uint32_t*'s.
+static inline uint32_t* binary_search_cache(
+        binary_search_top binary_search_point, uint32_t src_neuron_id) {
+
+    uint32_t imin = 0;
+    uint32_t imax = binary_search_point.len_of_array;
+
+    while (imin < imax) {
+        uint32_t imid = (imax + imin) >> 1;
+        binary_search_element entry = binary_search_point.elements[imid];
+        if (src_neuron_id == entry.src_neuron_id) {
+            return entry.row;
+        } else if (entry.src_neuron_id < src_neuron_id) {
+
+            // Entry must be in upper part of the table
+            imin = imid + 1;
+        } else {
+            // Entry must be in lower part of the table
+            imax = imid;
+        }
+    }
+    return NULL;
+}
+
 bool population_table_get_first_address(
-        spike_t spike, address_t* row_address, size_t* n_bytes_to_transfer) {
+        spike_t spike, address_t* row_address, size_t* n_bytes_to_transfer,
+        uint32_t* representation) {
     // locate the position in the binary search / array
     log_debug("Searching for key %d", spike);
 
@@ -675,7 +717,7 @@ bool population_table_get_first_address(
     // to be passed in but using the address of an argument is odd!
     uint32_t local_spike_id;
     bool get_next = population_table_get_next_address(
-            &local_spike_id, row_address, n_bytes_to_transfer);
+            &local_spike_id, row_address, n_bytes_to_transfer, representation);
 
     // tracks surplus DMAs
     if (!get_next) {
@@ -686,7 +728,8 @@ bool population_table_get_first_address(
 }
 
 bool population_table_get_next_address(
-        spike_t *spike, address_t *row_address, size_t *n_bytes_to_transfer) {
+        spike_t *spike, address_t *row_address, size_t *n_bytes_to_transfer,
+        uint32_t* representation) {
     // If there are no more items in the list, return false
     if (items_to_go <= 0) {
         return false;
@@ -703,9 +746,32 @@ bool population_table_get_next_address(
                 *row_address = (address_t) (get_direct_address(item) +
                     (last_neuron_id * sizeof(uint32_t)));
                 *n_bytes_to_transfer = 0;
+                *representation = item.representation;
                 is_valid = true;
-            } else {
 
+            } else if (item.representation == ARRAY) {
+                *n_bytes_to_transfer = 0;
+
+                *row_address = array_blocks[item.address][last_neuron_id];
+                if (*row_address == NULL) {
+                    is_valid = false;
+                } else {
+                    is_valid = true;
+                    *representation = item.representation;
+                }
+            }
+            else if (item.representation == BINARY_SEARCH) {
+                *n_bytes_to_transfer = 0;
+                *row_address = binary_search_cache(
+                    binary_blocks[item.address], last_neuron_id);
+                if (*row_address == NULL) {
+                    is_valid = false;
+                } else {
+                    is_valid = true;
+                    *representation = item.representation;
+                }
+            } else if (item.representation == DEFAULT) {
+                // sdram read needed
                 uint32_t row_length = population_table_get_row_length(item);
                 uint32_t block_address = population_table_get_address(item);
                 uint32_t stride = (row_length + N_SYNAPSE_ROW_HEADER_WORDS);
@@ -720,6 +786,10 @@ bool population_table_get_next_address(
                     *n_bytes_to_transfer);
                 *spike = last_spike;
                 is_valid = true;
+                *representation = item.representation;
+            } else {
+                log_error("cant recognise the representation %d.", item.representation);
+                return false;
             }
         }
 
