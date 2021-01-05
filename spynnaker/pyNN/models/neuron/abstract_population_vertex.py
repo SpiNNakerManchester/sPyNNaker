@@ -129,8 +129,8 @@ class AbstractPopulationVertex(
     _SYNAPSE_BASE_N_CPU_CYCLES = 10
 
     # 5 elements before the start of global parameters
-    # 1. has key, 2. key, 3. n atoms
-    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 3 * BYTES_PER_WORD
+    # 1. has key, 2. key, 3. n atoms, 4. n_synapse_types
+    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 4 * BYTES_PER_WORD
 
     def __init__(
             self, n_neurons, label, constraints, max_atoms_per_core,
@@ -407,6 +407,7 @@ class AbstractPopulationVertex(
         """
         return (
             self.BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
+            (self.__neuron_impl.get_n_synapse_types() * BYTES_PER_WORD) +
             self.tdma_sdram_size_in_bytes +
             self.__neuron_impl.get_sdram_usage_in_bytes(vertex_slice.n_atoms))
 

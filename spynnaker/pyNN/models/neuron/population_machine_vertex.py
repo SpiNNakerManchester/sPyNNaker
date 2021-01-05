@@ -205,7 +205,7 @@ class PopulationMachineVertex(
         self._write_common_data_spec(
             spec, machine_time_step, time_scale_factor, rec_regions)
 
-        self._write_neuron_data_spec(spec, routing_info)
+        self._write_neuron_data_spec(spec, routing_info, machine_time_step)
 
         self._write_synapse_data_spec(
             spec, machine_time_step, routing_info, machine_graph, n_key_map)

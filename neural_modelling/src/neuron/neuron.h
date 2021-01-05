@@ -32,6 +32,7 @@
 #ifndef _NEURON_H_
 #define _NEURON_H_
 
+#include "synapse_row.h"
 #include <common/neuron-typedefs.h>
 #include <spin1_api.h>
 
@@ -64,10 +65,10 @@ void neuron_pause(void);
 //! \brief Add inputs to the neuron
 //! \param[in] synapse_type_index the synapse type (e.g. exc. or inh.)
 //! \param[in] neuron_index the index of the neuron
-//! \param[in] weights_this_timestep weight inputs to be added
+//! \param[in] weights_this_timestep weight to be added (unscaled)
 void neuron_add_inputs(
         index_t synapse_type_index, index_t neuron_index,
-        input_t weights_this_timestep);
+        weight_t weights_this_timestep);
 
 #if LOG_LEVEL >= LOG_DEBUG
 //! \brief Print the inputs to the neurons.

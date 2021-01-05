@@ -240,4 +240,51 @@ static inline weight_t synapse_row_sparse_weight(uint32_t x) {
     return x >> (32 - SYNAPSE_WEIGHT_BITS);
 }
 
+//! \brief Converts a weight stored in a synapse row to an input
+//! \param[in] weight: the weight to convert in synapse-row form
+//! \param[in] left_shift: the shift to use when decoding
+//! \return the actual input weight for the model
+static inline input_t synapse_row_convert_weight_to_input(
+        weight_t weight, uint32_t left_shift) {
+    union {
+        int_k_t input_type;
+        s1615 output_type;
+    } converter;
+
+    converter.input_type = (int_k_t) (weight) << left_shift;
+
+    return converter.output_type;
+}
+
+//! \brief Get the index of the ring buffer for a given timestep, synapse type
+//!     and neuron index
+//! \param[in] simulation_timestep:
+//! \param[in] synapse_type_index:
+//! \param[in] neuron_index:
+//! \param[in] synapse_type_index_bits:
+//! \param[in] synapse_index_bits:
+//! \return Index into the ring buffer
+static inline index_t synapse_row_get_ring_buffer_index(
+        uint32_t simulation_timestep, uint32_t synapse_type_index,
+        uint32_t neuron_index, uint32_t synapse_type_index_bits,
+        uint32_t synapse_index_bits) {
+    return ((simulation_timestep & SYNAPSE_DELAY_MASK) << synapse_type_index_bits)
+            | (synapse_type_index << synapse_index_bits)
+            | neuron_index;
+}
+
+//! \brief Get the index of the ring buffer for a given timestep and combined
+//!     synapse type and neuron index (as stored in a synapse row)
+//! \param[in] simulation_timestep:
+//! \param[in] combined_synapse_neuron_index:
+//! \param[in] synapse_type_index_bits:
+//! \return Index into the ring buffer
+static inline index_t synapse_row_get_ring_buffer_index_combined(
+        uint32_t simulation_timestep,
+        uint32_t combined_synapse_neuron_index,
+        uint32_t synapse_type_index_bits) {
+    return ((simulation_timestep & SYNAPSE_DELAY_MASK) << synapse_type_index_bits)
+            | combined_synapse_neuron_index;
+}
+
 #endif  // SYNAPSE_ROW_H

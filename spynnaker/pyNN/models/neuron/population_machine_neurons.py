@@ -126,20 +126,21 @@ class PopulationMachineNeurons(AbstractReadParametersBeforeSet):
 
         return NeuronProvenance.N_ITEMS
 
-    def _write_neuron_data_spec(self, spec, routing_info):
+    def _write_neuron_data_spec(self, spec, routing_info, machine_time_step):
         """ Write the data specification of the neuron data
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
             The routing information to read the key from
+        :param int machine_time_step: The simulation time step
         """
         # Get and store the key
         self._set_key(routing_info.get_first_key_from_pre_vertex(
             self, SPIKE_PARTITION_ID))
 
         # Write the neuron parameters
-        self._write_neuron_parameters(spec)
+        self._write_neuron_parameters(spec, machine_time_step)
 
         # Write the neuron recording region
         neuron_recorder = self._app_vertex.neuron_recorder
@@ -151,11 +152,12 @@ class PopulationMachineNeurons(AbstractReadParametersBeforeSet):
         neuron_recorder.write_neuron_recording_region(
             spec, self._neuron_regions.neuron_recording, self._vertex_slice)
 
-    def _write_neuron_parameters(self, spec):
+    def _write_neuron_parameters(self, spec, machine_time_step):
         """ Write the neuron parameters region
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to
+        :param int machine_time_step: The simulation time step
         """
         self._app_vertex.update_state_variables()
 
@@ -189,6 +191,12 @@ class PopulationMachineNeurons(AbstractReadParametersBeforeSet):
         # Write the number of neurons in the block:
         spec.write_value(data=n_atoms)
 
+        # Write the ring bugger data
+        n_synapse_types = self._app_vertex.neuron_impl.get_n_synapse_types()
+        spec.write_value(n_synapse_types)
+        spec.write_array(self._app_vertex.get_ring_buffer_shifts(
+            machine_time_step))
+
         # Write the neuron parameters
         neuron_data = self._app_vertex.neuron_impl.get_data(
             self._app_vertex.parameters, self._app_vertex.state_variables,
@@ -207,17 +215,16 @@ class PopulationMachineNeurons(AbstractReadParametersBeforeSet):
 
         # shift past the extra stuff before neuron parameters that we don't
         # need to read
-        neuron_parameters_sdram_address = (
-            neuron_region_sdram_address +
+        neurons_pre_size = (
             self._app_vertex.tdma_sdram_size_in_bytes +
-            self._app_vertex.BYTES_TILL_START_OF_GLOBAL_PARAMETERS)
+            self._app_vertex.BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
+            self._app_vertex.neuron_impl.get_n_synapse_types())
+        neuron_parameters_sdram_address = (
+            neuron_region_sdram_address + neurons_pre_size)
 
         # get size of neuron params
         size_of_region = self._app_vertex.get_sdram_usage_for_neuron_params(
-            vertex_slice)
-        size_of_region -= (
-            self._app_vertex.BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
-            self._app_vertex.tdma_sdram_size_in_bytes)
+            vertex_slice) - neurons_pre_size
 
         # get data from the machine
         byte_array = transceiver.read_memory(

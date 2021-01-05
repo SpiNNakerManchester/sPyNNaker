@@ -32,6 +32,11 @@
 #include "profile_tags.h"
 #endif //PROFILER_ENABLED
 
+//! Process to handle ring buffers
+extern void process_ring_buffers(timer_t time, uint32_t n_neurons,
+        uint32_t n_synapse_types, uint32_t synapse_type_index_bits,
+        uint32_t synapse_index_bits, weight_t *ring_buffers);
+
 //! Globals required for synapse benchmarking to work.
 uint32_t  num_fixed_pre_synaptic_events = 0;
 
@@ -148,7 +153,7 @@ static inline void print_ring_buffers(uint32_t time) {
         for (uint32_t t = 0; t < n_synapse_types; t++) {
             // Determine if this row can be omitted
             for (uint32_t d = 0; d < (1 << SYNAPSE_DELAY_BITS); d++) {
-                if (ring_buffers[synapses_get_ring_buffer_index(
+                if (ring_buffers[synapse_row_get_ring_buffer_index(
                         d + time, t, n, synapse_type_index_bits,
                         synapse_index_bits)] != 0) {
                     goto doPrint;
@@ -160,7 +165,7 @@ static inline void print_ring_buffers(uint32_t time) {
             io_printf(IO_BUF, "%3d(%s):", n, get_type_char(t));
             for (uint32_t d = 0; d < (1 << SYNAPSE_DELAY_BITS); d++) {
                 io_printf(IO_BUF, " ");
-                uint32_t ring_buffer_index = synapses_get_ring_buffer_index(
+                uint32_t ring_buffer_index = synapse_row_get_ring_buffer_index(
                         d + time, t, n, synapse_type_index_bits,
                         synapse_index_bits);
                 synapses_print_weight(ring_buffers[ring_buffer_index],
@@ -170,15 +175,6 @@ static inline void print_ring_buffers(uint32_t time) {
         }
     }
     io_printf(IO_BUF, "----------------------------------------\n");
-#endif // LOG_LEVEL >= LOG_DEBUG
-}
-
-//! \brief Print the neuron inputs.
-//! \details Only does anything when debugging.
-static inline void print_inputs(void) {
-#if LOG_LEVEL >= LOG_DEBUG
-    log_debug("Inputs");
-    neuron_print_inputs();
 #endif // LOG_LEVEL >= LOG_DEBUG
 }
 
@@ -208,7 +204,7 @@ static inline void process_fixed_synapses(
         uint32_t weight = synapse_row_sparse_weight(synaptic_word);
 
         // Convert into ring buffer offset
-        uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
+        uint32_t ring_buffer_index = synapse_row_get_ring_buffer_index_combined(
                 delay + time, combined_synapse_neuron_index,
                 synapse_type_index_bits);
 
@@ -311,6 +307,29 @@ bool synapses_initialise(
     return true;
 }
 
+// Flush ring buffers for the given time
+void synapses_flush_ring_buffers(timer_t time) {
+    // Disable interrupts to stop DMAs interfering with the ring buffers
+    uint32_t state = spin1_irq_disable();
+
+    for (uint32_t neuron_index = 0; neuron_index < n_neurons;
+                neuron_index++) {
+        // Loop through all synapse types
+        for (uint32_t synapse_type_index = 0;
+                synapse_type_index < n_synapse_types; synapse_type_index++) {
+            // Get index in the ring buffers for the current time slot for
+            // this synapse type and neuron
+            uint32_t ring_buffer_index = synapse_row_get_ring_buffer_index(
+                    time, synapse_type_index, neuron_index,
+                    synapse_type_index_bits, synapse_index_bits);
+            ring_buffers[ring_buffer_index] = 0;
+        }
+    }
+
+    // Re-enable the interrupts
+    spin1_mode_restore(state);
+}
+
 void synapses_do_timestep_update(timer_t time) {
     print_ring_buffers(time);
 
@@ -320,32 +339,12 @@ void synapses_do_timestep_update(timer_t time) {
     // Clear any outstanding spikes
     spike_processing_clear_input_buffer(time);
 
-    // Transfer the input from the ring buffers into the input buffers
-    for (uint32_t neuron_index = 0; neuron_index < n_neurons;
-            neuron_index++) {
-        // Loop through all synapse types
-        for (uint32_t synapse_type_index = 0;
-                synapse_type_index < n_synapse_types; synapse_type_index++) {
-            // Get index in the ring buffers for the current time slot for
-            // this synapse type and neuron
-            uint32_t ring_buffer_index = synapses_get_ring_buffer_index(
-                    time, synapse_type_index, neuron_index,
-                    synapse_type_index_bits, synapse_index_bits);
+    // Reset any outstanding DMAs
+    spin1_dma_flush();
 
-            // Convert ring-buffer entry to input and add on to correct
-            // input for this synapse type and neuron
-            neuron_add_inputs(
-                    synapse_type_index, neuron_index,
-                    synapses_convert_weight_to_input(
-                            ring_buffers[ring_buffer_index],
-                            ring_buffer_to_input_left_shifts[synapse_type_index]));
-
-            // Clear ring buffer
-            ring_buffers[ring_buffer_index] = 0;
-        }
-    }
-
-    print_inputs();
+    // Call external process inputs function
+    process_ring_buffers(time, n_neurons, n_synapse_types,
+            synapse_type_index_bits, synapse_index_bits, ring_buffers);
 
     // Re-enable the interrupts
     spin1_mode_restore(state);

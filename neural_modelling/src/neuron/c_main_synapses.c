@@ -35,6 +35,7 @@
 
 #include "c_main_synapse.h"
 #include "c_main_common.h"
+#include <spin1_api_params.h>
 
 //! values for the priority for each callback
 typedef enum callback_priorities {
@@ -86,10 +87,19 @@ const struct synapse_priorities SYNAPSE_PRIORITIES = {
 
 //! A region of SDRAM used to transfer synapses
 struct sdram_config {
-    input_t *address;
+    //! The address of the input data to be transferred
+    uint32_t *address;
+    //! The size of the input data to be transferred
     uint32_t size_in_bytes;
-    uint32_t n_neurons;
+    //! The time of the transfer in us
+    uint32_t time_for_transfer;
 };
+
+//! The inverse of the number of clock cycles per ms (note assumes 200Mhz clock)
+#define INVERSE_CLOCK_CYCLES 0.005k
+
+//! A tag to indicate that the DMA of synaptic inputs is complete
+#define DMA_COMPLETE_TAG 10
 
 // Globals
 
@@ -112,9 +122,6 @@ static uint32_t recording_flags = 0;
 //! Where synaptic input is to be written
 static struct sdram_config sdram_inputs;
 
-//! A local copy of the front of the ring buffers
-static input_t *synaptic_inputs;
-
 //! \brief Callback to store provenance data (format: neuron_provenance).
 //! \param[out] provenance_region: Where to write the provenance data
 static void store_provenance_data(address_t provenance_region) {
@@ -133,11 +140,30 @@ void resume_callback(void) {
     synapses_resume(time + 1);
 }
 
+void process_ring_buffers(timer_t time, uint32_t n_neurons,
+        uint32_t n_synapse_types, uint32_t synapse_type_index_bits,
+        uint32_t synapse_index_bits, weight_t *ring_buffers) {
+    // Get the index of the first ring buffer for the next time step
+    uint32_t first_ring_buffer = synapse_row_get_ring_buffer_index(time + 1,
+            0, 0, synapse_type_index_bits, synapse_index_bits);
+    // Do the DMA transfer
+    // log_info("Writing %d bytes to 0x%08x from ring buffer %d", sdram_inputs.size_in_bytes, sdram_inputs.address, first_ring_buffer);
+    spin1_dma_transfer(DMA_COMPLETE_TAG, sdram_inputs.address,
+            &ring_buffers[first_ring_buffer], DMA_WRITE,
+            sdram_inputs.size_in_bytes);
+}
+
+//! \brief writes synaptic inputs to SDRAM
+void write_contributions(UNUSED uint unused0, UNUSED uint unused1) {
+    // Copy things out of DTCM
+    synapses_do_timestep_update(time);
+}
+
 //! \brief Timer interrupt callback
 //! \param[in] timer_count: the number of times this call back has been
 //!            executed since start of simulation
 //! \param[in] unused: unused parameter kept for API consistency
-void timer_callback(uint timer_count, UNUSED uint unused) {
+void timer_callback(UNUSED uint timer_count, UNUSED uint unused) {
 
     profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
 
@@ -148,6 +174,7 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
     /* if a fixed number of simulation ticks that were specified at startup
      * then do reporting for finishing */
     if (simulation_is_finished()) {
+        // Finally, clear the ring buffers
 
         // Enter pause and resume state to avoid another tick
         simulation_handle_pause_resume(resume_callback);
@@ -165,23 +192,18 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
         return;
     }
 
-    // TODO:
     // Setup to call back enough before the end of the timestep to transfer
     // synapses to SDRAM for the next timestep
+    uint32_t time_to_transfer = (tc[T1_COUNT] * INVERSE_CLOCK_CYCLES)
+            - sdram_inputs.time_for_transfer;
+    timer_schedule_proc(write_contributions, 0, 0, time_to_transfer);
+
+    synapses_flush_ring_buffers(time);
 
     // Do rewiring as needed
     synaptogenesis_do_timestep_update();
 
     profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
-}
-
-void send_synapses_callback(uint32_t unused0, uint32_t unused1) {
-    // TODO: Throw away anything that is happening now and stop DMAs
-
-    // Copy things out of DTCM
-    synapses_do_timestep_update(time);
-
-    // TODO: Do the transfer of synapses to SDRAM
 }
 
 //! \brief Initialises the model by reading in the regions and checking
@@ -208,22 +230,17 @@ static bool initialise(void) {
     struct sdram_config * sdram_config = data_specification_get_region(
             SDRAM_PARAMS_REGION, ds_regions);
     spin1_memcpy(&sdram_inputs, sdram_config, sizeof(struct sdram_config));
-    synaptic_inputs = spin1_malloc(sdram_inputs.size_in_bytes);
-    if (synaptic_inputs == NULL) {
-        log_error("Could not allocate %u bytes for synaptic inputs",
-                sdram_inputs.size_in_bytes);
-        return false;
+
+    // Wipe the inputs using word writes
+    for (uint32_t i = 0; i < sdram_inputs.size_in_bytes >> 2; i++) {
+        sdram_inputs.address[i] = 0;
     }
+
+    // Prepare to receive the timer
+    event_register_timer(SLOT_8);
 
     log_debug("Initialise: finished");
     return true;
-}
-
-void neuron_add_inputs(
-        index_t synapse_type_index, index_t neuron_index,
-        input_t weights_this_timestep) {
-    uint32_t index = (synapse_type_index * sdram_inputs.n_neurons) + neuron_index;
-    synaptic_inputs[index] = weights_this_timestep;
 }
 
 

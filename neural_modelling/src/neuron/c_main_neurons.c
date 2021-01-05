@@ -48,7 +48,8 @@ enum regions {
     PROFILER_REGION,
     RECORDING_REGION,
     NEURON_PARAMS_REGION,
-    NEURON_RECORDING_REGION
+    NEURON_RECORDING_REGION,
+    SDRAM_PARAMS_REGION
 };
 
 const struct common_regions COMMON_REGIONS = {
@@ -69,6 +70,25 @@ const struct neuron_regions NEURON_REGIONS = {
     .neuron_recording = NEURON_RECORDING_REGION
 };
 
+//! A region of SDRAM used to transfer synapses
+struct sdram_config {
+    //! The start address of the input data to be transferred
+    uint8_t *address;
+    //! The size of the input data to be transferred per core
+    uint32_t size_in_bytes;
+    //! The number of neurons
+    uint32_t n_neurons;
+    //! The number of synapse types
+    uint32_t n_synapse_types;
+    //! The number of synapse cores feeding into here
+    uint32_t n_synapse_cores;
+    //! The number of bits needed for the neurons
+    uint32_t synapse_index_bits;
+};
+
+//! The number of buffers for synaptic data (one processing, one in progress)
+#define N_SYNAPTIC_BUFFERS 2
+
 // Globals
 
 //! The current timer tick value.
@@ -86,6 +106,19 @@ static uint32_t infinite_run;
 
 //! The recording flags indicating if anything is recording
 static uint32_t recording_flags = 0;
+
+//! The SDRAM input configuration data
+static struct sdram_config sdram_inputs;
+
+//! The inputs from the various synapse cores
+static weight_t *synaptic_contributions[N_SYNAPTIC_BUFFERS];
+
+//! Variable to indicate DMA completion
+static bool dma_complete;
+
+static void dma_complete_callback(UNUSED uint unused0, UNUSED uint unused1) {
+    dma_complete = true;
+}
 
 //! \brief Callback to store provenance data (format: neuron_provenance).
 //! \param[out] provenance_region: Where to write the provenance data
@@ -142,6 +175,58 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
         return;
     }
 
+
+
+    // Start the transfer of the first part of the weight data
+    uint8_t *sdram = sdram_inputs.address;
+    uint32_t write_index = 0;
+    uint32_t read_index = 0;
+    dma_complete = false;
+    spin1_dma_transfer(0, sdram, synaptic_contributions[write_index], DMA_READ,
+            sdram_inputs.size_in_bytes);
+    write_index = !write_index;
+
+    for (uint32_t i = 0; i < sdram_inputs.n_synapse_cores; i++) {
+        // Wait for the last DMA to complete
+        while (!dma_complete) {
+            spin1_wfi();
+        }
+
+        // Start the next DMA if not finished
+        if (i + 1 < sdram_inputs.n_synapse_cores) {
+            dma_complete = false;
+            sdram += sdram_inputs.size_in_bytes;
+            spin1_dma_transfer(0, sdram, synaptic_contributions[write_index],
+                    DMA_READ, sdram_inputs.size_in_bytes);
+            write_index = !write_index;
+        }
+
+        // Read the data while the next transfer happens
+        // Transfer the input from the ring buffers into the input buffers
+        for (uint32_t neuron_index = 0; neuron_index < sdram_inputs.n_neurons;
+                neuron_index++) {
+            // Loop through all synapse types
+            for (uint32_t synapse_type_index = 0;
+                    synapse_type_index < sdram_inputs.n_synapse_types;
+                    synapse_type_index++) {
+                // Get the index, knowing that there is only the front of the
+                // ring buffers here, so use time = 0
+                // and synapse_type_index_bits then doesn't matter.
+                uint32_t ring_buffer_index = synapse_row_get_ring_buffer_index(
+                        0, synapse_type_index, neuron_index,
+                        0, sdram_inputs.synapse_index_bits);
+
+                // Convert ring-buffer entry to input and add on to correct
+                // input for this synapse type and neuron
+                weight_t value = synaptic_contributions[read_index][ring_buffer_index];
+                if (value != 0) {
+                    neuron_add_inputs(synapse_type_index, neuron_index, value);
+                }
+            }
+        }
+        read_index = !read_index;
+    }
+
     // Now do neuron time step update
     neuron_do_timestep_update(time, timer_count);
 
@@ -168,6 +253,29 @@ static bool initialise(void) {
             ds_regions, NEURON_REGIONS,  &n_rec_regions_used)) {
         return false;
     }
+
+    // Setup for reading synaptic inputs at start of each time step
+    struct sdram_config * sdram_config = data_specification_get_region(
+            SDRAM_PARAMS_REGION, ds_regions);
+    spin1_memcpy(&sdram_inputs, sdram_config, sizeof(struct sdram_config));
+
+    log_debug("Transferring ring buffers from 0x%08x for %d neurons (%d bits) "
+            "and %d synapse types from %d cores using %d bytes per core",
+            sdram_inputs.address, sdram_inputs.n_neurons,
+            sdram_inputs.synapse_index_bits, sdram_inputs.n_synapse_types,
+            sdram_inputs.n_synapse_cores, sdram_inputs.size_in_bytes);
+
+    for (uint32_t i = 0; i < N_SYNAPTIC_BUFFERS; i++) {
+        synaptic_contributions[i] = spin1_malloc(sdram_inputs.size_in_bytes);
+        if (synaptic_contributions == NULL) {
+            log_error("Could not allocate %d bytes for synaptic contributions %d",
+                    sdram_inputs.size_in_bytes, i);
+            return false;
+        }
+    }
+
+    // Add DMA complete callback
+    simulation_dma_transfer_done_callback_on(0, dma_complete_callback);
 
     log_debug("Initialise: finished");
     return true;

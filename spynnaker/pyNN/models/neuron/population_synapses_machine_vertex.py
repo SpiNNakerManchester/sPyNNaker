@@ -12,6 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import math
 from enum import Enum
 
 from pacman.executor.injection_decorator import inject_items
@@ -23,16 +24,20 @@ from spinn_front_end_common.utilities.constants import (
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.abstract_models import (
     ReceivesSynapticInputsOverSDRAM, SendsSynapticInputsOverSDRAM)
+from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .population_machine_synapses import (
     SynapseRegions, PopulationMachineSynapses, SynapseProvenance)
 
 # Size of SDRAM params = 1 word for address + 1 word for size
-#  + 1 word for n_neurons
+#  + 1 word for time to send
 SDRAM_PARAMS_SIZE = 3 * BYTES_PER_WORD
 
 # Number of bytes per synaptic input
 SYNAPTIC_INPUT_BYTES = BYTES_PER_SHORT
+
+# Time to send each ring buffer input in micro seconds
+TIME_TO_SEND_INPUT = 0.15
 
 
 class PopulationSynapsesMachineVertex(
@@ -198,6 +203,8 @@ class PopulationSynapsesMachineVertex(
             spec, machine_time_step, routing_info, machine_graph, n_key_map)
 
         # Write information about SDRAM
+        n_neurons = self._vertex_slice.n_atoms
+        n_synapse_types = self._app_vertex.neuron_impl.get_n_synapse_types()
         spec.reserve_memory_region(
             region=self.REGIONS.SDRAM_EDGE_PARAMS.value,
             size=SDRAM_PARAMS_SIZE, label="SDRAM Params")
@@ -206,20 +213,27 @@ class PopulationSynapsesMachineVertex(
             self.__sdram_partition.get_sdram_base_address_for(self))
         spec.write_value(
             self.__sdram_partition.get_sdram_size_of_region_for(self))
-        spec.write_value(self._vertex_slice.n_atoms)
+        spec.write_value(int(math.ceil(
+            TIME_TO_SEND_INPUT * n_neurons * n_synapse_types)))
 
         # End the writing of this specification:
         spec.end_specification()
 
-    @overrides(SendsSynapticInputsOverSDRAM.sdram_requirement)
-    def sdram_requirement(self, sdram_machine_edge):
-        n_bytes = (self._vertex_slice.n_atoms *
-                   self._app_vertex.neuron_impl.get_n_synapse_types() *
+    @staticmethod
+    def n_bytes_for_transfer(n_neurons, n_synapse_types):
+        n_bytes = (2 ** get_n_bits(n_neurons) * n_synapse_types *
                    SYNAPTIC_INPUT_BYTES)
         # May need to add some padding if not a round number of words
         extra_bytes = n_bytes % BYTES_PER_WORD
         if extra_bytes:
             n_bytes += BYTES_PER_WORD - extra_bytes
+        return n_bytes
+
+    @overrides(SendsSynapticInputsOverSDRAM.sdram_requirement)
+    def sdram_requirement(self, sdram_machine_edge):
+        n_bytes = self.n_bytes_for_transfer(
+            self._vertex_slice.n_atoms,
+            self._app_vertex.neuron_impl.get_n_synapse_types())
 
         if isinstance(sdram_machine_edge.post_vertex,
                       ReceivesSynapticInputsOverSDRAM):

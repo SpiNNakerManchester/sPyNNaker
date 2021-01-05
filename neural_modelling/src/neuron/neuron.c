@@ -36,7 +36,10 @@ static bool use_key;
 //! The number of neurons on the core
 static uint32_t n_neurons;
 
-//! The address of the params region
+//! Amount to left shift the ring buffer by to make it an input
+static uint32_t *ring_buffer_to_input_left_shifts;
+
+//! The address where the actual neuron parameters start
 static address_t saved_params_address;
 
 //! parameters that reside in the neuron_parameter_data_region
@@ -44,22 +47,18 @@ struct neuron_parameters {
     uint32_t has_key;
     uint32_t transmission_key;
     uint32_t n_neurons_to_simulate;
+    uint32_t n_synapse_types;
+    uint32_t ring_buffer_shifts[];
 };
-
-//! Offset of start of global parameters, in words.
-#define START_OF_GLOBAL_PARAMETERS \
-    ((sizeof(struct neuron_parameters) + \
-      sizeof(struct tdma_parameters)) / sizeof(uint32_t))
 
 //! \brief does the memory copy for the neuron parameters
 //! \param[in] address: the address where the neuron parameters are stored
 //!     in SDRAM
 //! \return bool which is true if the mem copy's worked, false otherwise
-static bool neuron_load_neuron_parameters(address_t address) {
+static bool neuron_load_neuron_parameters(void) {
     log_debug("loading parameters");
     // call the neuron implementation functions to do the work
-    neuron_impl_load_neuron_parameters(
-        address, START_OF_GLOBAL_PARAMETERS, n_neurons);
+    neuron_impl_load_neuron_parameters(saved_params_address, 0, n_neurons);
     return true;
 }
 
@@ -70,7 +69,7 @@ bool neuron_resume(void) { // EXPORTED
     }
 
     log_debug("neuron_reloading_neuron_parameters: starting");
-    return neuron_load_neuron_parameters(saved_params_address);
+    return neuron_load_neuron_parameters();
 }
 
 bool neuron_initialise(
@@ -79,7 +78,6 @@ bool neuron_initialise(
     log_debug("neuron_initialise: starting");
 
     // init the TDMA
-    saved_params_address = address;
     void *data_addr = address;
     tdma_processing_initialise(&data_addr);
 
@@ -102,6 +100,22 @@ bool neuron_initialise(
     // Read the neuron details
     n_neurons = params->n_neurons_to_simulate;
 
+    // Set up ring buffer left shifts
+    uint32_t ring_buffer_bytes = params->n_synapse_types * sizeof(uint32_t);
+    ring_buffer_to_input_left_shifts = spin1_malloc(ring_buffer_bytes);
+    if (ring_buffer_to_input_left_shifts == NULL) {
+        log_error("Not enough memory to allocate ring buffer");
+        return false;
+    }
+
+    // read in ring buffer to input left shifts
+    spin1_memcpy(
+            ring_buffer_to_input_left_shifts, params->ring_buffer_shifts,
+            ring_buffer_bytes);
+
+    // Store where the actual neuron parameters start
+    saved_params_address = &params->ring_buffer_shifts[params->n_synapse_types];
+
     log_debug("\t n_neurons = %u", n_neurons);
 
     // Call the neuron implementation initialise function to setup DTCM etc.
@@ -110,7 +124,7 @@ bool neuron_initialise(
     }
 
     // load the data into the allocated DTCM spaces.
-    if (!neuron_load_neuron_parameters(address)) {
+    if (!neuron_load_neuron_parameters()) {
         return false;
     }
 
@@ -126,8 +140,7 @@ bool neuron_initialise(
 void neuron_pause(void) { // EXPORTED
 
     // call neuron implementation function to do the work
-    neuron_impl_store_neuron_parameters(
-            saved_params_address, START_OF_GLOBAL_PARAMETERS, n_neurons);
+    neuron_impl_store_neuron_parameters(saved_params_address, 0, n_neurons);
 }
 
 void neuron_do_timestep_update(timer_t time, uint timer_count) { // EXPORTED
@@ -175,9 +188,12 @@ void neuron_do_timestep_update(timer_t time, uint timer_count) { // EXPORTED
 
 void neuron_add_inputs( // EXPORTED
         index_t synapse_type_index, index_t neuron_index,
-        input_t weights_this_timestep) {
+        weight_t weights_this_timestep) {
     neuron_impl_add_inputs(
-            synapse_type_index, neuron_index, weights_this_timestep);
+            synapse_type_index, neuron_index,
+            synapse_row_convert_weight_to_input(
+                    weights_this_timestep,
+                    ring_buffer_to_input_left_shifts[synapse_type_index]));
 }
 
 #if LOG_LEVEL >= LOG_DEBUG

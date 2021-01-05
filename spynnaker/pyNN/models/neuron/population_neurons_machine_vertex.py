@@ -23,13 +23,17 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.abstract_models import (
     ReceivesSynapticInputsOverSDRAM, SendsSynapticInputsOverSDRAM)
+from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .population_machine_neurons import (
     NeuronRegions, PopulationMachineNeurons, NeuronProvenance)
+from .population_synapses_machine_vertex import PopulationSynapsesMachineVertex
 
 # Size of SDRAM params = 1 word for address + 1 word for size
-# + 1 word for n_neurons
-SDRAM_PARAMS_SIZE = 3 * BYTES_PER_WORD
+# + 1 word for n_neurons + 1 word for n_synapse_types
+# + 1 word for number of synapse vertices
+# + 1 word for number of neuron bits needed
+SDRAM_PARAMS_SIZE = 6 * BYTES_PER_WORD
 
 
 class PopulationNeuronsMachineVertex(
@@ -178,18 +182,25 @@ class PopulationNeuronsMachineVertex(
         self._write_common_data_spec(
             spec, machine_time_step, time_scale_factor, rec_regions)
 
-        self._write_neuron_data_spec(spec, routing_info)
+        self._write_neuron_data_spec(spec, routing_info, machine_time_step)
 
         # Write information about SDRAM
+        n_neurons = self._vertex_slice.n_atoms
+        n_synapse_types = self._app_vertex.neuron_impl.get_n_synapse_types()
+        sdram_per_synapse_core = \
+            PopulationSynapsesMachineVertex.n_bytes_for_transfer(
+                n_neurons, n_synapse_types)
         spec.reserve_memory_region(
             region=self.REGIONS.SDRAM_EDGE_PARAMS.value,
             size=SDRAM_PARAMS_SIZE, label="SDRAM Params")
         spec.switch_write_focus(self.REGIONS.SDRAM_EDGE_PARAMS.value)
         spec.write_value(
             self.__sdram_partition.get_sdram_base_address_for(self))
-        spec.write_value(
-            self.__sdram_partition.get_sdram_size_of_region_for(self))
-        spec.write_value(self._vertex_slice.n_atoms)
+        spec.write_value(sdram_per_synapse_core)
+        spec.write_value(n_neurons)
+        spec.write_value(n_synapse_types)
+        spec.write_value(len(self.__sdram_partition.pre_vertices))
+        spec.write_value(get_n_bits(n_neurons))
 
         # End the writing of this specification:
         spec.end_specification()

@@ -360,7 +360,7 @@ bool synapse_dynamics_process_plastic_synapses(
                 synapse_structure_get_update_state(*plastic_words, type);
 
         // Convert into ring buffer offset
-        uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
+        uint32_t ring_buffer_index = synapse_row_get_ring_buffer_index_combined(
                 delay_axonal + delay_dendritic + time, type_index,
                 synapse_type_index_bits);
 
