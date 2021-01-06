@@ -71,7 +71,7 @@ static int my_abs(int a) {
 //! \return if row was modified
 static inline bool synaptogenesis_formation_rule(
         current_state_t *current_state, const formation_params_t *params,
-        UNUSED uint32_t time, address_t row) {
+        UNUSED uint32_t time, synaptic_row_t row) {
     // Compute distances
     // To do this I need to take the DIV and MOD of the
     // post-synaptic neuron ID, of the pre-synaptic neuron ID

@@ -110,6 +110,7 @@ typedef void (generate_param_func)(
  * \param[in] delays: Pointer to table of delays
  * \param[in] weights: Pointer to table of weights
  * \param[in] max_stage: The maximum delay stage to support
+ * \param[in] max_delay_in_a_stage: max delay in a delay stage
  */
 typedef void (generate_row_func)(
         void *generator,
@@ -119,6 +120,6 @@ typedef void (generate_row_func)(
         uint32_t synapse_type_bits, uint32_t synapse_index_bits,
         uint32_t synapse_type, uint32_t n_synapses,
         uint16_t *indices, uint16_t *delays, uint16_t *weights,
-        uint32_t max_stage);
+        uint32_t max_stage, uint32_t max_delay_in_a_stage);
 
 #endif //INCLUDED_GENERATOR_TYPES_H
