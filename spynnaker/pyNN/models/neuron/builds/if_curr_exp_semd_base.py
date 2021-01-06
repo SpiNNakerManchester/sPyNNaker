@@ -43,6 +43,7 @@ class IFCurrExpSEMDBase(AbstractPyNNNeuronModelStandard):
     :param float isyn_inh: :math:`I^{syn}_i`
     :param float multiplicator:
     :param float exc2_old:
+    :param float scaling_factor:
     """
 
     @default_initial_values({"v", "isyn_exc", "isyn_exc2", "isyn_inh",
@@ -51,12 +52,13 @@ class IFCurrExpSEMDBase(AbstractPyNNNeuronModelStandard):
             self, tau_m=20.0, cm=1.0, v_rest=-65.0, v_reset=-65.0,
             v_thresh=-50.0, tau_syn_E=5.0, tau_syn_E2=5.0, tau_syn_I=5.0,
             tau_refrac=0.1, i_offset=0.0, v=-65.0, isyn_exc=0.0,
-            isyn_exc2=0.0, isyn_inh=0.0, multiplicator=0.0, exc2_old=0.0):
+            isyn_exc2=0.0, isyn_inh=0.0, multiplicator=0.0, exc2_old=0.0,
+            scaling_factor=1.0):
         neuron_model = NeuronModelLeakyIntegrateAndFire(
             v, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac)
         synapse_type = SynapseTypeSEMD(
             tau_syn_E, tau_syn_E2, tau_syn_I, isyn_exc, isyn_exc2, isyn_inh,
-            multiplicator, exc2_old)
+            multiplicator, exc2_old, scaling_factor)
         input_type = InputTypeCurrent()
         threshold_type = ThresholdTypeStatic(v_thresh)
 
