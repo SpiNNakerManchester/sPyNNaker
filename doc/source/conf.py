@@ -389,13 +389,16 @@ autodoc_default_options = {
 }
 
 
-def filtered_files(base, excludes=None):
+def filtered_files(base, excludes=None, exclude_dir=None):
     if not excludes:
         excludes = []
+    excludes = set(base + "/" + e for e in excludes)
     for root, _dirs, files in os.walk(base):
         for filename in files:
-            if filename.endswith(".py") and not filename.startswith("_"):
-                full = root + "/" + filename
+            full = root + "/" + filename
+            if exclude_dir and exclude_dir in root:
+                yield full
+            elif filename.endswith(".py") and not filename.startswith("_"):
                 if full not in excludes:
                     yield full
 
@@ -437,9 +440,13 @@ explicit_wanted_files = [
     "spynnaker/pyNN/utilities/running_stats.py",
     "spynnaker/pyNN/utilities/utility_calls.py",
     "spynnaker/pyNN/utilities/struct.py",
-    ]
-options = ['-o', output_dir, "spynnaker"]
-options.extend(filtered_files("spynnaker", explicit_wanted_files))
+    "spynnaker8/spynnaker8_simulator_interface.py",
+    "spynnaker8/spynnaker_plotting.py",
+    "spynnaker8/utilities/exceptions.py",
+    "spynnaker8/utilities/neo_convertor.py",
+    "spynnaker8/utilities/neo_compare.py"]
+options = ['-o', output_dir, "."]
+options.extend(filtered_files(".", explicit_wanted_files, "tests"))
 try:
     # Old style API; Python 2.7
     from sphinx import apidoc
