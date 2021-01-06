@@ -38,8 +38,8 @@ typedef struct {
 // Functions
 //---------------------------------------
 address_t timing_initialise(address_t address) {
-    log_info("timing_initialise: starting");
-    log_info("\tVogels 2011 timing rule");
+    log_debug("timing_initialise: starting");
+    log_debug("\tVogels 2011 timing rule");
     vogels_2011_config_t *config = (vogels_2011_config_t *) address;
 
     // Copy parameters
@@ -49,7 +49,7 @@ address_t timing_initialise(address_t address) {
     address_t lut_address = config->lut_data;
     tau_lookup = maths_copy_int16_lut(&lut_address);
 
-    log_info("timing_initialise: completed successfully");
+    log_debug("timing_initialise: completed successfully");
 
     return lut_address;
 }

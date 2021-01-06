@@ -171,12 +171,12 @@ static inline void print_bitfields(uint32_t mp_i, uint32_t start,
         uint32_t end, filter_info_t *filters) {
 #if LOG_LEVEL >= LOG_DEBUG
     // print out the bit field for debug purposes
-    log_info("Bit field(s) for key 0x%08x:", master_population_table[mp_i].key);
+    log_debug("Bit field(s) for key 0x%08x:", master_population_table[mp_i].key);
     uint32_t offset = 0;
     for (uint32_t bf_i = start; bf_i < end; bf_i++) {
         uint32_t n_words = get_bit_field_size(filters[bf_i].n_atoms);
         for (uint32_t i = 0; i < n_words; i++) {
-            log_info("0x%08x", connectivity_bit_field[mp_i][offset + i]);
+            log_debug("0x%08x", connectivity_bit_field[mp_i][offset + i]);
         }
         offset += n_words;
     }
@@ -523,7 +523,7 @@ static inline bool cache_synaptic_blocks(
 
     // safety check to bypass work
     if (store->n_array_blocks == 0 && store->n_binary_search_blocks == 0) {
-        log_info("no need to try to cache, nothing to cache");
+        log_debug("no need to try to cache, nothing to cache");
         return true;
     }
 
@@ -698,7 +698,7 @@ bool population_table_get_first_address(
     if (!population_table_position_in_the_master_pop_array(spike, &position)) {
         invalid_master_pop_hits++;
         log_debug("Ghost searches: %u\n", ghost_pop_table_searches);
-        log_info("Spike %u (= %x): "
+        log_debug("Spike %u (= %x): "
                 "Population not found in master population table",
                 spike, spike);
         return false;

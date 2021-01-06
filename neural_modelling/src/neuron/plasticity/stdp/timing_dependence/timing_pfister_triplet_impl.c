@@ -36,8 +36,8 @@ int16_lut *tau_y_lookup;
 // Functions
 //---------------------------------------
 address_t timing_initialise(address_t address) {
-    log_info("timing_initialise: starting");
-    log_info("\tSTDP triplet rule");
+    log_debug("timing_initialise: starting");
+    log_debug("\tSTDP triplet rule");
     // **TODO** assert number of neurons is less than max
 
     // Copy LUTs from following memory
@@ -47,7 +47,7 @@ address_t timing_initialise(address_t address) {
     tau_x_lookup = maths_copy_int16_lut(&lut_address);
     tau_y_lookup = maths_copy_int16_lut(&lut_address);
 
-    log_info("timing_initialise: completed successfully");
+    log_debug("timing_initialise: completed successfully");
 
     return lut_address;
 }

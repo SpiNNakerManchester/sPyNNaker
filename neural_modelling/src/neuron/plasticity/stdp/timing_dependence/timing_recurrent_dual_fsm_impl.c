@@ -45,8 +45,8 @@ typedef struct {
 // Functions
 //---------------------------------------
 uint32_t *timing_initialise(address_t address) {
-    log_info("timing_initialise: starting");
-    log_info("\tRecurrent dual-FSM STDP rule");
+    log_debug("timing_initialise: starting");
+    log_debug("\tRecurrent dual-FSM STDP rule");
     dual_fsm_config_t *config = (dual_fsm_config_t *) address;
 
     // Copy plasticity region data from address
@@ -56,7 +56,7 @@ uint32_t *timing_initialise(address_t address) {
     plasticity_trace_region_data.accumulator_potentiation_minus_one =
             config->accumulator_potentiation_minus_one;
 
-    log_info("\tAccumulator depression=%d, Accumulator potentiation=%d",
+    log_debug("\tAccumulator depression=%d, Accumulator potentiation=%d",
             plasticity_trace_region_data.accumulator_depression_plus_one - 1,
             plasticity_trace_region_data.accumulator_potentiation_minus_one + 1);
 
@@ -66,7 +66,7 @@ uint32_t *timing_initialise(address_t address) {
     spin1_memcpy(post_exp_dist_lookup, config->post_exp_dist_lookup,
             sizeof(config->post_exp_dist_lookup));
 
-    log_info("timing_initialise: completed successfully");
+    log_debug("timing_initialise: completed successfully");
 
     return config->following_data;
 }
