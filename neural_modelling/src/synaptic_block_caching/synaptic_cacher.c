@@ -141,8 +141,7 @@ static inline void set_bitfield_to_merged_in_sdram(uint32_t bit_field_index) {
 
 //! \brief updates the counters in master pop SDRAM
 static inline void update_master_pop_counters(void) {
-    master_pop_top_counters_t* store =
-        (master_pop_top_counters_t*) master_pop_base_address;
+    pop_table_config_t* store = (pop_table_config_t*) master_pop_base_address;
     store->n_array_blocks = n_array_blocks;
     store->n_binary_search_blocks = n_binary_search_blocks;
 }
@@ -177,7 +176,7 @@ static inline bool synapses_are_plastic_or_structural_or_direct(
         return true;
     }
 
-    address_t row_address;
+    synaptic_row_t row;
     uint32_t representation;
     uint32_t base_key = not_redundant_tracker->filter[bit_field_index].key;
     size_t size;
@@ -190,12 +189,11 @@ static inline bool synapses_are_plastic_or_structural_or_direct(
 
         // get address in sdram for the row
         bool success = population_table_get_first_address(
-            key, &row_address, &size, &representation);
+            key, &row, &size, &representation);
         if (!success) {
             log_error("failed to read row for key 0x%08x", key);
             return false;
         }
-        synaptic_row_t row = (synaptic_row_t) row_address;
 
         // plastic
         if (synapse_row_plastic_size(row) > 0) {
@@ -244,10 +242,10 @@ static inline int calculate_binary_search_size(
     // populate stores
     for (uint32_t atom_id = 0; atom_id < n_atoms; atom_id++) {
         uint32_t atom_offset = atom_id * stride * sizeof(uint32_t);
-        address_t row_address = (address_t) (address + atom_offset);
+        synaptic_row_t row = (synaptic_row_t) (address + atom_offset);
 
         // get size
-        uint32_t n_targets_in_words = synapse_row_size_in_words(row_address);
+        uint32_t n_targets_in_words = synapse_row_size_in_words(row);
 
         if (n_targets_in_words != N_SYNAPSE_ROW_HEADER_WORDS) {
             // TODO FIX WHEN STAGE 2.5 HAS HAPPENED
@@ -290,9 +288,9 @@ static inline uint32_t calculate_array_search_size(
     // populate stores
     for (uint32_t atom_id = 0; atom_id < n_atoms; atom_id++) {
         uint32_t atom_offset = atom_id * stride * sizeof(uint32_t);
-        address_t row_address = (address_t) (address + atom_offset);
+        synaptic_row_t row = (synaptic_row_t) (address + atom_offset);
         // acquire real size in words of the row
-        uint32_t n_targets_in_words = synapse_row_size_in_words(row_address);
+        uint32_t n_targets_in_words = synapse_row_size_in_words(row);
 
         // if its just the header, then its empty
         if (n_targets_in_words != N_SYNAPSE_ROW_HEADER_WORDS) {

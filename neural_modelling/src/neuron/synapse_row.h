@@ -244,12 +244,12 @@ static inline weight_t synapse_row_sparse_weight(uint32_t x) {
 //! \brief get the size in bytes for the synapse row
 //! \param[in] row: The synaptic row
 //! \return the number of bytes needed for this synaptic row in memory.
-static inline size_t synapse_row_size_in_words(address_t row_address) {
+static inline size_t synapse_row_size_in_words(synaptic_row_t row) {
     return (
-        synapse_row_num_fixed_synapses(synapse_row_fixed_region(row_address)) +
+        synapse_row_num_fixed_synapses(synapse_row_fixed_region(row)) +
         ((synapse_row_num_plastic_controls(
-            synapse_row_fixed_region(row_address)) + 1) > 1) +
-        synapse_row_plastic_size(row_address) + N_SYNAPSE_ROW_HEADER_WORDS);
+            synapse_row_fixed_region(row)) + 1) > 1) +
+        synapse_row_plastic_size(row) + N_SYNAPSE_ROW_HEADER_WORDS);
 }
 
 #endif  // SYNAPSE_ROW_H

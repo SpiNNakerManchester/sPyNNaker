@@ -74,6 +74,14 @@ typedef struct {
     master_population_table_entry data[];
 } pop_table_config_t;
 
+// \brief struct for holding a binary search element
+typedef struct binary_search_element {
+    // the src neuron id
+    uint32_t src_neuron_id;
+    // row linked
+    synaptic_row_t row;
+} binary_search_element;
+
 // stores binary search components
 typedef struct binary_search_top {
     // the number of none empty rows
@@ -194,8 +202,7 @@ static inline uint32_t get_direct_address(address_and_row_length entry) {
 static inline master_population_table_entry*
         population_table_get_master_pop_entry_from_sdram(
             address_t table_address, uint32_t position) {
-    master_pop_top_counters_t* store =
-        (master_pop_top_counters_t*) table_address;
+    pop_table_config_t* store = (pop_table_config_t*) table_address;
     return &store->data[position];
 }
 
@@ -245,10 +252,9 @@ static inline address_list_entry population_table_get_address_entry(
 
 static inline address_list_entry* population_table_get_address_entry_from_sdram(
         address_t table_address, uint32_t address_entry_index) {
-    master_pop_top_counters_t* store =
-        (master_pop_top_counters_t*) table_address;
+    pop_table_config_t* store = (pop_table_config_t*) table_address;
     address_list_entry* addresses = (address_list_entry*) (
-        &store->data[store->master_population_table_length]);
+        &store->data[store->table_length]);
     return &addresses[address_entry_index];
 }
 
