@@ -33,6 +33,9 @@ class ThresholdTypeMulticastDeviceControl(AbstractThresholdType):
     __slots__ = ["__device"]
 
     def __init__(self, device):
+        """
+        :param list(AbstractMulticastControllableDevice) device:
+        """
         super(ThresholdTypeMulticastDeviceControl, self).__init__([
             DataType.UINT32,   # control_key
             DataType.UINT32,   # control_uses_payload

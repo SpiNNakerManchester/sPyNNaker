@@ -42,7 +42,6 @@
 
 //!================================================
 
-
 //! \brief An entry in the master population table.
 typedef struct master_population_table_entry {
     //! The key to match against the incoming message
@@ -59,27 +58,21 @@ typedef struct master_population_table_entry {
     uint32_t cache_in_dtcm: 1;
 } master_population_table_entry;
 
-//! \brief struct for counters
-typedef struct master_pop_top_counters_t {
+//! \brief The memory layout in SDRAM of the first part of the population table
+//!     configuration. Address list data (array of ::address_and_row_length) is
+//!     packed on the end.
+typedef struct {
     // length of master_population_table_entry array.
-    uint32_t master_population_table_length;
+    uint32_t table_length;
     // length of address_list_entry array.
-    uint32_t address_list_length;
+    uint32_t addr_list_length;
     // length of array_blocks array.
     uint32_t n_array_blocks;
     // length of binary_blocks array.
     uint32_t n_binary_search_blocks;
     // start of pop array
     master_population_table_entry data[];
-} master_pop_top_counters_t;
-
-// \brief struct for holding a binary search element
-typedef struct binary_search_element {
-    // the src neuron id
-    uint32_t src_neuron_id;
-    // row linked
-    uint32_t* row;
-} binary_search_element;
+} pop_table_config_t;
 
 // stores binary search components
 typedef struct binary_search_top {
@@ -169,6 +162,8 @@ extern uint32_t synaptic_rows_base_address;
 
 //! Base address for the synaptic matrix's direct rows
 extern uint32_t direct_rows_base_address;
+
+
 
 //! =================================================================
 //! debug bits to change dtcm state for printing
@@ -334,13 +329,13 @@ static inline bool population_table_set_start_and_count(
 
 
 //! \brief Prints the master pop table.
-//!
-//! For debugging
+//! \details For debugging
 static inline void print_master_population_table(void) {
-    log_debug("Master_population\n");
+#if log_level >= LOG_DEBUG
+    log_info("Master_population\n");
     for (uint32_t i = 0; i < master_population_table_length; i++) {
         master_population_table_entry entry = master_population_table[i];
-        log_debug(
+        log_info(
             "key: 0x%08x, mask: 0x%08x, start:%d, extra_info_flag:%d, "
             "count:%d, cache_in_dtcm:%d",
             entry.key, entry.mask, entry.start, entry.extra_info_flag,
@@ -350,15 +345,15 @@ static inline void print_master_population_table(void) {
         if (entry.extra_info_flag) {
             extra_info extra = address_list[start].extra;
             start += 1;
-            log_debug("    core_mask: 0x%08x, core_shift: %u, n_neurons: %u",
+            log_info("    core_mask: 0x%08x, core_shift: %u, n_neurons: %u",
                     extra.core_mask, extra.mask_shift, extra.n_neurons);
         }
         for (uint16_t j = start; j < (start + count); j++) {
             address_and_row_length addr = address_list[j].addr;
             if (addr.address == INVALID_ADDRESS) {
-                log_debug("    index %d: INVALID", j);
+                log_info("    index %d: INVALID", j);
             } else if (!(addr.representation == DIRECT)) {
-                log_debug(
+                log_info(
                     "    index %d: offset: %u, address: 0x%08x, "
                     "row_length: %u, representation %d",
                     j, population_table_get_offset(addr),
@@ -366,16 +361,17 @@ static inline void print_master_population_table(void) {
                     population_table_get_row_length(addr),
                     addr.representation);
             } else {
-                log_debug(
+                log_info(
                     "    index %d: offset: %u, address: 0x%08x, representation %d",
                     j, addr.address, get_direct_address(addr), addr.representation);
             }
         }
     }
-    log_debug("Population table has %u entries", master_population_table_length);
+    log_info("Population table has %u entries", master_population_table_length);
+#endif
 }
 
-//! \brief Sets up the table
+//! \brief Set up the table
 //! \param[in] table_address: The address of the start of the table data
 //! \param[in] synapse_rows_address: The address of the start of the synapse
 //!                                  data
@@ -402,8 +398,8 @@ bool population_table_load_bitfields(filter_region_t *filter_region);
 //! \param[out] representation: the rep of the data for this block
 //! \return True if there is a row to read, False if not
 bool population_table_get_first_address(
-        spike_t spike, address_t* row_address, size_t* n_bytes_to_transfer,
-        uint32_t* representation);
+        spike_t spike, synaptic_row_t* row_address,
+        size_t* n_bytes_to_transfer, uint32_t* representation);
 
 //! \brief Get the next row data for a previously given spike.  If no spike has
 //!        been given, return False.
@@ -413,7 +409,8 @@ bool population_table_get_first_address(
 //! \param[out] representation: the rep of the data for this block
 //! \return True if there is a row to read, False if not
 bool population_table_get_next_address(
-        spike_t *spike, address_t* row_address, size_t* n_bytes_to_transfer,
-        uint32_t* representation);
+        spike_t *spike, synaptic_row_t* row_address,
+        size_t* n_bytes_to_transfer, uint32_t* representation);
+
 
 #endif // _POPULATION_TABLE_H_

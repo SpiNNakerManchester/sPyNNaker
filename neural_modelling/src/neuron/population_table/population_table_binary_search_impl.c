@@ -583,7 +583,9 @@ bool population_table_initialise(
         address_t direct_rows_address, filter_region_t *filter_region,
         uint32_t *row_max_n_words) {
     log_debug("Population_table_initialise: starting");
+    pop_table_config_t *config = (pop_table_config_t *) table_address;
 
+    master_population_table_length = config->table_length;
     // Store the base address
     log_debug("The stored synaptic matrix base address is located at: 0x%08x",
             synapse_rows_address);
@@ -602,7 +604,6 @@ bool population_table_initialise(
             sizeof(master_population_table_entry));
     uint32_t n_master_pop_bytes =
             master_population_table_length * sizeof(master_population_table_entry);
-    uint32_t n_master_pop_words = n_master_pop_bytes >> 2;
     log_debug("Pop table size is %d\n", n_master_pop_bytes);
     log_debug("n cached array blocks = %d", store->n_array_blocks);
     log_debug("n cached binary blocks = %d", store->n_binary_search_blocks);
@@ -616,7 +617,7 @@ bool population_table_initialise(
         }
     }
 
-    uint32_t address_list_length = store->address_list_length;
+    uint32_t address_list_length = config->addr_list_length;
     uint32_t n_address_list_bytes =
             address_list_length * sizeof(address_list_entry);
 
@@ -635,11 +636,9 @@ bool population_table_initialise(
             address_list_length, n_address_list_bytes);
 
     // Copy the master population table
-    uint32_t past_counters = sizeof(master_pop_top_counters_t) >> 2;
-    spin1_memcpy(master_population_table, &table_address[past_counters],
+    spin1_memcpy(master_population_table, config->data,
             n_master_pop_bytes);
-    spin1_memcpy(address_list,
-        &table_address[past_counters + n_master_pop_words],
+    spin1_memcpy(address_list, &config->data[master_population_table_length],
         n_address_list_bytes);
 
     // print to ensure every looks ok before caching
@@ -688,8 +687,8 @@ static inline uint32_t* binary_search_cache(
 }
 
 bool population_table_get_first_address(
-        spike_t spike, address_t* row_address, size_t* n_bytes_to_transfer,
-        uint32_t* representation) {
+        spike_t spike, synaptic_row_t *row_address,
+        size_t *n_bytes_to_transfer, uint32_t *representation) {
     // locate the position in the binary search / array
     log_debug("Searching for key %d", spike);
 
@@ -762,10 +761,10 @@ bool population_table_get_first_address(
 }
 
 bool population_table_get_next_address(
-        spike_t *spike, address_t *row_address, size_t *n_bytes_to_transfer,
-        uint32_t* representation) {
+        spike_t *spike, synaptic_row_t *row_address,
+        size_t *n_bytes_to_transfer, uint32_t* representation) {
     // If there are no more items in the list, return false
-    if (items_to_go <= 0) {
+    if (items_to_go == 0) {
         return false;
     }
 
@@ -777,7 +776,7 @@ bool population_table_get_next_address(
             // If the row is a direct row, indicate this by specifying the
             // n_bytes_to_transfer is 0
             if (item.representation == DIRECT) {
-                *row_address = (address_t) (get_direct_address(item) +
+                *row_address = (synaptic_row_t) (get_direct_address(item) +
                     (last_neuron_id * sizeof(uint32_t)));
                 *n_bytes_to_transfer = 0;
                 *representation = item.representation;
@@ -813,7 +812,7 @@ bool population_table_get_next_address(
                 uint32_t stride = (row_length + N_SYNAPSE_ROW_HEADER_WORDS);
                 uint32_t neuron_offset = last_neuron_id * stride * sizeof(uint32_t);
 
-                *row_address = (address_t) (block_address + neuron_offset);
+                *row_address = (synaptic_row_t) (block_address + neuron_offset);
                 *n_bytes_to_transfer = stride * sizeof(uint32_t);
                 log_debug(
                     "neuron_id = %u, block_address = 0x%.8x,"

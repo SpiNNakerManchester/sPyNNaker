@@ -19,6 +19,7 @@ sPyNNaker
 =========
 
 .. automodule:: spynnaker
+   :noindex:
 
 Contents:
 
