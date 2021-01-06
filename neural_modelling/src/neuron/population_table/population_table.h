@@ -132,6 +132,15 @@ typedef union {
 
 //! ===========================================
 
+//! \brief The number of cached look ups.
+extern uint32_t n_master_pop_cached_look_ups;
+
+//! \brief The number of sdram look ups.
+extern uint32_t n_master_pop_sdram_look_ups;
+
+//! \brief The number of direct matrix look ups.
+extern uint32_t n_master_pop_direct_matrix_look_ups;
+
 //! \brief the number of times a DMA resulted in 0 entries
 extern uint32_t ghost_pop_table_searches;
 
@@ -157,6 +166,7 @@ extern uint32_t master_population_table_length;
 
 //! Base address for the synaptic matrix's indirect rows
 extern uint32_t synaptic_rows_base_address;
+
 //! Base address for the synaptic matrix's direct rows
 extern uint32_t direct_rows_base_address;
 

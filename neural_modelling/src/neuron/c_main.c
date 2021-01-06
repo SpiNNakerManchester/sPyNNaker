@@ -83,6 +83,10 @@ struct neuron_provenance {
     uint32_t spike_processing_get_max_filled_input_buffer_size;
     //! the number of times the TDMA fully missed its slots
     uint32_t n_tdma_mises;
+    // cahce vs sdram look ups
+    uint32_t n_master_pop_cached_look_ups;
+    uint32_t n_master_pop_sdram_look_ups;
+    uint32_t n_master_pop_direct_matrix_look_ups;
 };
 
 //! values for the priority for each callback
@@ -151,6 +155,10 @@ static void c_main_store_provenance_data(address_t provenance_region) {
     prov->spike_processing_get_max_filled_input_buffer_size =
         spike_processing_get_max_filled_input_buffer_size();
     prov->n_tdma_mises = tdma_processing_times_behind();
+    prov->n_master_pop_cached_look_ups = n_master_pop_cached_look_ups;
+    prov->n_master_pop_sdram_look_ups = n_master_pop_sdram_look_ups;
+    prov->n_master_pop_direct_matrix_look_ups =
+        n_master_pop_direct_matrix_look_ups;
 
     log_debug("finished other provenance data");
 }

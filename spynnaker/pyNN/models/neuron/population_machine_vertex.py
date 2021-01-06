@@ -92,6 +92,12 @@ class PopulationMachineVertex(
         INPUT_BUFFER_FILLED_SIZE = 13
         # the number of tdma misses
         TDMA_MISSES = 14
+        # The number of cached lookups
+        CACHED_LOOK_UPS = 15
+        # The number of sdram lookups
+        SDRAM_LOOK_UPS = 16
+        # The number of direct lookups
+        CACHED_DIRECT_LOOK_UPS = 17
 
     SATURATION_COUNT_NAME = "Times_synaptic_weights_have_saturated"
     SATURATION_COUNT_MESSAGE = (
@@ -133,6 +139,13 @@ class PopulationMachineVertex(
         ".spynnaker.cfg file or in the pynn.setup() method.")
 
     _MAX_FILLED_SIZE_OF_INPUT_BUFFER_NAME = "Max_filled_size_input_buffer"
+
+    _N_MASTER_POP_CACHED_LOOK_UPS_NAME = (
+        "n_master_population_table_look_ups_via_cached_in_dtcm")
+    _N_MASTER_POP_DIRECT_CACHED_LOOK_UP_NAME = (
+        "n_master_population_table_look_ups_via_direct_cache")
+    _N_MASTER_POP_SDRAM_LOOK_UP_NAME = (
+        "n_master_population_table_sdram_look_ups")
 
     _PROFILE_TAG_LABELS = {
         0: "TIMER",
@@ -282,6 +295,12 @@ class PopulationMachineVertex(
             self.EXTRA_PROVENANCE_DATA_ENTRIES.INPUT_BUFFER_FILLED_SIZE.value]
         tdma_misses = provenance_data[
             self.EXTRA_PROVENANCE_DATA_ENTRIES.TDMA_MISSES.value]
+        n_master_pop_cached_look_ups = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.CACHED_LOOK_UPS.value]
+        n_master_pop_sdram_look_ups = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.SDRAM_LOOK_UPS.value]
+        n_master_pop_direct_matrix_look_ups = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.CACHED_DIRECT_LOOK_UPS.value]
 
         label, x, y, p, names = self._get_placement_details(placement)
 
@@ -373,6 +392,17 @@ class PopulationMachineVertex(
 
         provenance_items.append(self._app_vertex.get_tdma_provenance_item(
                 names, x, y, p, tdma_misses))
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names, self._N_MASTER_POP_CACHED_LOOK_UPS_NAME),
+            n_master_pop_cached_look_ups, report=False))
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names, self._N_MASTER_POP_SDRAM_LOOK_UP_NAME),
+            n_master_pop_sdram_look_ups, report=False))
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(
+                names, self._N_MASTER_POP_DIRECT_CACHED_LOOK_UP_NAME),
+            n_master_pop_direct_matrix_look_ups, report=False))
+
         return provenance_items
 
     @overrides(AbstractReceiveBuffersToHost.get_recorded_region_ids)

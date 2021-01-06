@@ -85,6 +85,15 @@ uint32_t failed_bit_field_reads = 0;
 //!     they don't hit anything
 uint32_t bit_field_filtered_packets = 0;
 
+//! \brief The number of cached look ups.
+uint32_t n_master_pop_cached_look_ups = 0;
+
+//! \brief The number of sdram look ups.
+uint32_t n_master_pop_sdram_look_ups = 0;
+
+//! \brief The number of direct matrix look ups.
+uint32_t n_master_pop_direct_matrix_look_ups = 0;
+
 //! \name Support functions
 //! \{
 
@@ -293,10 +302,11 @@ static inline bool cached_in_array(
         uint32_t atoms, uint32_t address_index, uint32_t key,
         uint32_t* array_index) {
     log_debug(
-        "caching address entry %d into array with atoms %d",
-        address_index, atoms);
+        "caching address entry %d into array with atoms %d with base key %d",
+        address_index, atoms, key);
 
     // malloc space for array
+    log_info("size = %d", atoms * sizeof(uint32_t*));
     uint32_t** block = spin1_malloc(atoms * sizeof(uint32_t*));
     if (block == NULL) {
         log_error("failed to allocate DTCM for block with key %d", key);
@@ -312,29 +322,37 @@ static inline bool cached_in_array(
         address_t row_address;
         uint32_t size_to_read;
         uint32_t representation;
-        population_table_get_first_address(
+        bool success = population_table_get_first_address(
             spike, &row_address, &size_to_read, &representation);
-
-        // find real row size
-        uint32_t size_in_bytes = (
-            synapse_row_size_in_words(row_address) * BYTE_TO_WORD_CONVERSION);
-
-        // if no data, nullify the holder
-        if (size_in_bytes == N_SYNAPSE_ROW_HEADER_WORDS) {
-            block[atom_id] = NULL;
-        }
-
-        // allocate dtcm for this row
-        block[atom_id] = (uint32_t*) spin1_malloc(size_in_bytes);
-        if (array_blocks[*array_index] == NULL) {
-            log_error(
-                "failed to malloc dtcm for block at index %d", address_index);
+        if (!success) {
+            log_info("failed to read first address");
             return false;
         }
 
-        // move the sdram into dtcm
-        spin1_memcpy(block[atom_id], row_address, size_in_bytes);
+        // find real row size
+        uint32_t size_in_words = synapse_row_size_in_words(row_address);
+
+        // if no data, nullify the holder
+        if (size_in_words == N_SYNAPSE_ROW_HEADER_WORDS) {
+            block[atom_id] = NULL;
+            log_info("no data for atom %d", atom_id);
+        } else {
+            // allocate dtcm for this row
+            block[atom_id] = (uint32_t*) spin1_malloc(
+                size_in_words * BYTE_TO_WORD_CONVERSION);
+            if (array_blocks[*array_index] == NULL) {
+                log_error(
+                    "failed to malloc dtcm for block at index %d", address_index);
+                return false;
+            }
+
+            // move the sdram into dtcm
+            spin1_memcpy(
+                block[atom_id], row_address, size_in_words * BYTE_TO_WORD_CONVERSION);
+        }
     }
+
+    log_info("atoms complete");
     return true;
 }
 
@@ -357,8 +375,12 @@ static inline bool cached_in_binary_search(
         address_t row_address;
         uint32_t size_to_read;
         uint32_t representation;
-        population_table_get_first_address(
+        bool success = population_table_get_first_address(
             spike, &row_address, &size_to_read, &representation);
+        if (!success) {
+            log_error("failed to read first address");
+            return false;
+        }
 
         // find real row size
         uint32_t size_in_words = synapse_row_size_in_words(row_address);
@@ -447,30 +469,35 @@ static inline bool process_pop_entry_for_caching(
     // search blocks and put in correct rep store
     for (uint32_t address_index = start; address_index < count + start;
             address_index ++) {
-        address_list_entry address_entry =
-            population_table_get_address_entry(address_index);
+
+        // have to change rep here to default, to ensure get sdram address.
+        // NOTE: needs to be changed back at the end of this.
+        uint32_t correct_rep = address_list[address_index].addr.representation;
+        address_list[address_index].addr.representation = DEFAULT;
 
         // process each rep correctly
-        if (address_entry.addr.representation == BINARY_SEARCH) {
+        if (correct_rep == BINARY_SEARCH) {
+            log_debug("binary cache");
             success = cached_in_binary_search(
                 atoms, address_index, pop_entry.key, binary_index);
             if (success) {
-                address_entry.addr.address = *binary_index;
+                address_list[address_index].addr.address = *binary_index;
                 *binary_index = *binary_index + 1;
+                log_debug("success binary cache");
             }
-        } else if (address_entry.addr.representation == ARRAY) {
+        } else if (correct_rep == ARRAY) {
+            log_debug("array cache");
             success = cached_in_array(
                 atoms, address_index, pop_entry.key, array_index);
             if (success) {
-                address_entry.addr.address = *array_index;
+                address_list[address_index].addr.address = *array_index;
                 *array_index = *array_index + 1;
+                log_debug("success array cache");
             }
-        } else if (address_entry.addr.representation == DEFAULT ||
-              address_entry.addr.representation == DIRECT) {
+        } else if (correct_rep == DEFAULT || correct_rep == DIRECT) {
             // ignore, as these are not cacheable
         } else {
-            log_error(
-                "dont recognise the rep %d", address_entry.addr.representation);
+            log_error("dont recognise the rep %d", correct_rep);
             return false;
         }
 
@@ -478,6 +505,9 @@ static inline bool process_pop_entry_for_caching(
         if(!success) {
             return false;
         }
+
+        // reset the representation to be whatever type it was.
+        address_list[address_index].addr.representation = correct_rep;
     }
 
     // successfully cached all things
@@ -539,8 +569,10 @@ static inline bool cache_synaptic_blocks(
                     pop_entry_index, pop_entry.key);
                 return false;
             }
+            log_debug("successfully cached entry at %d", pop_entry_index);
         }
     }
+    log_info("finish cache");
     return true;
 }
 
@@ -575,8 +607,8 @@ bool population_table_initialise(
             master_population_table_length * sizeof(master_population_table_entry);
     uint32_t n_master_pop_words = n_master_pop_bytes >> 2;
     log_debug("Pop table size is %d\n", n_master_pop_bytes);
-    log_info("n cached array blocks = %d", store->n_array_blocks);
-    log_info("n cached binary blocks = %d", store->n_binary_search_blocks);
+    log_debug("n cached array blocks = %d", store->n_array_blocks);
+    log_debug("n cached binary blocks = %d", store->n_binary_search_blocks);
 
     // only try to malloc if there's stuff to malloc.
     if (n_master_pop_bytes != 0) {
@@ -664,7 +696,7 @@ bool population_table_get_first_address(
     if (!population_table_position_in_the_master_pop_array(spike, &position)) {
         invalid_master_pop_hits++;
         log_debug("Ghost searches: %u\n", ghost_pop_table_searches);
-        log_debug("Spike %u (= %x): "
+        log_info("Spike %u (= %x): "
                 "Population not found in master population table",
                 spike, spike);
         return false;
@@ -748,7 +780,7 @@ bool population_table_get_next_address(
                 *n_bytes_to_transfer = 0;
                 *representation = item.representation;
                 is_valid = true;
-
+                n_master_pop_direct_matrix_look_ups += 1;
             } else if (item.representation == ARRAY) {
                 *n_bytes_to_transfer = 0;
 
@@ -759,6 +791,7 @@ bool population_table_get_next_address(
                     is_valid = true;
                     *representation = item.representation;
                 }
+                n_master_pop_cached_look_ups += 1;
             }
             else if (item.representation == BINARY_SEARCH) {
                 *n_bytes_to_transfer = 0;
@@ -770,6 +803,7 @@ bool population_table_get_next_address(
                     is_valid = true;
                     *representation = item.representation;
                 }
+                n_master_pop_cached_look_ups += 1;
             } else if (item.representation == DEFAULT) {
                 // sdram read needed
                 uint32_t row_length = population_table_get_row_length(item);
@@ -787,10 +821,13 @@ bool population_table_get_next_address(
                 *spike = last_spike;
                 is_valid = true;
                 *representation = item.representation;
+                n_master_pop_sdram_look_ups += 1;
             } else {
                 log_error("cant recognise the representation %d.", item.representation);
                 return false;
             }
+        } else {
+            log_debug("invalid address");
         }
 
         next_item++;
