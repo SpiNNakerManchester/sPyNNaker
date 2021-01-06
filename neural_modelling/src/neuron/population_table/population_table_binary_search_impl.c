@@ -569,7 +569,7 @@ static inline bool cache_synaptic_blocks(
             log_debug("successfully cached entry at %d", pop_entry_index);
         }
     }
-    log_info("finish cache");
+    log_debug("finish cache");
     return true;
 }
 
@@ -585,9 +585,9 @@ bool population_table_initialise(
     log_debug("Population_table_initialise: starting");
 
     // Store the base address
-    log_info("The stored synaptic matrix base address is located at: 0x%08x",
+    log_debug("The stored synaptic matrix base address is located at: 0x%08x",
             synapse_rows_address);
-    log_info("The direct synaptic matrix base address is located at: 0x%08x",
+    log_debug("The direct synaptic matrix base address is located at: 0x%08x",
             direct_rows_address);
     synaptic_rows_base_address = (uint32_t) synapse_rows_address;
     direct_rows_base_address = (uint32_t) direct_rows_address;
