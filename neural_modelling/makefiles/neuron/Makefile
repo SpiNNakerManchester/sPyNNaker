@@ -39,7 +39,6 @@ MODELS = IF_curr_exp \
          IF_curr_exp_structural_last_neuron_distance_weight \
          IF_curr_exp_structural_random_distance_weight \
          IF_cond_exp_stdp_mad_nearest_pair_additive_structural_last_neuron_distance_weight \
-         IF_cond_exp_stdp_mad_pair_additive_structural_random_distance_weight \
          IF_curr_exp_stdp_mad_pair_additive_structural_random_distance_weight \
          IF_curr_exp_sEMD \
          IZK_curr_exp_stdp_mad_pair_additive \
@@ -48,6 +47,9 @@ MODELS = IF_curr_exp \
 # removed due to ITCM issues
 # IF_curr_exp_stdp_mad_pair_additive_structural_last_neuron_distance_weight
 # IF_cond_exp_stdp_mad_pair_additive_structural_last_neuron_distance_weight
+# IF_cond_exp_stdp_mad_pair_additive_structural_random_distance_weight
+#
+
 
 all:
 	for d in $(MODELS); do $(MAKE) -C $$d || exit $$?; done
