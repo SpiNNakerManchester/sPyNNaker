@@ -54,6 +54,10 @@ jobs:
       uses: ./support/actions/run-setup
       with:
         preinstall: ${{ matrix.python-version == 2.7 }}
+    - name: Checkout Spinnaker Test Cases
+      uses: ./support/actions/checkout-spinn-deps
+      with:
+        repositories: IntroLab PyNN8Examples
 
     - name: Create a spynnaker.cfg
       uses: ./support/actions/configure-spynnaker

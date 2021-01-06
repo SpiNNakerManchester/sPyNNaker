@@ -19,7 +19,6 @@ from spinn_front_end_common.utilities import globals_variables
 from spynnaker8.spinnaker import Spynnaker8FailedState
 
 
-
 class MockPopulation(object):
 
     def __init__(self, size, label):
