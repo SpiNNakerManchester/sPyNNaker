@@ -337,10 +337,10 @@ static inline bool population_table_set_start_and_count(
 //!
 //! For debugging
 static inline void print_master_population_table(void) {
-    log_info("Master_population\n");
+    log_debug("Master_population\n");
     for (uint32_t i = 0; i < master_population_table_length; i++) {
         master_population_table_entry entry = master_population_table[i];
-        log_info(
+        log_debug(
             "key: 0x%08x, mask: 0x%08x, start:%d, extra_info_flag:%d, "
             "count:%d, cache_in_dtcm:%d",
             entry.key, entry.mask, entry.start, entry.extra_info_flag,
@@ -350,15 +350,15 @@ static inline void print_master_population_table(void) {
         if (entry.extra_info_flag) {
             extra_info extra = address_list[start].extra;
             start += 1;
-            log_info("    core_mask: 0x%08x, core_shift: %u, n_neurons: %u",
+            log_debug("    core_mask: 0x%08x, core_shift: %u, n_neurons: %u",
                     extra.core_mask, extra.mask_shift, extra.n_neurons);
         }
         for (uint16_t j = start; j < (start + count); j++) {
             address_and_row_length addr = address_list[j].addr;
             if (addr.address == INVALID_ADDRESS) {
-                log_info("    index %d: INVALID", j);
+                log_debug("    index %d: INVALID", j);
             } else if (!(addr.representation == DIRECT)) {
-                log_info(
+                log_debug(
                     "    index %d: offset: %u, address: 0x%08x, "
                     "row_length: %u, representation %d",
                     j, population_table_get_offset(addr),
@@ -366,12 +366,13 @@ static inline void print_master_population_table(void) {
                     population_table_get_row_length(addr),
                     addr.representation);
             } else {
-                log_info("    index %d: offset: %u, address: 0x%08x, representation %d",
+                log_debug(
+                    "    index %d: offset: %u, address: 0x%08x, representation %d",
                     j, addr.address, get_direct_address(addr), addr.representation);
             }
         }
     }
-    log_info("Population table has %u entries", master_population_table_length);
+    log_debug("Population table has %u entries", master_population_table_length);
 }
 
 //! \brief Sets up the table

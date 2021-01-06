@@ -306,7 +306,6 @@ static inline bool cached_in_array(
         address_index, atoms, key);
 
     // malloc space for array
-    log_info("size = %d", atoms * sizeof(uint32_t*));
     uint32_t** block = spin1_malloc(atoms * sizeof(uint32_t*));
     if (block == NULL) {
         log_error("failed to allocate DTCM for block with key %d", key);
@@ -325,7 +324,7 @@ static inline bool cached_in_array(
         bool success = population_table_get_first_address(
             spike, &row_address, &size_to_read, &representation);
         if (!success) {
-            log_info("failed to read first address");
+            log_error("failed to read first address");
             return false;
         }
 
@@ -335,7 +334,7 @@ static inline bool cached_in_array(
         // if no data, nullify the holder
         if (size_in_words == N_SYNAPSE_ROW_HEADER_WORDS) {
             block[atom_id] = NULL;
-            log_info("no data for atom %d", atom_id);
+            log_debug("no data for atom %d", atom_id);
         } else {
             // allocate dtcm for this row
             block[atom_id] = (uint32_t*) spin1_malloc(
@@ -351,8 +350,6 @@ static inline bool cached_in_array(
                 block[atom_id], row_address, size_in_words * BYTE_TO_WORD_CONVERSION);
         }
     }
-
-    log_info("atoms complete");
     return true;
 }
 
@@ -560,7 +557,7 @@ static inline bool cache_synaptic_blocks(
         master_population_table_entry pop_entry =
             population_table_entry(pop_entry_index);
         if (pop_entry.cache_in_dtcm) {
-            log_info("attempting to cach entry at %d", pop_entry_index);
+            log_debug("attempting to cach entry at %d", pop_entry_index);
             bool success = process_pop_entry_for_caching(
                 pop_entry, filter_region, &array_index, &binary_index);
             if (!success) {
@@ -653,6 +650,11 @@ bool population_table_initialise(
         log_error("failed to cache into DTCM");
         return false;
     }
+
+    //reset counters to reflect only execution lookups
+    n_master_pop_cached_look_ups = 0;
+    n_master_pop_sdram_look_ups = 0;
+    n_master_pop_direct_matrix_look_ups = 0;
 
     *row_max_n_words = 0xFF + N_SYNAPSE_ROW_HEADER_WORDS;
     return true;
