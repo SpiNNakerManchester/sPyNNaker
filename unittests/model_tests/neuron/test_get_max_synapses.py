@@ -22,7 +22,7 @@ from unittests.mocks import MockSimulator
 
 
 def test_get_max_synapses():
-    MockSimulator.setup(False)
+    MockSimulator.setup()
     d = SynapseDynamicsSTDP(timing_dependence=TimingDependenceSpikePair(),
                             weight_dependence=WeightDependenceAdditive(),
                             pad_to_length=258)

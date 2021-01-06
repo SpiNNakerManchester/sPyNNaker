@@ -85,7 +85,7 @@ def delay(request):
 def test_connectors(
         n_pre, n_post, n_in_slice, create_connector, weight, delay):
 
-    MockSimulator.setup(False)
+    MockSimulator.setup()
 
     max_target = 0
     max_source = 0
