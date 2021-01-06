@@ -58,9 +58,6 @@ class SynapticBlockCacher(object):
     # flag which states that the binary finished cleanly.
     _SUCCESS = 0
 
-    # debug flag
-
-
     # error message when dealing wtih invalid executable types
     _INVALID_EXECUTABLE_TYPE_SUPPORTED = (
         "Can only operate with executable type \"USE_SIMULATION_INTERFACE\"")
