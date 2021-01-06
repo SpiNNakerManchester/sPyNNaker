@@ -16,8 +16,8 @@
 import configparser
 import numpy
 from spinn_front_end_common.utilities import globals_variables
-from spynnaker.pyNN.utilities.spynnaker_failed_state import (
-    SpynnakerFailedState)
+from spynnaker8.spinnaker import Spynnaker8FailedState
+
 
 
 class MockPopulation(object):
@@ -138,7 +138,7 @@ class MockSimulator(object):
     def setup(cls, init_failed_state=False):
         simulator = MockSimulator()
         if init_failed_state:
-            globals_variables.set_failed_state(SpynnakerFailedState())
+            globals_variables.set_failed_state(Spynnaker8FailedState())
         globals_variables.set_simulator(simulator)
         return simulator
 
