@@ -23,7 +23,7 @@ from unittest import SkipTest
 
 
 def test_csa_one_to_one_connector():
-    MockSimulator.setup()
+    MockSimulator.setup(False)
     connector = CSAConnector(csa.oneToOne)
     weight = 1.0
     delay = 2.0
@@ -43,7 +43,7 @@ def test_csa_one_to_one_connector():
 
 
 def test_csa_from_list_connector():
-    MockSimulator.setup()
+    MockSimulator.setup(False)
     conn_list = [(i, i + 1 % 10) for i in range(10)]
     connector = CSAConnector(conn_list)
     weight = 1.0
@@ -67,7 +67,7 @@ def test_csa_from_list_connector():
 
 
 def test_csa_random_connector():
-    MockSimulator.setup()
+    MockSimulator.setup(False)
     connector = CSAConnector(csa.random(0.05))
     weight = 1.0
     delay = 2.0
@@ -86,7 +86,7 @@ def test_csa_random_connector():
 
 
 def test_csa_block_connector():
-    MockSimulator.setup()
+    MockSimulator.setup(False)
     try:
         # This creates a block of size (2, 5) with a probability of 0.5; then
         # within the block an individual connection has a probability of 0.3

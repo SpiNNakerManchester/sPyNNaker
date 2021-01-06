@@ -50,7 +50,7 @@ def test_connector(
         clist, column_names, weights, delays, expected_clist, expected_weights,
         expected_delays, expected_extra_parameters,
         expected_extra_parameter_names):
-    MockSimulator.setup()
+    MockSimulator.setup(False)
     temp = tempfile.NamedTemporaryFile(delete=False)
     with temp as f:
         header = ''

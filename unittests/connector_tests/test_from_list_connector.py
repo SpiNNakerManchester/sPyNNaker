@@ -52,7 +52,7 @@ def test_connector(
         clist, column_names, weights, delays, expected_clist, expected_weights,
         expected_delays, expected_extra_parameters,
         expected_extra_parameter_names):
-    MockSimulator.setup()
+    MockSimulator.setup(False)
     connector = FromListConnector(clist, column_names=column_names)
     if expected_clist is not None:
         assert(numpy.array_equal(connector.conn_list, expected_clist))
@@ -100,7 +100,7 @@ class MockFromListConnector(FromListConnector):
 
 
 def test_connector_split():
-    MockSimulator.setup()
+    MockSimulator.setup(False)
     n_sources = 1000
     n_targets = 1000
     n_connections = 10000

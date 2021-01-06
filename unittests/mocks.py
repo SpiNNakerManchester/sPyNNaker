@@ -135,9 +135,10 @@ class MockSimulator(object):
         pass
 
     @classmethod
-    def setup(cls):
+    def setup(cls, init_failed_state=True):
         simulator = MockSimulator()
-        globals_variables.set_failed_state(SpynnakerFailedState())
+        if init_failed_state:
+            globals_variables.set_failed_state(SpynnakerFailedState())
         globals_variables.set_simulator(simulator)
         return simulator
 
