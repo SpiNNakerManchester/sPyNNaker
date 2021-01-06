@@ -45,6 +45,4 @@ static inline vcpu_t *vcpu(void) {
     return &sark_virtual_processor_info[core];
 }
 
-
-
 #endif // _BIT_FIELD_COMMON_H_

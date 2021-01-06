@@ -498,7 +498,7 @@ static inline bool process_pop_entry_for_caching(
         }
 
         // if it failed to cache return false
-        if(!success) {
+        if (!success) {
             return false;
         }
 
@@ -642,7 +642,7 @@ bool population_table_initialise(
     print_master_population_table();
 
     // start the caching process.
-    if(!cache_synaptic_blocks(table_address, filter_region)) {
+    if (!cache_synaptic_blocks(table_address, filter_region)) {
         log_error("failed to cache into DTCM");
         return false;
     }

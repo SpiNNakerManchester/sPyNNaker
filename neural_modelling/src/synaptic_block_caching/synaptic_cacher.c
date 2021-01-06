@@ -183,7 +183,7 @@ static inline bool synapses_are_plastic_or_structural_or_direct(
     uint32_t n_atoms = not_redundant_tracker->filter[bit_field_index].n_atoms;
 
     // cycle through atoms looking for plastic and struct synapses
-    for  (uint32_t atom_id = 0; atom_id < n_atoms; atom_id++) {
+    for (uint32_t atom_id = 0; atom_id < n_atoms; atom_id++) {
         // set key
         spike_t key = (spike_t) (base_key + atom_id);
 
@@ -694,8 +694,8 @@ static inline bool cache_blocks(void) {
                             binary_search_size, dtcm_to_use_tmp, dtcm_to_use);
                     }
                 }
-                else{  // array rep better. check if can be cached
-                    if(dtcm_to_use_tmp + array_search_size <= dtcm_to_use) {
+                else {  // array rep better. check if can be cached
+                    if (dtcm_to_use_tmp + array_search_size <= dtcm_to_use) {
                         log_debug(
                             "setting rep %d to ARRAY",
                             address_index - start);
@@ -723,7 +723,7 @@ static inline bool cache_blocks(void) {
                 }
 
                 // final check before caching.
-                if(dtcm_to_use_tmp >= dtcm_to_use) {
+                if (dtcm_to_use_tmp >= dtcm_to_use) {
                     log_debug(
                         "failed to cache as dtcm cost of %d is greater than %d",
                         dtcm_to_use_tmp, dtcm_to_use);

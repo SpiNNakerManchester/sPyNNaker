@@ -171,9 +171,8 @@ extern uint32_t synaptic_rows_base_address;
 //! Base address for the synaptic matrix's direct rows
 extern uint32_t direct_rows_base_address;
 
-
-
 //! =================================================================
+
 //! debug bits to change dtcm state for printing
 
 //! \brief sets a address list element to a different rep
@@ -331,8 +330,6 @@ static inline bool population_table_set_start_and_count(
     }
     return true;
 }
-
-
 
 //! \brief Prints the master pop table.
 //! \details For debugging
