@@ -17,6 +17,7 @@ import logging
 import math
 import re
 import numpy
+from spinn_utilities.log import FormatAdapter
 from pyNN.random import NumpyRNG, RandomDistribution
 from six import string_types, with_metaclass
 
@@ -29,7 +30,7 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spynnaker.pyNN.utilities import utility_calls
 
 # global objects
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 _expr_context = SafeEval(
     math, numpy, numpy.arccos, numpy.arcsin, numpy.arctan, numpy.arctan2,
     numpy.ceil, numpy.cos, numpy.cosh, numpy.exp, numpy.fabs, numpy.floor,

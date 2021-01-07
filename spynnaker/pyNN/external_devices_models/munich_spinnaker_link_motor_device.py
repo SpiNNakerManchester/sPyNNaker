@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
     FixedMaskConstraint)
@@ -28,7 +28,7 @@ from spinn_front_end_common.abstract_models import (
 from spynnaker.pyNN.models.defaults import defaults
 from .machine_munich_motor_device import MachineMunichMotorDevice
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class _MunichMotorDevice(ApplicationSpiNNakerLinkVertex):

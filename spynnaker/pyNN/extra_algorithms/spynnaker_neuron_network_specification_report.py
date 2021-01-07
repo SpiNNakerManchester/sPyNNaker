@@ -16,11 +16,12 @@
 import logging
 import os
 from six import raise_from
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class SpYNNakerNeuronGraphNetworkSpecificationReport(object):

@@ -19,11 +19,12 @@ import select
 import socket
 import subprocess
 from six import raise_from
+from spinn_utilities.log import FormatAdapter
 from spinnman.connections.abstract_classes import Listenable, Connection
 from spinnman.exceptions import SpinnmanIOException, SpinnmanTimeoutException
 from spinn_front_end_common.utilities.constants import BYTES_PER_KB
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 # A set of connections that have already been made
 _existing_connections = dict()
 
