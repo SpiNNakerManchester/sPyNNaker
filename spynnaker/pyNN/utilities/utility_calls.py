@@ -20,6 +20,7 @@ import os
 import logging
 import math
 import numpy
+from spinn_utilities.log import FormatAdapter
 from pyNN.random import RandomDistribution
 from scipy.stats import binom
 from spinn_utilities.safe_eval import SafeEval
@@ -53,7 +54,7 @@ STATS_BY_NAME = {
     'randint': RandomStatsRandIntImpl(),
     'vonmises': RandomStatsVonmisesImpl()}
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 def check_directory_exists_and_create_if_not(filename):

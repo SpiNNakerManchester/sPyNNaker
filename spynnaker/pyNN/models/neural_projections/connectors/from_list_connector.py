@@ -16,6 +16,7 @@
 import logging
 import numpy
 
+from spinn_utilities.log import FormatAdapter
 from spinn_front_end_common.utilities.constants import \
     MICRO_TO_MILLISECOND_CONVERSION
 from spinn_utilities.overrides import overrides
@@ -23,7 +24,7 @@ from spinn_front_end_common.utilities import globals_variables
 from .abstract_connector import AbstractConnector
 from spynnaker.pyNN.exceptions import InvalidParameterType
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 # Indices of the source and target in the connection list array
 _SOURCE = 0
