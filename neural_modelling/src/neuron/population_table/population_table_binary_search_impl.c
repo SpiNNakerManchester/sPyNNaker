@@ -99,6 +99,7 @@ uint32_t n_master_pop_direct_matrix_look_ups = 0;
 
 //! \brief prints the binary cache data
 void print_cache_arrays(address_t table_address) {
+#if LOG_LEVEL >= LOG_DEBUG
     pop_table_config_t *config = (pop_table_config_t *) table_address;
     for (uint32_t index = 0; index < config->n_binary_search_blocks; index++) {
         binary_search_top *block = &(binary_blocks[index]);
@@ -110,6 +111,9 @@ void print_cache_arrays(address_t table_address) {
                 inner_index, element->src_neuron_id);
         }
     }
+#else
+    use(table_address);
+#endif
 }
 
 //! \brief Get the source core index from a spike
