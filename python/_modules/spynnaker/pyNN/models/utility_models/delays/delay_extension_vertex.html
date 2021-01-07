@@ -55,6 +55,7 @@
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">pacman.model.constraints.key_allocator_constraints</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ContiguousKeyRangeContraint</span><span class="p">)</span>
@@ -69,7 +70,7 @@
 <span class="kn">from</span> <span class="nn">.delay_block</span> <span class="kn">import</span> <span class="n">DelayBlock</span>
 <span class="kn">from</span> <span class="nn">.delay_generator_data</span> <span class="kn">import</span> <span class="n">DelayGeneratorData</span>
 
-<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
 
 
 <div class="viewcode-block" id="DelayExtensionVertex"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex">[docs]</a><span class="k">class</span> <span class="nc">DelayExtensionVertex</span><span class="p">(</span>

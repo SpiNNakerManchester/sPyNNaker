@@ -53,11 +53,12 @@
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.external_devices_models</span> <span class="kn">import</span> <span class="n">ExternalDeviceLifControl</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.protocols</span> <span class="kn">import</span> <span class="n">MunichIoSpiNNakerLinkProtocol</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.defaults</span> <span class="kn">import</span> <span class="n">default_initial_values</span>
 
-<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
 
 
 <div class="viewcode-block" id="PushBotLifSpinnakerLink"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.external_devices_models.push_bot.push_bot_control_modules.html#spynnaker.pyNN.external_devices_models.push_bot.push_bot_control_modules.PushBotLifSpinnakerLink">[docs]</a><span class="k">class</span> <span class="nc">PushBotLifSpinnakerLink</span><span class="p">(</span><span class="n">ExternalDeviceLifControl</span><span class="p">):</span>

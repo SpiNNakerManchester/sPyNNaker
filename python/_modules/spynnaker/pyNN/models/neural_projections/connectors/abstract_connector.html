@@ -56,6 +56,7 @@
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">from</span> <span class="nn">pyNN.random</span> <span class="kn">import</span> <span class="n">NumpyRNG</span><span class="p">,</span> <span class="n">RandomDistribution</span>
 <span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">string_types</span><span class="p">,</span> <span class="n">with_metaclass</span>
 
@@ -68,7 +69,7 @@
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities</span> <span class="kn">import</span> <span class="n">utility_calls</span>
 
 <span class="c1"># global objects</span>
-<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
 <span class="n">_expr_context</span> <span class="o">=</span> <span class="n">SafeEval</span><span class="p">(</span>
     <span class="n">math</span><span class="p">,</span> <span class="n">numpy</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arccos</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arcsin</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arctan</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arctan2</span><span class="p">,</span>
     <span class="n">numpy</span><span class="o">.</span><span class="n">ceil</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">cos</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">cosh</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">exp</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">fabs</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">floor</span><span class="p">,</span>

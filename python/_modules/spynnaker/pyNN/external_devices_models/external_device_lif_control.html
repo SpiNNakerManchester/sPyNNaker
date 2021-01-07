@@ -54,6 +54,7 @@
 
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.exceptions</span> <span class="kn">import</span> <span class="n">ConfigurationException</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron</span> <span class="kn">import</span> <span class="n">AbstractPyNNNeuronModelStandard</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.defaults</span> <span class="kn">import</span> <span class="n">default_initial_values</span><span class="p">,</span>\
@@ -66,7 +67,7 @@
 <span class="kn">from</span> <span class="nn">.threshold_type_multicast_device_control</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ThresholdTypeMulticastDeviceControl</span><span class="p">)</span>
 
-<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
 
 
 <div class="viewcode-block" id="ExternalDeviceLifControl"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.ExternalDeviceLifControl">[docs]</a><span class="k">class</span> <span class="nc">ExternalDeviceLifControl</span><span class="p">(</span><span class="n">AbstractPyNNNeuronModelStandard</span><span class="p">):</span>

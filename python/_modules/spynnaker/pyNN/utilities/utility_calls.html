@@ -59,6 +59,7 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">from</span> <span class="nn">pyNN.random</span> <span class="kn">import</span> <span class="n">RandomDistribution</span>
 <span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">binom</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.safe_eval</span> <span class="kn">import</span> <span class="n">SafeEval</span>
@@ -92,7 +93,7 @@
     <span class="s1">&#39;randint&#39;</span><span class="p">:</span> <span class="n">RandomStatsRandIntImpl</span><span class="p">(),</span>
     <span class="s1">&#39;vonmises&#39;</span><span class="p">:</span> <span class="n">RandomStatsVonmisesImpl</span><span class="p">()}</span>
 
-<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
 
 
 <div class="viewcode-block" id="check_directory_exists_and_create_if_not"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.check_directory_exists_and_create_if_not">[docs]</a><span class="k">def</span> <span class="nf">check_directory_exists_and_create_if_not</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>

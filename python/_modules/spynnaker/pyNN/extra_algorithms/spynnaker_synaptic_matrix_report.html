@@ -55,11 +55,12 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.progress_bar</span> <span class="kn">import</span> <span class="n">ProgressBar</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SynapticConfigurationException</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neural_projections</span> <span class="kn">import</span> <span class="n">ProjectionApplicationEdge</span>
 
-<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
 <span class="n">_DIRNAME</span> <span class="o">=</span> <span class="s2">&quot;synaptic_matrix_reports&quot;</span>
 <span class="n">_TMPL_FILENAME</span> <span class="o">=</span> <span class="s2">&quot;synaptic_matrix_for_application_edge_</span><span class="si">{}</span><span class="s2">&quot;</span>
 
