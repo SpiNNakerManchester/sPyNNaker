@@ -37,7 +37,7 @@ logger = FormatAdapter(logging.getLogger(__file__))
 
 def _we_dont_do_this_now(*args):  # pylint: disable=unused-argument
     # pragma: no cover
-    raise NotImplementedError("sPyNNaker8 does not currently do this")
+    raise NotImplementedError("sPyNNaker does not currently do this")
 
 
 class PyNNPopulationCommon(object):

@@ -69,7 +69,7 @@ class Projection(PyNNProjectionCommon):
         # pylint: disable=too-many-arguments
         if source is not None:
             raise InvalidParameterType(
-                "sPyNNaker8 {} does not yet support multi-compartmental "
+                "sPyNNaker {} does not yet support multi-compartmental "
                 "cells.".format(__version__))
 
         self._check_population_param(pre_synaptic_population, connector)

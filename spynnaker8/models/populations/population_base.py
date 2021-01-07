@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 def _we_dont_do_this_now(*args):  # pylint: disable=unused-argument
     # pragma: no cover
-    raise NotImplementedError("sPyNNaker8 does not currently do this")
+    raise NotImplementedError("sPyNNaker does not currently do this")
 
 
 def _this_is_wholly_deprecated(msg, *args):  # pylint: disable=unused-argument
