@@ -300,7 +300,7 @@ static inline bool find_n_atoms(
 //! \return bool stating if successful or not.
 static inline bool cached_in_array(
         uint32_t atoms, uint32_t address_index, uint32_t key,
-        uint32_t* array_index) {
+        uint32_t array_index) {
     log_debug(
         "caching address entry %d into array with atoms %d with base key %d",
         address_index, atoms, key);
@@ -312,7 +312,7 @@ static inline bool cached_in_array(
     }
 
     // update and move marker
-    array_blocks[*array_index] = block;
+    array_blocks[array_index] = block;
 
     // store
     for (uint32_t atom_id = 0; atom_id < atoms; atom_id ++) {
@@ -339,7 +339,7 @@ static inline bool cached_in_array(
             // allocate dtcm for this row
             block[atom_id] = (synaptic_row_t) spin1_malloc(
                 size_in_words * BYTE_TO_WORD_CONVERSION);
-            if (array_blocks[*array_index] == NULL) {
+            if (array_blocks[array_index] == NULL) {
                 log_error(
                     "failed to malloc dtcm for block at index %d", address_index);
                 return false;
@@ -357,11 +357,11 @@ static inline bool cached_in_array(
 //! \param[in] atoms: the number of atoms in this block
 //! \param[in] address_index: the index of this address
 //! \param[in] key: the base routing key.
-//! \param[in/out] binary_index: the binary index for this block
+//! \param[in] binary_index: the binary index for this block
 //! \return bool stating if successful or not.
 static inline bool cached_in_binary_search(
         uint32_t atoms, uint32_t address_index, uint32_t key,
-        uint32_t* binary_index) {
+        uint32_t binary_index) {
     log_info("caching address entry %d into binary search", address_index);
     uint32_t elements_to_store = 0;
 
@@ -395,8 +395,8 @@ static inline bool cached_in_binary_search(
     }
 
     // update trackers
-    binary_blocks[*binary_index]->elements = block;
-    binary_blocks[*binary_index]->len_of_array = elements_to_store;
+    binary_blocks[binary_index]->elements = block;
+    binary_blocks[binary_index]->len_of_array = elements_to_store;
 
     // store
     uint32_t binary_block_index = 0;
@@ -416,8 +416,7 @@ static inline bool cached_in_binary_search(
             if (size_in_words != N_SYNAPSE_ROW_HEADER_WORDS) {
                 uint32_t size_in_bytes = size_in_words * BYTE_TO_WORD_CONVERSION;
                 block[binary_block_index].src_neuron_id = atom_id;
-                binary_blocks[*binary_index]->elements[binary_block_index].src_neuron_id = atom_id;
-                block[binary_block_index].row = spin1_malloc(size_in_bytes);
+                binary_blocks[binary_index]->elements[binary_block_index].src_neuron_id = atom_id;
                 log_info(
                     "set index %d src neuron id to %d with atom id %d",
                     binary_block_index,
@@ -425,13 +424,14 @@ static inline bool cached_in_binary_search(
 
                 log_info(
                     "from top level src neuron id is %d",
-                    binary_blocks[*binary_index]->elements[binary_block_index].src_neuron_id);
+                    binary_blocks[binary_index]->elements[binary_block_index].src_neuron_id);
 
+                block[binary_block_index].row = spin1_malloc(size_in_bytes);
                 if (block[binary_block_index].row == NULL) {
                     log_error(
                         "failed to allocate DTCM for binary index %d for "
                         "block index %d of size %d as left over memory is %d",
-                        *binary_index, binary_block_index, size_in_bytes,
+                        binary_index, binary_block_index, size_in_bytes,
                         sark_heap_max(sark.heap, 0));
                     return false;
                 }
@@ -491,7 +491,7 @@ static inline bool process_pop_entry_for_caching(
         if (correct_rep == BINARY_SEARCH) {
             log_info("binary cache");
             success = cached_in_binary_search(
-                atoms, address_index, pop_entry.key, binary_index);
+                atoms, address_index, pop_entry.key, *binary_index);
             if (success) {
                 address_list[address_index].addr.address = *binary_index;
                 *binary_index = *binary_index + 1;
@@ -500,7 +500,7 @@ static inline bool process_pop_entry_for_caching(
         } else if (correct_rep == ARRAY) {
             log_info("array cache");
             success = cached_in_array(
-                atoms, address_index, pop_entry.key, array_index);
+                atoms, address_index, pop_entry.key, *array_index);
             if (success) {
                 address_list[address_index].addr.address = *array_index;
                 *array_index = *array_index + 1;
