@@ -101,13 +101,13 @@ uint32_t n_master_pop_direct_matrix_look_ups = 0;
 void print_cache_arrays(address_t table_address) {
     pop_table_config_t *config = (pop_table_config_t *) table_address;
     for (uint32_t index = 0; index < config->n_binary_search_blocks; index++) {
-        binary_search_top block = binary_blocks[index];
-        log_info("blocks %d has %d elements", index, block.len_of_array);
-        for (uint32_t inner_index = 0; inner_index < block.len_of_array; inner_index++) {
-            binary_search_element element = block.elements[inner_index];
+        binary_search_top *block = &binary_blocks[index];
+        log_info("blocks %d has %d elements", index, block->len_of_array);
+        for (uint32_t inner_index = 0; inner_index < block->len_of_array; inner_index++) {
+            binary_search_element *element = &block->elements[inner_index];
             log_info(
                 "inner index %d contains the row for src neuron id %d",
-                inner_index, element.src_neuron_id);
+                inner_index, element->src_neuron_id);
         }
     }
 }
@@ -453,7 +453,7 @@ static inline bool cached_in_binary_search(
                 // move the sdram into dtcm
                 log_info(
                     "stored for key %08x and src neuron id %d", spike, atom_id);
-                spin1_memcpy(&binary_blocks[binary_index].elements[binary_block_index].row, &row, size_in_bytes);
+                spin1_memcpy(binary_blocks[binary_index].elements[binary_block_index].row, row, size_in_bytes);
             }
         } else {
             log_info("failed to read first address for key %08x", spike);
@@ -689,25 +689,25 @@ bool population_table_initialise(
 //! \param[out] row: the synaptic row
 //! \return the synaptic row data as uint32_t*'s.
 static inline bool binary_search_cache(
-        binary_search_top binary_search_point, uint32_t src_neuron_id,
+        binary_search_top *binary_search_point, uint32_t src_neuron_id,
         synaptic_row_t* row) {
 
     uint32_t imin = 0;
-    uint32_t imax = binary_search_point.len_of_array;
-    log_info("max array %d", binary_search_point.len_of_array);
+    uint32_t imax = binary_search_point->len_of_array;
+    log_info("max array %d", binary_search_point->len_of_array);
 
     while (imin < imax) {
         uint32_t imid = (imax + imin) >> 1;
-        binary_search_element entry = binary_search_point.elements[imid];
+        binary_search_element *entry = &binary_search_point->elements[imid];
         log_info(
             "src neuron id is %d and entry src neuron id is %d",
-            src_neuron_id, entry.src_neuron_id);
+            src_neuron_id, entry->src_neuron_id);
 
-        if (src_neuron_id == entry.src_neuron_id) {
+        if (src_neuron_id == entry->src_neuron_id) {
             log_info("returned");
-            *row = entry.row;
+            *row = entry->row;
             return true;
-        } else if (entry.src_neuron_id < src_neuron_id) {
+        } else if (entry->src_neuron_id < src_neuron_id) {
 
             // Entry must be in upper part of the table
             imin = imid + 1;
@@ -835,7 +835,7 @@ bool population_table_get_next_address(
                 *n_bytes_to_transfer = 0;
                 log_info("item address = %d", item.address);
                 bool success = binary_search_cache(
-                    binary_blocks[item.address], last_neuron_id, row);
+                    &binary_blocks[item.address], last_neuron_id, row);
                 if (!success) {
                     is_valid = false;
                     log_info("binary search failed to find the row");
