@@ -317,7 +317,7 @@ static inline bool population_table_set_start_and_count(
                 master_entry.key, &position)) {
             return false;
         }
-        log_debug("found extra info at index %d. skipping", position);
+        log_info("found extra info at index %d. skipping", position);
         *start += 1;
         *count -= 1;
     }
@@ -326,7 +326,7 @@ static inline bool population_table_set_start_and_count(
                 master_entry.key, &position)) {
             return false;
         }
-        log_debug("basic entry at master pop array at index %d", position);
+        log_info("basic entry at master pop array at index %d", position);
     }
     return true;
 }
