@@ -429,6 +429,11 @@ static inline bool initialise(void) {
         can_run = false;
     }
 
+    // only run if there are bitfields to use.
+    if (bit_field_base_address->n_filters == 0) {
+        can_run = false;
+    }
+
     return true;
 }
 
@@ -449,6 +454,10 @@ static void print_store(void) {
 //! \brief reads in the bitfields
 static inline bool read_in_bitfields(void) {
     // get the bitfields in a copy form
+    log_info(
+        "requires %d bytes for data store from %d and %d",
+        sizeof(not_redundant_tracker_t) * bit_field_base_address->n_filters,
+        sizeof(not_redundant_tracker_t), bit_field_base_address->n_filters);
     not_redundant_tracker = sark_xalloc(
         sv->sdram_heap,
         sizeof(not_redundant_tracker_t) * bit_field_base_address->n_filters,
