@@ -16,6 +16,7 @@
 import logging
 from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
@@ -31,7 +32,7 @@ from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spynnaker.pyNN.models.abstract_models import (
     AbstractSynapseExpandable, SYNAPSE_EXPANDER_APLX)
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 @add_metaclass(AbstractBase)

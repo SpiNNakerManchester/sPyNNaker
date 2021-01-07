@@ -15,6 +15,7 @@
 
 import logging
 import numpy
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
 try:
@@ -24,7 +25,7 @@ except ImportError as _ex:  # noqa: F821
     # Importing csa causes problems with readthedocs so allowing it to fail
     _csa_found = (False, _ex)
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class CSAConnector(AbstractConnector):

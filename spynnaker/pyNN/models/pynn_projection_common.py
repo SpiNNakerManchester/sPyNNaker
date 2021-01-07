@@ -16,6 +16,7 @@
 import logging
 import numpy
 from pyNN.random import RandomDistribution
+from spinn_utilities.log import FormatAdapter
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
@@ -28,7 +29,7 @@ from spynnaker.pyNN.models.neuron import ConnectionHolder
 
 # pylint: disable=protected-access
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 # noinspection PyProtectedMember
