@@ -311,7 +311,7 @@ static inline bool cached_in_array(
         log_error("failed to allocate DTCM for block with key %d", key);
     }
 
-    // update and move marker
+    // update
     array_blocks[array_index] = block;
 
     // store
