@@ -69,7 +69,7 @@ address_list_entry *address_list;
 synaptic_row_t** array_blocks;
 
 //! store of binary search blocks
-binary_search_top** binary_blocks;
+binary_search_top* binary_blocks;
 
 //! \brief the number of times a DMA resulted in 0 entries
 uint32_t ghost_pop_table_searches = 0;
@@ -395,8 +395,8 @@ static inline bool cached_in_binary_search(
     }
 
     // update trackers
-    binary_blocks[binary_index]->elements = block;
-    binary_blocks[binary_index]->len_of_array = elements_to_store;
+    binary_blocks[binary_index].elements = block;
+    binary_blocks[binary_index].len_of_array = elements_to_store;
 
     // store
     uint32_t binary_block_index = 0;
@@ -416,7 +416,7 @@ static inline bool cached_in_binary_search(
             if (size_in_words != N_SYNAPSE_ROW_HEADER_WORDS) {
                 uint32_t size_in_bytes = size_in_words * BYTE_TO_WORD_CONVERSION;
                 block[binary_block_index].src_neuron_id = atom_id;
-                binary_blocks[binary_index]->elements[binary_block_index].src_neuron_id = atom_id;
+                binary_blocks[binary_index].elements[binary_block_index].src_neuron_id = atom_id;
                 log_info(
                     "set index %d src neuron id to %d with atom id %d",
                     binary_block_index,
@@ -424,7 +424,7 @@ static inline bool cached_in_binary_search(
 
                 log_info(
                     "from top level src neuron id is %d",
-                    binary_blocks[binary_index]->elements[binary_block_index].src_neuron_id);
+                    binary_blocks[binary_index].elements[binary_block_index].src_neuron_id);
 
                 block[binary_block_index].row = spin1_malloc(size_in_bytes);
                 if (block[binary_block_index].row == NULL) {
@@ -678,15 +678,15 @@ bool population_table_initialise(
 //! \param[out] row: the synaptic row
 //! \return the synaptic row data as uint32_t*'s.
 static inline bool binary_search_cache(
-        binary_search_top *binary_search_point, uint32_t src_neuron_id,
+        binary_search_top binary_search_point, uint32_t src_neuron_id,
         synaptic_row_t* row) {
 
     uint32_t imin = 0;
-    uint32_t imax = binary_search_point->len_of_array;
+    uint32_t imax = binary_search_point.len_of_array;
 
     while (imin < imax) {
         uint32_t imid = (imax + imin) >> 1;
-        binary_search_element entry = binary_search_point->elements[imid];
+        binary_search_element entry = binary_search_point.elements[imid];
         log_info(
             "src neuron id is %d and entry src neuron id is %d",
             src_neuron_id, entry.src_neuron_id);
