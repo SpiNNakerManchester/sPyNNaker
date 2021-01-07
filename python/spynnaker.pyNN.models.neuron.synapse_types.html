@@ -823,7 +823,7 @@ they appear</p>
 
 <dl class="py class">
 <dt id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD">
-<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neuron.synapse_types.</code><code class="sig-name descname">SynapseTypeSEMD</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tau_syn_E</span></em>, <em class="sig-param"><span class="n">tau_syn_E2</span></em>, <em class="sig-param"><span class="n">tau_syn_I</span></em>, <em class="sig-param"><span class="n">isyn_exc</span></em>, <em class="sig-param"><span class="n">isyn_exc2</span></em>, <em class="sig-param"><span class="n">isyn_inh</span></em>, <em class="sig-param"><span class="n">multiplicator</span></em>, <em class="sig-param"><span class="n">exc2_old</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_semd.html#SynapseTypeSEMD"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neuron.synapse_types.</code><code class="sig-name descname">SynapseTypeSEMD</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tau_syn_E</span></em>, <em class="sig-param"><span class="n">tau_syn_E2</span></em>, <em class="sig-param"><span class="n">tau_syn_I</span></em>, <em class="sig-param"><span class="n">isyn_exc</span></em>, <em class="sig-param"><span class="n">isyn_exc2</span></em>, <em class="sig-param"><span class="n">isyn_inh</span></em>, <em class="sig-param"><span class="n">multiplicator</span></em>, <em class="sig-param"><span class="n">exc2_old</span></em>, <em class="sig-param"><span class="n">scaling_factor</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_semd.html#SynapseTypeSEMD"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -836,6 +836,7 @@ they appear</p>
 <li><p><strong>isyn_inh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(I^{syn}_i\)</span></p></li>
 <li><p><strong>multiplicator</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – </p></li>
 <li><p><strong>exc2_old</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – </p></li>
+<li><p><strong>scaling_factor</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – </p></li>
 </ul>
 </dd>
 </dl>
@@ -992,6 +993,11 @@ they appear</p>
 <dd></dd></dl>
 
 <dl class="py method">
+<dt id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.scaling_factor">
+<em class="property">property </em><code class="sig-name descname">scaling_factor</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.scaling_factor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.tau_syn_E">
 <em class="property">property </em><code class="sig-name descname">tau_syn_E</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.tau_syn_E" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -1094,7 +1100,7 @@ they appear</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2017.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.2.
     </div>
   </body>
 </html>

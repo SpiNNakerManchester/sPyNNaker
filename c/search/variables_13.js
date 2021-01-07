@@ -12,7 +12,7 @@ var searchData=
   ['samples_5fremaining_4137',['samples_remaining',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/profiler_8h.html#a7f57ae7f0b5b21b3704cac3695fedde9',1,'profiler_state']]],
   ['sark_5fslot_4138',['sark_slot',['http://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html#ae15883722c2dfa5b27eacebb0acd372e',1,'sark_vec_t']]],
   ['saturation_5fcount_4139',['saturation_count',['../delay__extension_8c.html#af98038a462abb37d565a0f4e6fbc2b2a',1,'delay_extension.c']]],
-  ['scaling_5ffactor_4140',['SCALING_FACTOR',['../synapse__types__semd__impl_8h.html#a85262ffe0e577594752d69035b2249c2',1,'synapse_types_semd_impl.h']]],
+  ['scaling_5ffactor_4140',['scaling_factor',['../synapse__types__semd__impl_8h.html#af29469cba3047bb7b6f9b64eb0daf0bf',1,'synapse_param_t']]],
   ['sdiv_4141',['sdiv',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/spinn__extra_8h.html#a660980f7bfac87937f71cfa10062b1e1',1,'sc_clock_mux_t']]],
   ['sdp_5fdest_4142',['sdp_dest',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/live__packet__gather_8c.html#a0360b5efd051469b543f86e23c94e9f2',1,'lpg_config']]],
   ['sdp_5fport_4143',['sdp_port',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/recording_8c.html#af070d61a2e388be08c8126bef2403a17',1,'recording_data_t']]],

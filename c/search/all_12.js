@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['r_1482',['R',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/spinn__extra_8h.html#a0848ff4af8ebb953f8f2c735a9ff024f',1,'sdram_dll_status_t::R()'],['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/spinn__extra_8h.html#ac6c705a7c4076e680c0fe17a6918ee1e',1,'sdram_dll_user_config0_t::R()'],['http://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html#a2235ccee39f7f922d3cd59a9f9854d8b',1,'vcpu_t::r()']]],
+  ['r_1482',['r',['http://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html#a2235ccee39f7f922d3cd59a9f9854d8b',1,'vcpu_t::r()'],['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/spinn__extra_8h.html#a0848ff4af8ebb953f8f2c735a9ff024f',1,'sdram_dll_status_t::R()'],['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/spinn__extra_8h.html#ac6c705a7c4076e680c0fe17a6918ee1e',1,'sdram_dll_user_config0_t::R()']]],
   ['r_5fmembrane_1483',['R_membrane',['../neuron__model__lif__impl_8h.html#aea78ba2caa325540d8571d35eba56b13',1,'neuron_t']]],
   ['rand_5fint_1484',['rand_int',['../sp__structs_8h.html#abfe9bbac4f366e370a68a174d26c0261',1,'sp_structs.h']]],
   ['random_1485',['random',['http://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html#aefcbe56944d42fc97fc6cd936529f008',1,'sark_data_t::random()'],['http://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html#ab2c7b4f5f622c5a397833ba72fd58b2a',1,'sv_t::random()']]],

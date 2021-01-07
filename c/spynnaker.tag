@@ -7725,13 +7725,6 @@
       <anchor>a8c173175ef5d71b07f3bc7d511cc11c7</anchor>
       <arglist>(synapse_param_t *parameters)</arglist>
     </member>
-    <member kind="variable" static="yes">
-      <type>static const REAL</type>
-      <name>SCALING_FACTOR</name>
-      <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
-      <anchor>a85262ffe0e577594752d69035b2249c2</anchor>
-      <arglist></arglist>
-    </member>
     <member kind="variable">
       <type>input_t</type>
       <name>excitatory_response</name>
@@ -12463,6 +12456,13 @@
       <name>exc2_old</name>
       <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
       <anchor>a8d690bc6f7611e73dc3f2841d7bfbc91</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>input_t</type>
+      <name>scaling_factor</name>
+      <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
+      <anchor>af29469cba3047bb7b6f9b64eb0daf0bf</anchor>
       <arglist></arglist>
     </member>
   </compound>
