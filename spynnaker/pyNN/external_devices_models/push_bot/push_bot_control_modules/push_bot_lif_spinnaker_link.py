@@ -25,7 +25,7 @@ logger = FormatAdapter(logging.getLogger(__name__))
 class PushBotLifSpinnakerLink(ExternalDeviceLifControl):
     """ Control module for a PushBot connected to a SpiNNaker Link
 
-    :param MunichIoSpiNNakerLinkProtocol protocol:
+    :param ~spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol protocol:
         How to talk to the bot.
     :param iterable(AbstractMulticastControllableDevice) devices:
         The devices on the bot that we are interested in.

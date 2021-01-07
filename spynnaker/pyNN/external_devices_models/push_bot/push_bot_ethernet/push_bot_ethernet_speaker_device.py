@@ -37,7 +37,8 @@ class PushBotEthernetSpeakerDevice(
             timesteps_between_send=None):
         """
         :param speaker: The PushBotSpeaker value to control
-        :type speaker: PushBotSpeaker
+        :type speaker:
+            ~spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.PushBotSpeaker
         :param protocol: The protocol instance to get commands from
         :type protocol: MunichIoEthernetProtocol
         :param start_active_time: The "active time" to set at the start

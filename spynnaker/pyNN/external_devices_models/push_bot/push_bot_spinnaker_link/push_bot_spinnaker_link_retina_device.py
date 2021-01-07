@@ -39,9 +39,10 @@ class PushBotSpiNNakerLinkRetinaDevice(
         """
         :param spinnaker_link_id:
         :param protocol:
-        :type protocol: MunichIoSpiNNakerLinkProtocol
+        :type protocol: ~spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol
         :param resolution:
-        :type resolution: PushBotRetinaResolution
+        :type resolution:
+            ~spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.PushBotRetinaResolution
         :param board_address:
         :param label:
         """

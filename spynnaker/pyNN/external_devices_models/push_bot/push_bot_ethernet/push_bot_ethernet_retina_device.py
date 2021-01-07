@@ -32,7 +32,8 @@ class PushBotEthernetRetinaDevice(
         :param protocol:
         :type protocol: MunichIoEthernetProtocol
         :param resolution:
-        :type resolution: PushBotRetinaResolution
+        :type resolution:
+            ~spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.PushBotRetinaResolution
         :param pushbot_ip_address:
         :param pushbot_port:
         :param injector_port:

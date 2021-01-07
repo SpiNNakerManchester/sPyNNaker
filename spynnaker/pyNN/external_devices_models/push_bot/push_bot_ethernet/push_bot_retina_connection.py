@@ -53,7 +53,8 @@ class PushBotRetinaConnection(SpynnakerLiveSpikesConnection):
         :param pushbot_wifi_connection:
         :type pushbot_wifi_connection: PushBotWIFIConnection
         :param resolution:
-        :type resolution: PushBotRetinaResolution
+        :type resolution:
+            ~spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.PushBotRetinaResolution
         :param local_host:
         :type local_host: str or None
         :param local_port:

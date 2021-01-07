@@ -93,5 +93,6 @@ class PushBotEthernetDevice(with_metaclass(
             separately from the protocol used to control the device.
 
         :param command_protocol: The protocol to use for this device
-        :type command_protocol: MunichIoSpiNNakerLinkProtocol
+        :type command_protocol:
+            ~spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol
         """

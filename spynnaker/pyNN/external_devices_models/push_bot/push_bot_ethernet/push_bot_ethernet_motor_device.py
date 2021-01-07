@@ -34,7 +34,8 @@ class PushBotEthernetMotorDevice(
     def __init__(self, motor, protocol, timesteps_between_send=None):
         """
         :param motor: a PushBotMotor value to indicate the motor to control
-        :type motor: PushBotMotor
+        :type motor:
+            ~spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.PushBotMotor
         :param protocol: The protocol used to control the device
         :type protocol: MunichIoEthernetProtocol
         :param timesteps_between_send:

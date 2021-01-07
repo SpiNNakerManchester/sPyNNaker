@@ -38,7 +38,8 @@ class PushBotEthernetLEDDevice(
             timesteps_between_send=None):
         """
         :param led: The PushBotLED parameter to control
-        :type led: PushBotLED
+        :type led:
+            ~spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.PushBotLED
         :param protocol: The protocol instance to get commands from
         :type protocol: MunichIoEthernetProtocol
         :param start_active_time_front:

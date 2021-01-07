@@ -37,7 +37,8 @@ class PushBotEthernetLaserDevice(
             start_frequency=None, timesteps_between_send=None):
         """
         :param laser: The PushBotLaser value to control
-        :type laser: PushBotLaser
+        :type laser:
+            ~spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.PushBotLaser
         :param protocol: The protocol instance to get commands from
         :type protocol: MunichIoEthernetProtocol
         :param start_active_time: The "active time" value to send at the start

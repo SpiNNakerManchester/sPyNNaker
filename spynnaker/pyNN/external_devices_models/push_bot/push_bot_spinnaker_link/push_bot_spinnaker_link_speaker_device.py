@@ -42,9 +42,11 @@ class PushBotSpiNNakerLinkSpeakerDevice(
             start_frequency=default_parameters['start_frequency'],
             start_melody=default_parameters['start_melody']):
         """
-        :param PushBotSpeaker speaker: The PushBotSpeaker value to control
-        :param MunichIoSpiNNakerLinkProtocol protocol:
-            The protocol instance to get commands from
+        :param speaker: Which speaker device to control
+        :type speaker:
+            ~spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.PushBotSpeaker
+        :param protocol: The protocol instance to get commands from
+        :type protocol: ~spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol
         :param int spinnaker_link_id: The SpiNNakerLink connected to
         :param int n_neurons: The number of neurons in the device
         :param str label: The label of the device

@@ -35,9 +35,11 @@ class PushBotSpiNNakerLinkMotorDevice(
             label=default_parameters['label'],
             board_address=default_parameters['board_address']):
         """
-        :param PushBotMotor motor: the motor to control
-        :param MunichIoSpiNNakerLinkProtocol protocol:
-            The protocol used to control the device
+        :param motor: the motor to control
+        :type motor:
+            ~spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.PushBotMotor
+        :param protocol: The protocol used to control the device
+        :type protocol: ~spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol
         :param int spinnaker_link_id: The SpiNNakerLink connected to
         :param int n_neurons: The number of neurons in the device
         :param str label: The label of the device

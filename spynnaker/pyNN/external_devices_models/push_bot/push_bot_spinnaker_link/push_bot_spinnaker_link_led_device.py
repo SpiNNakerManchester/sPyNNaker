@@ -41,9 +41,11 @@ class PushBotSpiNNakerLinkLEDDevice(
             start_total_period=default_parameters['start_total_period'],
             start_frequency=default_parameters['start_frequency']):
         """
-        :param PushBotLED led: The LED devic to control
-        :param MunichIoSpiNNakerLinkProtocol protocol:
-            The protocol instance to get commands from
+        :param led: The LED device to control
+        :type led:
+            ~spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.PushBotLED
+        :param protocol: The protocol instance to get commands from
+        :type protocol: ~spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol
         :param int spinnaker_link_id: The SpiNNakerLink connected to
         :param int n_neurons: The number of neurons in the device
         :param str label: The label of the device
