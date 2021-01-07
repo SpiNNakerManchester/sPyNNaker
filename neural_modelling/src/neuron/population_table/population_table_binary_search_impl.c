@@ -416,11 +416,16 @@ static inline bool cached_in_binary_search(
             if (size_in_words != N_SYNAPSE_ROW_HEADER_WORDS) {
                 uint32_t size_in_bytes = size_in_words * BYTE_TO_WORD_CONVERSION;
                 block[binary_block_index].src_neuron_id = atom_id;
+                binary_blocks[*binary_index]->elements[binary_block_index].src_neuron_id = atom_id;
                 block[binary_block_index].row = spin1_malloc(size_in_bytes);
                 log_info(
                     "set index %d src neuron id to %d with atom id %d",
                     binary_block_index,
                     block[binary_block_index].src_neuron_id, atom_id);
+
+                log_info(
+                    "from top level src neuron id is %d",
+                    binary_blocks[*binary_index]->elements[binary_block_index].src_neuron_id);
 
                 if (block[binary_block_index].row == NULL) {
                     log_error(
@@ -434,7 +439,7 @@ static inline bool cached_in_binary_search(
                 // move the sdram into dtcm
                 log_info(
                     "stored for key %08x and src neuron id %d", spike, atom_id);
-                spin1_memcpy(block[binary_block_index].row, row, size_in_bytes);
+                spin1_memcpy(&block[binary_block_index].row, &row, size_in_bytes);
             }
         } else {
             log_info("failed to read first address for key %08x", spike);
