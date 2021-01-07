@@ -97,6 +97,21 @@ uint32_t n_master_pop_direct_matrix_look_ups = 0;
 //! \name Support functions
 //! \{
 
+//! \brief prints the binary cache data
+void print_cache_arrays(address_t table_address) {
+    pop_table_config_t *config = (pop_table_config_t *) table_address;
+    for (uint32_t index = 0; index < config->n_binary_search_blocks; index++) {
+        binary_search_top block = binary_blocks[index];
+        log_info("blocks %d has %d elements", index, block.len_of_array);
+        for (uint32_t inner_index = 0; inner_index < block.len_of_array; inner_index++) {
+            binary_search_element element = block.elements[inner_index];
+            log_info(
+                "inner index %d contains the row for src neuron id %d",
+                inner_index, element.src_neuron_id);
+        }
+    }
+}
+
 //! \brief Get the source core index from a spike
 //! \param[in] extra: The extra info entry
 //! \param[in] spike: The spike received
@@ -388,14 +403,13 @@ static inline bool cached_in_binary_search(
     }
 
     // malloc space for array
-    binary_search_element *block = spin1_malloc(
+    binary_blocks[binary_index].elements = spin1_malloc(
         sizeof(binary_search_element) * elements_to_store);
-    if (block == NULL) {
+    if (binary_blocks[binary_index].elements == NULL) {
         log_error("failed to allocate DTCM for block with key %d", key);
     }
 
     // update trackers
-    binary_blocks[binary_index].elements = block;
     binary_blocks[binary_index].len_of_array = elements_to_store;
     log_info("size of array is %d", elements_to_store);
 
@@ -416,19 +430,18 @@ static inline bool cached_in_binary_search(
 
             if (size_in_words != N_SYNAPSE_ROW_HEADER_WORDS) {
                 uint32_t size_in_bytes = size_in_words * BYTE_TO_WORD_CONVERSION;
-                block[binary_block_index].src_neuron_id = atom_id;
                 binary_blocks[binary_index].elements[binary_block_index].src_neuron_id = atom_id;
                 log_info(
                     "set index %d src neuron id to %d with atom id %d",
                     binary_block_index,
-                    block[binary_block_index].src_neuron_id, atom_id);
+                    binary_blocks[binary_index].elements[binary_block_index].src_neuron_id, atom_id);
 
                 log_info(
                     "from top level src neuron id is %d",
                     binary_blocks[binary_index].elements[binary_block_index].src_neuron_id);
 
-                block[binary_block_index].row = spin1_malloc(size_in_bytes);
-                if (block[binary_block_index].row == NULL) {
+                binary_blocks[binary_index].elements[binary_block_index].row = spin1_malloc(size_in_bytes);
+                if (binary_blocks[binary_index].elements[binary_block_index].row == NULL) {
                     log_error(
                         "failed to allocate DTCM for binary index %d for "
                         "block index %d of size %d as left over memory is %d",
@@ -440,7 +453,7 @@ static inline bool cached_in_binary_search(
                 // move the sdram into dtcm
                 log_info(
                     "stored for key %08x and src neuron id %d", spike, atom_id);
-                spin1_memcpy(&block[binary_block_index].row, &row, size_in_bytes);
+                spin1_memcpy(&binary_blocks[binary_index].elements[binary_block_index].row, &row, size_in_bytes);
             }
         } else {
             log_info("failed to read first address for key %08x", spike);
@@ -584,6 +597,7 @@ static inline bool cache_synaptic_blocks(
             log_info("successfully cached entry at %d", pop_entry_index);
         }
     }
+    print_cache_arrays(table_address);
     log_info("finish cache");
     return true;
 }
@@ -609,18 +623,14 @@ bool population_table_initialise(
     synaptic_rows_base_address = (uint32_t) synapse_rows_address;
     direct_rows_base_address = (uint32_t) direct_rows_address;
 
-    // cast to correct store
-    pop_table_config_t* store = (pop_table_config_t*) table_address;
-
-    master_population_table_length = store->table_length;
     log_info("Master pop table length is %d\n", master_population_table_length);
     log_info("Master pop table entry size is %d\n",
             sizeof(master_population_table_entry));
     uint32_t n_master_pop_bytes =
             master_population_table_length * sizeof(master_population_table_entry);
     log_info("Pop table size is %d\n", n_master_pop_bytes);
-    log_info("n cached array blocks = %d", store->n_array_blocks);
-    log_info("n cached binary blocks = %d", store->n_binary_search_blocks);
+    log_info("n cached array blocks = %d", config->n_array_blocks);
+    log_info("n cached binary blocks = %d", config->n_binary_search_blocks);
 
     // only try to malloc if there's stuff to malloc.
     if (n_master_pop_bytes != 0) {

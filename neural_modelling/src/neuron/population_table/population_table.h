@@ -174,6 +174,7 @@ extern uint32_t direct_rows_base_address;
 //! =================================================================
 
 //! debug bits to change dtcm state for printing
+void print_cache_arrays(address_t table_address);
 
 //! \brief sets a address list element to a different rep
 //! \param[in] index: position in address list.

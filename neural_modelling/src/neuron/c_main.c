@@ -230,6 +230,9 @@ static bool initialise(void) {
             &row_max_n_words)) {
         return false;
     }
+    print_cache_arrays(
+        data_specification_get_region(POPULATION_TABLE_REGION, ds_regions));
+
     // Set up the synapse dynamics
     if (!synapse_dynamics_initialise(
             data_specification_get_region(SYNAPSE_DYNAMICS_REGION, ds_regions),
