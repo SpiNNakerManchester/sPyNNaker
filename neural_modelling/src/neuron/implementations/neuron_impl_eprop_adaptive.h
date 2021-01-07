@@ -337,7 +337,8 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 //    }
     if(neuron_index == 0){
 //        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[0+neuron_index].el_a;
-        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[10+neuron_index].delta_w;
+//        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[10+neuron_index].delta_w;
+        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->L;
 //        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[0+neuron_index].e_bar;
 //        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = *exc_value;
     }
@@ -345,19 +346,22 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 //    }
     else if(neuron_index == 1){
 //        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[20+neuron_index].el_a;
-        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[10+neuron_index].delta_w;
+//        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[10+neuron_index].delta_w;
+        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->L;
 //        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[10+neuron_index].e_bar;
 //        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = *exc_value;
     }
     else if(neuron_index == 2){
 //        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[20+neuron_index].el_a;
-        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[10+neuron_index].delta_w;
+//        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[10+neuron_index].delta_w;
+        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->L;
 //        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[10+neuron_index].e_bar;
 //        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = *exc_value;
     }
     else{
 //        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[10+neuron_index].el_a;
-        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[0+neuron_index].delta_w;
+//        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[0+neuron_index].delta_w;
+        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->L;
 //        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[0+neuron_index].e_bar;
 //        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = *exc_input_values;
     }
@@ -369,10 +373,10 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
             NUM_INHIBITORY_RECEPTORS, inh_input_values,
             external_bias, neuron, B_t);
 
-    REAL accum_time = (accum)(time%13000) * 0.001;
-    if (!accum_time){
-        accum_time += 1.k;
-    }
+//    REAL accum_time = (accum)(time%13000) * 0.001;
+//    if (!accum_time){
+//        accum_time += 1.k;
+//    }
 //    REAL reg_learning_signal = (global_parameters->core_pop_rate
 ////                                    / ((accum)(time%1300)
 ////                                    / (1.225k
@@ -381,7 +385,10 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 //                                    - global_parameters->core_target_rate;
 //    REAL reg_learning_signal = global_parameters->core_target_rate - (global_parameters->core_pop_rate / syn_dynamics_neurons_in_partition);
 //    REAL reg_learning_signal = (global_parameters->core_pop_rate / syn_dynamics_neurons_in_partition) - global_parameters->core_target_rate;
-    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->neuron_rate;//reg_learning_signal;//
+    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] =
+//                                            neuron->neuron_rate;
+                                            neuron->B;
+                                            //reg_learning_signal;//
 
 
 

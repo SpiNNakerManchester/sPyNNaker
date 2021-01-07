@@ -165,7 +165,7 @@ state_t neuron_model_state_update(
 //    if (new_learning_signal != learning_signal){// && time%1300 > 1100){
 //        io_printf(IO_BUF, "L:%k, rL:%k, cL:%k, nL:%k\n", learning_signal, reg_learning_signal, learning_signal + reg_learning_signal, new_learning_signal);
 //    if (reg_learning_signal > 0.5k || reg_learning_signal < -0.5k){
-    new_learning_signal =  v_mem_error + (reg_learning_signal);
+    new_learning_signal =  v_mem_error;// + (reg_learning_signal);
     for (uint32_t syn_ind=0; syn_ind < 10; syn_ind++){
         new_learning_signal += (learning_signal[syn_ind] * neuron->w_fb[syn_ind]);
     }
@@ -192,7 +192,7 @@ state_t neuron_model_state_update(
 //        io_printf(IO_BUF, "during B = %k, b = %k, time = %u\n", neuron->B, neuron->b, time);
 //    }
     if ((time % test_length == 0 || time % test_length == 1) && neuron->number_of_cues){
-//        io_printf(IO_BUF, "before B = %k, b = %k\n", neuron->B, neuron->b);
+//        io_printf(IO_BUF, "time %d\nbefore B = %k, b = %k\n", time, neuron->B, neuron->b);
         neuron->B = neuron->b_0;
         neuron->b = 0.k;
         neuron->V_membrane = neuron->V_rest;
@@ -386,23 +386,29 @@ void neuron_model_print_state_variables(restrict neuron_pointer_t neuron) {
 }
 
 void neuron_model_print_parameters(restrict neuron_pointer_t neuron) {
-//    io_printf(IO_BUF, "V reset       = %11.4k mv\n\n", neuron->V_reset);
-//    io_printf(IO_BUF, "V rest        = %11.4k mv\n", neuron->V_rest);
-//
-//    io_printf(IO_BUF, "I offset      = %11.4k nA\n", neuron->I_offset);
-//    io_printf(IO_BUF, "R membrane    = %11.4k Mohm\n", neuron->R_membrane);
-//
-//    io_printf(IO_BUF, "exp(-ms/(RC)) = %11.4k [.]\n", neuron->exp_TC);
-//
-//    io_printf(IO_BUF, "T refract     = %u timesteps\n", neuron->T_refract);
-//
-//    io_printf(IO_BUF, "learning      = %k n/a\n", neuron->L);
-//
-//    io_printf(IO_BUF, "feedback w    = %k n/a\n\n", neuron->w_fb);
-//
-//    io_printf(IO_BUF, "window size   = %u ts\n", neuron->window_size);
-//
-//    io_printf(IO_BUF, "beta    = %k n/a\n", neuron->beta);
-//
-//    io_printf(IO_BUF, "adpt          = %k n/a\n", neuron->adpt);
+    io_printf(IO_BUF, "V reset       = %11.4k mv\n\n", neuron->V_reset);
+    io_printf(IO_BUF, "V rest        = %11.4k mv\n", neuron->V_rest);
+
+    io_printf(IO_BUF, "I offset      = %11.4k nA\n", neuron->I_offset);
+    io_printf(IO_BUF, "R membrane    = %11.4k Mohm\n", neuron->R_membrane);
+
+    io_printf(IO_BUF, "exp(-ms/(RC)) = %11.4k [.]\n", neuron->exp_TC);
+
+    io_printf(IO_BUF, "T refract     = %u timesteps\n", neuron->T_refract);
+
+    io_printf(IO_BUF, "learning      = %k n/a\n", neuron->L);
+
+    io_printf(IO_BUF, "feedback w    = %k n/a\n\n", neuron->w_fb);
+
+    io_printf(IO_BUF, "window size   = %u ts\n", neuron->window_size);
+
+    io_printf(IO_BUF, "beta    = %k n/a\n", neuron->beta);
+
+    io_printf(IO_BUF, "b_0    = %k n/a\n", neuron->b_0);
+
+    io_printf(IO_BUF, "b    = %k n/a\n", neuron->b);
+
+    io_printf(IO_BUF, "B    = %k n/a\n", neuron->B);
+
+    io_printf(IO_BUF, "adpt          = %k n/a\n", neuron->adpt);
 }
