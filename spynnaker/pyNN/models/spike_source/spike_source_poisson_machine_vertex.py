@@ -226,7 +226,7 @@ class SpikeSourcePoissonMachineVertex(
         n_times_tdma_fell_behind = provenance_data[
             self.EXTRA_PROVENANCE_DATA_ENTRIES.TDMA_MISSED_SLOTS.value]
 
-        label, x, y, p, names = self._get_placement_details(placement)
+        _, x, y, p, names = self._get_placement_details(placement)
 
         provenance_items.append(
             self._app_vertex.get_tdma_provenance_item(

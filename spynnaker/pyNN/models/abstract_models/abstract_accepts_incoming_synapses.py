@@ -15,11 +15,14 @@
 
 from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from pacman.exceptions import PacmanConfigurationException
 
 
 @add_metaclass(AbstractBase)
 class AbstractAcceptsIncomingSynapses(object):
     """ Indicates an object that can be a post-vertex in a PyNN projection.
+
+    Note: See verify_splitter
     """
     __slots__ = ()
 
@@ -39,26 +42,18 @@ class AbstractAcceptsIncomingSynapses(object):
         """
 
     @abstractmethod
-    def get_maximum_delay_supported_in_ms(self, machine_time_step):
-        """ Get the maximum delay supported by this vertex.
-
-        :param int machine_time_step: microseconds
-        :rtype: int
-        """
-
-    @abstractmethod
     def get_connections_from_machine(
             self, transceiver, placements, app_edge, synapse_info):
         # pylint: disable=too-many-arguments
         """ Get the connections from the machine post-run.
 
-        :param ~spinnman.transceiver.Transceiver transceiver:
+        :param ~spinnman.transceiver.Transceiver transceiver:\
             How to read the connection data
-        :param ~pacman.model.placements.Placements placements:
+        :param ~pacman.model.placements.Placements placements:\
             Where the connection data is on the machine
-        :param ProjectionApplicationEdge app_edge:
+        :param ProjectionApplicationEdge app_edge:\
             The edge for which the data is being read
-        :param SynapseInformation synapse_info:
+        :param SynapseInformation synapse_info:\
             The specific projection within the edge
         """
 
@@ -66,3 +61,25 @@ class AbstractAcceptsIncomingSynapses(object):
     def clear_connection_cache(self):
         """ Clear the connection data stored in the vertex so far.
         """
+
+    def verify_splitter(self, splitter):
+        """
+        Check that the splitter implements the API(s) expected by the\
+        SynapticMatrices
+
+        Any Vertex that implements this api should override
+        ApplicationVertex.splitter method to also call this function
+
+        :param splitter: the splitter
+        :type splitter:
+            ~spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay
+        :raises PacmanConfigurationException: is the splitter is not an \
+            instance of AbstractSpynnakerSplitterDelay
+        """
+        # Delayed import to avoid cicular dependency
+        from spynnaker.pyNN.extra_algorithms.splitter_components import (
+            AbstractSpynnakerSplitterDelay)
+        if not isinstance(splitter, AbstractSpynnakerSplitterDelay):
+            raise PacmanConfigurationException(
+                "The splitter needs to be an instance of "
+                "----------------AbstractSpynnakerSplitterDelay")

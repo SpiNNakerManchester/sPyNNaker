@@ -81,13 +81,12 @@ class SynapticMatrix(object):
                  delay_routing_info, weight_scales, all_syn_block_sz,
                  all_single_syn_sz):
         """
-
         :param SynapseIORowBased synapse_io: The reader and writer of synapses
         :param MasterPopTableAsBinarySearch poptable:
             The master population table
         :param SynapseInformation synapse_info:
             The projection synapse information
-        :param ProjectionMachineEdge machine_edge:
+        :param ~pacman.model.graphs.machine.MachineEdge machine_edge:
             The projection machine edge
         :param ProjectionApplicationEdge app_edge:
             The projection application edge
@@ -169,9 +168,10 @@ class SynapticMatrix(object):
             not self.__synapse_info.postpop_is_view)
         return is_direct, next_addr
 
-    def get_row_data(self):
+    def get_row_data(self, machine_time_step):
         """ Generate the row data for a synaptic matrix from the description
 
+        :param float machine_time_step: the sim machine time step.
         :return: The data and the delayed data
         :rtype: tuple(~numpy.ndarray or None, ~numpy.ndarray or None)
         """
@@ -185,7 +185,8 @@ class SynapticMatrix(object):
             self.__n_synapse_types, self.__weight_scales,
             self.__machine_edge, self.__max_row_info,
             self.__routing_info is not None,
-            self.__delay_routing_info is not None)
+            self.__delay_routing_info is not None,
+            machine_time_step, self.__app_edge)
 
         if self.__app_edge.delay_edge is not None:
             pre_vertex_slice = self.__machine_edge.pre_vertex.vertex_slice
@@ -305,7 +306,7 @@ class SynapticMatrix(object):
         return single_addr
 
     def next_app_on_chip_address(self, app_block_addr, max_app_addr):
-        """ Allocate a machine-level address of a matrix from within an
+        """ Allocate a machine-level address of a matrix from within an\
             app-level allocation
 
         :param int app_block_addr:
@@ -326,8 +327,8 @@ class SynapticMatrix(object):
         return app_block_addr, addr
 
     def next_app_delay_on_chip_address(self, app_block_addr, max_app_addr):
-        """ Allocate a machine-level address of a delayed matrix from within an
-            app-level allocation
+        """ Allocate a machine-level address of a delayed matrix from within\
+            an app-level allocation
 
         :param int app_block_addr:
             The current position in the application block
@@ -347,7 +348,7 @@ class SynapticMatrix(object):
         return app_block_addr, addr
 
     def next_on_chip_address(self, block_addr):
-        """ Allocate an address for a machine matrix and add it to the
+        """ Allocate an address for a machine matrix and add it to the\
             population table
 
         :param int block_addr:
@@ -376,8 +377,8 @@ class SynapticMatrix(object):
         return block_addr, self.__syn_mat_offset
 
     def next_delay_on_chip_address(self, block_addr):
-        """ Allocate an address for a delayed machine matrix and add it to the
-            population table
+        """ Allocate an address for a delayed machine matrix and add it to \
+            the population table
 
         :param int block_addr:
             The address at which to start the allocation
@@ -404,16 +405,21 @@ class SynapticMatrix(object):
         block_addr = self.__next_addr(block_addr, self.__delay_matrix_size)
         return block_addr, self.__delay_syn_mat_offset
 
-    def get_generator_data(self, syn_mat_offset, d_mat_offset):
+    def get_generator_data(
+            self, syn_mat_offset, d_mat_offset, max_delay_per_stage,
+            machine_time_step):
         """ Get the generator data for this matrix
 
         :param int syn_mat_offset:
             The synaptic matrix offset to write the data to
+        :param float machine_time_step: the sim's machine time step.
         :param int d_mat_offset:
             The synaptic matrix offset to write the delayed data to
+        :param int max_delay_per_stage: around of timer ticks each delay stage
+            holds.
         :rtype: GeneratorData
         """
-        self.__write_on_chip_delay_data()
+        self.__write_on_chip_delay_data(max_delay_per_stage, machine_time_step)
         return GeneratorData(
             syn_mat_offset, d_mat_offset,
             self.__max_row_info.undelayed_max_words,
@@ -425,10 +431,14 @@ class SynapticMatrix(object):
             self.__machine_edge.pre_vertex.vertex_slice,
             self.__machine_edge.post_vertex.vertex_slice,
             self.__synapse_info, self.__app_edge.n_delay_stages + 1,
-            globals_variables.get_simulator().machine_time_step)
+            max_delay_per_stage, machine_time_step)
 
-    def __write_on_chip_delay_data(self):
+    def __write_on_chip_delay_data(
+            self, max_delay_per_stage, machine_time_step):
         """ Write data for delayed on-chip generation
+
+        :param machine_time_step: sim machine time step
+        :param max_delay_per_stage: max delay supported by psot vertex
         """
         # If delay edge exists, tell this about the data too, so it can
         # generate its own data
@@ -441,14 +451,15 @@ class SynapticMatrix(object):
                 self.__app_edge.post_vertex.vertex_slices,
                 self.__machine_edge.pre_vertex.vertex_slice,
                 self.__machine_edge.post_vertex.vertex_slice,
-                self.__synapse_info, self.__app_edge.n_delay_stages + 1)
+                self.__synapse_info, self.__app_edge.n_delay_stages + 1,
+                max_delay_per_stage, machine_time_step)
         elif self.__max_row_info.delayed_max_n_synapses != 0:
             raise Exception(
                 "Found delayed items but no delay machine edge for {}".format(
                     self.__app_edge.label))
 
     def __next_addr(self, block_addr, size, max_addr=None):
-        """ Get the next block address and check it hasn't overflowed the
+        """ Get the next block address and check it hasn't overflowed the\
             allocation
 
         :param int block_addr: The address of the allocation
@@ -510,20 +521,22 @@ class SynapticMatrix(object):
             else:
                 block = self.__get_block(
                     transceiver, placement, synapses_address)
+            splitter = self.__app_edge.post_vertex.splitter
             connections.append(self.__synapse_io.convert_to_connections(
                 self.__synapse_info, pre_slice, post_slice,
                 self.__max_row_info.undelayed_max_words,
                 self.__n_synapse_types, self.__weight_scales, block,
-                machine_time_step, delayed=False))
+                machine_time_step, False, splitter.max_support_delay()))
 
         if self.__delay_syn_mat_offset is not None:
             block = self.__get_delayed_block(
                 transceiver, placement, synapses_address)
+            splitter = self.__app_edge.post_vertex.splitter
             connections.append(self.__synapse_io.convert_to_connections(
                 self.__synapse_info, pre_slice, post_slice,
                 self.__max_row_info.delayed_max_words, self.__n_synapse_types,
                 self.__weight_scales, block,
-                machine_time_step, delayed=True))
+                machine_time_step, True, splitter.max_support_delay()))
 
         return connections
 

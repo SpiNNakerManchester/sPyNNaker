@@ -24,8 +24,9 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
 
-from .synaptic_matrix import SynapticMatrix
-from .generator_data import GeneratorData, SYN_REGION_UNUSED
+from spynnaker.pyNN.models.neuron.synaptic_matrix import SynapticMatrix
+from spynnaker.pyNN.models.neuron.generator_data import (
+    GeneratorData, SYN_REGION_UNUSED)
 
 
 class SynapticMatrixApp(object):
@@ -130,9 +131,12 @@ class SynapticMatrixApp(object):
         self.__matrices = dict()
 
         # Calculate the max row info for this edge
+        n_delay_stages = 0
+        if app_edge.delay_edge is not None:
+            n_delay_stages = app_edge.delay_edge.pre_vertex.n_delay_stages
         self.__max_row_info = self.__synapse_io.get_max_row_info(
-            synapse_info, self.__post_vertex_slice,
-            app_edge.n_delay_stages, self.__poptable,
+            synapse_info, self.__post_vertex_slice, n_delay_stages,
+            self.__poptable,
             globals_variables.get_simulator().machine_time_step, app_edge)
 
         # These are set directly later
@@ -170,8 +174,8 @@ class SynapticMatrixApp(object):
     def __get_matrix(self, machine_edge):
         """ Get or create a matrix object
 
-        :param ~pacman.model.graph.machine.machine_edge.MachineEdge
-            machine_edge: The machine edge to get the matrix for
+        :param ~pacman.model.graph.machine.MachineEdge machine_edge:
+            The machine edge to get the matrix for
         :rtype: SynapticMatrix
         """
         if machine_edge in self.__matrices:
@@ -179,9 +183,14 @@ class SynapticMatrixApp(object):
 
         r_info = self.__routing_info.get_routing_info_for_edge(machine_edge)
         delayed_r_info = None
-        if machine_edge.delay_edge is not None:
-            delayed_r_info = self.__routing_info.get_routing_info_for_edge(
-                machine_edge.delay_edge)
+        delayed_app_edge = machine_edge.app_edge.delay_edge
+        if delayed_app_edge is not None:
+            delayed_machine_edge = delayed_app_edge.get_machine_edge(
+                machine_edge.pre_vertex, machine_edge.post_vertex)
+            if delayed_machine_edge is not None:
+                delayed_r_info = (
+                    self.__routing_info.get_routing_info_for_edge(
+                        delayed_machine_edge))
         matrix = SynapticMatrix(
             self.__synapse_io, self.__poptable, self.__synapse_info,
             machine_edge, self.__app_edge, self.__n_synapse_types,
@@ -193,7 +202,7 @@ class SynapticMatrixApp(object):
     def add_matrix_size(self, addr):
         """ Add the bytes required by the synaptic matrices
 
-        :param addr: The initial address
+        :param int addr: The initial address
         :return: The final address after adding synapses
         :rtype: int
         """
@@ -207,7 +216,7 @@ class SynapticMatrixApp(object):
     def add_delayed_matrix_size(self, addr):
         """ Add the bytes required by the delayed synaptic matrices
 
-        :param addr: The initial address
+        :param int addr: The initial address
         :return: The final address after adding synapses
         :rtype: int
         """
@@ -284,7 +293,7 @@ class SynapticMatrixApp(object):
             Routing key information for all incoming edges
         :param list(float) weight_scales:
             Weight scale for each synapse edge
-        :param list(ProjectionMachineEdge) m_edges:
+        :param list(~pacman.model.graphs.machine.MachineEdge) m_edges:
             The machine edges incoming to this vertex
         """
         self.__all_syn_block_sz = all_syn_block_sz
@@ -306,7 +315,9 @@ class SynapticMatrixApp(object):
         self.__use_app_keys = (
             is_app_key and is_delay_app_key and len(m_edges) > 1)
 
-    def write_matrix(self, spec, block_addr, single_addr, single_synapses):
+    def write_matrix(
+            self, spec, block_addr, single_addr, single_synapses,
+            machine_time_step):
         """ Write a synaptic matrix from host
 
         :param ~data_specification.DataSpecificationGenerator spec:
@@ -317,6 +328,7 @@ class SynapticMatrixApp(object):
             The address in the "direct" or "single" matrix to start at
         :param list(int) single_synapses:
             A list of "direct" or "single" synapses to write to
+        :param float machine_time_step: the simulation machine time step
         :return: The updated block_addr and single_addr
         :rtype: tuple(int, int)
         """
@@ -326,7 +338,7 @@ class SynapticMatrixApp(object):
 
             # Get a synaptic matrix for each machine edge
             matrix = self.__get_matrix(m_edge)
-            row_data, delay_row_data = matrix.get_row_data()
+            row_data, delay_row_data = matrix.get_row_data(machine_time_step)
             self.__update_connection_holders(row_data, delay_row_data, m_edge)
 
             if self.__use_app_keys:
@@ -357,8 +369,10 @@ class SynapticMatrixApp(object):
             The specification to write to
         :param int block_addr:
             The address in the synaptic matrix region to start writing at
-        :param list(ProjectionMachineEdge, ~numpy.ndarray) matrix_data:
+        :param matrix_data:
             The data for each machine edge to be combined into a single matrix
+        :type matrix_data:
+            list(~pacman.model.graphs.machine.MachineEdge, ~numpy.ndarray)
         :return: The updated block address
         :rtype: int
         """
@@ -404,8 +418,10 @@ class SynapticMatrixApp(object):
             The specification to write to
         :param int block_addr:
             The address in the synaptic matrix region to start writing at
-        :param list(ProjectionMachineEdge, ~numpy.ndarray) matrix_data:
+        :param matrix_data:
             The data for each machine edge to be combined into a single matrix
+        :type matrix_data:
+            list(~pacman.model.graphs.machine.MachineEdge, ~numpy.ndarray)
         :return: The updated block address
         :rtype: int
         """
@@ -447,12 +463,14 @@ class SynapticMatrixApp(object):
 
         return block_addr
 
-    def write_on_chip_matrix_data(self, generator_data, block_addr):
+    def write_on_chip_matrix_data(
+            self, generator_data, block_addr, machine_time_step):
         """ Prepare to write a matrix using an on-chip generator
 
         :param list(GeneratorData) generator_data: List of data to add to
         :param int block_addr:
             The address in the synaptic matrix region to start writing at
+        :param float machine_time_step: the sim machine time step
         :return: The updated block address
         :rtype: int
         """
@@ -467,6 +485,8 @@ class SynapticMatrixApp(object):
         # overloading the generator, even if an application matrix is generated
         for m_edge in self.__m_edges:
             matrix = self.__get_matrix(m_edge)
+            max_delay_per_stage = (
+                m_edge.post_vertex.app_vertex.splitter.max_support_delay())
 
             if self.__use_app_keys:
                 syn_addr, syn_mat_offset = matrix.next_app_on_chip_address(
@@ -486,7 +506,8 @@ class SynapticMatrixApp(object):
             # generate since it is still doing it in chunks, so less local
             # memory is needed.
             generator_data.append(matrix.get_generator_data(
-                syn_mat_offset, d_mat_offset))
+                syn_mat_offset, d_mat_offset, max_delay_per_stage,
+                machine_time_step))
         return block_addr
 
     def __reserve_app_blocks(self, block_addr):
@@ -514,7 +535,7 @@ class SynapticMatrixApp(object):
                 delay_max_addr)
 
     def __reserve_mpop_block(self, block_addr):
-        """ Reserve a block in the master population table for an undelayed
+        """ Reserve a block in the master population table for an undelayed\
             matrix
 
         :param int block_addr:
@@ -577,7 +598,7 @@ class SynapticMatrixApp(object):
 
         :param ~numpy.ndarray data: The row data created
         :param ~numpy.ndarray delayed_data: The delayed row data created
-        :param MachineEdge machine_edge:
+        :param ~pacman.model.graphs.machine.MachineEdge machine_edge:
             The machine edge the connections are for
         """
         for conn_holder in self.__synapse_info.pre_run_connection_holders:
@@ -688,20 +709,22 @@ class SynapticMatrixApp(object):
 
         if self.__syn_mat_offset is not None:
             block = self.__get_block(transceiver, placement, synapses_address)
+            splitter = self.__app_edge.post_vertex.splitter
             connections.append(self.__synapse_io.convert_to_connections(
                 self.__synapse_info, pre_slice, self.__post_vertex_slice,
                 self.__max_row_info.undelayed_max_words,
                 self.__n_synapse_types, self.__weight_scales, block,
-                machine_time_step, delayed=False))
+                machine_time_step, False, splitter.max_support_delay()))
 
         if self.__delay_syn_mat_offset is not None:
             block = self.__get_delayed_block(
                 transceiver, placement, synapses_address)
+            splitter = self.__app_edge.post_vertex.splitter
             connections.append(self.__synapse_io.convert_to_connections(
                 self.__synapse_info, pre_slice, self.__post_vertex_slice,
                 self.__max_row_info.delayed_max_words, self.__n_synapse_types,
-                self.__weight_scales, block,
-                machine_time_step, delayed=True))
+                self.__weight_scales, block, machine_time_step, True,
+                splitter.max_support_delay()))
 
         return connections
 

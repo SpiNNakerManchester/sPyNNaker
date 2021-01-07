@@ -103,6 +103,11 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
         return self._get_delay_maximum(
             synapse_info.delays, self.__n_pre * synapse_info.n_post_neurons)
 
+    @overrides(AbstractConnector.get_delay_minimum)
+    def get_delay_minimum(self, synapse_info):
+        return self._get_delay_minimum(
+            synapse_info.delays, self.__n_pre * synapse_info.n_post_neurons)
+
     def _get_pre_neurons(self, synapse_info):
         """
         :param SynapseInformation synapse_info:

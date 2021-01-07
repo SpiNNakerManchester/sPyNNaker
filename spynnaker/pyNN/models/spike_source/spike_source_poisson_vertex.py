@@ -18,6 +18,7 @@ import math
 import numpy
 import scipy.stats
 from spinn_utilities.overrides import overrides
+from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
@@ -67,9 +68,10 @@ class SpikeSourcePoissonVertex(
         TDMAAwareApplicationVertex, AbstractSpikeRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractChangableAfterRun, SimplePopulationSettable,
-        ProvidesKeyToAtomMappingImpl):
+        ProvidesKeyToAtomMappingImpl, LegacyPartitionerAPI):
     """ A Poisson Spike source object
     """
+
     __slots__ = [
         "__change_requires_mapping",
         "__duration",
@@ -98,7 +100,7 @@ class SpikeSourcePoissonVertex(
             self, n_neurons, constraints, label, seed,
             max_atoms_per_core, model, rate=None, start=None,
             duration=None, rates=None, starts=None, durations=None,
-            max_rate=None):
+            max_rate=None, splitter=None):
         """
         :param int n_neurons:
         :param iterable(~pacman.model.constraints.AbstractConstraint) \
@@ -110,13 +112,16 @@ class SpikeSourcePoissonVertex(
         :param iterable(float) rate:
         :param iterable(int) start:
         :param iterable(int) duration:
+        :param splitter:
+        :type splitter:
+            ~pacman.model.partitioner_splitters.abstract_splitters.AbstractSplitterCommon
         """
         # pylint: disable=too-many-arguments
         TDMAAwareApplicationVertex.__init__(
-            self, label, constraints, max_atoms_per_core)
+            self, label, constraints, max_atoms_per_core, splitter)
 
         # atoms params
-        self.__n_atoms = n_neurons
+        self.__n_atoms = self.round_n_atoms(n_neurons, "n_neurons")
         self.__model_name = "SpikeSourcePoisson"
         self.__model = model
         self.__seed = seed
@@ -429,7 +434,7 @@ class SpikeSourcePoissonVertex(
         "machine_time_step": "MachineTimeStep"
     })
     @overrides(
-        TDMAAwareApplicationVertex.get_resources_used_by_atoms,
+        LegacyPartitionerAPI.get_resources_used_by_atoms,
         additional_arguments={"machine_time_step"}
     )
     def get_resources_used_by_atoms(self, vertex_slice, machine_time_step):
@@ -462,7 +467,7 @@ class SpikeSourcePoissonVertex(
     def n_atoms(self):
         return self.__n_atoms
 
-    @overrides(TDMAAwareApplicationVertex.create_machine_vertex)
+    @overrides(LegacyPartitionerAPI.create_machine_vertex)
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):

@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 name: Publish
-
 on:
   push:
     branches: [ master ]
@@ -41,38 +40,28 @@ jobs:
           repository: SpiNNakerManchester/SupportScripts
           path: support
       - name: Set dynamic environment variables
-        # This step can not be merged with Checkout Spinnaker Dependencies
         run: |
           echo "SPINN_DIRS=$PWD/spinnaker_tools" >> $GITHUB_ENV
-          echo "GITHUB_BRANCH=$(echo ${GITHUB_REF#refs/heads/} | tr / -)" >> $GITHUB_ENV
+          echo "NEURAL_MODELLING_DIRS=$PWD/neural_modelling" >> $GITHUB_ENV
+      - name: Install pip, etc
+        uses: ./support/actions/python-tools
       - name: Checkout SpiNNaker Dependencies
-        run: |
-          support/gitclone2.sh https://github.com/SpiNNakerManchester/spinnaker_tools.git
-          support/gitclone2.sh https://github.com/SpiNNakerManchester/SpiNNUtils.git
-          support/gitclone2.sh https://github.com/SpiNNakerManchester/SpiNNMachine.git
-          support/gitclone2.sh https://github.com/SpiNNakerManchester/SpiNNMan.git
-          support/gitclone2.sh https://github.com/SpiNNakerManchester/PACMAN.git
-          support/gitclone2.sh https://github.com/SpiNNakerManchester/DataSpecification.git
-          support/gitclone2.sh https://github.com/SpiNNakerManchester/spalloc.git
-          support/gitclone2.sh https://github.com/SpiNNakerManchester/SpiNNFrontEndCommon.git
+        uses: ./support/actions/checkout-spinn-deps
+        with:
+          repositories: >
+            spinnaker_tools SpiNNUtils SpiNNMachine SpiNNMan PACMAN
+            DataSpecification spalloc SpiNNFrontEndCommon
+          install: true
       - name: Read tags
         run: make doxysetup
         working-directory: neural_modelling
-      - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          (cd SpiNNUtils && exec python setup.py install || exit 1)
-          (cd SpiNNMachine && exec python setup.py install || exit 1)
-          (cd SpiNNMan && exec python setup.py install || exit 1)
-          (cd PACMAN && exec python setup.py install || exit 1)
-          (cd DataSpecification && exec python setup.py install || exit 1)
-          (cd spalloc && exec python setup.py install || exit 1)
-          (cd SpiNNFrontEndCommon && exec python setup.py install || exit 1)
-          pip install -r requirements-test.txt
+      - name: Setup
+        uses: ./support/actions/run-setup
 
       - name: Build Python Documentation
-        run: support/travis-sphinx.sh html -T -E -b html -d _build/doctrees-readthedocsdirhtml -D language=en . _build/html
-
+        uses: ./support/actions/sphinx
+        with:
+          directory: doc/source
       - name: Build C documentation
         uses: mattnotmitt/doxygen-action@v1.1.0
         with:

@@ -213,9 +213,9 @@ class _MasterPopEntry(object):
     def append(self, address, row_length, is_single):
         """ Add a synaptic matrix pointer to the entry
 
-        :param address: The address of the synaptic matrix
-        :param row_length: The length of each row in the matrix
-        :param is_single: True if the address is to the direct matrix
+        :param int address: The address of the synaptic matrix
+        :param int row_length: The length of each row in the matrix
+        :param bool is_single: True if the address is to the direct matrix
         :return: The index of the pointer within the entry
         :rtype: int
         """
@@ -270,7 +270,8 @@ class _MasterPopEntry(object):
         :param _MasterPopEntryCType entry: The entry to write to
         :param _AddressListEntryCType_Array address_list:
             The address_list to write to
-        :param start: The index of the entry of the address list to start at
+        :param int start:
+            The index of the entry of the address list to start at
         :return: The number of entries written to the address list
         :rtype: int
         """
@@ -316,12 +317,21 @@ class MasterPopTableAsBinarySearch(object):
         "__entries",
         "__n_addresses"]
 
+    MAX_ROW_LENGTH_ERROR_MSG = (
+        "Only rows of up to {} entries are allowed".format(
+            POP_TABLE_MAX_ROW_LENGTH))
+
+    OUT_OF_RANGE_ERROR_MESSAGE = (
+        "Address {} is out of range for this population table!")
+
+    # Over-scale of estimate for safety
+    UPPER_BOUND_FUDGE = 2
+
     def __init__(self):
         self.__entries = None
         self.__n_addresses = 0
 
-    @staticmethod
-    def get_master_population_table_size(in_edges):
+    def get_master_population_table_size(self, in_edges):
         """ Get the size of the master population table in SDRAM.
 
         :param iterable(~pacman.model.graphs.application.ApplicationEdge) \
@@ -338,30 +348,26 @@ class MasterPopTableAsBinarySearch(object):
         n_entries = 0
         for in_edge in in_edges:
             if isinstance(in_edge, ProjectionApplicationEdge):
-                # TODO: Fix this to be more accurate!
-                # May require modification to the master population table
-                # Get the number of atoms per core incoming
-                vertex = in_edge.pre_vertex
-                max_atoms = float(min(vertex.get_max_atoms_per_core(),
-                                      vertex.n_atoms))
-
-                # Get the number of likely vertices
-                n_edge_vertices = int(math.ceil(vertex.n_atoms / max_atoms))
-                n_vertices += n_edge_vertices
-                n_entries += (
-                    n_edge_vertices * len(in_edge.synapse_information))
+                slices, is_exact = (
+                    in_edge.pre_vertex.splitter.get_out_going_slices())
+                if is_exact:
+                    n_vertices += len(slices)
+                    n_entries += len(in_edge.synapse_information)
+                else:
+                    n_vertices += len(slices) * self.UPPER_BOUND_FUDGE
+                    n_entries += (
+                        len(in_edge.synapse_information) *
+                        self.UPPER_BOUND_FUDGE)
 
         # Multiply by 2 to get an upper bound
         return (
             _BASE_SIZE_BYTES +
-            (n_vertices * _OVERSCALE * _MASTER_POP_ENTRY_SIZE_BYTES) +
-            (n_vertices * _OVERSCALE * _EXTRA_INFO_ENTRY_SIZE_BYTES) +
-            (n_entries * _OVERSCALE * _ADDRESS_LIST_ENTRY_SIZE_BYTES))
+            (n_vertices * _MASTER_POP_ENTRY_SIZE_BYTES) +
+            (n_vertices * _EXTRA_INFO_ENTRY_SIZE_BYTES) +
+            (n_entries * _ADDRESS_LIST_ENTRY_SIZE_BYTES))
 
-    @staticmethod
-    def get_allowed_row_length(row_length):
-        """ Get the next allowed row length
-
+    def get_allowed_row_length(self, row_length):
+        """
         :param int row_length: the row length being considered
         :return: the row length available
         :rtype: int
@@ -370,14 +376,11 @@ class MasterPopTableAsBinarySearch(object):
 
         if row_length > POP_TABLE_MAX_ROW_LENGTH:
             raise SynapseRowTooBigException(
-                POP_TABLE_MAX_ROW_LENGTH,
-                "Only rows of up to {} entries are allowed".format(
-                    POP_TABLE_MAX_ROW_LENGTH))
+                POP_TABLE_MAX_ROW_LENGTH, self.MAX_ROW_LENGTH_ERROR_MSG)
         return row_length
 
-    @staticmethod
-    def get_next_allowed_address(next_address):
-        """ Get the next allowed address
+    def get_next_allowed_address(self, next_address):
+        """ Get the next allowed address.
 
         :param int next_address: The next address that would be used
         :return: The next address that can be used following next_address
@@ -387,7 +390,7 @@ class MasterPopTableAsBinarySearch(object):
         addr_scaled = (next_address + (_ADDRESS_SCALE - 1)) // _ADDRESS_SCALE
         if addr_scaled > _MAX_ADDRESS:
             raise SynapticConfigurationException(
-                "Address {} is out of range for this population table!".format(
+                self.OUT_OF_RANGE_ERROR_MESSAGE.format(
                     hex(addr_scaled * _ADDRESS_SCALE)))
         return addr_scaled * _ADDRESS_SCALE
 
@@ -399,7 +402,7 @@ class MasterPopTableAsBinarySearch(object):
 
     def add_machine_entry(
             self, block_start_addr, row_length, key_and_mask, is_single=False):
-        """ Add an entry for a machine-edge to the population table
+        """ Add an entry for a machine-edge to the population table.
 
         :param int block_start_addr: where the synaptic matrix block starts
         :param int row_length: how long in words each row is
@@ -417,7 +420,7 @@ class MasterPopTableAsBinarySearch(object):
     def add_application_entry(
             self, block_start_addr, row_length, key_and_mask, core_mask,
             core_shift, n_neurons):
-        """ Add an entry for an application-edge to the population table
+        """ Add an entry for an application-edge to the population table.
 
         :param int block_start_addr: where the synaptic matrix block starts
         :param int row_length: how long in words each row is
@@ -446,7 +449,7 @@ class MasterPopTableAsBinarySearch(object):
                 "The core mask of {} is too big (maximum {})".format(
                     core_mask, _MAX_CORE_MASK))
 
-        self.__update_master_population_table(
+        return self.__update_master_population_table(
             block_start_addr, row_length, key_and_mask, core_mask, core_shift,
             n_neurons, False)
 
@@ -506,7 +509,7 @@ class MasterPopTableAsBinarySearch(object):
             self, key_and_mask, core_mask=0, core_shift=0, n_neurons=0):
         """ Add an entry to the table that doesn't point to anywhere.  Used
             to keep indices in synchronisation between e.g. normal and delay
-            entries and between entries on different cores
+            entries and between entries on different cores.
 
         :param ~pacman.model.routing_info.BaseKeyAndMask key_and_mask:
             a key_and_mask object used as part of describing
@@ -578,7 +581,7 @@ class MasterPopTableAsBinarySearch(object):
 
     @property
     def max_n_neurons_per_core(self):
-        """ The maximum number of neurons per core supported when a core-mask
+        """ The maximum number of neurons per core supported when a core-mask\
             is > 0.
 
         :rtype: int
@@ -587,8 +590,8 @@ class MasterPopTableAsBinarySearch(object):
 
     @property
     def max_core_mask(self):
-        """ The maximum core mask supported when n_neurons is > 0; this is the
-            maximum number of cores that can be supported in a joined mask
+        """ The maximum core mask supported when n_neurons is > 0; this is the\
+            maximum number of cores that can be supported in a joined mask.
 
         :rtype: int
         """
@@ -603,8 +606,8 @@ class MasterPopTableAsBinarySearch(object):
         return _MAX_ADDRESS_COUNT
 
     def write_padding(self, spec, next_block_start_address):
-        """ Write padding to the data spec needed between blocks to align
-            addresses correctly
+        """ Write padding to the data spec needed between blocks to align\
+            addresses correctly.
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The spec to write to

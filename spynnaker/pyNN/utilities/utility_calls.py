@@ -122,6 +122,7 @@ def read_in_data_from_file(
     :param str file_path: absolute path to a file containing the data
     :param int min_atom: min neuron ID to which neurons to read in
     :param int max_atom: max neuron ID to which neurons to read in
+    :param extra:
     :param min_time: min time slot to read neurons values of.
     :type min_time: float or int
     :param max_time: max time slot to read neurons values of.
@@ -214,6 +215,16 @@ def get_probable_maximum_selected(
         with a probability of selection of selection_prob
     """
     prob = 1.0 - (chance / float(n_total_trials))
+    return binom.ppf(prob, n_trials, selection_prob)
+
+
+def get_probable_minimum_selected(
+        n_total_trials, n_trials, selection_prob, chance=(1.0 / 100.0)):
+    """ Get the likely minimum number of items that will be selected from a\
+        set of n_trials from a total set of n_total_trials\
+        with a probability of selection of selection_prob
+    """
+    prob = (chance / float(n_total_trials))
     return binom.ppf(prob, n_trials, selection_prob)
 
 
