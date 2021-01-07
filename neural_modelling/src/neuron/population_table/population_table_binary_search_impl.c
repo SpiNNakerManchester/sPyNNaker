@@ -397,6 +397,7 @@ static inline bool cached_in_binary_search(
     // update trackers
     binary_blocks[binary_index].elements = block;
     binary_blocks[binary_index].len_of_array = elements_to_store;
+    log_info("size of array is %d", elements_to_store);
 
     // store
     uint32_t binary_block_index = 0;
@@ -683,6 +684,7 @@ static inline bool binary_search_cache(
 
     uint32_t imin = 0;
     uint32_t imax = binary_search_point.len_of_array;
+    log_info("max array %d", binary_search_point.len_of_array);
 
     while (imin < imax) {
         uint32_t imid = (imax + imin) >> 1;
@@ -821,6 +823,7 @@ bool population_table_get_next_address(
             }
             else if (item.representation == BINARY_SEARCH) {
                 *n_bytes_to_transfer = 0;
+                log_info("item address = %d", item.address);
                 bool success = binary_search_cache(
                     binary_blocks[item.address], last_neuron_id, row);
                 if (!success) {
