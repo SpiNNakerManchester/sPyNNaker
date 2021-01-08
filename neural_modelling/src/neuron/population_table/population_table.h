@@ -320,7 +320,6 @@ static inline bool population_table_set_start_and_count(
         }
         log_info("found extra info at index %d. skipping", position);
         *start += 1;
-        *count -= 1;
     }
     else {
         if (!population_table_get_position_in_master_pop(
@@ -349,8 +348,10 @@ static inline void print_master_population_table(void) {
         if (entry.extra_info_flag) {
             extra_info extra = address_list[start].extra;
             start += 1;
-            log_info("    core_mask: 0x%08x, core_shift: %u, n_neurons: %u",
-                    extra.core_mask, extra.mask_shift, extra.n_neurons);
+            log_info(
+                "    index %d: extra entry: core_mask: 0x%08x, core_shift: %u,"
+                " n_neurons: %u",
+                start, extra.core_mask, extra.mask_shift, extra.n_neurons);
         }
         for (uint16_t j = start; j < (start + count); j++) {
             address_and_row_length addr = address_list[j].addr;
