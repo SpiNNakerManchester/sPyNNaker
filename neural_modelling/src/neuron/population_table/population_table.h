@@ -203,7 +203,7 @@ static inline master_population_table_entry*
         population_table_get_master_pop_entry_from_sdram(
             address_t table_address, uint32_t position) {
     pop_table_config_t* store = (pop_table_config_t*) table_address;
-    return &store->data[position];
+    return &(store->data[position]);
 }
 
 //! \brief get a master pop entry from array
@@ -255,7 +255,7 @@ static inline address_list_entry* population_table_get_address_entry_from_sdram(
     pop_table_config_t* store = (pop_table_config_t*) table_address;
     address_list_entry* addresses = (address_list_entry*) (
         &store->data[store->table_length]);
-    return &addresses[address_entry_index];
+    return &(addresses[address_entry_index]);
 }
 
 
@@ -318,7 +318,7 @@ static inline bool population_table_set_start_and_count(
                 master_entry.key, &position)) {
             return false;
         }
-        log_info("found extra info at index %d. skipping", position);
+        log_debug("found extra info at index %d. skipping", position);
         *start += 1;
     }
     else {
@@ -326,7 +326,7 @@ static inline bool population_table_set_start_and_count(
                 master_entry.key, &position)) {
             return false;
         }
-        log_info("basic entry at master pop array at index %d", position);
+        log_debug("basic entry at master pop array at index %d", position);
     }
     return true;
 }

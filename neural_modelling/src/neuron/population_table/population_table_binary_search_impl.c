@@ -844,8 +844,8 @@ bool population_table_get_next_address(
                 n_master_pop_cached_look_ups += 1;
             }
             else if (item.representation == BINARY_SEARCH) {
-                *n_bytes_to_transfer = 0;
                 log_debug("item address = %d", item.address);
+                *n_bytes_to_transfer = 0;
                 bool success = binary_search_cache(
                     &binary_blocks[item.address], last_neuron_id, row);
                 if (!success) {

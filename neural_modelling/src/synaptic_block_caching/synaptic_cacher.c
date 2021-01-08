@@ -176,9 +176,9 @@ static inline bool synapses_are_plastic_or_structural_or_direct(
 
     synaptic_row_t row;
     uint32_t representation;
-    uint32_t base_key = not_redundant_tracker->filter[bit_field_index].key;
+    uint32_t base_key = not_redundant_tracker[bit_field_index].filter->key;
     size_t size;
-    uint32_t n_atoms = not_redundant_tracker->filter[bit_field_index].n_atoms;
+    uint32_t n_atoms = not_redundant_tracker[bit_field_index].filter->n_atoms;
 
     // cycle through atoms looking for plastic and struct synapses
     for (uint32_t atom_id = 0; atom_id < n_atoms; atom_id++) {
@@ -229,13 +229,17 @@ static inline int calculate_binary_search_size(
         uint32_t bit_field_index, address_list_entry entry) {
     // build stores
     uint32_t dtcm_used = 0;
+    log_debug("bfi = %d", bit_field_index);
     uint32_t n_atoms =
-        not_redundant_tracker->filter[bit_field_index].n_atoms;
+        not_redundant_tracker[bit_field_index].filter->n_atoms;
     uint32_t n_valid_entries = 0;
-
+    log_debug("BB %d, %d", n_atoms, entry.addr.address);
     uint32_t address = population_table_get_address(entry.addr);
+    log_debug("BB");
     uint32_t row_length = population_table_get_row_length(entry.addr);
+    log_debug("BB, %d", row_length);
     uint32_t stride = (row_length + N_SYNAPSE_ROW_HEADER_WORDS);
+    log_debug("BB, %d", stride);
 
     // populate stores
     for (uint32_t atom_id = 0; atom_id < n_atoms; atom_id++) {
@@ -243,7 +247,16 @@ static inline int calculate_binary_search_size(
         synaptic_row_t row = (synaptic_row_t) (address + atom_offset);
 
         // get size
+        log_debug("BB %d", row);
+        uint32_t x = synapse_row_num_fixed_synapses(synapse_row_fixed_region(row));
+        log_debug("BB %d", x);
+        uint32_t y = ((synapse_row_num_plastic_controls(
+            synapse_row_fixed_region(row)) + 1) > 1);
+        log_debug("BB %d", y);
+        uint32_t z = synapse_row_plastic_size(row);
+        log_debug("BB %d", z);
         uint32_t n_targets_in_words = synapse_row_size_in_words(row);
+        log_debug("BB");
 
         if (n_targets_in_words != N_SYNAPSE_ROW_HEADER_WORDS) {
             // TODO FIX WHEN STAGE 2.5 HAS HAPPENED
@@ -276,19 +289,23 @@ static inline uint32_t calculate_array_search_size(
     // build stores
     uint32_t dtcm_used = 0;
     uint32_t n_atoms =
-        not_redundant_tracker->filter[bit_field_index].n_atoms;
+        not_redundant_tracker[bit_field_index].filter->n_atoms;
     dtcm_used += n_atoms * sizeof(uint32_t*) + malloc_cost;
 
+    log_debug("BB");
     uint32_t address = population_table_get_address(entry.addr);
     uint32_t row_length = population_table_get_row_length(entry.addr);
     uint32_t stride = (row_length + N_SYNAPSE_ROW_HEADER_WORDS);
+    log_debug("BB");
 
     // populate stores
     for (uint32_t atom_id = 0; atom_id < n_atoms; atom_id++) {
         uint32_t atom_offset = atom_id * stride * sizeof(uint32_t);
         synaptic_row_t row = (synaptic_row_t) (address + atom_offset);
         // acquire real size in words of the row
+        log_debug("BB");
         uint32_t n_targets_in_words = synapse_row_size_in_words(row);
+        log_debug("BB");
 
         // if its just the header, then its empty
         if (n_targets_in_words != N_SYNAPSE_ROW_HEADER_WORDS) {
@@ -438,9 +455,11 @@ static void print_store(void) {
     for (uint32_t bit_field = 0; bit_field < bit_field_base_address->n_filters;
             bit_field++) {
         log_debug(
-            "bitfield with index %d has key %d and has none redundant count of %d",
+            "bitfield with index %d has key %d and has none redundant "
+            "count of %d with n atoms of %d",
             bit_field, not_redundant_tracker[bit_field].filter->key,
-            not_redundant_tracker[bit_field].not_redundant_count);
+            not_redundant_tracker[bit_field].not_redundant_count,
+            not_redundant_tracker[bit_field].filter->n_atoms);
     }
     log_debug("fin");
 }
@@ -565,7 +584,7 @@ static inline void set_address_to_cache_reps(
         log_error("WTF unrecognised rep");
     }
 
-    // cahce for useage after setting
+    // cache for usage after setting
     uint32_t original_rep =
         population_table_get_address_entry(address_entry_index).addr.representation;
 
@@ -640,6 +659,7 @@ static inline bool cache_blocks(void) {
         uint32_t count = 0;
         bool success = population_table_set_start_and_count(
             master_entry, &start, &count);
+        log_debug("got start %d count %d with entry id %d", start, count, bit_field_index);
         if (!success) {
             log_error("failed to set start and count");
             return false;
@@ -653,7 +673,9 @@ static inline bool cache_blocks(void) {
         }
 
         // set them all to whats in currently
+        log_debug("A");
         set_reps_to_defaults(master_entry, reps);
+        log_debug("B");
 
         // test all the blocks. all or nothing due to bitfield
         for (uint32_t address_index = start; address_index < count + start;
@@ -662,12 +684,14 @@ static inline bool cache_blocks(void) {
                 population_table_get_address_entry(address_index);
 
             // if plastic or struct, wont cache during this impl.
+            log_debug("c");
             bool result;
             bool success = synapses_are_plastic_or_structural_or_direct(
                     bit_field_index, address_entry, address_index, &result);
             if (!success) {
                 return false;
             }
+            log_debug("d");
 
             if (result) {
                 cache = false;
@@ -677,10 +701,12 @@ static inline bool cache_blocks(void) {
             }
             else {
                 // test memory requirements of the 2 reps.
+                log_debug("E");
                 int binary_search_size = calculate_binary_search_size(
                     bit_field_index, address_entry);
                 int array_search_size = calculate_array_search_size(
                     bit_field_index, address_entry);
+                log_debug("F");
 
                 // if binary better memory. see if we can cache with that rep.
                 if (binary_search_size < array_search_size) {
@@ -740,6 +766,7 @@ static inline bool cache_blocks(void) {
         }
 
         // check heuristic over bitfields alone
+        log_debug("AA");
         if (cache) {
             cache = heuristic_worth_caching(bit_field_index);
         }
@@ -752,16 +779,20 @@ static inline bool cache_blocks(void) {
             }
         } else {
             // set master pop table to cache. and remove dtcm usage.
+            log_debug("Ac");
             bool success = set_master_pop_sdram_entry_to_cache(bit_field_index);
             if (!success) {
                 return false;
             }
+            log_debug("Ad");
 
             // set addresses to cached reps.
             for (uint32_t address_index = 0; address_index < count;
                     address_index ++) {
+                log_debug("AA");
                 set_address_to_cache_reps(
                     address_index + start, reps[address_index]);
+                log_debug("AA");
             }
 
             // set bitfield associated with this to merged. avoiding it
