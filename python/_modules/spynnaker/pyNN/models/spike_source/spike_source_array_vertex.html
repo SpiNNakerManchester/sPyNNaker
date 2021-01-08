@@ -137,6 +137,15 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">time_step</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_spikes_sampling_interval</span><span class="p">()</span>
+        <span class="n">current_time</span> <span class="o">=</span> <span class="n">globals_variables</span><span class="o">.</span><span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">get_current_time</span><span class="p">()</span>
+        <span class="c1"># warn the user if they are asking for a spike time out of range</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">spike_times</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">spike_times</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">current_time</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;A spike time of </span><span class="si">{}</span><span class="s2"> was specified for the &quot;</span>
+                               <span class="s2">&quot;SpikeSourceArray </span><span class="si">{}</span><span class="s2"> that is &quot;</span>
+                               <span class="s2">&quot;lower than the current time </span><span class="si">{}</span><span class="s2"> - this &quot;</span>
+                               <span class="s2">&quot;will be ignored.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                   <span class="nb">float</span><span class="p">(</span><span class="n">spike_times</span><span class="p">[</span><span class="n">n</span><span class="p">]),</span> <span class="bp">self</span><span class="p">,</span> <span class="n">current_time</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">send_buffer_times</span> <span class="o">=</span> <span class="n">_send_buffer_times</span><span class="p">(</span><span class="n">spike_times</span><span class="p">,</span> <span class="n">time_step</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_spike_times</span> <span class="o">=</span> <span class="n">spike_times</span>
 
@@ -239,7 +248,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2017.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
     </div>
   </body>
 </html>
