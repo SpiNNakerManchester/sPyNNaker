@@ -47,7 +47,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         "__synapse_verts_by_neuron",
         "__n_synapse_vertices",
         "__index",
-        "__poisson_edges"]
+        "__poisson_edges",
+        "__max_delay"]
 
     SPLITTER_NAME = "SplitterAbstractPopulationVertexNeuronsSynapses"
 
@@ -58,11 +59,14 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         "AbstractPopulationVertex. Please use the correct splitter for "
         "your vertex and try again.")
 
-    def __init__(self, n_synapse_vertices=1):
+    def __init__(self, n_synapse_vertices=1,
+                 max_delay=(AbstractSpynnakerSplitterDelay
+                            .MAX_SUPPORTED_DELAY_TICS)):
         super(SplitterAbstractPopulationVertexNeuronsSynapses, self).__init__(
             self.SPLITTER_NAME)
         AbstractSpynnakerSplitterDelay.__init__(self)
         self.__n_synapse_vertices = n_synapse_vertices
+        self.__max_delay = max_delay
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
@@ -264,3 +268,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
         # return the total resources.
         return container
+
+    @overrides(AbstractSpynnakerSplitterDelay.max_support_delay)
+    def max_support_delay(self):
+        return self.__max_delay
