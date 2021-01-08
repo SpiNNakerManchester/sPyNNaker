@@ -270,20 +270,33 @@ static inline update_state_t timing_apply_pre_spike(
                 // io_printf(IO_BUF, "DEP: t: %d, Vdiff: %k, histPot: %k    ", time, voltage_difference, post_synaptic_mem_V);
         	if (print_plasticity){ io_printf(IO_BUF, "        Accumulator limit reached: Depressing diff %k\n", voltage_difference); }
                 if (previous_state.lock == 0){
+                    //if ((voltage_difference > 900.0k) || ((mars_kiss64_seed(recurrentSeed) & ((STDP_FIXED_POINT_ONE>>2) - 1)) > 128)) {
+		    //io_printf(IO_BUF, " Dep vdiff: %k) ", voltage_difference);
                     if (voltage_difference > 900.0k) {
-                        // Neuron fires by feedforward input alone. May be too early. 
+                        // Neuron fires by feedforward input alone. Probably firing too early. 
                         // Enable full depression, which should push the firing a bit later.
                         //io_printf(IO_BUF, "FF dep\n");
 			previous_state.lock = 1;
 			previous_state.dep_accumulator = 0;
-			previous_state.weight_state.weight = weight_one_term_apply_depression_sd( previous_state.weight_state, syn_type, STDP_FIXED_POINT_ONE);
+			previous_state.weight_state = weight_one_term_apply_depression_sd( previous_state.weight_state, syn_type, STDP_FIXED_POINT_ONE);
 			if (print_plasticity) { io_printf(IO_BUF, "            Applying full depression (gap to threshold: %k)\n", voltage_difference); }
+                    } else if (voltage_difference > v_diff_pot_threshold) {
+                        // Still relying on teacher and a long way from threshold. Assume that we are in early learning stages. Synapse is
+                        // probably an early firer in the pattern, so can safely depress (risky):
+			previous_state.lock = 1;
+			previous_state.dep_accumulator = 0;
+			previous_state.weight_state = weight_one_term_apply_depression_sd( previous_state.weight_state, syn_type, STDP_FIXED_POINT_ONE);
+			previous_state.weight_state.weight += 1;
+                        //io_printf(IO_BUF, "Early dep\n");
+			if (print_plasticity) { io_printf(IO_BUF, "            Early firer. Applying full depression (gap to threshold: %k)\n", voltage_difference); }
+
                     } else {
                         // Neuron firing was due to teacher. So natural firing would still be late.
                         // So lock low, to avoid making the output spike even later.
 			previous_state.lock = 1;
 			previous_state.dep_accumulator = 0;
                         previous_state.weight_state.weight = previous_state.weight_state.weight + inc_teacher_dep;
+                        //io_printf(IO_BUF, "LL dep\n");
 			if (print_plasticity) { io_printf(IO_BUF, "            Applying teacher dep (LL)\n"); }
                     }
                 } else {
