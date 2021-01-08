@@ -127,8 +127,7 @@ void resume_callback(void) {
 }
 
 void process_ring_buffers(timer_t time, uint32_t n_neurons,
-        uint32_t n_synapse_types, uint32_t synapse_type_index_bits,
-        uint32_t synapse_index_bits, uint32_t synapse_delay_mask, weight_t *ring_buffers) {
+        uint32_t n_synapse_types, weight_t *ring_buffers) {
     // Transfer the input from the ring buffers into the input buffers
     for (uint32_t neuron_index = 0; neuron_index < n_neurons;
             neuron_index++) {

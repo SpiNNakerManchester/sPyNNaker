@@ -23,47 +23,14 @@
  * \author Petrut Bogdan
  */
 #include "synapse_dynamics.h"
+#include <neuron/synapses.h>
 #include <debug.h>
 #include <utils.h>
 
-//! ::synapse_index_bits + ::synapse_type_bits
-static uint32_t synapse_type_index_bits;
-//! Number of bits to hold the neuron index
-static uint32_t synapse_index_bits;
-//! Mask to extract the neuron index (has ::synapse_index_bits bits set)
-static uint32_t synapse_index_mask;
-//! Number of bits to hold the synapse type
-static uint32_t synapse_type_bits;
-//! Mask to extract the synapse type (has ::synapse_type_bits bits set)
-static uint32_t synapse_type_mask;
-static uint32_t synapse_delay_bits;
-static uint32_t synapse_delay_mask;
-
 bool synapse_dynamics_initialise(
-        UNUSED address_t address, uint32_t n_neurons, uint32_t n_synapse_types,
+        UNUSED address_t address, UNUSED uint32_t n_neurons,
+        UNUSED uint32_t n_synapse_types,
         UNUSED uint32_t *ring_buffer_to_input_buffer_left_shifts) {
-    uint32_t n_neurons_power_2 = n_neurons;
-    uint32_t log_n_neurons = 1;
-    if (n_neurons != 1) {
-        if (!is_power_of_2(n_neurons)) {
-            n_neurons_power_2 = next_power_of_2(n_neurons);
-        }
-        log_n_neurons = ilog_2(n_neurons_power_2);
-    }
-    uint32_t n_synapse_types_power_2 = n_synapse_types;
-    synapse_type_bits = 1;
-    if (n_synapse_types != 1) {
-        if (!is_power_of_2(n_synapse_types)) {
-            n_synapse_types_power_2 = next_power_of_2(n_synapse_types);
-        }
-        synapse_type_bits = ilog_2(n_synapse_types_power_2);
-    }
-    synapse_type_index_bits = log_n_neurons + synapse_type_bits;
-    synapse_index_bits = log_n_neurons;
-    synapse_index_mask = (1 << synapse_index_bits) - 1;
-    synapse_type_mask = (1 << synapse_type_bits) - 1;
-    synapse_delay_bits = 4;
-    synapse_delay_mask = 0xF;
     return true;
 }
 

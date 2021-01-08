@@ -34,9 +34,7 @@
 
 //! Process to handle ring buffers
 extern void process_ring_buffers(timer_t time, uint32_t n_neurons,
-        uint32_t n_synapse_types, uint32_t synapse_type_index_bits,
-        uint32_t synapse_index_bits, uint32_t synapse_delay_mask,
-        weight_t *ring_buffers);
+        uint32_t n_synapse_types, weight_t *ring_buffers);
 
 //! Globals required for synapse benchmarking to work.
 uint32_t  num_fixed_pre_synaptic_events = 0;
@@ -61,23 +59,25 @@ static uint32_t *ring_buffer_to_input_left_shifts;
 //! ```
 //! synapse_index_bits + synapse_type_bits
 //! ```
-static uint32_t synapse_type_index_bits;
+uint32_t synapse_type_index_bits;
 //! \brief Mask to pick out the synapse type and index.
 //! \details
 //! ```
 //! synapse_index_mask | synapse_type_mask
 //! ```
-static uint32_t synapse_type_index_mask;
+uint32_t synapse_type_index_mask;
 //! Number of bits in the synapse index
-static uint32_t synapse_index_bits;
+uint32_t synapse_index_bits;
 //! Mask to pick out the synapse index.
-static uint32_t synapse_index_mask;
+uint32_t synapse_index_mask;
 //! Number of bits in the synapse type
-static uint32_t synapse_type_bits;
+uint32_t synapse_type_bits;
 //! Mask to pick out the synapse type.
-static uint32_t synapse_type_mask;
-static uint32_t synapse_delay_bits;
-static uint32_t synapse_delay_mask;
+uint32_t synapse_type_mask;
+//! Number of bits in the delay
+uint32_t synapse_delay_bits;
+//! Mask to pick out the delay
+uint32_t synapse_delay_mask;
 
 //! Count of the number of times the ring buffers have saturated
 uint32_t synapses_saturation_count = 0;
@@ -350,9 +350,7 @@ void synapses_do_timestep_update(timer_t time) {
     spin1_dma_flush();
 
     // Call external process inputs function
-    process_ring_buffers(time, n_neurons, n_synapse_types,
-            synapse_type_index_bits, synapse_index_bits, synapse_delay_mask,
-            ring_buffers);
+    process_ring_buffers(time, n_neurons, n_synapse_types, ring_buffers);
 
     // Re-enable the interrupts
     spin1_mode_restore(state);

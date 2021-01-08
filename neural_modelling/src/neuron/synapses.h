@@ -21,8 +21,33 @@
 #define _SYNAPSES_H_
 
 #include <common/neuron-typedefs.h>
+#include <debug.h>
 #include "synapse_row.h"
-#include "neuron.h"
+
+//! \brief Number of bits needed for the synapse type and index
+//! \details
+//! ```
+//! synapse_index_bits + synapse_type_bits
+//! ```
+extern uint32_t synapse_type_index_bits;
+//! \brief Mask to pick out the synapse type and index.
+//! \details
+//! ```
+//! synapse_index_mask | synapse_type_mask
+//! ```
+extern uint32_t synapse_type_index_mask;
+//! Number of bits in the synapse index
+extern uint32_t synapse_index_bits;
+//! Mask to pick out the synapse index.
+extern uint32_t synapse_index_mask;
+//! Number of bits in the synapse type
+extern uint32_t synapse_type_bits;
+//! Mask to pick out the synapse type.
+extern uint32_t synapse_type_mask;
+//! Number of bits in the delay
+extern uint32_t synapse_delay_bits;
+//! Mask to pick out the delay
+extern uint32_t synapse_delay_mask;
 
 //! Count of the number of times the synapses have saturated their weights.
 extern uint32_t synapses_saturation_count;

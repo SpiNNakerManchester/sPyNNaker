@@ -36,21 +36,6 @@
 #include <neuron/plasticity/synapse_dynamics.h>
 #include <stddef.h>
 
-//! ::synapse_index_bits + number of synapse type bits
-static uint32_t synapse_type_index_bits;
-//! Number of bits to hold the neuron index
-static uint32_t synapse_index_bits;
-//! Mask to extract the neuron index (has ::synapse_index_bits bits set)
-static uint32_t synapse_index_mask;
-//! Mask to extract the type and index (has ::synapse_type_index_bits bits set)
-static uint32_t synapse_type_index_mask;
-//! ::synapse_delay_index_type_bits + number of bits to encode delay
-static uint32_t synapse_delay_index_type_bits;
-//! Mask to extract the synapse type
-static uint32_t synapse_type_mask;
-static uint32_t synapse_delay_bits;
-static uint32_t synapse_delay_mask;
-
 //! The type of configuration parameters in SDRAM (written by host)
 typedef struct stdp_params {
     //! The back-propagation delay, in basic simulation timesteps
@@ -289,32 +274,6 @@ bool synapse_dynamics_initialise(
         return false;
     }
 
-    uint32_t n_neurons_power_2 = n_neurons;
-    uint32_t log_n_neurons = 1;
-    if (n_neurons != 1) {
-        if (!is_power_of_2(n_neurons)) {
-            n_neurons_power_2 = next_power_of_2(n_neurons);
-        }
-        log_n_neurons = ilog_2(n_neurons_power_2);
-    }
-
-    uint32_t n_synapse_types_power_2 = n_synapse_types;
-    uint32_t log_n_synapse_types = 1;
-    if (n_synapse_types != 1) {
-        if (!is_power_of_2(n_synapse_types)) {
-            n_synapse_types_power_2 = next_power_of_2(n_synapse_types);
-        }
-        log_n_synapse_types = ilog_2(n_synapse_types_power_2);
-    }
-
-    synapse_type_index_bits = log_n_neurons + log_n_synapse_types;
-    synapse_type_index_mask = (1 << synapse_type_index_bits) - 1;
-    synapse_index_bits = log_n_neurons;
-    synapse_index_mask = (1 << synapse_index_bits) - 1;
-    synapse_delay_bits = 4;
-    synapse_delay_mask = (1 << synapse_delay_bits) - 1;
-    synapse_delay_index_type_bits = synapse_delay_bits + synapse_type_index_bits;
-    synapse_type_mask = (1 << log_n_synapse_types) - 1;
     return true;
 }
 
