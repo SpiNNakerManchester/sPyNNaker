@@ -142,10 +142,10 @@ void resume_callback(void) {
 
 void process_ring_buffers(timer_t time, uint32_t n_neurons,
         uint32_t n_synapse_types, uint32_t synapse_type_index_bits,
-        uint32_t synapse_index_bits, weight_t *ring_buffers) {
+        uint32_t synapse_index_bits, uint32_t synapse_delay_mask, weight_t *ring_buffers) {
     // Get the index of the first ring buffer for the next time step
     uint32_t first_ring_buffer = synapse_row_get_ring_buffer_index(time + 1,
-            0, 0, synapse_type_index_bits, synapse_index_bits);
+            0, 0, synapse_type_index_bits, synapse_index_bits, synapse_delay_mask);
     // Do the DMA transfer
     // log_info("Writing %d bytes to 0x%08x from ring buffer %d", sdram_inputs.size_in_bytes, sdram_inputs.address, first_ring_buffer);
     spin1_dma_transfer(DMA_COMPLETE_TAG, sdram_inputs.address,

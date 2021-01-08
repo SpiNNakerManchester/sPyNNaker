@@ -214,7 +214,7 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
                 // and synapse_type_index_bits then doesn't matter.
                 uint32_t ring_buffer_index = synapse_row_get_ring_buffer_index(
                         0, synapse_type_index, neuron_index,
-                        0, sdram_inputs.synapse_index_bits);
+                        0, sdram_inputs.synapse_index_bits, 0);
 
                 // Convert ring-buffer entry to input and add on to correct
                 // input for this synapse type and neuron

@@ -96,15 +96,6 @@
 #define SYNAPSE_WEIGHT_BITS 16
 #endif
 
-//! how many bits the synapse delay will take
-#ifndef SYNAPSE_DELAY_BITS
-#define SYNAPSE_DELAY_BITS 4
-#endif
-
-// Create some masks based on the number of bits
-//! the mask for the synapse delay in the row
-#define SYNAPSE_DELAY_MASK      ((1 << SYNAPSE_DELAY_BITS) - 1)
-
 #ifdef SYNAPSE_WEIGHTS_SIGNED
 //! Define the type of the weights
 typedef __int_t(SYNAPSE_WEIGHT_BITS) weight_t;
@@ -229,8 +220,8 @@ static inline index_t synapse_row_sparse_type_index(
 //!     Number of bits for the synapse type and index (depends on type)
 //! \return the delay
 static inline index_t synapse_row_sparse_delay(
-        uint32_t x, uint32_t synapse_type_index_bits) {
-    return (x >> synapse_type_index_bits) & SYNAPSE_DELAY_MASK;
+        uint32_t x, uint32_t synapse_type_index_bits, uint32_t synapse_delay_mask) {
+    return (x >> synapse_type_index_bits) & synapse_delay_mask;
 }
 
 //! \brief Get the weight from an encoded synapse descriptor
@@ -267,8 +258,8 @@ static inline input_t synapse_row_convert_weight_to_input(
 static inline index_t synapse_row_get_ring_buffer_index(
         uint32_t simulation_timestep, uint32_t synapse_type_index,
         uint32_t neuron_index, uint32_t synapse_type_index_bits,
-        uint32_t synapse_index_bits) {
-    return ((simulation_timestep & SYNAPSE_DELAY_MASK) << synapse_type_index_bits)
+        uint32_t synapse_index_bits, uint32_t synapse_delay_mask) {
+    return ((simulation_timestep & synapse_delay_mask) << synapse_type_index_bits)
             | (synapse_type_index << synapse_index_bits)
             | neuron_index;
 }
@@ -282,8 +273,8 @@ static inline index_t synapse_row_get_ring_buffer_index(
 static inline index_t synapse_row_get_ring_buffer_index_combined(
         uint32_t simulation_timestep,
         uint32_t combined_synapse_neuron_index,
-        uint32_t synapse_type_index_bits) {
-    return ((simulation_timestep & SYNAPSE_DELAY_MASK) << synapse_type_index_bits)
+        uint32_t synapse_type_index_bits, uint32_t synapse_delay_mask) {
+    return ((simulation_timestep & synapse_delay_mask) << synapse_type_index_bits)
             | combined_synapse_neuron_index;
 }
 

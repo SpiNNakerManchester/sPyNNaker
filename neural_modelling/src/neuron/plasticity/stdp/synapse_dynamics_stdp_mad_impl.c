@@ -48,6 +48,8 @@ static uint32_t synapse_type_index_mask;
 static uint32_t synapse_delay_index_type_bits;
 //! Mask to extract the synapse type
 static uint32_t synapse_type_mask;
+static uint32_t synapse_delay_bits;
+static uint32_t synapse_delay_mask;
 
 //! The type of configuration parameters in SDRAM (written by host)
 typedef struct stdp_params {
@@ -239,10 +241,10 @@ void synapse_dynamics_print_plastic_synapses(
         synapses_print_weight(
                 weight, ring_buffer_to_input_buffer_left_shifts[synapse_type]);
         log_debug("nA) d: %2u, %s, n = %3u)] - {%08x %08x}\n",
-            synapse_row_sparse_delay(control_word, synapse_type_index_bits),
+            synapse_row_sparse_delay(control_word, synapse_type_index_bits, synapse_delay_mask),
             synapse_types_get_type_char(synapse_type),
             synapse_row_sparse_index(control_word, synapse_index_mask),
-            SYNAPSE_DELAY_MASK, synapse_type_index_bits);
+            synapse_delay_mask, synapse_type_index_bits);
     }
 #endif // LOG_LEVEL >= LOG_DEBUG
 }
@@ -309,8 +311,9 @@ bool synapse_dynamics_initialise(
     synapse_type_index_mask = (1 << synapse_type_index_bits) - 1;
     synapse_index_bits = log_n_neurons;
     synapse_index_mask = (1 << synapse_index_bits) - 1;
-    synapse_delay_index_type_bits =
-            SYNAPSE_DELAY_BITS + synapse_type_index_bits;
+    synapse_delay_bits = 4;
+    synapse_delay_mask = (1 << synapse_delay_bits) - 1;
+    synapse_delay_index_type_bits = synapse_delay_bits + synapse_type_index_bits;
     synapse_type_mask = (1 << log_n_synapse_types) - 1;
     return true;
 }
@@ -347,7 +350,7 @@ bool synapse_dynamics_process_plastic_synapses(
         // 16-bits of 32-bit fixed synapse so same functions can be used
         uint32_t delay_axonal = sparse_axonal_delay(control_word);
         uint32_t delay_dendritic = synapse_row_sparse_delay(
-                control_word, synapse_type_index_bits);
+                control_word, synapse_type_index_bits, synapse_delay_mask);
         uint32_t type = synapse_row_sparse_type(
                 control_word, synapse_index_bits, synapse_type_mask);
         uint32_t index =
@@ -362,7 +365,7 @@ bool synapse_dynamics_process_plastic_synapses(
         // Convert into ring buffer offset
         uint32_t ring_buffer_index = synapse_row_get_ring_buffer_index_combined(
                 delay_axonal + delay_dendritic + time, type_index,
-                synapse_type_index_bits);
+                synapse_type_index_bits, synapse_delay_mask);
 
         // Update the synapse state
         uint32_t post_delay = delay_dendritic;
@@ -436,7 +439,7 @@ bool synapse_dynamics_find_neuron(
         uint32_t control_word = *control_words++;
         if (synapse_row_sparse_index(control_word, synapse_index_mask) == id) {
             *offset = synapse_row_num_plastic_controls(fixed_region) - plastic_synapse;
-            *delay = synapse_row_sparse_delay(control_word, synapse_type_index_bits);
+            *delay = synapse_row_sparse_delay(control_word, synapse_type_index_bits, synapse_delay_mask);
             *synapse_type = synapse_row_sparse_type(
                     control_word, synapse_index_bits, synapse_type_mask);
             return true;
@@ -473,7 +476,7 @@ bool synapse_dynamics_remove_neuron(uint32_t offset, synaptic_row_t row) {
 static inline control_t control_conversion(
         uint32_t id, uint32_t delay, uint32_t type) {
     control_t new_control =
-            (delay & ((1 << SYNAPSE_DELAY_BITS) - 1)) << synapse_type_index_bits;
+            (delay & ((1 << synapse_delay_bits) - 1)) << synapse_type_index_bits;
     new_control |= (type & ((1 << synapse_type_index_bits) - 1)) << synapse_index_bits;
     new_control |= id & ((1 << synapse_index_bits) - 1);
     return new_control;
