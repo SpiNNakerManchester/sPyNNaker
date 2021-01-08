@@ -431,6 +431,7 @@ class PopulationMachineSynapses(
         # Get values
         n_neurons = self._vertex_slice.n_atoms
         n_synapse_types = self._app_vertex.neuron_impl.get_n_synapse_types()
+        max_delay = self._app_vertex.splitter.max_support_delay()
 
         # Write synapse parameters
         spec.switch_write_focus(self._synapse_regions.synapse_params)
@@ -438,6 +439,7 @@ class PopulationMachineSynapses(
         spec.write_value(n_synapse_types)
         spec.write_value(get_n_bits(n_neurons))
         spec.write_value(get_n_bits(n_synapse_types))
+        spec.write_value(get_n_bits(max_delay))
         spec.write_value(int(self._app_vertex.drop_late_spikes))
         spec.write_value(self._app_vertex.incoming_spike_buffer_size)
         spec.write_array(self._app_vertex.get_ring_buffer_shifts(

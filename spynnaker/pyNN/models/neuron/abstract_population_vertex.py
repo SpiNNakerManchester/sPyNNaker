@@ -72,9 +72,10 @@ _NEURON_BASE_N_CPU_CYCLES = 10
 # 1 for number of synapse types
 # 1 for number of neuron bits
 # 1 for number of synapse type bits
+# 1 for number of delay bits
 # 1 for drop late packets,
 # 1 for incoming spike buffer size
-_SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES = 6 * BYTES_PER_WORD
+_SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES = 7 * BYTES_PER_WORD
 
 
 class AbstractPopulationVertex(

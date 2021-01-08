@@ -246,6 +246,7 @@ struct synapse_params {
     uint32_t n_synapse_types;
     uint32_t log_n_neurons;
     uint32_t log_n_synapse_types;
+    uint32_t log_max_delay;
     uint32_t drop_late_packets;
     uint32_t incoming_spike_buffer_size;
     uint32_t ring_buffer_shifts[];
@@ -269,6 +270,7 @@ bool synapses_initialise(
 
     uint32_t log_n_neurons = params->log_n_neurons;
     uint32_t log_n_synapse_types = params->log_n_synapse_types;
+    uint32_t log_max_delay = params->log_max_delay;
 
     // Set up ring buffer left shifts
     ring_buffer_to_input_left_shifts =
@@ -295,7 +297,7 @@ bool synapses_initialise(
     synapse_index_mask = (1 << synapse_index_bits) - 1;
     synapse_type_bits = log_n_synapse_types;
     synapse_type_mask = (1 << log_n_synapse_types) - 1;
-    synapse_delay_bits = 4;
+    synapse_delay_bits = log_max_delay;
     synapse_delay_mask = (1 << synapse_delay_bits) - 1;
 
     uint32_t n_ring_buffer_bits =
