@@ -40,6 +40,26 @@ class SplitterPoissonDelegate(SplitterSliceLegacy):
         super(SplitterPoissonDelegate, self).__init__(
             "SplitterPoissonDelegate")
 
+    @property
+    def send_over_sdram(self):
+        """ Determine if this vertex is to be sent using SDRAM
+
+        :rtype: bool
+        """
+        # If there is only one outgoing projection, and it is one-to-one
+        # connected to the target, and the target knows what to do, leave
+        # it to the target
+        if len(self._governed_app_vertex.outgoing_projections) == 1:
+            proj = self._governed_app_vertex.outgoing_projections[0]
+            post_vertex = proj._projection_edge.post_vertex
+            connector = proj._synapse_information.connector
+            if (isinstance(post_vertex, AbstractPopulationVertex) and
+                    isinstance(post_vertex.splitter,
+                               AbstractSupportsOneToOneSDRAMInput) and
+                    isinstance(connector, OneToOneConnector)):
+                return True
+        return False
+
     @overrides(SplitterSliceLegacy.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
         AbstractSplitterCommon.set_governed_app_vertex(self, app_vertex)
@@ -49,19 +69,26 @@ class SplitterPoissonDelegate(SplitterSliceLegacy):
 
     @overrides(SplitterSliceLegacy.create_machine_vertices)
     def create_machine_vertices(self, resource_tracker, machine_graph):
-
-        # Go through the outgoing projections and find cases where the Poisson
-        # source will be split elsewhere to allow SDRAM connections
-        for proj in self._governed_app_vertex.outgoing_projections:
-            post_vertex = proj._projection_edge.post_vertex
-            connector = proj._synapse_information.connector
-            if (isinstance(post_vertex, AbstractPopulationVertex) and
-                isinstance(post_vertex.splitter,
-                           AbstractSupportsOneToOneSDRAMInput) and
-                len(self._governed_app_vertex.outgoing_projections) == 1 and
-                    isinstance(connector, OneToOneConnector)):
-                return
+        # If sending over SDRAM, let the target handle this
+        if self.send_over_sdram:
+            return
 
         # If we passed this part, use the super class
-        super(SplitterPoissonDelegate, self).create_machine_vertices(
+        return super(SplitterPoissonDelegate, self).create_machine_vertices(
             resource_tracker, machine_graph)
+
+    @overrides(AbstractSplitterCommon.get_in_coming_slices)
+    def get_in_coming_slices(self):
+        if self.send_over_sdram:
+            proj = self._governed_app_vertex.outgoing_projections[0]
+            post_vertex = proj._projection_edge.post_vertex
+            return post_vertex.splitter.get_in_coming_slices()
+        return super(SplitterPoissonDelegate, self).get_in_coming_slices()
+
+    @overrides(AbstractSplitterCommon.get_out_going_slices)
+    def get_out_going_slices(self):
+        if self.send_over_sdram:
+            proj = self._governed_app_vertex.outgoing_projections[0]
+            post_vertex = proj._projection_edge.post_vertex
+            return post_vertex.splitter.get_out_going_slices()
+        return super(SplitterPoissonDelegate, self).get_out_going_slices()
