@@ -24,7 +24,7 @@ from spinn_front_end_common.utilities.constants import (
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.abstract_models import (
     ReceivesSynapticInputsOverSDRAM, SendsSynapticInputsOverSDRAM)
-from spynnaker.pyNN.utilities.utility_calls import get_n_bits
+from spynnaker.pyNN.utilities.utility_calls import get_time_to_write_us
 from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .population_machine_synapses import (
     SynapseRegions, PopulationMachineSynapses, SynapseProvenance)
@@ -203,40 +203,24 @@ class PopulationSynapsesMachineVertex(
             spec, machine_time_step, routing_info, machine_graph, n_key_map)
 
         # Write information about SDRAM
-        n_neurons = self._vertex_slice.n_atoms
-        n_synapse_types = self._app_vertex.neuron_impl.get_n_synapse_types()
+        send_size = self.__sdram_partition.get_sdram_size_of_region_for(self)
+        n_send_cores = len(self.__sdram_partition.pre_vertices)
         spec.reserve_memory_region(
             region=self.REGIONS.SDRAM_EDGE_PARAMS.value,
             size=SDRAM_PARAMS_SIZE, label="SDRAM Params")
         spec.switch_write_focus(self.REGIONS.SDRAM_EDGE_PARAMS.value)
         spec.write_value(
             self.__sdram_partition.get_sdram_base_address_for(self))
-        spec.write_value(
-            self.__sdram_partition.get_sdram_size_of_region_for(self))
-        spec.write_value(int(math.ceil(
-            TIME_TO_SEND_INPUT * n_neurons * n_synapse_types)))
+        spec.write_value(send_size)
+        spec.write_value(get_time_to_write_us(send_size, n_send_cores))
 
         # End the writing of this specification:
         spec.end_specification()
 
-    @staticmethod
-    def n_bytes_for_transfer(n_neurons, n_synapse_types):
-        n_bytes = (2 ** get_n_bits(n_neurons) * n_synapse_types *
-                   SYNAPTIC_INPUT_BYTES)
-        # May need to add some padding if not a round number of words
-        extra_bytes = n_bytes % BYTES_PER_WORD
-        if extra_bytes:
-            n_bytes += BYTES_PER_WORD - extra_bytes
-        return n_bytes
-
     @overrides(SendsSynapticInputsOverSDRAM.sdram_requirement)
     def sdram_requirement(self, sdram_machine_edge):
-        n_bytes = self.n_bytes_for_transfer(
-            self._vertex_slice.n_atoms,
-            self._app_vertex.neuron_impl.get_n_synapse_types())
-
         if isinstance(sdram_machine_edge.post_vertex,
                       ReceivesSynapticInputsOverSDRAM):
-            return n_bytes
+            return sdram_machine_edge.post_vertex.n_bytes_for_transfer
         raise SynapticConfigurationException(
             "Unknown post vertex type in edge {}".format(sdram_machine_edge))

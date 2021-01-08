@@ -24,7 +24,9 @@ from spynnaker.pyNN.models.abstract_models import (
 from spynnaker.pyNN.models.neural_projections import (
     SynapseInformation, ProjectionApplicationEdge)
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.neuron import ConnectionHolder
+from spynnaker.pyNN.models.neuron import (
+    ConnectionHolder, AbstractPopulationVertex)
+from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
 
 # pylint: disable=protected-access
 
@@ -149,8 +151,14 @@ class PyNNProjectionCommon(object):
         # add projection to the SpiNNaker control system
         spinnaker_control.add_projection(self)
 
-        # Add to the list of incoming projections
-        post_vertex.add_incoming_projection(self)
+        # If the target is a population, add to the list of incoming
+        # projections
+        if isinstance(post_vertex, AbstractPopulationVertex):
+            post_vertex.add_incoming_projection(self)
+
+        # If the source is a poisson, add to the list of outgoing projections
+        if isinstance(pre_vertex, SpikeSourcePoissonVertex):
+            pre_vertex.add_outgoing_projection(self)
 
         # If there is a virtual board, we need to hold the data in case the
         # user asks for it

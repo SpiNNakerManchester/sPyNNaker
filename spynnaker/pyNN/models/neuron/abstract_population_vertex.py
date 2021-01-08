@@ -1309,3 +1309,11 @@ class AbstractPopulationVertex(
             (self._SYNAPSE_BASE_N_CPU_CYCLES_PER_NEURON *
              vertex_slice.n_atoms) +
             self.__synapse_recorder.get_n_cpu_cycles(vertex_slice.n_atoms))
+
+    @property
+    def incoming_projections(self):
+        """ The projections that target this population vertex
+
+        :rtype: list(PyNNProjectionCommon)
+        """
+        return self.__incoming_projections

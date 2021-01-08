@@ -20,6 +20,7 @@ from spinn_utilities.overrides import overrides
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_front_end_common.utilities import globals_variables
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.abstract_models import (
     ReceivesSynapticInputsOverSDRAM, SendsSynapticInputsOverSDRAM)
@@ -27,7 +28,6 @@ from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .population_machine_neurons import (
     NeuronRegions, PopulationMachineNeurons, NeuronProvenance)
-from .population_synapses_machine_vertex import PopulationSynapsesMachineVertex
 
 # Size of SDRAM params = 1 word for address + 1 word for size
 # + 1 word for n_neurons + 1 word for n_synapse_types
@@ -187,16 +187,13 @@ class PopulationNeuronsMachineVertex(
         # Write information about SDRAM
         n_neurons = self._vertex_slice.n_atoms
         n_synapse_types = self._app_vertex.neuron_impl.get_n_synapse_types()
-        sdram_per_synapse_core = \
-            PopulationSynapsesMachineVertex.n_bytes_for_transfer(
-                n_neurons, n_synapse_types)
         spec.reserve_memory_region(
             region=self.REGIONS.SDRAM_EDGE_PARAMS.value,
             size=SDRAM_PARAMS_SIZE, label="SDRAM Params")
         spec.switch_write_focus(self.REGIONS.SDRAM_EDGE_PARAMS.value)
         spec.write_value(
             self.__sdram_partition.get_sdram_base_address_for(self))
-        spec.write_value(sdram_per_synapse_core)
+        spec.write_value(self.n_bytes_for_transfer)
         spec.write_value(n_neurons)
         spec.write_value(n_synapse_types)
         spec.write_value(len(self.__sdram_partition.pre_vertices))
@@ -226,11 +223,37 @@ class PopulationNeuronsMachineVertex(
     def set_reload_required(self, new_value):
         self.__change_requires_neuron_parameters_reload = new_value
 
+    @property
+    @overrides(ReceivesSynapticInputsOverSDRAM.n_target_neurons)
+    def n_target_neurons(self):
+        return self._vertex_slice.n_atoms
+
+    @property
+    @overrides(ReceivesSynapticInputsOverSDRAM.n_target_synapse_types)
+    def n_target_synapse_types(self):
+        return self._app_vertex.neuron_impl.get_n_synapse_types()
+
+    @property
+    @overrides(ReceivesSynapticInputsOverSDRAM.weight_scales)
+    def weight_scales(self):
+        machine_timestep = globals_variables.get_simulator().machine_time_step
+        return self._app_vertex.get_weight_scales(machine_timestep)
+
+    @property
+    @overrides(ReceivesSynapticInputsOverSDRAM.n_bytes_for_transfer)
+    def n_bytes_for_transfer(self):
+        n_bytes = (2 ** get_n_bits(self.n_target_neurons) *
+                   self.n_target_synapse_types * self.N_BYTES_PER_INPUT)
+        # May need to add some padding if not a round number of words
+        extra_bytes = n_bytes % BYTES_PER_WORD
+        if extra_bytes:
+            n_bytes += BYTES_PER_WORD - extra_bytes
+        return n_bytes
+
     @overrides(ReceivesSynapticInputsOverSDRAM.sdram_requirement)
     def sdram_requirement(self, sdram_machine_edge):
         if isinstance(sdram_machine_edge.pre_vertex,
                       SendsSynapticInputsOverSDRAM):
-            return sdram_machine_edge.pre_vertex.sdram_requirement(
-                sdram_machine_edge)
+            return self.n_bytes_for_transfer
         raise SynapticConfigurationException(
             "Unknown pre vertex type in edge {}".format(sdram_machine_edge))

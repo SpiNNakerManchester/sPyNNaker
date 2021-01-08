@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2020-2021 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -12,15 +12,13 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from six import add_metaclass
+from spinn_utilities.abstract_base import AbstractBase
 
-from .spike_source_array import SpikeSourceArray
-from .spike_source_from_file import SpikeSourceFromFile
-from .spike_source_poisson import SpikeSourcePoisson
-from .spike_source_poisson_variable import SpikeSourcePoissonVariable
-from .spike_source_poisson_machine_vertex import (
-    SpikeSourcePoissonMachineVertex)
-from .spike_source_poisson_vertex import SpikeSourcePoissonVertex
 
-__all__ = ["SpikeSourceArray", "SpikeSourceFromFile", "SpikeSourcePoisson",
-           "SpikeSourcePoissonMachineVertex", "SpikeSourcePoissonVariable",
-           "SpikeSourcePoissonVertex"]
+@add_metaclass(AbstractBase)
+class AbstractSupportsOneToOneSDRAMInput(object):
+    """ A marker interface for a splitter that supports one-to-one input using
+        SDRAM.  The splitter is assumed to handle the splitting on any inputs
+        that are actually one-to-one, as it will have to create the vertices
+    """

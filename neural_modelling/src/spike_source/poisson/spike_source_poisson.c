@@ -88,6 +88,7 @@ typedef enum region {
     PROVENANCE_REGION,    //!< provenance region
     PROFILER_REGION,      //!< profiling region
     TDMA_REGION,          //!< tdma processing region
+    SDRAM_PARAMS_REGION   //!< SDRAM transfer parameters region
 } region;
 
 //! The number of recording regions
@@ -153,6 +154,19 @@ typedef struct source_info {
     spike_source_t poissons[];
 } source_info;
 
+//! A region of SDRAM used to transfer synapses
+struct sdram_config {
+    //! The address of the input data to be transferred
+    uint32_t *address;
+    //! The size of the input data to be transferred
+    uint32_t size_in_bytes;
+    //! The offset into the data to write the weights (to account for different
+    //! synapse types)
+    uint32_t offset;
+    //! The weight to send for each active Poisson source
+    uint16_t weights[];
+};
+
 //! Array of pointers to sequences of rate data
 static source_info **source_data;
 
@@ -189,6 +203,12 @@ static volatile bool recording_in_progress = false;
 
 //! The timer period
 static uint32_t timer_period;
+
+//! Where synaptic input is to be written
+static struct sdram_config *sdram_inputs;
+
+//! The inputs to be sent at the end of this timestep
+static uint16_t *input_this_timestep;
 
 // ----------------------------------------------------------------------
 
@@ -465,6 +485,28 @@ static bool initialize(void) {
     profiler_init(
             data_specification_get_region(PROFILER_REGION, ds_regions));
 
+    // Setup SDRAM transfer
+    struct sdram_config *sdram_conf = data_specification_get_region(
+            SDRAM_PARAMS_REGION, ds_regions);
+    uint32_t sdram_inputs_size = sizeof(struct sdram_config) + (
+            ssp_params.n_spike_sources * sizeof(uint16_t));
+    sdram_inputs = spin1_malloc(sdram_inputs_size);
+    if (sdram_inputs == NULL) {
+        log_error("Could not allocate %d bytes for SDRAM inputs",
+                sdram_inputs_size);
+        return false;
+    }
+    spin1_memcpy(sdram_inputs, sdram_conf, sdram_inputs_size);
+    if (sdram_inputs->size_in_bytes != 0) {
+        input_this_timestep = spin1_malloc(sdram_inputs->size_in_bytes);
+        if (input_this_timestep == NULL) {
+            log_error("Could not allocate %d bytes for input this timestep",
+                    sdram_inputs->size_in_bytes);
+            return false;
+        }
+        sark_word_set(input_this_timestep, 0, sdram_inputs->size_in_bytes);
+    }
+
     log_info("Initialise: completed successfully");
 
     return true;
@@ -637,6 +679,9 @@ static void process_fast_source(
                 const uint32_t spike_key = ssp_params.key | s_id;
                 tdma_processing_send_packet(
                     spike_key, num_spikes, WITH_PAYLOAD, timer_count);
+            } else if (sdram_inputs->address != 0) {
+                input_this_timestep[sdram_inputs->offset + s_id] +=
+                     sdram_inputs->weights[s_id] * num_spikes;
             }
         }
     }
@@ -660,6 +705,9 @@ static void process_slow_source(
                 // Send package
                 tdma_processing_send_packet(
                     ssp_params.key | s_id, 0, NO_PAYLOAD, timer_count);
+            } else if (sdram_inputs->address != 0) {
+                input_this_timestep[sdram_inputs->offset + s_id] +=
+                     sdram_inputs->weights[s_id];
             }
 
             // Update time to spike (note, this might not get us back above
@@ -718,6 +766,11 @@ static void timer_callback(uint timer_count, UNUSED uint unused) {
         return;
     }
 
+    // Reset the inputs this timestep if using them
+    if (sdram_inputs->address != 0) {
+        sark_word_set(input_this_timestep, 0, sdram_inputs->size_in_bytes);
+    }
+
     // Loop through spike sources
     tdma_processing_reset_phase();
     for (index_t s_id = 0; s_id < ssp_params.n_spike_sources; s_id++) {
@@ -739,6 +792,12 @@ static void timer_callback(uint timer_count, UNUSED uint unused) {
     }
 
     profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
+
+    // If transferring over SDRAM, transfer now
+    if (sdram_inputs->address != 0) {
+        spin1_dma_transfer(0, sdram_inputs->address, input_this_timestep,
+                DMA_WRITE, sdram_inputs->size_in_bytes);
+    }
 
     // Record output spikes if required
     if (recording_flags > 0) {

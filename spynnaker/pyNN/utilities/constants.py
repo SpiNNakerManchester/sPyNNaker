@@ -74,3 +74,6 @@ POP_TABLE_MAX_ROW_LENGTH = 256
 
 #: The name of the partition for Synaptic SDRAM
 SYNAPSE_SDRAM_PARTITION_ID = "SDRAM Synaptic Inputs"
+
+#: The conservative amount of write bandwidth available on a chip
+WRITE_BANDWIDTH_BYTES_PER_SECOND = 250 * 1024 * 1024

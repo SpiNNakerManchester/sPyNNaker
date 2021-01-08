@@ -55,7 +55,7 @@ class SynapseInformation(object):
         :type rng: ~pyNN.random.NumpyRNG or None
         :param AbstractSynapseDynamics synapse_dynamics:
             The dynamic behaviour of the synapse
-        :param AbstractSynapseType synapse_type: The type of the synapse
+        :param int synapse_type: The type of the synapse
         :param bool is_virtual_machine: Whether the machine is virtual
         :param weights: The synaptic weights
         :type weights: float or list(float) or ~numpy.ndarray(float) or None
@@ -153,7 +153,7 @@ class SynapseInformation(object):
     def synapse_type(self):
         """ The type of the synapse
 
-        :rtype: AbstractSynapseType
+        :rtype: int
         """
         return self.__synapse_type
 

@@ -25,7 +25,7 @@ from spinn_front_end_common.utilities import (
     helpful_functions, globals_variables)
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_SECOND_CONVERSION, SIMULATION_N_BYTES, BYTES_PER_WORD,
-    MICRO_TO_MILLISECOND_CONVERSION)
+    MICRO_TO_MILLISECOND_CONVERSION, BYTES_PER_SHORT)
 from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.graphs.machine import MachineVertex
@@ -51,6 +51,9 @@ from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.constants import (
     LIVE_POISSON_CONTROL_PARTITION_ID)
 from spynnaker.pyNN.utilities.struct import Struct
+from spynnaker.pyNN.models.abstract_models import (
+    SendsSynapticInputsOverSDRAM, ReceivesSynapticInputsOverSDRAM)
+from spynnaker.pyNN.exceptions import SynapticConfigurationException
 
 
 def _flatten(alist):
@@ -74,6 +77,15 @@ def get_rates_bytes(vertex_slice, rate_data):
             (n_rates * PARAMS_WORDS_PER_RATE)) * BYTES_PER_WORD
 
 
+def get_sdram_edge_params_bytes(vertex_slice):
+    """ Gets the size of the Poisson SDRAM region in bytes
+    :param ~pacman.model.graphs.common.Slice vertex_slice:
+    :rtype: int
+    """
+    return SDRAM_EDGE_PARAMS_BASE_BYTES + (
+        vertex_slice.n_atoms * SDRAM_EDGE_PARAMS_BYTES_PER_WEIGHT)
+
+
 # uint32_t n_rates; uint32_t index
 PARAMS_WORDS_PER_NEURON = 2
 
@@ -81,20 +93,31 @@ PARAMS_WORDS_PER_NEURON = 2
 # sqrt_lambda, isi_val, time_to_spike
 PARAMS_WORDS_PER_RATE = 8
 
+# The size of each weight to be stored for SDRAM transfers
+SDRAM_EDGE_PARAMS_BYTES_PER_WEIGHT = BYTES_PER_SHORT
+
+# SDRAM edge param base size:
+# 1. address, 2. size of transfer,
+# 3. offset to start writing, 4. VLA of weights (not counted here)
+SDRAM_EDGE_PARAMS_BASE_BYTES = 4 * BYTES_PER_WORD
+
 
 class SpikeSourcePoissonMachineVertex(
         MachineVertex, AbstractReceiveBuffersToHost,
         ProvidesProvenanceDataFromMachineImpl, AbstractRecordable,
         AbstractSupportsDatabaseInjection, AbstractHasProfileData,
         AbstractHasAssociatedBinary, AbstractRewritesDataSpecification,
-        AbstractGeneratesDataSpecification, AbstractReadParametersBeforeSet):
+        AbstractGeneratesDataSpecification, AbstractReadParametersBeforeSet,
+        SendsSynapticInputsOverSDRAM):
 
     __slots__ = [
         "__buffered_sdram_per_timestep",
         "__is_recording",
         "__minimum_buffer_sdram",
         "__resources",
-        "__change_requires_neuron_parameters_reload"]
+        "__change_requires_neuron_parameters_reload",
+        "__sdram_partition",
+        "__sdram_projection"]
 
     class POISSON_SPIKE_SOURCE_REGIONS(Enum):
         SYSTEM_REGION = 0
@@ -104,6 +127,7 @@ class SpikeSourcePoissonMachineVertex(
         PROVENANCE_REGION = 4
         PROFILER_REGION = 5
         TDMA_REGION = 6
+        SDRAM_EDGE_PARAMS = 7
 
     PROFILE_TAG_LABELS = {
         0: "TIMER",
@@ -157,6 +181,10 @@ class SpikeSourcePoissonMachineVertex(
         self.__is_recording = is_recording
         self.__resources = resources_required
         self.__change_requires_neuron_parameters_reload = False
+        self.__sdram_partition = None
+
+    def set_sdram_partition(self, sdram_partition):
+        self.__sdram_partition = sdram_partition
 
     @property
     @overrides(MachineVertex.resources_required)
@@ -366,6 +394,39 @@ class SpikeSourcePoissonMachineVertex(
         spec.write_array(
             self._app_vertex.generate_tdma_data_specification_data(
                 self._app_vertex.vertex_slices.index(self.vertex_slice)))
+
+        # write SDRAM edge parameters
+        spec.switch_write_focus(
+            self.POISSON_SPIKE_SOURCE_REGIONS.SDRAM_EDGE_PARAMS.value)
+        if self.__sdram_partition is None:
+            spec.write_array([0, 0, 0, 0])
+        else:
+            size = self.__sdram_partition.get_sdram_size_of_region_for(self)
+            proj = self._app_vertex.outgoing_projections[0]
+            synapse_info = proj._synapse_information
+            spec.write_value(
+                self.__sdram_partition.get_sdram_base_address_for(self))
+            spec.write_value(size)
+
+            # Work out the offset into the data to write from, based on the
+            # synapse type in use
+            synapse_type = synapse_info.synapse_type
+            offset = synapse_type * self.vertex_slice.n_atoms
+            spec.write_value(offset)
+
+            # If we are here, the connector must be one-to-one so create
+            # the synapses and then store the scaled weights
+            connections = synapse_info.connector.create_synaptic_block(
+                None, None, self.vertex_slice, self.vertex_slice, synapse_type,
+                synapse_info)
+            weight_scales = synapse_info.post_population._get_vertex\
+                .get_weight_scales(machine_time_step)
+            weights = connections["weight"] * weight_scales[synapse_type]
+            weights = numpy.rint(numpy.abs(weights)).astype("uint16")
+            if len(weights) % 2 != 0:
+                padding = numpy.array([0], dtype="uint16")
+                weights = numpy.concatenate((weights, padding))
+            spec.write_array(weights.view("uint32"))
 
         # End-of-Spec:
         spec.end_specification()
@@ -588,6 +649,11 @@ class SpikeSourcePoissonMachineVertex(
 
         placement.vertex.reserve_provenance_data_region(spec)
 
+        spec.reserve_memory_region(
+            region=self.POISSON_SPIKE_SOURCE_REGIONS.SDRAM_EDGE_PARAMS.value,
+            label="sdram edge params",
+            size=get_sdram_edge_params_bytes(self.vertex_slice))
+
     def _reserve_poisson_params_rates_region(self, placement, spec):
         """ Allocate space for the Poisson parameters and rates regions as\
             they can be reused for setters after an initial run
@@ -699,3 +765,11 @@ class SpikeSourcePoissonMachineVertex(
             # rewritten when the parameters are loaded
             self._app_vertex.time_to_spike.set_value_by_id(
                 i, time_to_next_spike)
+
+    @overrides(SendsSynapticInputsOverSDRAM.sdram_requirement)
+    def sdram_requirement(self, sdram_machine_edge):
+        if isinstance(sdram_machine_edge.post_vertex,
+                      ReceivesSynapticInputsOverSDRAM):
+            return sdram_machine_edge.post_vertex.n_bytes_for_transfer
+        raise SynapticConfigurationException(
+            "Unknown post vertex type in edge {}".format(sdram_machine_edge))

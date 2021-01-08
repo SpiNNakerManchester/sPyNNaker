@@ -29,6 +29,9 @@ from spynnaker.pyNN.utilities.random_stats import (
     RandomStatsNormalClippedImpl, RandomStatsNormalImpl,
     RandomStatsPoissonImpl, RandomStatsRandIntImpl, RandomStatsUniformImpl,
     RandomStatsVonmisesImpl, RandomStatsBinomialImpl)
+from spinn_front_end_common.utilities.constants import (
+    MICRO_TO_SECOND_CONVERSION)
+from spynnaker.pyNN.utilities.constants import WRITE_BANDWIDTH_BYTES_PER_SECOND
 
 
 MAX_RATE = 2 ** 32 - 1  # To allow a unit32_t to be used to store the rate
@@ -336,3 +339,14 @@ def get_n_bits(n_values):
     if n_values == 1:
         return 1
     return int(math.ceil(math.log(n_values, 2)))
+
+
+def get_time_to_write_us(n_bytes, n_cores):
+    """ Determine how long a write of a given number of bytes will take in us
+
+    :param int n_bytes: The number of bytes to transfer
+    :param int n_cores: How many cores will be writing at the same time
+    """
+    bandwidth_per_core = WRITE_BANDWIDTH_BYTES_PER_SECOND / n_cores
+    seconds = n_bytes / bandwidth_per_core
+    return int(math.ceil(seconds * MICRO_TO_SECOND_CONVERSION))

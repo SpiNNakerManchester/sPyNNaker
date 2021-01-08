@@ -26,11 +26,18 @@ from spynnaker.pyNN.models.neuron import (
     PopulationNeuronsMachineVertex, PopulationSynapsesMachineVertex,
     NeuronProvenance, SynapseProvenance, AbstractPopulationVertex)
 from spynnaker.pyNN.utilities.constants import SYNAPSE_SDRAM_PARTITION_ID
+from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    OneToOneConnector)
+from .splitter_poisson_delegate import SplitterPoissonDelegate
 from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
+from .abstract_supports_one_to_one_sdram_input import (
+    AbstractSupportsOneToOneSDRAMInput)
 
 
 class SplitterAbstractPopulationVertexNeuronsSynapses(
-        AbstractSplitterCommon, AbstractSpynnakerSplitterDelay):
+        AbstractSplitterCommon, AbstractSpynnakerSplitterDelay,
+        AbstractSupportsOneToOneSDRAMInput):
     """ handles the splitting of the AbstractPopulationVertex via slice logic.
     """
 
@@ -39,13 +46,14 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         "__synapse_vertices",
         "__synapse_verts_by_neuron",
         "__n_synapse_vertices",
-        "__index"]
+        "__index",
+        "__poisson_edges"]
 
     SPLITTER_NAME = "SplitterAbstractPopulationVertexNeuronsSynapses"
 
     INVALID_POP_ERROR_MESSAGE = (
         "The vertex {} cannot be supported by the "
-        "SplitterAbstractPopulationVertexSlice as"
+        "SplitterAbstractPopVertexNeuronsSynapses as"
         " the only vertex supported by this splitter is a "
         "AbstractPopulationVertex. Please use the correct splitter for "
         "your vertex and try again.")
@@ -65,16 +73,47 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, resource_tracker, machine_graph):
+        label = self._governed_app_vertex.label
+        self.__poisson_edges = set()
+
+        # Go through the incoming projections and find Poisson sources with
+        # splitters that work with us, and one-to-one connections that will
+        # then work with SDRAM
+        incoming_direct_poisson = defaultdict(list)
+        for proj in self._governed_app_vertex.incoming_projections:
+            pre_vertex = proj._projection_edge.pre_vertex
+            connector = proj._synapse_information.connector
+            if (isinstance(pre_vertex, SpikeSourcePoissonVertex) and
+                isinstance(pre_vertex.splitter, SplitterPoissonDelegate) and
+                    len(pre_vertex.outgoing_projections) == 1 and
+                    isinstance(connector, OneToOneConnector)):
+
+                # Create the direct Poisson vertices here; the splitter
+                # for the Poisson will create any others as needed
+                for vertex_slice in self.__get_fixed_slices():
+                    resources = pre_vertex.get_resources_used_by_atoms(
+                        vertex_slice)
+                    poisson_label = "{}_Poisson:{}-{}".format(
+                        label, vertex_slice.lo_atom, vertex_slice.hi_atom)
+                    poisson_m_vertex = pre_vertex.create_machine_vertex(
+                        vertex_slice, resources, label=poisson_label)
+                    machine_graph.add_vertex(poisson_m_vertex)
+                    incoming_direct_poisson[vertex_slice].append(
+                        poisson_m_vertex)
+
+                # Keep track of edges that have been used for this
+                self.__poisson_edges.add(proj._projection_edge)
+
         self.__neuron_vertices = list()
         self.__synapse_vertices = list()
         self.__synapse_verts_by_neuron = defaultdict(list)
         self.__index = 0
-        label = self._governed_app_vertex.label
         for vertex_slice in self.__get_fixed_slices():
 
             # Create the neuron an synapse vertices
             neuron_resources = self.__get_neuron_resources(vertex_slice)
             synapse_resources = self.__get_synapse_resources(vertex_slice)
+            all_resources = [neuron_resources]
             neuron_label = "{}_Neurons:{}-{}".format(
                 label, vertex_slice.lo_atom, vertex_slice.hi_atom)
             neuron_vertex = PopulationNeuronsMachineVertex(
@@ -90,28 +129,42 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 synapse_vertex = PopulationSynapsesMachineVertex(
                     synapse_resources, synapse_label, None,
                     self._governed_app_vertex, vertex_slice)
+                all_resources.append(synapse_resources)
                 machine_graph.add_vertex(synapse_vertex)
                 self.__synapse_vertices.append(synapse_vertex)
                 synapse_vertices.append(synapse_vertex)
 
-            # Create the SDRAM edge between the parts
-            sdram_label = "SDRAM {}-->{}".format(synapse_label, neuron_label)
+            # Add resources for Poisson vertices
+            poisson_vertices = incoming_direct_poisson[vertex_slice]
+            for poisson_vertex in poisson_vertices:
+                all_resources.append(poisson_vertex.resources_required)
+
+            # Create an SDRAM edge partition
+            sdram_label = "SDRAM {} Synapses-->Neurons:{}-{}".format(
+                label, vertex_slice.lo_atom, vertex_slice.hi_atom)
+            source_vertices = poisson_vertices + synapse_vertices
             sdram_partition = SourceSegmentedSDRAMMachinePartition(
-                SYNAPSE_SDRAM_PARTITION_ID, sdram_label, synapse_vertices)
+                SYNAPSE_SDRAM_PARTITION_ID, sdram_label, source_vertices)
             machine_graph.add_outgoing_edge_partition(sdram_partition)
             neuron_vertex.set_sdram_partition(sdram_partition)
-            for synapse_vertex in synapse_vertices:
+
+            # Add SDRAM edges for synapse vertices
+            for source_vertex in source_vertices:
+                edge_label = "SDRAM {}-->{}".format(
+                    source_vertex.label, neuron_vertex.label)
                 machine_graph.add_edge(
                     SDRAMMachineEdge(
-                        synapse_vertex, neuron_vertex, sdram_label),
+                        source_vertex, neuron_vertex, edge_label),
                     SYNAPSE_SDRAM_PARTITION_ID)
-                synapse_vertex.set_sdram_partition(sdram_partition)
+                source_vertex.set_sdram_partition(sdram_partition)
+
+            # Add SDRAM edge requirements to the neuron SDRAM, as the resource
+            # tracker will otherwise try to add another core for it
+            neuron_resources.extend(ResourceContainer(sdram=ConstantSDRAM(
+                sdram_partition.total_sdram_requirements())))
 
             # Allocate all the resources to ensure they all fit
-            sdram_resources = ResourceContainer(sdram=ConstantSDRAM(
-                sdram_partition.total_sdram_requirements()))
-            resource_tracker.allocate_group_resources(
-                [neuron_resources, synapse_resources, sdram_resources])
+            resource_tracker.allocate_group_resources(all_resources)
 
         return True
 
@@ -136,6 +189,9 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
     def get_in_coming_vertices(
             self, edge, outgoing_edge_partition, src_machine_vertex):
+        # Filter out edges from Poisson sources being done using SDRAM
+        if edge in self.__poisson_edges:
+            return {}
         self.__index = (self.__index + 1) % self.__n_synapse_vertices
         return {v[self.__index]: [MachineEdge]
                 for v in self.__synapse_verts_by_neuron.values()}

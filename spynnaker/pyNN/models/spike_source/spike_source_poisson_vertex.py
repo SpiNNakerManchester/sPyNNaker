@@ -39,7 +39,8 @@ from spinn_front_end_common.interface.profiling import profile_utils
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, MultiSpikeRecorder, SimplePopulationSettable)
 from .spike_source_poisson_machine_vertex import (
-    SpikeSourcePoissonMachineVertex, _flatten, get_rates_bytes)
+    SpikeSourcePoissonMachineVertex, _flatten, get_rates_bytes,
+    get_sdram_edge_params_bytes)
 from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
 from spynnaker.pyNN.utilities.ranged.spynnaker_ranged_dict \
     import SpynnakerRangeDictionary
@@ -92,7 +93,8 @@ class SpikeSourcePoissonVertex(
         "__n_profile_samples",
         "__data",
         "__is_variable_rate",
-        "__max_spikes"]
+        "__max_spikes",
+        "__outgoing_projections"]
 
     SPIKE_RECORDING_REGION_ID = 0
 
@@ -276,6 +278,24 @@ class SpikeSourcePoissonVertex(
             self.__max_spikes = numpy.sum(scipy.stats.poisson.ppf(
                 1.0 - (1.0 / max_rates), max_rates))
 
+        # Keep track of how many outgoing projections exist
+        self.__outgoing_projections = list()
+
+    def add_outgoing_projection(self, projection):
+        """ Add an outgoing projection from this vertex
+
+        :param PyNNProjectionCommon projection: The projection to add
+        """
+        self.__outgoing_projections.append(projection)
+
+    @property
+    def outgoing_projections(self):
+        """ The projections outgoing from this vertex
+
+        :rtype: list(PyNNProjectionCommon)
+        """
+        return self.__outgoing_projections
+
     @property
     def n_profile_samples(self):
         return self.__n_profile_samples
@@ -444,13 +464,15 @@ class SpikeSourcePoissonVertex(
         """
         # pylint: disable=arguments-differ
         poisson_params_sz = get_rates_bytes(vertex_slice, self.__data["rates"])
+        sdram_sz = get_sdram_edge_params_bytes(vertex_slice)
         other = ConstantSDRAM(
             SYSTEM_BYTES_REQUIREMENT +
             SpikeSourcePoissonMachineVertex.get_provenance_data_size(0) +
             poisson_params_sz + self.tdma_sdram_size_in_bytes +
             recording_utilities.get_recording_header_size(1) +
             recording_utilities.get_recording_data_constant_size(1) +
-            profile_utils.get_profile_region_size(self.__n_profile_samples))
+            profile_utils.get_profile_region_size(self.__n_profile_samples) +
+            sdram_sz)
 
         recording = self.get_recording_sdram_usage(
             vertex_slice, machine_time_step)
