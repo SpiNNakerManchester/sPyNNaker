@@ -946,7 +946,7 @@ class SynapticManager(object):
             print("-" * 80)
         if self.__ring_buffer_shifts is None:
             print("=" * 80)
-            print("Computing values for RB left shifts...")
+            print("Computing values for RB left shifts for", application_vertex.label)
             self.__ring_buffer_shifts = \
                 self._get_ring_buffer_to_input_left_shifts(
                     application_vertex, application_graph, machine_timestep,
