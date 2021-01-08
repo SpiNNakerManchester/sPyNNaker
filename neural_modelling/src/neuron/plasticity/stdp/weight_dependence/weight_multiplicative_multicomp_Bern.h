@@ -40,7 +40,7 @@ typedef struct {
 
 typedef struct {
 
-    int32_t weight;
+    weight_t weight;
 
     uint32_t weight_shift;
     const plasticity_weight_region_data_t *weight_region;
@@ -61,7 +61,7 @@ extern uint32_t *weight_shift;
 static inline weight_state_t weight_get_initial(
         weight_t weight, index_t synapse_type) {
     return (weight_state_t ) {
-        .weight = (int32_t) weight,
+        .weight = weight,
         .weight_shift =
                 weight_shift[synapse_type],
         .weight_region = &plasticity_weight_region_data[synapse_type]
@@ -74,18 +74,18 @@ static inline weight_t weight_get_final(weight_state_t new_state) {
     return (weight_t) new_state.weight;
 }
 
-static inline int32_t convert_real_to_int(REAL value) {
-    union {
-        REAL input_type;
-        int32_t output_type;
-    } converter;
+// static inline int32_t convert_real_to_int(REAL value) {
+//     union {
+//         REAL input_type;
+//         int32_t output_type;
+//     } converter;
 
-    converter.input_type = (value);
+//     converter.input_type = (value);
 
-    //io_printf(IO_BUF, "weight conv %k returning %k\n", value, converter.output_type);
+//     //io_printf(IO_BUF, "weight conv %k returning %k\n", value, converter.output_type);
 
-    return converter.output_type;
-}
+//     return converter.output_type;
+// }
 
 //---------------------------------------
 static inline weight_state_t weight_one_term_apply_update(weight_state_t state, REAL total_rate) {
@@ -100,9 +100,9 @@ static inline weight_state_t weight_one_term_apply_update(weight_state_t state, 
 
     io_printf(IO_BUF, "Delta w %k, weight shift %d\n", delta, state.weight_shift);
 
-    state.weight = state.weight + ((convert_real_to_int(delta)) >> state.weight_shift);
+    state.weight = state.weight + delta;
 
-    //io_printf(IO_BUF, "weight updated %k\n", state.weight);
+    io_printf(IO_BUF, "weight updated %k\n", state.weight);
 
     //MORE EFFICIENT WAY TO DO THIS?
     if(state.weight < state.weight_region->min_weight) {

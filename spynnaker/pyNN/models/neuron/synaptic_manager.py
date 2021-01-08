@@ -87,13 +87,15 @@ class SynapticManager(object):
         "__ring_buffer_shifts",
         "__gen_on_machine",
         "__max_row_info",
-        "__synapse_indices"]
+        "__synapse_indices",
+        "__synapse_rescale"]
 
     def __init__(self, n_synapse_types, ring_buffer_sigma, spikes_per_second,
-                 config, population_table_type=None, synapse_io=None):
+                 config, population_table_type=None, synapse_io=None, synapse_rescale = False):
         self.__n_synapse_types = n_synapse_types
         self.__ring_buffer_sigma = ring_buffer_sigma
         self.__spikes_per_second = spikes_per_second
+        self.__synapse_rescale = synapse_rescale
 
         # Get the type of population table
         self.__poptable_type = population_table_type
@@ -535,12 +537,14 @@ class SynapticManager(object):
         return list(max_weight_powers)
 
     @staticmethod
-    def _get_weight_scale(ring_buffer_to_input_left_shift):
+    def _get_weight_scale(ring_buffer_to_input_left_shift, synapse_rescale):
         """ Return the amount to scale the weights by to convert them from \
             floating point values to 16-bit fixed point numbers which can be \
             shifted left by ring_buffer_to_input_left_shift to produce an\
             s1615 fixed point number
         """
+        if not synapse_rescale:
+            return 1.0
         return float(math.pow(2, 16 - (ring_buffer_to_input_left_shift + 1)))
 
     def _write_synapse_parameters(
@@ -555,7 +559,7 @@ class SynapticManager(object):
         spec.write_array(ring_buffer_shifts)
 
         weight_scales = numpy.array([
-            self._get_weight_scale(r) * weight_scale
+            self._get_weight_scale(r, self.__synapse_rescale) * weight_scale
             for r in ring_buffer_shifts])
         return weight_scales
 

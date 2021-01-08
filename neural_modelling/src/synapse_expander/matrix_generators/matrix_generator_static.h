@@ -104,7 +104,7 @@ static void matrix_generator_static_write_row(
         uint32_t max_row_n_words, uint32_t max_delayed_row_n_words,
         uint32_t synapse_type_bits, uint32_t synapse_index_bits,
         uint32_t synapse_type, uint32_t n_synapses,
-        uint16_t *indices, uint16_t *delays, accum *weights,
+        uint16_t *indices, uint16_t *delays, uint32_t *weights,
         uint32_t max_stage) {
     use(data);
 
@@ -167,7 +167,7 @@ static void matrix_generator_static_write_row(
         uint32_t post_index = indices[synapse];
 
         // Weight
-        accum weight = weights[synapse];
+        uint32_t weight = weights[synapse];
 
         // Work out the delay stage and final value
         struct delay_value delay = get_delay(delays[synapse], max_stage);
@@ -237,8 +237,7 @@ static void matrix_generator_static_write_row(
 
         // Write the word
         log_debug("Writing word to 0x%08x", &write_address[delay.stage][0]);
-        *fixed[delay.stage] = word;
-        fixed[delay.stage]++;
+        *fixed[delay.stage]++ = word;
 
         id_words_per_row[delay.stage]++;
     }
@@ -248,17 +247,16 @@ static void matrix_generator_static_write_row(
         if(row_address[i] != NULL) {
 
             // Compute the padding for the fixed part
-            uint32_t fixed_padding = id_words_per_row[i] % 4;
+            uint8_t fixed_padding = id_words_per_row[i] % 4;
 
             if(fixed_padding > 0) {
 
                 // Number of slots missing to complete a word
                 fixed_padding = 4 - fixed_padding;
 
-                for(uint32_t j = 0; j < fixed_padding; j++) {
+                for(uint8_t j = 0; j < fixed_padding; j++) {
 
-                    *fixed[i] = 0;
-                    fixed[i]++;
+                    *fixed[i]++ = 0;
                     id_words_per_row[i]++;
                 }
             }

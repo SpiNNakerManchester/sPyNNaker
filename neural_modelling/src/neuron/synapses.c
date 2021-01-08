@@ -255,6 +255,13 @@ bool synapses_initialise(
         synaptic_matrix, synaptic_matrix_address,
         synaptic_matrix_size * sizeof(uint32_t));
 
+    //PURE MADNESS! Print syn mat uint32 by uint32
+    for(uint32_t i = 0; i < synaptic_matrix_size; i++) {
+        io_printf(IO_BUF, "M %u\n", synaptic_matrix[i]);
+    }
+
+    io_printf(IO_BUF, "Finished \n");
+
     // address_t is a uint32_t*
     *dtcm_synaptic_matrix = synaptic_matrix;
 
@@ -311,7 +318,7 @@ bool synapses_initialise(
 
     uint32_t n_ring_buffer_bits =
             log_n_neurons + log_n_synapse_types;
-    // +1 to have the double ring buffer to write in the safe one
+            
     uint32_t ring_buffer_size = 1 << (n_ring_buffer_bits);
 
     ring_buffers = spin1_malloc(ring_buffer_size * sizeof(REAL));

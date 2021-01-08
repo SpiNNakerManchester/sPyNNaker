@@ -134,7 +134,7 @@ static inline control_t* synapse_row_plastic_controls(address_t fixed) {
 }
 
 static inline accum *synapse_row_fixed_weight_controls(address_t fixed) {
-    return &fixed[2];
+    return (accum *) &fixed[2];
 }
 
 static inline uint8_t *synapse_row_fixed_data(address_t fixed, uint32_t n_synapses) {

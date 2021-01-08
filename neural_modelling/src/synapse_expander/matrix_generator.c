@@ -162,7 +162,7 @@ static void matrix_generator_write_row(
         uint32_t max_row_n_words, uint32_t max_delayed_row_n_words,
         uint32_t n_synapse_type_bits, uint32_t n_synapse_index_bits,
         uint32_t synapse_type, uint32_t n_synapses,
-        uint16_t *indices, uint16_t *delays, accum *weights,
+        uint16_t *indices, uint16_t *delays, uint32_t *weights,
         uint32_t max_stage) {
     generator->type->write_row(
             generator->data, synaptic_matrix, delayed_synaptic_matrix,
@@ -239,6 +239,7 @@ bool matrix_generator_generate(
                 weight_generator, n_indices, pre_neuron_index, indices, params);
         for (uint32_t j = 0; j < n_indices; j++) {
             weights[j] = rescale_weight(params[j], weight_scales[synapse_type]);
+            io_printf(IO_BUF, "weights %k\n", weights[j]);
         }
 
         // Write row
@@ -247,7 +248,7 @@ bool matrix_generator_generate(
                 pre_slice_count, pre_neuron_index - pre_slice_start,
                 max_row_n_words, max_delayed_row_n_words,
                 n_synapse_type_bits, n_synapse_index_bits,
-                synapse_type, n_indices, indices, delays, weights, max_stage);
+                synapse_type, n_indices, indices, delays, (uint32_t *) weights, max_stage);
 
         n_connections += n_indices;
     }

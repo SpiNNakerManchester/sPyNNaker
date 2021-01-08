@@ -125,9 +125,11 @@ void matrix_generator_stdp_write_row(
         uint32_t max_row_n_words, uint32_t max_delayed_row_n_words,
         uint32_t synapse_type_bits, uint32_t synapse_index_bits,
         uint32_t synapse_type, uint32_t n_synapses,
-        uint16_t *indices, uint16_t *delays, accum *weights,
+        uint16_t *indices, uint16_t *delays, uint32_t *weights,
         uint32_t max_stage) {
     struct matrix_generator_stdp *obj = data;
+
+    obj->n_words_per_pp_row_header = 1;
 
     // Row address for each possible delay stage (including no delay stage)
     address_t row_address[max_stage];
@@ -187,6 +189,8 @@ void matrix_generator_stdp_write_row(
             pp_address[i] = (uint32_t *) &row_address[i][
                     STDP_PLASTIC_PLASTIC_OFFSET +
                     obj->n_words_per_pp_row_header];
+
+            io_printf(IO_BUF, "words %d\n", obj->n_words_per_pp_row_header);
         } else {
             pp_address[i] = NULL;
         }
@@ -195,7 +199,7 @@ void matrix_generator_stdp_write_row(
     // Write the plastic-plastic part of the row
     for (uint32_t synapse = 0; synapse < n_synapses; synapse++) {
         // Weight
-        accum weight = weights[synapse];
+        uint32_t weight = weights[synapse];
         // Delay (mostly to get the stage)
         struct delay_value delay = get_delay(delays[synapse], max_stage);
 
@@ -217,12 +221,13 @@ void matrix_generator_stdp_write_row(
         uint32_t *weight_words = pp_address[delay.stage];
         pp_address[delay.stage] =
                 &pp_address[delay.stage][obj->n_words_per_pp_synapse];
+
         for (uint32_t i = 0; i < obj->n_words_per_pp_synapse; i++) {
-            // Possible type issue, since weight_words is uint32 and not accum, double check
             weight_words[i] = 0;
         }
-        // Possible type issue, since weight_words is uint32 and not accum, double check!
+
         weight_words[obj->weight_word] = weight;
+        io_printf(IO_BUF, "plast weight %k\n", weight_words[obj->weight_word]);
         n_words_per_row[delay.stage] +=
                 obj->n_words_per_pp_synapse;
         space_words[delay.stage] -= obj->n_words_per_pp_synapse;
@@ -296,7 +301,7 @@ void matrix_generator_stdp_write_row(
             }
 
             // Save the fixed plastic size (n of written bytes / 4)
-            fp_address[i][STDP_FIXED_PLASTIC_SIZE] = n_fixed_words_per_row[i] >> 2;
+            fixed_address[i][STDP_FIXED_PLASTIC_SIZE] = n_fixed_words_per_row[i] >> 2;
         }
     }
 }
