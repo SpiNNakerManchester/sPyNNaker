@@ -35,12 +35,8 @@ class SynapseDynamicsSTDP(_BaseClass):
             weight=PyNNStaticSynapse.default_parameters['weight'], delay=None,
             backprop_delay=True):
         """
-        :param timing_dependence:
-        :type timing_dependence:
-            ~spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.AbstractTimingDependence
-        :param weight_dependence:
-        :type weight_dependence:
-            ~spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence
+        :param AbstractTimingDependence timing_dependence:
+        :param AbstractWeightDependence weight_dependence:
         :param None voltage_dependence: Unsupported
         :param float dendritic_delay_fraction:
         :param float weight:

@@ -290,10 +290,9 @@ def get_projections_data(projection_data):
     """
     :param projection_data: the projection to attributes mapping
     :type projection_data:
-        dict(~spynnaker.pyNN.models.pynn_projection_common.PyNNProjectionCommon,\
-        list(int) or tuple(int) or None)
+        dict(~PyNNProjectionCommon, list(int) or tuple(int) or None)
     :return: a extracted data object with get method for getting the data
-    :rtype: ~spynnaker.pyNN.utilities.extracted_data.ExtractedData
+    :rtype: ExtractedData
     """
     return globals_variables.get_simulator().get_projections_data(
         projection_data)
@@ -426,13 +425,9 @@ def Projection(
     :type presynaptic_population: ~spynnaker8.models.populations.Population
     :param postsynaptic_population: the dest pop
     :type postsynaptic_population: ~spynnaker8.models.populations.Population
-    :param connector: the connector type
-    :type connector:
-        ~spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector
-    :param synapse_type: the synapse type
-    :type synapse_type:
-        ~spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractStaticSynapseDynamics
-    :param None source: Unsupported; must be None
+    :param AbstractConnector connector: the connector type
+    :param AbstractStaticSynapseDynamics synapse_type: the synapse type
+    :param None source: Unsupported; must be ``None``
     :param str receptor_type: the receptor type
     :param space: the space object
     :type space: ~pyNN.space.Space or None
@@ -541,9 +536,7 @@ def set_number_of_neurons_per_core(neuron_type, max_permitted):
     """ Sets a ceiling on the number of neurons of a given type that can be\
         placed on a single core.
 
-    :param neuron_type: neuron type
-    :type neuron_type:
-        type(~spynnaker.pyNN.models.neuron.AbstractPopulationVertex)
+    :param type(AbstractPopulationVertex) neuron_type: neuron type
     :param int max_permitted: the number to set to
     :rtype: None
     """
@@ -582,7 +575,7 @@ def create(cellclass, cellparams=None, n=1):
     """ Builds a population with certain params
 
     :param cellclass: population class
-    :type cellclass: type or ~spynnaker.pyNN.models.AbstractPyNNModel
+    :type cellclass: type or AbstractPyNNModel
     :param cellparams: population params.
     :param int n: n neurons
     :rtype: ~spynnaker8.models.populations.Population

@@ -46,7 +46,7 @@ class Population(PyNNPopulationCommon, Recorder, PopulationBase):
         """
         :param int size: The number of neurons in the population
         :param cellclass: The implementation of the individual neurons.
-        :type cellclass: type or ~spynnaker.pyNN.models.AbstractPyNNModel
+        :type cellclass: type or AbstractPyNNModel
         :param dict cellparams: Parameters to pass to ``cellclass`` if it
             is a class to instantiate.
         :param ~pyNN.space.BaseStructure structure:
@@ -123,7 +123,7 @@ class Population(PyNNPopulationCommon, Recorder, PopulationBase):
         """ Implements the PyNN expected celltype property
 
         :return: The celltype this property has been set to
-        :rtype: ~spynnaker.pyNN.models.AbstractPyNNModel
+        :rtype: AbstractPyNNModel
         """
         return self._celltype
 
@@ -538,7 +538,7 @@ class Population(PyNNPopulationCommon, Recorder, PopulationBase):
         Returns a Population object.
 
         :param cellclass: see :meth:`Population.__init__`
-        :type cellclass: type or ~spynnaker.pyNN.models.AbstractPyNNModel
+        :type cellclass: type or AbstractPyNNModel
         :param cellparams: see :meth:`Population.__init__`
         :type cellparams: dict(str, ...)
         :param int n: see :meth:`Population.__init__` (``size`` parameter)

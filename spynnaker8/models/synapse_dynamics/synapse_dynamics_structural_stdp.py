@@ -36,21 +36,12 @@ class SynapseDynamicsStructuralSTDP(STDPStructuralBaseClass):
             seed=None, weight=PyNNStaticSynapse.default_parameters['weight'],
             delay=None, backprop_delay=True):
         """
-        :param partner_selection: The partner selection rule
-        :type partner_selection:
-            ~spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.partner_selection.AbstractPartnerSelection
-        :param formation: The formation rule
-        :type formation:
-            ~spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation.AbstractFormation
-        :param elimination: The elimination rule
-        :type elimination:
-            ~spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.AbstractElimination
-        :param timing_dependence:
-        :type timing_dependence:
-            ~spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.AbstractTimingDependence
-        :param weight_dependence:
-        :type weight_dependence:
-            ~spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence
+        :param AbstractPartnerSelection partner_selection:
+            The partner selection rule
+        :param AbstractFormation formation: The formation rule
+        :param AbstractElimination elimination: The elimination rule
+        :param AbstractTimingDependence timing_dependence:
+        :param AbstractWeightDependence weight_dependence:
         :param voltage_dependence: The STDP voltage dependence (unsupported)
         :type voltage_dependence: None
         :param float dendritic_delay_fraction:

@@ -121,7 +121,7 @@ class IDMixin(object):
     @property
     def celltype(self):
         """
-        :rtype: ~spynnaker.pyNN.models.AbstractPyNNModel
+        :rtype: AbstractPyNNModel
         """
         return self.__population.celltype
 

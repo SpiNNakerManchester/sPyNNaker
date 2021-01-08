@@ -105,7 +105,7 @@ class PopulationView(PopulationBase):
     def celltype(self):
         """ The type of neurons making up the underlying Population.
 
-        :rtype: ~spynnaker.pyNN.models.AbstractPyNNModel
+        :rtype: AbstractPyNNModel
         """
         return self.__population.celltype
 

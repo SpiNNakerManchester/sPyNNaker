@@ -55,12 +55,8 @@ class Projection(PyNNProjectionCommon):
                 pre_synaptic_population:
         :param ~spynnaker8.models.populations.PopulationBase \
                 post_synaptic_population:
-        :param connector:
-        :type connector:
-            ~spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector
-        :param synapse_type:
-        :type synapse_type:
-            ~spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractStaticSynapseDynamics
+        :param AbstractConnector connector:
+        :param AbstractStaticSynapseDynamics synapse_type:
         :param None source: Unsupported; must be None
         :param str receptor_type:
         :param ~pyNN.space.Space space:

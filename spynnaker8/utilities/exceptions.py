@@ -14,19 +14,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+from spynnaker.pyNN.exceptions import SpynnakerException
 
 
-class Spynnaker8Exception(Exception):
-    """ Superclass of all exceptions from the pyNN module
-    """
-
-
-class MemReadException(Spynnaker8Exception):
+class MemReadException(SpynnakerException):
     """ Raised when the pyNN front end fails to read a certain memory region
     """
 
 
-class FilterableException(Spynnaker8Exception):
+class FilterableException(SpynnakerException):
     """ Raised when it is not possible to determine if an edge should be\
         filtered
     """
@@ -59,6 +55,6 @@ class DelayExtensionException(ConfigurationException):
     """
 
 
-class InvalidParameterType(Spynnaker8Exception):
+class InvalidParameterType(SpynnakerException):
     """ Raised when a parameter is not recognised
     """

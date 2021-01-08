@@ -28,9 +28,9 @@ from spinn_front_end_common.utilities.constants import (
 from spynnaker.pyNN.abstract_spinnaker_common import AbstractSpiNNakerCommon
 from spynnaker.pyNN.utilities.spynnaker_failed_state import (
     SpynnakerFailedState)
+from spynnaker.pyNN.spynnaker_simulator_interface import (
+    SpynnakerSimulatorInterface)
 from spynnaker8 import _version
-from spynnaker8.spynnaker8_simulator_interface import (
-    Spynnaker8SimulatorInterface)
 from ._version import __version__ as version
 
 log = FormatAdapter(logging.getLogger(__name__))
@@ -39,7 +39,7 @@ NAME = "SpiNNaker_under_version({}-{})".format(
 
 
 class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
-                Spynnaker8SimulatorInterface):
+                SpynnakerSimulatorInterface):
     """ Main interface for the sPyNNaker implementation of PyNN 0.8/0.9
     """
 
@@ -141,6 +141,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
 
         self.__segment_counter += 1
 
+        # Call superclass implementation
         AbstractSpiNNakerCommon.reset(self)
 
     def _run_wait(self, duration_ms, sync_time=0.0):
@@ -304,8 +305,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
 
 
 # Defined in this file to prevent an import loop
-class Spynnaker8FailedState(SpynnakerFailedState,
-                            Spynnaker8SimulatorInterface):
+class Spynnaker8FailedState(SpynnakerFailedState, SpynnakerSimulatorInterface):
     __slots__ = ("write_on_end")
 
     def __init__(self):

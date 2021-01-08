@@ -34,15 +34,10 @@ class SynapseDynamicsStructuralStatic(StaticStructuralBaseClass):
             seed=None, weight=PyNNStaticSynapse.default_parameters['weight'],
             delay=None):
         """
-        :param partner_selection: The partner selection rule
-        :type partner_selection:
-            ~spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.partner_selection.AbstractPartnerSelection
-        :param formation: The formation rule
-        :type formation:
-            ~spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation.AbstractFormation
-        :param elimination: The elimination rule
-        :type elimination:
-            ~spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.AbstractElimination
+        :param AbstractPartnerSelection partner_selection:
+            The partner selection rule
+        :param AbstractFormation formation: The formation rule
+        :param AbstractElimination elimination: The elimination rule
         :param int f_rew: How many rewiring attempts will be done per second.
         :param float initial_weight:
             Weight assigned to a newly formed connection
