@@ -833,7 +833,6 @@ bool population_table_get_next_address(
                 n_master_pop_direct_matrix_look_ups += 1;
             } else if (item.representation == ARRAY) {
                 *n_bytes_to_transfer = 0;
-
                 *row = array_blocks[item.address][last_neuron_id];
                 if (*row == NULL) {
                     is_valid = false;

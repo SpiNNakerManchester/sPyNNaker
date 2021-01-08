@@ -26,6 +26,7 @@
 #include <neuron/synapse_row.h>
 #include <neuron/direct_synapses.h>
 #include <neuron/population_table/population_table.h>
+#include <malloc_extras.h>
 
 // stuff needed for the structural stuff to work
 #include <neuron/structural_plasticity/synaptogenesis/sp_structs.h>
@@ -78,9 +79,6 @@ address_t direct_synapses_address;
 //! \brief Stores the max row size for DMA reads (used when extracting a
 //!     synapse row from sdram.
 uint32_t row_max_n_words;
-
-//! Holds SDRAM read row
-uint32_t * row_data;
 
 //! Says if we should run
 bool can_run = true;
@@ -385,6 +383,9 @@ static inline bool initialise(void) {
     malloc_cost = dtcm_used - (ALANS_RANDOM * sizeof(uint32_t));
     log_info("malloc cost is %d", malloc_cost);
 
+    // malloc extra setup, so that can malloc dtcm / sdram as needed
+    malloc_extras_initialise_no_fake_heap_data();
+    malloc_extras_turn_off_safety();
 
     // init the synapses to get direct synapse address
     log_info("Direct synapse init");
@@ -415,13 +416,6 @@ static inline bool initialise(void) {
     }
 
     // set up a sdram read for a row
-    log_debug("Allocating dtcm for row data");
-    row_data = sark_xalloc(
-        sv->sdram_heap, row_max_n_words * sizeof(uint32_t), 0, ALLOC_LOCK);
-    if (row_data == NULL) {
-        log_error("Could not allocate dtcm for the row data");
-        return false;
-    }
     log_debug("Finished pop table set connectivity lookup");
 
     // sort out user 2 to see if we have anything to do
@@ -458,10 +452,8 @@ static inline bool read_in_bitfields(void) {
         "requires %d bytes for data store from %d and %d",
         sizeof(not_redundant_tracker_t) * bit_field_base_address->n_filters,
         sizeof(not_redundant_tracker_t), bit_field_base_address->n_filters);
-    not_redundant_tracker = sark_xalloc(
-        sv->sdram_heap,
-        sizeof(not_redundant_tracker_t) * bit_field_base_address->n_filters,
-        0, ALLOC_LOCK);
+    not_redundant_tracker = MALLOC(
+        sizeof(not_redundant_tracker_t) * bit_field_base_address->n_filters);
 
     if (not_redundant_tracker == NULL) {
         log_error("failed to malloc the main array");
@@ -573,6 +565,10 @@ static inline void set_address_to_cache_reps(
         log_error("WTF unrecognised rep");
     }
 
+    // cahce for useage after setting
+    uint32_t original_rep =
+        population_table_get_address_entry(address_entry_index).addr.representation;
+
     // set dtcm master pop just to allow bulk transfer
     population_table_set_address_to_rep(address_entry_index, rep);
 
@@ -583,6 +579,9 @@ static inline void set_address_to_cache_reps(
         population_table_get_address_entry(address_entry_index);
 
     spin1_memcpy(sdram_entry, &dtcm_entry, sizeof(address_list_entry));
+
+    //reset dtcm rep entry back to original in case needs looking up again
+    population_table_set_address_to_rep(address_entry_index, original_rep);
 
     // update counters as required
     if (rep == ARRAY) {
@@ -647,8 +646,7 @@ static inline bool cache_blocks(void) {
         }
 
         // set up reps
-        uint32_t* reps = sark_xalloc(
-            sv->sdram_heap, sizeof(uint32_t) * count, 0, ALLOC_LOCK);
+        uint32_t* reps = MALLOC(sizeof(uint32_t) * count);
         if (reps == NULL) {
             log_error("cannot allocate sdram for the reps.");
             return false;
@@ -776,6 +774,7 @@ static inline bool cache_blocks(void) {
             log_debug("removing %d bytes from %d", dtcm_to_use_tmp, dtcm_to_use);
             dtcm_to_use -= dtcm_to_use_tmp;
         }
+        FREE(reps);
     }
 
     log_info("dtcm left over should be %d", dtcm_to_use);
