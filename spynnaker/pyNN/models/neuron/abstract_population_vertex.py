@@ -112,7 +112,10 @@ class AbstractPopulationVertex(
         "__spikes_per_second",
         "__drop_late_spikes",
         "__incoming_projections",
-        "__synapse_dynamics"]
+        "__synapse_dynamics",
+        "__synapse_size",
+        "__synapse_expander_size",
+        "__pop_table_size"]
 
     #: recording region IDs
     _SPIKE_RECORDING_REGION = 0
@@ -235,6 +238,9 @@ class AbstractPopulationVertex(
         self.__incoming_projections = list()
         self.__ring_buffer_shifts = None
         self.__weight_scales = None
+        self.__synapse_size = dict()
+        self.__synapse_expander_size = None
+        self.__pop_table_size = None
 
         # Prepare for dealing with STDP - there can only be one (non-static)
         # synapse dynamics per vertex at present
@@ -274,6 +280,7 @@ class AbstractPopulationVertex(
         self.__change_requires_mapping = True
         self.__ring_buffer_shifts = None
         self.__weight_scales = None
+        self.__synapse_size = dict()
         self.__incoming_projections.append(projection)
 
     @property
@@ -1051,9 +1058,13 @@ class AbstractPopulationVertex(
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of the vertex to get the usage of
         """
+        if vertex_slice in self.__synapse_size:
+            return self.__synapse_size[vertex_slice]
+
         addr = 2 * BYTES_PER_WORD
         for proj in self.__incoming_projections:
             addr = self.__add_matrix_size(addr, proj, vertex_slice)
+        self.__synapse_size[vertex_slice] = addr
         return addr
 
     @staticmethod
@@ -1098,14 +1109,18 @@ class AbstractPopulationVertex(
 
         :rtype: int
         """
-        return MasterPopTableAsBinarySearch.get_master_population_table_size(
-            self.__incoming_projections)
+        if self.__pop_table_size is None:
+            self.__pop_table_size = MasterPopTableAsBinarySearch\
+                .get_master_population_table_size(self.__incoming_projections)
+        return self.__pop_table_size
 
     def get_synapse_expander_size(self):
         """ Get the size of the synapse expander region in bytes
 
         :rtype: int
         """
+        if self.__synapse_expander_size is not None:
+            return self.__synapse_expander_size
         size = 0
         for proj in self.__incoming_projections:
             synapse_info = proj._synapse_information
@@ -1122,6 +1137,7 @@ class AbstractPopulationVertex(
         if size:
             size += SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES
             size += self.__neuron_impl.get_n_synapse_types() * BYTES_PER_WORD
+        self.__synapse_expander_size = size
         return size
 
     @staticmethod
