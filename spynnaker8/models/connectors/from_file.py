@@ -13,10 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .from_list_connector import FromListConnector
 import os
 import numpy
 from six import string_types
+from .from_list import FromListConnector
 from pyNN.connectors import FromFileConnector as PyNNFromFileConnector
 from pyNN.recording import files
 

@@ -16,7 +16,7 @@
 from __future__ import division
 import numpy
 import math
-from spynnaker8.models.populations.population_view import PopulationView
+from spynnaker8.models.populations import PopulationView
 
 
 class PatternSpiker(object):

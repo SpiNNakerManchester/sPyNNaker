@@ -13,10 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .synapse_dynamics_static import SynapseDynamicsStatic
-from .synapse_dynamics_stdp import SynapseDynamicsSTDP
-from .synapse_dynamics_structural_static import SynapseDynamicsStructuralStatic
-from .synapse_dynamics_structural_stdp import SynapseDynamicsStructuralSTDP
+from .static import SynapseDynamicsStatic
+from .stdp import SynapseDynamicsSTDP
+from .structural_static import SynapseDynamicsStructuralStatic
+from .structural_stdp import SynapseDynamicsStructuralSTDP
 
 __all__ = ["SynapseDynamicsStatic", "SynapseDynamicsSTDP",
            "SynapseDynamicsStructuralStatic", "SynapseDynamicsStructuralSTDP"]

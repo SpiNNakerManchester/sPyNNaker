@@ -19,20 +19,19 @@ Connectors are objects that describe how neurons in
 are connected to each other.
 """
 
-from .all_to_all_connector import AllToAllConnector
+from .all_to_all import AllToAllConnector
 from .array_connector import ArrayConnector
 from .csa_connector import CSAConnector
-from .distance_dependent_probability_connector import (
-    DistanceDependentProbabilityConnector)
-from .fixed_number_post_connector import FixedNumberPostConnector
-from .fixed_number_pre_connector import FixedNumberPreConnector
-from .fixed_probability_connector import FixedProbabilityConnector
-from .from_file_connector import FromFileConnector
-from .from_list_connector import FromListConnector
-from .index_based_probability_connector import IndexBasedProbabilityConnector
-from .multapse_connector import MultapseConnector as FixedTotalNumberConnector
-from .one_to_one_connector import OneToOneConnector
-from .small_world_connector import SmallWorldConnector
+from .distance_dependent_prob import DistanceDependentProbabilityConnector
+from .fixed_number_post import FixedNumberPostConnector
+from .fixed_number_pre import FixedNumberPreConnector
+from .fixed_prob import FixedProbabilityConnector
+from .from_file import FromFileConnector
+from .from_list import FromListConnector
+from .index_based_prob import IndexBasedProbabilityConnector
+from .multapse import MultapseConnector as FixedTotalNumberConnector
+from .one_to_one import OneToOneConnector
+from .small_world import SmallWorldConnector
 from .kernel_connector import KernelConnector
 
 __all__ = ["AllToAllConnector", "ArrayConnector", "CSAConnector",

@@ -32,55 +32,53 @@ from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 
 # connections
 # noinspection PyUnresolvedReferences
-from spynnaker8.models.connectors.all_to_all_connector import (
-    AllToAllConnector)
+from spynnaker8.models.connectors.all_to_all import AllToAllConnector
 # noinspection PyUnresolvedReferences
 from spynnaker8.models.connectors.array_connector import ArrayConnector
 # noinspection PyUnresolvedReferences
 from spynnaker8.models.connectors.csa_connector import CSAConnector
 # noinspection PyUnresolvedReferences
-from spynnaker8.models.connectors.distance_dependent_probability_connector \
-    import DistanceDependentProbabilityConnector
+from spynnaker8.models.connectors.distance_dependent_prob import (
+    DistanceDependentProbabilityConnector)
 # noinspection PyUnresolvedReferences
-from spynnaker8.models.connectors.fixed_number_post_connector import (
+from spynnaker8.models.connectors.fixed_number_post import (
     FixedNumberPostConnector)
 # noinspection PyUnresolvedReferences
-from spynnaker8.models.connectors.fixed_number_pre_connector import (
+from spynnaker8.models.connectors.fixed_number_pre import (
     FixedNumberPreConnector)
 # noinspection PyUnresolvedReferences
-from spynnaker8.models.connectors.fixed_probability_connector import (
-    FixedProbabilityConnector)
+from spynnaker8.models.connectors.fixed_prob import FixedProbabilityConnector
 # noinspection PyUnresolvedReferences
-from spynnaker8.models.connectors.from_file_connector import FromFileConnector
+from spynnaker8.models.connectors.from_file import FromFileConnector
 # noinspection PyUnresolvedReferences
-from spynnaker8.models.connectors.from_list_connector import FromListConnector
+from spynnaker8.models.connectors.from_list import FromListConnector
 # noinspection PyUnresolvedReferences
-from spynnaker8.models.connectors.index_based_probability_connector import (
+from spynnaker8.models.connectors.index_based_prob import (
     IndexBasedProbabilityConnector)
 # noinspection PyUnresolvedReferences
-from spynnaker8.models.connectors.multapse_connector import (
+from spynnaker8.models.connectors.multapse import (
     MultapseConnector as FixedTotalNumberConnector)
 # noinspection PyUnresolvedReferences
-from spynnaker8.models.connectors.one_to_one_connector import (
-    OneToOneConnector)
+from spynnaker8.models.connectors.one_to_one import OneToOneConnector
 # noinspection PyUnresolvedReferences
-from spynnaker8.models.connectors.small_world_connector import (
-    SmallWorldConnector)
+from spynnaker8.models.connectors.small_world import SmallWorldConnector
 # noinspection PyUnresolvedReferences
-from spynnaker8.models.connectors.kernel_connector import (
-    KernelConnector)
+from spynnaker8.models.connectors.kernel_connector import KernelConnector
 
 # synapse structures
-from spynnaker8.models.synapse_dynamics.synapse_dynamics_static import (
+from spynnaker8.models.synapse_dynamics.static import (
     SynapseDynamicsStatic as StaticSynapse)
 
 # plastic stuff
-from spynnaker8.models.synapse_dynamics.synapse_dynamics_stdp import (
-    SynapseDynamicsSTDP as STDPMechanism)
-from spynnaker8.models.synapse_dynamics.synapse_dynamics_structural_static \
-    import SynapseDynamicsStructuralStatic as StructuralMechanismStatic
-from spynnaker8.models.synapse_dynamics.synapse_dynamics_structural_stdp \
-    import SynapseDynamicsStructuralSTDP as StructuralMechanismSTDP
+from spynnaker8.models.synapse_dynamics.stdp import (
+    SynapseDynamicsSTDP as
+    STDPMechanism)
+from spynnaker8.models.synapse_dynamics.structural_static import (
+    SynapseDynamicsStructuralStatic as
+    StructuralMechanismStatic)
+from spynnaker8.models.synapse_dynamics.structural_stdp import (
+    SynapseDynamicsStructuralSTDP as
+    StructuralMechanismSTDP)
 from spynnaker8.models.synapse_dynamics.weight_dependence.additive import (
     WeightDependenceAdditive as
     AdditiveWeightDependence)
