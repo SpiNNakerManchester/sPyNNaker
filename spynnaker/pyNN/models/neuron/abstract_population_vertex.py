@@ -115,7 +115,8 @@ class AbstractPopulationVertex(
         "__synapse_dynamics",
         "__synapse_size",
         "__synapse_expander_size",
-        "__pop_table_size"]
+        "__pop_table_size"
+        "__max_row_info"]
 
     #: recording region IDs
     _SPIKE_RECORDING_REGION = 0
@@ -241,6 +242,7 @@ class AbstractPopulationVertex(
         self.__synapse_size = dict()
         self.__synapse_expander_size = None
         self.__pop_table_size = None
+        self.__max_row_info = dict()
 
         # Prepare for dealing with STDP - there can only be one (non-static)
         # synapse dynamics per vertex at present
@@ -1067,8 +1069,7 @@ class AbstractPopulationVertex(
         self.__synapse_size[vertex_slice] = addr
         return addr
 
-    @staticmethod
-    def __add_matrix_size(addr, projection, vertex_slice):
+    def __add_matrix_size(self, addr, projection, vertex_slice):
         """ Add the size of the matrices for the projection to the vertex slice
             to the address
 
@@ -1082,8 +1083,8 @@ class AbstractPopulationVertex(
         synapse_info = projection._synapse_information
         app_edge = projection._projection_edge
 
-        max_row_info = get_max_row_info(
-            synapse_info, vertex_slice, app_edge.n_delay_stages, app_edge)
+        max_row_info = self.get_max_row_info(
+            synapse_info, vertex_slice, app_edge)
 
         vertex = app_edge.pre_vertex
         n_sub_atoms = int(min(vertex.get_max_atoms_per_core(), vertex.n_atoms))
@@ -1103,6 +1104,15 @@ class AbstractPopulationVertex(
                     addr)
                 addr += size
         return addr
+
+    def get_max_row_info(self, synapse_info, vertex_slice, app_edge):
+        key = (app_edge, synapse_info, vertex_slice)
+        if key in self.__max_row_info:
+            return self.__max_row_info[key]
+        max_row_info = get_max_row_info(
+            synapse_info, vertex_slice, app_edge.n_delay_stages, app_edge)
+        self.__max_row_info[key] = max_row_info
+        return max_row_info
 
     def get_pop_table_size(self):
         """ Get the size of the master population table in bytes
