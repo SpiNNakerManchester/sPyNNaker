@@ -30,7 +30,7 @@ from spynnaker.pyNN.models.recording_common import RecordingCommon
 from spynnaker.pyNN.utilities.constants import (
     SPIKES, MEMBRANE_POTENTIAL, GSYN_EXCIT, GSYN_INHIB)
 from spynnaker.pyNN.exceptions import InvalidParameterType
-from .data_cache import DataCache
+from spynnaker.pyNN.utilities.data_cache import DataCache
 
 logger = FormatAdapter(logging.getLogger(__name__))
 

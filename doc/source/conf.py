@@ -435,14 +435,15 @@ explicit_wanted_files = [
     "spynnaker/pyNN/utilities/bit_field_utilities.py",
     "spynnaker/pyNN/utilities/spynnaker_failed_state.py",
     "spynnaker/pyNN/utilities/constants.py",
+    "spynnaker/pyNN/utilities/data_cache.py",
     "spynnaker/pyNN/utilities/extracted_data.py",
     "spynnaker/pyNN/utilities/fake_HBP_Portal_machine_provider.py",
     "spynnaker/pyNN/utilities/running_stats.py",
     "spynnaker/pyNN/utilities/utility_calls.py",
     "spynnaker/pyNN/utilities/struct.py",
+    "spynnaker/pyNN/utilities/variable_cache.py",
     "spynnaker8/spynnaker8_simulator_interface.py",
     "spynnaker8/spynnaker_plotting.py",
-    "spynnaker8/utilities/exceptions.py",
     "spynnaker8/utilities/neo_convertor.py",
     "spynnaker8/utilities/neo_compare.py"]
 options = ['-o', output_dir, "."]
