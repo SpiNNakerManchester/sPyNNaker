@@ -58,7 +58,7 @@ static inline update_state_t timing_apply_rate(update_state_t current_state, REA
     REAL post_rate = post_diff * pre_rate;
 
     //io_printf(IO_BUF, " pre_rate %k rate product plast %k\n", pre_rate, post_rate);
-    io_printf(IO_BUF, "pre rate %k, post rate %k\n", pre_rate, post_rate);
+    //io_printf(IO_BUF, "pre rate %k, post rate %k\n", pre_rate, post_rate);
 
     return weight_one_term_apply_update(current_state, post_rate);
 }

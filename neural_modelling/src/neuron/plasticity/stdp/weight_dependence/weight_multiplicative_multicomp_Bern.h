@@ -98,11 +98,11 @@ static inline weight_state_t weight_one_term_apply_update(weight_state_t state, 
     if(delta < 0 && delta >= -0.000122k)
         delta = 0;
 
-    io_printf(IO_BUF, "Delta w %k, weight shift %d\n", delta, state.weight_shift);
+    // io_printf(IO_BUF, "Delta w %k, weight shift %d\n", delta, state.weight_shift);
 
     state.weight = state.weight + delta;
 
-    io_printf(IO_BUF, "weight updated %k\n", state.weight);
+    // io_printf(IO_BUF, "weight updated %k\n", state.weight);
 
     //MORE EFFICIENT WAY TO DO THIS?
     if(state.weight < state.weight_region->min_weight) {

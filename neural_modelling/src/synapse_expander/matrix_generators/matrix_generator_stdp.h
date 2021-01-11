@@ -129,8 +129,6 @@ void matrix_generator_stdp_write_row(
         uint32_t max_stage) {
     struct matrix_generator_stdp *obj = data;
 
-    obj->n_words_per_pp_row_header = 1;
-
     // Row address for each possible delay stage (including no delay stage)
     address_t row_address[max_stage];
 
@@ -296,12 +294,12 @@ void matrix_generator_stdp_write_row(
 
                     *fp_address[i] = 0;
                     fp_address[i]++;
-                    n_fixed_words_per_row[i]++;
+                    //n_fixed_words_per_row[i]++;
                 }
             }
 
-            // Save the fixed plastic size (n of written bytes / 4)
-            fixed_address[i][STDP_FIXED_PLASTIC_SIZE] = n_fixed_words_per_row[i] >> 2;
+            // Save the fixed plastic size (n of written bytes)
+            fixed_address[i][STDP_FIXED_PLASTIC_SIZE] = n_fixed_words_per_row[i];
         }
     }
 }

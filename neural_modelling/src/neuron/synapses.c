@@ -213,9 +213,9 @@ static inline void process_fixed_synapses(
 
         //io_printf(IO_BUF,"acc %k, t%d\n", accumulation, time);
 
-        io_printf(IO_BUF, "acc %k index %d\n", accumulation, ring_buffer_index);
+        // io_printf(IO_BUF, "acc %k index %d\n", accumulation, ring_buffer_index);
 
-        io_printf(IO_BUF, "weight %k in rate %k\n", synaptic_weight, rate);
+        // io_printf(IO_BUF, "weight %k in rate %k\n", synaptic_weight, rate);
     }
 }
 

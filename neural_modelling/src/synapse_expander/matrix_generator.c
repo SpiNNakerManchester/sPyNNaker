@@ -242,6 +242,8 @@ bool matrix_generator_generate(
             io_printf(IO_BUF, "weights %k\n", weights[j]);
         }
 
+        io_printf(IO_BUF, "max row n words %d\n", max_row_n_words);
+
         // Write row
         matrix_generator_write_row(
                 generator, synaptic_matrix, delayed_synaptic_matrix,

@@ -69,9 +69,7 @@ class TimingDependenceMulticompBern(AbstractTimingDependence):
     @property
     def pre_trace_n_bytes(self):
 
-        # Pair rule requires no pre-synaptic trace when only the nearest
-        # Neighbours are considered and, a single 16-bit R1 trace
-        return 2
+        return 0
 
     @overrides(AbstractTimingDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self):

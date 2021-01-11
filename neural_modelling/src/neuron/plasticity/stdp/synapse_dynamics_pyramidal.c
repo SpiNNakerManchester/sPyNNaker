@@ -312,13 +312,13 @@ bool synapse_dynamics_process_plastic_synapses(
 
         //io_printf(IO_BUF, "index %d\n", index);
 
-        io_printf(IO_BUF, "plast in row %k\n", *plastic_words);
+        //io_printf(IO_BUF, "plast in row %k\n", *plastic_words);
         
         // Create update state from the plastic synaptic word
         update_state_t current_state =
                 synapse_structure_get_update_state(*plastic_words, type);
 
-        io_printf(IO_BUF, "plast weight %k\n", current_state.weight);
+        //io_printf(IO_BUF, "plast weight %k\n", current_state.weight);
 
         //  Determine the type of synapse ans update the state
         // Type = 2 is apical inh, type = 1 basal exc
