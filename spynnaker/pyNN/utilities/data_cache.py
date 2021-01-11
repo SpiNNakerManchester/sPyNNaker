@@ -23,7 +23,7 @@ class DataCache(object):
     .. note::
         Required because deep-copy does not work on neo Objects
 
-    Stores the Data shared by all variable types at the top level\
+    Stores the Data shared by all variable types at the top level
     and holds a cache for the variable specific data.
     """
 
@@ -113,10 +113,11 @@ class DataCache(object):
         :param ~numpy.ndarray data: raw data in sPyNNaker format
         :param ~numpy.ndarray indexes:
             population indexes for which data should be returned
-        :param int n_neurons: Number of neurons in the population.\
-            Regardless of if they where recording or not.
+        :param int n_neurons: Number of neurons in the population,
+            regardless of if they where recording or not.
         :param str units: the units in which the data is
-        :rtype: None
+        :param sampling_interval: The number of milliseconds between samples.
+        :type sampling_interval: float or int
         """
         self.__rec_datetime = datetime.now()
         variable_cache = VariableCache(

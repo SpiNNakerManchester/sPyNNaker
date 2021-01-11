@@ -76,6 +76,7 @@ class Recorder(RecordingCommon):
         # add fluff to the neo block
         block.name = self._population.label
         block.description = self._population.describe()
+        # pylint: disable=no-member
         block.rec_datetime = block.segments[0].rec_datetime
         block.annotate(**self._metadata())
         if annotations:
@@ -98,6 +99,12 @@ class Recorder(RecordingCommon):
                 return _DEFAULT_UNITS[variable]
             raise
 
+    def __spike_sampling_interval(self):
+        """
+        :rtype: float
+        """
+        return self._population._vertex.get_spikes_sampling_interval()
+
     def cache_data(self):
         """ Store data for later extraction
         """
@@ -116,8 +123,7 @@ class Recorder(RecordingCommon):
             for variable in variables:
                 if variable == SPIKES:
                     data = self._get_spikes()
-                    sampling_interval = self._population._vertex. \
-                        get_spikes_sampling_interval()
+                    sampling_interval = self.__spike_sampling_interval()
                     indexes = None
                 else:
                     results = self._get_recorded_matrix(variable)
@@ -142,7 +148,9 @@ class Recorder(RecordingCommon):
         """ Sorts out variables for processing usage
 
         :param variables: list of variables names, or 'all', or single.
-        :return: ordered set of variables strings.
+        :type variables: str or list(str)
+        :return: ordered set of variables' names.
+        :rtype: iterable(str)
         """
         # if variable is a base string, plonk into a array for ease of
         # conversion
@@ -170,8 +178,7 @@ class Recorder(RecordingCommon):
 
         for variable in variables:
             if variable == SPIKES:
-                sampling_interval = self._population._vertex. \
-                    get_spikes_sampling_interval()
+                sampling_interval = self.__spike_sampling_interval()
                 self.read_in_spikes(
                     segment=segment,
                     spikes=self._get_spikes(),

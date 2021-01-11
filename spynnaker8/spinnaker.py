@@ -13,18 +13,18 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
 from lazyarray import __version__ as lazyarray_version
 from quantities import __version__ as quantities_version
 from neo import __version__ as neo_version
 from pyNN.common import control as pynn_control
 from pyNN import __version__ as pynn_version
-from spinn_utilities.log import FormatAdapter
 from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.failed_state import FAILED_STATE_MSG
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION)
+from spinn_front_end_common.interface.abstract_spinnaker_base import (
+    AbstractSpinnakerBase)
 from spynnaker.pyNN.abstract_spinnaker_common import AbstractSpiNNakerCommon
 from spynnaker.pyNN.utilities.spynnaker_failed_state import (
     SpynnakerFailedState)
@@ -33,7 +33,6 @@ from spynnaker.pyNN.spynnaker_simulator_interface import (
 from spynnaker8 import _version
 from ._version import __version__ as version
 
-log = FormatAdapter(logging.getLogger(__name__))
 NAME = "SpiNNaker_under_version({}-{})".format(
     _version.__version__, _version.__version_name__)
 
@@ -142,7 +141,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
         self.__segment_counter += 1
 
         # Call superclass implementation
-        AbstractSpiNNakerCommon.reset(self)
+        AbstractSpinnakerBase.reset(self)
 
     def _run_wait(self, duration_ms, sync_time=0.0):
         """ Run the simulation for a length of simulation time.
@@ -158,7 +157,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
         """ Used to bypass the dual level object
 
         :return: the SpiNNaker object
-        :rtype: spynnaker8.spinnaker.SpiNNaker
+        :rtype: ~spynnaker8.spinnaker.SpiNNaker
         """
         return self
 
@@ -170,6 +169,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
             Meaningless on SpiNNaker, so we pretend we're the head node.
 
         :return: Constant: 0
+        :rtype: int
         """
         return 0
 
@@ -188,6 +188,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
             Meaningless on SpiNNaker, so we pretend there's one MPI process
 
         :return: Constant: 1
+        :rtype: int
         """
         return 1
 
@@ -203,15 +204,15 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
         """ The machine time step in milliseconds
 
         :return: the machine time step
+        :rtype: float
         """
-
         return self.machine_time_step / float(MICRO_TO_MILLISECOND_CONVERSION)
 
     @dt.setter
     def dt(self, new_value):
         """ The machine time step in milliseconds
 
-        :param new_value: new value for machine time step in microseconds
+        :param float new_value: new value for machine time step in microseconds
         """
         self.machine_time_step = new_value * MICRO_TO_MILLISECOND_CONVERSION
 
@@ -220,6 +221,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
         """ The current simulation time in milliseconds
 
         :return: the current runtime already executed
+        :rtype: float
         """
         return (
             self._current_run_timesteps * (self.machine_time_step / 1000.0))
@@ -229,6 +231,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
         """ The number of the current recording segment being generated.
 
         :return: the segment counter
+        :rtype: int
         """
         return self.__segment_counter
 
@@ -236,7 +239,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
     def segment_counter(self, new_value):
         """ The number of the current recording segment being generated.
 
-        :param new_value: new value for the segment counter
+        :param int new_value: new value for the segment counter
         """
         self.__segment_counter = new_value
 
@@ -248,6 +251,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
             Ties into our has_ran parameter for automatic pause and resume.
 
         :return: the has_ran variable from the SpiNNaker main interface
+        :rtype: bool
         """
         return self._has_ran
 
@@ -256,7 +260,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
         """ Setter for the has_ran parameter, only used by the PyNN interface,\
             supports tracking where it thinks its setting this parameter.
 
-        :param new_value: the new value for the simulation
+        :param bool new_value: the new value for the simulation
         """
         self._has_ran = new_value
 
@@ -266,6 +270,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
             blocks are correctly labelled.
 
         :return: the name of the simulator.
+        :rtype: str
         """
         return NAME
 
@@ -274,6 +279,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
         """ The list of all populations in the simulation.
 
         :return: list of populations
+        :rtype: list(Population)
         """
         # needed by the population class
         return self._populations
@@ -283,6 +289,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
         """ The list of all projections in the simulation.
 
         :return: list of projections
+        :rtype: list(Projection)
         """
         # needed by the projection class.
         return self._projections
@@ -292,6 +299,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
         """ The recorders, used by the PyNN state object
 
         :return: the internal recorders object
+        :rtype: list(Recorder)
         """
         return self.__recorders
 
@@ -306,7 +314,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
 
 # Defined in this file to prevent an import loop
 class Spynnaker8FailedState(SpynnakerFailedState, SpynnakerSimulatorInterface):
-    __slots__ = ("write_on_end")
+    __slots__ = ("write_on_end", )
 
     def __init__(self):
         self.write_on_end = []

@@ -57,7 +57,10 @@ extensions = [
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3.6', None),
     'numpy': ("https://numpy.org/doc/1.19/", None),
+    'matplotlib': ('https://matplotlib.org', None),
     'pynn': ("http://neuralensemble.org/docs/PyNN/", None),
+    'neo': ('https://neo.readthedocs.io/en/stable/', None),
+    # We don't link to quantities; their docs are too awful
     'spinn_utilities': ('https://spinnutils.readthedocs.io/en/latest/', None),
     'spinn_machine': ('https://spinnmachine.readthedocs.io/en/latest/', None),
     'spinnman': ('https://spinnman.readthedocs.io/en/latest/', None),
@@ -82,7 +85,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'sPyNNaker'
-copyright = u'2014-2017'
+copyright = u'2014-2021'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -417,6 +420,7 @@ explicit_wanted_files = [
     "spynnaker/pyNN/exceptions.py",
     "spynnaker/pyNN/spynnaker_simulator_interface.py",
     "spynnaker/pyNN/spynnaker_external_device_plugin_manager.py",
+    "spynnaker/pyNN/models/abstract_pynn_model.py",
     "spynnaker/pyNN/models/pynn_population_common.py",
     "spynnaker/pyNN/models/pynn_projection_common.py",
     "spynnaker/pyNN/models/defaults.py",

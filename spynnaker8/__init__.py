@@ -194,19 +194,19 @@ class RandomDistribution(_PynnRandomDistribution):
 
     :param str distribution: the name of a random number distribution.
     :param parameters_pos:
-        parameters of the distribution, provided as a tuple. For the correct\
+        parameters of the distribution, provided as a tuple. For the correct
         ordering, see `random.available_distributions`.
     :type parameters_pos: tuple or None
-    :param rng: the random number generator to use, if a specific one is\
+    :param rng: the random number generator to use, if a specific one is
         desired (e.g., to provide a seed).
-    :type rng: ~pyNN.random.NumpyRNG or ~pyNN.random.GSLRNG or \
+    :type rng: ~pyNN.random.NumpyRNG or ~pyNN.random.GSLRNG or
         ~pyNN.random.NativeRNG or None
     :param parameters_named:
         parameters of the distribution, provided as keyword arguments.
 
-    Parameters may be provided either through ``parameters_pos`` or through\
-    ``parameters_named``, but not both. All parameters must be provided, there\
-    are no default values. Parameter names are, in general, as used in\
+    Parameters may be provided either through ``parameters_pos`` or through
+    ``parameters_named``, but not both. All parameters must be provided, there
+    are no default values. Parameter names are, in general, as used in
     Wikipedia.
 
     Examples::
@@ -274,8 +274,8 @@ def distance(src, tgt, mask=None, scale_factor=1.0, offset=0.0,
         * to ignore the z-dimension, use ``mask=array([0,1])``
         * to ignore y, ``mask=array([0,2])``
         * to just consider z-distance, ``mask=array([2])``
-    :param float scale_factor: allows for different units in the pre- and\
-        post-position (the post-synaptic position is multiplied by this\
+    :param float scale_factor: allows for different units in the pre- and
+        post-position (the post-synaptic position is multiplied by this
         quantity).
     :param float offset:
     :param periodic_boundaries:
@@ -315,7 +315,7 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
     :type max_delay: float or str
     :param graph_label: the label for the graph
     :type graph_label: str or None
-    :param database_socket_addresses: the sockets used by external devices\
+    :param database_socket_addresses: the sockets used by external devices
         for the database notification protocol
     :type database_socket_addresses:
         iterable(~spinn_utilities.socket_address.SocketAddress)
@@ -342,9 +342,9 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
         Must be None if n_boards_required specified.
     :type n_chips_required: int or None
     :param n_boards_required:
-        if you need to be allocated a machine (for spalloc) before building\
+        if you need to be allocated a machine (for spalloc) before building
         your graph, then fill this in with a general idea of the number of
-        boards you need so that the spalloc system can allocate you a machine\
+        boards you need so that the spalloc system can allocate you a machine
         big enough for your needs.
     :type n_boards_required: int or None
     :param extra_params: other keyword argumets used to configure PyNN
@@ -447,7 +447,6 @@ def _create_overloaded_functions(spinnaker_simulator):
         (given from PyNN)
 
     :param spinnaker_simulator: the simulator object we use underneath
-    :rtype: None
     """
 
     # overload the failed ones with now valid ones, now that we're in setup
@@ -472,9 +471,8 @@ def _create_overloaded_functions(spinnaker_simulator):
 def end(_=True):
     """ Cleans up the SpiNNaker machine and software
 
-    :param _: was named compatible_output, which we don't care about,\
+    :param _: was named compatible_output, which we don't care about,
         so is a non-existent parameter
-    :rtype: None
     """
     for (population, variables, filename) in \
             globals_variables.get_simulator().write_on_end:
@@ -505,11 +503,10 @@ def record_gsyn(source, filename):
         This is not documented in the public facing API
 
     :param source: the population / view / assembly to record
-    :type source: ~spynnaker8.models.populations.Population or \
-        ~spynnaker8.models.populations.PopulationView or \
+    :type source: ~spynnaker8.models.populations.Population or
+        ~spynnaker8.models.populations.PopulationView or
         ~spynnaker8.models.populations.Assembly
     :param str filename: the neo file to write to
-    :rtype: None
     """
     logger.warning(
         "Using record_gsyn is deprecated.  Use record('gsyn_exc') and/or"
@@ -536,7 +533,6 @@ def set_number_of_neurons_per_core(neuron_type, max_permitted):
 
     :param type(AbstractPopulationVertex) neuron_type: neuron type
     :param int max_permitted: the number to set to
-    :rtype: None
     """
     if isinstance(neuron_type, str):
         msg = "set_number_of_neurons_per_core call now expects " \
@@ -561,7 +557,6 @@ def connect(pre, post, weight=0.0, delay=None, receptor_type=None, p=1,
     :param str receptor_type: excitatory / inhibitory
     :param float p: probability
     :param ~pyNN.random.NumpyRNG rng: random number generator
-    :rtype: None
     """
     # pylint: disable=too-many-arguments
     if not globals_variables.has_simulator():
@@ -587,7 +582,7 @@ def NativeRNG(seed_value):
     """ Fixes the random number generator's seed
 
     :param seed_value:
-    :rtype: None
+    :type seed_value: int or list(int) or ~numpy.ndarray(int32)
     """
     __numpy.random.seed(seed_value)
 
@@ -607,6 +602,7 @@ def get_min_delay():
         least this.
 
     :return: returns the min delay of the simulation
+    :rtype: int
     """
     if not globals_variables.has_simulator():
         raise ConfigurationException(FAILED_STATE_MSG)
@@ -618,6 +614,7 @@ def get_max_delay():
         most this.
 
     :return: returns the max delay of the simulation
+    :rtype: int
     """
     if not globals_variables.has_simulator():
         raise ConfigurationException(FAILED_STATE_MSG)
@@ -628,6 +625,7 @@ def get_time_step():
     """ The integration time step
 
     :return: get the time step of the simulation (in ms)
+    :rtype: float
     """
     if not globals_variables.has_simulator():
         raise ConfigurationException(FAILED_STATE_MSG)
@@ -638,11 +636,10 @@ def initialize(cells, **initial_values):
     """ Sets cells to be initialised to the given values
 
     :param cells: the cells to change params on
-    :type cells: ~spynnaker8.models.populations.Population or \
-        ~spynnaker8.models.populations.PopulationView or \
+    :type cells: ~spynnaker8.models.populations.Population or
+        ~spynnaker8.models.populations.PopulationView or
         ~spynnaker8.models.populations.Assembly
     :param initial_values: the params and their values to change
-    :rtype: None
     """
     if not globals_variables.has_simulator():
         raise ConfigurationException(FAILED_STATE_MSG)
@@ -656,6 +653,7 @@ def num_processes():
         Always 1 on SpiNNaker, which doesn't use MPI.
 
     :return: the number of MPI processes
+    :rtype: int
     """
     if not globals_variables.has_simulator():
         raise ConfigurationException(FAILED_STATE_MSG)
@@ -669,6 +667,7 @@ def rank():
         Always 0 on SpiNNaker, which doesn't use MPI.
 
     :return: MPI rank
+    :rtype: int
     """
     if not globals_variables.has_simulator():
         raise ConfigurationException(FAILED_STATE_MSG)
@@ -679,12 +678,12 @@ def record(variables, source, filename, sampling_interval=None,
            annotations=None):
     """ Sets variables to be recorded.
 
-    :param variables: may be either a single variable name or a list of \
-        variable names. For a given celltype class, celltype.recordable \
+    :param variables: may be either a single variable name or a list of
+        variable names. For a given celltype class, celltype.recordable
         contains a list of variables that can be recorded for that celltype.
     :type variables: str or list(str)
     :param source: where to record from
-    :type source: ~spynnaker8.models.populations.Population or \
+    :type source: ~spynnaker8.models.populations.Population or
         ~spynnaker8.models.populations.PopulationView
     :param str filename: file name to write data to
     :param sampling_interval:

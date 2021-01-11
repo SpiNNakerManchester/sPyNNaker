@@ -17,11 +17,12 @@
 class VariableCache(object):
     """ Simple holder method to keep data, IDs, indexes and units together
 
-    Typically used to recreate the Neo object for one type of variable for\
-    one segment
+    Typically used to recreate the Neo object for one type of variable for
+    one segment.
     """
-    __slots__ = ("__data", "__indexes", "__n_neurons", "__sampling_interval",
-                 "__units")
+    __slots__ = (
+        "__data", "__indexes", "__n_neurons", "__spike_sampling_interval",
+        "__units")
 
     def __init__(self, data, indexes, n_neurons, units, sampling_interval):
         """
@@ -31,13 +32,14 @@ class VariableCache(object):
         :param int n_neurons: Number of neurons in the population,
             regardless of whether they were recording or not.
         :param str units: the units in which the data is
-        :param int sampling_interval:
+        :param sampling_interval: The number of milliseconds between samples.
+        :type sampling_interval: float or int
         """
         self.__data = data
         self.__indexes = indexes
         self.__n_neurons = n_neurons
         self.__units = units
-        self.__sampling_interval = sampling_interval
+        self.__spike_sampling_interval = sampling_interval
 
     @property
     def data(self):
@@ -69,4 +71,7 @@ class VariableCache(object):
 
     @property
     def sampling_interval(self):
-        return self.__sampling_interval
+        """
+        :rtype: float or int
+        """
+        return self.__spike_sampling_interval
