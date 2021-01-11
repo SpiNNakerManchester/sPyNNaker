@@ -176,6 +176,55 @@ extern uint32_t direct_rows_base_address;
 //! debug bits to change dtcm state for printing
 void print_cache_arrays(address_t table_address);
 
+
+//! \brief Get the source core index from a spike
+//! \param[in] extra: The extra info entry
+//! \param[in] spike: The spike received
+//! \return the source core index in the list of source cores
+static inline uint32_t get_core_index(extra_info extra, spike_t spike) {
+    return (spike >> extra.mask_shift) & extra.core_mask;
+}
+
+//! \brief Get the total number of neurons on cores which come before this core
+//! \param[in] extra: The extra info entry
+//! \param[in] spike: The spike received
+//! \return the base neuron number of this core
+static inline uint32_t get_core_sum(extra_info extra, spike_t spike) {
+    return get_core_index(extra, spike) * extra.n_neurons;
+}
+
+//! \brief Get the source neuron ID for a spike given its table entry (without extra info)
+//! \param[in] entry: the table entry
+//! \param[in] spike: the spike
+//! \return the neuron ID
+static inline uint32_t get_neuron_id(
+        master_population_table_entry entry, spike_t spike) {
+    return spike & ~entry.mask;
+}
+
+//! \brief Get the neuron id of the neuron on the source core, for a spike with
+//         extra info
+//! \param[in] entry: the table entry
+//! \param[in] extra_info: the extra info entry
+//! \param[in] spike: the spike received
+//! \return the source neuron id local to the core
+static inline uint32_t get_local_neuron_id(
+        master_population_table_entry entry, extra_info extra, spike_t spike) {
+    return spike & ~(entry.mask | (extra.core_mask << extra.mask_shift));
+}
+
+//! \brief Get the full source neuron id for a spike with extra info
+//! \param[in] entry: the table entry
+//! \param[in] extra_info: the extra info entry
+//! \param[in] spike: the spike received
+//! \return the source neuron id
+static inline uint32_t get_extended_neuron_id(
+        master_population_table_entry entry, extra_info extra, spike_t spike) {
+    uint32_t local_neuron_id = get_local_neuron_id(entry, extra, spike);
+    uint32_t neuron_id = local_neuron_id + get_core_sum(extra, spike);
+    return neuron_id;
+}
+
 //! \brief sets a address list element to a different rep
 //! \param[in] index: position in address list.
 //! \param[in] rep: the new rep to set to.
@@ -302,13 +351,32 @@ static bool population_table_get_position_in_master_pop(
     return true;
 }
 
+//! \brief finds the number of atoms for a core via filter via a key
+//! \param[in] key: the base key of a core
+//! \param[in] filter_region: the bitfield filters region.
+//! \param[out] filter: the filter containing data found.
+//! \return bool if successful or not
+static inline bool find_bit_field_filter(
+        uint32_t key, filter_region_t *filter_region, filter_info_t* filter) {
+    for (uint32_t f_id = 0; f_id < filter_region->n_filters; f_id++) {
+        if (filter_region->filters[f_id].key == key) {
+            *filter = filter_region->filters[f_id];
+            return true;
+        }
+        log_info("searched with key %d", filter_region->filters[f_id].key);
+    }
+    return false;
+}
+
 //! \brief ensures we only deal with basic addresses and not the extra ones.
 //! \param[in] master_entry: master pop entry.
 //! \param[out] start: the start point in the address array
 //! \param[out] count: the number of entries to iterate over in address array.
+//! \param[out] n_atoms: the atom offset for src atom ids
+//! \return bool success or not
 static inline bool population_table_set_start_and_count(
         master_population_table_entry master_entry, uint32_t* start,
-        uint32_t* count) {
+        uint32_t* count, uint32_t* n_atoms, filter_region_t *filter_region) {
     // if an extra info flag is set, skip it as that is not cachable.
     *start = master_entry.start;
     *count = master_entry.count;
@@ -318,14 +386,39 @@ static inline bool population_table_set_start_and_count(
                 master_entry.key, &position)) {
             return false;
         }
-        log_debug("found extra info at index %d. skipping", position);
         *start += 1;
+        extra_info extra = address_list[master_entry.start].extra;
+
+        // accum all atoms from all cores, ensure the capture of the last
+        // cores lack of power of 2 atoms
+        for (uint32_t core_id = 0; core_id < 2; core_id ++) {
+            uint32_t core_key = master_entry.key & (core_id << extra.mask_shift);
+            uint32_t atom_key = get_extended_neuron_id(master_entry, extra, core_key);
+            log_info("core key %d, atom key = %d", core_key, atom_key);
+            filter_info_t filter;
+            bool success = find_bit_field_filter(atom_key, filter_region, &filter);
+            if (!success) {
+                log_error("failed to find filter for key %d.", core_key);
+                return false;
+            }
+            *n_atoms = *n_atoms + filter.n_atoms;
+        }
+        log_debug("found extra info at index %d. skipping", position);
     }
     else {
         if (!population_table_get_position_in_master_pop(
                 master_entry.key, &position)) {
             return false;
         }
+        filter_info_t filter;
+        bool success = find_bit_field_filter(
+            master_entry.key, filter_region, &filter);
+        if (!success) {
+            log_error("failed to find filter for key %d.", master_entry.key);
+            return false;
+        }
+
+        *n_atoms = filter.n_atoms;
         log_debug("basic entry at master pop array at index %d", position);
     }
     return true;
@@ -334,7 +427,6 @@ static inline bool population_table_set_start_and_count(
 //! \brief Prints the master pop table.
 //! \details For debugging
 static inline void print_master_population_table(void) {
-#if log_level >= LOG_DEBUG
     log_info("Master_population\n");
     for (uint32_t i = 0; i < master_population_table_length; i++) {
         master_population_table_entry entry = master_population_table[i];
@@ -347,11 +439,11 @@ static inline void print_master_population_table(void) {
         int start = entry.start;
         if (entry.extra_info_flag) {
             extra_info extra = address_list[start].extra;
-            start += 1;
             log_info(
                 "    index %d: extra entry: core_mask: 0x%08x, core_shift: %u,"
                 " n_neurons: %u",
                 start, extra.core_mask, extra.mask_shift, extra.n_neurons);
+            start += 1;
         }
         for (uint16_t j = start; j < (start + count); j++) {
             address_and_row_length addr = address_list[j].addr;
@@ -373,7 +465,6 @@ static inline void print_master_population_table(void) {
         }
     }
     log_info("Population table has %u entries", master_population_table_length);
-#endif
 }
 
 //! \brief Set up the table

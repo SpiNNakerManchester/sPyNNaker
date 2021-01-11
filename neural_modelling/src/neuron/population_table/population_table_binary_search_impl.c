@@ -116,62 +116,6 @@ void print_cache_arrays(address_t table_address) {
 #endif
 }
 
-//! \brief Get the source core index from a spike
-//! \param[in] extra: The extra info entry
-//! \param[in] spike: The spike received
-//! \return the source core index in the list of source cores
-static inline uint32_t get_core_index(extra_info extra, spike_t spike) {
-    return (spike >> extra.mask_shift) & extra.core_mask;
-}
-
-//! \brief Get the total number of neurons on cores which come before this core
-//! \param[in] extra: The extra info entry
-//! \param[in] spike: The spike received
-//! \return the base neuron number of this core
-static inline uint32_t get_core_sum(extra_info extra, spike_t spike) {
-    return get_core_index(extra, spike) * extra.n_neurons;
-}
-
-//! \brief Get the source neuron ID for a spike given its table entry (without extra info)
-//! \param[in] entry: the table entry
-//! \param[in] spike: the spike
-//! \return the neuron ID
-static inline uint32_t get_neuron_id(
-        master_population_table_entry entry, spike_t spike) {
-    return spike & ~entry.mask;
-}
-
-//! \brief Get the neuron id of the neuron on the source core, for a spike with
-//         extra info
-//! \param[in] entry: the table entry
-//! \param[in] extra_info: the extra info entry
-//! \param[in] spike: the spike received
-//! \return the source neuron id local to the core
-static inline uint32_t get_local_neuron_id(
-        master_population_table_entry entry, extra_info extra, spike_t spike) {
-    return spike & ~(entry.mask | (extra.core_mask << extra.mask_shift));
-}
-
-//! \brief Get the full source neuron id for a spike with extra info
-//! \param[in] entry: the table entry
-//! \param[in] extra_info: the extra info entry
-//! \param[in] spike: the spike received
-//! \return the source neuron id
-static inline uint32_t get_extended_neuron_id(
-        master_population_table_entry entry, extra_info extra, spike_t spike) {
-    uint32_t local_neuron_id = get_local_neuron_id(entry, extra, spike);
-    uint32_t neuron_id = local_neuron_id + get_core_sum(extra, spike);
-#ifdef DEBUG
-    uint32_t n_neurons = get_n_neurons(extra);
-    if (local_neuron_id > n_neurons) {
-        log_error("Spike %u is outside of expected neuron id range"
-            "(neuron id %u of maximum %u)", spike, local_neuron_id, n_neurons);
-        rt_error(RTE_SWERR);
-    }
-#endif
-    return neuron_id;
-}
-
 //! \brief Check if the entry is a match for the given key
 //! \param[in] mp_i: The master population table entry index
 //! \param[in] key: The key to check
@@ -333,19 +277,16 @@ static inline bool cached_in_array(
     // update
     array_blocks[array_index] = block;
 
+    address_list_entry entry = address_list[address_index];
+    uint32_t address = population_table_get_address(entry.addr);
+    uint32_t row_length = population_table_get_row_length(entry.addr);
+    uint32_t stride = (row_length + N_SYNAPSE_ROW_HEADER_WORDS);
+
     // store
     for (uint32_t atom_id = 0; atom_id < atoms; atom_id ++) {
         // find row address
-        spike_t spike = key + atom_id;
-        synaptic_row_t row;
-        uint32_t size_to_read;
-        uint32_t representation;
-        bool success = population_table_get_first_address(
-            spike, &row, &size_to_read, &representation);
-        if (!success) {
-            log_error("failed to read first address");
-            return false;
-        }
+        uint32_t atom_offset = atom_id * stride * sizeof(uint32_t);
+        synaptic_row_t row = (synaptic_row_t) (address + atom_offset);
 
         // find real row size
         uint32_t size_in_words = synapse_row_size_in_words(row);
@@ -382,29 +323,28 @@ static inline bool cached_in_binary_search(
         uint32_t atoms, uint32_t address_index, uint32_t key,
         uint32_t binary_index) {
     log_debug("caching address entry %d into binary search", address_index);
+    address_list_entry entry = address_list[address_index];
+    uint32_t address = population_table_get_address(entry.addr);
+    uint32_t row_length = population_table_get_row_length(entry.addr);
+    uint32_t stride = (row_length + N_SYNAPSE_ROW_HEADER_WORDS);
+
     uint32_t elements_to_store = 0;
 
     // find elements total
     for (uint32_t atom_id = 0; atom_id < atoms; atom_id ++) {
         // find row address
         spike_t spike = key + atom_id;
-        synaptic_row_t row;
-        uint32_t size_to_read;
-        uint32_t representation;
-        bool success = population_table_get_first_address(
-            spike, &row, &size_to_read, &representation);
-        if (success) {
-            // find real row size
-            uint32_t size_in_words = synapse_row_size_in_words(row);
+        uint32_t atom_offset = atom_id * stride * sizeof(uint32_t);
+        synaptic_row_t row = (synaptic_row_t) (address + atom_offset);
+        // find real row size
+        uint32_t size_in_words = synapse_row_size_in_words(row);
 
-            if (size_in_words != N_SYNAPSE_ROW_HEADER_WORDS) {
-                log_debug("has data for key %08x", spike);
-                elements_to_store += 1;
-            }
-        } else {
-            log_debug("failed to read first address for key %08x", spike);
+        if (size_in_words != N_SYNAPSE_ROW_HEADER_WORDS) {
+            log_debug("has data for key %08x", spike);
+            elements_to_store += 1;
         }
     }
+    log_debug("elements to store = %d", elements_to_store);
 
     // malloc space for array
     binary_blocks[binary_index].elements = spin1_malloc(
@@ -422,56 +362,51 @@ static inline bool cached_in_binary_search(
     for (uint32_t atom_id = 0; atom_id < atoms; atom_id ++) {
         // find row address
         spike_t spike = key + atom_id;
-        synaptic_row_t row;
-        uint32_t size_to_read;
-        uint32_t representation;
-        bool success = population_table_get_first_address(
-            spike, &row, &size_to_read, &representation);
-        if (success) {
+        uint32_t atom_offset = atom_id * stride * sizeof(uint32_t);
+        synaptic_row_t row = (synaptic_row_t) (address + atom_offset);
 
-            // find real row size
-            uint32_t size_in_words = synapse_row_size_in_words(row);
+        // find real row size
+        uint32_t size_in_words = synapse_row_size_in_words(row);
 
-            if (size_in_words != N_SYNAPSE_ROW_HEADER_WORDS) {
-                uint32_t size_in_bytes = (
-                    size_in_words * BYTE_TO_WORD_CONVERSION);
+        if (size_in_words != N_SYNAPSE_ROW_HEADER_WORDS) {
+            uint32_t size_in_bytes = (
+                size_in_words * BYTE_TO_WORD_CONVERSION);
+            binary_blocks[binary_index].elements[
+                binary_block_index].src_neuron_id = atom_id;
+            log_debug(
+                "set index %d src neuron id to %d with atom id %d",
+                binary_block_index,
                 binary_blocks[binary_index].elements[
-                    binary_block_index].src_neuron_id = atom_id;
-                log_debug(
-                    "set index %d src neuron id to %d with atom id %d",
-                    binary_block_index,
-                    binary_blocks[binary_index].elements[
-                        binary_block_index].src_neuron_id, atom_id);
+                    binary_block_index].src_neuron_id, atom_id);
 
-                log_debug(
-                    "from top level src neuron id is %d",
-                    binary_blocks[binary_index].elements[
-                        binary_block_index].src_neuron_id);
-
+            log_debug(
+                "from top level src neuron id is %d",
                 binary_blocks[binary_index].elements[
-                    binary_block_index].row = spin1_malloc(size_in_bytes);
-                if (binary_blocks[binary_index].elements[
-                        binary_block_index].row == NULL) {
-                    log_error(
-                        "failed to allocate DTCM for binary index %d for "
-                        "block index %d of size %d as left over memory is %d",
-                        binary_index, binary_block_index, size_in_bytes,
-                        sark_heap_max(sark.heap, 0));
-                    return false;
-                }
+                    binary_block_index].src_neuron_id);
 
-                // move the sdram into dtcm
-                log_debug(
-                    "stored for key %08x and src neuron id %d", spike, atom_id);
-                spin1_memcpy(
-                    binary_blocks[binary_index].elements[binary_block_index].row,
-                    row, size_in_bytes);
-                binary_block_index += 1;
+            binary_blocks[binary_index].elements[
+                binary_block_index].row = spin1_malloc(size_in_bytes);
+            if (binary_blocks[binary_index].elements[
+                    binary_block_index].row == NULL) {
+                log_error(
+                    "failed to allocate DTCM for binary index %d for "
+                    "block index %d of size %d as left over memory is %d",
+                    binary_index, binary_block_index, size_in_bytes,
+                    sark_heap_max(sark.heap, 0));
+                return false;
             }
-        } else {
-            log_debug("failed to read first address for key %08x", spike);
-        }
 
+            // move the sdram into dtcm
+            log_debug(
+                "stored for key %08x and src neuron id %d", spike, atom_id);
+            spin1_memcpy(
+                binary_blocks[binary_index].elements[binary_block_index].row,
+                row, size_in_bytes);
+            log_debug(
+                "for neuron %d targets neuron %d",
+                atom_id, synapse_row_fixed_region(row)->data[0]);
+            binary_block_index += 1;
+        }
     }
     return true;
 }
@@ -490,18 +425,12 @@ static inline bool process_pop_entry_for_caching(
     // if an extra info flag is set, skip it as that is not cachable.
     uint32_t start = 0;
     uint32_t count = 0;
+    uint32_t atoms = 0;
     bool success = population_table_set_start_and_count(
-        pop_entry, &start, &count);
+        pop_entry, &start, &count, &atoms, filter_region);
+    log_info("start %d, count %d", start, count);
     if (!success) {
         log_error("failed to set start and count");
-        return false;
-    }
-
-    // find size of block in terms of atoms
-    uint32_t atoms = 0;
-    success = find_n_atoms(pop_entry.key, filter_region, &atoms);
-    if (!success) {
-        log_error("failed to find the n atoms for key %d.", pop_entry.key);
         return false;
     }
 
@@ -516,16 +445,17 @@ static inline bool process_pop_entry_for_caching(
 
         // process each rep correctly
         if (correct_rep == BINARY_SEARCH) {
-            log_debug("binary cache");
+            log_info("binary cache");
             success = cached_in_binary_search(
                 atoms, address_index, pop_entry.key, *binary_index);
             if (success) {
                 address_list[address_index].addr.address = *binary_index;
                 *binary_index = *binary_index + 1;
-                log_debug("success binary cache");
+                log_info("success binary cache");
             }
+            log_info("fin");
         } else if (correct_rep == ARRAY) {
-            log_debug("array cache");
+            log_info("array cache");
             success = cached_in_array(
                 atoms, address_index, pop_entry.key, *array_index);
             if (success) {
@@ -598,7 +528,7 @@ static inline bool cache_synaptic_blocks(
         master_population_table_entry pop_entry =
             population_table_entry(pop_entry_index);
         if (pop_entry.cache_in_dtcm) {
-            log_debug("attempting to cach entry at %d", pop_entry_index);
+            log_info("attempting to cach entry at %d", pop_entry_index);
             bool success = process_pop_entry_for_caching(
                 pop_entry, filter_region, &array_index, &binary_index);
             if (!success) {
@@ -642,8 +572,8 @@ bool population_table_initialise(
     uint32_t n_master_pop_bytes =
             master_population_table_length * sizeof(master_population_table_entry);
     log_debug("Pop table size is %d\n", n_master_pop_bytes);
-    log_debug("n cached array blocks = %d", config->n_array_blocks);
-    log_debug("n cached binary blocks = %d", config->n_binary_search_blocks);
+    log_info("n cached array blocks = %d", config->n_array_blocks);
+    log_info("n cached binary blocks = %d", config->n_binary_search_blocks);
 
     // only try to malloc if there's stuff to malloc.
     if (n_master_pop_bytes != 0) {
@@ -729,7 +659,7 @@ static inline bool binary_search_cache(
             imax = imid;
         }
     }
-    log_debug("failed to find element in binary search");
+    log_info("failed to find element in binary search");
     return false;
 }
 
@@ -743,8 +673,8 @@ bool population_table_get_first_address(
     uint32_t position;
     if (!population_table_position_in_the_master_pop_array(spike, &position)) {
         invalid_master_pop_hits++;
-        log_debug("Ghost searches: %u\n", ghost_pop_table_searches);
-        log_debug("Spike %u (= %x): "
+        log_info("Ghost searches: %u\n", ghost_pop_table_searches);
+        log_info("Spike %u (= %x): "
                 "Population not found in master population table",
                 spike, spike);
         return false;
@@ -753,7 +683,7 @@ bool population_table_get_first_address(
 
     master_population_table_entry entry = master_population_table[position];
     if (entry.count == 0) {
-        log_debug("Spike %u (= %x): Population found in master population"
+        log_info("Spike %u (= %x): Population found in master population"
                 "table but count is 0", spike, spike);
     }
 
@@ -802,7 +732,7 @@ bool population_table_get_first_address(
 
     // tracks surplus DMAs
     if (!get_next) {
-        log_debug("Found a entry which has a ghost entry for key %d", spike);
+        log_info("Found a entry which has a ghost entry for key %d", spike);
         ghost_pop_table_searches++;
     }
     return get_next;
@@ -836,7 +766,7 @@ bool population_table_get_next_address(
                 *row = array_blocks[item.address][last_neuron_id];
                 if (*row == NULL) {
                     is_valid = false;
-                    log_debug("array search returned null");
+                    log_info("array search returned null");
                 } else {
                     is_valid = true;
                     *representation = item.representation;
@@ -850,7 +780,7 @@ bool population_table_get_next_address(
                     &binary_blocks[item.address], last_neuron_id, row);
                 if (!success) {
                     is_valid = false;
-                    log_debug("binary search failed to find the row");
+                    log_info("binary search failed to find the row");
                 } else {
                     is_valid = true;
                     *representation = item.representation;
@@ -881,7 +811,7 @@ bool population_table_get_next_address(
                 return false;
             }
         } else {
-            log_debug("invalid address");
+            log_info("invalid address");
         }
 
         next_item++;
