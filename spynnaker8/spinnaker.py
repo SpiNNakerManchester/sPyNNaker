@@ -19,8 +19,6 @@ from neo import __version__ as neo_version
 from pyNN.common import control as pynn_control
 from pyNN import __version__ as pynn_version
 from spinn_front_end_common.utilities import globals_variables
-from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spinn_front_end_common.utilities.failed_state import FAILED_STATE_MSG
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION)
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
@@ -33,7 +31,7 @@ from spynnaker.pyNN.spynnaker_simulator_interface import (
 from spynnaker8 import _version
 from ._version import __version__ as version
 
-NAME = "SpiNNaker_under_version({}-{})".format(
+_NAME = "SpiNNaker_under_version({}-{})".format(
     _version.__version__, _version.__version_name__)
 
 
@@ -272,7 +270,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
         :return: the name of the simulator.
         :rtype: str
         """
-        return NAME
+        return _NAME
 
     @property
     def populations(self):
@@ -320,32 +318,8 @@ class Spynnaker8FailedState(SpynnakerFailedState, SpynnakerSimulatorInterface):
         self.write_on_end = []
 
     @property
-    def dt(self):
-        raise ConfigurationException(FAILED_STATE_MSG)
-
-    @property
-    def mpi_rank(self):
-        raise ConfigurationException(FAILED_STATE_MSG)
-
-    @property
     def name(self):
-        return NAME
-
-    @property
-    def num_processes(self):
-        raise ConfigurationException(FAILED_STATE_MSG)
-
-    @property
-    def recorders(self):
-        raise ConfigurationException(FAILED_STATE_MSG)
-
-    @property
-    def segment_counter(self):
-        raise ConfigurationException(FAILED_STATE_MSG)
-
-    @property
-    def t(self):
-        raise ConfigurationException(FAILED_STATE_MSG)
+        return _NAME
 
 
 # At import time change the default FailedState

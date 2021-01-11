@@ -50,3 +50,27 @@ class SpynnakerFailedState(SpynnakerSimulatorInterface, FailedState, object):
 
     def set_number_of_neurons_per_core(self, neuron_type, max_permitted):
         raise ConfigurationException(FAILED_STATE_MSG)
+
+    @property
+    def dt(self):
+        raise ConfigurationException(FAILED_STATE_MSG)
+
+    @property
+    def mpi_rank(self):
+        raise ConfigurationException(FAILED_STATE_MSG)
+
+    @property
+    def num_processes(self):
+        raise ConfigurationException(FAILED_STATE_MSG)
+
+    @property
+    def recorders(self):
+        raise ConfigurationException(FAILED_STATE_MSG)
+
+    @property
+    def segment_counter(self):
+        raise ConfigurationException(FAILED_STATE_MSG)
+
+    @property
+    def t(self):
+        raise ConfigurationException(FAILED_STATE_MSG)
