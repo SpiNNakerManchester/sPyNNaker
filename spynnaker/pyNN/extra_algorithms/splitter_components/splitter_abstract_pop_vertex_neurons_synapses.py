@@ -29,10 +29,16 @@ from spynnaker.pyNN.utilities.constants import SYNAPSE_SDRAM_PARTITION_ID
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
 from spynnaker.pyNN.models.neural_projections.connectors import (
     OneToOneConnector)
+from spynnaker.pyNN.utilities.utility_calls import get_n_bits
+from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from .splitter_poisson_delegate import SplitterPoissonDelegate
 from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
 from .abstract_supports_one_to_one_sdram_input import (
     AbstractSupportsOneToOneSDRAMInput)
+
+# The maximum number of bits for the ring buffer index that are likely to
+# fit in DTCM (14-bits = 16,384 16-bit ring buffer entries = 32Kb DTCM
+MAX_RING_BUFFER_BITS = 14
 
 
 class SplitterAbstractPopulationVertexNeuronsSynapses(
@@ -48,7 +54,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         "__n_synapse_vertices",
         "__index",
         "__poisson_edges",
-        "__max_delay"]
+        "__max_delay",
+        "__slices"]
 
     SPLITTER_NAME = "SplitterAbstractPopulationVertexNeuronsSynapses"
 
@@ -67,6 +74,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         AbstractSpynnakerSplitterDelay.__init__(self)
         self.__n_synapse_vertices = n_synapse_vertices
         self.__max_delay = max_delay
+        self.__slices = None
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
@@ -77,6 +85,21 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, resource_tracker, machine_graph):
+        # Do some checks to make sure everything is likely to fit
+        atoms_per_core = min(
+            self._governed_app_vertex.get_max_atoms_per_core(),
+            self._governed_app_vertex.n_atoms)
+        n_synapse_types = (
+            self._governed_app_vertex.neuron_impl.get_n_synapse_types())
+        if (get_n_bits(atoms_per_core) + get_n_bits(n_synapse_types) +
+                get_n_bits(self.__max_delay)) > MAX_RING_BUFFER_BITS:
+            raise SynapticConfigurationException(
+                "The combination of the number of neurons per core ({}), "
+                "the number of synapse types ({}), and the maximum delay per "
+                "core ({}) will require too much DTCM.  Please reduce one or "
+                "more of these values.".format(
+                    atoms_per_core, n_synapse_types, self.__max_delay))
+
         label = self._governed_app_vertex.label
         self.__poisson_edges = set()
 
@@ -173,10 +196,13 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         return True
 
     def __get_fixed_slices(self):
+        if self.__slices is not None:
+            return self.__slices
         atoms_per_core = self._governed_app_vertex.get_max_atoms_per_core()
         n_atoms = self._governed_app_vertex.n_atoms
-        return [Slice(low, min(low + atoms_per_core - 1, n_atoms - 1))
-                for low in range(0, n_atoms, atoms_per_core)]
+        self.__slices = [Slice(low, min(low + atoms_per_core - 1, n_atoms - 1))
+                         for low in range(0, n_atoms, atoms_per_core)]
+        return self.__slices
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
     def get_in_coming_slices(self):
