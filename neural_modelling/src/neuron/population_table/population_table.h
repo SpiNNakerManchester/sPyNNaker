@@ -432,7 +432,7 @@ static inline bool population_table_set_start_and_count(
         // accum all atoms from all cores, ensure the capture of the last
         // cores lack of power of 2 atoms
         for (uint32_t core_id = 0; core_id < max_cores; core_id ++) {
-            uint32_t core_key = master_entry.key & (core_id << extra.mask_shift);
+            uint32_t core_key = master_entry.key | (core_id << extra.mask_shift);
             uint32_t atom_key = get_extended_neuron_id(master_entry, extra, core_key);
             log_debug("core key %d, atom key = %d", core_key, atom_key);
             filter_info_t filter;
