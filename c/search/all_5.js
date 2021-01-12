@@ -71,7 +71,7 @@ var searchData=
   ['expand_5fspike_5frecording_5fbuffer_499',['expand_spike_recording_buffer',['../spike__source__poisson_8c.html#a09166600548501c6befb79b410cdc98a',1,'spike_source_poisson.c']]],
   ['expander_5fconfig_500',['expander_config',['../synapse__expander_8c.html#structexpander__config',1,'']]],
   ['expander_5fregion_501',['EXPANDER_REGION',['../delay__extension_8h.html#a6e4d67a0bd74db4da98539f8d2e5ab32a719368d00e2ee9a5b0e27a360ea05be4',1,'delay_extension.h']]],
-  ['exponential_502',['EXPONENTIAL',['../param__generator_8c.html#a06fc87d81c62e9abb8790b6e5713c55baa6055a3a8ab1aed0594419b51d9ec15e',1,'param_generator.c']]],
+  ['exponential_502',['EXPONENTIAL',['../param__generator_8c.html#a385c44f6fb256e5716a2302a5b940388aa6055a3a8ab1aed0594419b51d9ec15e',1,'param_generator.c']]],
   ['exponential_5fsynapse_5finput_5fbuffer_5fregions_503',['exponential_synapse_input_buffer_regions',['../synapse__types__exponential__impl_8h.html#aa8f436b9633d82c53bcbeea73f3eb4ab',1,'synapse_types_exponential_impl.h']]],
   ['extra_5finfo_504',['extra_info',['../population__table__binary__search__impl_8c.html#structextra__info',1,'']]],
   ['extra_5finfo_5fflag_505',['extra_info_flag',['../population__table__binary__search__impl_8c.html#a12b8d8e12253bc56e1bbd8581ad3da81',1,'master_population_table_entry']]],

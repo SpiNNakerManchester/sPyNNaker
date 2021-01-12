@@ -236,7 +236,7 @@ var searchData=
   ['state_5fpre_5fopen_1903',['STATE_PRE_OPEN',['../timing__recurrent__common_8h.html#aa582d447f01913259d0486c7335a3455acaed6c3d35a93a30b38bdf72f2d13b7e',1,'timing_recurrent_common.h']]],
   ['state_5ft_1904',['state_t',['../neuron-typedefs_8h.html#ab5816efea940631eca6d71dd4ca99c17',1,'neuron-typedefs.h']]],
   ['static_2dassert_2eh_1905',['static-assert.h',['http://spinnakermanchester.github.io/spinn_common/static-assert_8h.html',1,'']]],
-  ['static_5fmatrix_5fgenerator_1906',['STATIC_MATRIX_GENERATOR',['../matrix__generator_8c.html#a06fc87d81c62e9abb8790b6e5713c55baf14f18f5ed2665f8cb095c1363fc9848',1,'matrix_generator.c']]],
+  ['static_5fmatrix_5fgenerator_1906',['STATIC_MATRIX_GENERATOR',['../matrix__generator_8c.html#ab04a0655cd1e3bcac5e8f48c18df1a57af14f18f5ed2665f8cb095c1363fc9848',1,'matrix_generator.c']]],
   ['static_5frow_5ft_1907',['static_row_t',['../matrix__generator__static_8h.html#structstatic__row__t',1,'']]],
   ['statistics_1908',['statistics',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/spinn__extra_8h.html#ae81f150edf05ba184530a0e87c7fe756',1,'dma_t']]],
   ['statistics_5fcontrol_1909',['statistics_control',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/spinn__extra_8h.html#a03a9a2f71853dcb652be288918f30cd7',1,'dma_t']]],

@@ -4,5 +4,5 @@ var searchData=
   ['excitatory_5fone_4506',['EXCITATORY_ONE',['../synapse__types__dual__excitatory__exponential__impl_8h.html#a5e42ec2b0d3c67e38a79be2f1d457b51ae7536bbfd551e2b571749964e82cfd5e',1,'EXCITATORY_ONE():&#160;synapse_types_dual_excitatory_exponential_impl.h'],['../synapse__types__semd__impl_8h.html#ac5bb58bf4fa0e9ea571c2a09f810b511ae7536bbfd551e2b571749964e82cfd5e',1,'EXCITATORY_ONE():&#160;synapse_types_semd_impl.h']]],
   ['excitatory_5ftwo_4507',['EXCITATORY_TWO',['../synapse__types__dual__excitatory__exponential__impl_8h.html#a5e42ec2b0d3c67e38a79be2f1d457b51ac7f31813b08e992fff7171fb726aae2f',1,'EXCITATORY_TWO():&#160;synapse_types_dual_excitatory_exponential_impl.h'],['../synapse__types__semd__impl_8h.html#ac5bb58bf4fa0e9ea571c2a09f810b511ac7f31813b08e992fff7171fb726aae2f',1,'EXCITATORY_TWO():&#160;synapse_types_semd_impl.h']]],
   ['expander_5fregion_4508',['EXPANDER_REGION',['../delay__extension_8h.html#a6e4d67a0bd74db4da98539f8d2e5ab32a719368d00e2ee9a5b0e27a360ea05be4',1,'delay_extension.h']]],
-  ['exponential_4509',['EXPONENTIAL',['../param__generator_8c.html#a06fc87d81c62e9abb8790b6e5713c55baa6055a3a8ab1aed0594419b51d9ec15e',1,'param_generator.c']]]
+  ['exponential_4509',['EXPONENTIAL',['../param__generator_8c.html#a385c44f6fb256e5716a2302a5b940388aa6055a3a8ab1aed0594419b51d9ec15e',1,'param_generator.c']]]
 ];
