@@ -75,6 +75,18 @@ def _make_array(ctype, n_items):
     return array_type()
 
 
+class _MaxCoresCType(ctypes.LittleEndianStructure):
+    """ A entry for base key and the n cores for extra info holder
+    """
+
+    _fields_ = [
+        # the base key
+        ("base_key", ctypes.c_uint32),
+        # the number of cores covered by the extra address
+        ("n_cores", ctypes.c_uint32)
+    ]
+
+
 class _MasterPopEntryCType(ctypes.LittleEndianStructure):
     """ A Master Population Table Entry; matches the C struct
     """
@@ -162,10 +174,11 @@ class _AddressListEntryCType(ctypes.Union):
 _MASTER_POP_ENTRY_SIZE_BYTES = ctypes.sizeof(_MasterPopEntryCType)
 _ADDRESS_LIST_ENTRY_SIZE_BYTES = ctypes.sizeof(_AddressListEntryCType)
 _EXTRA_INFO_ENTRY_SIZE_BYTES = ctypes.sizeof(_ExtraInfoCType)
+_MAX_CORES_INFO_SIZE_BYTES = ctypes.sizeof(_MaxCoresCType)
 
 # Base size - 4 words for : 1. size of table 2. address list 3. n array blocks
-# 4. n binary search blocks
-_BASE_SIZE_BYTES = 4 * BYTES_PER_WORD
+# 4. n binary search blocks 5. n elements in max cores map
+_BASE_SIZE_BYTES = 5 * BYTES_PER_WORD
 
 # Over-scale of estimate for safety
 _OVERSCALE = 2
@@ -331,7 +344,8 @@ class MasterPopTableAsBinarySearch(object):
     """
     __slots__ = [
         "__entries",
-        "__n_addresses"]
+        "__n_addresses",
+        "__n_max_cores_store"]
 
     MAX_ROW_LENGTH_ERROR_MSG = (
         "Only rows of up to {} entries are allowed".format(
@@ -346,6 +360,7 @@ class MasterPopTableAsBinarySearch(object):
     def __init__(self):
         self.__entries = None
         self.__n_addresses = 0
+        self.__n_max_cores_store = None
 
     def get_master_population_table_size(self, in_edges):
         """ Get the size of the master population table in SDRAM.
@@ -380,6 +395,7 @@ class MasterPopTableAsBinarySearch(object):
             _BASE_SIZE_BYTES +
             (n_vertices * _MASTER_POP_ENTRY_SIZE_BYTES) +
             (n_vertices * _EXTRA_INFO_ENTRY_SIZE_BYTES) +
+            (n_vertices * _MAX_CORES_INFO_SIZE_BYTES) +
             (n_entries * _ADDRESS_LIST_ENTRY_SIZE_BYTES))
 
     def get_allowed_row_length(self, row_length):
@@ -414,6 +430,7 @@ class MasterPopTableAsBinarySearch(object):
         """ Initialise the master pop data structure.
         """
         self.__entries = dict()
+        self.__n_max_cores_store = dict()
         self.__n_addresses = 0
 
     def add_machine_entry(
@@ -435,6 +452,9 @@ class MasterPopTableAsBinarySearch(object):
         return self.__update_master_population_table(
             block_start_addr, row_length, key_and_mask, 0, 0, 0,
             representation)
+
+    def add_max_core_tracker(self, base_key, n_cores):
+        self.__n_max_cores_store[base_key] = n_cores
 
     def add_application_entry(
             self, block_start_addr, row_length, key_and_mask, core_mask,
@@ -566,12 +586,14 @@ class MasterPopTableAsBinarySearch(object):
             self.__entries.values(),
             key=lambda a_entry: a_entry.routing_key)
         n_entries = len(entries)
+        n_max_cores = len(self.__n_max_cores_store.keys())
 
         # reserve space and switch
         master_pop_table_sz = (
             _BASE_SIZE_BYTES +
             n_entries * _MASTER_POP_ENTRY_SIZE_BYTES +
-            self.__n_addresses * _ADDRESS_LIST_ENTRY_SIZE_BYTES)
+            self.__n_addresses * _ADDRESS_LIST_ENTRY_SIZE_BYTES +
+            n_max_cores * _MAX_CORES_INFO_SIZE_BYTES)
         spec.reserve_memory_region(
             region=POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
             size=master_pop_table_sz, label='PopTable')
@@ -585,21 +607,34 @@ class MasterPopTableAsBinarySearch(object):
         spec.write_value(0)
         spec.write_value(0)
 
+        # add count for n max cores
+        spec.write_value(n_max_cores)
+
         # Generate the table and list as arrays
         pop_table = _make_array(_MasterPopEntryCType, n_entries)
         address_list = _make_array(_AddressListEntryCType, self.__n_addresses)
+        max_cores = _make_array(_MaxCoresCType, n_max_cores)
         start = 0
         for i, entry in enumerate(entries):
             start += entry.write_to_table(pop_table[i], address_list, start)
 
+        # build each element of the max cores array
+        for i, base_key in enumerate(self.__n_max_cores_store.keys()):
+            max_cores[i].base_key = base_key
+            max_cores[i].n_cores = self.__n_max_cores_store[base_key]
+
         # Write the arrays
         spec.write_array(_to_numpy(pop_table))
         spec.write_array(_to_numpy(address_list))
+        spec.write_array(_to_numpy(max_cores))
 
         self.__entries.clear()
         del self.__entries
         self.__entries = None
         self.__n_addresses = 0
+        self.__n_max_cores_store.clear()
+        del self.__n_max_cores_store
+        self.__n_max_cores_store = None
 
     @property
     def max_n_neurons_per_core(self):

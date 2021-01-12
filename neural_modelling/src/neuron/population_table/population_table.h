@@ -70,9 +70,20 @@ typedef struct {
     uint32_t n_array_blocks;
     // length of binary_blocks array.
     uint32_t n_binary_search_blocks;
+    // length of max cores array.
+    uint32_t max_cores_length;
     // start of pop array
     master_population_table_entry data[];
+    // after this is array of address_list_entry and then array of
 } pop_table_config_t;
+
+//! \brief layout for max cores for a given key for extra info
+typedef struct max_core_element_t{
+    // base key for master pop entry for extra info
+    uint32_t base_key;
+    // number of cores covered by this extra info
+    uint32_t max_cores;
+} max_core_element_t;
 
 // \brief struct for holding a binary search element
 typedef struct binary_search_element {
@@ -171,11 +182,31 @@ extern uint32_t synaptic_rows_base_address;
 //! Base address for the synaptic matrix's direct rows
 extern uint32_t direct_rows_base_address;
 
+//! The length of the max cores map
+extern uint32_t max_cores_length;
+
+//! The array of information that points to max cores for each extra address
+extern max_core_element_t *max_cores_map;
+
 //! =================================================================
 
 //! debug bits to change dtcm state for printing
 void print_cache_arrays(address_t table_address);
 
+//! \brief returns the max cores for a given extra address
+//! \param[in] key: the base key to find max cores for.
+//! \param[out] max_cores: the number of cores covered.
+//! \return bool saying successful or not.
+static inline bool find_max_cores(uint32_t key, uint32_t* max_cores) {
+    for (uint32_t max_core_index = 0; max_core_index < max_cores_length;
+            max_core_index++) {
+        if (max_cores_map[max_core_index].base_key == key) {
+            *max_cores = max_cores_map[max_core_index].max_cores;
+            return true;
+        }
+    }
+    return false;
+}
 
 //! \brief Get the source core index from a spike
 //! \param[in] extra: The extra info entry
@@ -363,7 +394,7 @@ static inline bool find_bit_field_filter(
             *filter = filter_region->filters[f_id];
             return true;
         }
-        log_info("searched with key %d", filter_region->filters[f_id].key);
+        log_debug("searched with key %d", filter_region->filters[f_id].key);
     }
     return false;
 }
@@ -388,15 +419,24 @@ static inline bool population_table_set_start_and_count(
         }
         *start += 1;
         extra_info extra = address_list[master_entry.start].extra;
+        uint32_t max_cores = 0;
+        bool success = find_max_cores(master_entry.key, &max_cores);
+        if (!success) {
+            log_error(
+                "failed to find max cores for key %d under the extra"
+                "info in address index %d",
+                master_entry.key, master_entry.start);
+            return false;
+        }
 
         // accum all atoms from all cores, ensure the capture of the last
         // cores lack of power of 2 atoms
-        for (uint32_t core_id = 0; core_id < 2; core_id ++) {
+        for (uint32_t core_id = 0; core_id < max_cores; core_id ++) {
             uint32_t core_key = master_entry.key & (core_id << extra.mask_shift);
             uint32_t atom_key = get_extended_neuron_id(master_entry, extra, core_key);
-            log_info("core key %d, atom key = %d", core_key, atom_key);
+            log_debug("core key %d, atom key = %d", core_key, atom_key);
             filter_info_t filter;
-            bool success = find_bit_field_filter(atom_key, filter_region, &filter);
+            success = find_bit_field_filter(atom_key, filter_region, &filter);
             if (!success) {
                 log_error("failed to find filter for key %d.", core_key);
                 return false;
@@ -427,6 +467,7 @@ static inline bool population_table_set_start_and_count(
 //! \brief Prints the master pop table.
 //! \details For debugging
 static inline void print_master_population_table(void) {
+#if log_level >= LOG_DEBUG
     log_info("Master_population\n");
     for (uint32_t i = 0; i < master_population_table_length; i++) {
         master_population_table_entry entry = master_population_table[i];
@@ -465,6 +506,7 @@ static inline void print_master_population_table(void) {
         }
     }
     log_info("Population table has %u entries", master_population_table_length);
+#endif
 }
 
 //! \brief Set up the table

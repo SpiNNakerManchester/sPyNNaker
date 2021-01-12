@@ -225,12 +225,11 @@ static inline bool synapses_are_plastic_or_structural_or_direct(
 }
 
 //! \brief returns the size of dtcm needed when using binary search rep
-//! \param[in] bit_field_index: index in bitfields.
 //! \param[in] entry: the address list entry.
 //! \param[in] n_atoms: the n_atoms of this block.
 //! \return: the size in bytes used by dtcm.
 static inline int calculate_binary_search_size(
-        uint32_t bit_field_index, address_list_entry entry, uint32_t n_atoms) {
+        address_list_entry entry, uint32_t n_atoms) {
     // build stores
     uint32_t dtcm_used = 0;
     uint32_t n_valid_entries = 0;
@@ -245,10 +244,6 @@ static inline int calculate_binary_search_size(
         synaptic_row_t row = (synaptic_row_t) (address + atom_offset);
 
         // get size
-        uint32_t x = synapse_row_num_fixed_synapses(synapse_row_fixed_region(row));
-        uint32_t y = ((synapse_row_num_plastic_controls(
-            synapse_row_fixed_region(row)) + 1) > 1);
-        uint32_t z = synapse_row_plastic_size(row);
         uint32_t n_targets_in_words = synapse_row_size_in_words(row);
 
         if (n_targets_in_words != N_SYNAPSE_ROW_HEADER_WORDS) {
@@ -277,12 +272,11 @@ static inline int calculate_binary_search_size(
 }
 
 //! \brief returns the size of dtcm needed when using array search rep
-//! \param[in] bit_field_index: index in bitfields.
 //! \param[in] entry: the address list entry.
 //! \param[in] n_atoms: the numebr of atoms for this entry
 //! \return: the size in bytes used by dtcm.
 static inline uint32_t calculate_array_search_size(
-        uint32_t bit_field_index, address_list_entry entry, uint32_t n_atoms) {
+        address_list_entry entry, uint32_t n_atoms) {
     // build stores
     uint32_t dtcm_used = 0;
     dtcm_used += n_atoms * sizeof(uint32_t*) + malloc_cost;
@@ -692,9 +686,9 @@ static inline bool cache_blocks(void) {
             else {
                 // test memory requirements of the 2 reps.
                 int binary_search_size = calculate_binary_search_size(
-                    bit_field_index, address_entry, n_atoms);
+                    address_entry, n_atoms);
                 int array_search_size = calculate_array_search_size(
-                    bit_field_index, address_entry, n_atoms);
+                    address_entry, n_atoms);
                 log_info(
                     "binary size = %d, array size = %d",
                     binary_search_size, array_search_size);

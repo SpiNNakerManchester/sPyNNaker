@@ -59,11 +59,17 @@ uint32_t synaptic_rows_base_address;
 //! The length of ::master_population_table
 uint32_t master_population_table_length;
 
+//! The length of the max cores map
+uint32_t max_cores_length;
+
 //! The master population table. This is sorted.
 master_population_table_entry *master_population_table;
 
 //! The array of information that points into the synaptic matrix
 address_list_entry *address_list;
+
+//! The array of information that points to max cores for each extra address
+max_core_element_t *max_cores_map;
 
 //! store of array dtcm blocks
 synaptic_row_t** array_blocks;
@@ -428,7 +434,7 @@ static inline bool process_pop_entry_for_caching(
     uint32_t atoms = 0;
     bool success = population_table_set_start_and_count(
         pop_entry, &start, &count, &atoms, filter_region);
-    log_info("start %d, count %d", start, count);
+    log_debug("start %d, count %d", start, count);
     if (!success) {
         log_error("failed to set start and count");
         return false;
@@ -445,17 +451,17 @@ static inline bool process_pop_entry_for_caching(
 
         // process each rep correctly
         if (correct_rep == BINARY_SEARCH) {
-            log_info("binary cache");
+            log_debug("binary cache");
             success = cached_in_binary_search(
                 atoms, address_index, pop_entry.key, *binary_index);
             if (success) {
                 address_list[address_index].addr.address = *binary_index;
                 *binary_index = *binary_index + 1;
-                log_info("success binary cache");
+                log_debug("success binary cache");
             }
-            log_info("fin");
+            log_debug("fin");
         } else if (correct_rep == ARRAY) {
-            log_info("array cache");
+            log_debug("array cache");
             success = cached_in_array(
                 atoms, address_index, pop_entry.key, *array_index);
             if (success) {
@@ -528,7 +534,7 @@ static inline bool cache_synaptic_blocks(
         master_population_table_entry pop_entry =
             population_table_entry(pop_entry_index);
         if (pop_entry.cache_in_dtcm) {
-            log_info("attempting to cach entry at %d", pop_entry_index);
+            log_debug("attempting to cach entry at %d", pop_entry_index);
             bool success = process_pop_entry_for_caching(
                 pop_entry, filter_region, &array_index, &binary_index);
             if (!success) {
@@ -543,6 +549,19 @@ static inline bool cache_synaptic_blocks(
     print_cache_arrays(table_address);
     log_debug("finish cache");
     return true;
+}
+
+void print_max_core_map(void) {
+#if log_level >= LOG_DEBUG
+    log_info("print map core map");
+    for (uint32_t map_index = 0; map_index < max_cores_length; map_index++) {
+        log_info(
+            "base key is %d, n cores = %d",
+            max_cores_map[map_index].base_key,
+            max_cores_map[map_index].max_cores);
+    }
+    log_info("fin");
+#endif
 }
 
 //! \}
@@ -572,8 +591,8 @@ bool population_table_initialise(
     uint32_t n_master_pop_bytes =
             master_population_table_length * sizeof(master_population_table_entry);
     log_debug("Pop table size is %d\n", n_master_pop_bytes);
-    log_info("n cached array blocks = %d", config->n_array_blocks);
-    log_info("n cached binary blocks = %d", config->n_binary_search_blocks);
+    log_debug("n cached array blocks = %d", config->n_array_blocks);
+    log_debug("n cached binary blocks = %d", config->n_binary_search_blocks);
 
     // only try to malloc if there's stuff to malloc.
     if (n_master_pop_bytes != 0) {
@@ -597,19 +616,39 @@ bool population_table_initialise(
         }
     }
 
+    max_cores_length = config->max_cores_length;
+    uint32_t n_max_cores_map_bytes =
+        max_cores_length * sizeof(max_core_element_t);
+    if (n_max_cores_map_bytes != 0) {
+        max_cores_map = spin1_malloc(n_max_cores_map_bytes);
+        if (max_cores_map == NULL) {
+            log_error("Could not allocate max core map");
+            return false;
+        }
+    }
+
     log_debug("Pop table size: %u (%u bytes)",
             master_population_table_length, n_master_pop_bytes);
     log_debug("Address list size: %u (%u bytes)",
             address_list_length, n_address_list_bytes);
 
+    // get addresses for start of the VLA's
+    address_list_entry* start_of_address_array =
+        (address_list_entry*) &config->data[master_population_table_length];
+    max_core_element_t* start_of_max_cores_array =
+        (max_core_element_t*) &start_of_address_array[address_list_length];
+
     // Copy the master population table
     spin1_memcpy(master_population_table, config->data,
             n_master_pop_bytes);
-    spin1_memcpy(address_list, &config->data[master_population_table_length],
-        n_address_list_bytes);
+    spin1_memcpy(address_list, start_of_address_array, n_address_list_bytes);
+    spin1_memcpy(max_cores_map, start_of_max_cores_array, n_max_cores_map_bytes);
 
     // print to ensure every looks ok before caching
     print_master_population_table();
+
+    // print max core map for debugging
+    print_max_core_map();
 
     // start the caching process.
     if (!cache_synaptic_blocks(table_address, filter_region)) {
@@ -659,7 +698,7 @@ static inline bool binary_search_cache(
             imax = imid;
         }
     }
-    log_info("failed to find element in binary search");
+    log_debug("failed to find element in binary search");
     return false;
 }
 
@@ -673,8 +712,8 @@ bool population_table_get_first_address(
     uint32_t position;
     if (!population_table_position_in_the_master_pop_array(spike, &position)) {
         invalid_master_pop_hits++;
-        log_info("Ghost searches: %u\n", ghost_pop_table_searches);
-        log_info("Spike %u (= %x): "
+        log_debug("Ghost searches: %u\n", ghost_pop_table_searches);
+        log_debug("Spike %u (= %x): "
                 "Population not found in master population table",
                 spike, spike);
         return false;
@@ -683,7 +722,7 @@ bool population_table_get_first_address(
 
     master_population_table_entry entry = master_population_table[position];
     if (entry.count == 0) {
-        log_info("Spike %u (= %x): Population found in master population"
+        log_debug("Spike %u (= %x): Population found in master population"
                 "table but count is 0", spike, spike);
     }
 
@@ -732,7 +771,7 @@ bool population_table_get_first_address(
 
     // tracks surplus DMAs
     if (!get_next) {
-        log_info("Found a entry which has a ghost entry for key %d", spike);
+        log_debug("Found a entry which has a ghost entry for key %d", spike);
         ghost_pop_table_searches++;
     }
     return get_next;
@@ -766,7 +805,7 @@ bool population_table_get_next_address(
                 *row = array_blocks[item.address][last_neuron_id];
                 if (*row == NULL) {
                     is_valid = false;
-                    log_info("array search returned null");
+                    log_debug("array search returned null");
                 } else {
                     is_valid = true;
                     *representation = item.representation;
@@ -780,7 +819,7 @@ bool population_table_get_next_address(
                     &binary_blocks[item.address], last_neuron_id, row);
                 if (!success) {
                     is_valid = false;
-                    log_info("binary search failed to find the row");
+                    log_debug("binary search failed to find the row");
                 } else {
                     is_valid = true;
                     *representation = item.representation;
@@ -811,7 +850,7 @@ bool population_table_get_next_address(
                 return false;
             }
         } else {
-            log_info("invalid address");
+            log_debug("invalid address");
         }
 
         next_item++;

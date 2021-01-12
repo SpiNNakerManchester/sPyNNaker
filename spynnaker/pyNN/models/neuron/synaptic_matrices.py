@@ -261,10 +261,17 @@ class SynapticMatrices(object):
 
             spec.comment("\nWriting matrix for edge:{}\n".format(
                 app_edge.label))
-            app_key_info = self.__app_key_and_mask(
+            app_key_info, max_cores = self.__app_key_and_mask(
                 m_edges, app_edge, routing_info, key_space_tracker)
-            d_app_key_info = self.__delay_app_key_and_mask(
+            d_app_key_info, delay_max_cores = self.__delay_app_key_and_mask(
                 m_edges, app_edge, routing_info, key_space_tracker)
+
+            if max_cores is not None:
+                self.__poptable.add_max_core_tracker(
+                    max_cores[0][0], len(max_cores))
+            if delay_max_cores is not None:
+                self.__poptable.add_max_core_tracker(
+                    delay_max_cores[0][0], len(delay_max_cores))
 
             for synapse_info in app_edge.synapse_information:
                 app_matrix = self.__app_matrix(app_edge, synapse_info)
@@ -392,7 +399,7 @@ class SynapticMatrices(object):
         keys = sorted(keys, key=lambda item: item[0])
         mask_size = KeySpaceTracker.count_trailing_0s(mask)
         if not self.__check_keys_adjacent(keys, mask_size):
-            return None
+            return None, None
 
         # Get the key as the first key and the mask as the mask that covers
         # enough keys
@@ -404,17 +411,17 @@ class SynapticMatrices(object):
         # Final check because adjacent keys don't mean they all fit under a
         # single mask
         if key & new_mask != key:
-            return None
+            return None, None
 
         # Check that the key doesn't cover other keys that it shouldn't
         next_key = keys[-1][0] + (2 ** mask_size)
         max_key = key + (2 ** (mask_size + n_extra_mask_bits))
         n_unused = max_key - (next_key & mask)
         if n_unused > 0 and key_space_tracker.is_allocated(next_key, n_unused):
-            return None
+            return None, None
 
         return _AppKeyInfo(key, new_mask, core_mask, mask_size,
-                           keys[0][1].n_atoms * n_stages)
+                           keys[0][1].n_atoms * n_stages), keys
 
     def __check_key_slices(self, n_atoms, slices):
         """ Check if a list of slices cover all n_atoms without any gaps
@@ -462,7 +469,7 @@ class SynapticMatrices(object):
         """
         # If there are too many pre-cores, give up now
         if len(m_edges) > self.__poptable.max_core_mask:
-            return None
+            return None, None
 
         # Work out if the keys allow the machine vertices to be merged
         mask = None
@@ -476,19 +483,19 @@ class SynapticMatrices(object):
             pre_slices.append(vertex_slice)
             # No routing info at all? Must have been filtered, so doesn't work
             if rinfo is None:
-                return None
+                return None, None
             # Mask is not the same as the last mask?  Doesn't work
             if mask is not None and rinfo.first_mask != mask:
-                return None
+                return None, None
             mask = rinfo.first_mask
             keys.append((rinfo.first_key, vertex_slice))
 
         if mask is None:
-            return None
+            return None, None
 
         if not self.__check_key_slices(
                 app_edge.pre_vertex.n_atoms, pre_slices):
-            return None
+            return None, None
 
         return self.__get_app_key_and_mask(keys, mask, 1, key_space_tracker)
 
@@ -516,27 +523,27 @@ class SynapticMatrices(object):
             # If the edge doesn't have a delay edge, give up
             delayed_app_edge = m_edge.app_edge.delay_edge
             if delayed_app_edge is None:
-                return None
+                return None, None
             delayed_machine_edge = delayed_app_edge.get_machine_edge(
                 m_edge.pre_vertex, m_edge.post_vertex)
             if delayed_machine_edge is None:
-                return None
+                return None, None
             rinfo = routing_info.get_routing_info_for_edge(
                 delayed_machine_edge)
             vertex_slice = m_edge.pre_vertex.vertex_slice
             pre_slices.append(vertex_slice)
             # No routing info at all? Must have been filtered, so doesn't work
             if rinfo is None:
-                return None
+                return None, None
             # Mask is not the same as the last mask?  Doesn't work
             if mask is not None and rinfo.first_mask != mask:
-                return None
+                return None, None
             mask = rinfo.first_mask
             keys.append((rinfo.first_key, vertex_slice))
 
         if not self.__check_key_slices(
                 app_edge.pre_vertex.n_atoms, pre_slices):
-            return None
+            return None, None
 
         return self.__get_app_key_and_mask(
             keys, mask, app_edge.n_delay_stages, key_space_tracker)
