@@ -27,7 +27,11 @@ class SpynnakerFailedState(SpynnakerSimulatorInterface, FailedState, object):
     """ Marks the simulation as failed.
     """
 
-    __slots__ = ()
+    __slots__ = ("write_on_end", "__name")
+
+    def __init__(self, name):
+        self.__name = name
+        self.write_on_end = []
 
     def get_current_time(self):
         raise ConfigurationException(FAILED_STATE_MSG)
@@ -74,3 +78,7 @@ class SpynnakerFailedState(SpynnakerSimulatorInterface, FailedState, object):
     @property
     def t(self):
         raise ConfigurationException(FAILED_STATE_MSG)
+
+    @property
+    def name(self):
+        return self.__name

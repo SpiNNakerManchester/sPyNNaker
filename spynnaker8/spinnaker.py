@@ -18,7 +18,7 @@ from quantities import __version__ as quantities_version
 from neo import __version__ as neo_version
 from pyNN.common import control as pynn_control
 from pyNN import __version__ as pynn_version
-from spinn_front_end_common.utilities import globals_variables
+from spinn_front_end_common.utilities.globals_variables import set_failed_state
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION)
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
@@ -311,16 +311,12 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
 
 
 # Defined in this file to prevent an import loop
-class Spynnaker8FailedState(SpynnakerFailedState, SpynnakerSimulatorInterface):
-    __slots__ = ("write_on_end", )
+class Spynnaker8FailedState(SpynnakerFailedState):
+    __slots__ = ()
 
     def __init__(self):
-        self.write_on_end = []
-
-    @property
-    def name(self):
-        return _NAME
+        super(Spynnaker8FailedState, self).__init__(_NAME)
 
 
 # At import time change the default FailedState
-globals_variables.set_failed_state(Spynnaker8FailedState())
+set_failed_state(Spynnaker8FailedState())

@@ -18,16 +18,16 @@ import math
 import os
 from six import with_metaclass
 
-from spinn_front_end_common.utilities.constants import \
-    MICRO_TO_MILLISECOND_CONVERSION
 from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.log import FormatAdapter
+from spinn_front_end_common.utilities.constants import (
+    MICRO_TO_MILLISECOND_CONVERSION)
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
     AbstractSpinnakerBase)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utility_models import CommandSender
 from spinn_front_end_common.utilities.utility_objs import ExecutableFinder
-from spinn_front_end_common.utilities import globals_variables
+from spinn_front_end_common.utilities.globals_variables import unset_simulator
 from spinn_front_end_common.utilities.helpful_functions import read_config
 from spynnaker.pyNN import extra_algorithms, model_binaries
 from spynnaker.pyNN.utilities import constants
@@ -366,7 +366,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
         super(AbstractSpiNNakerCommon, self).stop(
             turn_off_machine, clear_routing_tables, clear_tags)
         self.reset_number_of_neurons_per_core()
-        globals_variables.unset_simulator(self)
+        unset_simulator(self)
 
     def run(self, run_time, sync_time=0.0):
         """ Run the model created.
