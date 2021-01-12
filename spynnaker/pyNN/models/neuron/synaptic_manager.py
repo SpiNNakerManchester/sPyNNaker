@@ -637,14 +637,17 @@ class SynapticManager(object):
                             connector.generate_on_machine(
                                 synapse_info.weight, synapse_info.delay) and
                             isinstance(dynamics, AbstractGenerateOnMachine) and
-                            dynamics.generate_on_machine and
-                            not self.__is_direct(
-                                single_addr, connector, pre_vertex_slice,
-                                post_vertex_slice, app_edge)):
+                            dynamics.generate_on_machine
+                           # COMMENTED OUT THIS CHECK TO FORCE SYNAPSE EXPANDER ON ONE TO ONE TOO!
+                           #  THS IS FOR US MODEL 
+                           #  and not self.__is_direct(
+                           #     single_addr, connector, pre_vertex_slice,
+                           #     post_vertex_slice, app_edge)
+                           ):
                         generate_on_machine.append((
                             synapse_info, pre_slices, pre_vertex_slice,
                             pre_slice_index, app_edge, rinfo))
-                    # WITH SYN MATRIX IN DTCM WE SHOULD NEVER GET INTO THIS ELSE! THIS IS FOR DIRECT SYNAPSES!!!!!!!!!!
+                    # This else is for direct synapses!
                     else:
                         block_addr, single_addr, index = self.__write_block(
                             spec, synaptic_matrix_region, synapse_info,
@@ -891,7 +894,7 @@ class SynapticManager(object):
         """
         return (
             app_edge.n_delay_stages == 0 and
-            isinstance(connector, OneToOneConnector) and
+            not isinstance(connector, OneToOneConnector) and
             (single_addr + (pre_vertex_slice.n_atoms * 4) <=
                 self.__one_to_one_connection_dtcm_max_bytes) and
             (pre_vertex_slice.lo_atom == post_vertex_slice.lo_atom) and
