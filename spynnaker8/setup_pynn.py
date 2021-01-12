@@ -13,6 +13,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+This script installs sPyNNaker so that it usable as the ``pyNN.spiNNaker``
+module.
+
+.. note::
+    This *modifies* your pyNN installation!
+"""
+
 import os
 from distutils.version import StrictVersion as Version  # pylint: disable=all
 import pyNN
