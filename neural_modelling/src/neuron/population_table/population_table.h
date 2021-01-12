@@ -436,7 +436,7 @@ static inline bool population_table_set_start_and_count(
             uint32_t atom_key = get_extended_neuron_id(master_entry, extra, core_key);
             log_debug("core key %d, atom key = %d", core_key, atom_key);
             filter_info_t filter;
-            success = find_bit_field_filter(atom_key, filter_region, &filter);
+            success = find_bit_field_filter(core_key, filter_region, &filter);
             if (!success) {
                 log_error("failed to find filter for key %d.", core_key);
                 return false;
