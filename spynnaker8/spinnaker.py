@@ -28,8 +28,7 @@ from spynnaker.pyNN.utilities.spynnaker_failed_state import (
     SpynnakerFailedState)
 from spynnaker.pyNN.spynnaker_simulator_interface import (
     SpynnakerSimulatorInterface)
-from spynnaker8 import _version
-from ._version import __version__ as version
+from spynnaker import _version
 
 _NAME = "SpiNNaker_under_version({}-{})".format(
     _version.__version__, _version.__version_name__)
@@ -80,7 +79,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
         if extra_mapping_inputs is not None:
             built_in_extra_mapping_inputs.update(extra_mapping_inputs)
 
-        front_end_versions = [("sPyNNaker8_version", version)]
+        front_end_versions = [("sPyNNaker8_version", _version.__version__)]
         front_end_versions.append(("pyNN_version", pynn_version))
         front_end_versions.append(("quantities_version", quantities_version))
         front_end_versions.append(("neo_version", neo_version))

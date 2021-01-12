@@ -30,8 +30,8 @@ from spynnaker8.models.synapse_dynamics import SynapseDynamicsStatic
 # This line has to come in this order as it otherwise causes a circular
 # dependency
 from spynnaker.pyNN.models.pynn_projection_common import PyNNProjectionCommon
+from spynnaker._version import __version__
 from spynnaker8.models.populations import Population, PopulationView
-from spynnaker8._version import __version__
 
 logger = logging.getLogger(__name__)
 
