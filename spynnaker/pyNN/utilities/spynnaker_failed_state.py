@@ -23,14 +23,14 @@ from spynnaker.pyNN.spynnaker_simulator_interface import (
 
 
 @add_metaclass(AbstractBase)
-class SpynnakerFailedState(SpynnakerSimulatorInterface, FailedState, object):
+class SpynnakerFailedState(SpynnakerSimulatorInterface, FailedState):
     """ Marks the simulation as failed.
     """
 
-    __slots__ = ("write_on_end", "__name")
+    __slots__ = ("write_on_end", "_name")
 
     def __init__(self, name):
-        self.__name = name
+        self._name = name
         self.write_on_end = []
 
     def get_current_time(self):
@@ -81,4 +81,4 @@ class SpynnakerFailedState(SpynnakerSimulatorInterface, FailedState, object):
 
     @property
     def name(self):
-        return self.__name
+        return self._name
