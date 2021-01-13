@@ -306,8 +306,10 @@ class SynapticMatrices(object):
             dtype = DataType.U3232
             spec.write_value(data=min(w, dtype.max), data_type=dtype)
 
+        items = list()
         for data in generator_data:
-            spec.write_array(data.gen_data)
+            items.extend(data.gen_data)
+        spec.write_array(numpy.concatenate(items))
 
     def __in_edges_by_app_edge(self, in_machine_edges, routing_info):
         """ Convert a list of machine edges to a dict of

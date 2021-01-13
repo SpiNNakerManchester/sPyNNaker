@@ -127,4 +127,4 @@ class GeneratorData(object):
         items.append(connector.gen_delay_params(
             self.__synapse_information.delays, self.__pre_vertex_slice,
             self.__post_vertex_slice))
-        return numpy.concatenate(items)
+        return items
