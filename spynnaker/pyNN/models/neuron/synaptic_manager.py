@@ -243,7 +243,10 @@ class SynapticManager(object):
                     memory_size = self.__add_synapse_size(
                         memory_size, synapse_info, post_vertex_slice, in_edge,
                         machine_time_step)
-        return int(memory_size * _SYNAPSE_SDRAM_OVERSCALE)
+        # REMOVED SYNAPTIC MATRIC OVERSCALE FOR MATRIX IN DTCM. WE SHOULD ALREADY BE GIVING MORE
+        # SPACE THAN NEEDED
+        # return int(memory_size * _SYNAPSE_SDRAM_OVERSCALE)
+        return memory_size
 
     def __add_synapse_size(self, memory_size, synapse_info, post_vertex_slice,
                            in_edge, machine_time_step):
@@ -554,7 +557,8 @@ class SynapticManager(object):
 
         spec.switch_write_focus(POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value)
 
-        spec.write_value(all_syn_block_sz, data_type=DataType.UINT32)
+        # all_syn_block_sz is the size of the synaptic matrix in bytes
+        spec.write_value(int(math.ceil(float(all_syn_block_sz) / 4.0)), data_type=DataType.UINT32)
 
         spec.write_array(ring_buffer_shifts)
 
