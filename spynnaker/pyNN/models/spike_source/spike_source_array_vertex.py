@@ -98,6 +98,15 @@ class SpikeSourceArrayVertex(
 
         """
         time_step = self.get_spikes_sampling_interval()
+        current_time = globals_variables.get_simulator().get_current_time()
+        # warn the user if they are asking for a spike time out of range
+        for n in range(len(spike_times)):
+            if spike_times[n] < current_time:
+                logger.warning("A spike time of {} was specified for the "
+                               "SpikeSourceArray {} that is "
+                               "lower than the current time {} - this "
+                               "will be ignored.".format(
+                                   float(spike_times[n]), self, current_time))
         self.send_buffer_times = _send_buffer_times(spike_times, time_step)
         self._spike_times = spike_times
 
