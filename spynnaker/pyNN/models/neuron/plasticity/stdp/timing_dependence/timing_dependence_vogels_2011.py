@@ -74,7 +74,6 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
         """
         return self.__tau
 
-
     @property
     def A_plus(self):
         r""" :math:`A^+`
