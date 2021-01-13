@@ -38,6 +38,7 @@ from spynnaker.pyNN.utilities.bit_field_utilities import (
     get_estimated_sdram_for_bit_field_region,
     get_estimated_sdram_for_key_region,
     exact_sdram_for_bit_field_builder_region)
+from spynnaker.pyNN.models.neural_projections import DelayedApplicationEdge
 from .splitter_poisson_delegate import SplitterPoissonDelegate
 from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
 from .abstract_supports_one_to_one_sdram_input import (
@@ -273,6 +274,10 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
     def get_in_coming_vertices(
             self, edge, outgoing_edge_partition, src_machine_vertex):
+        # If the edge is delayed, get the real edge
+        if isinstance(edge, DelayedApplicationEdge):
+            edge = edge.undelayed_edge
+
         # Filter out edges from Poisson sources being done using SDRAM
         if edge in self.__poisson_edges:
             return {}
