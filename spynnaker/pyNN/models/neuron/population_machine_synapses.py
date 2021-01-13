@@ -350,7 +350,8 @@ class PopulationMachineSynapses(
 
     def _write_synapse_data_spec(
             self, spec, machine_time_step, routing_info, machine_graph,
-            n_key_map):
+            n_key_map, ring_buffer_shifts, weight_scales, all_syn_block_sz,
+            structural_sz):
         """ Write the data specification for the synapse data
 
         :param ~data_specification.DataSpecificationGenerator spec:
@@ -365,12 +366,9 @@ class PopulationMachineSynapses(
         """
 
         # Write the synapse parameters
-        self._write_synapse_parameters(spec, machine_time_step)
+        self._write_synapse_parameters(spec, ring_buffer_shifts)
 
         # Write the synaptic matrices
-        all_syn_block_sz = self._app_vertex.get_synapses_size(
-            self._vertex_slice)
-        weight_scales = self._app_vertex.get_weight_scales(machine_time_step)
         self._synaptic_matrices.write_synaptic_data(
             spec, self, all_syn_block_sz, weight_scales, routing_info,
             machine_graph)
@@ -387,8 +385,6 @@ class PopulationMachineSynapses(
                 spec, self._synapse_regions.synapse_dynamics,
                 machine_time_step, weight_scales)
         if isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural):
-            structural_sz = self._app_vertex.get_structural_dynamics_size(
-                self._vertex_slice)
             spec.reserve_memory_region(
                 region=self._synapse_regions.structural_dynamics,
                 size=structural_sz, label='synapseDynamicsStructuralParams')
@@ -415,7 +411,7 @@ class PopulationMachineSynapses(
             self._synapse_regions.structural_dynamics,
             isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural))
 
-    def _write_synapse_parameters(self, spec, machine_time_step):
+    def _write_synapse_parameters(self, spec, ring_buffer_shifts):
         """ Write the synapse parameters data region
 
         :param ~data_specification.DataSpecificationGenerator spec:
@@ -442,8 +438,7 @@ class PopulationMachineSynapses(
         spec.write_value(get_n_bits(max_delay))
         spec.write_value(int(self._app_vertex.drop_late_spikes))
         spec.write_value(self._app_vertex.incoming_spike_buffer_size)
-        spec.write_array(self._app_vertex.get_ring_buffer_shifts(
-            machine_time_step))
+        spec.write_array(ring_buffer_shifts)
 
     @overrides(AbstractSynapseExpandable.gen_on_machine)
     def gen_on_machine(self):

@@ -126,7 +126,7 @@ class PopulationMachineNeurons(AbstractReadParametersBeforeSet):
 
         return NeuronProvenance.N_ITEMS
 
-    def _write_neuron_data_spec(self, spec, routing_info, machine_time_step):
+    def _write_neuron_data_spec(self, spec, routing_info, ring_buffer_shifts):
         """ Write the data specification of the neuron data
 
         :param ~data_specification.DataSpecificationGenerator spec:
@@ -140,7 +140,7 @@ class PopulationMachineNeurons(AbstractReadParametersBeforeSet):
             self, SPIKE_PARTITION_ID))
 
         # Write the neuron parameters
-        self._write_neuron_parameters(spec, machine_time_step)
+        self._write_neuron_parameters(spec, ring_buffer_shifts)
 
         # Write the neuron recording region
         neuron_recorder = self._app_vertex.neuron_recorder
@@ -152,7 +152,7 @@ class PopulationMachineNeurons(AbstractReadParametersBeforeSet):
         neuron_recorder.write_neuron_recording_region(
             spec, self._neuron_regions.neuron_recording, self._vertex_slice)
 
-    def _write_neuron_parameters(self, spec, machine_time_step):
+    def _write_neuron_parameters(self, spec, ring_buffer_shifts):
         """ Write the neuron parameters region
 
         :param ~data_specification.DataSpecificationGenerator spec:
@@ -194,8 +194,7 @@ class PopulationMachineNeurons(AbstractReadParametersBeforeSet):
         # Write the ring bugger data
         n_synapse_types = self._app_vertex.neuron_impl.get_n_synapse_types()
         spec.write_value(n_synapse_types)
-        spec.write_array(self._app_vertex.get_ring_buffer_shifts(
-            machine_time_step))
+        spec.write_array(ring_buffer_shifts)
 
         # Write the neuron parameters
         neuron_data = self._app_vertex.neuron_impl.get_data(

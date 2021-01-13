@@ -38,7 +38,11 @@ class PopulationMachineVertex(
     __slots__ = [
         "__change_requires_neuron_parameters_reload",
         "__synaptic_matrices",
-        "__key"]
+        "__key",
+        "__ring_buffer_shifts",
+        "__weight_scales",
+        "__all_syn_block_sz",
+        "__structural_sz"]
 
     class REGIONS(Enum):
         """Regions for populations."""
@@ -95,7 +99,8 @@ class PopulationMachineVertex(
 
     def __init__(
             self, resources_required, label, constraints, app_vertex,
-            vertex_slice):
+            vertex_slice, ring_buffer_shifts, weight_scales, all_syn_block_sz,
+            structural_sz):
         """
         :param ~pacman.model.resources.ResourceContainer resources_required:
             The resources used by the vertex
@@ -115,6 +120,10 @@ class PopulationMachineVertex(
         self.__key = None
         self.__synaptic_matrices = self._create_synaptic_matrices()
         self.__change_requires_neuron_parameters_reload = False
+        self.__ring_buffer_shifts = ring_buffer_shifts
+        self.__weight_scales = weight_scales
+        self.__all_syn_block_sz = all_syn_block_sz
+        self.__structural_sz = structural_sz
 
     @property
     @overrides(PopulationMachineNeurons._key)
@@ -205,10 +214,13 @@ class PopulationMachineVertex(
         self._write_common_data_spec(
             spec, machine_time_step, time_scale_factor, rec_regions)
 
-        self._write_neuron_data_spec(spec, routing_info, machine_time_step)
+        self._write_neuron_data_spec(
+            spec, routing_info, self.__ring_buffer_shifts)
 
         self._write_synapse_data_spec(
-            spec, machine_time_step, routing_info, machine_graph, n_key_map)
+            spec, machine_time_step, routing_info, machine_graph, n_key_map,
+            self.__ring_buffer_shifts, self.__weight_scales,
+            self.__all_syn_block_sz, self.__structural_sz)
 
         # End the writing of this specification:
         spec.end_specification()

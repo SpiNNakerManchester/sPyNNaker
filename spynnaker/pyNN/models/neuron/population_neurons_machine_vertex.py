@@ -48,7 +48,9 @@ class PopulationNeuronsMachineVertex(
     __slots__ = [
         "__change_requires_neuron_parameters_reload",
         "__key",
-        "__sdram_partition"]
+        "__sdram_partition",
+        "__ring_buffer_shifts",
+        "__weight_scales"]
 
     class REGIONS(Enum):
         """Regions for populations."""
@@ -78,7 +80,7 @@ class PopulationNeuronsMachineVertex(
 
     def __init__(
             self, resources_required, label, constraints, app_vertex,
-            vertex_slice):
+            vertex_slice, ring_buffer_shifts, weight_scales):
         """
         :param ~pacman.model.resources.ResourceContainer resources_required:
             The resources used by the vertex
@@ -98,6 +100,8 @@ class PopulationNeuronsMachineVertex(
         self.__key = None
         self.__change_requires_neuron_parameters_reload = False
         self.__sdram_partition = None
+        self.__ring_buffer_shifts = ring_buffer_shifts
+        self.__weight_scales = weight_scales
 
     @property
     @overrides(PopulationMachineNeurons._key)
@@ -182,7 +186,8 @@ class PopulationNeuronsMachineVertex(
         self._write_common_data_spec(
             spec, machine_time_step, time_scale_factor, rec_regions)
 
-        self._write_neuron_data_spec(spec, routing_info, machine_time_step)
+        self._write_neuron_data_spec(
+            spec, routing_info, self.__ring_buffer_shifts)
 
         # Write information about SDRAM
         n_neurons = self._vertex_slice.n_atoms
@@ -236,8 +241,7 @@ class PopulationNeuronsMachineVertex(
     @property
     @overrides(ReceivesSynapticInputsOverSDRAM.weight_scales)
     def weight_scales(self):
-        machine_timestep = globals_variables.get_simulator().machine_time_step
-        return self._app_vertex.get_weight_scales(machine_timestep)
+        return self.__weight_scales
 
     @property
     @overrides(ReceivesSynapticInputsOverSDRAM.n_bytes_for_transfer)

@@ -113,9 +113,6 @@ class AbstractPopulationVertex(
         "__drop_late_spikes",
         "__incoming_projections",
         "__synapse_dynamics",
-        "__synapse_size",
-        "__synapse_expander_size",
-        "__pop_table_size"
         "__max_row_info"]
 
     #: recording region IDs
@@ -239,9 +236,6 @@ class AbstractPopulationVertex(
         self.__incoming_projections = list()
         self.__ring_buffer_shifts = None
         self.__weight_scales = None
-        self.__synapse_size = dict()
-        self.__synapse_expander_size = None
-        self.__pop_table_size = None
         self.__max_row_info = dict()
 
         # Prepare for dealing with STDP - there can only be one (non-static)
@@ -282,7 +276,6 @@ class AbstractPopulationVertex(
         self.__change_requires_mapping = True
         self.__ring_buffer_shifts = None
         self.__weight_scales = None
-        self.__synapse_size = dict()
         self.__incoming_projections.append(projection)
 
     @property
@@ -844,16 +837,13 @@ class AbstractPopulationVertex(
         return ((average_spikes_per_timestep * weight_mean) +
                 (sigma * math.sqrt(poisson_variance + weight_variance)))
 
-    def _get_ring_buffer_to_input_left_shifts(self, machine_timestep):
-        """ Get the scaling of the ring buffer to provide as much accuracy as\
-            possible without too much overflow
+    def get_ring_buffer_shifts(self, incoming_projections):
+        """ Get the shift of the ring buffers for transfer of values into the
+            input buffers for this model.
 
-        :param .MachineVertex machine_vertex:
-        :param .MachineGraph machine_graph:
-        :param int machine_timestep:
-        :param float weight_scale:
-        :rtype: list(int)
+        :param int machine_timestep: The time step of the simulation
         """
+        machine_timestep = globals_variables.get_simulator().machine_time_step
         weight_scale = self.__neuron_impl.get_global_weight_scale()
         weight_scale_squared = weight_scale * weight_scale
         n_synapse_types = self.__neuron_impl.get_n_synapse_types()
@@ -865,7 +855,7 @@ class AbstractPopulationVertex(
         rate_stats = [RunningStats() for _ in range(n_synapse_types)]
         steps_per_second = MICRO_TO_SECOND_CONVERSION / machine_timestep
 
-        for proj in self.__incoming_projections:
+        for proj in incoming_projections:
             synapse_info = proj._synapse_information
             synapse_type = synapse_info.synapse_type
             synapse_dynamics = synapse_info.synapse_dynamics
@@ -946,17 +936,6 @@ class AbstractPopulationVertex(
 
         return list(max_weight_powers)
 
-    def get_ring_buffer_shifts(self, machine_timestep):
-        """ Get the shift of the ring buffers for transfer of values into the
-            input buffers for this model.
-
-        :param int machine_timestep: The time step of the simulation
-        """
-        if self.__ring_buffer_shifts is None:
-            self.__ring_buffer_shifts = \
-                self._get_ring_buffer_to_input_left_shifts(machine_timestep)
-        return self.__ring_buffer_shifts
-
     @staticmethod
     def __get_weight_scale(ring_buffer_to_input_left_shift):
         """ Return the amount to scale the weights by to convert them from \
@@ -969,18 +948,15 @@ class AbstractPopulationVertex(
         """
         return float(math.pow(2, 16 - (ring_buffer_to_input_left_shift + 1)))
 
-    def get_weight_scales(self, machine_timestep):
+    def get_weight_scales(self, ring_buffer_shifts):
         """ Get the weight scaling to apply to weights in synapses
 
         :param int machine_time_step: The simulation time step
         """
-        if self.__weight_scales is None:
-            ring_buffer_shifts = self.get_ring_buffer_shifts(machine_timestep)
-            weight_scale = self.__neuron_impl.get_global_weight_scale()
-            self.__weight_scales = numpy.array([
-                self.__get_weight_scale(r) * weight_scale
-                for r in ring_buffer_shifts])
-        return self.__weight_scales
+        weight_scale = self.__neuron_impl.get_global_weight_scale()
+        return numpy.array([
+            self.__get_weight_scale(r) * weight_scale
+            for r in ring_buffer_shifts])
 
     @overrides(AbstractAcceptsIncomingSynapses.get_connections_from_machine)
     def get_connections_from_machine(
@@ -1037,7 +1013,7 @@ class AbstractPopulationVertex(
         return self.__synapse_dynamics.get_parameters_sdram_usage_in_bytes(
             vertex_slice.n_atoms, self.__neuron_impl.get_n_synapse_types())
 
-    def get_structural_dynamics_size(self, vertex_slice):
+    def get_structural_dynamics_size(self, vertex_slice, incoming_projections):
         """ Get the size of the structural dynamics region
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
@@ -1052,21 +1028,17 @@ class AbstractPopulationVertex(
 
         return self.__synapse_dynamics\
             .get_structural_parameters_sdram_usage_in_bytes(
-                self.__incoming_projections, vertex_slice.n_atoms)
+                incoming_projections, vertex_slice.n_atoms)
 
-    def get_synapses_size(self, vertex_slice):
+    def get_synapses_size(self, vertex_slice, incoming_projections):
         """ Get the maximum SDRAM usage for the synapses on a vertex slice
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of the vertex to get the usage of
         """
-        if vertex_slice in self.__synapse_size:
-            return self.__synapse_size[vertex_slice]
-
         addr = 2 * BYTES_PER_WORD
-        for proj in self.__incoming_projections:
+        for proj in incoming_projections:
             addr = self.__add_matrix_size(addr, proj, vertex_slice)
-        self.__synapse_size[vertex_slice] = addr
         return addr
 
     def __add_matrix_size(self, addr, projection, vertex_slice):
@@ -1114,25 +1086,13 @@ class AbstractPopulationVertex(
         self.__max_row_info[key] = max_row_info
         return max_row_info
 
-    def get_pop_table_size(self):
-        """ Get the size of the master population table in bytes
-
-        :rtype: int
-        """
-        if self.__pop_table_size is None:
-            self.__pop_table_size = MasterPopTableAsBinarySearch\
-                .get_master_population_table_size(self.__incoming_projections)
-        return self.__pop_table_size
-
-    def get_synapse_expander_size(self):
+    def get_synapse_expander_size(self, incoming_projections):
         """ Get the size of the synapse expander region in bytes
 
         :rtype: int
         """
-        if self.__synapse_expander_size is not None:
-            return self.__synapse_expander_size
         size = 0
-        for proj in self.__incoming_projections:
+        for proj in incoming_projections:
             synapse_info = proj._synapse_information
             app_edge = proj._projection_edge
             n_sub_edges = len(app_edge.pre_vertex.machine_vertices)
@@ -1247,28 +1207,6 @@ class AbstractPopulationVertex(
             self.get_sdram_usage_for_neuron_params(vertex_slice) +
             self.__neuron_recorder.get_metadata_sdram_usage_in_bytes(
                 vertex_slice))
-
-    def get_synapse_constant_sdram(self, vertex_slice):
-
-        """ Get the amount of fixed SDRAM used by synapse parts
-
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-            The slice of neurons to get the size of
-
-        :rtype: int
-        """
-        return (
-            self.get_synapse_params_size() +
-            self.get_synapse_dynamics_size(vertex_slice) +
-            self.get_structural_dynamics_size(vertex_slice) +
-            self.get_synapses_size(vertex_slice) +
-            self.get_pop_table_size() +
-            self.get_synapse_expander_size() +
-            get_estimated_sdram_for_bit_field_region(
-                self.__incoming_projections) +
-            get_estimated_sdram_for_key_region(
-                self.__incoming_projections) +
-            exact_sdram_for_bit_field_builder_region())
 
     def get_common_dtcm(self):
         """ Get the amount of DTCM used by common parts

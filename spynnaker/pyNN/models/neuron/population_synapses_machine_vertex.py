@@ -12,7 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import math
 from enum import Enum
 
 from pacman.executor.injection_decorator import inject_items
@@ -50,7 +49,11 @@ class PopulationSynapsesMachineVertex(
 
     __slots__ = [
         "__synaptic_matrices",
-        "__sdram_partition"]
+        "__sdram_partition",
+        "__ring_buffer_shifts",
+        "__weight_scales",
+        "__all_syn_block_sz",
+        "__structural_sz"]
 
     class REGIONS(Enum):
         """Regions for populations."""
@@ -100,7 +103,8 @@ class PopulationSynapsesMachineVertex(
 
     def __init__(
             self, resources_required, label, constraints, app_vertex,
-            vertex_slice):
+            vertex_slice, ring_buffer_shifts, weight_scales, all_syn_block_sz,
+            structural_sz):
         """
         :param ~pacman.model.resources.ResourceContainer resources_required:
             The resources used by the vertex
@@ -119,6 +123,10 @@ class PopulationSynapsesMachineVertex(
             self._PROFILE_TAG_LABELS, self.__get_binary_file_name(app_vertex))
         self.__synaptic_matrices = self._create_synaptic_matrices()
         self.__sdram_partition = None
+        self.__ring_buffer_shifts = ring_buffer_shifts
+        self.__weight_scales = weight_scales
+        self.__all_syn_block_sz = all_syn_block_sz
+        self.__structural_sz = structural_sz
 
     @property
     @overrides(PopulationMachineSynapses._synapse_regions)
@@ -200,7 +208,9 @@ class PopulationSynapsesMachineVertex(
             spec, machine_time_step, time_scale_factor, rec_regions)
 
         self._write_synapse_data_spec(
-            spec, machine_time_step, routing_info, machine_graph, n_key_map)
+            spec, machine_time_step, routing_info, machine_graph, n_key_map,
+            self.__ring_buffer_shifts, self.__weight_scales,
+            self.__all_syn_block_sz, self.__structural_sz)
 
         # Write information about SDRAM
         send_size = self.__sdram_partition.get_sdram_size_of_region_for(self)

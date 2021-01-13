@@ -27,7 +27,13 @@ from spynnaker.pyNN.models.neuron import (
     AbstractPopulationVertex, PopulationMachineVertex)
 from spynnaker.pyNN.models.neuron.population_machine_vertex import (
     NeuronProvenance, SynapseProvenance)
+from spynnaker.pyNN.models.neuron.master_pop_table import (
+    MasterPopTableAsBinarySearch)
 from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
+from spynnaker.pyNN.utilities.bit_field_utilities import (
+    get_estimated_sdram_for_bit_field_region,
+    get_estimated_sdram_for_key_region,
+    exact_sdram_for_bit_field_builder_region)
 
 
 class SplitterAbstractPopulationVertexSlice(
@@ -35,7 +41,14 @@ class SplitterAbstractPopulationVertexSlice(
     """ handles the splitting of the AbstractPopulationVertex via slice logic.
     """
 
-    __slots__ = []
+    __slots__ = [
+        "__ring_buffer_shifts",
+        "__weight_scales",
+        "__all_syn_block_sz",
+        "__structural_sz",
+        "__synapse_expander_sz",
+        "__bitfield_sz"
+    ]
 
     SPLITTER_NAME = "SplitterAbstractPopulationVertexSlice"
 
@@ -49,6 +62,12 @@ class SplitterAbstractPopulationVertexSlice(
     def __init__(self):
         AbstractSplitterSlice.__init__(self, self.SPLITTER_NAME)
         AbstractSpynnakerSplitterDelay.__init__(self)
+        self.__ring_buffer_shifts = None
+        self.__weight_scales = None
+        self.__all_syn_block_sz = dict()
+        self.__structural_sz = dict()
+        self.__synapse_expander_sz = None
+        self.__bitfield_sz = None
 
     @overrides(AbstractSplitterSlice.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
@@ -69,9 +88,18 @@ class SplitterAbstractPopulationVertexSlice(
     @overrides(AbstractSplitterSlice.create_machine_vertex)
     def create_machine_vertex(
             self, vertex_slice, resources, label, remaining_constraints):
+        if self.__ring_buffer_shifts is None:
+            app_vertex = self._governed_app_vertex
+            self.__ring_buffer_shifts = app_vertex.get_ring_buffer_shifts(
+                app_vertex.incoming_projections)
+            self.__weight_scales = app_vertex.get_weight_scales(
+                self.__ring_buffer_shifts)
+
         return PopulationMachineVertex(
             resources, label, remaining_constraints, self._governed_app_vertex,
-            vertex_slice)
+            vertex_slice, self.__ring_buffer_shifts, self.__weight_scales,
+            self.__all_syn_block_size(vertex_slice),
+            self.__structural_size(vertex_slice))
 
     @overrides(AbstractSplitterSlice.get_resources_used_by_atoms)
     def get_resources_used_by_atoms(self, vertex_slice):
@@ -121,7 +149,59 @@ class SplitterAbstractPopulationVertexSlice(
             self._governed_app_vertex.get_common_constant_sdram(
                 n_record, n_provenance) +
             self._governed_app_vertex.get_neuron_constant_sdram(vertex_slice) +
-            self._governed_app_vertex.get_synapse_constant_sdram(vertex_slice))
+            self.__get_synapse_constant_sdram(vertex_slice))
+
+    def __get_synapse_constant_sdram(self, vertex_slice):
+
+        """ Get the amount of fixed SDRAM used by synapse parts
+
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The slice of neurons to get the size of
+
+        :rtype: int
+        """
+        app_vertex = self._governed_app_vertex
+        return (
+            app_vertex.get_synapse_params_size() +
+            app_vertex.get_synapse_dynamics_size(vertex_slice) +
+            self.__structural_size(vertex_slice) +
+            self.__all_syn_block_size(vertex_slice) +
+            MasterPopTableAsBinarySearch.get_master_population_table_size(
+                app_vertex.incoming_projections) +
+            self.__synapse_expander_size() +
+            self.__bitfield_size())
+
+    def __all_syn_block_size(self, vertex_slice):
+        if vertex_slice in self.__all_syn_block_sz:
+            return self.__all_syn_block_sz[vertex_slice]
+        all_syn_block_sz = self._governed_app_vertex.get_synapses_size(
+            vertex_slice, self._governed_app_vertex.incoming_projections)
+        self.__all_syn_block_sz[vertex_slice] = all_syn_block_sz
+        return all_syn_block_sz
+
+    def __structural_size(self, vertex_slice):
+        if vertex_slice in self.__structural_sz:
+            return self.__structural_sz[vertex_slice]
+        structural_sz = self._governed_app_vertex.get_structural_dynamics_size(
+            vertex_slice, self._governed_app_vertex.incoming_projections)
+        self.__structural_sz[vertex_slice] = structural_sz
+        return structural_sz
+
+    def __synapse_expander_size(self):
+        if self.__synapse_expander_sz is None:
+            self.__synapse_expander_sz = \
+                self._governed_app_vertex.get_synapse_expander_size(
+                    self._governed_app_vertex.incoming_projections)
+        return self.__synapse_expander_sz
+
+    def __bitfield_size(self):
+        if self.__bitfield_sz is None:
+            projections = self._governed_app_vertex.incoming_projections
+            self.__bitfield_sz = (
+                get_estimated_sdram_for_bit_field_region(projections) +
+                get_estimated_sdram_for_key_region(projections) +
+                exact_sdram_for_bit_field_builder_region())
+        return self.__bitfield_sz
 
     def __get_dtcm_cost(self, vertex_slice):
         """ get the dtcm cost for the slice of atoms
@@ -152,3 +232,11 @@ class SplitterAbstractPopulationVertexSlice(
             supported_constraints=[
                 MaxVertexAtomsConstraint, FixedVertexAtomsConstraint],
             abstract_constraint_type=AbstractPartitionerConstraint)
+
+    @overrides(AbstractSplitterSlice.reset_called)
+    def reset_called(self):
+        super(SplitterAbstractPopulationVertexSlice, self).reset_called()
+        self.__ring_buffer_shifts = None
+        self.__weight_scales = None
+        self.__all_syn_block_sz = dict()
+        self.__structural_sz = dict()

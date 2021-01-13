@@ -116,8 +116,7 @@ class SpikeSourcePoissonMachineVertex(
         "__minimum_buffer_sdram",
         "__resources",
         "__change_requires_neuron_parameters_reload",
-        "__sdram_partition",
-        "__sdram_projection"]
+        "__sdram_partition"]
 
     class POISSON_SPIKE_SOURCE_REGIONS(Enum):
         SYSTEM_REGION = 0
@@ -419,8 +418,9 @@ class SpikeSourcePoissonMachineVertex(
             connections = synapse_info.connector.create_synaptic_block(
                 None, None, self.vertex_slice, self.vertex_slice, synapse_type,
                 synapse_info)
-            weight_scales = synapse_info.post_population._get_vertex\
-                .get_weight_scales(machine_time_step)
+            weight_scales = (
+                next(iter(self.__sdram_partition.edges))
+                .post_vertex.weight_scales)
             weights = connections["weight"] * weight_scales[synapse_type]
             weights = numpy.rint(numpy.abs(weights)).astype("uint16")
             if len(weights) % 2 != 0:
