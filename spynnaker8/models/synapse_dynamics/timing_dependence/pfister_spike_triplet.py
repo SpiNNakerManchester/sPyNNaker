@@ -38,23 +38,4 @@ class TimingDependencePfisterSpikeTriplet(_BaseClass):
         # pylint: disable=too-many-arguments
         super(TimingDependencePfisterSpikeTriplet, self).__init__(
             tau_plus=tau_plus, tau_minus=tau_minus, tau_x=tau_x,
-            tau_y=tau_y)
-
-        self.__a_plus = A_plus
-        self.__a_minus = A_minus
-
-    @property
-    def A_plus(self):
-        return self.__a_plus
-
-    @A_plus.setter
-    def A_plus(self, new_value):
-        self.__a_plus = new_value
-
-    @property
-    def A_minus(self):
-        return self.__a_minus
-
-    @A_minus.setter
-    def A_minus(self, new_value):
-        self.__a_minus = new_value
+            tau_y=tau_y, A_plus=A_plus, A_minus=A_minus)

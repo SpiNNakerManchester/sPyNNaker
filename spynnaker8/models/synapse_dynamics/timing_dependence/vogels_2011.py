@@ -33,22 +33,5 @@ class TimingDependenceVogels2011(_BaseClass):
         :param float A_plus: :math:`A^+`
         :param float A_minus: :math:`A^-`
         """
-        super(TimingDependenceVogels2011, self).__init__(tau=tau, alpha=alpha)
-        self.__a_plus = A_plus
-        self.__a_minus = A_minus
-
-    @property
-    def A_plus(self):
-        return self.__a_plus
-
-    @A_plus.setter
-    def A_plus(self, new_value):
-        self.__a_plus = new_value
-
-    @property
-    def A_minus(self):
-        return self.__a_minus
-
-    @A_minus.setter
-    def A_minus(self, new_value):
-        self.__a_minus = new_value
+        super(TimingDependenceVogels2011, self).__init__(
+            tau=tau, alpha=alpha, A_plus=A_plus, A_minus=A_minus)
