@@ -12,17 +12,20 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-from pyNN.connectors import (
-    FixedProbabilityConnector as PyNNFixedProbabilityConnector)
+import logging
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    FixedProbabilityConnector as CommonFixedProbabilityConnector)
+    FixedProbabilityConnector as _BaseClass)
+logger = logging.getLogger(__file__)
 
 
-class FixedProbabilityConnector(
-        CommonFixedProbabilityConnector, PyNNFixedProbabilityConnector):
+class FixedProbabilityConnector(_BaseClass):
     """ For each pair of pre-post cells, the connection probability is \
         constant.
+
+    .. deprecated:: 6.0
+        Use
+        :py:class:`spynnaker.pyNN.models.neural_projections.connectors.FixedProbabilityConnector`
+        instead.
     """
     __slots__ = []
 
@@ -52,18 +55,10 @@ class FixedProbabilityConnector(
                 Not supported by sPyNNaker.
         """
         # pylint: disable=too-many-arguments
-        CommonFixedProbabilityConnector.__init__(
+        _BaseClass.__init__(
             self, p_connect=p_connect,
             allow_self_connections=allow_self_connections, safe=safe,
-            verbose=verbose, rng=rng)
-        PyNNFixedProbabilityConnector.__init__(
-            self, p_connect=p_connect, callback=callback,
-            allow_self_connections=allow_self_connections, rng=rng, safe=safe)
-
-    @property
-    def p_connect(self):
-        return self._p_connect
-
-    @p_connect.setter
-    def p_connect(self, new_value):
-        self._p_connect = new_value
+            verbose=verbose, rng=rng, callback=callback)
+        logger.warning(
+            "please use spynnaker.pyNN.models.neural_projections.connectors."
+            "FixedProbabilityConnector instead")

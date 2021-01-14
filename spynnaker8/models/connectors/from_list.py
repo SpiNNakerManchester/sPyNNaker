@@ -12,13 +12,19 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+import logging
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    FromListConnector as CommonFromListConnector)
+    FromListConnector as _BaseClass)
+logger = logging.getLogger(__file__)
 
 
-class FromListConnector(CommonFromListConnector):
+class FromListConnector(_BaseClass):
     """ Make connections according to a list.
+
+    .. deprecated:: 6.0
+        Use
+        :py:class:`spynnaker.pyNN.models.neural_projections.connectors.FromListConnector`
+        instead.
     """
     __slots__ = []
 
@@ -51,6 +57,9 @@ class FromListConnector(CommonFromListConnector):
             .. note::
                 Not supported by sPyNNaker.
         """
-        CommonFromListConnector.__init__(
+        _BaseClass.__init__(
             self, conn_list=conn_list, safe=safe, verbose=verbose,
             column_names=column_names, callback=callback)
+        logger.warning(
+            "please use spynnaker.pyNN.models.neural_projections.connectors."
+            "FromListConnector instead")
