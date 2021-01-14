@@ -116,8 +116,14 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
                 pre.n_atoms * post.n_atoms / float(n_connections)
                 if pre and post else 0
                 for pre in pre_slices for post in post_slices]
-            self.__synapses_per_edge = self.get_rng_next(
-                self.__num_synapses, prob_connect)
+            # Use the multinomial directly if possible
+            if (hasattr(self._rng, "rng") and
+                    hasattr(self._rng.rng, "multinomial")):
+                self.__synapses_per_edge = self._rng.rng.multinomial(
+                    self.__num_synapses, prob_connect)
+            else:
+                self.__synapses_per_edge = self.get_rng_next(
+                    self.__num_synapses, prob_connect)
             if sum(self.__synapses_per_edge) != self.__num_synapses:
                 raise Exception("{} of {} synapses generated".format(
                     sum(self.__synapses_per_edge), self.__num_synapses))
