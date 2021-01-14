@@ -59,6 +59,14 @@ static uint32_t synapse_index_mask;
 static uint32_t synapse_type_bits;
 static uint32_t synapse_type_mask;
 
+static uint32_t memory_index;
+static uint32_t offset;
+
+static weight_t *synaptic_region;
+
+// Size of the memory chunk containing the ring buffers to be sent to neuron core
+static size_t size_to_be_transferred;
+
 static uint32_t *synaptic_matrix;
 
 
@@ -232,7 +240,8 @@ static inline void print_synapse_parameters(void) {
 /* INTERFACE FUNCTIONS */
 bool synapses_initialise(
         address_t synapse_params_address, address_t direct_matrix_address,
-        uint32_t n_neurons_value, uint32_t n_synapse_types_value,
+        uint32_t *n_neurons_value, uint32_t *n_synapse_types_value,
+        uint32_t *incoming_rate_buffer_size,
         uint32_t **ring_buffer_to_input_buffer_left_shifts,
         address_t *dtcm_synaptic_matrix, REAL starting_rate,
         address_t synaptic_matrix_address) {
@@ -535,4 +544,10 @@ bool add_static_neuron_with_id(
     // Increment FF
     fixed_region[0]++;
     return true;
+}
+
+void synapses_set:contribution_region(){
+
+    synaptic_region = sark_tag_ptr(memory_index, 0);
+    synaptic_region += (offset << synapse_index_bits);
 }
