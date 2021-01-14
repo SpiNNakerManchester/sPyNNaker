@@ -12,19 +12,23 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-from pyNN.random import RandomDistribution
-from pyNN.connectors import OneToOneConnector as PyNNOneToOneConnector
+import logging
 from spynnaker.pyNN.models.neural_projections.connectors import (
     OneToOneConnector as
-    CommonOneToOneConnector)
+    _BaseClass)
+logger = logging.getLogger(__file__)
 
 
-class OneToOneConnector(CommonOneToOneConnector, PyNNOneToOneConnector):
+class OneToOneConnector(_BaseClass):
     """
     Where the pre- and postsynaptic populations have the same size, connect\
     cell *i* in the presynaptic population to cell *i* in the postsynaptic\
     population for all *i*.
+
+    .. deprecated:: 6.0
+        Use
+        :py:class:`spynnaker.pyNN.models.neural_projections.connectors.OneToOneConnector`
+        instead.
     """
     __slots__ = []
 
@@ -39,6 +43,7 @@ class OneToOneConnector(CommonOneToOneConnector, PyNNOneToOneConnector):
             .. note::
                 Not supported by sPyNNaker.
         """
-        CommonOneToOneConnector.__init__(
-            self, safe=safe, random_number_class=RandomDistribution)
-        PyNNOneToOneConnector.__init__(self, safe=safe, callback=callback)
+        _BaseClass.__init__(self, safe=safe, callback=callback)
+        logger.warning(
+            "please use spynnaker.pyNN.models.neural_projections.connectors."
+            "OneToOneConnector instead")

@@ -37,11 +37,8 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
     DistanceDependentProbabilityConnector, FixedNumberPostConnector,
     FixedNumberPreConnector, FixedProbabilityConnector,
     FromFileConnector, FromListConnector, IndexBasedProbabilityConnector,
-    KernelConnector, MultapseConnector as FixedTotalNumberConnector)
-# noinspection PyUnresolvedReferences
-from spynnaker8.models.connectors.one_to_one import OneToOneConnector
-# noinspection PyUnresolvedReferences
-from spynnaker8.models.connectors.small_world import SmallWorldConnector
+    KernelConnector, MultapseConnector as FixedTotalNumberConnector,
+    OneToOneConnector, SmallWorldConnector)
 
 # synapse structures
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (

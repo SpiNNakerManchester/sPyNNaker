@@ -17,6 +17,9 @@ r"""
 Connectors are objects that describe how neurons in
 :py:class:`~spynnaker8.models.populations.Population`\ s
 are connected to each other.
+
+.. deprecated:: 6.0
+    Use :py:mod:`spynnaker.pyNN.models.neural_projections.connectors` instead.
 """
 
 from .all_to_all import AllToAllConnector

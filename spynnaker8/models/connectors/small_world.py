@@ -12,16 +12,22 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+import logging
 from spynnaker.pyNN.models.neural_projections.connectors import (
     SmallWorldConnector as
     _BaseClass)
+logger = logging.getLogger(__file__)
 
 
 class SmallWorldConnector(_BaseClass):
     """ Create a connector that uses connection statistics based on the\
         Small World network connectivity model. Note that this is typically\
         used from a population to itself.
+
+    .. deprecated:: 6.0
+        Use
+        :py:class:`spynnaker.pyNN.models.neural_projections.connectors.SmallWorldConnector`
+        instead.
     """
     __slots__ = []
 
@@ -57,3 +63,6 @@ class SmallWorldConnector(_BaseClass):
             allow_self_connections=allow_self_connections,
             n_connections=n_connections, rng=rng, safe=safe, callback=callback,
             verbose=verbose)
+        logger.warning(
+            "please use spynnaker.pyNN.models.neural_projections.connectors."
+            "SmallWorldConnector instead")
