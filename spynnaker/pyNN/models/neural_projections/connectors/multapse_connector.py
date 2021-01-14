@@ -334,7 +334,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
             pre_size * post_size])
         params.extend(self._get_connector_seed(
             pre_vertex_slice, post_vertex_slice, self._rng))
-        return numpy.array(params, dtype="uint32")
+        return numpy.array(params, dtype=numpy.uint32)
 
     @property
     @overrides(

@@ -539,7 +539,7 @@ class SynapseDynamicsSTDP(
         return numpy.array([
             self._n_header_bytes // BYTES_PER_SHORT,
             synapse_struct.get_n_half_words_per_connection(),
-            synapse_struct.get_weight_half_word()], dtype="uint32")
+            synapse_struct.get_weight_half_word()], dtype=numpy.uint32)
 
     @property
     @overrides(AbstractGenerateOnMachine.

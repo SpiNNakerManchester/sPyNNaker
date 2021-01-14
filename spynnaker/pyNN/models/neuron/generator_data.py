@@ -115,7 +115,7 @@ class GeneratorData(object):
             connector.gen_connector_id,
             connector.gen_weights_id(self.__synapse_information.weights),
             connector.gen_delays_id(self.__synapse_information.delays)],
-            dtype="uint32"))
+            dtype=numpy.uint32))
         items.append(synapse_dynamics.gen_matrix_params)
         items.append(connector.gen_connector_params(
             self.__pre_slices, self.__post_slices, self.__pre_vertex_slice,
