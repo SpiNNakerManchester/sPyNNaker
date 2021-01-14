@@ -20,6 +20,14 @@ logger = logging.getLogger(__name__)
 
 
 class WeightDependenceAdditive(_BaseClass):
+    """
+    .. deprecated:: 6.0
+        Use
+        :py:class:`spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditive`
+        instead.
+    """
+    __slots__ = []
+
     # noinspection PyPep8Naming
     def __init__(self, w_min=0.0, w_max=1.0):
         r"""

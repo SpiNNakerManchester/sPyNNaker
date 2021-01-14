@@ -22,9 +22,13 @@ logger = logging.getLogger(__name__)
 
 
 class TimingDependenceSpikePair(_BaseClass):
-    __slots__ = [
-        "__a_plus",
-        "__a_minus"]
+    """
+    .. deprecated:: 6.0
+        Use
+        :py:class:`spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikePair`
+        instead.
+    """
+    __slots__ = []
 
     def __init__(
             self, tau_plus=20.0, tau_minus=20.0, A_plus=0.01, A_minus=0.01):

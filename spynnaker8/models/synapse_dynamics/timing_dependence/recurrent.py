@@ -22,9 +22,13 @@ logger = logging.getLogger(__name__)
 
 
 class TimingDependenceRecurrent(_BaseClass):
-    __slots__ = [
-        "__a_plus",
-        "__a_minus"]
+    """
+    .. deprecated:: 6.0
+        Use
+        :py:class:`spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceRecurrent`
+        instead.
+    """
+    __slots__ = []
 
     def __init__(
             self, accumulator_depression=_defaults['accumulator_depression'],

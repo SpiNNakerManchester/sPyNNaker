@@ -21,9 +21,13 @@ logger = logging.getLogger(__name__)
 
 
 class TimingDependencePfisterSpikeTriplet(_BaseClass):
-    __slots__ = [
-        "__a_plus",
-        "__a_minus"]
+    """
+    .. deprecated:: 6.0
+        Use
+        :py:class:`spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependencePfisterSpikeTriplet`
+        instead.
+    """
+    __slots__ = []
 
     # noinspection PyPep8Naming
     def __init__(

@@ -20,6 +20,14 @@ logger = logging.getLogger(__name__)
 
 
 class WeightDependenceMultiplicative(_BaseClass):
+    """
+    .. deprecated:: 6.0
+        Use
+        :py:class:`spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceMultiplicative`
+        instead.
+    """
+    __slots__ = []
+
     def __init__(self, w_min=0.0, w_max=1.0):
         r"""
         :param float w_min: :math:`w_\mathrm{min}`
