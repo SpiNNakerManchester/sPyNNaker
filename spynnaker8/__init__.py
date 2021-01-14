@@ -36,19 +36,12 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
     AllToAllConnector, ArrayConnector, CSAConnector,
     DistanceDependentProbabilityConnector, FixedNumberPostConnector,
     FixedNumberPreConnector, FixedProbabilityConnector,
-    FromFileConnector, FromListConnector)
-# noinspection PyUnresolvedReferences
-from spynnaker8.models.connectors.index_based_prob import (
-    IndexBasedProbabilityConnector)
-# noinspection PyUnresolvedReferences
-from spynnaker8.models.connectors.multapse import (
-    MultapseConnector as FixedTotalNumberConnector)
+    FromFileConnector, FromListConnector, IndexBasedProbabilityConnector,
+    KernelConnector, MultapseConnector as FixedTotalNumberConnector)
 # noinspection PyUnresolvedReferences
 from spynnaker8.models.connectors.one_to_one import OneToOneConnector
 # noinspection PyUnresolvedReferences
 from spynnaker8.models.connectors.small_world import SmallWorldConnector
-# noinspection PyUnresolvedReferences
-from spynnaker8.models.connectors.kernel_connector import KernelConnector
 
 # synapse structures
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
@@ -136,8 +129,8 @@ __all__ = [
     'DistanceDependentProbabilityConnector', 'FixedNumberPostConnector',
     'FixedNumberPreConnector', 'FixedProbabilityConnector',
     'FromFileConnector', 'FromListConnector', 'IndexBasedProbabilityConnector',
-    'FixedTotalNumberConnector', 'OneToOneConnector', 'SmallWorldConnector',
-    'KernelConnector',
+    'FixedTotalNumberConnector', 'KernelConnector', 'OneToOneConnector',
+    'SmallWorldConnector',
     # synapse structures
     'StaticSynapse',
     # plastic stuff

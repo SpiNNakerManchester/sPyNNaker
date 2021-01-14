@@ -29,7 +29,7 @@ from .fixed_prob import FixedProbabilityConnector
 from .from_file import FromFileConnector
 from .from_list import FromListConnector
 from .index_based_prob import IndexBasedProbabilityConnector
-from .multapse import MultapseConnector as FixedTotalNumberConnector
+from .multapse import MultapseConnector
 from .one_to_one import OneToOneConnector
 from .small_world import SmallWorldConnector
 from .kernel_connector import KernelConnector
@@ -38,5 +38,5 @@ __all__ = ["AllToAllConnector", "ArrayConnector", "CSAConnector",
            "DistanceDependentProbabilityConnector", "FixedNumberPostConnector",
            "FixedNumberPreConnector", "FixedProbabilityConnector",
            "FromFileConnector", "FromListConnector",
-           "IndexBasedProbabilityConnector", "FixedTotalNumberConnector",
+           "IndexBasedProbabilityConnector", "MultapseConnector",
            "OneToOneConnector", "SmallWorldConnector", "KernelConnector"]

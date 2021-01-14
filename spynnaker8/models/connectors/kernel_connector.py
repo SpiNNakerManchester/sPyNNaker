@@ -12,21 +12,23 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+import logging
 from spynnaker.pyNN.models.neural_projections.connectors import (
     KernelConnector as
-    CommonKernelConnector)
+    _BaseClass)
+logger = logging.getLogger(__file__)
 
 
-class KernelConnector(CommonKernelConnector):
+class KernelConnector(_BaseClass):
     """
     Where the pre- and post-synaptic populations are considered as a 2D array.\
     Connect every post(row, col) neuron to many pre(row, col, kernel) through\
     a (kernel) set of weights and/or delays.
 
-    .. admonition:: TODO
-
-        Should these include `allow_self_connections` and `with_replacement`?
+    .. deprecated:: 6.0
+        Use
+        :py:class:`spynnaker.pyNN.models.neural_projections.connectors.KernelConnector`
+        instead.
     """
     __slots__ = []
 
@@ -77,10 +79,13 @@ class KernelConnector(CommonKernelConnector):
             CSV file
         :param callable callback: (ignored)
         """
-        # pylint: disable=too-many-arguments, unused-argument
+        # pylint: disable=too-many-arguments
         super(KernelConnector, self).__init__(
             shape_pre, shape_post, shape_kernel, weight_kernel,
             delay_kernel, shape_common, pre_sample_steps_in_post,
             pre_start_coords_in_post, post_sample_steps_in_pre,
-            post_start_coords_in_pre, safe=safe, verbose=verbose,
+            post_start_coords_in_pre, safe=safe, space=space, verbose=verbose,
             callback=callback)
+        logger.warning(
+            "please use spynnaker.pyNN.models.neural_projections.connectors."
+            "KernelConnector instead")

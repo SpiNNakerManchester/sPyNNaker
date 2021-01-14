@@ -12,15 +12,21 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+import logging
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    IndexBasedProbabilityConnector as CommonIndexBasedProbabilityConnector)
+    IndexBasedProbabilityConnector as _BaseClass)
+logger = logging.getLogger(__file__)
 
 
-class IndexBasedProbabilityConnector(CommonIndexBasedProbabilityConnector):
+class IndexBasedProbabilityConnector(_BaseClass):
     """ Create an index-based probability connector.
         The `index_expression` must depend on the indices `i`, `j` of the\
         populations.
+
+    .. deprecated:: 6.0
+        Use
+        :py:class:`spynnaker.pyNN.models.neural_projections.connectors.IndexBasedProbabilityConnector`
+        instead.
     """
     __slots__ = []
 
@@ -28,9 +34,10 @@ class IndexBasedProbabilityConnector(CommonIndexBasedProbabilityConnector):
             self, index_expression, allow_self_connections=True, rng=None,
             safe=True, callback=None, verbose=False):
         """
-        :param str `index_expression`: A function of the indices of the
+        :param str index_expression: A function of the indices of the
             populations, written as a Python expression; the indices will be
-            given as variables `i` and `j` when the expression is evaluated.
+            given as variables ``i`` and ``j`` when the expression is
+            evaluated.
         :param bool allow_self_connections:
             allow a neuron to connect to itself
         :param rng: random number generator
@@ -52,3 +59,6 @@ class IndexBasedProbabilityConnector(CommonIndexBasedProbabilityConnector):
             index_expression=index_expression,
             allow_self_connections=allow_self_connections, rng=rng,
             safe=safe, callback=callback, verbose=verbose)
+        logger.warning(
+            "please use spynnaker.pyNN.models.neural_projections.connectors."
+            "IndexBasedProbabilityConnector instead")
