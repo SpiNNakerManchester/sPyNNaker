@@ -153,9 +153,6 @@ _EXTRA_INFO_ENTRY_SIZE_BYTES = ctypes.sizeof(_ExtraInfoCType)
 # Base size - 2 words for size of table and address list
 _BASE_SIZE_BYTES = 8
 
-# Over-scale of estimate for safety
-_OVERSCALE = 2
-
 # A ctypes pointer to a uint32
 _UINT32_PTR = ctypes.POINTER(ctypes.c_uint32)
 
