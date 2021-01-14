@@ -12,26 +12,32 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-from pyNN.standardmodels.synapses import StaticSynapse as PyNNStaticSynapse
-from spinn_front_end_common.utilities import globals_variables
-from spynnaker.pyNN.models.neuron.synapse_dynamics \
-    import SynapseDynamicsStructuralStatic as StaticStructuralBaseClass
+import logging
+from pyNN.standardmodels.synapses import StaticSynapse
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    SynapseDynamicsStructuralStatic as
+    _BaseClass)
 from spynnaker.pyNN.models.neuron.synapse_dynamics.\
     synapse_dynamics_structural_common import (
         DEFAULT_F_REW, DEFAULT_INITIAL_WEIGHT, DEFAULT_INITIAL_DELAY,
         DEFAULT_S_MAX)
+logger = logging.getLogger(__name__)
 
 
-class SynapseDynamicsStructuralStatic(StaticStructuralBaseClass):
-
+class SynapseDynamicsStructuralStatic(_BaseClass):
+    """
+    .. deprecated:: 6.0
+        Use
+        :py:class:`spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralStatic`
+        instead.
+    """
     __slots__ = []
 
     def __init__(
             self, partner_selection, formation, elimination,
             f_rew=DEFAULT_F_REW, initial_weight=DEFAULT_INITIAL_WEIGHT,
             initial_delay=DEFAULT_INITIAL_DELAY, s_max=DEFAULT_S_MAX,
-            seed=None, weight=PyNNStaticSynapse.default_parameters['weight'],
+            seed=None, weight=StaticSynapse.default_parameters['weight'],
             delay=None):
         """
         :param AbstractPartnerSelection partner_selection:
@@ -42,9 +48,9 @@ class SynapseDynamicsStructuralStatic(StaticStructuralBaseClass):
         :param float initial_weight:
             Weight assigned to a newly formed connection
         :param initial_delay:
-            Delay assigned to a newly formed connection; a single value means\
-            a fixed delay value, or a tuple of two values means the delay will\
-            be chosen at random from a uniform distribution between the given\
+            Delay assigned to a newly formed connection; a single value means
+            a fixed delay value, or a tuple of two values means the delay will
+            be chosen at random from a uniform distribution between the given
             values
         :type initial_delay: float or tuple(float, float)
         :param int s_max: Maximum fan-in per target layer neuron
@@ -53,9 +59,10 @@ class SynapseDynamicsStructuralStatic(StaticStructuralBaseClass):
         :param delay: The delay of connections formed by the connector
         :type delay: float or None
         """
-        if delay is None:
-            delay = globals_variables.get_simulator().min_delay
-        StaticStructuralBaseClass.__init__(
+        _BaseClass.__init__(
             self, partner_selection, formation, elimination, f_rew=f_rew,
             initial_weight=initial_weight, initial_delay=initial_delay,
             s_max=s_max, seed=seed, weight=weight, delay=delay)
+        logger.warning(
+            "please use spynnaker.pyNN.models.neuron.synapse_dynamics."
+            "SynapseDynamicsStructuralStatic instead")

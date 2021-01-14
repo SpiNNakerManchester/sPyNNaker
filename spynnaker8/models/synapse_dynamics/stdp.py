@@ -12,20 +12,21 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+import logging
 from pyNN.standardmodels.synapses import StaticSynapse as PyNNStaticSynapse
-from spinn_front_end_common.utilities import globals_variables
-from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsSTDP as
     _BaseClass)
-
-TIME_STAMP_BYTES = BYTES_PER_WORD
-# When not using the MAD scheme, how many pre-synaptic events are buffered
-NUM_PRE_SYNAPTIC_EVENTS = 4
+logger = logging.getLogger(__name__)
 
 
 class SynapseDynamicsSTDP(_BaseClass):
+    """
+    .. deprecated:: 6.0
+        Use
+        :py:class:`spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP`
+        instead.
+    """
 
     __slots__ = []
 
@@ -46,17 +47,11 @@ class SynapseDynamicsSTDP(_BaseClass):
         """
         # pylint: disable=too-many-arguments
 
-        # move data from timing to weight dependence over as needed to reflect
-        # standard structure underneath
-        a_plus = timing_dependence.A_plus
-        a_minus = timing_dependence.A_minus
-        weight_dependence.set_a_plus_a_minus(a_plus=a_plus, a_minus=a_minus)
-
-        if delay is None:
-            delay = globals_variables.get_simulator().min_delay
-
         # instantiate common functionality.
         super(SynapseDynamicsSTDP, self).__init__(
             timing_dependence, weight_dependence, voltage_dependence,
             dendritic_delay_fraction, weight, delay,
             backprop_delay=backprop_delay)
+        logger.warning(
+            "please use spynnaker.pyNN.models.neuron.synapse_dynamics."
+            "SynapseDynamicsSTDP instead")

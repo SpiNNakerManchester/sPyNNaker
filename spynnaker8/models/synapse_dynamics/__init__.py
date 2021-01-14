@@ -13,6 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+.. warning::
+    Using classes via this module is deprecated. Please use
+    :py:mod:`spynnaker.pyNN.models.neuron.synapse_dynamics` instead.
+"""
+
 from .static import SynapseDynamicsStatic
 from .stdp import SynapseDynamicsSTDP
 from .structural_static import SynapseDynamicsStructuralStatic

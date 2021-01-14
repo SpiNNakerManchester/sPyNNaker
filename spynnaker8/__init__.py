@@ -66,23 +66,18 @@ from spynnaker8.models.connectors.small_world import SmallWorldConnector
 from spynnaker8.models.connectors.kernel_connector import KernelConnector
 
 # synapse structures
-from spynnaker8.models.synapse_dynamics.static import (
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic as StaticSynapse)
 
 # plastic stuff
-from spynnaker8.models.synapse_dynamics.stdp import (
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsSTDP as
-    STDPMechanism)
-from spynnaker8.models.synapse_dynamics.structural_static import (
-    SynapseDynamicsStructuralStatic as
-    StructuralMechanismStatic)
-from spynnaker8.models.synapse_dynamics.structural_stdp import (
-    SynapseDynamicsStructuralSTDP as
+    STDPMechanism, SynapseDynamicsStructuralStatic as
+    StructuralMechanismStatic, SynapseDynamicsStructuralSTDP as
     StructuralMechanismSTDP)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
     WeightDependenceAdditive as
-    AdditiveWeightDependence,
-    WeightDependenceMultiplicative as
+    AdditiveWeightDependence, WeightDependenceMultiplicative as
     MultiplicativeWeightDependence)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
     TimingDependenceSpikePair as

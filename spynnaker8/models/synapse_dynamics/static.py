@@ -12,16 +12,21 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+import logging
 from pyNN.standardmodels.synapses import StaticSynapse as PyNNStaticSynapse
-from spinn_front_end_common.utilities import globals_variables
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic as
     _BaseClass)
+logger = logging.getLogger(__name__)
 
 
 class SynapseDynamicsStatic(_BaseClass):
-
+    """
+    .. deprecated:: 6.0
+        Use
+        :py:class:`spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic`
+        instead.
+    """
     __slots__ = []
 
     def __init__(
@@ -32,6 +37,7 @@ class SynapseDynamicsStatic(_BaseClass):
         :param delay:
         :type delay: float or None
         """
-        if delay is None:
-            delay = globals_variables.get_simulator().min_delay
         super(SynapseDynamicsStatic, self).__init__(weight, delay)
+        logger.warning(
+            "please use spynnaker.pyNN.models.neuron.synapse_dynamics."
+            "SynapseDynamicsStatic instead")
