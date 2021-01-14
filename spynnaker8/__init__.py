@@ -32,19 +32,9 @@ from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 
 # connections
 # noinspection PyUnresolvedReferences
-from spynnaker8.models.connectors.all_to_all import AllToAllConnector
-# noinspection PyUnresolvedReferences
-from spynnaker8.models.connectors.array_connector import ArrayConnector
-# noinspection PyUnresolvedReferences
-from spynnaker8.models.connectors.csa_connector import CSAConnector
-# noinspection PyUnresolvedReferences
-from spynnaker8.models.connectors.distance_dependent_prob import (
-    DistanceDependentProbabilityConnector)
-# noinspection PyUnresolvedReferences
-from spynnaker8.models.connectors.fixed_number_post import (
-    FixedNumberPostConnector)
-# noinspection PyUnresolvedReferences
-from spynnaker8.models.connectors.fixed_number_pre import (
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    AllToAllConnector, ArrayConnector, CSAConnector,
+    DistanceDependentProbabilityConnector, FixedNumberPostConnector,
     FixedNumberPreConnector)
 # noinspection PyUnresolvedReferences
 from spynnaker8.models.connectors.fixed_prob import FixedProbabilityConnector

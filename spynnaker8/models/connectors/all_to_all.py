@@ -14,16 +14,19 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-from pyNN.connectors import AllToAllConnector as PyNNAllToAllConnector
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    AllToAllConnector as CommonAllToAllConnector)
-
+    AllToAllConnector as _BaseClass)
 logger = logging.getLogger(__file__)
 
 
-class AllToAllConnector(CommonAllToAllConnector, PyNNAllToAllConnector):
+class AllToAllConnector(_BaseClass):
     """ Connects all cells in the presynaptic population to all cells in \
         the postsynaptic population
+
+    .. deprecated:: 6.0
+        Use
+        :py:class:`spynnaker.pyNN.models.neural_projections.connectors.AllToAllConnector`
+        instead.
     """
     __slots__ = []
 
@@ -46,9 +49,9 @@ class AllToAllConnector(CommonAllToAllConnector, PyNNAllToAllConnector):
             .. note::
                 Not supported by sPyNNaker.
         """
-        CommonAllToAllConnector.__init__(
+        _BaseClass.__init__(
             self, allow_self_connections=allow_self_connections,
-            safe=safe, verbose=verbose)
-        PyNNAllToAllConnector.__init__(
-            self, allow_self_connections=allow_self_connections, safe=safe,
-            callback=callback)
+            safe=safe, verbose=verbose, callback=callback)
+        logger.warning(
+            "please use spynnaker.pyNN.models.neural_projections.connectors."
+            "AllToAllConnector instead")

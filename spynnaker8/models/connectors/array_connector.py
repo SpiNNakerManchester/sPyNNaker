@@ -12,14 +12,20 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+import logging
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    ArrayConnector as CommonArrayConnector)
+    ArrayConnector as _BaseClass)
+logger = logging.getLogger(__file__)
 
 
-class ArrayConnector(CommonArrayConnector):
+class ArrayConnector(_BaseClass):
     """ Make connections using an array of integers based on the IDs\
         of the neurons in the pre- and post-populations.
+
+    .. deprecated:: 6.0
+        Use
+        :py:class:`spynnaker.pyNN.models.neural_projections.connectors.ArrayConnector`
+        instead.
     """
     __slots__ = []
 
@@ -40,7 +46,8 @@ class ArrayConnector(CommonArrayConnector):
             Whether to output extra information about the connectivity to a
             CSV file
         """
-        # pylint: disable=too-many-arguments
         super(ArrayConnector, self).__init__(
-            array=array,
-            safe=safe, callback=callback, verbose=verbose)
+            array=array, safe=safe, callback=callback, verbose=verbose)
+        logger.warning(
+            "please use spynnaker.pyNN.models.neural_projections.connectors."
+            "ArrayConnector instead")

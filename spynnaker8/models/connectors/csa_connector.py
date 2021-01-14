@@ -12,14 +12,20 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+import logging
 from spynnaker.pyNN.models.neural_projections.connectors import (
     CSAConnector as
-    CommonCSAConnector)
+    _BaseClass)
+logger = logging.getLogger(__file__)
 
 
-class CSAConnector(CommonCSAConnector):
+class CSAConnector(_BaseClass):
     """ A CSA (*Connection Set Algebra*, Djurfeldt 2012) connector.
+
+    .. deprecated:: 6.0
+        Use
+        :py:class:`spynnaker.pyNN.models.neural_projections.connectors.CSAConnector`
+        instead.
     """
     __slots__ = []
 
@@ -41,5 +47,7 @@ class CSAConnector(CommonCSAConnector):
         """
         # pylint: disable=too-many-arguments
         super(CSAConnector, self).__init__(
-            cset=cset,
-            safe=safe, callback=callback, verbose=verbose)
+            cset=cset, safe=safe, callback=callback, verbose=verbose)
+        logger.warning(
+            "please use spynnaker.pyNN.models.neural_projections.connectors."
+            "CSAConnector instead")

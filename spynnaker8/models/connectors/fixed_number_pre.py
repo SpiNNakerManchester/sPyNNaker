@@ -14,18 +14,19 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-from pyNN.connectors import (
-    FixedNumberPreConnector as PyNNFixedNumberPreConnector)
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    FixedNumberPreConnector as CommonFixedNumberPreConnector)
-
+    FixedNumberPreConnector as _BaseClass)
 logger = logging.getLogger(__file__)
 
 
-class FixedNumberPreConnector(CommonFixedNumberPreConnector,
-                              PyNNFixedNumberPreConnector):
+class FixedNumberPreConnector(_BaseClass):
     """ Connects a fixed number of pre-synaptic neurons selected at random,\
         to all post-synaptic neurons.
+
+    .. deprecated:: 6.0
+        Use
+        :py:class:`spynnaker.pyNN.models.neural_projections.connectors.FixedNumberPreConnector`
+        instead.
     """
     __slots__ = []
 
@@ -62,3 +63,6 @@ class FixedNumberPreConnector(CommonFixedNumberPreConnector,
             n=n, allow_self_connections=allow_self_connections,
             with_replacement=with_replacement, safe=safe, verbose=verbose,
             rng=rng)
+        logger.warning(
+            "please use spynnaker.pyNN.models.neural_projections.connectors."
+            "FixedNumberPreConnector instead")

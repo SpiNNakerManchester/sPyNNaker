@@ -31,7 +31,7 @@ logger = FormatAdapter(logging.getLogger(__name__))
 class CSAConnector(AbstractConnector):
     """ Make connections using a Connection Set Algebra (Djurfeldt 2012)\
         description between the neurons in the pre- and post-populations.
-        If you get TypeError in Python 3 see:
+        If you get ``TypeError`` in Python 3 see:
         https://github.com/INCF/csa/issues/10
     """
 
@@ -43,8 +43,17 @@ class CSAConnector(AbstractConnector):
         :param csa.connset.CSet cset:
             A description of the connection set between populations
         :param bool safe:
-        :param callable callback: Ignored
+            If ``True``, check that weights and delays have valid values.
+            If ``False``, this check is skipped.
+        :param callable callback:
+            if given, a callable that display a progress bar on the terminal.
+
+            .. note::
+                Not supported by sPyNNaker.
+
         :param bool verbose:
+            Whether to output extra information about the connectivity to a
+            CSV file
         :raises ImportError:
             if the `csa` library isn't present; it's tricky to install in
             some environments so we don't force it to be present unless you

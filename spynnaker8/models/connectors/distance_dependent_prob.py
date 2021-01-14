@@ -12,19 +12,20 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-from pyNN.connectors import (
-    DistanceDependentProbabilityConnector as
-    PyNNDistanceDependentProbabilityConnector)
+import logging
 from spynnaker.pyNN.models.neural_projections.connectors import (
     DistanceDependentProbabilityConnector as
-    CommonDistanceDependentProbabilityConnector)
+    _BaseClass)
+logger = logging.getLogger(__file__)
 
 
-class DistanceDependentProbabilityConnector(
-        CommonDistanceDependentProbabilityConnector,
-        PyNNDistanceDependentProbabilityConnector):
+class DistanceDependentProbabilityConnector(_BaseClass):
     """ Make connections using a distribution which varies with distance.
+
+    .. deprecated:: 6.0
+        Use
+        :py:class:`spynnaker.pyNN.models.neural_projections.connectors.DistanceDependentProbabilityConnector`
+        instead.
     """
     __slots__ = []
 
@@ -57,11 +58,10 @@ class DistanceDependentProbabilityConnector(
                 Not supported by sPyNNaker.
         """
         # pylint: disable=too-many-arguments
-        CommonDistanceDependentProbabilityConnector.__init__(
+        _BaseClass.__init__(
             self, d_expression=d_expression,
             allow_self_connections=allow_self_connections,
             safe=safe, verbose=verbose, n_connections=n_connections)
-        PyNNDistanceDependentProbabilityConnector.__init__(
-            self, d_expression=d_expression,
-            allow_self_connections=allow_self_connections, rng=rng, safe=safe,
-            callback=callback)
+        logger.warning(
+            "please use spynnaker.pyNN.models.neural_projections.connectors."
+            "DistanceDependentProbabilityConnector instead")

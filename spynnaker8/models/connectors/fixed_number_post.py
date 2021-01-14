@@ -14,18 +14,19 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-from pyNN.connectors import (
-    FixedNumberPostConnector as PyNNFixedNumberPostConnector)
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    FixedNumberPostConnector as CommonFixedNumberPostConnector)
-
+    FixedNumberPostConnector as _BaseClass)
 logger = logging.getLogger(__file__)
 
 
-class FixedNumberPostConnector(CommonFixedNumberPostConnector,
-                               PyNNFixedNumberPostConnector):
+class FixedNumberPostConnector(_BaseClass):
     """ PyNN connector that puts a fixed number of connections on each of the\
         post neurons.
+
+    .. deprecated:: 6.0
+        Use
+        :py:class:`spynnaker.pyNN.models.neural_projections.connectors.FixedNumberPostConnector`
+        instead.
     """
     __slots__ = []
 
@@ -33,7 +34,6 @@ class FixedNumberPostConnector(CommonFixedNumberPostConnector,
             self, n, allow_self_connections=True, safe=True, verbose=False,
             with_replacement=False, rng=None, callback=None):
         """
-
         :param int n:
             number of random post-synaptic neurons connected to pre-neurons
         :param bool allow_self_connections:
@@ -63,3 +63,6 @@ class FixedNumberPostConnector(CommonFixedNumberPostConnector,
             n=n, allow_self_connections=allow_self_connections,
             with_replacement=with_replacement, safe=safe, verbose=verbose,
             rng=rng)
+        logger.warning(
+            "please use spynnaker.pyNN.models.neural_projections.connectors."
+            "FixedNumberPostConnector instead")

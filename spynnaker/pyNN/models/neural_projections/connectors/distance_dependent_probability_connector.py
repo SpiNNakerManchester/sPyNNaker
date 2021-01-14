@@ -20,10 +20,14 @@ from numpy import (
     arccos, arcsin, arctan, arctan2, ceil, cos, cosh, exp, fabs, floor, fmod,
     hypot, ldexp, log, log10, modf, power, sin, sinh, sqrt, tan, tanh, maximum,
     minimum, e, pi)
+from pyNN.connectors import (
+    DistanceDependentProbabilityConnector as
+    PyNNDistanceDependentProbabilityConnector)
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinn_utilities.safe_eval import SafeEval
-from spynnaker.pyNN.utilities import utility_calls
+from spynnaker.pyNN.utilities.utility_calls import (
+    get_probable_maximum_selected, get_probable_minimum_selected)
 from .abstract_connector import AbstractConnector
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -45,33 +49,44 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
 
     def __init__(
             self, d_expression, allow_self_connections=True, safe=True,
-            callback=None, verbose=False, n_connections=None, rng=None):
+            verbose=False, n_connections=None, rng=None, callback=None):
         """
         :param str d_expression:
             the right-hand side of a valid python expression for
-            probability, involving 'd', e.g. "exp(-abs(d))", or "d<3",
-            that can be parsed by eval(), that computes the distance
+            probability, involving ``d``,
+            (e.g. ``"exp(-abs(d))"``, or ``"d < 3"``),
+            that can be parsed by ``eval()``, that computes the distance
             dependent distribution.
         :param bool allow_self_connections:
             if the connector is used to connect a Population to itself, this
             flag determines whether a neuron is allowed to connect to itself,
             or only to other neurons in the Population.
-        :param ~pyNN.space.Space space:
-            a Space object, needed if you wish to specify distance-dependent
-            weights or delays.
         :param bool safe:
-        :param callable callback: Ignored
+            if ``True``, check that weights and delays have valid values.
+            If ``False``, this check is skipped.
         :param bool verbose:
+            Whether to output extra information about the connectivity to a
+            CSV file
         :param n_connections:
             The number of efferent synaptic connections per neuron.
         :type n_connections: int or None
         :param rng:
-            Seeded random number generator, or None to make one when needed
+            Seeded random number generator, or ``None`` to make one when
+            needed.
         :type rng: ~pyNN.random.NumpyRNG or None
+        :param callable callback:
         """
+        # :param ~pyNN.space.Space space:
+        #    a Space object, needed if you wish to specify distance-dependent
+        #    weights or delays.
+
         # pylint: disable=too-many-arguments
         super(DistanceDependentProbabilityConnector, self).__init__(
             safe, callback, verbose)
+        PyNNDistanceDependentProbabilityConnector.__init__(
+            self, d_expression=d_expression,
+            allow_self_connections=allow_self_connections, rng=rng, safe=safe,
+            callback=callback)
         self.__d_expression = d_expression
         self.__allow_self_connections = allow_self_connections
         self._rng = rng
@@ -114,7 +129,7 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
     def get_delay_maximum(self, synapse_info):
         return self._get_delay_maximum(
             synapse_info.delays,
-            utility_calls.get_probable_maximum_selected(
+            get_probable_maximum_selected(
                 synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
                 synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
                 numpy.amax(self.__probs)))
@@ -123,7 +138,7 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
     def get_delay_minimum(self, synapse_info):
         return self._get_delay_minimum(
             synapse_info.delays,
-            utility_calls.get_probable_minimum_selected(
+            get_probable_minimum_selected(
                 synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
                 synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
                 numpy.amax(self.__probs)))
@@ -136,7 +151,7 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
         max_prob = numpy.amax(
             self.__probs[0:synapse_info.n_pre_neurons,
                          post_vertex_slice.as_slice])
-        n_connections = utility_calls.get_probable_maximum_selected(
+        n_connections = get_probable_maximum_selected(
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             post_vertex_slice.n_atoms, max_prob)
 
@@ -151,7 +166,7 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):
         # pylint: disable=too-many-arguments
-        return utility_calls.get_probable_maximum_selected(
+        return get_probable_maximum_selected(
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             synapse_info.n_post_neurons,
             numpy.amax(self.__probs))
@@ -161,7 +176,7 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
         # pylint: disable=too-many-arguments
         return self._get_weight_maximum(
             synapse_info.weights,
-            utility_calls.get_probable_maximum_selected(
+            get_probable_maximum_selected(
                 synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
                 synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
                 numpy.amax(self.__probs)))
