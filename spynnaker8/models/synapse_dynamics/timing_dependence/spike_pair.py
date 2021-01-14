@@ -13,9 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
     TimingDependenceSpikePair as
     _BaseClass)
+
+logger = logging.getLogger(__name__)
 
 
 class TimingDependenceSpikePair(_BaseClass):
@@ -34,3 +37,6 @@ class TimingDependenceSpikePair(_BaseClass):
         super(TimingDependenceSpikePair, self).__init__(
             tau_plus=tau_plus, tau_minus=tau_minus, A_plus=A_plus,
             A_minus=A_minus)
+        logger.warning(
+            "please use spynnaker.pyNN.models.neuron.plasticity.stdp."
+            "timing_dependence.TimingDependenceSpikePair instead")

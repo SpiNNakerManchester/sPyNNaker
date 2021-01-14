@@ -79,23 +79,23 @@ from spynnaker8.models.synapse_dynamics.structural_static import (
 from spynnaker8.models.synapse_dynamics.structural_stdp import (
     SynapseDynamicsStructuralSTDP as
     StructuralMechanismSTDP)
-from spynnaker8.models.synapse_dynamics.weight_dependence.additive import (
+from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
     WeightDependenceAdditive as
-    AdditiveWeightDependence)
-from spynnaker8.models.synapse_dynamics.weight_dependence\
-    .multiplicative import (
-        WeightDependenceMultiplicative as
-        MultiplicativeWeightDependence)
-from spynnaker8.models.synapse_dynamics.timing_dependence.spike_pair import (
-    TimingDependenceSpikePair as SpikePairRule)
+    AdditiveWeightDependence,
+    WeightDependenceMultiplicative as
+    MultiplicativeWeightDependence)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
+    TimingDependenceSpikePair as
+    SpikePairRule)
 from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
-    .partner_selection import LastNeuronSelection
+    .partner_selection import (
+        LastNeuronSelection, RandomSelection)
 from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
-    .partner_selection import RandomSelection
+    .formation import (
+        DistanceDependentFormation)
 from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
-    .formation import DistanceDependentFormation
-from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
-    .elimination import RandomByWeightElimination
+    .elimination import (
+        RandomByWeightElimination)
 
 # neuron stuff
 # noinspection PyUnresolvedReferences

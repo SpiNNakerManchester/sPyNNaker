@@ -220,20 +220,29 @@ class Projection(PyNNProjectionCommon):
 
     def getWeights(self, format='list',  # @ReservedAssignment
                    gather=True):
-        """ DEPRECATED """
+        """
+        .. deprecated:: 5.0
+            Use ``get('weight')`` instead.
+        """
         logger.warning("getWeights is deprecated.  Use get('weight') instead")
         return self.get('weight', format, gather, with_address=False)
 
     def getDelays(self, format='list',  # @ReservedAssignment
                   gather=True):
-        """ DEPRECATED """
+        """
+        .. deprecated:: 5.0
+            Use ``get('delay')`` instead.
+        """
         logger.warning("getDelays is deprecated.  Use get('delay') instead")
         return self.get('delay', format, gather, with_address=False)
 
     def getSynapseDynamics(self, parameter_name,
                            format='list',  # @ReservedAssignment
                            gather=True):
-        """ DEPRECATED """
+        """
+        .. deprecated:: 5.0
+            Use ``get(parameter_name)`` instead.
+        """
         logger.warning(
             "getSynapseDynamics is deprecated. Use get(parameter_name)"
             " instead")
@@ -241,7 +250,10 @@ class Projection(PyNNProjectionCommon):
 
     def saveConnections(self, file,  # @ReservedAssignment
                         gather=True, compatible_output=True):
-        """ DEPRECATED """
+        """
+        .. deprecated:: 5.0
+            Use ``save('all')`` instead.
+        """
         if not compatible_output:
             logger.warning("SpiNNaker only supports compatible_output=True.")
         logger.warning(
@@ -250,28 +262,35 @@ class Projection(PyNNProjectionCommon):
 
     def printWeights(self, file, format='list',  # @ReservedAssignment
                      gather=True):
-        """ DEPRECATED """
+        """
+        .. deprecated:: 5.0
+            Use ``save('weight')`` instead.
+        """
         logger.warning(
             "printWeights is deprecated. Use save('weight') instead")
         self.save('weight', file, format, gather)
 
     def printDelays(self, file, format='list',  # @ReservedAssignment
                     gather=True):
-        """ DEPRECATED
+        """
+        .. deprecated:: 5.0
+            Use ``save('delay')`` instead.
 
-            Print synaptic weights to file. In the array format, zeros are\
-            printed for non-existent connections.
+        Print synaptic weights to file. In the array format, zeros are
+        printed for non-existent connections.
         """
         logger.warning("printDelays is deprecated. Use save('delay') instead")
         self.save('delay', file, format, gather)
 
     def weightHistogram(self, min=None, max=None,  # @ReservedAssignment
                         nbins=10):
-        """ DEPRECATED
+        """
+        .. deprecated:: 5.0
+            Use ``numpy.histogram`` on the weights instead.
 
-            Return a histogram of synaptic weights.\
-            If min and max are not given, the minimum and maximum weights are\
-            calculated automatically.
+        Return a histogram of synaptic weights.
+        If ``min`` and ``max`` are not given, the minimum and maximum weights
+        are calculated automatically.
         """
         logger.warning(
             "weightHistogram is deprecated. Use numpy.histogram function"

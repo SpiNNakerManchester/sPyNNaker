@@ -13,6 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+.. warning::
+    Using classes via this module is deprecated. Please use
+    :py:mod:`spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence`
+    instead.
+"""
+
 from .spike_pair import TimingDependenceSpikePair
 from .pfister_spike_triplet import TimingDependencePfisterSpikeTriplet
 from .recurrent import TimingDependenceRecurrent

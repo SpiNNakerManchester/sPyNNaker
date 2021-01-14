@@ -12,10 +12,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+import logging
 from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
     WeightDependenceMultiplicative as
     _BaseClass)
+logger = logging.getLogger(__name__)
 
 
 class WeightDependenceMultiplicative(_BaseClass):
@@ -26,3 +27,6 @@ class WeightDependenceMultiplicative(_BaseClass):
         """
         super(WeightDependenceMultiplicative, self).__init__(
             w_max=w_max, w_min=w_min)
+        logger.warning(
+            "please use spynnaker.pyNN.models.neuron.plasticity.stdp."
+            "weight_dependence.WeightDependenceMultiplicative instead")

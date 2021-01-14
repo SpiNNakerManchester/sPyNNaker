@@ -12,12 +12,13 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+import logging
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
     TimingDependenceRecurrent as
     _BaseClass)
 
 _defaults = _BaseClass.default_parameters
+logger = logging.getLogger(__name__)
 
 
 class TimingDependenceRecurrent(_BaseClass):
@@ -47,3 +48,6 @@ class TimingDependenceRecurrent(_BaseClass):
             mean_pre_window=mean_pre_window,
             mean_post_window=mean_post_window,
             dual_fsm=dual_fsm, A_plus=A_plus, A_minus=A_minus)
+        logger.warning(
+            "please use spynnaker.pyNN.models.neuron.plasticity.stdp."
+            "timing_dependence.TimingDependenceRecurrent instead")
