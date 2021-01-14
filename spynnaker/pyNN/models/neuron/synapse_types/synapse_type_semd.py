@@ -28,6 +28,7 @@ ISYN_EXC2 = "isyn_exc2"
 ISYN_INH = "isyn_inh"
 MULTIPLICATOR = "multiplicator"
 EXC2_OLD = "exc2_old"
+SCALING_FACTOR = "scaling_factor"
 
 UNITS = {
     TAU_SYN_E: "mV",
@@ -38,6 +39,7 @@ UNITS = {
     ISYN_INH: "",
     MULTIPLICATOR: "",
     EXC2_OLD: "",
+    SCALING_FACTOR: "",
 }
 
 
@@ -50,11 +52,12 @@ class SynapseTypeSEMD(AbstractSynapseType):
         "__isyn_exc2",
         "__isyn_inh",
         "__multiplicator",
-        "__exc2_old"]
+        "__exc2_old",
+        "__scaling_factor"]
 
     def __init__(
             self, tau_syn_E, tau_syn_E2, tau_syn_I, isyn_exc, isyn_exc2,
-            isyn_inh, multiplicator, exc2_old):
+            isyn_inh, multiplicator, exc2_old, scaling_factor):
         r"""
         :param float tau_syn_E: :math:`\tau^{syn}_{e_1}`
         :param float tau_syn_E2: :math:`\tau^{syn}_{e_2}`
@@ -64,6 +67,7 @@ class SynapseTypeSEMD(AbstractSynapseType):
         :param float isyn_inh: :math:`I^{syn}_i`
         :param float multiplicator:
         :param float exc2_old:
+        :param float scaling_factor:
         """
         super(SynapseTypeSEMD, self).__init__(
             [DataType.U032,    # decay_E
@@ -76,7 +80,8 @@ class SynapseTypeSEMD(AbstractSynapseType):
              DataType.U032,    # init_I
              DataType.S1615,   # isyn_inh
              DataType.S1615,   # multiplicator
-             DataType.S1615])  # exc2_old
+             DataType.S1615,   # exc2_old
+             DataType.S1615])  # scaling_factor
         self.__tau_syn_E = tau_syn_E
         self.__tau_syn_E2 = tau_syn_E2
         self.__tau_syn_I = tau_syn_I
@@ -85,6 +90,7 @@ class SynapseTypeSEMD(AbstractSynapseType):
         self.__isyn_inh = isyn_inh
         self.__multiplicator = multiplicator
         self.__exc2_old = exc2_old
+        self.__scaling_factor = scaling_factor
 
     @overrides(AbstractSynapseType.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
@@ -96,6 +102,7 @@ class SynapseTypeSEMD(AbstractSynapseType):
         parameters[TAU_SYN_E2] = self.__tau_syn_E2
         parameters[TAU_SYN_I] = self.__tau_syn_I
         parameters[MULTIPLICATOR] = self.__multiplicator
+        parameters[SCALING_FACTOR] = self.__scaling_factor
 
     @overrides(AbstractSynapseType.add_state_variables)
     def add_state_variables(self, state_variables):
@@ -137,14 +144,16 @@ class SynapseTypeSEMD(AbstractSynapseType):
                 parameters[TAU_SYN_I].apply_operation(init),
                 state_variables[ISYN_INH],
                 parameters[MULTIPLICATOR],
-                state_variables[EXC2_OLD]]
+                state_variables[EXC2_OLD],
+                parameters[SCALING_FACTOR]]
 
     @overrides(AbstractSynapseType.update_values)
     def update_values(self, values, parameters, state_variables):
 
         # Read the data
         (_decay_E, _init_E, isyn_exc, _decay_E2, _init_E2, isyn_exc2,
-         _decay_I, _init_I, isyn_inh, _multiplicator, exc2_old) = values
+         _decay_I, _init_I, isyn_inh, _multiplicator, exc2_old,
+         _scaling_factor) = values
 
         state_variables[ISYN_EXC] = isyn_exc
         state_variables[ISYN_EXC2] = isyn_exc2
@@ -232,3 +241,11 @@ class SynapseTypeSEMD(AbstractSynapseType):
     @exc2_old.setter
     def exc2_old(self, exc2_old):
         self.__exc2_old = exc2_old
+
+    @property
+    def scaling_factor(self):
+        return self.__scaling_factor
+
+    @scaling_factor.setter
+    def scaling_factor(self, scaling_factor):
+        self.__scaling_factor = scaling_factor
