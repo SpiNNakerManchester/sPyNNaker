@@ -99,7 +99,7 @@ SDRAM_EDGE_PARAMS_BYTES_PER_WEIGHT = BYTES_PER_SHORT
 # SDRAM edge param base size:
 # 1. address, 2. size of transfer,
 # 3. offset to start writing, 4. VLA of weights (not counted here)
-SDRAM_EDGE_PARAMS_BASE_BYTES = 4 * BYTES_PER_WORD
+SDRAM_EDGE_PARAMS_BASE_BYTES = 3 * BYTES_PER_WORD
 
 
 class SpikeSourcePoissonMachineVertex(
@@ -398,7 +398,7 @@ class SpikeSourcePoissonMachineVertex(
         spec.switch_write_focus(
             self.POISSON_SPIKE_SOURCE_REGIONS.SDRAM_EDGE_PARAMS.value)
         if self.__sdram_partition is None:
-            spec.write_array([0, 0, 0, 0])
+            spec.write_array([0, 0, 0])
         else:
             size = self.__sdram_partition.get_sdram_size_of_region_for(self)
             proj = self._app_vertex.outgoing_projections[0]
