@@ -53,10 +53,6 @@ from spynnaker.pyNN.utilities.constants import POSSION_SIGMA_SUMMATION_LIMIT
 from spynnaker.pyNN.utilities.running_stats import RunningStats
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamics, AbstractSynapseDynamicsStructural)
-from spynnaker.pyNN.utilities.bit_field_utilities import (
-    get_estimated_sdram_for_bit_field_region,
-    get_estimated_sdram_for_key_region,
-    exact_sdram_for_bit_field_builder_region)
 from .synapse_io import get_max_row_info
 from .master_pop_table import MasterPopTableAsBinarySearch
 from .generator_data import GeneratorData
