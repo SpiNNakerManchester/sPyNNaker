@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017-2021 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,8 +19,8 @@ from six import string_types
 from six.moves import xrange
 import neo
 import quantities
-from spinn_utilities import logger_utils
 from spinn_utilities.log import FormatAdapter
+from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.globals_variables import get_simulator
@@ -83,7 +83,6 @@ class Recorder(object):
         :param int sampling_interval: the interval to record them
         :param indexes: List of indexes to record or None for all
         :type indexes: list(int) or None
-        :return: None
         """
 
         get_simulator().verify_not_running()
@@ -110,13 +109,13 @@ class Recorder(object):
 
         if variable == "gsyn_exc":
             if not self.__population._vertex.conductance_based:
-                logger_utils.warn_once(
+                warn_once(
                     logger, "You are trying to record the excitatory "
                     "conductance from a model which does not use conductance "
                     "input. You will receive current measurements instead.")
         elif variable == "gsyn_inh":
             if not self.__population._vertex.conductance_based:
-                logger_utils.warn_once(
+                warn_once(
                     logger, "You are trying to record the inhibitory "
                     "conductance from a model which does not use conductance "
                     "input. You will receive current measurements instead.")
@@ -224,8 +223,6 @@ class Recorder(object):
 
     def _turn_off_all_recording(self, indexes=None):
         """ Turns off recording, is used by a pop saying `.record()`
-
-        :rtype: None
         """
         # check for standard record which includes spikes
         if isinstance(self.__population._vertex, AbstractNeuronRecordable):
@@ -249,7 +246,6 @@ class Recorder(object):
         :return: The Neo block
         :rtype: ~neo.core.Block
         """
-
         block = neo.Block()
 
         for previous in range(0, get_simulator().segment_counter):
@@ -257,14 +253,14 @@ class Recorder(object):
                 block, previous, variables, view_indexes)
 
         # add to the segments the new block
-        self._append_current_segment(block, variables, view_indexes, clear)
+        self.__append_current_segment(block, variables, view_indexes, clear)
 
         # add fluff to the neo block
         block.name = self._population.label
         block.description = self._population.describe()
         # pylint: disable=no-member
         block.rec_datetime = block.segments[0].rec_datetime
-        block.annotate(**self._metadata())
+        block.annotate(**self.__metadata())
         if annotations:
             block.annotate(**annotations)
         return block
@@ -322,6 +318,7 @@ class Recorder(object):
             self._data_cache[segment_number] = data_cache
 
     def _filter_recorded(self, filter_ids):
+        # TODO: unused?
         record_ids = list()
         for neuron_id in range(0, len(filter_ids)):
             if filter_ids[neuron_id]:
@@ -352,7 +349,7 @@ class Recorder(object):
             variables.update(self._get_all_recording_variables())
         return variables
 
-    def _append_current_segment(self, block, variables, view_indexes, clear):
+    def __append_current_segment(self, block, variables, view_indexes, clear):
         # build segment for the current data to be gathered in
         segment = neo.Segment(
             name="segment{}".format(get_simulator().segment_counter),
@@ -469,7 +466,7 @@ class Recorder(object):
                 variables.add(possible)
         return variables
 
-    def _metadata(self):
+    def __metadata(self):
         metadata = {
             'size': self._population.size,
             'first_index': 0,
@@ -571,7 +568,7 @@ class Recorder(object):
                       "selective recording is active will result in only " \
                       "the requested neurons being returned in numerical " \
                       "order and without repeats."
-                logger_utils.warn_once(logger, msg)
+                warn_once(logger, msg)
             indexes = numpy.array(data_indexes)
         elif view_indexes == data_indexes:
             indexes = numpy.array(data_indexes)
@@ -609,11 +606,11 @@ def _get_channel_index(ids, block):
     return channel_index
 
 
-def _convert_extracted_data_into_neo_expected_format(
-        signal_array, indexes):
+def _convert_extracted_data_into_neo_expected_format(signal_array, indexes):
     """ Converts data between sPyNNaker format and Neo format
 
     :param ~numpy.ndarray signal_array: Draw data in sPyNNaker format
+    :param list(int) indexes:
     :rtype: ~numpy.ndarray
     """
     processed_data = [

@@ -26,9 +26,10 @@ from spynnaker.pyNN.models.neural_projections import (
     SynapseInformation, ProjectionApplicationEdge)
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neuron import ConnectionHolder
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    FromListConnector)
 
 # pylint: disable=protected-access
-
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
@@ -42,7 +43,6 @@ class PyNNProjectionCommon(object):
     __slots__ = [
         "__has_retrieved_synaptic_list_from_machine",
         "__host_based_synapse_list",
-        "__label",
         "__projection_edge",
         "__requires_mapping",
         "__spinnaker_control",
@@ -54,12 +54,9 @@ class PyNNProjectionCommon(object):
     def __init__(
             self, spinnaker_control, connector, synapse_dynamics_stdp,
             target, pre_synaptic_population, post_synaptic_population,
-            prepop_is_view, postpop_is_view,
-            rng, machine_time_step, label, time_scale_factor):
+            prepop_is_view, postpop_is_view, label):
         """
-        :param spinnaker_control: The simulator engine core.
-        :type spinnaker_control:
-            ~spinn_front_end_common.interface.abstract_spinnaker_base.AbstractSpinnakerBase
+        :param SpiNNaker spinnaker_control: The simulator engine core.
         :param AbstractConnector connector:
             What is the connector for this projection.
         :param AbstractSynapseDynamics synapse_dynamics_stdp:
@@ -69,20 +66,18 @@ class PyNNProjectionCommon(object):
             Where do we connect from?
         :param AbstractPopulationVertex post_synaptic_population:
             Where do we connect to?
-        :param rng:
-        :type rng: ~pyNN.random.NumpyRNG or None
-        :param int machine_time_step:
+        :param bool prepop_is_view:
+        :param bool postpop_is_view:
         :param label: Label for the projection, or None to generate one
         :type label: str or None
-        :param int time_scale_factor:
         """
         # pylint: disable=too-many-arguments, too-many-locals
         self.__spinnaker_control = spinnaker_control
+        machine_time_step = spinnaker_control.machine_time_step
         self.__projection_edge = None
         self.__host_based_synapse_list = None
         self.__has_retrieved_synaptic_list_from_machine = False
         self.__requires_mapping = True
-        self.__label = None
         pre_vertex = pre_synaptic_population._get_vertex
         post_vertex = post_synaptic_population._get_vertex
 
@@ -98,6 +93,11 @@ class PyNNProjectionCommon(object):
                 "Synapse target {} not found in {}".format(
                     target, post_synaptic_population.label))
 
+        # as a from-list connector can have plastic parameters, grab those (
+        # if any) and add them to the synapse dynamics object
+        if isinstance(connector, FromListConnector):
+            connector._apply_parameters_to_synapse_type(synapse_type)
+
         # round the delays to multiples of full timesteps
         # (otherwise SDRAM estimation calculations can go wrong)
         if not isinstance(synapse_dynamics_stdp.delay, RandomDistribution):
@@ -111,6 +111,8 @@ class PyNNProjectionCommon(object):
         #  when needed)
         post_vertex.set_synapse_dynamics(synapse_dynamics_stdp)
 
+        # get rng if needed
+        rng = connector.rng if hasattr(connector, "rng") else None
         # Set and store synapse information for future processing
         self.__synapse_information = SynapseInformation(
             connector, pre_synaptic_population, post_synaptic_population,

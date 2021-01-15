@@ -423,3 +423,11 @@ class FromListConnector(AbstractConnector):
                    (self.__sources <= _pre_slice.hi_atom) &
                    (_post_slice.lo_atom <= self.__targets) &
                    (self.__targets <= _post_slice.hi_atom))
+
+    def _apply_parameters_to_synapse_type(self, synapse_type):
+        """
+        :param AbstractStaticSynapseDynamics synapse_type:
+        """
+        if self.__extra_parameter_names:
+            for i, name in enumerate(self.__extra_parameter_names):
+                synapse_type.set_value(name, self.__extra_parameters[:, i])

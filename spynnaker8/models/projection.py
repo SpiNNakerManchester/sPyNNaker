@@ -13,22 +13,20 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
 import functools
+import logging
 import numpy
 from six import string_types
-from pyNN import common as pynn_common, recording
+from pyNN import common as pynn_common
+from pyNN.recording.files import StandardTextFile
 from pyNN.space import Space as PyNNSpace
 from spinn_utilities.logger_utils import warn_once
-from spinn_front_end_common.utilities import globals_variables
+from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnectorSupportsViewsOnMachine)
-from spynnaker8.models.connectors import FromListConnector
-from spynnaker8.models.synapse_dynamics import SynapseDynamicsStatic
-# This line has to come in this order as it otherwise causes a circular
-# dependency
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    SynapseDynamicsStatic)
 from spynnaker.pyNN.models.pynn_projection_common import PyNNProjectionCommon
 from spynnaker._version import __version__
 from spynnaker8.models.populations import Population, PopulationView
@@ -41,10 +39,7 @@ class Projection(PyNNProjectionCommon):
     """
     # pylint: disable=redefined-builtin
     __slots__ = [
-        "__simulator",
-        "__label"]
-
-    _static_synapse_class = SynapseDynamicsStatic
+        "__proj_label"]
 
     def __init__(
             self, pre_synaptic_population, post_synaptic_population,
@@ -64,65 +59,55 @@ class Projection(PyNNProjectionCommon):
         """
         # pylint: disable=too-many-arguments
         if source is not None:
-            raise InvalidParameterType(
+            raise NotImplementedError(
                 "sPyNNaker {} does not yet support multi-compartmental "
                 "cells.".format(__version__))
 
-        self._check_population_param(pre_synaptic_population, connector)
-        self._check_population_param(post_synaptic_population, connector)
+        pre_is_view = self.__check_population(
+            pre_synaptic_population, connector)
+        post_is_view = self.__check_population(
+            post_synaptic_population, connector)
 
         # set space object if not set
         if space is None:
             space = PyNNSpace()
 
-        # set the simulator object correctly.
-        self.__simulator = globals_variables.get_simulator()
-
         # set label
-        self.__label = label
+        self.__proj_label = label
         if label is None:
             # set the projection's label here, but allow the edge label
             # to be set lower down if necessary
-            self.__label = "from pre {} to post {} with connector {}".format(
-                pre_synaptic_population.label, post_synaptic_population.label,
-                connector)
+            self.__proj_label = (
+                "from pre {} to post {} with connector {}".format(
+                    pre_synaptic_population.label,
+                    post_synaptic_population.label, connector))
 
+        # Handle default synapse type
         if synapse_type is None:
             synapse_type = SynapseDynamicsStatic()
 
         # set the space function as required
         connector.set_space(space)
 
-        # as a from list connector can have plastic parameters, grab those (
-        # if any and add them to the synapse dynamics object)
-        if isinstance(connector, FromListConnector):
-            synapse_plastic_parameters = connector.get_extra_parameters()
-            if synapse_plastic_parameters is not None:
-                for i, parameter in enumerate(
-                        connector.get_extra_parameter_names()):
-                    synapse_type.set_value(
-                        parameter, synapse_plastic_parameters[:, i])
-
-        # set rng if needed
-        rng = None
-        if hasattr(connector, "rng"):
-            rng = connector.rng
-
         super(Projection, self).__init__(
             connector=connector, synapse_dynamics_stdp=synapse_type,
-            target=receptor_type, spinnaker_control=self.__simulator,
+            target=receptor_type, spinnaker_control=get_simulator(),
             pre_synaptic_population=pre_synaptic_population,
             post_synaptic_population=post_synaptic_population,
-            prepop_is_view=isinstance(pre_synaptic_population,
-                                      PopulationView),
-            postpop_is_view=isinstance(post_synaptic_population,
-                                       PopulationView),
-            rng=rng, machine_time_step=self.__simulator.machine_time_step,
-            label=label, time_scale_factor=self.__simulator.time_scale_factor)
+            prepop_is_view=pre_is_view, postpop_is_view=post_is_view,
+            label=label)
 
-    def _check_population_param(self, param, connector):
+    @staticmethod
+    def __check_population(param, connector):
+        """
+        :param ~spynnaker8.models.populations.PopulationBase param:
+        :param AbstractConnector connector:
+        :return: Whether the parameter is a view
+        :rtype: bool
+        """
         if isinstance(param, Population):
-            return  # Projections definitely work from Populations
+            # Projections definitely work from Populations
+            return False
         if not isinstance(param, PopulationView):
             raise ConfigurationException(
                 "Unexpected parameter type {}. Expected Population".format(
@@ -138,13 +123,7 @@ class Projection(PyNNProjectionCommon):
                 "Projections over views only work on contiguous arrays, "
                 "e.g. view = pop[n:m], not view = pop[n,m]")
         # Projection is compatible with PopulationView
-
-    def __len__(self):
-        raise NotImplementedError
-
-    def set(self, **attributes):
-        """ NOT IMPLEMENTED """
-        raise NotImplementedError
+        return True
 
     def get(self, attribute_names, format,  # @ReservedAssignment
             gather=True, with_address=True, multiple_synapses='last'):
@@ -169,20 +148,18 @@ class Projection(PyNNProjectionCommon):
         # pylint: disable=too-many-arguments
         if not gather:
             logger.warning("sPyNNaker always gathers from every core.")
-
-        return self._get_data(
-            attribute_names, format, with_address, multiple_synapses)
-
-    def _get_data(
-            self, attribute_names, format,  # @ReservedAssignment
-            with_address, multiple_synapses='last', notify=None):
-        """ Internal data getter to add notify option
-        """
-        # pylint: disable=too-many-arguments
         if multiple_synapses != 'last':
             raise ConfigurationException(
                 "sPyNNaker only recognises multiple_synapses == last")
 
+        return self.__get_data(
+            attribute_names, format, with_address, notify=None)
+
+    def __get_data(
+            self, attribute_names, format,  # @ReservedAssignment
+            with_address, notify):
+        """ Internal data getter to add notify option
+        """
         # fix issue with 1 versus many
         if isinstance(attribute_names, string_types):
             attribute_names = [attribute_names]
@@ -215,7 +192,108 @@ class Projection(PyNNProjectionCommon):
         return self._get_synaptic_data(
             format == "list", data_items, fixed_values, notify=notify)
 
+    @staticmethod
+    def __save_callback(save_file, metadata, data):
+        # Convert structured array to normal numpy array
+        if hasattr(data, "dtype") and hasattr(data.dtype, "names"):
+            dtype = [(name, "<f8") for name in data.dtype.names]
+            data = data.astype(dtype)
+        data = numpy.nan_to_num(data)
+        if isinstance(save_file, string_types):
+            data_file = StandardTextFile(save_file, mode='wb')
+        else:
+            data_file = save_file
+        try:
+            data_file.write(data, metadata)
+        finally:
+            data_file.close()
+
+    def save(
+            self, attribute_names, file, format='list',  # @ReservedAssignment
+            gather=True, with_address=True):
+        """ Print synaptic attributes (weights, delays, etc.) to file. In the\
+            array format, zeros are printed for non-existent connections.\
+            Values will be expressed in the standard PyNN units (i.e., \
+            millivolts, nanoamps, milliseconds, microsiemens, nanofarads, \
+            event per second).
+
+        :param attribute_names:
+        :type attribute_names: str or list(str)
+        :param file: filename or open handle (which will be closed)
+        :type file: str or pyNN.recording.files.BaseFile
+        :param str format:
+        :param bool gather: Ignored
+
+            .. note::
+                SpiNNaker always gathers.
+
+        :param bool with_address:
+        """
+        if not gather:
+            warn_once(
+                logger, "sPyNNaker only supports gather=True. We will run "
+                "as if gather was set to True.")
+        if isinstance(attribute_names, string_types):
+            attribute_names = [attribute_names]
+        # pylint: disable=too-many-arguments
+        if attribute_names in (['all'], ['connections']):
+            attribute_names = \
+                self._projection_edge.post_vertex.synapse_dynamics.\
+                get_parameter_names()
+        metadata = {"columns": attribute_names}
+        if with_address:
+            metadata["columns"] = ["i", "j"] + list(metadata["columns"])
+        self.__get_data(
+            attribute_names, format, with_address,
+            notify=functools.partial(self.__save_callback, file, metadata))
+
+    @property
+    def pre(self):
+        """ The pre-population.
+
+        :rtype: PopulationBase
+        """
+        return self._synapse_information.pre_population
+
+    @property
+    def post(self):
+        """ The post-population.
+
+        :rtype: PopulationBase
+        """
+        return self._synapse_information.post_population
+
+    @property
+    def label(self):
+        """
+        :rtype: str
+        """
+        return self.__proj_label
+
+    def __repr__(self):
+        return "projection {}".format(self.__proj_label)
+
+    # -----------------------------------------------------------------
+
+    def __len__(self):
+        """
+        .. warning::
+            Not implemented.
+        """
+        raise NotImplementedError
+
     def __iter__(self):
+        """
+        .. warning::
+            Not implemented.
+        """
+        raise NotImplementedError
+
+    def set(self, **attributes):
+        """
+        .. warning::
+            Not implemented.
+        """
         raise NotImplementedError
 
     def getWeights(self, format='list',  # @ReservedAssignment
@@ -297,83 +375,3 @@ class Projection(PyNNProjectionCommon):
             " instead")
         pynn_common.Projection.weightHistogram(
             self, min=min, max=max, nbins=nbins)
-
-    def __save_callback(self, save_file, metadata, data):
-        # Convert structured array to normal numpy array
-        if hasattr(data, "dtype") and hasattr(data.dtype, "names"):
-            dtype = [(name, "<f8") for name in data.dtype.names]
-            data = data.astype(dtype)
-        data = numpy.nan_to_num(data)
-        if isinstance(save_file, string_types):
-            data_file = recording.files.StandardTextFile(save_file, mode='wb')
-        else:
-            data_file = save_file
-        try:
-            data_file.write(data, metadata)
-        finally:
-            data_file.close()
-
-    def save(
-            self, attribute_names, file, format='list',  # @ReservedAssignment
-            gather=True, with_address=True):
-        """ Print synaptic attributes (weights, delays, etc.) to file. In the\
-            array format, zeros are printed for non-existent connections.\
-            Values will be expressed in the standard PyNN units (i.e., \
-            millivolts, nanoamps, milliseconds, microsiemens, nanofarads, \
-            event per second).
-
-        :param attribute_names:
-        :type attribute_names: str or list(str)
-        :param file: filename or open handle (which will be closed)
-        :type file: str or pyNN.recording.files.BaseFile
-        :param str format:
-        :param bool gather: Ignored
-
-            .. note::
-                SpiNNaker always gathers.
-
-        :param bool with_address:
-        """
-        if not gather:
-            warn_once(
-                logger, "sPyNNaker only supports gather=True. We will run "
-                "as if gather was set to True.")
-        if isinstance(attribute_names, string_types):
-            attribute_names = [attribute_names]
-        # pylint: disable=too-many-arguments
-        if attribute_names in (['all'], ['connections']):
-            attribute_names = \
-                self._projection_edge.post_vertex.synapse_dynamics.\
-                get_parameter_names()
-        metadata = {"columns": attribute_names}
-        if with_address:
-            metadata["columns"] = ["i", "j"] + list(metadata["columns"])
-        self._get_data(
-            attribute_names, format, with_address,
-            notify=functools.partial(self.__save_callback, file, metadata))
-
-    @property
-    def pre(self):
-        """ The pre-population.
-
-        :rtype: PopulationBase
-        """
-        return self._synapse_information.pre_population
-
-    @property
-    def post(self):
-        """ The post-population.
-
-        :rtype: PopulationBase
-        """
-        return self._synapse_information.post_population
-
-    @property
-    def label(self):
-        """
-        :rtype: str
-        """
-        return self.__label
-
-    def __repr__(self):
-        return "projection {}".format(self.__label)
