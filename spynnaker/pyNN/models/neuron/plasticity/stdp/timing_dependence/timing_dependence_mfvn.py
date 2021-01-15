@@ -19,12 +19,14 @@ class TimingDependenceMFVN(AbstractTimingDependence):
         "_tau_plus",
         "_tau_plus_last_entry",
         "_beta",
-        "_sigma"
+        "_sigma",
+        "_kernel_scaling"
         ]
 
-    def __init__(self, tau_plus=20.0, tau_minus=20.0, beta=10, sigma=200):
+    def __init__(self, tau_plus=20.0, tau_minus=20.0, beta=10, sigma=200, kernel_scaling=1.0):
         self._tau_plus = tau_plus
         self._tau_minus = tau_minus
+        self._kernel_scaling = kernel_scaling
 
         self._synapse_structure = SynapseStructureWeightOnly()
 
@@ -90,7 +92,8 @@ class TimingDependenceMFVN(AbstractTimingDependence):
             beta=self._beta,
             time_probe=None,
             lut_size=LUT_SIZE,
-            shift=0)
+            shift=0,
+            kernel_scaling=self._kernel_scaling)
 
     @property
     def synaptic_structure(self):

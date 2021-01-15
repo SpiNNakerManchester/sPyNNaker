@@ -2,14 +2,15 @@ from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common \
     import write_pfpc_lut, get_lut_provenance
 from .abstract_timing_dependence import AbstractTimingDependence
-from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure\
+from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure \
     import SynapseStructureWeightOnly
 
-
 import logging
+
 logger = logging.getLogger(__name__)
 
 LUT_SIZE = 256
+
 
 class TimingDependencePFPC(AbstractTimingDependence):
     __slots__ = [
@@ -18,13 +19,15 @@ class TimingDependencePFPC(AbstractTimingDependence):
         "_tau_minus_last_entry",
         "_tau_plus",
         "_tau_plus_last_entry",
-        "_t_peak"]
+        "_t_peak",
+        "_kernel_scaling"]
 
     def __init__(self, tau_plus=20.0, tau_minus=20.0,
-                 t_peak=100):
+                 t_peak=100, kernel_scaling=1.0):
         self._tau_plus = tau_plus
         self._tau_minus = tau_minus
         self._t_peak = t_peak
+        self._kernel_scaling = kernel_scaling
 
         self._synapse_structure = SynapseStructureWeightOnly()
 
@@ -59,11 +62,11 @@ class TimingDependencePFPC(AbstractTimingDependence):
     def pre_trace_n_bytes(self):
 
         # Here we will record the last 16 spikes, these will be 32-bit quantities,
-        return (16 * 4) + (2 * 16) # 16 4-byte entries, plus one counter for the number of spikes
+        return (16 * 4) + (2 * 16)  # 16 4-byte entries, plus one counter for the number of spikes
 
     @overrides(AbstractTimingDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self):
-        return 2 * LUT_SIZE #in bytes: 256 * 16 bit values
+        return 2 * LUT_SIZE  # in bytes: 256 * 16 bit values
 
     @property
     def n_weight_terms(self):
@@ -82,7 +85,9 @@ class TimingDependencePFPC(AbstractTimingDependence):
             peak_time=self._t_peak,
             time_probe=None,
             lut_size=LUT_SIZE,
-            shift=0)
+            shift=0,
+            kernel_scaling=self._kernel_scaling
+        )
 
     @property
     def synaptic_structure(self):
