@@ -297,8 +297,8 @@ bool synapse_dynamics_process_plastic_synapses(
         // EDIT THIS TO BE *plastic_words ONCE THE WEIGHT UPDATE IS ADAPTED
         REAL curr_weight = synapse_structure_get_final_weight(final_state);
 
-        io_printf(IO_BUF, "plast ring buff index %d, syn type %d, neu index %d\n", ring_buffer_index);
-        io_printf(IO_BUF, "IP %k t %d\n", curr_weight, time);
+        //io_printf(IO_BUF, "plast ring buff index %d, syn type %d, neu index %d\n", ring_buffer_index);
+        //io_printf(IO_BUF, "IP %k t %d\n", curr_weight, time);
 
         // Add the current rate contribution with the new rate
         REAL accumulation = ring_buffers[ring_buffer_index] +

@@ -427,8 +427,8 @@ static inline REAL* neuron_impl_post_rates(index_t neuron_index) {
     postsynaptic_rates[1] =
         set_spike_source_rate(neuron->U_membrane * neuron->plasticity_rate_multiplier) - set_spike_source_rate(neuron->Vb);
 
-    io_printf(IO_BUF, "va %k, vb %k, u %k\n", neuron->Va, neuron->Vb, neuron->U_membrane);
-    io_printf(IO_BUF, "Rates diff ap %k, bas %k\n", postsynaptic_rates[0], postsynaptic_rates[1]);
+    //io_printf(IO_BUF, "va %k, vb %k, u %k\n", neuron->Va, neuron->Vb, neuron->U_membrane);
+    //io_printf(IO_BUF, "Rates diff ap %k, bas %k\n", postsynaptic_rates[0], postsynaptic_rates[1]);
 
     return postsynaptic_rates;
 

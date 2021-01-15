@@ -240,8 +240,6 @@ static void matrix_generator_static_write_row(
         *fixed[delay.stage]++ = word;
 
         id_words_per_row[delay.stage]++;
-
-        io_printf(IO_BUF, "delay stage %d ptr %x\n", delay.stage, fixed[delay.stage]);
     }
 
     for(uint32_t i = 0; i < max_stage; i++) {
@@ -260,15 +258,11 @@ static void matrix_generator_static_write_row(
 
                     *fixed[i]++ = 0;
                     //id_words_per_row[i]++;
-
-                    io_printf(IO_BUF, "i %d ptr %x\n", i, fixed[i]);
                 }
             }
 
             // Save the fixed size (n of written bytes)
             row_address[i][STATIC_FIXED_PLASTIC_SIZE] = id_words_per_row[i];
-
-            io_printf(IO_BUF, "stat size %d , row size %d\n", row_address[i][STATIC_FIXED_FIXED_SIZE], synaptic_matrix - (address_t) fixed[i]);
         }
     }
 

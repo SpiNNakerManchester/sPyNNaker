@@ -330,14 +330,14 @@ bool synapse_dynamics_process_plastic_synapses(
             final_state = plasticity_update_apical_synapse(
                     time, last_pre_rate, current_state, &post_event_history[index]);
 
-            io_printf(IO_BUF, "apical ");
+            //io_printf(IO_BUF, "apical ");
         }
         else if (type == 1) {
 
             final_state = plasticity_update_basal_synapse(
                     time, last_pre_rate, current_state, &post_event_history[index]);
 
-            io_printf(IO_BUF, "basal ");
+            //io_printf(IO_BUF, "basal ");
         }
         // LP: THIS CHECK MIGHT BE REMOVED IF WE DECIDE TO CHANGE THE SYNAPSE TYPES
         else {
@@ -353,7 +353,7 @@ bool synapse_dynamics_process_plastic_synapses(
         // EDIT THIS TO BE *plastic_words ONCE THE WEIGHT UPDATE IS ADAPTED
         REAL curr_weight = synapse_structure_get_final_weight(final_state);
 
-        io_printf(IO_BUF, "%k t %d\n", curr_weight, time);
+        //io_printf(IO_BUF, "%k t %d\n", curr_weight, time);
 
         // Add the current rate contribution with the new rate
         REAL accumulation = ring_buffers[ring_buffer_index] +

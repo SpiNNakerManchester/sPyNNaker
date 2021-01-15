@@ -187,8 +187,6 @@ void matrix_generator_stdp_write_row(
             pp_address[i] = (uint32_t *) &row_address[i][
                     STDP_PLASTIC_PLASTIC_OFFSET +
                     obj->n_words_per_pp_row_header];
-
-            io_printf(IO_BUF, "words %d\n", obj->n_words_per_pp_row_header);
         } else {
             pp_address[i] = NULL;
         }
@@ -225,7 +223,6 @@ void matrix_generator_stdp_write_row(
         }
 
         weight_words[obj->weight_word] = weight;
-        io_printf(IO_BUF, "plast weight %k\n", weight_words[obj->weight_word]);
         n_words_per_row[delay.stage] +=
                 obj->n_words_per_pp_synapse;
         space_words[delay.stage] -= obj->n_words_per_pp_synapse;
