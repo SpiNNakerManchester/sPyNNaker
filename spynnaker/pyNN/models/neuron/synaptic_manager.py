@@ -32,7 +32,6 @@ from spinn_front_end_common.utilities.utility_objs\
     .provenance_data_item import ProvenanceDataItem
 
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
-from spynnaker.pyNN.models.abstract_models import AbstractMaxSpikes
 from spynnaker.pyNN.models.neuron.synapse_io import SynapseIORowBased
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsSTDP, SynapseDynamicsStructuralStatic)
