@@ -29,13 +29,15 @@ class AbstractSynapseDynamicsStructural(object):
         Note: At the Application level this will be an estimate.
 
         :param graph: Graph at same level as vertex.
-        :type graph: ApplicationGraph or MachineGraph
+        :type graph: ~pacman.model.graphs.application.ApplicationGraph or
+            ~pacman.model.graphs.machine.MachineGraph
         :param vertex: Vertex at the same level as the graph
-        :type vertex: ApplicationVertex or MachineVertex
+        :type vertex: ~pacman.model.graphs.application.ApplicationVertex or
+            ~pacman.model.graphs.machine.MachineVertex
         :param int n_neurons:
         :return: the size of the parameters, in bytes
         :rtype: int
-        :raises PacmanInvalidParameterException
+        :raises PacmanInvalidParameterException:
         """
 
     @abstractmethod
@@ -47,7 +49,7 @@ class AbstractSynapseDynamicsStructural(object):
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to
         :param int region: region ID
-        :param int machine_time_step: The simulation time step
+        :param float machine_time_step: The simulation time step
         :param list(float) weight_scales: Weight scaling for each synapse type
         :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
             The machine graph
@@ -69,7 +71,7 @@ class AbstractSynapseDynamicsStructural(object):
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         :param ProjectionApplicationEdge app_edge:
         :param SynapseInformation synapse_info:
-        :param ProjectionMachineEdge machine_edge:
+        :param ~pacman.model.graphs.machine.MachineEdge machine_edge:
         """
 
     @abstractproperty

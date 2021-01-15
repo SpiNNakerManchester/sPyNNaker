@@ -33,9 +33,6 @@ from .key_space_tracker import KeySpaceTracker
 from .synaptic_matrix_app import SynapticMatrixApp
 
 
-# Amount to scale synapse SDRAM estimate by to make sure the synapses fit
-_SYNAPSE_SDRAM_OVERSCALE = 1.1
-
 # 1 for n_edges
 # 2 for post_vertex_slice.lo_atom, post_vertex_slice.n_atoms
 # 1 for n_synapse_types
@@ -88,7 +85,7 @@ class SynapticMatrices(object):
         :param int n_synapse_types: The number of synapse types available
         :param int all_single_syn_sz:
             The space available for "direct" or "single" synapses
-        :param .SynapseIO synapse_io: How to read and write synapses
+        :param SynapseIORowBased synapse_io: How to read and write synapses
         :param int synaptic_matrix_region:
             The region where synaptic matrices are stored
         :param int direct_matrix_region:
@@ -155,7 +152,9 @@ class SynapticMatrices(object):
     def synapses_size(self, app_edges):
         """ The size of the synaptic blocks in bytes
 
-        :param app_edges: The incoming application edges
+        :param iterable(~pacman.model.graphs.application.ApplicationEdge) \
+                app_edges:
+            The incoming application edges
         :rtype: int
         """
         # Base size requirements
@@ -173,7 +172,9 @@ class SynapticMatrices(object):
     def size(self, app_edges):
         """ The size required by all parts of the matrices
 
-        :param app_edges: The incoming application edges
+        :param iterable(~pacman.model.graphs.application.ApplicationEdge) \
+                app_edges:
+            The incoming application edges
         :rtype: int
         """
         return (
@@ -184,7 +185,9 @@ class SynapticMatrices(object):
     def __gen_info_size(self, app_edges):
         """ The size in bytes of the synaptic expander parameters
 
-        :param app_edges: The incoming application edges
+        :param iterable(~pacman.model.graphs.application.ApplicationEdge) \
+                app_edges:
+            The incoming application edges
         :rtype: int
         """
         gen_on_machine = False
@@ -206,18 +209,22 @@ class SynapticMatrices(object):
 
     def write_synaptic_matrix_and_master_population_table(
             self, spec, machine_vertex, all_syn_block_sz, weight_scales,
-            routing_info, machine_graph):
+            routing_info, machine_graph, machine_time_step):
         """ Simultaneously generates both the master population table and
             the synaptic matrix.
 
-        :param ~.DataSpecificationGenerator spec: The spec to write to
-        :param .MachineVertex machine_vertex: The machine vertex to write for
+        :param ~data_specification.DataSpecificationGenerator spec:
+            The spec to write to
+        :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:
+            The machine vertex to write for
         :param int all_syn_block_sz:
             The size in bytes of the space reserved for synapses
         :param list(float) weight_scales: The weight scale of each synapse
-        :param .RoutingInfo routing_info:
+        :param ~pacman.model.routing_info.RoutingInfo routing_info:
             The routing information for all edges
-        :param .MachineGraph machine_graph: The machine graph
+        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
+            The machine graph
+        :param float machine_time_step: sim machine time step
         :return: A list of generator data to be written elsewhere
         :rtype: list(GeneratorData)
         """
@@ -267,7 +274,8 @@ class SynapticMatrices(object):
                     generate_on_machine.append(app_matrix)
                 else:
                     block_addr, single_addr = app_matrix.write_matrix(
-                        spec, block_addr, single_addr, single_synapses)
+                        spec, block_addr, single_addr, single_synapses,
+                        machine_time_step)
 
         self.__host_generated_block_addr = block_addr
 
@@ -276,7 +284,7 @@ class SynapticMatrices(object):
         generator_data = list()
         for app_matrix in generate_on_machine:
             block_addr = app_matrix.write_on_chip_matrix_data(
-                generator_data, block_addr)
+                generator_data, block_addr, machine_time_step)
             self.__gen_on_machine = True
 
         self.__on_chip_generated_block_addr = block_addr
@@ -303,23 +311,27 @@ class SynapticMatrices(object):
         """ Convert a list of machine edges to a dict of
             application edge -> list of machine edges, and a key tracker
 
-        :param list(MachineEdge) in_machine_edges: The incoming machine edges
+        :param list(~pacman.model.graphs.machine.MachineEdge) in_machine_edges:
+            The incoming machine edges
         :param RoutingInfo routing_info: Routing information for all edges
         :rtype: tuple(dict, KeySpaceTracker)
         """
         in_edges_by_app_edge = defaultdict(OrderedSet)
         key_space_tracker = KeySpaceTracker()
-        for edge in in_machine_edges:
-            rinfo = routing_info.get_routing_info_for_edge(edge)
+        for machine_edge in in_machine_edges:
+            rinfo = routing_info.get_routing_info_for_edge(machine_edge)
             key_space_tracker.allocate_keys(rinfo)
-            app_edge = edge.app_edge
+            app_edge = machine_edge.app_edge
             if isinstance(app_edge, ProjectionApplicationEdge):
-                in_edges_by_app_edge[app_edge].add(edge)
+                in_edges_by_app_edge[app_edge].add(machine_edge)
             elif isinstance(app_edge, DelayedApplicationEdge):
                 # We need to make sure that if an undelayed edge is filtered
                 # but a delayed one is not, we still pick it up
+                undelayed_machine_edge = (
+                    machine_edge.app_edge.undelayed_edge.get_machine_edge(
+                        machine_edge.pre_vertex, machine_edge.post_vertex))
                 in_edges_by_app_edge[app_edge.undelayed_edge].add(
-                    edge.undelayed_edge)
+                    undelayed_machine_edge)
         return in_edges_by_app_edge, key_space_tracker
 
     @staticmethod
@@ -499,9 +511,15 @@ class SynapticMatrices(object):
         pre_slices = list()
         for m_edge in m_edges:
             # If the edge doesn't have a delay edge, give up
-            if m_edge.delay_edge is None:
+            delayed_app_edge = m_edge.app_edge.delay_edge
+            if delayed_app_edge is None:
                 return None
-            rinfo = routing_info.get_routing_info_for_edge(m_edge.delay_edge)
+            delayed_machine_edge = delayed_app_edge.get_machine_edge(
+                m_edge.pre_vertex, m_edge.post_vertex)
+            if delayed_machine_edge is None:
+                return None
+            rinfo = routing_info.get_routing_info_for_edge(
+                delayed_machine_edge)
             vertex_slice = m_edge.pre_vertex.vertex_slice
             pre_slices.append(vertex_slice)
             # No routing info at all? Must have been filtered, so doesn't work
@@ -517,15 +535,17 @@ class SynapticMatrices(object):
                 app_edge.pre_vertex.n_atoms, pre_slices):
             return None
 
-        return self.__get_app_key_and_mask(keys, mask, app_edge.n_delay_stages,
-                                           key_space_tracker)
+        return self.__get_app_key_and_mask(
+            keys, mask, app_edge.n_delay_stages, key_space_tracker)
 
     def get_connections_from_machine(
             self, transceiver, placement, app_edge, synapse_info):
         """ Get the synaptic connections from the machine
 
-        :param Transceiver transceiver: Used to read the data from the machine
-        :param Placements placements: Where the vertices are on the machine
+        :param ~spinnman.transceiver.Transceiver transceiver:
+            Used to read the data from the machine
+        :param ~pacman.model.placements.Placement placement:
+            Where the vertices are on the machine
         :param ProjectionApplicationEdge app_edge:
             The application edge of the projection
         :param SynapseInformation synapse_info:
@@ -541,8 +561,10 @@ class SynapticMatrices(object):
         """ Fill in any pre-run connection holders for data which is generated
             on the machine, after it has been generated
 
-        :param Transceiver transceiver: How to read the data from the machine
-        :param Placement placement: where the data is to be read from
+        :param ~spinnman.transceiver.Transceiver transceiver:
+            How to read the data from the machine
+        :param ~pacman.model.placements.Placement placement:
+            where the data is to be read from
         """
         for matrix in itervalues(self.__matrices):
             matrix.read_generated_connection_holders(transceiver, placement)
@@ -568,7 +590,7 @@ class SynapticMatrices(object):
             The application edge of the projection
         :param SynapseInformation synapse_info:
             The synapse information of the projection
-        :param ProjectionMachineEdge machine_edge:
+        :param ~pacman.model.graphs.machine.MachineEdge machine_edge:
             The machine edge to get the index of
         """
         matrix = self.__app_matrix(app_edge, synapse_info)

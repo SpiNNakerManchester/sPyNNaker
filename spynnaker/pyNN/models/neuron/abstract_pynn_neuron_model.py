@@ -26,7 +26,7 @@ _population_parameters = {
     "spikes_per_second": None, "ring_buffer_sigma": None,
     "min_weights": None, "weight_random_sigma": None,
     "max_stdp_spike_delta": None, "incoming_spike_buffer_size": None,
-    "drop_late_spikes": None
+    "drop_late_spikes": None, "splitter": None
 }
 
 
@@ -62,11 +62,11 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
             self, n_neurons, label, constraints, spikes_per_second,
             ring_buffer_sigma, min_weights, weight_random_sigma,
             max_stdp_spike_delta, incoming_spike_buffer_size,
-            drop_late_spikes):
+            drop_late_spikes, splitter):
         # pylint: disable=arguments-differ
         max_atoms = self.get_max_atoms_per_core()
         return AbstractPopulationVertex(
             n_neurons, label, constraints, max_atoms, spikes_per_second,
             ring_buffer_sigma, min_weights, weight_random_sigma,
             max_stdp_spike_delta, incoming_spike_buffer_size,
-            self.__model, self, drop_late_spikes)
+            self.__model, self, drop_late_spikes, splitter)

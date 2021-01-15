@@ -39,20 +39,23 @@ extern uint32_t failed_bit_field_reads;
 //!     they don't hit anything
 extern uint32_t bit_field_filtered_packets;
 
-//! \brief Sets up the table
+//! \brief Set up the table
 //! \param[in] table_address: The address of the start of the table data
 //! \param[in] synapse_rows_address: The address of the start of the synapse
 //!                                  data
 //! \param[in] direct_rows_address: The address of the start of the direct
 //!                                 synapse data
-//! \param[in] bitfield_address: The address of the start of the bitfield data
 //! \param[out] row_max_n_words: Updated with the maximum length of any row in
 //!                              the table in words
 //! \return True if the table was initialised successfully, False otherwise
 bool population_table_initialise(
         address_t table_address, address_t synapse_rows_address,
-        address_t direct_rows_address, filter_region_t *bitfield_address,
-        uint32_t *row_max_n_words);
+        address_t direct_rows_address, uint32_t *row_max_n_words);
+
+//! \brief Initialise the bitfield filtering system.
+//! \param[in] filter_region: Where the bitfield configuration is
+//! \return True on success
+bool population_table_load_bitfields(filter_region_t *filter_region);
 
 //! \brief Get the first row data for the given input spike
 //! \param[in] spike: The spike received
@@ -60,7 +63,8 @@ bool population_table_initialise(
 //! \param[out] n_bytes_to_transfer: Updated with the number of bytes to read
 //! \return True if there is a row to read, False if not
 bool population_table_get_first_address(
-        spike_t spike, address_t* row_address, size_t* n_bytes_to_transfer);
+        spike_t spike, synaptic_row_t* row_address,
+        size_t* n_bytes_to_transfer);
 
 //! \brief Get the next row data for a previously given spike.  If no spike has
 //!        been given, return False.
@@ -69,7 +73,7 @@ bool population_table_get_first_address(
 //! \param[out] n_bytes_to_transfer: Updated with the number of bytes to read
 //! \return True if there is a row to read, False if not
 bool population_table_get_next_address(
-        spike_t *spike, address_t* row_address, size_t* n_bytes_to_transfer);
-
+        spike_t *spike, synaptic_row_t* row_address,
+        size_t* n_bytes_to_transfer);
 
 #endif // _POPULATION_TABLE_H_

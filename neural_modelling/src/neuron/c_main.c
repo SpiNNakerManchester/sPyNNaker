@@ -134,7 +134,7 @@ static void c_main_store_provenance_data(address_t provenance_region) {
 
     // store the data into the provenance data region
     prov->n_pre_synaptic_events = synapses_get_pre_synaptic_events();
-    prov->n_synaptic_weight_saturations = synapses_get_saturation_count();
+    prov->n_synaptic_weight_saturations = synapses_saturation_count;
     prov->n_input_buffer_overflows = spike_processing_get_buffer_overflows();
     prov->current_timer_tick = time;
     prov->n_plastic_synaptic_weight_saturations =
@@ -217,9 +217,7 @@ static bool initialise(void) {
     if (!population_table_initialise(
             data_specification_get_region(POPULATION_TABLE_REGION, ds_regions),
             data_specification_get_region(SYNAPTIC_MATRIX_REGION, ds_regions),
-            direct_synapses_address,
-            data_specification_get_region(BIT_FIELD_FILTER_REGION, ds_regions),
-            &row_max_n_words)) {
+            direct_synapses_address, &row_max_n_words)) {
         return false;
     }
 
@@ -247,6 +245,12 @@ static bool initialise(void) {
 
     // Setup profiler
     profiler_init(data_specification_get_region(PROFILER_REGION, ds_regions));
+
+    // Do bitfield configuration last to only use any unused memory
+    if (!population_table_load_bitfields(
+            data_specification_get_region(BIT_FIELD_FILTER_REGION, ds_regions))) {
+        return false;
+    }
 
     print_post_to_pre_entry();
 
@@ -295,7 +299,7 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
 
     /* if a fixed number of simulation ticks that were specified at startup
      * then do reporting for finishing */
-    if (infinite_run != TRUE && time >= simulation_ticks) {
+    if (simulation_is_finished()) {
 
         // Enter pause and resume state to avoid another tick
         simulation_handle_pause_resume(resume_callback);

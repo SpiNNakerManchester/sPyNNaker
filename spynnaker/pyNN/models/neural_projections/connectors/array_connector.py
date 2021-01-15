@@ -15,10 +15,11 @@
 
 import logging
 import numpy
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class ArrayConnector(AbstractConnector):
@@ -58,6 +59,10 @@ class ArrayConnector(AbstractConnector):
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
         return self._get_delay_maximum(synapse_info.delays, len(self.__array))
+
+    @overrides(AbstractConnector.get_delay_minimum)
+    def get_delay_minimum(self, synapse_info):
+        return self._get_delay_minimum(synapse_info.delays, len(self.__array))
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(

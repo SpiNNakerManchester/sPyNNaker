@@ -15,6 +15,7 @@
 
 import logging
 from spinn_utilities.overrides import overrides
+from spinn_utilities.log import FormatAdapter
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModelStandard
 from spynnaker.pyNN.models.defaults import default_initial_values,\
@@ -27,7 +28,7 @@ from .external_device_lif_control_vertex import ExternalDeviceLifControlVertex
 from .threshold_type_multicast_device_control import (
     ThresholdTypeMulticastDeviceControl)
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
@@ -101,7 +102,7 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
             self, n_neurons, label, constraints, spikes_per_second,
             ring_buffer_sigma, min_weights, weight_random_sigma,
             max_stdp_spike_delta, incoming_spike_buffer_size,
-            n_steps_per_timestep, drop_late_spikes):
+            n_steps_per_timestep, drop_late_spikes, splitter):
         if n_neurons != len(self._devices):
             raise ConfigurationException(
                 "Number of neurons does not match number of devices in {}"
@@ -112,4 +113,5 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
             self._devices, self._create_edges, max_atoms, self._model, self,
             self._translator, spikes_per_second, label, ring_buffer_sigma,
             min_weights, weight_random_sigma, max_stdp_spike_delta,
-            incoming_spike_buffer_size, constraints, drop_late_spikes)
+            incoming_spike_buffer_size, constraints, drop_late_spikes,
+            splitter)

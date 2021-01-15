@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import collections
-import math
 import numpy
 from six import add_metaclass
 from spinn_utilities.abstract_base import (
@@ -29,7 +28,7 @@ from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION, MICRO_TO_SECOND_CONVERSION,
     BYTES_PER_WORD, BYTES_PER_SHORT)
 from spynnaker.pyNN.models.neural_projections import (
-    ProjectionApplicationEdge, ProjectionMachineEdge)
+    ProjectionApplicationEdge)
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
@@ -89,7 +88,8 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         """
         return 1. / self.f_rew
 
-    @overrides(AbstractSynapseDynamicsStructural.write_structural_parameters)
+    @overrides(AbstractSynapseDynamicsStructural.write_structural_parameters,
+               extend_doc=False)
     def write_structural_parameters(
             self, spec, region, machine_time_step, weight_scales,
             machine_graph, machine_vertex, routing_info, synaptic_matrices):
@@ -103,11 +103,12 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         :type weight_scales: ~numpy.ndarray or list(float)
         :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
             Full machine level network
-        :param MachineVertex machine_vertex:
+        :param AbstractPopulationVertex machine_vertex:
             the vertex for which data specs are being prepared
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
             All of the routing information on the network
         :param SynapticMatrices synaptic_matrices:
+            The synaptic matrices for this vertex
         """
         spec.comment("Writing structural plasticity parameters")
         spec.switch_write_focus(region)
@@ -168,13 +169,13 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         machine_edges = collections.defaultdict(list)
         for machine_edge in machine_graph.get_edges_ending_at_vertex(
                 machine_vertex):
-            if isinstance(machine_edge, ProjectionMachineEdge):
-                for synapse_info in machine_edge.synapse_information:
+            app_edge = machine_edge.app_edge
+            if isinstance(app_edge, ProjectionApplicationEdge):
+                for synapse_info in app_edge.synapse_information:
                     if isinstance(synapse_info.synapse_dynamics,
                                   AbstractSynapseDynamicsStructural):
-                        app_edge = machine_edge.app_edge
                         if app_edge in structural_edges:
-                            if (structural_edges[app_edge] != synapse_info):
+                            if structural_edges[app_edge] != synapse_info:
                                 raise SynapticConfigurationException(
                                    self.PAIR_ERROR)
                         else:
@@ -188,7 +189,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
 
         :param ~data_specification.DataSpecificationGenerator spec:
             the data spec
-        :param MachineVertex machine_vertex:
+        :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:
             the vertex for which data specs are being prepared
         :param int machine_time_step: the duration of a machine time step (ms)
         :param int n_pre_pops: the number of pre-populations
@@ -234,12 +235,15 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
             machine_time_step):
         """
         :param ~data_specification.DataSpecificationGenerator spec:
-        :param MachineVertex machine_vertex:
+        :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:
             the vertex for which data specs are being prepared
         :param list(tuple(ProjectionApplicationEdge,SynapseInformation)) \
                 structural_edges:
-        :param dict(AppEdge, list(MachineEdge) machine_edges_by_app: \
-                map of app edge to associated machine edges
+        :param machine_edges_by_app:
+            map of app edge to associated machine edges
+        :type machine_edges_by_app:
+            dict(~pacman.model.graphs.application.ApplicationEdge,
+            list(~pacman.model.graphs.machine.MachineEdge))
         :param RoutingInfo routing_info:
         :param dict(AbstractSynapseType,float) weight_scales:
         :param SynapticMatrices synaptic_matrices:
@@ -297,7 +301,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         :param ~data_specification.DataSpecificationGenerator spec:
         :param dict(tuple(AbstractPopulationVertex,SynapseInformation),int) \
                 pop_index:
-        :param MachineVertex machine_vertex:
+        :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:
             the vertex for which data specs are being prepared
         """
         # pylint: disable=unsubscriptable-object
@@ -376,11 +380,9 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
             if machine_edges_by_app:
                 n_sub_edges += len(machine_edges_by_app[app_edge])
             else:
-                max_atoms = app_edge.pre_vertex.get_max_atoms_per_core()
-                if app_edge.pre_vertex.n_atoms < max_atoms:
-                    max_atoms = app_edge.pre_vertex.n_atoms
-                n_sub_edges += int(math.ceil(
-                    float(app_edge.pre_vertex.n_atoms) / float(max_atoms)))
+                slices, _ = (
+                    app_edge.pre_vertex.splitter.get_out_going_slices())
+                n_sub_edges = len(slices)
             dynamics = synapse_info.synapse_dynamics
             param_sizes += dynamics.formation\
                 .get_parameters_sdram_usage_in_bytes()
@@ -424,24 +426,24 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
 
     @abstractproperty
     def connections(self):
-        """
-        initial connectivity as defined via connector
-        :rtype dict:
+        """ initial connectivity as defined via connector
+
+        :rtype: dict
         """
 
     @abstractmethod
     def get_seeds(self, app_vertex=None):
-        """
-        Generate a seed for the RNG on chip that is the same for all
-        of the cores that have perform structural updates.
+        """ Generate a seed for the RNG on chip that is the same for all\
+            of the cores that have perform structural updates.
 
         It should be different between application vertices
-            but the same for the same app_vertex
-        It should be different every time called with None
+        but the same for the same app_vertex.
+        It should be different every time called with None.
 
         :param app_vertex:
         :type app_vertex: ApplicationVertex or None
         :return: list of random seed (4 words), generated randomly
+        :rtype: list(int)
         """
 
     def check_initial_delay(self, max_delay_ms):

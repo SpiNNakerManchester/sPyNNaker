@@ -20,7 +20,11 @@ SpiNNaker_PACMAN >= 1!5.1.1, < 1!6.0.0
 SpiNNaker_DataSpecification >= 1!5.1.1, < 1!6.0.0
 spalloc >= 2.0.2, < 3.0.0
 SpiNNFrontEndCommon >= 1!5.1.1, < 1!6.0.0
-numpy
+numpy > 1.13, < 1.17; python_version == '2.7'
+numpy > 1.13, < 1.19; python_version == '3.5'
+numpy > 1.13, < 1.20; python_version == '3.6'
+numpy > 1.13, < 1.21; python_version == '3.7'
+numpy; python_version >= '3.8'
 scipy
 lxml
 six
@@ -29,7 +33,7 @@ quantities >= 0.12.1
 pynn >= 0.9.1, < 0.10
 lazyarray >= 0.2.9, <= 0.4.0
 appdirs >= 1.4.2 , < 2.0.0
-neo >= 0.5.2, < 0.7.0
+neo >= 0.5.2, < 0.9.0
 matplotlib
 # csa  # needed but excluded due to readthedocs
 # spinnaker_tools

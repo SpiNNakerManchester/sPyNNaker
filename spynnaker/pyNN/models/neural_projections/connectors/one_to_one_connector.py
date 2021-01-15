@@ -15,6 +15,7 @@
 
 import logging
 import numpy
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
@@ -22,7 +23,7 @@ from .abstract_generate_connector_on_machine import (
 from .abstract_connector_supports_views_on_machine import (
     AbstractConnectorSupportsViewsOnMachine)
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class OneToOneConnector(AbstractGenerateConnectorOnMachine,
@@ -47,6 +48,12 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
         return self._get_delay_maximum(
+            synapse_info.delays,
+            max(synapse_info.n_pre_neurons, synapse_info.n_post_neurons))
+
+    @overrides(AbstractConnector.get_delay_minimum)
+    def get_delay_minimum(self, synapse_info):
+        return self._get_delay_minimum(
             synapse_info.delays,
             max(synapse_info.n_pre_neurons, synapse_info.n_post_neurons))
 

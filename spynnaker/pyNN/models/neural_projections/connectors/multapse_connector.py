@@ -18,6 +18,7 @@ import math
 import numpy.random
 from six import raise_from
 from spinn_utilities.abstract_base import abstractmethod
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.common import Slice
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
@@ -31,7 +32,7 @@ from .abstract_connector_supports_views_on_machine import (
 
 N_GEN_PARAMS = 8
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class MultapseConnector(AbstractGenerateConnectorOnMachine,
@@ -89,6 +90,11 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
         return self._get_delay_maximum(
+            synapse_info.delays, self.__num_synapses)
+
+    @overrides(AbstractConnector.get_delay_minimum)
+    def get_delay_minimum(self, synapse_info):
+        return self._get_delay_minimum(
             synapse_info.delays, self.__num_synapses)
 
     def _update_synapses_per_post_vertex(self, pre_slices, post_slices):

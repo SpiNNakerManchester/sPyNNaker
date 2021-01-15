@@ -42,6 +42,6 @@ formation_params_t *synaptogenesis_formation_init(uint8_t **data);
 //! \return if row was modified
 static inline bool synaptogenesis_formation_rule(
         current_state_t *current_state, const formation_params_t *params,
-        uint32_t time, address_t row);
+        uint32_t time, synaptic_row_t row);
 
 #endif // _FORMATION_H_

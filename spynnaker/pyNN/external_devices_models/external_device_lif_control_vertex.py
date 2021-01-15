@@ -15,6 +15,7 @@
 
 from collections import OrderedDict
 import logging
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
     FixedKeyAndMaskConstraint)
@@ -26,7 +27,7 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 from .abstract_ethernet_controller import AbstractEthernetController
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class ExternalDeviceLifControlVertex(
@@ -75,6 +76,9 @@ class ExternalDeviceLifControlVertex(
         :param float weight_random_sigma:
         :param float max_stdp_spike_delta:
         :param int incoming_spike_buffer_size:
+        :param splitter: splitter from app to machine
+        :type splitter: None or
+            ~pacman.model.partitioner_splitters.abstract_splitters.AbstractSplitterCommon
         :param list(~pacman.model.constraints.AbstractConstraint) constraints:
         """
         # pylint: disable=too-many-arguments, too-many-locals

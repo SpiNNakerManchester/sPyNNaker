@@ -23,6 +23,8 @@ class InputTypeCurrent(AbstractInputType):
     __slots__ = []
 
     def __init__(self):
+        """
+        """
         super(InputTypeCurrent, self).__init__([])
 
     @overrides(AbstractInputType.get_n_cpu_cycles)

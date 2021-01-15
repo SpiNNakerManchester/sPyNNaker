@@ -61,8 +61,7 @@ class PyNNPopulationCommon(object):
         "_vertex_changeable_after_run",
         "_vertex_contains_units",
         "_vertex_population_initializable",
-        "_vertex_population_settable",
-        "_vertex_read_parameters_before_set"]
+        "_vertex_population_settable"]
 
     def __init__(
             self, spinnaker_control, size, label, constraints, model,
@@ -79,7 +78,7 @@ class PyNNPopulationCommon(object):
             How do we constrain where to put things on SpiNNaker
         :param model: What neuron model is being run by this population
         :type model:
-            AbstractPyNNModel or
+            ~spynnaker.pyNN.models.AbstractPyNNModel or
             ~pacman.model.graphs.application.ApplicationVertex
         :param structure: How the neurons are arranged in space
         :type structure: ~pyNN.space.BaseStructure or None
@@ -137,8 +136,6 @@ class PyNNPopulationCommon(object):
             isinstance(self.__vertex, AbstractPopulationInitializable)
         self._vertex_changeable_after_run = \
             isinstance(self.__vertex, AbstractChangableAfterRun)
-        self._vertex_read_parameters_before_set = \
-            isinstance(self.__vertex, AbstractReadParametersBeforeSet)
         self._vertex_contains_units = \
             isinstance(self.__vertex, AbstractContainsUnits)
 
@@ -185,6 +182,15 @@ class PyNNPopulationCommon(object):
     @staticmethod
     def _process_additional_params(
             additional_parameters, population_parameters):
+        """ essential method for allowing things like splitter objects at\
+            pop level
+
+        :param additional_parameters: the additional params handed down from
+            user
+        :param population_parameters: the additional params the vertex can
+            support.
+        :return: the list of params that are accepted.
+        """
         for key in additional_parameters.keys():
             if key in population_parameters:
                 population_parameters[key] = additional_parameters[key]
@@ -261,13 +267,13 @@ class PyNNPopulationCommon(object):
         """ Get the values of a parameter for every local cell in the\
             population.
 
-        :param parameter_names: Name of parameter. This is either a single\
+        :param parameter_names: Name of parameter. This is either a single
             string or a list of strings
         :type parameter_names: str or iterable(str)
         :param bool gather: pointless on sPyNNaker
         :param bool simplify: ignored
-        :return: A single list of values (or possibly a single value) if\
-            paramter_names is a string, or a dict of these if parameter names\
+        :return: A single list of values (or possibly a single value) if
+            paramter_names is a string, or a dict of these if parameter names
             is a list.
         :rtype: str or list(str) or dict(str,str) or dict(str,list(str))
         """
@@ -292,15 +298,15 @@ class PyNNPopulationCommon(object):
         """ Get the values of a parameter for the selected cell in the\
             population.
 
-        :param selector: a description of the subrange to accept. \
-            Or None for all. See: \
+        :param selector: a description of the subrange to accept.
+            Or None for all. See:
             :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
         :type selector: slice or int or iterable(bool) or iterable(int)
-        :param parameter_names: Name of parameter. This is either a\
+        :param parameter_names: Name of parameter. This is either a
             single string or a list of strings
         :type parameter_names: str or iterable(str)
-        :return: A single list of values (or possibly a single value) if\
-            paramter_names is a string or a dict of these if parameter names\
+        :return: A single list of values (or possibly a single value) if
+            paramter_names is a string or a dict of these if parameter names
             is a list.
         :rtype: str or list(str) or dict(str,str) or dict(str,list(str))
         """
@@ -447,9 +453,9 @@ class PyNNPopulationCommon(object):
     def set(self, parameter, value=None):
         """ Set one or more parameters for every cell in the population.
 
-        param can be a dict, in which case value should not be supplied, or a\
-        string giving the parameter name, in which case value is the parameter\
-        value. value can be a numeric value, or list of such\
+        param can be a dict, in which case value should not be supplied, or a
+        string giving the parameter name, in which case value is the parameter
+        value. value can be a numeric value, or list of such
         (e.g. for setting spike times)::
 
             p.set("tau_m", 20.0).
@@ -474,8 +480,8 @@ class PyNNPopulationCommon(object):
     def set_by_selector(self, selector, parameter, value=None):
         """ Set one or more parameters for selected cell in the population.
 
-        param can be a dict, in which case value should not be supplied, or a\
-        string giving the parameter name, in which case value is the parameter\
+        param can be a dict, in which case value should not be supplied, or a
+        string giving the parameter name, in which case value is the parameter
         value. value can be a numeric value, or list of such
         (e.g. for setting spike times)::
 
@@ -507,21 +513,21 @@ class PyNNPopulationCommon(object):
 
         # If the tools have run before, and not reset, and the read
         # hasn't already been done, read back the data
-        if globals_variables.get_simulator().has_ran \
-                and self._vertex_read_parameters_before_set \
-                and not self.__has_read_neuron_parameters_this_run \
-                and not globals_variables.get_simulator().use_virtual_board:
+        if (globals_variables.get_simulator().has_ran
+                and not self.__has_read_neuron_parameters_this_run
+                and not globals_variables.get_simulator().use_virtual_board):
             # go through each machine vertex and read the neuron parameters
             # it contains
             for machine_vertex in self.__vertex.machine_vertices:
-                # tell the core to rewrite neuron params back to the
-                # SDRAM space.
-                placement = globals_variables.get_simulator().placements.\
-                    get_placement_of_vertex(machine_vertex)
+                if isinstance(machine_vertex, AbstractReadParametersBeforeSet):
+                    # tell the core to rewrite neuron params back to the
+                    # SDRAM space.
+                    placement = globals_variables.get_simulator().\
+                        placements.get_placement_of_vertex(machine_vertex)
 
-                self.__vertex.read_parameters_from_machine(
-                    globals_variables.get_simulator().transceiver, placement,
-                    machine_vertex.vertex_slice)
+                    machine_vertex.read_parameters_from_machine(
+                        globals_variables.get_simulator().transceiver,
+                        placement, machine_vertex.vertex_slice)
 
             self.__has_read_neuron_parameters_this_run = True
 
@@ -670,7 +676,7 @@ class PyNNPopulationCommon(object):
         # Allow a float which has a near int value
         temp = int(round(size))
         if abs(temp - size) < 0.001:
-            logger.warning("Size of the population rounded "
+            logger.warning("Size of the population {} rounded "
                            "from {} to {}. Please use int values for size",
                            label, size, temp)
             return temp

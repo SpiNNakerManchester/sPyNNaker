@@ -24,12 +24,14 @@ import pytest
 from tempfile import mkdtemp
 
 import spinn_utilities.conf_loader as conf_loader
+from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
 from spinn_utilities.overrides import overrides
 from spinn_machine import SDRAM
 from pacman.model.placements import Placement
 from pacman.model.resources import ResourceContainer
 from pacman.model.graphs.common import Slice
-from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
+from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex, \
+    MachineEdge
 from pacman.model.routing_info import (
     RoutingInfo, PartitionRoutingInfo, BaseKeyAndMask)
 from pacman.model.graphs.application import ApplicationVertex
@@ -57,13 +59,19 @@ from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
 from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
     .elimination import RandomByWeightElimination
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
-from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
-from unittests.mocks import MockSimulator
+from spynnaker.pyNN.models.utility_models.delays import (
+    DelayExtensionVertex, DelayExtensionMachineVertex)
+from spynnaker.pyNN.extra_algorithms.splitter_components.\
+    splitter_delay_vertex_slice import SplitterDelayVertexSlice
 from pacman.model.placements.placements import Placements
 from pacman.model.graphs.application.application_graph import ApplicationGraph
 from data_specification.constants import MAX_MEM_REGIONS
 from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
 import io
+from unittests.mocks import MockSimulator, MockPopulation
+from pacman.model.partitioner_splitters import SplitterSliceLegacy
+from spynnaker.pyNN.extra_algorithms.splitter_components import (
+    AbstractSpynnakerSplitterDelay)
 
 
 class MockSynapseIO(object):
@@ -101,14 +109,21 @@ class MockTransceiverRawData(object):
         return self._data_to_read[base_address:base_address + length]
 
 
-class SimpleApplicationVertex(ApplicationVertex):
+class MockSplitter(SplitterSliceLegacy, AbstractSpynnakerSplitterDelay):
+
+    def __init__(self):
+        SplitterSliceLegacy.__init__(self, "mock splitter")
+        AbstractSpynnakerSplitterDelay.__init__(self)
+
+
+class SimpleApplicationVertex(ApplicationVertex, LegacyPartitionerAPI):
 
     def __init__(self, n_atoms, label=None):
         super(SimpleApplicationVertex, self).__init__(label=label)
         self._n_atoms = n_atoms
 
     @property
-    @overrides(ApplicationVertex.n_atoms)
+    @overrides(LegacyPartitionerAPI.n_atoms)
     def n_atoms(self):
         return self._n_atoms
 
@@ -116,14 +131,14 @@ class SimpleApplicationVertex(ApplicationVertex):
     def size(self):
         return self._n_atoms
 
-    @overrides(ApplicationVertex.create_machine_vertex)
+    @overrides(LegacyPartitionerAPI.create_machine_vertex)
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
         return SimpleMachineVertex(
             resources_required, label, constraints, self, vertex_slice)
 
-    @overrides(ApplicationVertex.get_resources_used_by_atoms)
+    @overrides(LegacyPartitionerAPI.get_resources_used_by_atoms)
     def get_resources_used_by_atoms(self, vertex_slice):
         return ResourceContainer()
 
@@ -153,55 +168,64 @@ def test_write_data_spec():
     machine_time_step = 1000.0
 
     placements = Placements()
+    pre_app_population = MockPopulation(10, "mock pop pre")
     pre_app_vertex = SimpleApplicationVertex(10, label="pre")
+    pre_app_vertex.splitter = MockSplitter()
+    pre_app_vertex.splitter._called = True
     pre_vertex_slice = Slice(0, 9)
+
+    post_app_population = MockPopulation(10, "mock pop post")
     pre_vertex = pre_app_vertex.create_machine_vertex(
         pre_vertex_slice, None)
     placements.add_placement(Placement(pre_vertex, 0, 0, 1))
     post_app_vertex = SimpleApplicationVertex(10, label="post")
+    post_app_vertex.splitter = MockSplitter()
+    post_app_vertex.splitter._called = True
     post_vertex_slice = Slice(0, 9)
     post_vertex = post_app_vertex.create_machine_vertex(
         post_vertex_slice, None)
     post_vertex_placement = Placement(post_vertex, 0, 0, 2)
     placements.add_placement(post_vertex_placement)
     delay_app_vertex = DelayExtensionVertex(
-        10, 16, pre_app_vertex, 1000, 1, label="delay")
-    delay_vertex = delay_app_vertex.create_machine_vertex(
-        post_vertex_slice, resources_required=None)
+        10, 16, 51, pre_app_vertex, label="delay")
+    delay_app_vertex.set_new_n_delay_stages_and_delay_per_stage(
+        16, 51)
+    delay_app_vertex.splitter = SplitterDelayVertexSlice(
+        pre_app_vertex.splitter)
+    delay_vertex = DelayExtensionMachineVertex(
+        resources_required=None, label="", constraints=[],
+        app_vertex=delay_app_vertex, vertex_slice=post_vertex_slice)
     placements.add_placement(Placement(delay_vertex, 0, 0, 3))
     one_to_one_connector_1 = OneToOneConnector(None)
     direct_synapse_information_1 = SynapseInformation(
-        one_to_one_connector_1, pre_app_vertex, post_app_vertex, False,
-        False, None, SynapseDynamicsStatic(), 0, True, 1.5, 1.0)
+        one_to_one_connector_1, pre_app_population, post_app_population,
+        False, False, None, SynapseDynamicsStatic(), 0, True, 1.5, 1.0)
     one_to_one_connector_1.set_projection_information(
         machine_time_step, direct_synapse_information_1)
     one_to_one_connector_2 = OneToOneConnector(None)
     direct_synapse_information_2 = SynapseInformation(
-        one_to_one_connector_2, pre_app_vertex, post_app_vertex, False,
-        False, None, SynapseDynamicsStatic(), 1, True, 2.5, 2.0)
+        one_to_one_connector_2, pre_app_population, post_app_population,
+        False, False, None, SynapseDynamicsStatic(), 1, True, 2.5, 2.0)
     one_to_one_connector_2.set_projection_information(
         machine_time_step, direct_synapse_information_2)
-    all_to_all_connector = AllToAllConnector()
+    all_to_all_connector = AllToAllConnector(None)
     all_to_all_synapse_information = SynapseInformation(
-        all_to_all_connector, pre_app_vertex, post_app_vertex, False,
-        False, None, SynapseDynamicsStatic(), 0, True, 4.5, 4.0)
+        all_to_all_connector, pre_app_population, post_app_population,
+        False, False, None, SynapseDynamicsStatic(), 0, True, 4.5, 4.0)
     all_to_all_connector.set_projection_information(
         machine_time_step, all_to_all_synapse_information)
     from_list_list = [(i, i, i, (i * 5) + 1) for i in range(10)]
     from_list_connector = FromListConnector(conn_list=from_list_list)
     from_list_synapse_information = SynapseInformation(
-        from_list_connector, pre_app_vertex, post_app_vertex, False,
-        False, None, SynapseDynamicsStatic(), 0, True)
+        from_list_connector, pre_app_population, post_app_population,
+        False, False, None, SynapseDynamicsStatic(), 0, True)
     from_list_connector.set_projection_information(
         machine_time_step, from_list_synapse_information)
-    n_delay_stages = int(math.ceil(
-        max([values[3] for values in from_list_list]) / 16.0))
     app_edge = ProjectionApplicationEdge(
         pre_app_vertex, post_app_vertex, direct_synapse_information_1)
     app_edge.add_synapse_information(direct_synapse_information_2)
     app_edge.add_synapse_information(all_to_all_synapse_information)
     app_edge.add_synapse_information(from_list_synapse_information)
-    delay_app_vertex.n_delay_stages = n_delay_stages
     delay_edge = DelayedApplicationEdge(
         delay_app_vertex, post_app_vertex, direct_synapse_information_1,
         app_edge)
@@ -209,20 +233,20 @@ def test_write_data_spec():
     delay_edge.add_synapse_information(all_to_all_synapse_information)
     delay_edge.add_synapse_information(from_list_synapse_information)
     app_edge.delay_edge = delay_edge
-    machine_edge = app_edge.create_machine_edge(
-        pre_vertex, post_vertex, label=None)
-    delay_machine_edge = delay_edge.create_machine_edge(
-        delay_vertex, post_vertex, label=None)
+    machine_edge = MachineEdge(
+        pre_vertex, post_vertex, app_edge=app_edge)
+    delay_machine_edge = MachineEdge(
+        delay_vertex, post_vertex, app_edge=delay_edge)
     partition_name = "TestPartition"
 
-    graph = MachineGraph("Test")
+    app_graph = ApplicationGraph("Test")
+    graph = MachineGraph("Test", app_graph)
     graph.add_vertex(pre_vertex)
     graph.add_vertex(post_vertex)
     graph.add_vertex(delay_vertex)
     graph.add_edge(machine_edge, partition_name)
     graph.add_edge(delay_machine_edge, partition_name)
 
-    app_graph = ApplicationGraph("Test")
     app_graph.add_vertex(pre_app_vertex)
     app_graph.add_vertex(post_app_vertex)
     app_graph.add_vertex(delay_app_vertex)
@@ -517,9 +541,11 @@ def test_pop_based_master_pop_table_standard(
     app_graph = ApplicationGraph("Test")
     mac_graph = MachineGraph("Test", app_graph)
     pre_app_vertex = SimpleApplicationVertex(1000)
+    pre_app_vertex.splitter = MockSplitter()
     app_graph.add_vertex(pre_app_vertex)
     post_vertex_slice = Slice(0, 99)
     post_app_vertex = SimpleApplicationVertex(100)
+    post_app_vertex.splitter = MockSplitter()
     app_graph.add_vertex(post_app_vertex)
     post_mac_vertex = post_app_vertex.create_machine_vertex(
         post_vertex_slice, None)
@@ -535,14 +561,15 @@ def test_pop_based_master_pop_table_standard(
     # Add delays if needed
     if delayed_indices_connected:
         pre_app_delay_vertex = DelayExtensionVertex(
-            1000, 16.0, pre_app_vertex, 1.0, 1.0)
-        pre_app_delay_vertex.n_delay_stages = 1
+            1000, 16.0, 4, pre_app_vertex)
+        pre_app_delay_vertex.set_new_n_delay_stages_and_delay_per_stage(
+            16, 20)
         app_graph.add_vertex(pre_app_delay_vertex)
 
         for i in range(10):
             pre_mac_slice = Slice(i * 100, ((i + 1) * 100) - 1)
-            pre_mac_vertex = pre_app_delay_vertex.create_machine_vertex(
-                pre_mac_slice, None)
+            pre_mac_vertex = DelayExtensionMachineVertex(
+                None, "", [], pre_app_delay_vertex, pre_mac_slice)
             mac_graph.add_vertex(pre_mac_vertex)
 
     # Make the routing info line up to force an app key in the pop table if
@@ -575,8 +602,8 @@ def test_pop_based_master_pop_table_standard(
     # Create the machine edges
     for pre_mac_vertex in pre_app_vertex.machine_vertices:
         i = pre_mac_vertex.index
-        mac_edge = app_edge.create_machine_edge(
-            pre_mac_vertex, post_mac_vertex, None)
+        mac_edge = MachineEdge(
+            pre_mac_vertex, post_mac_vertex, app_edge=app_edge)
         if undelayed_indices_connected and i in undelayed_indices_connected:
             mac_graph.add_edge(mac_edge, "Test")
             partition = mac_graph.get_outgoing_partition_for_edge(mac_edge)
@@ -594,8 +621,8 @@ def test_pop_based_master_pop_table_standard(
         base_d_key = 16 * n_keys
         for pre_mac_vertex in pre_app_delay_vertex.machine_vertices:
             i = pre_mac_vertex.index
-            mac_edge = delay_app_edge.create_machine_edge(
-                pre_mac_vertex, post_mac_vertex, None)
+            mac_edge = MachineEdge(
+                pre_mac_vertex, post_mac_vertex, app_edge=delay_app_edge)
             if i in delayed_indices_connected:
                 mac_graph.add_edge(mac_edge, "Test")
                 partition = mac_graph.get_outgoing_partition_for_edge(mac_edge)
@@ -613,7 +640,7 @@ def test_pop_based_master_pop_table_standard(
         max_stdp_spike_delta=None, config=config, drop_late_spikes=True)
     synaptic_manager.write_data_spec(
         spec, post_app_vertex, post_vertex_slice, post_mac_vertex,
-        mac_graph, app_graph, routing_info, 1.0, 1.0)
+        mac_graph, app_graph, routing_info, 1.0, 1000.0)
     spec.end_specification()
     with io.FileIO(temp_spec, "rb") as spec_reader:
         executor = DataSpecificationExecutor(

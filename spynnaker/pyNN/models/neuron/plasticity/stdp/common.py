@@ -16,8 +16,9 @@
 import math
 import logging
 import numpy
+from spinn_utilities.log import FormatAdapter
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 # Default value of fixed-point one for STDP
 STDP_FIXED_POINT_ONE = (1 << 11)
 

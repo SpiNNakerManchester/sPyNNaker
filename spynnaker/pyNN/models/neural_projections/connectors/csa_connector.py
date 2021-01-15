@@ -15,6 +15,7 @@
 
 import logging
 import numpy
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
 try:
@@ -24,7 +25,7 @@ except ImportError as _ex:  # noqa: F821
     # Importing csa causes problems with readthedocs so allowing it to fail
     _csa_found = (False, _ex)
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class CSAConnector(AbstractConnector):
@@ -64,6 +65,12 @@ class CSAConnector(AbstractConnector):
         n_conns_max = synapse_info.n_pre_neurons * synapse_info.n_post_neurons
         # we can probably look at the array and do better than this?
         return self._get_delay_maximum(synapse_info.delays, n_conns_max)
+
+    @overrides(AbstractConnector.get_delay_minimum)
+    def get_delay_minimum(self, synapse_info):
+        n_conns_max = synapse_info.n_pre_neurons * synapse_info.n_post_neurons
+        # we can probably look at the array and do better than this?
+        return self._get_delay_minimum(synapse_info.delays, n_conns_max)
 
     def _get_n_connections(
             self, pre_vertex_slice, post_vertex_slice, synapse_info):

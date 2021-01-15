@@ -32,6 +32,7 @@ from spinn_front_end_common.utilities.utility_objs\
     .provenance_data_item import ProvenanceDataItem
 
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
+from spynnaker.pyNN.models.abstract_models import AbstractMaxSpikes
 from spynnaker.pyNN.models.neuron.synapse_io import SynapseIORowBased
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsSTDP, SynapseDynamicsStructuralStatic)
@@ -108,6 +109,19 @@ class SynapticManager(object):
 
     # 1. address of direct addresses, 2. size of direct addresses matrix size
     STATIC_SYNAPSE_MATRIX_SDRAM_IN_BYTES = 2 * BYTES_PER_WORD
+
+    NOT_EXACT_SLICES_ERROR_MESSAGE = (
+        "The splitter {} is returning estimated slices during DSG. "
+        "This is deemed an error. Please fix and try again")
+
+    TOO_MUCH_WRITTEN_SYNAPTIC_DATA = (
+        "Too much synaptic memory has been written: {} of {} ")
+
+    INDEXS_DONT_MATCH_ERROR_MESSAGE = (
+        "Delay index {} and normal index {} do not match")
+
+    NO_DELAY_EDGE_FOR_SRC_IDS_MESSAGE = (
+        "Found delayed source IDs but no delay machine edge for {}")
 
     def __init__(
             self, n_synapse_types, ring_buffer_sigma, spikes_per_second,
@@ -210,6 +224,10 @@ class SynapticManager(object):
         # Post vertex slice to synaptic matrices
         self.__synaptic_matrices = dict()
 
+        # Store weight provenance information mapping from
+        # (real weight, represented weight) -> list of edges
+        self.__weight_provenance = defaultdict(list)
+
     def __get_synaptic_matrices(self, post_vertex_slice):
         """ Get the synaptic matrices for a given slice of the vertex
 
@@ -217,10 +235,6 @@ class SynapticManager(object):
             the slice of the vertex to get the matrices for
         :rtype: SynapticMatrices
         """
-        # Store weight provenance information mapping from
-        # (real weight, represented weight) -> list of edges
-        self.__weight_provenance = defaultdict(list)
-
         # Use the cached version if possible
         if post_vertex_slice in self.__synaptic_matrices:
             return self.__synaptic_matrices[post_vertex_slice]
@@ -235,7 +249,7 @@ class SynapticManager(object):
         return matrices
 
     def host_written_matrix_size(self, post_vertex_slice):
-        """ The size of the matrix written by the host for a given
+        """ The size of the matrix written by the host for a given\
             machine vertex
 
         :param post_vertex_slice: The slice of the vertex to get the size of
@@ -245,7 +259,7 @@ class SynapticManager(object):
         return matrices.host_generated_block_addr
 
     def on_chip_written_matrix_size(self, post_vertex_slice):
-        """ The size of the matrix that will be written on the machine for a
+        """ The size of the matrix that will be written on the machine for a\
             given machine vertex
 
         :param post_vertex_slice: The slice of the vertex to get the size of
@@ -257,7 +271,7 @@ class SynapticManager(object):
 
     @property
     def synapse_dynamics(self):
-        """ The synapse dynamics used by the synapses e.g. plastic or static.
+        """ The synapse dynamics used by the synapses e.g. plastic or static.\
             Settable.
 
         :rtype: AbstractSynapseDynamics or None
@@ -270,8 +284,8 @@ class SynapticManager(object):
 
     @synapse_dynamics.setter
     def synapse_dynamics(self, synapse_dynamics):
-        """ Set the synapse dynamics.  Note that after setting, the dynamics
-            might not be the type set as it can be combined with the existing
+        """ Set the synapse dynamics.  Note that after setting, the dynamics\
+            might not be the type set as it can be combined with the existing\
             dynamics in exciting ways.
         """
         if self.__synapse_dynamics is None:
@@ -282,7 +296,7 @@ class SynapticManager(object):
 
     @property
     def ring_buffer_sigma(self):
-        """ The sigma in the estimation of the maximum summed ring buffer
+        """ The sigma in the estimation of the maximum summed ring buffer\
             weights.  Settable.
 
         :rtype: float
@@ -295,7 +309,7 @@ class SynapticManager(object):
 
     @property
     def spikes_per_second(self):
-        """ The assumed maximum spikes per second of an incoming population.
+        """ The assumed maximum spikes per second of an incoming population.\
             Used when calculating the ring buffer weight scaling. Settable.
 
         :rtype: float
@@ -305,15 +319,6 @@ class SynapticManager(object):
     @spikes_per_second.setter
     def spikes_per_second(self, spikes_per_second):
         self.__spikes_per_second = spikes_per_second
-
-    def get_maximum_delay_supported_in_ms(self, machine_time_step):
-        """ The maximum delay supported by this vertex, before delay extensions
-            are needed
-
-        :rtype: int
-        """
-        return self.__synapse_io.get_maximum_delay_supported_in_ms(
-            machine_time_step)
 
     @property
     def vertex_executable_suffix(self):
@@ -398,8 +403,10 @@ class SynapticManager(object):
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of the vertex to allocate for
         :param int all_syn_block_sz: The memory to reserve for synapses
-        :param ~.MachineGraph machine_graph: The machine graph
-        :param ~.MachineVertex machine_vertex: The machine vertex
+        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
+            The machine graph
+        :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:
+            The machine vertex
         """
         spec.reserve_memory_region(
             region=self._synapse_params_region,
@@ -574,15 +581,11 @@ class SynapticManager(object):
         """
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to
-        :param ~pacman.model.graphs.application_graph.ApplicationGraph \
-        application_graph: the app graph
         :param AbstractPopulationVertex application_vertex:
             The vertex owning the synapses
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
             The part of the vertex we're dealing with
         :param PopulationMachineVertex machine_vertex: The machine vertex
-        :param ~pacman.model.placements.Placement placement:
-            Where the vertex is placed
         :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
             The graph containing the machine vertex
         :param ~pacman.model.graphs.application.ApplicationGraph \
@@ -591,7 +594,7 @@ class SynapticManager(object):
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
             How messages are routed
         :param float weight_scale: How to scale the weights of the synapses
-        :param int machine_time_step:
+        :param float machine_time_step:
         """
 
         # Reserve the memory
@@ -620,7 +623,7 @@ class SynapticManager(object):
 
         gen_data = matrices.write_synaptic_matrix_and_master_population_table(
             spec, machine_vertex, all_syn_block_sz, self.__weight_scales,
-            routing_info, machine_graph)
+            routing_info, machine_graph, machine_time_step)
 
         if self.__synapse_dynamics is not None:
             self.__synapse_dynamics.write_parameters(
@@ -644,7 +647,6 @@ class SynapticManager(object):
             The specification to write to
         :param ~pacman.model.common.Slice post_vertex_slice:
             The slice of the vertex being written
-        :type weight_scales: list(int or float)
         :param list(GeneratorData) generator_data:
         """
         if not generator_data:
@@ -683,8 +685,10 @@ class SynapticManager(object):
             self, transceiver, placements, app_edge, synapse_info):
         """ Read the connections from the machine for a given projection
 
-        :param Transceiver transceiver: Used to read the data from the machine
-        :param Placements placements: Where the vertices are on the machine
+        :param ~spinnman.transciever.Transceiver transceiver:
+            Used to read the data from the machine
+        :param ~pacman.model.placements.Placements placements:
+            Where the vertices are on the machine
         :param ProjectionApplicationEdge app_edge:
             The application edge of the projection
         :param SynapseInformation synapse_info:
@@ -775,8 +779,10 @@ class SynapticManager(object):
         """ Fill in any pre-run connection holders for data which is generated
             on the machine, after it has been generated
 
-        :param Transceiver transceiver: How to read the data from the machine
-        :param Placement placement: where the data is to be read from
+        :param ~spinnman.transceiver.Transceiver transceiver:
+            How to read the data from the machine
+        :param ~pacman.model.placements.Placement placement:
+            where the data is to be read from
         """
         matrices = self.__get_synaptic_matrices(placement.vertex.vertex_slice)
         matrices.read_generated_connection_holders(transceiver, placement)

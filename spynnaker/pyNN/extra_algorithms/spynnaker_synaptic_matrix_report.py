@@ -16,29 +16,30 @@
 import logging
 import os
 import numpy
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 _DIRNAME = "synaptic_matrix_reports"
 _TMPL_FILENAME = "synaptic_matrix_for_application_edge_{}"
 
 
 class SpYNNakerSynapticMatrixReport(object):
     """ Generate the synaptic matrices for reporting purposes.
-
-    :param str report_folder: where to write the report
-    :param connection_holder: where the synaptic matrices are stored \
-        (possibly after retrieval from the machine)
-    :type connection_holder:
-        dict(tuple(ProjectionApplicationEdge, SynapseInformation), \
-        ConnectionHolder)
-    :param dsg_targets: used to check if connection holders are populated
     """
 
     def __call__(self, report_folder, connection_holder, dsg_targets):
         """ Convert synaptic matrix for every application edge.
+
+        :param str report_folder: where to write the report
+        :param connection_holder: where the synaptic matrices are stored \
+            (possibly after retrieval from the machine)
+        :type connection_holder:
+            dict(tuple(ProjectionApplicationEdge, SynapseInformation), \
+            ConnectionHolder)
+        :param dsg_targets: used to check if connection holders are populated
         """
 
         # Update the print options to display everything
