@@ -497,6 +497,10 @@ static bool initialize(void) {
         return false;
     }
     spin1_memcpy(sdram_inputs, sdram_conf, sdram_inputs_size);
+    log_info("Writing output to address 0x%08x, size in total %d,"
+             "offset in half-words %d, size to write %d", sdram_inputs->address,
+             sdram_inputs->size_in_bytes, sdram_inputs->offset,
+             ssp_params.n_spike_sources * sizeof(uint16_t));
     if (sdram_inputs->size_in_bytes != 0) {
         input_this_timestep = spin1_malloc(sdram_inputs->size_in_bytes);
         if (input_this_timestep == NULL) {
