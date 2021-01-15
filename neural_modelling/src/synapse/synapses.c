@@ -17,7 +17,7 @@
 
 #include "synapses.h"
 #include "spike_processing.h"
-#include "neuron.h"
+#include "neuron/neuron.h"
 #include "plasticity/synapse_dynamics.h"
 #include "compartment_type/compartment_type.h"
 #include <profiler.h>
@@ -25,6 +25,9 @@
 #include <spin1_api.h>
 #include <utils.h>
 #include <round.h>
+
+#define DMA_TAG_WRITE_SYNAPTIC_CONTRIBUTION 1
+#define SYNAPSE_RECORDING_INDEX 0
 
 //! if using profiler import profiler tags
 #ifdef PROFILER_ENABLED
@@ -40,14 +43,16 @@ static uint32_t n_neurons;
 // The number of synapse types
 static uint32_t n_synapse_types;
 
+static uint8_t synapse_index;
+
 // Ring buffers to handle delays between synapses and neurons
 static REAL *ring_buffers;
 
 // Amount to left shift the ring buffer by to make it an input
 static uint32_t *ring_buffer_to_input_left_shifts;
 
-// Amount to right shift the content for ring buffer after multiplication to keep max precision
-static uint32_t *ring_buffer_relative_shifts;
+// Amount to right shift the content for ring buffer after multiplication to keep max precision POSSIBLE REMOVE?
+// static uint32_t *ring_buffer_relative_shifts;
 
 // Count of the number of times the ring buffers have saturated
 static uint32_t saturation_count = 0;
@@ -69,6 +74,20 @@ static size_t size_to_be_transferred;
 
 static uint32_t *synaptic_matrix;
 
+//! parameters that reside in the synapse_parameter_data_region
+struct synapse_parameters {
+    uint32_t n_neurons_to_simulate;
+    uint32_t n_synapse_types;
+    uint32_t incoming_rate_buffer_size;
+    uint32_t synapse_index;
+    uint32_t mem_index;
+    uint32_t offset;
+    //uint32_t n_recorded_variables;
+    //uint32_t is_recording;
+    uint32_t synaptic_matrix_size;
+};
+#define START_OF_GLOBAL_PARAMETERS \
+    (sizeof(struct neuron_parameters) / sizeof(uint32_t))
 
 /* PRIVATE FUNCTIONS */
 
@@ -239,7 +258,7 @@ static inline void print_synapse_parameters(void) {
 
 /* INTERFACE FUNCTIONS */
 bool synapses_initialise(
-        address_t synapse_params_address, address_t direct_matrix_address,
+        address_t address, address_t direct_matrix_address,
         uint32_t *n_neurons_value, uint32_t *n_synapse_types_value,
         uint32_t *incoming_rate_buffer_size,
         uint32_t **ring_buffer_to_input_buffer_left_shifts,
@@ -247,11 +266,29 @@ bool synapses_initialise(
         address_t synaptic_matrix_address) {
 
     size_t synaptic_matrix_size;
-    log_debug("synapses_initialise: starting");
-    n_neurons = n_neurons_value;
-    n_synapse_types = n_synapse_types_value;
 
-    synaptic_matrix_size =  synapse_params_address[0];
+    log_debug("synapses_initialise: starting");
+
+    struct synapse_parameters *params = (void *) address;
+
+    *n_neurons_value = params->n_neurons_to_simulate;
+    n_neurons = *n_neurons_value;
+
+    *n_synapse_types_value = params->n_synapse_types;
+    n_synapse_types = *n_synapse_types_value;
+
+    *incoming_rate_buffer_size = params->incoming_rate_buffer_size;
+
+    synapse_index = params->synapse_index;
+
+    memory_index = params->mem_index;
+
+    offset = params->offset; 
+
+    // n_recorder_vars = params->n_recorded_vars;
+    // is_recording = params->is_recording;
+
+    synaptic_matrix_size =  params->synaptic_matrix_size;
 
     // Store the synaptic matrix into DTCM
     synaptic_matrix = spin1_malloc(synaptic_matrix_size * sizeof(uint32_t));
@@ -275,6 +312,7 @@ bool synapses_initialise(
     *dtcm_synaptic_matrix = synaptic_matrix;
 
     // Set up ring buffer left shifts
+    //USING REAL VALUES WE SHOULD BE ABLE TO GET RID OF THIS
     ring_buffer_to_input_left_shifts =
             spin1_malloc(n_synapse_types * sizeof(uint32_t));
     if (ring_buffer_to_input_left_shifts == NULL) {
@@ -282,33 +320,10 @@ bool synapses_initialise(
         return false;
     }
     spin1_memcpy(
-            ring_buffer_to_input_left_shifts, ++synapse_params_address,
+            ring_buffer_to_input_left_shifts, address + START_OF_GLOBAL_PARAMETERS,
             n_synapse_types * sizeof(uint32_t));
     *ring_buffer_to_input_buffer_left_shifts =
             ring_buffer_to_input_left_shifts;
-
-
-    // REMOVE
-    // Work out the positions of the direct and indirect synaptic matrices
-    // and copy the direct matrix to DTCM
-//    uint32_t direct_matrix_size = direct_matrix_address[0];
-//    log_debug("Direct matrix malloc size is %d", direct_matrix_size);
-//
-//    if (direct_matrix_size != 0) {
-//        *direct_synapses_address = spin1_malloc(direct_matrix_size);
-//        if (*direct_synapses_address == NULL) {
-//            log_error("Not enough memory to allocate direct matrix");
-//            return false;
-//        }
-//        log_debug("Copying %u bytes of direct synapses to 0x%08x",
-//                direct_matrix_size, *direct_synapses_address);
-//        spin1_memcpy(
-//                *direct_synapses_address, &direct_matrix_address[1],
-//                direct_matrix_size);
-//    }
-
-    log_debug("synapses_initialise: completed successfully");
-    print_synapse_parameters();
 
     uint32_t n_neurons_power_2 = n_neurons;
     uint32_t log_n_neurons = 1;
@@ -342,7 +357,8 @@ bool synapses_initialise(
         ring_buffers[i] = starting_rate;
     }
 
-    //io_printf(IO_BUF, "starting rate %k\n", starting_rate);
+    // Since we don't have delay slots, we send the whole ring buffer
+    size_to_be_transferred = ring_buffer_size;
 
     synapse_type_index_bits = log_n_neurons + log_n_synapse_types;
     synapse_type_index_mask = (1 << synapse_type_index_bits) - 1;
@@ -350,40 +366,60 @@ bool synapses_initialise(
     synapse_index_mask = (1 << synapse_index_bits) - 1;
     synapse_type_bits = log_n_synapse_types;
     synapse_type_mask = (1 << log_n_synapse_types) - 1;
+
+    log_debug("synapses_initialise: completed successfully");
+    print_synapse_parameters();
+
     return true;
 }
 
+// static inline void write_recording(timer_t time) {
+
+//     // Write recording data. Doesn't use DMA, since the cb is NULL
+//     for(uint32_t i = 0; i < n_recorded_vars; i++) {
+//        uint32_t index = var_recording_indexes[i];
+
+// 		syn_rec.spikes_a = num_fixed_pre_synaptic_events_per_timestep & 0xFF;
+// 		syn_rec.spikes_b = spikes_remaining_this_tick & 0xFF;
+// 		syn_rec.spikes_c = kickstarts;
+// 		syn_rec.spikes_d = zero_target_spikes_per_dt;
+
+
+//        var_recording_values[i]->states[index] = spike_profiling_get_spike_holder_as_accum(syn_rec);
+
+//        if (var_recording_count[i] == var_recording_rate[i]) {
+//             var_recording_count[i] = 1;
+//             var_recording_values[i]->time = time;
+//             recording_record_and_notify(
+//             i, var_recording_values[i], var_recording_size[i], NULL);
+//        } else {
+//             var_recording_count[i] += var_recording_increment[i];
+//        }
+//     }
+// }
+
 void synapses_do_timestep_update(timer_t time) {
+
     print_ring_buffers(time);
 
     // Disable interrupts to stop DMAs interfering with the ring buffers
     uint32_t state = spin1_irq_disable();
 
-    // Transfer the input from the ring buffers into the input buffers
-    for (uint32_t neuron_index = 0; neuron_index < n_neurons;
-            neuron_index++) {
-        // Loop through all synapse types
-        for (uint32_t synapse_type_index = 0;
-                synapse_type_index < n_synapse_types; synapse_type_index++) {
-            // Get index in the ring buffers for the current time slot for
-            // this synapse type and neuron
-            uint32_t ring_buffer_index = synapses_get_ring_buffer_index(
-                    0, synapse_type_index, neuron_index,
-                    synapse_type_index_bits, synapse_index_bits);
+    // THIS CAN PROBABLY BE REMOVED FOR THE RATE-BASED AND PASS DIRECTLY THE POINTER TO RING_BUFFER
+    uint32_t ring_buffer_index = synapses_get_ring_buffer_index(
+                0, 0, 0,synapse_index_bits, synapse_index_bits);
 
-            // Convert ring-buffer entry to input and add on to correct
-            // input for this synapse type and neuron
-
-            //io_printf(IO_BUF, "writing %k to index %d\n", ring_buffers[ring_buffer_index], ring_buffer_index);
-
-            neuron_add_inputs(
-                    synapse_type_index, neuron_index, ring_buffers[ring_buffer_index]);
-
-            ring_buffers[ring_buffer_index] = 0.0k;
-        }
-    }
+    spin1_dma_transfer(DMA_TAG_WRITE_SYNAPTIC_CONTRIBUTION, synaptic_region, &ring_buffers[ring_buffer_index],
+                DMA_WRITE, size_to_be_transferred);
 
     print_inputs();
+
+    // if(is_recording) {
+
+    //     write_recording(time);
+    //     num_fixed_pre_synaptic_events_per_timestep = 0;
+    //     kickstarts = 0;
+    // }
 
     // Re-enable the interrupts
     spin1_mode_restore(state);
@@ -546,7 +582,7 @@ bool add_static_neuron_with_id(
     return true;
 }
 
-void synapses_set:contribution_region(){
+void synapses_set_contribution_region(){
 
     synaptic_region = sark_tag_ptr(memory_index, 0);
     synaptic_region += (offset << synapse_index_bits);

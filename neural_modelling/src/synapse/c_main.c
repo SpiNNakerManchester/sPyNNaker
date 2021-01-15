@@ -39,7 +39,7 @@
 #include "spike_processing.h"
 #include "population_table/population_table.h"
 #include "plasticity/synapse_dynamics.h"
-#include "synapse/structural_plasticity/synaptogenesis_dynamics.h"
+#include "structural_plasticity/synaptogenesis_dynamics.h"
 #include "neuron/profile_tags.h"
 
 #include <data_specification.h>
@@ -54,6 +54,18 @@
 #error APPLICATION_NAME_HASH was undefined.  Make sure you define this\
        constant
 #endif
+
+struct synapse_provenance {
+    uint32_t n_pre_synaptic_events;
+    uint32_t n_synaptic_weight_saturations;
+    uint32_t n_input_buffer_overflows;
+    uint32_t current_timer_tick;
+    uint32_t n_plastic_synaptic_weight_saturations;
+    uint32_t flushed_spikes;
+    uint32_t max_flushed_spikes;
+    uint32_t max_time;
+    uint32_t cb_calls;
+}
 
 typedef enum extra_provenance_data_region_entries{
     NUMBER_OF_PRE_SYNAPTIC_EVENT_COUNT = 0,
@@ -123,20 +135,19 @@ static bool initialise_recording(address_t recording_address){
 void c_main_store_provenance_data(address_t provenance_region){
     log_debug("writing other provenance data");
 
+    struct synapse_provenance *prov = (void *) provenance_region;
+
     // store the data into the provenance data region
-    provenance_region[NUMBER_OF_PRE_SYNAPTIC_EVENT_COUNT] =
-        synapses_get_pre_synaptic_events();
-    provenance_region[SYNAPTIC_WEIGHT_SATURATION_COUNT] =
-        synapses_get_saturation_count();
-    provenance_region[INPUT_BUFFER_OVERFLOW_COUNT] =
-        spike_processing_get_buffer_overflows();
-    provenance_region[CURRENT_TIMER_TICK] = time;
-    provenance_region[PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT] =
+    prov->n_pre_synaptic_events = synapses_get_pre_synaptic_events();
+    prov->n_synaptic_weight_saturations = synapses_get_saturation_count();
+    prov->n_input_buffer_overflows = spike_processing_get_buffer_overflows();
+    prov->current_timer_tick = time;
+    prov->n_plastic_synaptic_weight_saturations =
             synapse_dynamics_get_plastic_saturation_count();
-    provenance_region[FLUSHED_SPIKES] = spikes_remaining;
-    provenance_region[MAX_FLUSHED_SPIKES] = max_spikes_remaining;
-    provenance_region[MAX_TIME] = max_time;
-    provenance_region[CB_CALLS] = cb_calls;
+    prov->flushed_spikes = spikes_remaining;
+    prov->max_flushed_spikes = max_spikes_remaining;
+    prov->max_time = max_time;
+    prov->cb_calls = cb_calls;
     log_debug("finished other provenance data");
 }
 
