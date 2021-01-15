@@ -26,7 +26,7 @@ from spinn_utilities.log import FormatAdapter
 from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.models.common import (
     AbstractNeuronRecordable, AbstractSpikeRecordable)
-from spynnaker.pyNN.models.recording_common import RecordingCommon
+from spynnaker.pyNN.models.recorder import RecordingCommon
 from spynnaker.pyNN.utilities.constants import (
     SPIKES, MEMBRANE_POTENTIAL, GSYN_EXCIT, GSYN_INHIB)
 from spynnaker.pyNN.exceptions import InvalidParameterType
