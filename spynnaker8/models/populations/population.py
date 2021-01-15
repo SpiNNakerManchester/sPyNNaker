@@ -26,11 +26,11 @@ from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.models.pynn_population_common import PyNNPopulationCommon
+from spynnaker.pyNN.models.recorder import Recorder
 from spynnaker.pyNN.utilities.constants import SPIKES
 from .idmixin import IDMixin
 from .population_base import PopulationBase
 from .population_view import PopulationView
-from spynnaker8.models.recorder import Recorder
 
 logger = logging.getLogger(__name__)
 

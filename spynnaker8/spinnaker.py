@@ -296,7 +296,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
         """ The recorders, used by the PyNN state object
 
         :return: the internal recorders object
-        :rtype: list(Recorder)
+        :rtype: list(~spynnaker.pyNN.models.recorder.Recorder)
         """
         return self.__recorders
 

@@ -39,7 +39,7 @@ _DEFAULT_UNITS = {
     GSYN_INHIB: "uS"}
 
 
-class RecordingCommon(object):
+class Recorder(object):
     """ Object to hold recording behaviour.
     """
     # pylint: disable=protected-access

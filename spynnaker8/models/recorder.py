@@ -14,14 +14,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-from spynnaker.pyNN.models.recorder import RecordingCommon
+from spynnaker.pyNN.models.recorder import Recorder as _BaseClass
 logger = logging.getLogger(__name__)
 
 
-class Recorder(RecordingCommon):
+class Recorder(_BaseClass):
     """
     .. deprecated:: 6.0
-        Use :py:class:`spynnaker.pyNN.models.recorder.RecordingCommon` instead.
+        Use :py:class:`spynnaker.pyNN.models.recorder.Recorder` instead.
     """
     # DO NOT DEFINE SLOTS! Multiple inheritance problems otherwise.
     # __slots__ = []
@@ -33,5 +33,4 @@ class Recorder(RecordingCommon):
         """
         super(Recorder, self).__init__(population)
         logger.warning(
-            "please use spynnaker.pyNN.models.recorder.RecordingCommon "
-            "instead")
+            "please use spynnaker.pyNN.models.recorder.Recorder instead")

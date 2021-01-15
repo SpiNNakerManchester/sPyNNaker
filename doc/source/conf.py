@@ -424,7 +424,7 @@ explicit_wanted_files = [
     "spynnaker/pyNN/models/pynn_population_common.py",
     "spynnaker/pyNN/models/pynn_projection_common.py",
     "spynnaker/pyNN/models/defaults.py",
-    "spynnaker/pyNN/models/recording_common.py",
+    "spynnaker/pyNN/models/recorder.py",
     "spynnaker/pyNN/models/neuron/key_space_tracker.py",
     "spynnaker/pyNN/models/neuron/synaptic_matrices.py",
     "spynnaker/pyNN/models/neuron/master_pop_table.py",
