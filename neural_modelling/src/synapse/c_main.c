@@ -264,7 +264,7 @@ static bool initialise(uint32_t *timer_period) {
     }
 
     if (!spike_processing_initialise(
-            row_max_n_words, MC,
+            row_max_n_words, MC, USER, 
             incoming_spike_buffer_size)) {
         return false;
     }

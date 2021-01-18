@@ -35,11 +35,10 @@
 #include <common/in_spikes.h>
 #include "regions.h"
 #include "neuron.h"
-#include "synapses.h"
-#include "spike_processing.h"
-#include "population_table/population_table.h"
-#include "plasticity/synapse_dynamics.h"
-#include "structural_plasticity/synaptogenesis_dynamics.h"
+#include "synapse/synapses.h"
+#include "synapse/spike_processing.h"
+#include "synapse/plasticity/synapse_dynamics.h"
+#include "synapse/structural_plasticity/synaptogenesis_dynamics.h"
 #include "profile_tags.h"
 #include <round.h>
 
@@ -159,69 +158,14 @@ static bool initialise(void) {
         return false;
     }
 
-    // Set up the neurons
-    uint32_t n_neurons;
-    uint32_t n_synapse_types;
-    uint32_t incoming_spike_buffer_size;
-
-    REAL starting_rate;
     if (!neuron_initialise(
             data_specification_get_region(NEURON_PARAMS_REGION, ds_regions),
-            &n_neurons, &n_synapse_types, &incoming_spike_buffer_size,
-            &timer_offset, &starting_rate)) {
-        return false;
-    }
-
-    //io_printf(IO_BUF, "cmain starting rate %k\n", starting_rate);
-
-    // Set up the synapses
-    uint32_t *ring_buffer_to_input_buffer_left_shifts;
-    address_t indirect_synapses_address =
-            data_specification_get_region(SYNAPTIC_MATRIX_REGION, ds_regions);
-    address_t dtcm_synaptic_matrix;
-
-    if (!synapses_initialise(
-            data_specification_get_region(SYNAPSE_PARAMS_REGION, ds_regions),
-            data_specification_get_region(DIRECT_MATRIX_REGION, ds_regions),
-            n_neurons, n_synapse_types,
-            &ring_buffer_to_input_buffer_left_shifts,
-            &dtcm_synaptic_matrix, starting_rate,
-            indirect_synapses_address)) {
-        return false;
-    }
-
-    // Set up the population table
-    uint32_t row_max_n_words;
-    if (!population_table_initialise(
-            data_specification_get_region(POPULATION_TABLE_REGION, ds_regions),
-            indirect_synapses_address, dtcm_synaptic_matrix,
-            &row_max_n_words)) {
-        return false;
-    }
-    // Set up the synapse dynamics
-    address_t synapse_dynamics_region_address =
-            data_specification_get_region(SYNAPSE_DYNAMICS_REGION, ds_regions);
-    address_t syn_dyn_end_address = synapse_dynamics_initialise(
-            synapse_dynamics_region_address, n_neurons, n_synapse_types,
-            ring_buffer_to_input_buffer_left_shifts);
-
-    if (synapse_dynamics_region_address && !syn_dyn_end_address) {
-        return false;
-    }
-
-    // Set up structural plasticity dynamics
-    if (synapse_dynamics_region_address &&
-            !synaptogenesis_dynamics_initialise(syn_dyn_end_address)) {
+            &timer_offset)) {
         return false;
     }
 
     rewiring_period = get_p_rew();
     rewiring = rewiring_period != -1;
-
-    if (!spike_processing_initialise(
-            row_max_n_words, MC, USER, incoming_spike_buffer_size)) {
-        return false;
-    }
 
     // Setup profiler
     profiler_init(data_specification_get_region(PROFILER_REGION, ds_regions));
@@ -332,7 +276,6 @@ void timer_callback(uint timer_count, uint unused) {
 
     //io_printf(IO_BUF, "\n\ntimestep %d\n", time);
 
-    synapses_do_timestep_update(time);
     neuron_do_timestep_update(time, timer_count, timer_period);
 
     // trigger buffering_out_mechanism

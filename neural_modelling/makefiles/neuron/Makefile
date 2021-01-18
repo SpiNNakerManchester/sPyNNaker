@@ -13,10 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-MODELS = IF_exp_two_comp_rate \
+MODELS = Static_synapse_pyramidal_rate \
+		 Static_synapse_two_comp_rate \
+		 IF_exp_two_comp_rate \
 		 IF_exp_two_comp_rate_stdp_mad_Bern_plasticity \
-		 Pyramidal_rate\
-		 Pyramidal_rate_stdp_mad_Bern_plasticity\
+		 Pyramidal_rate \
+		 Pyramidal_rate_stdp_mad_Bern_plasticity \
 #         IF_curr_exp \
 #         IF_cond_exp \
 #         IZK_curr_exp \

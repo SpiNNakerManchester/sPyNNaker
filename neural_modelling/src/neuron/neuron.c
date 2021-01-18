@@ -23,7 +23,7 @@
 
 #include "neuron.h"
 #include "implementations/neuron_impl.h"
-#include "plasticity/synapse_dynamics.h"
+#include "synapse/plasticity/synapse_dynamics.h"
 #include <common/out_spikes.h>
 #include <debug.h>
 
@@ -34,6 +34,7 @@ extern void spin1_wfi(void);
 extern uint ticks;
 
 #define SPIKE_RECORDING_CHANNEL 0
+#define DMA_TAG_READ_SYNAPTIC_CONTRIBUTION 1
 
 //! The key to be used for this core (will be ORed with neuron ID)
 static key_t key;
@@ -44,6 +45,8 @@ static bool use_key;
 
 //! The number of neurons on the core
 static uint32_t n_neurons;
+
+static uint32_t n_synapse_types;
 
 //! Number of timesteps between spike recordings
 static uint32_t spike_recording_rate;
@@ -92,6 +95,32 @@ static uint32_t expected_time;
 //! The number of recordings outstanding
 static uint32_t n_recordings_outstanding = 0;
 
+//! The synaptic contributions for the current timestep
+static REAL *synaptic_contributions;
+
+static uint32_t *synaptic_contributions_to_input_left_shifts;
+
+static uint32_t synapse_type_index_bits;
+static uint32_t synapse_index_bits;
+
+static uint32_t memory_index;
+
+static timer_t current_time;
+
+//! Size of DMA read for synaptic contributions
+static size_t dma_size;
+
+static volatile bool dma_finished;
+
+static REAL *synaptic_region;
+
+//! Offset for the second exc synaptic contribution
+static uint32_t contribution_offset;
+static uint32_t poisson_offset;
+
+//! Placeholder for synaptic contributions sum
+static REAL sum;
+
 //! parameters that reside in the neuron_parameter_data_region
 struct neuron_parameters {
     uint32_t timer_start_offset;
@@ -100,13 +129,15 @@ struct neuron_parameters {
     uint32_t transmission_key;
     uint32_t n_neurons_to_simulate;
     uint32_t n_synapse_types;
-    uint32_t incoming_spike_buffer_size;
+    uint32_t n_synapse_types;
+    uint32_t mem_index;
     uint32_t n_recorded_variables;
 };
 #define START_OF_GLOBAL_PARAMETERS \
     (sizeof(struct neuron_parameters) / sizeof(uint32_t))
 
 static void reset_record_counter(void) {
+
     if (spike_recording_rate == 0) {
         // Setting increment to zero means spike_index will never equal
         // spike_rate
@@ -141,6 +172,7 @@ static void reset_record_counter(void) {
 //! in SDRAM
 //! \return bool which is true if the mem copy's worked, false otherwise
 static bool neuron_load_neuron_parameters(address_t address) {
+
     uint32_t next = START_OF_GLOBAL_PARAMETERS;
 
     log_debug("loading parameters");
@@ -167,12 +199,22 @@ static bool neuron_load_neuron_parameters(address_t address) {
 
     // call the neuron implementation functions to do the work
     neuron_impl_load_neuron_parameters(address, next, n_neurons);
+    
     return true;
 }
 
 bool neuron_reload_neuron_parameters(address_t address) { // EXPORTED
+
     log_debug("neuron_reloading_neuron_parameters: starting");
     return neuron_load_neuron_parameters(address);
+}
+
+void dma_done_callback(uint arg1, uint arg2) {
+
+    use(arg1);
+    use(arg2);
+
+    dma_finished = true;
 }
 
 //! \brief Set up the neuron models
@@ -182,9 +224,8 @@ bool neuron_reload_neuron_parameters(address_t address) { // EXPORTED
 //!            (contains which regions are active and how big they are)
 //! \param[out] n_neurons_value The number of neurons this model is to emulate
 //! \return True is the initialisation was successful, otherwise False
-bool neuron_initialise(address_t address, uint32_t *n_neurons_value, // EXPORTED
-        uint32_t *n_synapse_types_value, uint32_t *incoming_spike_buffer_size,
-        uint32_t *timer_offset, REAL *starting_rate) {
+bool neuron_initialise(address_t address, uint32_t *timer_offset) {
+
     log_debug("neuron_initialise: starting");
     struct neuron_parameters *params = (void *) address;
 
@@ -208,20 +249,60 @@ bool neuron_initialise(address_t address, uint32_t *n_neurons_value, // EXPORTED
 
     // Read the neuron details
     n_neurons = params->n_neurons_to_simulate;
-    *n_neurons_value = n_neurons;
-    *n_synapse_types_value = params->n_synapse_types;
+    n_synapse_types = params->n_synapse_types;
 
-    // Read the size of the incoming spike buffer to use
-    *incoming_spike_buffer_size = params->incoming_spike_buffer_size;
+    memory_index = params->mem_index;
 
     // Read number of recorded variables
     n_recorded_vars = params->n_recorded_variables;
 
-    log_debug("\t n_neurons = %u, spike buffer size = %u", n_neurons,
-            *incoming_spike_buffer_size);
+    uint32_t n_neurons_power_2 = n_neurons;
+    uint32_t log_n_neurons = 1;
+    if (n_neurons != 1) {
+        if (!is_power_of_2(n_neurons)) {
+            n_neurons_power_2 = next_power_of_2(n_neurons);
+        }
+        log_n_neurons = ilog_2(n_neurons_power_2);
+    }
+
+    uint32_t n_synapse_types_power_2 = n_synapse_types;
+    if (!is_power_of_2(n_synapse_types)) {
+        n_synapse_types_power_2 = next_power_of_2(n_synapse_types);
+    }
+    uint32_t log_n_synapse_types = ilog_2(n_synapse_types_power_2);
+
+    synapse_type_index_bits = log_n_neurons + log_n_synapse_types;
+    synapse_index_bits = log_n_neurons;
+
+    uint32_t contribution_bits =
+        log_n_neurons + log_n_synapse_types;
+    uint32_t contribution_size = (1 << (contribution_bits));
+
+    contribution_offset = 2 * n_neurons_power_2;
+
+    dma_size = contribution_size * sizeof(REAL);
+
+    dma_finished = false;
+
+
+    //Allocate the region in SDRAM for synaptic contribution. Size is dma_size.
+    //Flag = 1 allocates with lock in order to avoid multiple accesses
+    synaptic_region = (REAL *) sark_xalloc(sv->sdram_heap, dma_size, memory_index, 1);
+
+    //set the region to 0 (necessary for the first timestep and for syn cores that never receive spikes)
+    for(index_t i = 0; i < contribution_size; i++) {
+        synaptic_region[i] = 0;
+    }
 
     // Call the neuron implementation initialise function to setup DTCM etc.
     if (!neuron_impl_initialise(n_neurons)) {
+        return false;
+    }
+
+    // Allocate space for the synaptic contribution buffer
+    synaptic_contributions = (REAL *) spin1_malloc(dma_size);
+    if (synaptic_contributions == NULL) {
+        log_error("Unable to allocate Synaptic contribution buffers");
         return false;
     }
 
@@ -285,9 +366,10 @@ bool neuron_initialise(address_t address, uint32_t *n_neurons_value, // EXPORTED
         return false;
     }
 
-    *starting_rate = neuron_impl_get_starting_rate();
-
     reset_record_counter();
+
+    simulation_dma_transfer_done_callback_on(
+        DMA_TAG_READ_SYNAPTIC_CONTRIBUTION, dma_done_callback);
 
     return true;
 }
@@ -313,8 +395,16 @@ static void recording_done_callback(void) {
 //! \param[in] time the timer tick  value currently being executed
 void neuron_do_timestep_update( // EXPORTED
         timer_t time, uint timer_count, uint timer_period) {
-    // Set the next expected time to wait for between spike sending
-    expected_time = sv->cpu_clk * timer_period;
+    
+    current_time = time;
+
+    spin1_dma_transfer (
+        DMA_TAG_READ_SYNAPTIC_CONTRIBUTION, synaptic_region,
+        synaptic_contributions, DMA_READ, dma_size);
+
+    while (!dma_finished);
+
+    dma_finished = false;
 
     // Wait until recordings have completed, to ensure the recording space
     // can be re-written
@@ -332,11 +422,23 @@ void neuron_do_timestep_update( // EXPORTED
 
     // update each neuron individually
     for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
+        
+        for (index_t synapse_type_index = 0; synapse_type_index < n_synapse_types; synapse_type_index++) {
+
+            uint32_t buff_index = ((synapse_type_index << synapse_index_bits) | neuron_index);
+
+            //Add the values from synaptic_contributions
+            sum = 0;
+
+            //MAKE IT INLINE?
+            neuron_impl_add_inputs(synapse_type_index, neuron_index, sum);
+        }    
         // Get external bias from any source of intrinsic plasticity
         input_t external_bias =
                 synapse_dynamics_get_intrinsic_bias(time, neuron_index);
 
         // call the implementation function (boolean for spike)
+        // MAKE IT INLINE
         bool spike = neuron_impl_do_timestep_update(
                 neuron_index, external_bias, recorded_variable_values);
 
@@ -409,14 +511,6 @@ void neuron_do_timestep_update( // EXPORTED
 
     // Re-enable interrupts
     spin1_mode_restore(cpsr);
-}
-
-void neuron_add_inputs( // EXPORTED
-        index_t synapse_type_index, index_t neuron_index,
-        input_t weights_this_timestep) {
-
-    neuron_impl_add_inputs(
-            synapse_type_index, neuron_index, weights_this_timestep);
 }
 
 #if LOG_LEVEL >= LOG_DEBUG

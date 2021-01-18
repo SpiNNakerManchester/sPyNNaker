@@ -18,14 +18,14 @@ APP = $(notdir $(CURDIR))
 OTHER_SOURCES = $(NEURON_DIR)/neuron/models/neuron_model_lif_two_comp_rate_impl.c
 NEURON_IMPL_H = $(NEURON_DIR)/neuron/implementations/neuron_impl_two_comp_rate.h
 
-SYNAPSE_DYNAMICS = $(NEURON_DIR)/neuron/plasticity/stdp/synapse_dynamics_multicomp_Bern.c
+SYNAPSE_DYNAMICS = $(NEURON_DIR)/synapse/plasticity/stdp/synapse_dynamics_multicomp_Bern.c
 
-TIMING_DEPENDENCE = $(NEURON_DIR)/neuron/plasticity/stdp/timing_dependence/timing_multicomp_Bern.c
-TIMING_DEPENDENCE_H = $(NEURON_DIR)/neuron/plasticity/stdp/timing_dependence/timing_multicomp_Bern.h
-WEIGHT_DEPENDENCE = $(NEURON_DIR)/neuron/plasticity/stdp/weight_dependence/weight_multiplicative_multicomp_Bern.c
-WEIGHT_DEPENDENCE_H = $(NEURON_DIR)/neuron/plasticity/stdp/weight_dependence/weight_multiplicative_multicomp_Bern.h
+TIMING_DEPENDENCE = $(NEURON_DIR)/synapse/plasticity/stdp/timing_dependence/timing_multicomp_Bern.c
+TIMING_DEPENDENCE_H = $(NEURON_DIR)/synapse/plasticity/stdp/timing_dependence/timing_multicomp_Bern.h
+WEIGHT_DEPENDENCE = $(NEURON_DIR)/synapse/plasticity/stdp/weight_dependence/weight_multiplicative_multicomp_Bern.c
+WEIGHT_DEPENDENCE_H = $(NEURON_DIR)/synapse/plasticity/stdp/weight_dependence/weight_multiplicative_multicomp_Bern.h
 
-COMPARTMENT_TYPE_H = $(NEURON_DIR)/neuron/compartment_type/compartment_type_US_model.h
+COMPARTMENT_TYPE_H = $(NEURON_DIR)/synapse/compartment_type/compartment_type_US_model.h
 
 include ../neural_build.mk
 
