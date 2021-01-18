@@ -144,3 +144,7 @@ class MockSimulator(object):
     @property
     def use_virtual_board(self):
         return True
+
+    @property
+    def min_delay(self):
+        return 1
