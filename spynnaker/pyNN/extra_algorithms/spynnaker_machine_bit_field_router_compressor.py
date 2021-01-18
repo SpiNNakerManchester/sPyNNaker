@@ -103,7 +103,8 @@ class AbstractMachineBitFieldRouterCompressor(object):
                 time_scale_factor=time_scale_factor,
                 threshold_percentage=threshold_percentage,
                 compress_as_much_as_possible=compress_as_much_as_possible,
-                executable_targets=executable_targets)
+                executable_targets=executable_targets,
+                provenance_data_objects=provenance_data_objects)
 
         # adjust cores to exclude the ones which did not give sdram.
         expander_chip_cores = self._locate_expander_rerun_targets(
