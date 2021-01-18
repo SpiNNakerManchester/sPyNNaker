@@ -33,9 +33,6 @@ from .key_space_tracker import KeySpaceTracker
 from .synaptic_matrix_app import SynapticMatrixApp
 
 
-# Amount to scale synapse SDRAM estimate by to make sure the synapses fit
-_SYNAPSE_SDRAM_OVERSCALE = 1.1
-
 # 1 for n_edges
 # 2 for post_vertex_slice.lo_atom, post_vertex_slice.n_atoms
 # 1 for n_synapse_types
