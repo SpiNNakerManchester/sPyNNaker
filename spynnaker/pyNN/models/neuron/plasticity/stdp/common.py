@@ -83,7 +83,7 @@ def get_exp_lut_array(time_step, time_constant, shift=0):
 
 
 def write_pfpc_lut(spec, peak_time, lut_size, shift, time_probe,
-                   fixed_point_one=STDP_FIXED_POINT_ONE):
+                   fixed_point_one=STDP_FIXED_POINT_ONE, kernel_scaling=1.0):
     # Add this to function arguments in the future
     machine_time_step = 1.0
     sin_pwr = 20
@@ -92,7 +92,7 @@ def write_pfpc_lut(spec, peak_time, lut_size, shift, time_probe,
     time_constant = peak_time / math.atan(sin_pwr)
     inv_tau = (1.0 / float(time_constant))  # * (machine_time_step / 1000.0)
 
-    #         # caluclate time of peak (from differentiating kernel and setting to zero)
+    #         # calculate time of peak (from differentiating kernel and setting to zero)
     #         kernel_peak_time = math.atan(20) / inv_tau
 
     # evaluate peak value of kernel to normalise LUT
@@ -115,7 +115,7 @@ def write_pfpc_lut(spec, peak_time, lut_size, shift, time_probe,
             exp_float = 0
         else:
             # Evaluate kernel
-            exp_float = math.exp(-value) * math.sin(value) ** sin_pwr / kernel_peak_value
+            exp_float = (math.exp(-value) * math.sin(value) ** sin_pwr / kernel_peak_value) * kernel_scaling
 
         # Convert to fixed-point
         exp_fix = float_to_fixed(exp_float, fixed_point_one)
@@ -134,6 +134,9 @@ def write_pfpc_lut(spec, peak_time, lut_size, shift, time_probe,
     if spec is None:
         print("peak: time {}, value {}".format(peak_time, kernel_peak_value))
         t = numpy.arange(0, lut_size)
+        out_fixed = numpy.array(out_fixed)
+        out_float = numpy.array(out_float)
+
         plt.plot(t, out_float, label='float')
         # plt.plot(t,out_fixed, label='fixed')
         plt.legend()
@@ -146,8 +149,6 @@ def write_pfpc_lut(spec, peak_time, lut_size, shift, time_probe,
         plt.savefig("figures/write_pfpc_lut_final_exp_fix.png")
         # plt.show()
 
-        out_fixed = numpy.array(out_fixed)
-        out_float = numpy.array(out_float)
         compare_t_values = numpy.array([15, 20, 30, 35, 45, 47,
                                         99, 115, 135, 140, 150])
         print("LUT VALUES TO COMPARE TO SPINNAKER:")
@@ -157,14 +158,11 @@ def write_pfpc_lut(spec, peak_time, lut_size, shift, time_probe,
 
         return t, out_float
     else:
-        # exp_fix_array_int16 = numpy.asarray(
-        #     final_exp_fix, dtype="uint16").view("uint32")
-        # spec.write_array(exp_fix_array_int16)
         spec.write_array(final_exp_fix, data_type=DataType.INT16)
 
 
 def write_mfvn_lut(spec, sigma, beta, lut_size, shift, time_probe,
-                   fixed_point_one=STDP_FIXED_POINT_ONE):
+                   fixed_point_one=STDP_FIXED_POINT_ONE, kernel_scaling=1.0):
     # Add this to function arguments in the future
     machine_time_step = 1.0
     cos_pwr = 2
@@ -194,7 +192,7 @@ def write_mfvn_lut(spec, sigma, beta, lut_size, shift, time_probe,
             exp_float = 0
         else:
             # Evaluate kernel
-            exp_float = math.exp(-abs(value * beta)) * math.cos(value) ** cos_pwr / kernel_peak_value
+            exp_float = (math.exp(-abs(value * beta)) * math.cos(value) ** cos_pwr / kernel_peak_value) * kernel_scaling
 
         # Convert to fixed-point
         exp_fix = float_to_fixed(exp_float, fixed_point_one)
@@ -213,15 +211,22 @@ def write_mfvn_lut(spec, sigma, beta, lut_size, shift, time_probe,
 
     if spec is None:
         print("peak: time {}, value {}".format(peak_time, kernel_peak_value))
+        out_fixed = numpy.array(out_fixed)
+        out_float = numpy.array(out_float)
+
         plt.plot(plot_times, out_float, label='float')
         # plt.plot(t,out_fixed, label='fixed')
         plt.legend()
         plt.title("mf-VN LUT")
         plt.savefig("figures/write_mfvn_lut.png")
+
+        compare_t_values = numpy.array([15, 20, 30, 35, 45, 47,
+                                        99, 115, 135, 140, 150])
+        print("LUT VALUES TO COMPARE TO SPINNAKER:")
+        print("TIME DELTAS | FIXED MULTIPLIERS | FLOAT MULTIPLIERS")
+        for x, y, z, in zip(compare_t_values, out_fixed[compare_t_values], out_float[compare_t_values]):
+            print("{:8} | {:8} | {:8.4f}".format(x, y, z))
         # plt.show()
         return plot_times, out_float
     else:
-        # exp_fix_array_int16 = numpy.asarray(
-        #     final_exp_fix, dtype="uint16").view("uint32")
-
         spec.write_array(final_exp_fix, data_type=DataType.INT16)
