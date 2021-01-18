@@ -68,10 +68,6 @@ class Projection(PyNNProjectionCommon):
         post_is_view = self.__check_population(
             post_synaptic_population, connector)
 
-        # set space object if not set
-        if space is None:
-            space = PyNNSpace()
-
         # set label
         self.__proj_label = label
         if label is None:
@@ -87,6 +83,8 @@ class Projection(PyNNProjectionCommon):
             synapse_type = SynapseDynamicsStatic()
 
         # set the space function as required
+        if space is None:
+            space = PyNNSpace()
         connector.set_space(space)
 
         super(Projection, self).__init__(

@@ -13,6 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+The :py:mod:`spynnaker.pyNN` package contains the front end specifications
+and implementation for the PyNN High-level API
+(http://neuralensemble.org/trac/PyNN).
+
+This package contains the profile of that code for PyNN 0.9
+"""
 # common imports
 import logging
 import numpy as __numpy

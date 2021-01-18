@@ -38,7 +38,7 @@ class PopulationBase(object):
     r""" Shared methods between :py:class:`Population`\ s and
     :py:class:`PopulationView`\ s.
 
-    Mainly pass through and not implemented
+    Mainly pass through and not implemented.
     """
     __slots__ = []
 
@@ -73,8 +73,8 @@ class PopulationBase(object):
 
     def getSpikes(self, *args, **kwargs):  # pylint: disable=unused-argument
         """
-        .. warning::
-            Deprecated. Use `get_data('spikes')` instead.
+        .. deprecated:: 5.0
+            Use ``get_data('spikes')`` instead.
         """
         logger.warning(
             'getSpikes is deprecated. Call transfered to get_data("spikes") '
@@ -104,12 +104,13 @@ class PopulationBase(object):
             If this is True, recorded data will be deleted from the Population.
         :param annotations: annotations to put on the neo block
         :type annotations: None or dict(str, ...)
+        :rtype: ~neo.core.Block
         """
 
     def get_gsyn(self, *args, **kwargs):  # pylint: disable=unused-argument
         """
-        .. warning::
-            Deprecated. Use `get_data(['gsyn_exc', 'gsyn_inh'])` instead.
+        .. deprecated:: 5.0
+            Use ``get_data(['gsyn_exc', 'gsyn_inh'])`` instead.
         """
         logger.warning(
             'get_gsyn is deprecated. '
@@ -137,8 +138,8 @@ class PopulationBase(object):
 
     def get_v(self, *args, **kwargs):  # pylint: disable=unused-argument
         """
-        .. warning::
-            Deprecated. Use `get_data('v')` instead.
+        .. deprecated:: 5.0
+            Use ``get_data('v')`` instead.
         """
         logger.warning(
             'getSpikes is deprecated. '
@@ -181,8 +182,8 @@ class PopulationBase(object):
 
     def meanSpikeCount(self, *args, **kwargs):
         """
-        .. warning::
-            Deprecated. Use `mean_spike_count()` instead.
+        .. deprecated:: 5.0
+            Use ``mean_spike_count()`` instead.
         """
         logger.warning(
             'meanSpikeCount is deprecated. '
@@ -277,8 +278,8 @@ class PopulationBase(object):
 
     def printSpikes(self, filename, gather=True):
         """
-        .. warning::
-            Deprecated. Use `write_data(file, 'spikes')` instead.
+        .. deprecated:: 5.0
+            Use ``write_data(file, 'spikes')`` instead.
 
         .. note::
             Method signature is the PyNN0.7 one
@@ -294,9 +295,8 @@ class PopulationBase(object):
 
     def print_gsyn(self, filename, gather=True):
         """
-        .. warning::
-            Deprecated. Use `write_data(file, ['gsyn_exc', 'gsyn_inh'])`\
-            instead.
+        .. deprecated:: 5.0
+            Use ``write_data(file, ['gsyn_exc', 'gsyn_inh'])`` instead.
 
         .. note::
             Method signature is the PyNN0.7 one
@@ -312,8 +312,8 @@ class PopulationBase(object):
 
     def print_v(self, filename, gather=True):
         """
-        .. warning::
-            Deprecated. Use `write_data(file, 'v')` instead.
+        .. deprecated:: 5.0
+            Use ``write_data(file, 'v')`` instead.
 
         .. note::
             Method signature is the PyNN0.7 one
@@ -355,8 +355,8 @@ class PopulationBase(object):
 
     def record_gsyn(self, sampling_interval=1, to_file=None):
         """
-        .. warning::
-            Deprecated. Use `record(['gsyn_exc', 'gsyn_inh'])` instead.
+        .. deprecated:: 5.0
+            Use ``record(['gsyn_exc', 'gsyn_inh'])`` instead.
 
         .. note::
             Method signature is the PyNN 0.7 one
@@ -371,11 +371,11 @@ class PopulationBase(object):
 
     def record_v(self, sampling_interval=1, to_file=None):
         """
-        .. warning::
-            Deprecated. Use `record('v')` instead.
+        .. deprecated:: 5.0
+            Use ``record('v')`` instead.
 
         .. note::
-            Method signature is the PyNN 0.7 one\
+            Method signature is the PyNN 0.7 one
             with the extra non-PyNN `sampling_interval` and `indexes`
         """
         logger.warning('record_v is deprecated. '
@@ -386,8 +386,8 @@ class PopulationBase(object):
 
     def rset(self, *args, **kwargs):
         """
-        .. warning::
-            Deprecated. Use `set(parametername=rand_distr)` instead.
+        .. deprecated:: 5.0
+            Use ``set(parametername=rand_distr)`` instead.
         """
         _this_is_wholly_deprecated(
             " Use set(parametername=rand_distr) instead.", args, kwargs)
@@ -415,8 +415,8 @@ class PopulationBase(object):
 
     def tset(self, **kwargs):
         """
-        .. warning::
-            Deprecated. Use `set(parametername=value_array)` instead.
+        .. deprecated:: 5.0
+            Use ``set(parametername=value_array)`` instead.
         """
         _this_is_wholly_deprecated(
             "Use set(parametername=value_array) instead.", kwargs)

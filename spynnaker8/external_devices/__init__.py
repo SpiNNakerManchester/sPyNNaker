@@ -14,9 +14,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-The :py:mod:`spynnaker.pyNN` package contains the front end specifications
-and implementation for the PyNN High-level API
-(http://neuralensemble.org/trac/PyNN)
+This contains functions and classes for handling external devices such as the
+PushBot (http://spinnakermanchester.github.io/docs/push_bot/).
+
+.. note::
+    When using external devices, it is normally important to configure your
+    SpiNNaker system to run in real-time mode, which usually reduces numerical
+    accuracy to gain performance.
 """
 import logging
 import os
@@ -24,12 +28,12 @@ from spinn_utilities.socket_address import SocketAddress
 from spinnman.messages.eieio import EIEIOType
 from spinn_front_end_common.abstract_models import (
     AbstractSendMeMulticastCommandsVertex)
-from spinn_front_end_common.utilities import globals_variables
+from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.abstract_spinnaker_common import AbstractSpiNNakerCommon
 from spynnaker.pyNN.external_devices_models import (
     AbstractEthernetController, AbstractEthernetSensor,
     ArbitraryFPGADevice, ExternalCochleaDevice, ExternalFPGARetinaDevice,
-    MunichMotorDevice, MunichRetinaDevice)
+    MunichMotorDevice, MunichRetinaDevice, ExternalDeviceLifControl)
 from spynnaker.pyNN.models.utility_models.spike_injector import (
     SpikeInjector as
     ExternalDeviceSpikeInjector)
@@ -37,13 +41,14 @@ from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.connections import (
     EthernetCommandConnection, EthernetControlConnection,
     SpynnakerLiveSpikesConnection, SpynnakerPoissonControlConnection)
-from spynnaker.pyNN.external_devices_models import ExternalDeviceLifControl
 from spynnaker.pyNN.external_devices_models.push_bot.push_bot_control_modules \
     import (
         PushBotLifEthernet, PushBotLifSpinnakerLink)
 from spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link \
     import (
-        PushBotSpiNNakerLinkRetinaDevice)
+        PushBotSpiNNakerLinkRetinaDevice,
+        PushBotSpiNNakerLinkLaserDevice, PushBotSpiNNakerLinkLEDDevice,
+        PushBotSpiNNakerLinkMotorDevice, PushBotSpiNNakerLinkSpeakerDevice)
 from spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet \
     import (
         PushBotEthernetLaserDevice, PushBotEthernetLEDDevice,
@@ -53,10 +58,6 @@ from spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters \
     import (
         PushBotLaser, PushBotLED, PushBotMotor, PushBotRetinaResolution,
         PushBotSpeaker, PushBotRetinaViewer)
-from spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link \
-    import (
-        PushBotSpiNNakerLinkLaserDevice, PushBotSpiNNakerLinkLEDDevice,
-        PushBotSpiNNakerLinkMotorDevice, PushBotSpiNNakerLinkSpeakerDevice)
 from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
 from spynnaker.pyNN.spynnaker_external_device_plugin_manager import (
     SpynnakerExternalDevicePluginManager as
@@ -121,30 +122,30 @@ def run_forever(sync_time=0):
     :return: returns when the application has started running on the\
         SpiNNaker platform.
     """
-    globals_variables.get_simulator().run(None, sync_time)
+    get_simulator().run(None, sync_time)
 
 
 def run_sync(run_time, sync_time):
-    """ Run in steps of the given number of milliseconds pausing between
+    """ Run in steps of the given number of milliseconds pausing between\
         for a signal to be sent from the host
 
     :param float run_time: The time in milliseconds to run the simulation for
     :param float sync_time: The time in milliseconds to pause before allowing
     """
-    globals_variables.get_simulator().run(run_time, sync_time)
+    get_simulator().run(run_time, sync_time)
 
 
 def continue_simulation():
     """ Continue a synchronised simulation
     """
-    globals_variables.get_simulator().continue_simulation()
+    get_simulator().continue_simulation()
 
 
 def request_stop():
     """ Request a stop in the simulation without a complete stop.  Will stop\
         after the next auto-pause-and-resume cycle
     """
-    globals_variables.get_simulator().stop_run()
+    get_simulator().stop_run()
 
 
 def register_database_notification_request(hostname, notify_port, ack_port):
@@ -153,7 +154,6 @@ def register_database_notification_request(hostname, notify_port, ack_port):
     :param str hostname: hostname to connect to
     :param int notify_port: port num for the notify command
     :param int ack_port: port num for the acknowledge command
-    :rtype: None
     """
     spynnaker_external_devices.add_socket_address(
         SocketAddress(hostname, notify_port, ack_port))
@@ -166,7 +166,7 @@ __ethernet_control_connection = None
 def EthernetControlPopulation(
         n_neurons, model, label=None, local_host=None, local_port=None,
         database_notify_port_num=None, database_ack_port_num=None):
-    """ Create a PyNN population that can be included in a network to
+    """ Create a PyNN population that can be included in a network to\
         control an external device which is connected to the host
 
     :param int n_neurons: The number of neurons in the control population
@@ -192,7 +192,7 @@ def EthernetControlPopulation(
         A pyNN Population which can be used as the target of a Projection.
         Note that the Population can also be used as the source of a
         Projection, but it might not send spikes.
-    :rtype: Population
+    :rtype: ~spynnaker8.models.populations.Population
     :raises Exception: If an invalid model class is used.
     """
     # pylint: disable=protected-access, too-many-arguments, too-many-locals
@@ -255,7 +255,7 @@ def EthernetSensorPopulation(
     :return:
         A pyNN Population which can be used as the source of a Projection.
         Note that the Population cannot be used as the target of a Projection.
-    :rtype: Population
+    :rtype: ~spynnaker8.models.populations.Population
     """
     if not isinstance(device, AbstractEthernetSensor):
         raise Exception("Device must be an instance of AbstractEthernetSensor")
@@ -283,19 +283,23 @@ def EthernetSensorPopulation(
 def SpikeInjector(
         notify=True, database_notify_host=None, database_notify_port_num=None,
         database_ack_port_num=None):
-    """ Supports adding a spike injector to the application graph.
+    """ Supports creating a spike injector that can be added to the\
+        application graph.
 
     :param bool notify: Whether to register for notifications
-    :param database_notify_host: the hostname for the device which is\
+    :param database_notify_host: the hostname for the device which is
         listening to the database notification.
     :type database_notify_host: str or None
-    :param database_ack_port_num: the port number to which a external device\
-        will acknowledge that they have finished reading the database and are\
+    :param database_ack_port_num: the port number to which a external device
+        will acknowledge that they have finished reading the database and are
         ready for it to start execution
     :type database_ack_port_num: int or None
-    :param database_notify_port_num: The port number to which a external\
+    :param database_notify_port_num: The port number to which a external
         device will receive the database is ready command
     :type database_notify_port_num: int or None
+    :return: The spike injector model object that can be placed in a pyNN
+        :py:class:`~spynnaker8.models.populations.Population`.
+    :rtype: ~spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel
     """
     # pylint: disable=too-many-arguments
     if notify:

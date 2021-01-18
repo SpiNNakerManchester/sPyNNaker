@@ -31,10 +31,10 @@ class PopulationView(PopulationBase):
     """ A view of a subset of neurons within a\
     :py:class:`~spynnaker8.models.populations.Population`.
 
-    In most ways, Populations and PopulationViews have the same behaviour,\
-    i.e., they can be recorded, connected with Projections, etc. \
-    It should be noted that any changes to neurons in a PopulationView\
-    will be reflected in the parent Population and vice versa.
+    In most ways, Populations and PopulationViews have the same behaviour,
+    i.e., they can be recorded, connected with Projections, etc.
+    It should be noted that any changes to neurons in a PopulationView
+    will be reflected in the parent Population and *vice versa.*
 
     It is possible to have views of views.
 
@@ -52,12 +52,12 @@ class PopulationView(PopulationBase):
     def __init__(self, parent, selector, label=None):
         """
         :param parent: the population or view to make the view from
-        :type parent: ~spynnaker8.models.populations.Population or\
+        :type parent: ~spynnaker8.models.populations.Population or
             ~spynnaker8.models.populations.PopulationView
-        :param selector: a slice or numpy mask array.\
-            The mask array should either be a boolean array (ideally) of the\
-            same size as the parent,\
-            or an integer array containing cell indices,\
+        :param selector: a slice or numpy mask array.
+            The mask array should either be a boolean array (ideally) of the
+            same size as the parent,
+            or an integer array containing cell indices,
             i.e. if `p.size == 5` then:
 
             ::
@@ -67,7 +67,7 @@ class PopulationView(PopulationBase):
                 PopulationView(p, slice(2, 5, 2))
 
             will all create the same view.
-        :type selector: None or slice or int or list(bool) or list(int) or\
+        :type selector: None or slice or int or list(bool) or list(int) or
             ~numpy.ndarray(bool) or ~numpy.ndarray(int)
         :param str label: A label for the view
         """
@@ -129,7 +129,7 @@ class PopulationView(PopulationBase):
     def mask(self):
         """  The selector mask that was used to create this view.
 
-        :rtype: None or slice or int or list(bool) or list(int) or\
+        :rtype: None or slice or int or list(bool) or list(int) or
             ~numpy.ndarray(bool) or ~numpy.ndarray(int)
         """
         return self.__mask
@@ -205,10 +205,10 @@ class PopulationView(PopulationBase):
                  engine='default'):
         """ Returns a human-readable description of the population view.
 
-        The output may be customized by specifying a different template\
+        The output may be customized by specifying a different template
         together with an associated template engine (see pyNN.descriptions).
 
-        If template is None, then a dictionary containing the template\
+        If template is None, then a dictionary containing the template
         context will be returned.
 
         :param str template: Template filename
@@ -237,11 +237,14 @@ class PopulationView(PopulationBase):
 
     def get(self, parameter_names, gather=False, simplify=True):
         """ Get the values of the given parameters for every local cell in\
-            the population, or, if gather=True,\
+            the population, or, if ``gather=True``,\
             for all cells in the population.
 
-        Values will be expressed in the standard PyNN units (i.e. millivolts,\
+        Values will be expressed in the standard PyNN units (i.e. millivolts,
         nanoamps, milliseconds, microsiemens, nanofarads, event per second).
+
+        .. note::
+            SpiNNaker always gathers.
         """
         if not gather:
             logger.warning("SpiNNaker only supports gather=True. We will run "
@@ -275,6 +278,10 @@ class PopulationView(PopulationBase):
         :param annotations: annotations to put on the neo block
         :type annotations: dict(str, ...)
         :rtype: ~neo.core.Block
+        :raises \
+            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
+            If the variable or variables have not been previously set to
+            record.
         """
         if not gather:
             logger.warning("SpiNNaker only supports gather=True. We will run "
@@ -319,7 +326,7 @@ class PopulationView(PopulationBase):
         """ Returns the parent Population at the root of the tree (since the\
             immediate parent may itself be a PopulationView).
 
-        The name "grandparent" is of course a little misleading, as it could\
+        The name "grandparent" is of course a little misleading, as it could
         be just the parent, or the great, great, great, ..., grandparent.
 
         :rtype: ~spynnaker8.models.populations.Population
@@ -348,12 +355,12 @@ class PopulationView(PopulationBase):
 
         * single numeric values (all neurons set to the same value), or
         * :py:class:`~pyNN.random.RandomDistribution` objects, or
-        * lists / arrays of numbers of the same size as the population\
-          mapping functions, where a mapping function accepts a single\
+        * lists / arrays of numbers of the same size as the population
+          mapping functions, where a mapping function accepts a single
           argument (the cell index) and returns a single number.
 
-        Values should be expressed in the standard PyNN units(\
-        i.e. millivolts, nanoamps, milliseconds, microsiemens, nanofarads,\
+        Values should be expressed in the standard PyNN units(
+        i.e. millivolts, nanoamps, milliseconds, microsiemens, nanofarads,
         event per second).
 
         Examples::
@@ -373,7 +380,7 @@ class PopulationView(PopulationBase):
 
         :param variables: either a single variable name, or a list of variable
             names, or ``all`` to record everything. For a given celltype
-            class, celltype.recordable contains a\
+            class, celltype.recordable contains a
             list of variables that can be recorded for that celltype.
         :type variables: str or list(str)
         :param to_file:
@@ -410,15 +417,15 @@ class PopulationView(PopulationBase):
 
         * single values,
         * :py:class:`~pyNN.random.RandomDistribution` objects, or
-        * lists / arrays of values of the same size as the population\
-          mapping functions, where a mapping function accepts a single\
+        * lists / arrays of values of the same size as the population
+          mapping functions, where a mapping function accepts a single
           argument (the cell index) and returns a single value.
 
-        Here, a "single value" may be either a single number or a list /\
+        Here, a "single value" may be either a single number or a list /
         array of numbers (e.g. for spike times).
 
-        Values should be expressed in the standard PyNN units (i.e. \
-        millivolts, nanoamps, milliseconds, microsiemens, nanofarads, \
+        Values should be expressed in the standard PyNN units (i.e.
+        millivolts, nanoamps, milliseconds, microsiemens, nanofarads,
         event per second).
 
         Examples::
@@ -436,8 +443,8 @@ class PopulationView(PopulationBase):
         """ Write recorded data to file, using one of the file formats\
             supported by Neo.
 
-        :param io: a Neo IO instance
-        :type io: ~neo.io or ~neo.rawio or str
+        :param io: a Neo IO instance or the name of a file to write
+        :type io: neo.io.BaseIO or str
         :param variables: either a single variable name or a list of variable
             names. These must have been previously recorded, otherwise an
             Exception will be raised.
@@ -456,6 +463,10 @@ class PopulationView(PopulationBase):
             as numbers and strings. The contents will be written into the
             output data file as metadata.
         :type annotations: dict(str, ...)
+        :raises \
+            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
+            If the variable or variables have not been previously set to
+            record.
         """
         if not gather:
             logger.warning("SpiNNaker only supports gather=True. We will run "

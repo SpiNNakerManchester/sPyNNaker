@@ -61,7 +61,7 @@ class IDMixin(object):
         :param to_file:
             If specified, should be a Neo IO instance and write_data()
             will be automatically called when end() is called.
-        :type to_file: ~neo.io or ~neo.rawio or str
+        :type to_file: neo.io.baseio.BaseIO or str
         :param int sampling_interval:
             should be a value in milliseconds, and an integer multiple of the
             simulation timestep.
