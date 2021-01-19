@@ -76,10 +76,11 @@ class AbstractMachineBitFieldRouterCompressor(object):
         :param int threshold_percentage:
             the percentage of bitfields to do on chip before its considered
             a success
-        :param int retry_count:
+        :param retry_count:
             Number of times that the sorters should set of the compressions
-            again
-         :param bool read_algorithm_iobuf: flag saying if read iobuf
+            again. None for as much as needed
+        :type retry_count: int or None
+        :param bool read_algorithm_iobuf: flag saying if read iobuf
         :param bool compress_as_much_as_possible:
             flag asking if should compress as much as possible
         :param bool read_expander_iobuf: reads the synaptic expander iobuf.
