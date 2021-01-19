@@ -658,7 +658,9 @@ bool population_table_initialise(
     }
 
     // free memory as no longer needed, now that caching done
-    sark_xfree(sark.heap, max_cores_map, ALLOC_LOCK);
+    if (max_cores_map != NULL) {
+        sark_xfree(sark.heap, max_cores_map, ALLOC_LOCK);
+    }
 
     //reset counters to reflect only execution lookups
     n_master_pop_cached_look_ups = 0;
