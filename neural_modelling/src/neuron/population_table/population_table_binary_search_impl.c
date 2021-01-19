@@ -593,6 +593,7 @@ bool population_table_initialise(
     log_debug("Pop table size is %d\n", n_master_pop_bytes);
     log_debug("n cached array blocks = %d", config->n_array_blocks);
     log_debug("n cached binary blocks = %d", config->n_binary_search_blocks);
+    log_debug("max_cores_length = %d", config->max_cores_length);
 
     // only try to malloc if there's stuff to malloc.
     if (n_master_pop_bytes != 0) {
@@ -655,6 +656,9 @@ bool population_table_initialise(
         log_error("failed to cache into DTCM");
         return false;
     }
+
+    // free memory as no longer needed, now that caching done
+    sark_xfree(sark.heap, max_cores_map, ALLOC_LOCK);
 
     //reset counters to reflect only execution lookups
     n_master_pop_cached_look_ups = 0;
