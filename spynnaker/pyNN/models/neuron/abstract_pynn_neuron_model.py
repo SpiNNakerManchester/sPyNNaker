@@ -14,14 +14,18 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from pacman.model.decorators.overrides import overrides
-from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+from spynnaker.pyNN.models.neuron.pynn_partition_vertex import PyNNPartitionVertex
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 
-DEFAULT_MAX_ATOMS_PER_CORE = 255
+#Must be a power of 2!!!
+DEFAULT_MAX_ATOMS_PER_SYN_CORE = 64
+SYN_CORES_PER_NEURON_CORE = 1
+DEFAULT_MAX_ATOMS_PER_NEURON_CORE = DEFAULT_MAX_ATOMS_PER_SYN_CORE * SYN_CORES_PER_NEURON_CORE
 
 _population_parameters = {
     "spikes_per_second": None, "ring_buffer_sigma": None,
-    "incoming_spike_buffer_size": None
+    "incoming_spike_buffer_size": None, "in_partitions": None,
+    "out_partitions": None
 }
 
 
@@ -38,22 +42,26 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
         return self.__model
 
     @classmethod
-    def set_model_max_atoms_per_core(cls, n_atoms=DEFAULT_MAX_ATOMS_PER_CORE):
+    def set_model_max_atoms_per_core(cls, n_atoms=DEFAULT_MAX_ATOMS_PER_NEURON_CORE):
         super(AbstractPyNNNeuronModel, cls).set_model_max_atoms_per_core(
             n_atoms)
 
     @classmethod
     def get_max_atoms_per_core(cls):
         if cls not in super(AbstractPyNNNeuronModel, cls)._max_atoms_per_core:
-            return DEFAULT_MAX_ATOMS_PER_CORE
+            return DEFAULT_MAX_ATOMS_PER_NEURON_CORE
         return super(AbstractPyNNNeuronModel, cls).get_max_atoms_per_core()
 
     @overrides(AbstractPyNNModel.create_vertex,
                additional_arguments=_population_parameters.keys())
     def create_vertex(
             self, n_neurons, label, constraints, spikes_per_second,
-            ring_buffer_sigma, incoming_spike_buffer_size):
+            ring_buffer_sigma, incoming_spike_buffer_size,
+            in_partitions, out_partitions):
+
         max_atoms = self.get_max_atoms_per_core()
-        return AbstractPopulationVertex(
+        
+        return PyNNPartitionVertex(
             n_neurons, label, constraints, max_atoms, spikes_per_second,
-            ring_buffer_sigma, incoming_spike_buffer_size, self.__model, self)
+            ring_buffer_sigma, self.__model, self, incoming_spike_buffer_size,
+            in_partitions, out_partitions)

@@ -18,9 +18,10 @@ from .connection_holder import ConnectionHolder
 from .population_machine_vertex import PopulationMachineVertex
 from .synaptic_manager import SynapticManager
 from .abstract_pynn_neuron_model import AbstractPyNNNeuronModel
+from .pynn_partition_vertex import PyNNPartitionVertex
 from .abstract_pynn_neuron_model_standard import (
     AbstractPyNNNeuronModelStandard)
 
 __all__ = ["AbstractPopulationVertex", "ConnectionHolder", "SynapticManager",
            "PopulationMachineVertex", "AbstractPyNNNeuronModel",
-           "AbstractPyNNNeuronModelStandard"]
+           "AbstractPyNNNeuronModelStandard", "PyNNPartitionVertex"]
