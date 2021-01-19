@@ -19,10 +19,9 @@ from spinn_front_end_common.abstract_models import (
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from .push_bot_ethernet_device import PushBotEthernetDevice
-from spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters \
-    import (
-        PushBotMotor)
+from .device import PushBotEthernetDevice
+from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
+    PushBotMotor)
 
 
 class PushBotEthernetMotorDevice(
@@ -35,7 +34,7 @@ class PushBotEthernetMotorDevice(
         """
         :param motor: a PushBotMotor value to indicate the motor to control
         :type motor:
-            ~spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.PushBotMotor
+            ~spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotMotor
         :param protocol: The protocol used to control the device
         :type protocol: MunichIoEthernetProtocol
         :param timesteps_between_send:

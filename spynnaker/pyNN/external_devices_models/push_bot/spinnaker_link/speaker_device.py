@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
-from spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet import (
+from spynnaker.pyNN.external_devices_models.push_bot.ethernet import (
     PushBotEthernetSpeakerDevice)
 
 
@@ -44,7 +44,7 @@ class PushBotSpiNNakerLinkSpeakerDevice(
         """
         :param speaker: Which speaker device to control
         :type speaker:
-            ~spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.PushBotSpeaker
+            ~spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotSpeaker
         :param protocol: The protocol instance to get commands from
         :type protocol: ~spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol
         :param int spinnaker_link_id: The SpiNNakerLink connected to

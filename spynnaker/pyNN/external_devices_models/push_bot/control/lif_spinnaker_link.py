@@ -13,26 +13,18 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from spynnaker.pyNN.models.defaults import default_initial_values
-from spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet \
-    import (
-        PushBotTranslator)
 from spynnaker.pyNN.external_devices_models import ExternalDeviceLifControl
-from spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet \
-    import (
-        get_pushbot_wifi_connection)
+from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
+from spynnaker.pyNN.models.defaults import default_initial_values
 
 
-class PushBotLifEthernet(ExternalDeviceLifControl):
-    """ Leaky integrate and fire neuron with an exponentially decaying \
-        current input
+class PushBotLifSpinnakerLink(ExternalDeviceLifControl):
+    """ Control module for a PushBot connected to a SpiNNaker Link
 
-    :param MunichIoEthernetProtocol protocol:
+    :param ~spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol protocol:
         How to talk to the bot.
     :param iterable(AbstractMulticastControllableDevice) devices:
         The devices on the bot that we are interested in.
-    :param str pushbot_ip_address: Where is the pushbot?
-    :param int pushbot_port: (defaulted)
     :param float tau_m: LIF neuron parameter (defaulted)
     :param float cm: LIF neuron parameter (defaulted)
     :param float v_rest: LIF neuron parameter (defaulted)
@@ -49,8 +41,7 @@ class PushBotLifEthernet(ExternalDeviceLifControl):
 
     @default_initial_values({"v", "isyn_exc", "isyn_inh"})
     def __init__(
-            self, protocol, devices, pushbot_ip_address,
-            pushbot_port=56000,
+            self, protocol, devices,
 
             # default params for the neuron model type
             tau_m=20.0, cm=1.0, v_rest=0.0, v_reset=0.0, tau_syn_E=5.0,
@@ -58,10 +49,12 @@ class PushBotLifEthernet(ExternalDeviceLifControl):
             isyn_exc=0.0, isyn_inh=0.0):
         # pylint: disable=too-many-arguments, too-many-locals
 
-        translator = PushBotTranslator(
-            protocol,
-            get_pushbot_wifi_connection(pushbot_ip_address, pushbot_port))
+        command_protocol = MunichIoSpiNNakerLinkProtocol(
+            protocol.mode, uart_id=protocol.uart_id)
+        for device in devices:
+            device.set_command_protocol(command_protocol)
 
-        super(PushBotLifEthernet, self).__init__(
-            devices, False, translator, tau_m, cm, v_rest, v_reset,
+        # Initialise the abstract LIF class
+        super(PushBotLifSpinnakerLink, self).__init__(
+            devices, True, None, tau_m, cm, v_rest, v_reset,
             tau_syn_E, tau_syn_I, tau_refrac, i_offset, v, isyn_exc, isyn_inh)

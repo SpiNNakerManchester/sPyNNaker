@@ -17,10 +17,8 @@
 utility class containing simple helper methods
 """
 import os
-import logging
 import math
 import numpy
-from spinn_utilities.log import FormatAdapter
 from pyNN.random import RandomDistribution
 from scipy.stats import binom
 from spinn_utilities.safe_eval import SafeEval
@@ -30,7 +28,6 @@ from spynnaker.pyNN.utilities.random_stats import (
     RandomStatsNormalClippedImpl, RandomStatsNormalImpl,
     RandomStatsPoissonImpl, RandomStatsRandIntImpl, RandomStatsUniformImpl,
     RandomStatsVonmisesImpl, RandomStatsBinomialImpl)
-
 
 MAX_RATE = 2 ** 32 - 1  # To allow a unit32_t to be used to store the rate
 
@@ -53,8 +50,6 @@ STATS_BY_NAME = {
     'uniform': RandomStatsUniformImpl(),
     'randint': RandomStatsRandIntImpl(),
     'vonmises': RandomStatsVonmisesImpl()}
-
-logger = FormatAdapter(logging.getLogger(__name__))
 
 
 def check_directory_exists_and_create_if_not(filename):

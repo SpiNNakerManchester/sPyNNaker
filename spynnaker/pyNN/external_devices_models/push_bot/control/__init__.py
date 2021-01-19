@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .push_bot_lif_ethernet import PushBotLifEthernet
-from .push_bot_lif_spinnaker_link import PushBotLifSpinnakerLink
+from .lif_ethernet import PushBotLifEthernet
+from .lif_spinnaker_link import PushBotLifSpinnakerLink
 
 __all__ = ["PushBotLifEthernet", "PushBotLifSpinnakerLink"]

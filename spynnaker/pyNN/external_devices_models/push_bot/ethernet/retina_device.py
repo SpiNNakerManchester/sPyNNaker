@@ -15,9 +15,9 @@
 
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.external_devices_models import AbstractEthernetSensor
-from .push_bot_translator import PushBotTranslator
-from .push_bot_wifi_connection import get_pushbot_wifi_connection
-from .push_bot_retina_connection import PushBotRetinaConnection
+from .translator import PushBotTranslator
+from .wifi_connection import get_pushbot_wifi_connection
+from .retina_connection import PushBotRetinaConnection
 from spynnaker.pyNN.external_devices_models.push_bot import (
     AbstractPushBotRetinaDevice)
 
@@ -33,7 +33,7 @@ class PushBotEthernetRetinaDevice(
         :type protocol: MunichIoEthernetProtocol
         :param resolution:
         :type resolution:
-            ~spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.PushBotRetinaResolution
+            ~spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaResolution
         :param pushbot_ip_address:
         :param pushbot_port:
         :param injector_port:

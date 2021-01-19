@@ -13,19 +13,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
 import numpy
 from pyNN.random import RandomDistribution
 from pyNN.connectors import OneToOneConnector as PyNNOneToOneConnector
-from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
 from .abstract_connector_supports_views_on_machine import (
     AbstractConnectorSupportsViewsOnMachine)
-
-logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class OneToOneConnector(AbstractGenerateConnectorOnMachine,

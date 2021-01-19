@@ -13,10 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
 import numpy
 from pyNN.random import RandomDistribution
-from spinn_utilities.log import FormatAdapter
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
@@ -28,9 +26,7 @@ from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neuron import ConnectionHolder
 from spynnaker.pyNN.models.neural_projections.connectors import (
     FromListConnector)
-
 # pylint: disable=protected-access
-logger = FormatAdapter(logging.getLogger(__name__))
 
 
 # noinspection PyProtectedMember

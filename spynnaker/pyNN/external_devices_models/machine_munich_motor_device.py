@@ -25,8 +25,8 @@ from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification)
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
-from spinn_front_end_common.interface.provenance import \
-    ProvidesProvenanceDataFromMachineImpl
+from spinn_front_end_common.interface.provenance import (
+    ProvidesProvenanceDataFromMachineImpl)
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES, BYTES_PER_WORD)
@@ -50,20 +50,21 @@ class MachineMunichMotorDevice(
         "__speed",
         "__update_time"]
 
-    MOTOR_PARTITION_ID = "MOTOR"
+    _MOTOR_PARTITION_ID = "MOTOR"
 
-    N_ATOMS = 6
+    _N_ATOMS = 6
 
-    SYSTEM_REGION = 0
-    PARAMS_REGION = 1
-    PROVENANCE_REGION = 2
+    _SYSTEM_REGION = 0
+    _PARAMS_REGION = 1
+    _PROVENANCE_REGION = 2
 
-    PROVENANCE_ELEMENTS = 1
+    _PROVENANCE_ELEMENTS = 1
 
-    PARAMS_SIZE = 7 * BYTES_PER_WORD
+    _PARAMS_SIZE = 7 * BYTES_PER_WORD
 
+    #: The name of the provenance item saying that packets were lost.
     INPUT_BUFFER_FULL_NAME = "Times_the_input_buffer_lost_packets"
-    INPUT_BUFFER_FULL_MESSAGE = (
+    _INPUT_BUFFER_FULL_MESSAGE = (
         "The input buffer for {} on {}, {}, {} lost packets on {} "
         "occasions. This is often a sign that the system is running "
         "too quickly for the number of neurons per core.  Please "
@@ -87,7 +88,7 @@ class MachineMunichMotorDevice(
         """
         super(MachineMunichMotorDevice, self).__init__(
             label=label, constraints=constraints, app_vertex=app_vertex,
-            vertex_slice=Slice(0, self.N_ATOMS-1))
+            vertex_slice=Slice(0, self._N_ATOMS - 1))
         self.__speed = speed
         self.__sample_time = sample_time
         self.__update_time = update_time
@@ -100,8 +101,8 @@ class MachineMunichMotorDevice(
     def resources_required(self):
         return ResourceContainer(
             sdram=ConstantSDRAM(
-                SYSTEM_BYTES_REQUIREMENT + self.PARAMS_SIZE +
-                self.get_provenance_data_size(self.PROVENANCE_ELEMENTS)),
+                SYSTEM_BYTES_REQUIREMENT + self._PARAMS_SIZE +
+                self.get_provenance_data_size(self._PROVENANCE_ELEMENTS)),
             dtcm=DTCMResource(0), cpu_cycles=CPUCyclesPerTickResource(0))
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
@@ -115,12 +116,12 @@ class MachineMunichMotorDevice(
     @property
     @overrides(ProvidesProvenanceDataFromMachineImpl._provenance_region_id)
     def _provenance_region_id(self):
-        return self.PROVENANCE_REGION
+        return self._PROVENANCE_REGION
 
     @property
     @overrides(ProvidesProvenanceDataFromMachineImpl._n_additional_data_items)
     def _n_additional_data_items(self):
-        return self.PROVENANCE_ELEMENTS
+        return self._PROVENANCE_ELEMENTS
 
     @overrides(ProvidesProvenanceDataFromMachineImpl.
                get_provenance_data_from_machine)
@@ -143,7 +144,7 @@ class MachineMunichMotorDevice(
         provenance_items.append(ProvenanceDataItem(
             self._add_name(names, self.INPUT_BUFFER_FULL_NAME),
             n_buffer_overflows, report=n_buffer_overflows > 0,
-            message=self.INPUT_BUFFER_FULL_MESSAGE.format(
+            message=self._INPUT_BUFFER_FULL_MESSAGE.format(
                 label, x, y, p, n_buffer_overflows)))
         return provenance_items
 
@@ -169,20 +170,20 @@ class MachineMunichMotorDevice(
         spec.comment("\n*** Spec for robot motor control ***\n\n")
 
         # handle simulation data
-        spec.switch_write_focus(self.SYSTEM_REGION)
+        spec.switch_write_focus(self._SYSTEM_REGION)
         spec.write_array(simulation_utilities.get_simulation_header_array(
             placement.vertex.get_binary_file_name(), machine_time_step,
             time_scale_factor))
 
         # Get the key
         edge_key = routing_info.get_first_key_from_pre_vertex(
-            placement.vertex, self.MOTOR_PARTITION_ID)
+            placement.vertex, self._MOTOR_PARTITION_ID)
         if edge_key is None:
             raise SpynnakerException(
                 "This motor should have one outgoing edge to the robot")
 
         # write params to memory
-        spec.switch_write_focus(region=self.PARAMS_REGION)
+        spec.switch_write_focus(region=self._PARAMS_REGION)
         spec.write_value(data=edge_key)
         spec.write_value(data=self.__speed)
         spec.write_value(data=self.__sample_time)
@@ -208,9 +209,9 @@ class MachineMunichMotorDevice(
 
         # Reserve memory:
         spec.reserve_memory_region(
-            self.SYSTEM_REGION, SIMULATION_N_BYTES, label='setup')
+            self._SYSTEM_REGION, SIMULATION_N_BYTES, label='setup')
 
         spec.reserve_memory_region(
-            self.PARAMS_REGION, self.PARAMS_SIZE, label='params')
+            self._PARAMS_REGION, self._PARAMS_SIZE, label='params')
 
         self.reserve_provenance_data_region(spec)

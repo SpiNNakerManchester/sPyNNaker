@@ -13,13 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
 import numpy
-from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
-
-logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class ArrayConnector(AbstractConnector):

@@ -14,12 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from enum import Enum
-import logging
-from spinn_utilities.log import FormatAdapter
 from spinn_front_end_common.utility_models import MultiCastCommand
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-
-logger = FormatAdapter(logging.getLogger(__name__))
 
 # structure of command is KKKKKKKKKKKKKKKKKKKKK-IIIIIII-F-DDD
 # K = ignored key at the top of the command

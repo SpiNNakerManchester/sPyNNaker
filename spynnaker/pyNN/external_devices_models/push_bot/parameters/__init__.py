@@ -13,18 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .push_bot_spinnaker_link_laser_device import (
-    PushBotSpiNNakerLinkLaserDevice)
-from .push_bot_spinnaker_link_led_device import PushBotSpiNNakerLinkLEDDevice
-from .push_bot_spinnaker_link_motor_device import (
-    PushBotSpiNNakerLinkMotorDevice)
-from .push_bot_spinnaker_link_retina_device import (
-    PushBotSpiNNakerLinkRetinaDevice)
-from .push_bot_spinnaker_link_speaker_device import (
-    PushBotSpiNNakerLinkSpeakerDevice)
+from .laser import PushBotLaser
+from .led import PushBotLED
+from .motor import PushBotMotor
+from .retina_resolution import PushBotRetinaResolution
+from .retina_viewer import PushBotRetinaViewer
+from .speaker import PushBotSpeaker
 
-__all__ = ["PushBotSpiNNakerLinkLaserDevice",
-           "PushBotSpiNNakerLinkLEDDevice",
-           "PushBotSpiNNakerLinkMotorDevice",
-           "PushBotSpiNNakerLinkRetinaDevice",
-           "PushBotSpiNNakerLinkSpeakerDevice"]
+__all__ = ["PushBotLaser", "PushBotLED", "PushBotMotor", "PushBotSpeaker",
+           "PushBotRetinaResolution", "PushBotRetinaViewer"]

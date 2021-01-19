@@ -33,7 +33,7 @@ class AbstractPushBotRetinaDevice(
             ~spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol
         :param resolution:
         :type resolution:
-            ~spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.PushBotRetinaResolution
+            ~spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaResolution
         """
         self._protocol = protocol
         self._resolution = resolution

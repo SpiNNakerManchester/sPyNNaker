@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
-from spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet import (
+from spynnaker.pyNN.external_devices_models.push_bot.ethernet import (
     PushBotEthernetMotorDevice)
 
 
@@ -37,7 +37,7 @@ class PushBotSpiNNakerLinkMotorDevice(
         """
         :param motor: the motor to control
         :type motor:
-            ~spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.PushBotMotor
+            ~spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotMotor
         :param protocol: The protocol used to control the device
         :type protocol: ~spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol
         :param int spinnaker_link_id: The SpiNNakerLink connected to

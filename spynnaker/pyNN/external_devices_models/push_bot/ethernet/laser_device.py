@@ -19,51 +19,46 @@ from spinn_front_end_common.abstract_models import (
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from .push_bot_ethernet_device import PushBotEthernetDevice
-from spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters \
-    import (
-        PushBotLED)
+from .device import PushBotEthernetDevice
+from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
+    PushBotLaser)
 
 
-class PushBotEthernetLEDDevice(
+class PushBotEthernetLaserDevice(
         PushBotEthernetDevice, AbstractSendMeMulticastCommandsVertex,
         ProvidesKeyToAtomMappingImpl):
-    """ The LED of a PushBot
+    """ The Laser of a PushBot
     """
 
     def __init__(
-            self, led, protocol,
-            start_active_time_front=None, start_active_time_back=None,
-            start_total_period=None, start_frequency=None,
-            timesteps_between_send=None):
+            self, laser, protocol,
+            start_active_time=None, start_total_period=None,
+            start_frequency=None, timesteps_between_send=None):
         """
-        :param led: The PushBotLED parameter to control
-        :type led:
-            ~spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.PushBotLED
+        :param laser: The PushBotLaser value to control
+        :type laser:
+            ~spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotLaser
         :param protocol: The protocol instance to get commands from
         :type protocol: MunichIoEthernetProtocol
-        :param start_active_time_front:
-            The "active time" to set for the front LED at the start
-        :param start_active_time_back:
-            The "active time" to set for the back LED at the start
-        :param start_total_period: The "total period" to set at the start
-        :param start_frequency: The "frequency" to set at the start
+        :param start_active_time: The "active time" value to send at the start
+        :param start_total_period:
+            The "total period" value to send at the start
+        :param start_frequency: The "frequency" to send at the start
         :param timesteps_between_send:
             The number of timesteps between sending commands to the device,\
             or None to use the default
         """
         # pylint: disable=too-many-arguments
-        if not isinstance(led, PushBotLED):
+        if not isinstance(laser, PushBotLaser):
             raise ConfigurationException(
-                "led parameter must be a PushBotLED value")
+                "laser parameter must be a PushBotLaser value")
 
-        super(PushBotEthernetLEDDevice, self).__init__(
-            protocol, led, True, timesteps_between_send)
+        super(PushBotEthernetLaserDevice, self).__init__(
+            protocol, laser, True, timesteps_between_send)
 
         # protocol specific data items
         self.__command_protocol = protocol
-        self.__start_active_time_front = start_active_time_front
-        self.__start_active_time_back = start_active_time_back
+        self.__start_active_time = start_active_time
         self.__start_total_period = start_total_period
         self.__start_frequency = start_frequency
 
@@ -82,29 +77,26 @@ class PushBotEthernetLEDDevice(
 
         # device specific commands
         if self.__start_total_period is not None:
-            commands.append(self.__command_protocol.push_bot_led_total_period(
-                self.__start_total_period))
-        if self.__start_active_time_front is not None:
             commands.append(
-                self.__command_protocol.push_bot_led_front_active_time(
-                    self.__start_active_time_front))
-        if self.__start_active_time_back is not None:
+                self.__command_protocol.push_bot_laser_config_total_period(
+                    total_period=self.__start_total_period))
+        if self.__start_active_time is not None:
             commands.append(
-                self.__command_protocol.push_bot_led_back_active_time(
-                    self.__start_active_time_back))
+                self.__command_protocol.push_bot_laser_config_active_time(
+                    active_time=self.__start_active_time))
         if self.__start_frequency is not None:
-            commands.append(self.__command_protocol.push_bot_led_set_frequency(
-                self.__start_frequency))
+            commands.append(
+                self.__command_protocol.push_bot_laser_set_frequency(
+                    frequency=self.__start_frequency))
         return commands
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
     def pause_stop_commands(self):
         return [
-            self.__command_protocol.push_bot_led_front_active_time(0),
-            self.__command_protocol.push_bot_led_back_active_time(0),
-            self.__command_protocol.push_bot_led_total_period(0),
-            self.__command_protocol.push_bot_led_set_frequency(0)]
+            self.__command_protocol.push_bot_laser_config_total_period(0),
+            self.__command_protocol.push_bot_laser_config_active_time(0),
+            self.__command_protocol.push_bot_laser_set_frequency(0)]
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)

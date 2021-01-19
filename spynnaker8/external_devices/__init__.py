@@ -22,7 +22,6 @@ PushBot (http://spinnakermanchester.github.io/docs/push_bot/).
     SpiNNaker system to run in real-time mode, which usually reduces numerical
     accuracy to gain performance.
 """
-import logging
 import os
 from spinn_utilities.socket_address import SocketAddress
 from spinnman.messages.eieio import EIEIOType
@@ -41,23 +40,19 @@ from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.connections import (
     EthernetCommandConnection, EthernetControlConnection,
     SpynnakerLiveSpikesConnection, SpynnakerPoissonControlConnection)
-from spynnaker.pyNN.external_devices_models.push_bot.push_bot_control_modules \
-    import (
-        PushBotLifEthernet, PushBotLifSpinnakerLink)
-from spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link \
-    import (
-        PushBotSpiNNakerLinkRetinaDevice,
-        PushBotSpiNNakerLinkLaserDevice, PushBotSpiNNakerLinkLEDDevice,
-        PushBotSpiNNakerLinkMotorDevice, PushBotSpiNNakerLinkSpeakerDevice)
-from spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet \
-    import (
-        PushBotEthernetLaserDevice, PushBotEthernetLEDDevice,
-        PushBotEthernetMotorDevice, PushBotEthernetRetinaDevice,
-        PushBotEthernetSpeakerDevice)
-from spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters \
-    import (
-        PushBotLaser, PushBotLED, PushBotMotor, PushBotRetinaResolution,
-        PushBotSpeaker, PushBotRetinaViewer)
+from spynnaker.pyNN.external_devices_models.push_bot.control import (
+    PushBotLifEthernet, PushBotLifSpinnakerLink)
+from spynnaker.pyNN.external_devices_models.push_bot.spinnaker_link import (
+    PushBotSpiNNakerLinkRetinaDevice,
+    PushBotSpiNNakerLinkLaserDevice, PushBotSpiNNakerLinkLEDDevice,
+    PushBotSpiNNakerLinkMotorDevice, PushBotSpiNNakerLinkSpeakerDevice)
+from spynnaker.pyNN.external_devices_models.push_bot.ethernet import (
+    PushBotEthernetLaserDevice, PushBotEthernetLEDDevice,
+    PushBotEthernetMotorDevice, PushBotEthernetRetinaDevice,
+    PushBotEthernetSpeakerDevice)
+from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
+    PushBotLaser, PushBotLED, PushBotMotor, PushBotRetinaResolution,
+    PushBotSpeaker, PushBotRetinaViewer)
 from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
 from spynnaker.pyNN.spynnaker_external_device_plugin_manager import (
     SpynnakerExternalDevicePluginManager as
@@ -69,8 +64,6 @@ add_database_socket_address = Plugins.add_database_socket_address
 activate_live_output_to = Plugins.activate_live_output_to
 activate_live_output_for = Plugins.activate_live_output_for
 add_poisson_live_rate_control = Plugins.add_poisson_live_rate_control
-
-logger = logging.getLogger(__name__)
 
 AbstractSpiNNakerCommon.register_binary_search_path(
     os.path.dirname(model_binaries.__file__))
@@ -208,7 +201,7 @@ def EthernetControlPopulation(
         __ethernet_control_connection = EthernetControlConnection(
             translator, vertex.label, live_packet_gather_label, local_host,
             local_port)
-        add_database_socket_address(
+        Plugins.add_database_socket_address(
             __ethernet_control_connection.local_ip_address,
             __ethernet_control_connection.local_port, database_ack_port_num)
     else:
@@ -220,7 +213,7 @@ def EthernetControlPopulation(
         ethernet_command_connection = EthernetCommandConnection(
             translator, devices_with_commands, local_host,
             database_notify_port_num)
-        add_database_socket_address(
+        Plugins.add_database_socket_address(
             ethernet_command_connection.local_ip_address,
             ethernet_command_connection.local_port, database_ack_port_num)
     Plugins.update_live_packet_gather_tracker(
@@ -266,17 +259,17 @@ def EthernetSensorPopulation(
         label=device.get_injector_label(),
         additional_parameters=injector_params)
     if isinstance(device, AbstractSendMeMulticastCommandsVertex):
-        ethernet_command_connection = EthernetCommandConnection(
+        cmd_conn = EthernetCommandConnection(
             device.get_translator(), [device], local_host,
             database_notify_port_num)
-        add_database_socket_address(
-            ethernet_command_connection.local_ip_address,
-            ethernet_command_connection.local_port, database_ack_port_num)
-    database_connection = device.get_database_connection()
-    if database_connection is not None:
-        add_database_socket_address(
-            database_connection.local_ip_address,
-            database_connection.local_port, database_ack_port_num)
+        Plugins.add_database_socket_address(
+            cmd_conn.local_ip_address, cmd_conn.local_port,
+            database_ack_port_num)
+    db_conn = device.get_database_connection()
+    if db_conn is not None:
+        Plugins.add_database_socket_address(
+            db_conn.local_ip_address, db_conn.local_port,
+            database_ack_port_num)
     return population
 
 
@@ -303,7 +296,7 @@ def SpikeInjector(
     """
     # pylint: disable=too-many-arguments
     if notify:
-        add_database_socket_address(database_notify_host,
-                                    database_notify_port_num,
-                                    database_ack_port_num)
+        Plugins.add_database_socket_address(
+            database_notify_host, database_notify_port_num,
+            database_ack_port_num)
     return ExternalDeviceSpikeInjector()

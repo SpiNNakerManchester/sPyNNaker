@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
 import math
 import numpy
 from numpy import (
@@ -23,14 +22,12 @@ from numpy import (
 from pyNN.connectors import (
     DistanceDependentProbabilityConnector as
     PyNNDistanceDependentProbabilityConnector)
-from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinn_utilities.safe_eval import SafeEval
 from spynnaker.pyNN.utilities.utility_calls import (
     get_probable_maximum_selected, get_probable_minimum_selected)
 from .abstract_connector import AbstractConnector
 
-logger = FormatAdapter(logging.getLogger(__name__))
 # support for arbitrary expression for the distance dependence
 _d_expr_context = SafeEval(math, numpy, arccos, arcsin, arctan, arctan2, ceil,
                            cos, cosh, exp, fabs, floor, fmod, hypot, ldexp,

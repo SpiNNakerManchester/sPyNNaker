@@ -13,18 +13,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
 from threading import RLock
 import numpy
-from spinn_utilities.log import FormatAdapter
 from spinnman.connections import ConnectionListener
 from spinn_front_end_common.utilities.constants import BYTES_PER_SHORT
 from spynnaker.pyNN.connections import SpynnakerLiveSpikesConnection
-from spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters \
-    import (
-        PushBotRetinaResolution)
+from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
+    PushBotRetinaResolution)
 
-logger = FormatAdapter(logging.getLogger(__name__))
 _RETINA_PACKET_SIZE = BYTES_PER_SHORT
 
 
@@ -54,7 +50,7 @@ class PushBotRetinaConnection(SpynnakerLiveSpikesConnection):
         :type pushbot_wifi_connection: PushBotWIFIConnection
         :param resolution:
         :type resolution:
-            ~spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.PushBotRetinaResolution
+            ~spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaResolution
         :param local_host:
         :type local_host: str or None
         :param local_port:

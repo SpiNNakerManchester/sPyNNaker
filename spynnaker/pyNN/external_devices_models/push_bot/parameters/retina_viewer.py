@@ -38,6 +38,15 @@ class PushBotRetinaViewer(Thread):
             self, resolution, port=0, display_max=_DISPLAY_MAX,
             frame_time_ms=_FRAME_TIME_MS,
             decay_time_constant_ms=_DECAY_TIME_CONSTANT_MS):
+        """
+        :param PushBotRetinaResolution resolution:
+        :param int port:
+        :param float display_max: Value of brightest pixel to show
+        :param int frame_time_ms:
+            How regularity to display frames (milliseconds)
+        :param int decay_time_constant_ms:
+            Time constant of pixel decay (milliseconds)
+        """
         # pylint: disable=too-many-arguments
         try:
             from matplotlib import pyplot  # NOQA

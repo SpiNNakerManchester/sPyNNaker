@@ -94,14 +94,14 @@ class PopulationMachineVertex(
         TDMA_MISSES = 14
 
     SATURATION_COUNT_NAME = "Times_synaptic_weights_have_saturated"
-    SATURATION_COUNT_MESSAGE = (
+    _SATURATION_COUNT_MESSAGE = (
         "The weights from the synapses for {} on {}, {}, {} saturated "
         "{} times. If this causes issues you can increase the "
         "spikes_per_second and / or ring_buffer_sigma "
         "values located within the .spynnaker.cfg file.")
 
     INPUT_BUFFER_FULL_NAME = "Times_the_input_buffer_lost_packets"
-    INPUT_BUFFER_FULL_MESSAGE = (
+    _INPUT_BUFFER_FULL_MESSAGE = (
         "The input buffer for {} on {}, {}, {} lost packets on {} "
         "occasions. This is often a sign that the system is running "
         "too quickly for the number of neurons per core.  Please "
@@ -114,7 +114,7 @@ class PopulationMachineVertex(
 
     SATURATED_PLASTIC_WEIGHTS_NAME = (
         "Times_plastic_synaptic_weights_have_saturated")
-    SATURATED_PLASTIC_WEIGHTS_MESSAGE = (
+    _SATURATED_PLASTIC_WEIGHTS_MESSAGE = (
         "The weights from the plastic synapses for {} on {}, {}, {} "
         "saturated {} times. If this causes issue increase the "
         "spikes_per_second and / or ring_buffer_sigma values located "
@@ -142,7 +142,7 @@ class PopulationMachineVertex(
         4: "PROCESS_PLASTIC_SYNAPSES"}
 
     # x words needed for a bitfield covering 256 atoms
-    WORDS_TO_COVER_256_ATOMS = 8
+    _WORDS_TO_COVER_256_ATOMS = 8
 
     # provenance data items
     BIT_FIELD_FILTERED_PACKETS = \
@@ -289,12 +289,12 @@ class PopulationMachineVertex(
         provenance_items.append(ProvenanceDataItem(
             self._add_name(names, self.SATURATION_COUNT_NAME),
             n_saturations, report=n_saturations > 0,
-            message=self.SATURATION_COUNT_MESSAGE.format(
+            message=self._SATURATION_COUNT_MESSAGE.format(
                 label, x, y, p, n_saturations)))
         provenance_items.append(ProvenanceDataItem(
             self._add_name(names, self.INPUT_BUFFER_FULL_NAME),
             n_buffer_overflows, report=n_buffer_overflows > 0,
-            message=self.INPUT_BUFFER_FULL_MESSAGE.format(
+            message=self._INPUT_BUFFER_FULL_MESSAGE.format(
                 label, x, y, p, n_buffer_overflows)))
         provenance_items.append(ProvenanceDataItem(
             self._add_name(names, self.TOTAL_PRE_SYNAPTIC_EVENT_NAME),
@@ -305,7 +305,7 @@ class PopulationMachineVertex(
         provenance_items.append(ProvenanceDataItem(
             self._add_name(names, self.SATURATED_PLASTIC_WEIGHTS_NAME),
             n_plastic_saturations, report=n_plastic_saturations > 0,
-            message=self.SATURATED_PLASTIC_WEIGHTS_MESSAGE.format(
+            message=self._SATURATED_PLASTIC_WEIGHTS_MESSAGE.format(
                 label, x, y, p, n_plastic_saturations)))
         provenance_items.append(ProvenanceDataItem(
             self._add_name(names, self.N_RE_WIRES_NAME), n_rewires))
@@ -329,7 +329,7 @@ class PopulationMachineVertex(
                 "size of buffers, or neuron params per neuron etc.".format(
                     failed_to_read_bit_fields,
                     failed_to_read_bit_fields *
-                    self.WORDS_TO_COVER_256_ATOMS))))
+                    self._WORDS_TO_COVER_256_ATOMS))))
         provenance_items.append(ProvenanceDataItem(
             self._add_name(names, self.DMA_COMPLETE), dma_completes))
         provenance_items.append(ProvenanceDataItem(
@@ -347,9 +347,8 @@ class PopulationMachineVertex(
             self._add_name(names, self.BIT_FIELD_FILTERED_PACKETS),
             n_packets_filtered_by_bit_field_filter,
             report=(
-                    n_packets_filtered_by_bit_field_filter > 0 and (
-                        n_buffer_overflows > 0 or
-                        times_timer_tic_overran > 0)),
+                n_packets_filtered_by_bit_field_filter > 0 and (
+                    n_buffer_overflows > 0 or times_timer_tic_overran > 0)),
             message=(
                 "There were {} packets received by {}:{}:{} that were "
                 "filtered by the Bitfield filterer on the core. These packets "
@@ -372,7 +371,7 @@ class PopulationMachineVertex(
             input_buffer_max_filled_size, report=False))
 
         provenance_items.append(self._app_vertex.get_tdma_provenance_item(
-                names, x, y, p, tdma_misses))
+            names, x, y, p, tdma_misses))
         return provenance_items
 
     @overrides(AbstractReceiveBuffersToHost.get_recorded_region_ids)

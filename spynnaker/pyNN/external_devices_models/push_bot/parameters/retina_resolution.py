@@ -13,12 +13,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .push_bot_laser import PushBotLaser
-from .push_bot_led import PushBotLED
-from .push_bot_motor import PushBotMotor
-from .push_bot_retina_resolution import PushBotRetinaResolution
-from .push_bot_retina_viewer import PushBotRetinaViewer
-from .push_bot_speaker import PushBotSpeaker
+from enum import Enum
+from spynnaker.pyNN.protocols import RetinaKey
 
-__all__ = ["PushBotLaser", "PushBotLED", "PushBotMotor", "PushBotSpeaker",
-           "PushBotRetinaResolution", "PushBotRetinaViewer"]
+
+class PushBotRetinaResolution(Enum):
+    """ Resolutions supported by the pushbot retina device
+    """
+
+    #: The native resolution
+    NATIVE_128_X_128 = RetinaKey.NATIVE_128_X_128
+    #: Down sampled 4 (:math:`2 \times 2`) pixels to 1
+    DOWNSAMPLE_64_X_64 = RetinaKey.DOWNSAMPLE_64_X_64
+    #: Down sampled 16 (:math:`4 \times 4`) pixels to 1
+    DOWNSAMPLE_32_X_32 = RetinaKey.DOWNSAMPLE_32_X_32
+    #: Down sampled 64 (:math:`8 \times 8`) pixels to 1
+    DOWNSAMPLE_16_X_16 = RetinaKey.DOWNSAMPLE_16_X_16
