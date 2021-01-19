@@ -23,6 +23,7 @@
 #include <data_specification.h>
 #include <debug.h>
 #include <common/bit_field_common.h>
+#include <malloc_extras.h>
 #include <neuron/synapse_row.h>
 #include <neuron/direct_synapses.h>
 #include <neuron/population_table/population_table.h>
@@ -115,6 +116,10 @@ static inline void success_shut_down(void) {
 
 //! \brief Read in the vertex region addresses
 static inline bool read_in_addresses(void) {
+    // malloc extra setup, so that can malloc dtcm / sdram as needed
+    malloc_extras_initialise_no_fake_heap_data();
+    malloc_extras_turn_off_safety();
+
     // get the data (linked to sdram tag 2 and assume the app ids match)
     data_specification_metadata_t *dsg_metadata =
             data_specification_get_data_address();
@@ -143,7 +148,7 @@ static inline bool read_in_addresses(void) {
             builder_data->bit_field_key_map_region_id, dsg_metadata);
     uint32_t pair_size = sizeof(key_atom_data_t) +
             (keys_to_max_atoms_sdram->n_pairs * sizeof(key_atom_pair_t));
-    keys_to_max_atoms = spin1_malloc(pair_size);
+    keys_to_max_atoms = MALLOC_REVERSE(pair_size);
     if (keys_to_max_atoms == NULL) {
         log_error("Couldn't allocate memory for key_to_max_atoms");
         rt_error(RTE_SWERR);
@@ -231,7 +236,7 @@ bool initialise(void) {
 
     // set up a sdram read for a row
     log_debug("Allocating dtcm for row data");
-    row_data = spin1_malloc(row_max_n_words * sizeof(uint32_t));
+    row_data = MALLOC_REVERSE(row_max_n_words * sizeof(uint32_t));
     if (row_data == NULL) {
         log_error("Could not allocate dtcm for the row data");
         can_run = false;
