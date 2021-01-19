@@ -50,7 +50,7 @@ class AbstractMachineBitFieldRouterCompressor(object):
             produce_report, default_report_folder, target_length,
             routing_infos, time_to_try_for_each_iteration, use_timer_cut_off,
             machine_time_step, time_scale_factor, threshold_percentage,
-            executable_targets, read_expander_iobuf,
+            retry_count, executable_targets, read_expander_iobuf,
             compress_as_much_as_possible=False, provenance_data_objects=None):
         """ entrance for routing table compression with bit field
 
@@ -76,7 +76,10 @@ class AbstractMachineBitFieldRouterCompressor(object):
         :param int threshold_percentage:
             the percentage of bitfields to do on chip before its considered
             a success
-        :param bool read_algorithm_iobuf: flag saying if read iobuf
+        :param int retry_count:
+            Number of times that the sorters should set of the compressions
+            again
+         :param bool read_algorithm_iobuf: flag saying if read iobuf
         :param bool compress_as_much_as_possible:
             flag asking if should compress as much as possible
         :param bool read_expander_iobuf: reads the synaptic expander iobuf.
@@ -102,6 +105,7 @@ class AbstractMachineBitFieldRouterCompressor(object):
                 machine_time_step=machine_time_step,
                 time_scale_factor=time_scale_factor,
                 threshold_percentage=threshold_percentage,
+                retry_count=retry_count,
                 compress_as_much_as_possible=compress_as_much_as_possible,
                 executable_targets=executable_targets,
                 provenance_data_objects=provenance_data_objects)

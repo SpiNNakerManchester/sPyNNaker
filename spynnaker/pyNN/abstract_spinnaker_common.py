@@ -148,30 +148,6 @@ class AbstractSpiNNakerCommon(with_metaclass(
         self.update_extra_inputs({'UserDefinedMaxDelay': self.__max_delay})
 
         extra_mapping_inputs = dict()
-        extra_mapping_inputs['RouterBitfieldCompressionReport'] = \
-            self.config.getboolean(
-                "Reports", "generate_router_compression_with_bitfield_report")
-
-        extra_mapping_inputs['RouterCompressorBitFieldUseCutOff'] = \
-            self.config.getboolean(
-                "Mapping",
-                "router_table_compression_with_bit_field_use_time_cutoff")
-
-        time = read_config(
-            self.config, "Mapping",
-            "router_table_compression_with_bit_field_iteration_time")
-        if time is not None:
-            time = int(time)
-        extra_mapping_inputs['RouterCompressorBitFieldTimePerAttempt'] = time
-
-        extra_mapping_inputs["RouterCompressorBitFieldPreAllocSize"] = \
-            self.config.getint(
-                "Mapping",
-                "router_table_compression_with_bit_field_pre_alloced_sdram")
-        extra_mapping_inputs["RouterCompressorBitFieldPercentageThreshold"] = \
-            self.config.getint(
-                "Mapping",
-                "router_table_compression_with_bit_field_acceptance_threshold")
         extra_mapping_inputs['CreateAtomToEventIdMapping'] = \
             self.config.getboolean(
                 "Database", "create_routing_info_to_neuron_id_mapping")
