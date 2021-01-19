@@ -97,10 +97,8 @@ class WeightDependenceMultiplicative(
             spec.write_value(
                 data=int(round(self.__w_max * w)), data_type=DataType.INT32)
 
-            spec.write_value(
-                data=int(round(self.A_plus * w)), data_type=DataType.INT32)
-            spec.write_value(
-                data=int(round(self.A_minus * w)), data_type=DataType.INT32)
+            spec.write_value(data=self.A_plus, data_type=DataType.S1615)
+            spec.write_value(data=self.A_minus, data_type=DataType.S1615)
 
     @property
     def weight_maximum(self):

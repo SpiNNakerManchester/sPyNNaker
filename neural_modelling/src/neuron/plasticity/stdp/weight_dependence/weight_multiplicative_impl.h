@@ -35,8 +35,8 @@ typedef struct {
     int32_t min_weight;    //!< Minimum weight
     int32_t max_weight;    //!< Maximum weight
 
-    int32_t a2_plus;       //!< Amount to move weight on potentiation
-    int32_t a2_minus;      //!< Amount to move weight on depression
+    REAL a2_plus;       //!< Amount to move weight on potentiation
+    REAL a2_minus;      //!< Amount to move weight on depression
 } plasticity_weight_region_data_t;
 
 //! The current state data for the rule
@@ -83,15 +83,16 @@ static inline weight_state_t weight_get_initial(
 static inline weight_state_t weight_one_term_apply_depression(
         weight_state_t state, int32_t depression) {
     // Calculate scale
-    // **NOTE** this calculation must be done at runtime-defined weight
-    // fixed-point format
-    int32_t scale = maths_fixed_mul16(
-            state.weight - state.weight_region->min_weight,
-            state.weight_region->a2_minus, 0);
+    int32_t scale = mulik((state.weight - state.weight_region->min_weight),
+            state.weight_region->a2_minus);
 
     // Multiply scale by depression and subtract
     // **NOTE** using standard STDP fixed-point format handles format conversion
     state.weight -= STDP_FIXED_MUL_16X16(scale, depression);
+
+    log_debug("weight, min_weight (dep), scale, depression %d %d %d %d",
+            state.weight, state.weight_region->min_weight, scale, depression);
+
     return state;
 }
 //---------------------------------------
@@ -102,15 +103,16 @@ static inline weight_state_t weight_one_term_apply_depression(
 static inline weight_state_t weight_one_term_apply_potentiation(
         weight_state_t state, int32_t potentiation) {
     // Calculate scale
-    // **NOTE** this calculation must be done at runtime-defined weight
-    // fixed-point format
-    int32_t scale = maths_fixed_mul16(
-            state.weight_region->max_weight - state.weight,
-            state.weight_region->a2_plus, 0);
+    int32_t scale = mulik((state.weight_region->max_weight - state.weight),
+            state.weight_region->a2_plus);
 
     // Multiply scale by potentiation and add
     // **NOTE** using standard STDP fixed-point format handles format conversion
     state.weight += STDP_FIXED_MUL_16X16(scale, potentiation);
+
+    log_debug("weight, max_weight (pot), scale, potentiation: %d %d %d %d",
+            state.weight, state.weight_region->max_weight, scale, potentiation);
+
     return state;
 }
 //---------------------------------------
@@ -120,7 +122,7 @@ static inline weight_state_t weight_one_term_apply_potentiation(
  * \return The new weight.
  */
 static inline weight_t weight_get_final(weight_state_t new_state) {
-    log_debug("\tnew_weight:%d\n", new_state.weight);
+    log_info("\tnew_weight:%d\n", new_state.weight);
 
     return (weight_t) new_state.weight;
 }

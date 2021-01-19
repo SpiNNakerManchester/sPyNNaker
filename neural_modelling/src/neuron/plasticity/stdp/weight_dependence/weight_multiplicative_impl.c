@@ -30,8 +30,8 @@ plasticity_weight_region_data_t *plasticity_weight_region_data;
 typedef struct {
     int32_t min_weight;
     int32_t max_weight;
-    int32_t a2_plus;
-    int32_t a2_minus;
+    REAL a2_plus;
+    REAL a2_minus;
 } multiplicative_config_t;
 
 //---------------------------------------
@@ -60,7 +60,7 @@ address_t weight_initialise(
         dtcm_copy[s].a2_plus = config->a2_plus;
         dtcm_copy[s].a2_minus = config->a2_minus;
 
-        log_debug("\tSynapse type %u: Min weight:%d, Max weight:%d, A2+:%d, A2-:%d",
+        log_debug("\tSynapse type %u: Min weight:%d, Max weight:%d, A2+:%k, A2-:%k",
                 s, dtcm_copy[s].min_weight, dtcm_copy[s].max_weight,
                 dtcm_copy[s].a2_plus, dtcm_copy[s].a2_minus);
     }
