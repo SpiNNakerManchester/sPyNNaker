@@ -70,6 +70,7 @@ from spynnaker.pyNN.extra_algorithms.splitter_components import (
 from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
 from unittests.mocks import MockSimulator, MockPopulation
 
+
 # pylint: disable=unused-argument
 class MockSynapseIO(object):
     def get_block_n_bytes(self, max_row_length, n_rows):
