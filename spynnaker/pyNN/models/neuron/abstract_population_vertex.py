@@ -45,7 +45,8 @@ from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, AbstractNeuronRecordable, NeuronRecorder)
 from spynnaker.pyNN.models.abstract_models import (
     AbstractPopulationInitializable, AbstractAcceptsIncomingSynapses,
-    AbstractPopulationSettable, AbstractContainsUnits, AbstractMaxSpikes)
+    AbstractPopulationSettable, AbstractContainsUnits, AbstractMaxSpikes,
+    HasSynapses)
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.utilities.ranged import (
     SpynnakerRangeDictionary, SpynnakerRangedList)
@@ -654,7 +655,8 @@ class AbstractPopulationVertex(
         """ Flush the cache of connection information; needed for a second run
         """
         for post_vertex in self.machine_vertices:
-            post_vertex.clear_connection_cache()
+            if isinstance(post_vertex, HasSynapses):
+                post_vertex.clear_connection_cache()
 
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
                get_outgoing_partition_constraints)
@@ -973,20 +975,18 @@ class AbstractPopulationVertex(
         :rtype: ~numpy.ndarray
         """
 
-        # TODO: Make sure this only contains neuron vertices
-        post_vertices = self.machine_vertices
-
         # Start with something in the list so that concatenate works
         connections = [numpy.zeros(
                 0, dtype=AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE)]
         progress = ProgressBar(
-            len(post_vertices),
+            len(self.machine_vertices),
             "Getting synaptic data between {} and {}".format(
                 app_edge.pre_vertex.label, app_edge.post_vertex.label))
-        for post_vertex in progress.over(post_vertices):
-            placement = placements.get_placement_of_vertex(post_vertex)
-            connections.extend(post_vertex.get_connections_from_machine(
-                transceiver, placement, app_edge, synapse_info))
+        for post_vertex in progress.over(self.machine_vertices):
+            if isinstance(post_vertex, HasSynapses):
+                placement = placements.get_placement_of_vertex(post_vertex)
+                connections.extend(post_vertex.get_connections_from_machine(
+                    transceiver, placement, app_edge, synapse_info))
         return numpy.concatenate(connections)
 
     def get_synapse_params_size(self):
@@ -1092,7 +1092,8 @@ class AbstractPopulationVertex(
         for proj in incoming_projections:
             synapse_info = proj._synapse_information
             app_edge = proj._projection_edge
-            n_sub_edges = len(app_edge.pre_vertex.machine_vertices)
+            n_sub_edges = len(
+                app_edge.pre_vertex.splitter.get_out_going_slices()[0])
             if not n_sub_edges:
                 vertex = app_edge.pre_vertex
                 max_atoms = float(min(vertex.get_max_atoms_per_core(),

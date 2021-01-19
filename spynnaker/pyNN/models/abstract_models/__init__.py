@@ -28,6 +28,7 @@ from .abstract_weight_updatable import AbstractWeightUpdatable
 from .sends_synaptic_inputs_over_sdram import SendsSynapticInputsOverSDRAM
 from .receives_synaptic_inputs_over_sdram import (
     ReceivesSynapticInputsOverSDRAM)
+from .has_synapses import HasSynapses
 
 __all__ = ["AbstractAcceptsIncomingSynapses", "AbstractContainsUnits",
            "AbstractHasDelayStages",
@@ -35,4 +36,5 @@ __all__ = ["AbstractAcceptsIncomingSynapses", "AbstractContainsUnits",
            "AbstractPopulationSettable", "AbstractReadParametersBeforeSet",
            "AbstractSettable", "AbstractSynapseExpandable",
            "AbstractWeightUpdatable", "SYNAPSE_EXPANDER_APLX",
-           "SendsSynapticInputsOverSDRAM", "ReceivesSynapticInputsOverSDRAM"]
+           "SendsSynapticInputsOverSDRAM", "ReceivesSynapticInputsOverSDRAM",
+           "HasSynapses"]

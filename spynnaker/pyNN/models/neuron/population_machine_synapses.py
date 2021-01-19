@@ -31,7 +31,8 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spynnaker.pyNN.utilities import bit_field_utilities
-from spynnaker.pyNN.models.abstract_models import AbstractSynapseExpandable
+from spynnaker.pyNN.models.abstract_models import (
+    AbstractSynapseExpandable, HasSynapses)
 
 from .synaptic_matrices import SynapticMatrices
 
@@ -88,7 +89,8 @@ SynapseRegions = namedtuple(
 class PopulationMachineSynapses(
         AbstractSupportsBitFieldGeneration,
         AbstractSupportsBitFieldRoutingCompression,
-        AbstractSynapseExpandable):
+        AbstractSynapseExpandable,
+        HasSynapses):
     """ Mix-in for machine vertices that contain synapses
     """
 
