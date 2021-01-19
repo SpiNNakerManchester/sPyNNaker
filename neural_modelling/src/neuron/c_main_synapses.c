@@ -153,9 +153,11 @@ void process_ring_buffers(timer_t time, UNUSED uint32_t n_neurons,
 }
 
 //! \brief writes synaptic inputs to SDRAM
-void write_contributions(UNUSED uint unused0, UNUSED uint unused1) {
+INT_HANDLER write_contributions(void) {
+    tc[T2_INT_CLR] = (uint) tc;         // Clear interrupt in timer
     // Copy things out of DTCM
     synapses_do_timestep_update(time);
+    vic[VIC_VADDR] = (uint) vic;        // Ack the VIC
 }
 
 //! \brief Timer interrupt callback
@@ -193,10 +195,13 @@ void timer_callback(UNUSED uint timer_count, UNUSED uint unused) {
 
     // Setup to call back enough before the end of the timestep to transfer
     // synapses to SDRAM for the next timestep
-    uint32_t time_to_transfer = (tc[T1_COUNT] * INVERSE_CLOCK_CYCLES)
-            - sdram_inputs.time_for_transfer;
-    timer_schedule_proc(write_contributions, 0, 0, time_to_transfer);
-
+    uint32_t cspr = spin1_int_disable();
+    uint32_t timer = tc[T1_COUNT];
+    uint32_t time_to_transfer = timer - (sdram_inputs.time_for_transfer * 200);
+    tc[T2_LOAD] = time_to_transfer;
+    tc[T2_CONTROL] = 0xe3;
+    spin1_mode_restore(cspr);
+    
     synapses_flush_ring_buffers(time);
 
     // Do rewiring as needed
@@ -236,7 +241,9 @@ static bool initialise(void) {
     }
 
     // Prepare to receive the timer
-    event_register_timer(SLOT_8);
+    tc[T2_CONTROL] = 0;                     // Disable timer
+    event.vic_enable |= 1 << TIMER2_INT;    // Disabled by event_stop
+    sark_vic_set(TIMER2_PRIORITY, TIMER2_INT, 1, write_contributions);
 
     log_debug("Initialise: finished");
     return true;

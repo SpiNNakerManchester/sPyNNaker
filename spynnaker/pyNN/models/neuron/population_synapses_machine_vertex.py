@@ -35,8 +35,8 @@ SDRAM_PARAMS_SIZE = 3 * BYTES_PER_WORD
 # Number of bytes per synaptic input
 SYNAPTIC_INPUT_BYTES = BYTES_PER_SHORT
 
-# Time to send each ring buffer input in micro seconds
-TIME_TO_SEND_INPUT = 0.15
+# Overhead in time to write, which includes the clearing of input spikes
+TIME_TO_CLEAR_SPIKES = 5
 
 
 class PopulationSynapsesMachineVertex(
@@ -222,7 +222,8 @@ class PopulationSynapsesMachineVertex(
         spec.write_value(
             self.__sdram_partition.get_sdram_base_address_for(self))
         spec.write_value(send_size)
-        spec.write_value(get_time_to_write_us(send_size, n_send_cores))
+        spec.write_value(TIME_TO_CLEAR_SPIKES +
+                         get_time_to_write_us(send_size, n_send_cores))
 
         # End the writing of this specification:
         spec.end_specification()
