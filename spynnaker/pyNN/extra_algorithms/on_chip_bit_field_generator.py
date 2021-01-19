@@ -12,10 +12,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+import logging
 from collections import defaultdict
 import os
 import struct
+
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
@@ -24,6 +26,9 @@ from spinn_front_end_common.abstract_models import (
 from spinn_front_end_common.utilities import system_control_logic
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
+from spynnaker.pyNN.exceptions import SpynnakerException
+
+logger = FormatAdapter(logging.getLogger(__name__))
 
 _ONE_WORD = struct.Struct("<I")
 _THREE_WORDS = struct.Struct("<III")
@@ -132,12 +137,17 @@ class OnChipBitFieldGenerator(object):
         progress.update(1)
 
         # run app
-        system_control_logic.run_system_application(
+        success = system_control_logic.run_system_application(
             expander_cores, bit_field_app_id, transceiver,
             provenance_file_path, executable_finder,
             write_bit_field_generator_iobuf, self.__check_for_success,
             [CPUState.FINISHED], False,
             "bit_field_expander_on_{}_{}_{}.txt", progress_bar=progress)
+
+        if not success:
+            raise SpynnakerException(
+                "The bitfield expander failed to complete successfully.")
+
         # update progress bar
         progress.end()
 
@@ -337,5 +347,7 @@ class OnChipBitFieldGenerator(object):
 
                 # The result is 0 if success, otherwise failure
                 if result != self._SUCCESS:
+                    logger.error(
+                        "failed to complete on core {}:{}:{}".format(x, y, p))
                     return False
         return True
