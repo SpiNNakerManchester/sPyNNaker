@@ -114,7 +114,7 @@ static inline void success_shut_down(void) {
 }
 
 //! \brief Read in the vertex region addresses
-void read_in_addresses(void) {
+static inline bool read_in_addresses(void) {
     // get the data (linked to sdram tag 2 and assume the app ids match)
     data_specification_metadata_t *dsg_metadata =
             data_specification_get_data_address();
@@ -147,6 +147,7 @@ void read_in_addresses(void) {
     if (keys_to_max_atoms == NULL) {
         log_error("Couldn't allocate memory for key_to_max_atoms");
         rt_error(RTE_SWERR);
+        return false;
     }
     spin1_memcpy(keys_to_max_atoms, keys_to_max_atoms_sdram, pair_size);
 
@@ -160,6 +161,7 @@ void read_in_addresses(void) {
     log_debug("Structural matrix region base address = %0x",
             structural_matrix_region_base_address);
     log_info("Finished reading in vertex data region addresses");
+    return true;
 }
 
 #ifdef __PRINT_KEY_ATOM_MAP__
@@ -183,13 +185,13 @@ static void print_key_to_max_atom_map(void) {
 //! \brief Set up the master pop table and synaptic matrix for the bit field
 //!        processing.
 //! \return whether the init was successful.
-bool initialise(void) {
+void initialise(void) {
     // init the synapses to get direct synapse address
     log_info("Direct synapse init");
     if (!direct_synapses_initialise(
             direct_matrix_region_base_address, &direct_synapses_address)) {
         log_error("Failed to init the synapses. failing");
-        return false;
+        can_run = false;
     }
 
     // init the master pop table
@@ -199,7 +201,7 @@ bool initialise(void) {
             direct_synapses_address, bit_field_base_address,
             &row_max_n_words)) {
         log_error("Failed to init the master pop table. failing");
-        return false;
+        can_run = false;
     }
 
     log_info("Structural plastic if needed");
@@ -208,7 +210,7 @@ bool initialise(void) {
                 structural_matrix_region_base_address, &rewiring_data,
                 &pre_info, &post_to_pre_table)) {
             log_error("Failed to init the synaptogenesis");
-            return false;
+            can_run = false;
         }
     }
 
@@ -216,7 +218,6 @@ bool initialise(void) {
          success_shut_down();
          log_info("There were no bitfields to process.");
          can_run = false;
-         return true;
     }
 
     // read in the correct key to max atom map
@@ -229,11 +230,9 @@ bool initialise(void) {
     row_data = spin1_malloc(row_max_n_words * sizeof(uint32_t));
     if (row_data == NULL) {
         log_error("Could not allocate dtcm for the row data");
-        return false;
+        can_run = false;
     }
     log_debug("Finished pop table set connectivity lookup");
-
-    return true;
 }
 
 //! \brief Check plastic and fixed elements to see if there is a target.
@@ -453,15 +452,18 @@ void c_main(void) {
     log_info("Starting the bit field expander");
 
     // read in sdram data
-    read_in_addresses();
-
-    // generate bit field for each vertex regions
-    if (!initialise()) {
-        log_error("Failed to init the master pop and synaptic matrix");
+    if (!read_in_addresses()){
+        log_error("Failed to read in addresses.");
         fail_shut_down();
     }
 
-    if (can_run) {
+    // generate bit field for each vertex regions
+    initialise();
+
+    if (!can_run) {
+        log_error("Failed to init");
+        fail_shut_down();
+    } else {
         log_info("Generating bit field");
         if (!generate_bit_field()) {
             log_error("Failed to generate bitfield");
