@@ -185,13 +185,14 @@ static void print_key_to_max_atom_map(void) {
 //! \brief Set up the master pop table and synaptic matrix for the bit field
 //!        processing.
 //! \return whether the init was successful.
-void initialise(void) {
+bool initialise(void) {
     // init the synapses to get direct synapse address
     log_info("Direct synapse init");
     if (!direct_synapses_initialise(
             direct_matrix_region_base_address, &direct_synapses_address)) {
         log_error("Failed to init the synapses. failing");
         can_run = false;
+        return false;
     }
 
     // init the master pop table
@@ -202,6 +203,7 @@ void initialise(void) {
             &row_max_n_words)) {
         log_error("Failed to init the master pop table. failing");
         can_run = false;
+        return false;
     }
 
     log_info("Structural plastic if needed");
@@ -211,6 +213,7 @@ void initialise(void) {
                 &pre_info, &post_to_pre_table)) {
             log_error("Failed to init the synaptogenesis");
             can_run = false;
+            return false;
         }
     }
 
@@ -218,6 +221,7 @@ void initialise(void) {
          success_shut_down();
          log_info("There were no bitfields to process.");
          can_run = false;
+         return true;
     }
 
     // read in the correct key to max atom map
@@ -231,8 +235,10 @@ void initialise(void) {
     if (row_data == NULL) {
         log_error("Could not allocate dtcm for the row data");
         can_run = false;
+        return false;
     }
     log_debug("Finished pop table set connectivity lookup");
+    return true;
 }
 
 //! \brief Check plastic and fixed elements to see if there is a target.
@@ -458,11 +464,13 @@ void c_main(void) {
     }
 
     // generate bit field for each vertex regions
-    initialise();
+    bool success_init = initialise();
 
     if (!can_run) {
-        log_error("Failed to init");
-        fail_shut_down();
+        if (!success_init) {
+            log_error("Failed to init");
+            fail_shut_down();
+        }
     } else {
         log_info("Generating bit field");
         if (!generate_bit_field()) {
