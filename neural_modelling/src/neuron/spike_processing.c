@@ -264,7 +264,7 @@ static void setup_synaptic_dma_read(dma_buffer *current_buffer,
             dma_n_rewires = 0;
             dma_n_spikes = 0;
         } else {
-            log_error("failed to recognise representation");
+            log_error("failed to recognise representation %d", representation);
         }
 
         // needs to be here to ensure that its only recording actual spike

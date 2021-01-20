@@ -84,9 +84,6 @@ uint32_t n_vertex_regions = 0;
 //!     master pop table. chicken vs egg.
 bit_field_t* fake_bit_fields;
 
-//! Holds SDRAM read row
-synaptic_row_t row_data;
-
 //! Says if we should run
 bool can_run = true;
 
@@ -205,7 +202,7 @@ bool initialise(void) {
     if (!population_table_initialise(
             master_pop_base_address, synaptic_matrix_base_address,
             direct_synapses_address, bit_field_base_address,
-            &row_max_n_words, true)) {
+            &row_max_n_words, false)) {
         log_error("Failed to init the master pop table. failing");
         can_run = false;
         return false;
@@ -213,6 +210,7 @@ bool initialise(void) {
 
     log_info("Structural plastic if needed");
     if (structural_matrix_region_base_address != NULL) {
+        log_info("setting up structural");
         if (! sp_structs_read_in_common(
                 structural_matrix_region_base_address, &rewiring_data,
                 &pre_info, &post_to_pre_table)) {
@@ -234,14 +232,6 @@ bool initialise(void) {
     print_key_to_max_atom_map();
 #endif
 
-    // set up a sdram read for a row
-    log_debug("Allocating dtcm for row data");
-    row_data = MALLOC_REVERSE(row_max_n_words * sizeof(uint32_t));
-    if (row_data == NULL) {
-        log_error("Could not allocate dtcm for the row data");
-        can_run = false;
-        return false;
-    }
     log_debug("Finished pop table set connectivity lookup");
     return true;
 }
@@ -266,18 +256,6 @@ bool process_synaptic_row(synaptic_row_t row) {
         log_debug("Fixed row has entries, so cant be pruned");
         return true;
     }
-}
-
-//! \brief Do an SDRAM read to get synaptic row.
-//! \param[in] row_address: the SDRAM address to read
-//! \param[in] n_bytes_to_transfer:
-//!     how many bytes to read to get the synaptic row
-//! \return Whether there is target
-static bool do_sdram_read_and_test(
-        synaptic_row_t row, uint32_t n_bytes_to_transfer) {
-    spin1_memcpy(row_data, row, n_bytes_to_transfer);
-    log_debug("Process synaptic row");
-    return process_synaptic_row(row_data);
 }
 
 //! \brief Sort filters by key
@@ -394,7 +372,7 @@ bool generate_bit_field(void) {
                     } else {
                         // sdram read (faking dma transfer)
                         log_debug("DMA read synapse");
-                        bit_found = do_sdram_read_and_test(row, n_bytes_to_transfer);
+                        bit_found = process_synaptic_row(row);
                     }
 
                     while (!bit_found && population_table_get_next_address(
@@ -410,8 +388,7 @@ bool generate_bit_field(void) {
                         } else if (representation == DEFAULT) {
                             // sdram read (faking dma transfer)
                             log_debug("DMA read synapse");
-                            bit_found = do_sdram_read_and_test(
-                                row, n_bytes_to_transfer);
+                            bit_found = process_synaptic_row(row);
                         } else {
                             log_error(
                                 "do not know how to process representation %d",
