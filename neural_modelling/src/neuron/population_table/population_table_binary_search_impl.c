@@ -668,7 +668,7 @@ bool population_table_initialise(
     n_master_pop_sdram_look_ups = 0;
     n_master_pop_direct_matrix_look_ups = 0;
 
-    *row_max_n_words = 0xFF + N_SYNAPSE_ROW_HEADER_WORDS;
+    *row_max_n_words = 256 + N_SYNAPSE_ROW_HEADER_WORDS;
     return true;
 }
 
