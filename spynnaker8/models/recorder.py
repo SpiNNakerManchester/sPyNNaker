@@ -29,7 +29,7 @@ class Recorder(_BaseClass):
     def __init__(self, population):
         """
         :param population: the population to record for
-        :type population: ~spynnaker8.models.populations.Population
+        :type population: ~spynnaker.pyNN.models.populations.Population
         """
         super(Recorder, self).__init__(population)
         logger.warning(

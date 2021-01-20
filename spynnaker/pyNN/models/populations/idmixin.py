@@ -33,7 +33,7 @@ class IDMixin(object):
 
     def __init__(self, population, id):  # pylint: disable=redefined-builtin
         """
-        :param ~spynnaker8.models.populations.Population population:
+        :param ~spynnaker.pyNN.models.populations.Population population:
         :param int id:
         """
         self.__id = id
@@ -185,7 +185,7 @@ class IDMixin(object):
     def as_view(self):
         """ Return a PopulationView containing just this cell.
 
-        :rtype: ~spynnaker8.models.populations.PopulationView
+        :rtype: ~spynnaker.pyNN.models.populations.PopulationView
         """
         return self.__population[self.__id]
 

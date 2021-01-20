@@ -12,29 +12,22 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import logging
-from spynnaker.pyNN.models.populations import Assembly as _BaseClass
-logger = logging.getLogger(__file__)
+
+from pyNN import common as pynn_common
+from spinn_front_end_common.utilities import globals_variables
 
 
-class Assembly(_BaseClass):
+class Assembly(pynn_common.Assembly):
     """
     A group of neurons, may be heterogeneous, in contrast to a Population
     where all the neurons are of the same type.
 
-    .. deprecated:: 6.0
-        Use
-        :py:class:`spynnaker.pyNN.models.populations.Assembly` instead.
+    :param populations: the populations or views to form the assembly out of
+    :type populations: ~spynnaker.pyNN.models.populations.Population or
+        ~spynnaker.pyNN.models.populations.PopulationView
+    :param kwargs: may contain `label` (a string describing the assembly)
     """
 
-    def __init__(self, *populations, **kwargs):
-        """
-        :param populations:
-            the populations or views to form the assembly out of
-        :type populations: ~spynnaker.pyNN.models.populations.Population or
-            ~spynnaker.pyNN.models.populations.PopulationView
-        :param kwargs: may contain `label` (a string describing the assembly)
-        """
-        super(Assembly, self).__init__(*populations, **kwargs)
-        logger.warning(
-            "please use spynnaker.pyNN.models.populations.Assembly instead")
+    @property
+    def _simulator(self):
+        return globals_variables.get_simulator()

@@ -67,6 +67,9 @@ class PopulationBase(object):
 
         .. warning::
             Currently unimplemented.
+
+        :param PopulationBase other:
+        :rtype: Assembly
         """
         # TODO: support assemblies
         _we_dont_do_this_now(other)  # pragma: no cover

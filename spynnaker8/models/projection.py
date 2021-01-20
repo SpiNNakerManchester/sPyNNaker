@@ -29,7 +29,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic)
 from spynnaker.pyNN.models.pynn_projection_common import PyNNProjectionCommon
 from spynnaker._version import __version__
-from spynnaker8.models.populations import Population, PopulationView
+from spynnaker.pyNN.models.populations import Population, PopulationView
 
 logger = logging.getLogger(__name__)
 
@@ -46,9 +46,9 @@ class Projection(PyNNProjectionCommon):
             connector, synapse_type=None, source=None,
             receptor_type=None, space=None, label=None):
         """
-        :param ~spynnaker8.models.populations.PopulationBase \
+        :param ~spynnaker.pyNN.models.populations.PopulationBase \
                 pre_synaptic_population:
-        :param ~spynnaker8.models.populations.PopulationBase \
+        :param ~spynnaker.pyNN.models.populations.PopulationBase \
                 post_synaptic_population:
         :param AbstractConnector connector:
         :param AbstractStaticSynapseDynamics synapse_type:
@@ -98,7 +98,7 @@ class Projection(PyNNProjectionCommon):
     @staticmethod
     def __check_population(param, connector):
         """
-        :param ~spynnaker8.models.populations.PopulationBase param:
+        :param ~spynnaker.pyNN.models.populations.PopulationBase param:
         :param AbstractConnector connector:
         :return: Whether the parameter is a view
         :rtype: bool
@@ -249,7 +249,7 @@ class Projection(PyNNProjectionCommon):
     def pre(self):
         """ The pre-population.
 
-        :rtype: PopulationBase
+        :rtype: ~spynnaker.pyNN.models.populations.PopulationBase
         """
         return self._synapse_information.pre_population
 
@@ -257,7 +257,7 @@ class Projection(PyNNProjectionCommon):
     def post(self):
         """ The post-population.
 
-        :rtype: PopulationBase
+        :rtype: ~spynnaker.pyNN.models.populations.PopulationBase
         """
         return self._synapse_information.post_population
 

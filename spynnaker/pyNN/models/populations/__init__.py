@@ -14,14 +14,29 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-Populations are objects that contain groups of neurons.
+A population is a group of neurons with the same neuron model and synaptic
+model, but possibly (usually!) varying connectivity and configuration
+parameters.
 
-.. deprecated:: 6.0
-    Use :py:mod:`spynnaker.pyNN.models.populations` instead.
+A population view is a subset of a population, created by slicing the
+population::
+
+    view = population[n:m]
+
+An assembly is an agglomeration of populations and population views, created
+by adding them together::
+
+    assembly = population_1 + population_2
+
+.. note::
+    sPyNNaker only has incomplete support for assemblies; do not use.
 """
 
 from .assembly import Assembly
+from .idmixin import IDMixin
+from .population_base import PopulationBase
 from .population import Population
 from .population_view import PopulationView
 
-__all__ = ["Assembly", "Population", "PopulationView"]
+__all__ = ["Assembly", "IDMixin", "Population", "PopulationBase",
+           "PopulationView"]

@@ -15,7 +15,7 @@
 
 r"""
 Connectors are objects that describe how neurons in
-:py:class:`~spynnaker8.models.populations.Population`\ s
+:py:class:`~spynnaker.pyNN.models.populations.Population`\ s
 are connected to each other.
 
 .. deprecated:: 6.0

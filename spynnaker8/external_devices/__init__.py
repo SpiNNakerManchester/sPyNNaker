@@ -57,7 +57,7 @@ from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
 from spynnaker.pyNN.spynnaker_external_device_plugin_manager import (
     SpynnakerExternalDevicePluginManager as
     Plugins)
-from spynnaker8.models.populations import Population
+from spynnaker.pyNN.models.populations import Population
 
 # useful functions
 add_database_socket_address = Plugins.add_database_socket_address
@@ -185,7 +185,7 @@ def EthernetControlPopulation(
         A pyNN Population which can be used as the target of a Projection.
         Note that the Population can also be used as the source of a
         Projection, but it might not send spikes.
-    :rtype: ~spynnaker8.models.populations.Population
+    :rtype: ~spynnaker.pyNN.models.populations.Population
     :raises Exception: If an invalid model class is used.
     """
     # pylint: disable=protected-access, too-many-arguments, too-many-locals
@@ -248,7 +248,7 @@ def EthernetSensorPopulation(
     :return:
         A pyNN Population which can be used as the source of a Projection.
         Note that the Population cannot be used as the target of a Projection.
-    :rtype: ~spynnaker8.models.populations.Population
+    :rtype: ~spynnaker.pyNN.models.populations.Population
     """
     if not isinstance(device, AbstractEthernetSensor):
         raise Exception("Device must be an instance of AbstractEthernetSensor")
@@ -291,7 +291,7 @@ def SpikeInjector(
         device will receive the database is ready command
     :type database_notify_port_num: int or None
     :return: The spike injector model object that can be placed in a pyNN
-        :py:class:`~spynnaker8.models.populations.Population`.
+        :py:class:`~spynnaker.pyNN.models.populations.Population`.
     :rtype: ~spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel
     """
     # pylint: disable=too-many-arguments

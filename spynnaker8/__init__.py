@@ -99,11 +99,8 @@ from spynnaker.pyNN.models.spike_source.spike_source_poisson import (
 
 # pops
 # noinspection PyUnresolvedReferences
-from spynnaker8.models.populations.assembly import Assembly
-# noinspection PyUnresolvedReferences
-from spynnaker8.models.populations.population import Population
-# noinspection PyUnresolvedReferences
-from spynnaker8.models.populations.population_view import PopulationView
+from spynnaker.pyNN.models.populations import (
+    Assembly, Population, PopulationView)
 
 # projection
 # noinspection PyUnresolvedReferences
@@ -397,9 +394,11 @@ def Projection(
     """ Used to support PEP 8 spelling correctly
 
     :param presynaptic_population: the source pop
-    :type presynaptic_population: ~spynnaker8.models.populations.Population
+    :type presynaptic_population:
+        ~spynnaker.pyNN.models.populations.Population
     :param postsynaptic_population: the dest pop
-    :type postsynaptic_population: ~spynnaker8.models.populations.Population
+    :type postsynaptic_population:
+        ~spynnaker.pyNN.models.populations.Population
     :param AbstractConnector connector: the connector type
     :param AbstractStaticSynapseDynamics synapse_type: the synapse type
     :param None source: Unsupported; must be ``None``
@@ -463,10 +462,11 @@ def record_v(source, filename):
     """ Deprecated method for getting voltage.\
         This is not documented in the public facing API.
 
+    .. deprecated:: 5.0
+
     :param source: the population / view / assembly to record
-    :type source: ~spynnaker8.models.populations.Population or \
-        ~spynnaker8.models.populations.PopulationView or \
-        ~spynnaker8.models.populations.Assembly
+    :type source: ~spynnaker.pyNN.models.populations.Population or
+        ~spynnaker.pyNN.models.populations.PopulationView
     :param str filename: the neo file to write to
     :rtype: None
     """
@@ -479,10 +479,11 @@ def record_gsyn(source, filename):
     """ Deprecated method for getting both types of gsyn.\
         This is not documented in the public facing API
 
+    .. deprecated:: 5.0
+
     :param source: the population / view / assembly to record
-    :type source: ~spynnaker8.models.populations.Population or
-        ~spynnaker8.models.populations.PopulationView or
-        ~spynnaker8.models.populations.Assembly
+    :type source: ~spynnaker.pyNN.models.populations.Population or
+        ~spynnaker.pyNN.models.populations.PopulationView
     :param str filename: the neo file to write to
     """
     logger.warning(
@@ -527,8 +528,8 @@ def connect(pre, post, weight=0.0, delay=None, receptor_type=None, p=1,
             rng=None):
     """ Builds a projection
 
-    :param ~spynnaker8.models.populations.Population pre: source pop
-    :param ~spynnaker8.models.populations.Population post: destination pop
+    :param ~spynnaker.pyNN.models.populations.Population pre: source pop
+    :param ~spynnaker.pyNN.models.populations.Population post: destination pop
     :param float weight: weight of the connections
     :param float delay: the delay of the connections
     :param str receptor_type: excitatory / inhibitory
@@ -548,7 +549,7 @@ def create(cellclass, cellparams=None, n=1):
     :type cellclass: type or AbstractPyNNModel
     :param cellparams: population params.
     :param int n: n neurons
-    :rtype: ~spynnaker8.models.populations.Population
+    :rtype: ~spynnaker.pyNN.models.populations.Population
     """
     if not globals_variables.has_simulator():
         raise ConfigurationException(FAILED_STATE_MSG)
@@ -613,9 +614,8 @@ def initialize(cells, **initial_values):
     """ Sets cells to be initialised to the given values
 
     :param cells: the cells to change params on
-    :type cells: ~spynnaker8.models.populations.Population or
-        ~spynnaker8.models.populations.PopulationView or
-        ~spynnaker8.models.populations.Assembly
+    :type cells: ~spynnaker.pyNN.models.populations.Population or
+        ~spynnaker.pyNN.models.populations.PopulationView
     :param initial_values: the params and their values to change
     """
     if not globals_variables.has_simulator():
@@ -660,8 +660,8 @@ def record(variables, source, filename, sampling_interval=None,
         contains a list of variables that can be recorded for that celltype.
     :type variables: str or list(str)
     :param source: where to record from
-    :type source: ~spynnaker8.models.populations.Population or
-        ~spynnaker8.models.populations.PopulationView
+    :type source: ~spynnaker.pyNN.models.populations.Population or
+        ~spynnaker.pyNN.models.populations.PopulationView
     :param str filename: file name to write data to
     :param sampling_interval:
         how often to sample the recording, not ignored so far
