@@ -13,12 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import tempfile
 import numpy
 import pytest
 from pacman.model.graphs.common.slice import Slice
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    FromFileConnector)
 from unittests.mocks import MockSimulator, MockSynapseInfo, MockPopulation
-from spynnaker8.models.connectors import FromFileConnector
-import tempfile
 
 
 @pytest.mark.parametrize(

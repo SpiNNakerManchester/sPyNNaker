@@ -16,8 +16,8 @@
 import pytest
 from pyNN.random import RandomDistribution, NumpyRNG
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+from spynnaker.pyNN.models.populations import PopulationView
 import spynnaker8 as sim
-from spynnaker8.models.populations import PopulationView
 from p8_integration_tests.base_test_case import BaseTestCase
 
 
