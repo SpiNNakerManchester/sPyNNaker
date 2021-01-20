@@ -421,6 +421,7 @@ explicit_wanted_files = [
     "spynnaker/pyNN/spynnaker_simulator_interface.py",
     "spynnaker/pyNN/spynnaker_external_device_plugin_manager.py",
     "spynnaker/pyNN/models/abstract_pynn_model.py",
+    "spynnaker/pyNN/models/projection.py",
     "spynnaker/pyNN/models/pynn_population_common.py",
     "spynnaker/pyNN/models/pynn_projection_common.py",
     "spynnaker/pyNN/models/defaults.py",

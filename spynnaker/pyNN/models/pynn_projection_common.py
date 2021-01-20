@@ -52,7 +52,7 @@ class PyNNProjectionCommon(object):
             target, pre_synaptic_population, post_synaptic_population,
             prepop_is_view, postpop_is_view, label):
         """
-        :param SpiNNaker spinnaker_control: The simulator engine core.
+        :param ~.SpiNNaker spinnaker_control: The simulator engine core.
         :param AbstractConnector connector:
             What is the connector for this projection.
         :param AbstractSynapseDynamics synapse_dynamics_stdp:

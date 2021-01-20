@@ -85,7 +85,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
         :param user_extra_algorithms_pre_run:
         :type user_extra_algorithms_pre_run: list(str) or None
         :param time_scale_factor:
-        :type time_scale_factor:
+        :type time_scale_factor: float or None
         :param extra_post_run_algorithms:
         :type extra_post_run_algorithms: list(str) or None
         :param extra_mapping_algorithms:
@@ -93,7 +93,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
         :param extra_load_algorithms:
         :type extra_load_algorithms: list(str) or None
         :param front_end_versions:
-        :type front_end_versions:
+        :type front_end_versions: list(tuple(str,str)) or None
         """
         # pylint: disable=too-many-arguments, too-many-locals
 
@@ -231,7 +231,12 @@ class AbstractSpiNNakerCommon(with_metaclass(
                     self.machine_time_step)
 
     def _set_up_timings(self, timestep, min_delay, config, time_scale_factor):
-        # pylint: disable=too-many-arguments
+        """
+        :param float timestep:
+        :param int min_delay:
+        :param configparser.ConfigParser config:
+        :param float time_scale_factor:
+        """
 
         # Get the standard values
         if timestep is None:
@@ -297,6 +302,8 @@ class AbstractSpiNNakerCommon(with_metaclass(
 
     def _detect_if_graph_has_changed(self, reset_flags=True):
         """ Iterate though the graph and look for changes.
+
+        :param bool reset_flags:
         """
         changed, data_changed = super(AbstractSpiNNakerCommon, self).\
             _detect_if_graph_has_changed(reset_flags)
@@ -432,7 +439,8 @@ class AbstractSpiNNakerCommon(with_metaclass(
         :param projection_to_attribute_map:
             the projection to attributes mapping
         :type projection_to_attribute_map:
-            dict(PyNNProjectionCommon, list(int) or tuple(int) or None)
+            dict(~spynnaker.pyNN.models.projection.Projection,
+            list(int) or tuple(int) or None)
         :return: a extracted data object with get method for getting the data
         :rtype: ExtractedData
         """
@@ -489,10 +497,11 @@ class AbstractSpiNNakerCommon(with_metaclass(
         """ Locate receivers and their corresponding monitor cores for\
             setting router time-outs.
 
-        :param projections: the projections going to be read
+        :param list projections: the projections going to be read
         :param gatherers: the gatherers per Ethernet chip
         :param extra_monitors_per_chip: the extra monitor cores per chip
         :return: list of tuples with gatherer and its extra monitor cores
+        :rtype: list
         """
         # pylint: disable=protected-access
         important_gathers = set()

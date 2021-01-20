@@ -104,7 +104,7 @@ from spynnaker.pyNN.models.populations import (
 
 # projection
 # noinspection PyUnresolvedReferences
-from spynnaker8.models.projection import Projection as SpiNNakerProjection
+from spynnaker.pyNN.models.projection import Projection as SpiNNakerProjection
 
 from spynnaker8 import external_devices
 from spynnaker8 import extra_models
@@ -262,7 +262,7 @@ def get_projections_data(projection_data):
     """
     :param projection_data: the projection to attributes mapping
     :type projection_data:
-        dict(~PyNNProjectionCommon, list(int) or tuple(int) or None)
+        dict(~.Projection, list(int) or tuple(int) or None)
     :return: a extracted data object with get method for getting the data
     :rtype: ExtractedData
     """
@@ -408,7 +408,7 @@ def Projection(
     :param label: the label
     :type label: str or None
     :return: a projection object for SpiNNaker
-    :rtype: ~spynnaker8.models.projection.Projection
+    :rtype: ~spynnaker.pyNN.models.projection.Projection
     """
     # pylint: disable=too-many-arguments
     return SpiNNakerProjection(

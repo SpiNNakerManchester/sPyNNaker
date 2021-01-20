@@ -276,7 +276,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
         """ The list of all populations in the simulation.
 
         :return: list of populations
-        :rtype: list(Population)
+        :rtype: list(~spynnaker.pyNN.models.population.Population)
         """
         # needed by the population class
         return self._populations
@@ -286,7 +286,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
         """ The list of all projections in the simulation.
 
         :return: list of projections
-        :rtype: list(Projection)
+        :rtype: list(~spynnaker.pyNN.models.projection.Projection)
         """
         # needed by the projection class.
         return self._projections
