@@ -227,7 +227,7 @@ static bool initialise(void) {
             data_specification_get_region(SYNAPTIC_MATRIX_REGION, ds_regions),
             direct_synapses_address,
             data_specification_get_region(BIT_FIELD_FILTER_REGION, ds_regions),
-            &row_max_n_words)) {
+            &row_max_n_words, true)) {
         return false;
     }
     print_cache_arrays(

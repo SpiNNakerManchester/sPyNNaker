@@ -572,7 +572,7 @@ void print_max_core_map(void) {
 bool population_table_initialise(
         address_t table_address, address_t synapse_rows_address,
         address_t direct_rows_address, filter_region_t *filter_region,
-        uint32_t *row_max_n_words) {
+        uint32_t *row_max_n_words, bool free_max_cores_map) {
     log_debug("Population_table_initialise: starting");
     pop_table_config_t *config = (pop_table_config_t *) table_address;
 
@@ -593,6 +593,7 @@ bool population_table_initialise(
     log_debug("Pop table size is %d\n", n_master_pop_bytes);
     log_debug("n cached array blocks = %d", config->n_array_blocks);
     log_debug("n cached binary blocks = %d", config->n_binary_search_blocks);
+    log_debug("max_cores_length = %d", config->max_cores_length);
 
     // only try to malloc if there's stuff to malloc.
     if (n_master_pop_bytes != 0) {
@@ -656,12 +657,18 @@ bool population_table_initialise(
         return false;
     }
 
+    // free memory as no longer needed, now that caching done
+    if (max_cores_map != NULL && free_max_cores_map) {
+        sark_xfree(sark.heap, max_cores_map, ALLOC_LOCK);
+        max_cores_length = 0;
+    }
+
     //reset counters to reflect only execution lookups
     n_master_pop_cached_look_ups = 0;
     n_master_pop_sdram_look_ups = 0;
     n_master_pop_direct_matrix_look_ups = 0;
 
-    *row_max_n_words = 0xFF + N_SYNAPSE_ROW_HEADER_WORDS;
+    *row_max_n_words = 256 + N_SYNAPSE_ROW_HEADER_WORDS;
     return true;
 }
 
