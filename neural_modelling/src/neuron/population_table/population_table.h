@@ -518,11 +518,13 @@ static inline void print_master_population_table(void) {
 //! \param[in] filter_region: The address of the start of the bitfield region.
 //! \param[out] row_max_n_words: Updated with the maximum length of any row in
 //!                              the table in words
+//! \param[in] free_max_cores_map: bool informing if the max cores map
+//!                                should be freed
 //! \return True if the table was initialised successfully, False otherwise
 bool population_table_initialise(
         address_t table_address, address_t synapse_rows_address,
         address_t direct_rows_address, filter_region_t *filter_region,
-        uint32_t *row_max_n_words);
+        uint32_t *row_max_n_words, bool free_max_cores_map);
 
 //! \brief Initialise the bitfield filtering system.
 //! \param[in] filter_region: Where the bitfield configuration is

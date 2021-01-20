@@ -572,7 +572,7 @@ void print_max_core_map(void) {
 bool population_table_initialise(
         address_t table_address, address_t synapse_rows_address,
         address_t direct_rows_address, filter_region_t *filter_region,
-        uint32_t *row_max_n_words) {
+        uint32_t *row_max_n_words, bool free_max_cores_map) {
     log_debug("Population_table_initialise: starting");
     pop_table_config_t *config = (pop_table_config_t *) table_address;
 
@@ -658,7 +658,7 @@ bool population_table_initialise(
     }
 
     // free memory as no longer needed, now that caching done
-    if (max_cores_map != NULL) {
+    if (max_cores_map != NULL && free_max_cores_map) {
         sark_xfree(sark.heap, max_cores_map, ALLOC_LOCK);
     }
 

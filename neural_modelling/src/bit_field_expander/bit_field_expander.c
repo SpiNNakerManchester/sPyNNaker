@@ -205,7 +205,7 @@ bool initialise(void) {
     if (!population_table_initialise(
             master_pop_base_address, synaptic_matrix_base_address,
             direct_synapses_address, bit_field_base_address,
-            &row_max_n_words)) {
+            &row_max_n_words, true)) {
         log_error("Failed to init the master pop table. failing");
         can_run = false;
         return false;
