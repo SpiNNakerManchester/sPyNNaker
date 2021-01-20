@@ -20,8 +20,9 @@ from .delayed_machine_edge import DelayedMachineEdge
 from .projection_application_edge import ProjectionApplicationEdge
 from .projection_machine_edge import ProjectionMachineEdge
 from .synapse_information import SynapseInformation
+from .pynn_partition_edge import PyNNPartitionEdge
 
 __all__ = ["DelayAfferentApplicationEdge", "DelayAfferentMachineEdge",
            "DelayedApplicationEdge", "DelayedMachineEdge",
            "ProjectionApplicationEdge", "ProjectionMachineEdge",
-           "SynapseInformation", ]
+           "SynapseInformation", "PyNNPartitionEdge",]

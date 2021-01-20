@@ -57,6 +57,8 @@ static uint32_t *ring_buffer_to_input_left_shifts;
 // Count of the number of times the ring buffers have saturated
 static uint32_t saturation_count = 0;
 
+uint32_t num_fixed_pre_synaptic_events_per_timestep = 0;
+
 static uint32_t synapse_type_index_bits;
 static uint32_t synapse_type_index_mask;
 static uint32_t synapse_index_bits;
@@ -72,6 +74,30 @@ static weight_t *synaptic_region;
 // Size of the memory chunk containing the ring buffers to be sent to neuron core
 static size_t size_to_be_transferred;
 
+// Recording
+static uint32_t n_recorded_vars;
+
+static uint32_t is_recording;
+
+//! The number of timesteps between each variable recording
+static uint32_t *var_recording_rate;
+
+//! Count of timesteps until next variable recording
+static uint32_t *var_recording_count;
+
+//! Increment of count until next variable recording
+//! - 0 if not recorded, 1 if recorded
+static uint32_t *var_recording_increment;
+
+//! The index to record each variable to for each neuron
+static uint8_t *var_recording_indexes;
+
+//! The values of the recorded variables
+static timed_state_t **var_recording_values;
+
+//! The size of the recorded variables in bytes for a timestep
+static uint32_t *var_recording_size;
+
 static uint32_t *synaptic_matrix;
 
 //! parameters that reside in the synapse_parameter_data_region
@@ -82,9 +108,9 @@ struct synapse_parameters {
     uint32_t synapse_index;
     uint32_t mem_index;
     uint32_t offset;
-    //uint32_t n_recorded_variables;
-    //uint32_t is_recording;
     uint32_t synaptic_matrix_size;
+    uint32_t n_recorded_variables;
+    uint32_t is_recording;
 };
 #define START_OF_GLOBAL_PARAMETERS \
     (sizeof(struct neuron_parameters) / sizeof(uint32_t))
@@ -185,7 +211,34 @@ static inline void print_ring_buffers(uint32_t time) {
 static inline void print_inputs(void) {
 #if LOG_LEVEL >= LOG_DEBUG
     log_debug("Inputs\n");
-    neuron_print_inputs();
+
+    bool empty = true;
+    for (index_t i = 0; i < n_neurons; i++) {
+        empty = empty
+                && (bitsk(synapse_types_get_excitatory_input(
+                        &(neuron_synapse_shaping_params[i]))
+                    - synapse_types_get_inhibitory_input(
+                        &(neuron_synapse_shaping_params[i]))) == 0);
+    }
+
+    if (!empty) {
+        log_debug("-------------------------------------\n");
+
+        for (index_t i = 0; i < n_neurons; i++) {
+            input_t input =
+                synapse_types_get_excitatory_input(
+                    &(neuron_synapse_shaping_params[i]))
+                - synapse_types_get_inhibitory_input(
+                    &(neuron_synapse_shaping_params[i]));
+            if (bitsk(input) != 0) {
+                log_debug("%3u: %12.6k (= ", i, input);
+                synapse_types_print_input(
+                    &(neuron_synapse_shaping_params[i]));
+                log_debug(")\n");
+            }
+        }
+        log_debug("-------------------------------------\n");
+    }
 #endif // LOG_LEVEL >= LOG_DEBUG
 }
 
@@ -285,8 +338,8 @@ bool synapses_initialise(
 
     offset = params->offset; 
 
-    // n_recorder_vars = params->n_recorded_vars;
-    // is_recording = params->is_recording;
+    n_recorded_vars = params->n_recorded_variables;
+    is_recording = params->is_recording;
 
     synaptic_matrix_size =  params->synaptic_matrix_size;
 
@@ -324,6 +377,85 @@ bool synapses_initialise(
             n_synapse_types * sizeof(uint32_t));
     *ring_buffer_to_input_buffer_left_shifts =
             ring_buffer_to_input_left_shifts;
+
+    var_recording_rate = (uint32_t *) spin1_malloc(
+        n_recorded_vars * sizeof(uint32_t));
+    if (var_recording_rate == NULL) {
+        log_error("Could not allocate space for var_recording_rate");
+        return false;
+    }
+    var_recording_count = (uint32_t *) spin1_malloc(
+        n_recorded_vars * sizeof(uint32_t));
+    if (var_recording_count == NULL) {
+        log_error("Could not allocate space for var_recording_count");
+        return false;
+    }
+    var_recording_increment = (uint32_t *) spin1_malloc(
+        n_recorded_vars * sizeof(uint32_t));
+    if (var_recording_increment == NULL) {
+        log_error("Could not allocate space for var_recording_increment");
+        return false;
+    }
+    var_recording_indexes = (uint8_t *) spin1_malloc(
+        n_recorded_vars * sizeof(uint8_t));
+    if (var_recording_indexes == NULL) {
+        log_error("Could not allocate space for var_recording_indexes");
+        return false;
+    }
+    var_recording_size = (uint32_t *) spin1_malloc(
+        n_recorded_vars * sizeof(uint32_t));
+    if (var_recording_size == NULL) {
+        log_error("Could not allocate space for var_recording_size");
+        return false;
+    }
+    var_recording_values = (timed_state_t **) spin1_malloc(
+        n_recorded_vars * sizeof(timed_state_t *));
+    if (var_recording_values == NULL) {
+        log_error("Could not allocate space for var_recording_values");
+        return false;
+    }
+
+    for (uint32_t i = 0; i < n_recorded_vars; i++) {
+        var_recording_values[i] = (timed_state_t *) spin1_malloc(
+            sizeof(uint32_t) + (sizeof(state_t)));
+            if (var_recording_values[i] == NULL) {
+            log_error(
+                "Could not allocate space for var_recording_values[%d]", i);
+            return false;
+        }
+    }
+
+    uint32_t ptr = START_OF_GLOBAL_PARAMETERS + n_synapse_types;
+
+//    uint32_t n_words_for_n_neurons = (n_neurons + 3) >> 2;
+    uint32_t n_words_for_n_neurons = 1;
+
+    // Load other variable recording details
+    for (uint32_t i = 0; i < n_recorded_vars; i++) {
+        var_recording_rate[i] = address[ptr++];
+        uint32_t n_neurons_recording_var = address[ptr++];
+        var_recording_size[i] =
+            (n_neurons_recording_var + 1) * sizeof(uint32_t);
+//        spin1_memcpy(
+//            var_recording_indexes[i], &synapse_params_address[ptr],
+//            n_neurons * sizeof(uint8_t));
+        var_recording_indexes[i] = address[ptr];
+        ptr += n_words_for_n_neurons;
+    }
+
+    for (uint32_t i = 0; i < n_recorded_vars; i++) {
+        if (var_recording_rate[i] == 0) {
+            // Setting increment to zero means count will never equal rate
+            var_recording_increment[i] = 0;
+            // Count is not rate so does not record
+            var_recording_count[i] = 1;
+        } else {
+            // Increase one each call so count gets to rate
+            var_recording_increment[i] = 1;
+            // Using rate here so that the zero time is recorded
+            var_recording_count[i] = var_recording_rate[i];
+        }
+    }
 
     uint32_t n_neurons_power_2 = n_neurons;
     uint32_t log_n_neurons = 1;
@@ -373,37 +505,37 @@ bool synapses_initialise(
     return true;
 }
 
-// static inline void write_recording(timer_t time) {
+static inline void write_recording(timer_t time) {
 
-//     // Write recording data. Doesn't use DMA, since the cb is NULL
-//     for(uint32_t i = 0; i < n_recorded_vars; i++) {
-//        uint32_t index = var_recording_indexes[i];
+    // Write recording data. Doesn't use DMA, since the cb is NULL
+    for(uint32_t i = 0; i < n_recorded_vars; i++) {
+       uint32_t index = var_recording_indexes[i];
 
-// 		syn_rec.spikes_a = num_fixed_pre_synaptic_events_per_timestep & 0xFF;
-// 		syn_rec.spikes_b = spikes_remaining_this_tick & 0xFF;
-// 		syn_rec.spikes_c = kickstarts;
-// 		syn_rec.spikes_d = zero_target_spikes_per_dt;
+		syn_rec.spikes_a = num_fixed_pre_synaptic_events_per_timestep & 0xFF;
+		syn_rec.spikes_b = spikes_remaining_this_tick & 0xFF;
+		syn_rec.spikes_c = kickstarts;
+		syn_rec.spikes_d = zero_target_spikes_per_dt;
 
 
-//        var_recording_values[i]->states[index] = spike_profiling_get_spike_holder_as_accum(syn_rec);
+       var_recording_values[i]->states[index] = spike_profiling_get_spike_holder_as_accum(syn_rec);
 
-//        if (var_recording_count[i] == var_recording_rate[i]) {
-//             var_recording_count[i] = 1;
-//             var_recording_values[i]->time = time;
-//             recording_record_and_notify(
-//             i, var_recording_values[i], var_recording_size[i], NULL);
-//        } else {
-//             var_recording_count[i] += var_recording_increment[i];
-//        }
-//     }
-// }
+       if (var_recording_count[i] == var_recording_rate[i]) {
+            var_recording_count[i] = 1;
+            var_recording_values[i]->time = time;
+            recording_record_and_notify(
+            i, var_recording_values[i], var_recording_size[i], NULL);
+       } else {
+            var_recording_count[i] += var_recording_increment[i];
+       }
+    }
+}
 
 void synapses_do_timestep_update(timer_t time) {
 
     print_ring_buffers(time);
 
     // Disable interrupts to stop DMAs interfering with the ring buffers
-    uint32_t state = spin1_irq_disable();
+    //uint32_t state = spin1_irq_disable();
 
     // THIS CAN PROBABLY BE REMOVED FOR THE RATE-BASED AND PASS DIRECTLY THE POINTER TO RING_BUFFER
     uint32_t ring_buffer_index = synapses_get_ring_buffer_index(
@@ -414,15 +546,14 @@ void synapses_do_timestep_update(timer_t time) {
 
     print_inputs();
 
-    // if(is_recording) {
+    if(is_recording) {
 
-    //     write_recording(time);
-    //     num_fixed_pre_synaptic_events_per_timestep = 0;
-    //     kickstarts = 0;
-    // }
+        write_recording(time);
+        num_fixed_pre_synaptic_events_per_timestep = 0;
+    }
 
     // Re-enable the interrupts
-    spin1_mode_restore(state);
+    //spin1_mode_restore(state);
 }
 
 bool synapses_process_synaptic_row(
@@ -580,6 +711,30 @@ bool add_static_neuron_with_id(
     // Increment FF
     fixed_region[0]++;
     return true;
+}
+
+void synapses_flush_ring_buffer(uint32_t timestep) {
+
+    uint32_t ring_buffer_index;
+
+    for (uint32_t neuron_index = 0; neuron_index < n_neurons;
+            neuron_index++) {
+
+        // Loop through all synapse types
+        for (uint32_t synapse_type_index = 0;
+                synapse_type_index < n_synapse_types; synapse_type_index++) {
+
+            // Get index in the ring buffers for the previous time slot for
+            // this synapse type and neuron
+            ring_buffer_index = synapses_get_ring_buffer_index(
+                timestep, synapse_type_index, neuron_index, synapse_index_bits,
+                synapse_index_bits);
+
+            // Clear ring buffer
+            ring_buffers[ring_buffer_index] = 0;
+        }
+    }
+
 }
 
 void synapses_set_contribution_region(){

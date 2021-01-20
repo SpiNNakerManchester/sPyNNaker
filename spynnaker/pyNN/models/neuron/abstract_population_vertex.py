@@ -16,13 +16,19 @@
 import logging
 import os
 import math
+import numpy
+
 from spinn_utilities.overrides import overrides
+
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
+from pacman.model.constraints.placer_constraints import SameChipAsConstraint
+from pacman.model.graphs.common import Slice
+
 from spinn_front_end_common.abstract_models import (
     AbstractChangableAfterRun, AbstractProvidesIncomingPartitionConstraints,
     AbstractProvidesOutgoingPartitionConstraints, AbstractHasAssociatedBinary,
@@ -37,20 +43,21 @@ from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.interface.buffer_management import (
     recording_utilities)
 from spinn_front_end_common.interface.profiling import profile_utils
+
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, AbstractNeuronRecordable, NeuronRecorder)
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models import (
-    AbstractPopulationInitializable, AbstractAcceptsIncomingSynapses,
-    AbstractPopulationSettable, AbstractReadParametersBeforeSet,
-    AbstractContainsUnits)
+    AbstractPopulationInitializable, AbstractPopulationSettable,
+    AbstractReadParametersBeforeSet, AbstractContainsUnits)
+from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.utilities.ranged import (
     SpynnakerRangeDictionary, SpynnakerRangedList)
 from spynnaker.pyNN.models.neural_properties import AbstractIsRateBased
-from data_specification.enums import DataType
-from .synaptic_manager import SynapticManager
+
 from .population_machine_vertex import PopulationMachineVertex
+from spynnaker.pyNN.utilities.running_stats import RunningStats
 
 logger = logging.getLogger(__name__)
 
@@ -74,12 +81,10 @@ class AbstractPopulationVertex(
         AbstractHasAssociatedBinary, AbstractContainsUnits,
         AbstractSpikeRecordable,  AbstractNeuronRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
-        AbstractProvidesIncomingPartitionConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
         AbstractChangableAfterRun,
         AbstractRewritesDataSpecification, AbstractReadParametersBeforeSet,
-        AbstractAcceptsIncomingSynapses, ProvidesKeyToAtomMappingImpl,
-        AbstractCanReset):
+        ProvidesKeyToAtomMappingImpl, AbstractCanReset):
     """ Underlying vertex model for Neural Populations.
     """
     __slots__ = [
@@ -97,11 +102,17 @@ class AbstractPopulationVertex(
         "__synapse_manager",
         "__time_between_requests",
         "__units",
+        "_ring_buffer_shifts",
+        "_machine_vertices",
+        "_connected_app_vertices",
         "__n_subvertices",
         "__n_data_specs",
         "__initial_state_variables",
         "__has_reset_last",
-        "__updated_state_variables"]
+        "__updated_state_variables",
+        "_atoms_offset",
+        "_slice_list",
+        "_incoming_partitions"]
 
     BASIC_MALLOC_USAGE = 2
 
@@ -111,8 +122,8 @@ class AbstractPopulationVertex(
     # the size of the runtime SDP port data region
     RUNTIME_SDP_PORT_SIZE = 4
 
-    # 8 elements before the start of global parameters
-    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 32
+    # 12 elements before the start of global parameters
+    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 40
 
     # The Buffer traffic type
     TRAFFIC_IDENTIFIER = "BufferTraffic"
@@ -120,9 +131,8 @@ class AbstractPopulationVertex(
     _n_vertices = 0
 
     def __init__(
-            self, n_neurons, label, constraints, max_atoms_per_core,
-            spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
-            neuron_impl, pynn_model):
+            self, n_neurons, atoms_offset, label, constraints, max_atoms_per_core,
+            spikes_per_second, ring_buffer_sigma, neuron_impl, pynn_model):
         # pylint: disable=too-many-arguments, too-many-locals
         super(AbstractPopulationVertex, self).__init__(
             label, constraints, max_atoms_per_core)
@@ -130,16 +140,10 @@ class AbstractPopulationVertex(
         self.__n_atoms = n_neurons
         self.__n_subvertices = 0
         self.__n_data_specs = 0
-
-        # buffer data
-        self.__incoming_spike_buffer_size = incoming_spike_buffer_size
+        self._atoms_offset = atoms_offset
 
         # get config from simulator
         config = globals_variables.get_simulator().config
-
-        if incoming_spike_buffer_size is None:
-            self.__incoming_spike_buffer_size = config.getint(
-                "Simulation", "incoming_spike_buffer_size")
 
         self.__neuron_impl = neuron_impl
         self.__pynn_model = pynn_model
@@ -147,6 +151,12 @@ class AbstractPopulationVertex(
         self._state_variables = SpynnakerRangeDictionary(n_neurons)
         self.__neuron_impl.add_parameters(self._parameters)
         self.__neuron_impl.add_state_variables(self._state_variables)
+        #possible remove the ring buffer shif, or just placeholder for rate-based
+        self._ring_buffer_shifts = None
+        self._machine_vertices = dict()
+        self._connected_app_vertices = None
+        self._slice_list = None
+        self._incoming_partitions = None
         self.__initial_state_variables = None
         self.__updated_state_variables = set()
 
@@ -154,11 +164,6 @@ class AbstractPopulationVertex(
         recordables = ["spikes"]
         recordables.extend(self.__neuron_impl.get_recordable_variables())
         self.__neuron_recorder = NeuronRecorder(recordables, n_neurons)
-
-        # Set up synapse handling
-        self.__synapse_manager = SynapticManager(
-            self.__neuron_impl.get_n_synapse_types(), ring_buffer_sigma,
-            spikes_per_second, config)
 
         # bool for if state has changed.
         self.__change_requires_mapping = True
@@ -178,6 +183,10 @@ class AbstractPopulationVertex(
     @property
     def _neuron_recorder(self):  # for testing only
         return self.__neuron_recorder
+
+    @property
+    def atoms_offset(self):
+        return self._atoms_offset
 
     @inject_items({
         "graph": "MemoryApplicationGraph",
@@ -215,6 +224,30 @@ class AbstractPopulationVertex(
         return self.__change_requires_mapping
 
     @property
+    def connected_app_vertices(self):
+        return self._connected_app_vertices
+
+    @connected_app_vertices.setter
+    def connected_app_vertices(self, connected_app_vertices):
+        self._connected_app_vertices = connected_app_vertices
+
+    @property
+    def slice_list(self):
+        return self._slice_list
+
+    @slice_list.setter
+    def slice_list(self, slices):
+        self._slice_list = slices
+
+    @property
+    def incoming_partitions(self):
+        return self._incoming_partitions
+
+    @incoming_partitions.setter
+    def incoming_partitions(self, incoming_partitions):
+        self._incoming_partitions = incoming_partitions
+
+    @property
     @overrides(AbstractChangableAfterRun.requires_data_generation)
     def requires_data_generation(self):
         return self.__change_requires_data_generation
@@ -248,25 +281,40 @@ class AbstractPopulationVertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
 
-        self.__n_subvertices += 1
-        return PopulationMachineVertex(
+        # Update the low and high atoms for the slice, transparent to PACMAN
+        #vertex_slice.lo_atom += self._atoms_offset
+        #vertex_slice.hi_atom += self._atoms_offset
+
+        vertex = PopulationMachineVertex(
             resources_required, self.__neuron_recorder.recorded_region_ids,
             label, constraints)
+
+        AbstractPopulationVertex._n_vertices += 1
+        self._machine_vertices[self.__n_subvertices] = vertex
+
+        for app_vertex in self._connected_app_vertices:
+            out_vertices =\
+                app_vertex.get_machine_vertex_at(
+                    vertex_slice.lo_atom, vertex_slice.hi_atom)
+            if len(out_vertices)> 0:
+                for out_vertex in out_vertices:
+                    vertex.add_constraint(SameChipAsConstraint(out_vertex))
+        self.__n_subvertices += 1
+
+        return vertex
 
     def get_cpu_usage_for_atoms(self, vertex_slice):
         return (
             _NEURON_BASE_N_CPU_CYCLES + _C_MAIN_BASE_N_CPU_CYCLES +
             (_NEURON_BASE_N_CPU_CYCLES_PER_NEURON * vertex_slice.n_atoms) +
             self.__neuron_recorder.get_n_cpu_cycles(vertex_slice.n_atoms) +
-            self.__neuron_impl.get_n_cpu_cycles(vertex_slice.n_atoms) +
-            self.__synapse_manager.get_n_cpu_cycles())
+            self.__neuron_impl.get_n_cpu_cycles(vertex_slice.n_atoms))
 
     def get_dtcm_usage_for_atoms(self, vertex_slice):
         return (
             _NEURON_BASE_DTCM_USAGE_IN_BYTES +
             self.__neuron_impl.get_dtcm_usage_in_bytes(vertex_slice.n_atoms) +
-            self.__neuron_recorder.get_dtcm_usage_in_bytes(vertex_slice) +
-            self.__synapse_manager.get_dtcm_usage_in_bytes())
+            self.__neuron_recorder.get_dtcm_usage_in_bytes(vertex_slice))
 
     def _get_sdram_usage_for_neuron_params(self, vertex_slice):
         """ Calculate the SDRAM usage for just the neuron parameters region.
@@ -277,11 +325,13 @@ class AbstractPopulationVertex(
 
         base = 0
 
+        # We are currently not using the rate LUT, maybe remove
         if hasattr(self.__pynn_model, "_rate_based"):
             base = self.__neuron_impl.get_sdram_usage_for_rate_lut() + 1
 
         return (
             self.BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
+            self.__neuron_impl.get_n_synapse_types() * 4 +
             self.__neuron_recorder.get_sdram_usage_in_bytes(vertex_slice) +
             self.__neuron_impl.get_sdram_usage_in_bytes(vertex_slice.n_atoms) +
             base)
@@ -296,9 +346,6 @@ class AbstractPopulationVertex(
             recording_utilities.get_recording_data_constant_size(n_record) +
             PopulationMachineVertex.get_provenance_data_size(
                 PopulationMachineVertex.N_ADDITIONAL_PROVENANCE_DATA_ITEMS) +
-            self.__synapse_manager.get_sdram_usage_in_bytes(
-                vertex_slice, graph.get_edges_ending_at_vertex(self),
-                machine_time_step) +
             profile_utils.get_profile_region_size(
                 self.__n_profile_samples))
 
@@ -340,6 +387,115 @@ class AbstractPopulationVertex(
             size=params_size,
             label='NeuronParams')
 
+    # We PROBABLY DON'T NEED THE NEXT TWO METHODS ANYMORE!, KEPT FOR COMPATIBILITY NOW
+    def _get_ring_buffer_to_input_left_shifts(
+            self, application_vertex, application_graph, machine_timestep):
+        """ Get the scaling of the ring buffer to provide as much accuracy as\
+            possible without too much overflow
+        """
+        weight_scale_squared = application_vertex.weight_scale * application_vertex.weight_scale
+        n_synapse_types = application_vertex.implemented_synapse_types
+        running_totals = [RunningStats() for _ in range(n_synapse_types)]
+        delay_running_totals = [RunningStats() for _ in range(n_synapse_types)]
+        total_weights = numpy.zeros(n_synapse_types)
+        biggest_weight = numpy.zeros(n_synapse_types)
+        weights_signed = False
+        rate_stats = [RunningStats() for _ in range(n_synapse_types)]
+        steps_per_second = 1000000.0 / machine_timestep
+
+        for app_edge in application_graph.get_edges_ending_at_vertex(
+                application_vertex):
+            if isinstance(app_edge, ProjectionApplicationEdge):
+                for synapse_info in app_edge.synapse_information:
+                    if n_synapse_types > 1:
+                        synapse_type = synapse_info.synapse_type
+                    else:
+                        synapse_type = 0
+                    synapse_dynamics = synapse_info.synapse_dynamics
+                    connector = synapse_info.connector
+                    weight_mean = (
+                        synapse_dynamics.get_weight_mean(connector, synapse_info.weight) *
+                        application_vertex.weight_scale)
+                    n_connections = \
+                        connector.get_n_connections_to_post_vertex_maximum()
+                    weight_variance = synapse_dynamics.get_weight_variance(
+                        connector, synapse_info.weight) * weight_scale_squared
+                    running_totals[synapse_type].add_items(
+                        weight_mean, weight_variance, n_connections)
+
+                    delay_variance = synapse_dynamics.get_delay_variance(
+                        connector, synapse_info.delay)
+                    delay_running_totals[synapse_type].add_items(
+                        0.0, delay_variance, n_connections)
+
+                    weight_max = (synapse_dynamics.get_weight_maximum(
+                        connector, synapse_info.weight) * application_vertex.weight_scale)
+                    biggest_weight[synapse_type] = max(
+                        biggest_weight[synapse_type], weight_max)
+
+                    spikes_per_tick = max(
+                        1.0, application_vertex.spikes_per_second / steps_per_second)
+                    spikes_per_second = application_vertex.spikes_per_second
+                    rate_stats[synapse_type].add_items(
+                        spikes_per_second, 0, n_connections)
+                    total_weights[synapse_type] += spikes_per_tick * (
+                        weight_max * n_connections)
+
+                    if synapse_dynamics.are_weights_signed():
+                        weights_signed = True
+
+        max_weights = numpy.zeros(n_synapse_types)
+        for synapse_type in range(n_synapse_types):
+            stats = running_totals[synapse_type]
+            rates = rate_stats[synapse_type]
+            if delay_running_totals[synapse_type].variance == 0.0:
+                max_weights[synapse_type] = max(total_weights[synapse_type],
+                                                biggest_weight[synapse_type])
+            else:
+                max_weights[synapse_type] = min(
+                    self._ring_buffer_expected_upper_bound(
+                        stats.mean, stats.standard_deviation, rates.mean,
+                        machine_timestep, stats.n_items,
+                        application_vertex.ring_buffer_sigma),
+                    total_weights[synapse_type])
+                max_weights[synapse_type] = max(
+                    max_weights[synapse_type], biggest_weight[synapse_type])
+
+        # Convert these to powers
+        max_weight_powers = (
+            0 if w <= 0 else int(math.ceil(max(0, math.log(w, 2))))
+            for w in max_weights)
+
+        # If 2^max_weight_power equals the max weight, we have to add another
+        # power, as range is 0 - (just under 2^max_weight_power)!
+        max_weight_powers = (
+            w + 1 if (2 ** w) <= a else w
+            for w, a in zip(max_weight_powers, max_weights))
+
+        # If we have synapse dynamics that uses signed weights,
+        # Add another bit of shift to prevent overflows
+        if weights_signed:
+            max_weight_powers = (m + 1 for m in max_weight_powers)
+
+        return list(max_weight_powers)
+
+    def _get_ring_buffer_shifts(
+            self, application_graph, machine_timestep):
+        """ Get the ring buffer shifts for this vertex
+        """
+        if self._ring_buffer_shifts is None:
+            self._ring_buffer_shifts = []
+            previous_syn_type = -1
+            for vertex in self._connected_app_vertices:
+                if vertex.synapse_index != previous_syn_type:
+                    # self._ring_buffer_shifts.extend(
+                    #     self._get_ring_buffer_to_input_left_shifts(
+                    #         vertex, application_graph,
+                    #         machine_timestep))
+                    self._ring_buffer_shifts.extend(vertex.ring_buffer_shifts)
+                    previous_syn_type = vertex.synapse_index
+        return self._ring_buffer_shifts
+    
     @staticmethod
     def __copy_ranged_dict(source, merge=None, merge_keys=None):
         target = SpynnakerRangeDictionary(len(source))
@@ -358,7 +514,7 @@ class AbstractPopulationVertex(
 
     def _write_neuron_parameters(
             self, spec, key, vertex_slice, machine_time_step,
-            time_scale_factor):
+            time_scale_factor, application_graph, index):
 
         # If resetting, reset any state variables that need to be reset
         if (self.__has_reset_last and
@@ -396,7 +552,7 @@ class AbstractPopulationVertex(
 
         # Write the number of microseconds between sending spikes
         time_between_spikes = (
-            (machine_time_step * time_scale_factor) / (n_atoms * 2.0))
+            (machine_time_step * time_scale_factor) / (n_atoms * 100.0))
         spec.write_value(data=int(time_between_spikes))
 
         # Write whether the key is to be used, and then the key, or 0 if it
@@ -414,20 +570,35 @@ class AbstractPopulationVertex(
         # Write the number of synapse types
         spec.write_value(data=self.__neuron_impl.get_n_synapse_types())
 
-        # Write the size of the incoming spike buffer
-        spec.write_value(data=self.__incoming_spike_buffer_size)
+        # Write the SDRAM tag for the contribution area
+        spec.write_value(data=index)
+
+        # Write the number of incoming partitions to allocate a sufficiently big contribution area
+        # for all the synapse cores.
+        spec.write_value(data=(self._incoming_partitions))
 
         # Write the number of variables that can be recorded
         spec.write_value(
             data=len(self.__neuron_impl.get_recordable_variables()))
 
+        # Write Synaptic contribution left shift
+        #AGAIN POSSIBLE DELETE
+        ring_buffer_shifts = self._get_ring_buffer_shifts(
+            application_graph, machine_time_step)
+
+        spec.write_array(ring_buffer_shifts)
+
         # Write the recording data
         recording_data = self.__neuron_recorder.get_data(vertex_slice)
         spec.write_array(recording_data)
 
+        # Remove offset from the slice to write correct neuron params
+        new_slice = Slice(vertex_slice.lo_atom-self.atoms_offset,
+                          vertex_slice.hi_atom-self.atoms_offset)
+
         # Write the neuron parameters
         neuron_data = self.__neuron_impl.get_data(
-            self._parameters, self._state_variables, vertex_slice)
+            self._parameters, self._state_variables, new_slice)
         spec.write_array(neuron_data)
 
         if hasattr(self.__pynn_model, "_rate_based"):
@@ -461,7 +632,8 @@ class AbstractPopulationVertex(
                 placement.vertex, constants.SPIKE_PARTITION_ID),
             machine_time_step=machine_time_step, spec=spec,
             time_scale_factor=time_scale_factor,
-            vertex_slice=vertex_slice)
+            vertex_slice=vertex_slice,
+            index=placement.vertex.vertex_index())
 
         # close spec
         spec.end_specification()
@@ -526,23 +698,23 @@ class AbstractPopulationVertex(
         spec.write_array(recording_utilities.get_recording_header_array(
             self._get_buffered_sdram(vertex_slice, data_n_time_steps)))
 
+        # writing of data spec for neuron vertices is forced to
+        # happen before synapse ones
+        vertex.vertex_index = placement.p
+
+        for c in vertex.constraints:
+            if isinstance(c, SameChipAsConstraint):
+                c.vertex.vertex_index = placement.p
+        
         # Write the neuron parameters
         self._write_neuron_parameters(
-            spec, key, vertex_slice, machine_time_step, time_scale_factor)
+            spec, key, vertex_slice, machine_time_step,
+            time_scale_factor, application_graph, vertex.vertex_index)
 
         # write profile data
         profile_utils.write_profile_region_data(
             spec, constants.POPULATION_BASED_REGIONS.PROFILING.value,
             self.__n_profile_samples)
-
-        # Get the weight_scale value from the appropriate location
-        weight_scale = self.__neuron_impl.get_global_weight_scale()
-
-        # allow the synaptic matrix to write its data spec-able data
-        self.__synapse_manager.write_data_spec(
-            spec, self, vertex_slice, vertex, placement, machine_graph,
-            application_graph, routing_info, graph_mapper,
-            weight_scale, machine_time_step)
 
         # End the writing of this specification:
         spec.end_specification()
@@ -550,14 +722,15 @@ class AbstractPopulationVertex(
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
     def get_binary_file_name(self):
 
-        # Split binary name into title and extension
-        binary_title, binary_extension = os.path.splitext(
-            self.__neuron_impl.binary_name)
+        # # Split binary name into title and extension
+        # binary_title, binary_extension = os.path.splitext(
+        #     self.__neuron_impl.binary_name)
 
-        # Reunite title and extension and return
-        return (binary_title +
-                self.__synapse_manager.vertex_executable_suffix +
-                binary_extension)
+        # # Reunite title and extension and return
+        # return (binary_title +
+        #         self.__synapse_manager.vertex_executable_suffix +
+        #         binary_extension)
+        return self.__neuron_impl.binary_name
 
     @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
     def get_binary_start_type(self):
@@ -736,69 +909,6 @@ class AbstractPopulationVertex(
     def weight_scale(self):
         return self.__neuron_impl.get_global_weight_scale()
 
-    @property
-    def ring_buffer_sigma(self):
-        return self.__synapse_manager.ring_buffer_sigma
-
-    @ring_buffer_sigma.setter
-    def ring_buffer_sigma(self, ring_buffer_sigma):
-        self.__synapse_manager.ring_buffer_sigma = ring_buffer_sigma
-
-    @property
-    def spikes_per_second(self):
-        return self.__synapse_manager.spikes_per_second
-
-    @spikes_per_second.setter
-    def spikes_per_second(self, spikes_per_second):
-        self.__synapse_manager.spikes_per_second = spikes_per_second
-
-    @property
-    def synapse_dynamics(self):
-        return self.__synapse_manager.synapse_dynamics
-
-    def set_synapse_dynamics(self, synapse_dynamics):
-        self.__synapse_manager.synapse_dynamics = synapse_dynamics
-
-    def add_pre_run_connection_holder(
-            self, connection_holder, edge, synapse_info):
-        # pylint: disable=arguments-differ
-        self.__synapse_manager.add_pre_run_connection_holder(
-            connection_holder, edge, synapse_info)
-
-    def get_connection_holders(self):
-        return self.__synapse_manager.get_connection_holders()
-
-    @overrides(AbstractAcceptsIncomingSynapses.get_connections_from_machine)
-    def get_connections_from_machine(
-            self, transceiver, placement, edge, graph_mapper, routing_infos,
-            synapse_information, machine_time_step, using_extra_monitor_cores,
-            placements=None, monitor_api=None, monitor_placement=None,
-            monitor_cores=None, handle_time_out_configuration=True,
-            fixed_routes=None):
-        # pylint: disable=too-many-arguments
-        return self.__synapse_manager.get_connections_from_machine(
-            transceiver, placement, edge, graph_mapper, routing_infos,
-            synapse_information, machine_time_step, using_extra_monitor_cores,
-            placements, monitor_api, monitor_placement, monitor_cores,
-            handle_time_out_configuration, fixed_routes)
-
-    def clear_connection_cache(self):
-        self.__synapse_manager.clear_connection_cache()
-
-    def get_maximum_delay_supported_in_ms(self, machine_time_step):
-        return self.__synapse_manager.get_maximum_delay_supported_in_ms(
-            machine_time_step)
-
-    @overrides(AbstractProvidesIncomingPartitionConstraints.
-               get_incoming_partition_constraints)
-    def get_incoming_partition_constraints(self, partition):
-        """ Gets the constraints for partitions going into this vertex.
-
-        :param partition: partition that goes into this vertex
-        :return: list of constraints
-        """
-        return self.__synapse_manager.get_incoming_partition_constraints()
-
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
                get_outgoing_partition_constraints)
     def get_outgoing_partition_constraints(self, partition):
@@ -877,14 +987,21 @@ class AbstractPopulationVertex(
     def get_synapse_id_by_target(self, target):
         return self.__neuron_impl.get_synapse_id_by_target(target)
 
+    #used to know how many synapse vertices we need
+    def get_n_synapse_types(self):
+        return self.__neuron_impl.get_n_synapse_types()
+
+    def get_machine_vertex_at(self, index):
+
+        if index in self._machine_vertices:
+            return self._machine_vertices[index]
+        return None
+
     def __str__(self):
         return "{} with {} atoms".format(self.label, self.n_atoms)
 
     def __repr__(self):
         return self.__str__()
-
-    def gen_on_machine(self, vertex_slice):
-        return self.__synapse_manager.gen_on_machine(vertex_slice)
 
     @overrides(AbstractCanReset.reset_to_first_timestep)
     def reset_to_first_timestep(self):
@@ -893,6 +1010,6 @@ class AbstractPopulationVertex(
         self.__change_requires_neuron_parameters_reload = True
 
         # If synapses change during the run,
-        if self.__synapse_manager.synapse_dynamics.changes_during_run:
+        if self._connected_app_vertices[0].synapse_dynamics.changes_during_run:
             self.__change_requires_data_generation = True
             self.__change_requires_neuron_parameters_reload = False

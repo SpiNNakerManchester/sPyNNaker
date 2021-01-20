@@ -16,6 +16,8 @@
 from spinn_front_end_common.interface.interface_functions import (
     GraphDataSpecificationWriter)
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
+from spynnaker.pyNN.models.neuron import SynapticManager
+from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 
 
 class SpynnakerDataSpecificationWriter(
@@ -32,6 +34,8 @@ class SpynnakerDataSpecificationWriter(
         # pylint: disable=too-many-arguments
 
         delay_extensions = list()
+        syn_vertices = list()
+        neuron_vertices = list()
         placement_order = list()
         for placement in placements.placements:
             associated_vertex = graph_mapper.get_application_vertex(
@@ -39,8 +43,14 @@ class SpynnakerDataSpecificationWriter(
 
             if isinstance(associated_vertex, DelayExtensionVertex):
                 delay_extensions.append(placement)
+            elif isinstance(associated_vertex, SynapticManager):
+                syn_vertices.append(placement)
+            elif isinstance(associated_vertex, AbstractPopulationVertex):
+                neuron_vertices.append(placement)
             else:
                 placement_order.append(placement)
+        placement_order.extend(neuron_vertices)
+        placement_order.extend(syn_vertices)
         placement_order.extend(delay_extensions)
 
         return super(SpynnakerDataSpecificationWriter, self).__call__(
