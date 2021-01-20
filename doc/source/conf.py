@@ -423,7 +423,6 @@ explicit_wanted_files = [
     "spynnaker/pyNN/models/abstract_pynn_model.py",
     "spynnaker/pyNN/models/projection.py",
     "spynnaker/pyNN/models/pynn_population_common.py",
-    "spynnaker/pyNN/models/pynn_projection_common.py",
     "spynnaker/pyNN/models/defaults.py",
     "spynnaker/pyNN/models/recorder.py",
     "spynnaker/pyNN/models/neuron/key_space_tracker.py",
