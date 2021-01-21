@@ -148,3 +148,7 @@ class MockSimulator(object):
     @property
     def min_delay(self):
         return 1
+
+    @property
+    def t(self):
+        return 0
