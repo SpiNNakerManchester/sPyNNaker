@@ -33,8 +33,8 @@ def find_good_chip(machine, n_target):
                    .format(n_target))
 
 
-def do_run():
-    n_source = 1650
+def do_one_run():
+    n_source = 2000
     n_target = 16
     n_neurons = 1
     n_boards = math.ceil((n_source + n_target) / 16 / 48)
@@ -64,7 +64,11 @@ def do_run():
 
     for s in range(n_source):
         for t in range(n_target):
-            if (s + 1) % (t + 1) == 0:
+            sim.Projection(
+                sources[s], targets[t], sim.AllToAllConnector(),
+                synapse_type=sim.StaticSynapse(weight=5, delay=1),
+                receptor_type="excitatory")
+            if t > 1 and s % t == 0:
                 sim.Projection(
                     sources[s], targets[t], sim.AllToAllConnector(),
                     synapse_type=sim.StaticSynapse(weight=5, delay=1),

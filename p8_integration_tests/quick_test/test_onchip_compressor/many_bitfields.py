@@ -33,10 +33,10 @@ def find_good_chip(machine, n_target):
                    .format(n_target))
 
 
-def do_run():
-    n_source = 1650
+def do_bitfield_run():
+    n_source = 40
     n_target = 16
-    n_neurons = 1
+    n_neurons = 50
     n_boards = math.ceil((n_source + n_target) / 16 / 48)
 
     sim.setup(timestep=1.0, n_boards_required=n_boards)
@@ -64,11 +64,14 @@ def do_run():
 
     for s in range(n_source):
         for t in range(n_target):
-            if (s + 1) % (t + 1) == 0:
-                sim.Projection(
-                    sources[s], targets[t], sim.AllToAllConnector(),
-                    synapse_type=sim.StaticSynapse(weight=5, delay=1),
-                    receptor_type="inhibitory")
+            weird_list = []
+            for i in range(n_neurons):
+                if (s+i) % (t+1) == 0:
+                    weird_list.append([i, i])
+            sim.Projection(
+                sources[s], targets[t], sim.FromListConnector(weird_list),
+                synapse_type=sim.StaticSynapse(weight=5, delay=1),
+                receptor_type="inhibitory")
 
     sim.run(1)
     sim.end()
