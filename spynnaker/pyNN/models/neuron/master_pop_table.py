@@ -180,9 +180,6 @@ _MAX_CORES_INFO_SIZE_BYTES = ctypes.sizeof(_MaxCoresCType)
 # 4. n binary search blocks 5. n elements in max cores map
 _BASE_SIZE_BYTES = 5 * BYTES_PER_WORD
 
-# Over-scale of estimate for safety
-_OVERSCALE = 2
-
 # A ctypes pointer to a uint32
 _UINT32_PTR = ctypes.POINTER(ctypes.c_uint32)
 

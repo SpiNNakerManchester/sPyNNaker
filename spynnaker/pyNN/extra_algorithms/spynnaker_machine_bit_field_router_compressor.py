@@ -25,7 +25,7 @@ from spinn_front_end_common.abstract_models import (
 from spinn_front_end_common.interface.interface_functions.\
     machine_bit_field_router_compressor import (
         MachineBitFieldPairRouterCompressor,
-        MachineBitFieldUnorderedRouterCompressor)
+        MachineBitFieldOrderedCoveringCompressor)
 from spinn_front_end_common.utilities.system_control_logic import (
     run_system_application)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
@@ -50,7 +50,7 @@ class AbstractMachineBitFieldRouterCompressor(object):
             produce_report, default_report_folder, target_length,
             routing_infos, time_to_try_for_each_iteration, use_timer_cut_off,
             machine_time_step, time_scale_factor, threshold_percentage,
-            executable_targets, read_expander_iobuf,
+            retry_count, executable_targets, read_expander_iobuf,
             compress_as_much_as_possible=False, provenance_data_objects=None):
         """ entrance for routing table compression with bit field
 
@@ -76,6 +76,10 @@ class AbstractMachineBitFieldRouterCompressor(object):
         :param int threshold_percentage:
             the percentage of bitfields to do on chip before its considered
             a success
+        :param retry_count:
+            Number of times that the sorters should set of the compressions
+            again. None for as much as needed
+        :type retry_count: int or None
         :param bool read_algorithm_iobuf: flag saying if read iobuf
         :param bool compress_as_much_as_possible:
             flag asking if should compress as much as possible
@@ -102,8 +106,10 @@ class AbstractMachineBitFieldRouterCompressor(object):
                 machine_time_step=machine_time_step,
                 time_scale_factor=time_scale_factor,
                 threshold_percentage=threshold_percentage,
+                retry_count=retry_count,
                 compress_as_much_as_possible=compress_as_much_as_possible,
-                executable_targets=executable_targets)
+                executable_targets=executable_targets,
+                provenance_data_objects=provenance_data_objects)
 
         # adjust cores to exclude the ones which did not give sdram.
         expander_chip_cores = self._locate_expander_rerun_targets(
@@ -188,11 +194,30 @@ class AbstractMachineBitFieldRouterCompressor(object):
                 cls._RERUN_IOBUF_NAME_PATTERN)
 
 
-class SpynnakerMachineBitFieldUnorderedRouterCompressor(
+class SpynnakerMachineBitFieldOrderedCoveringCompressor(
         AbstractMachineBitFieldRouterCompressor):
     @overrides(AbstractMachineBitFieldRouterCompressor._compressor_factory)
     def _compressor_factory(self):
-        return MachineBitFieldUnorderedRouterCompressor()
+        return MachineBitFieldOrderedCoveringCompressor()
+
+
+class SpynnakerMachineBitFieldUnorderedRouterCompressor(
+        AbstractMachineBitFieldRouterCompressor):
+    """ DEPRACATED use MachineBitFieldRouterCompressor """
+
+    def __new__(cls, *args, **kwargs):
+        logger.warning(
+            "SpynnakerMachineBitFieldUnorderedRouterCompressor "
+            "algorithm name is deprecated. "
+            "Please use MachineBitFieldOrderedCoveringCompressor instead. "
+            "Remove algorithms from your cfg to use defaults")
+        return super(
+            SpynnakerMachineBitFieldUnorderedRouterCompressor, cls).__new__(
+            cls, *args, **kwargs)
+
+    @overrides(AbstractMachineBitFieldRouterCompressor._compressor_factory)
+    def _compressor_factory(self):
+        return MachineBitFieldOrderedCoveringCompressor()
 
 
 class SpynnakerMachineBitFieldPairRouterCompressor(
