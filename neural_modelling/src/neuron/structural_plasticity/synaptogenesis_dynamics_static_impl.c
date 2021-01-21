@@ -29,7 +29,8 @@ bool synaptogenesis_dynamics_initialise(UNUSED address_t sdram_sp_address) {
 
 bool synaptogenesis_dynamics_rewire(
         UNUSED uint32_t time, UNUSED spike_t *spike,
-        UNUSED synaptic_row_t *synaptic_row, UNUSED uint32_t *n_bytes) {
+        UNUSED synaptic_row_t *synaptic_row, UNUSED uint32_t *n_bytes,
+        UNUSED uint32_t* representation) {
     return false;
 }
 

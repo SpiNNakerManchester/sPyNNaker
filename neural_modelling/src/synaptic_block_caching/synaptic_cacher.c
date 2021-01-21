@@ -152,7 +152,8 @@ static inline void update_master_pop_counters(void) {
 //! \param[in] bit_field_index: index in bitfields.
 //! \param[in] entry: the address list entry.
 //! \param[in] address_index: the index this was at.
-//! \return: bool stating if the block contains plastic synapses.
+//! \param[out] result: stating if the block contains plastic synapses
+//! \return: bool successful or not.
 static inline bool synapses_are_plastic_or_structural_or_direct(
         uint32_t bit_field_index, address_list_entry entry,
         uint32_t address_index, bool* result) {
