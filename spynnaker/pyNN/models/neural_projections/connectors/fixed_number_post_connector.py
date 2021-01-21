@@ -299,8 +299,8 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         # The same seed needs to be sent to each of the slices
         key = (id(pre_vertex_slice), id(post_slices))
         if key not in self.__post_connector_seed:
-            self.__post_connector_seed[key] = [
-                int(i * 0xFFFFFFFF) for i in self._rng.next(n=4)]
+            self.__post_connector_seed[
+                key] = utility_calls.create_mars_kiss_seeds(self._rng)
 
         # Only deal with self-connections if the two populations are the same
         self_connections = True

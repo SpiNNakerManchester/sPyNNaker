@@ -302,8 +302,8 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
         # The same seed needs to be sent to each of the slices
         key = (id(synapse_info), id(post_vertex_slice))
         if key not in self.__pre_connector_seed:
-            self.__pre_connector_seed[key] = [
-                int(i * 0xFFFFFFFF) for i in self._rng.next(n=4)]
+            self.__pre_connector_seed[
+                key] = utility_calls.create_mars_kiss_seeds(self._rng)
 
         # Only deal with self-connections if the two populations are the same
         self_connections = True
