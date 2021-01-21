@@ -79,7 +79,7 @@ class Recorder(object):
         return self.__write_to_files_indicators
 
     def record(self, variable, sampling_interval=None, to_file=None,
-                indexes=None):
+               indexes=None):
         """ Tell the vertex to record data.
 
         :param str variable: The variable to record, supported variables to
