@@ -64,7 +64,7 @@
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.interface_functions.</span>\
     <span class="n">machine_bit_field_router_compressor</span> <span class="kn">import</span> <span class="p">(</span>
         <span class="n">MachineBitFieldPairRouterCompressor</span><span class="p">,</span>
-        <span class="n">MachineBitFieldUnorderedRouterCompressor</span><span class="p">)</span>
+        <span class="n">MachineBitFieldOrderedCoveringCompressor</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.system_control_logic</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">run_system_application</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.utility_objs</span> <span class="kn">import</span> <span class="n">ExecutableType</span>
@@ -89,7 +89,7 @@
             <span class="n">produce_report</span><span class="p">,</span> <span class="n">default_report_folder</span><span class="p">,</span> <span class="n">target_length</span><span class="p">,</span>
             <span class="n">routing_infos</span><span class="p">,</span> <span class="n">time_to_try_for_each_iteration</span><span class="p">,</span> <span class="n">use_timer_cut_off</span><span class="p">,</span>
             <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="p">,</span> <span class="n">threshold_percentage</span><span class="p">,</span>
-            <span class="n">executable_targets</span><span class="p">,</span> <span class="n">read_expander_iobuf</span><span class="p">,</span>
+            <span class="n">retry_count</span><span class="p">,</span> <span class="n">executable_targets</span><span class="p">,</span> <span class="n">read_expander_iobuf</span><span class="p">,</span>
             <span class="n">compress_as_much_as_possible</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">provenance_data_objects</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; entrance for routing table compression with bit field</span>
 
@@ -115,6 +115,10 @@
 <span class="sd">        :param int threshold_percentage:</span>
 <span class="sd">            the percentage of bitfields to do on chip before its considered</span>
 <span class="sd">            a success</span>
+<span class="sd">        :param retry_count:</span>
+<span class="sd">            Number of times that the sorters should set of the compressions</span>
+<span class="sd">            again. None for as much as needed</span>
+<span class="sd">        :type retry_count: int or None</span>
 <span class="sd">        :param bool read_algorithm_iobuf: flag saying if read iobuf</span>
 <span class="sd">        :param bool compress_as_much_as_possible:</span>
 <span class="sd">            flag asking if should compress as much as possible</span>
@@ -141,8 +145,10 @@
                 <span class="n">machine_time_step</span><span class="o">=</span><span class="n">machine_time_step</span><span class="p">,</span>
                 <span class="n">time_scale_factor</span><span class="o">=</span><span class="n">time_scale_factor</span><span class="p">,</span>
                 <span class="n">threshold_percentage</span><span class="o">=</span><span class="n">threshold_percentage</span><span class="p">,</span>
+                <span class="n">retry_count</span><span class="o">=</span><span class="n">retry_count</span><span class="p">,</span>
                 <span class="n">compress_as_much_as_possible</span><span class="o">=</span><span class="n">compress_as_much_as_possible</span><span class="p">,</span>
-                <span class="n">executable_targets</span><span class="o">=</span><span class="n">executable_targets</span><span class="p">)</span>
+                <span class="n">executable_targets</span><span class="o">=</span><span class="n">executable_targets</span><span class="p">,</span>
+                <span class="n">provenance_data_objects</span><span class="o">=</span><span class="n">provenance_data_objects</span><span class="p">)</span>
 
         <span class="c1"># adjust cores to exclude the ones which did not give sdram.</span>
         <span class="n">expander_chip_cores</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_locate_expander_rerun_targets</span><span class="p">(</span>
@@ -227,11 +233,30 @@
                 <span class="bp">cls</span><span class="o">.</span><span class="n">_RERUN_IOBUF_NAME_PATTERN</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="SpynnakerMachineBitFieldUnorderedRouterCompressor"><a class="viewcode-back" href="../../../../spynnaker.pyNN.extra_algorithms.html#spynnaker.pyNN.extra_algorithms.SpynnakerMachineBitFieldUnorderedRouterCompressor">[docs]</a><span class="k">class</span> <span class="nc">SpynnakerMachineBitFieldUnorderedRouterCompressor</span><span class="p">(</span>
+<span class="k">class</span> <span class="nc">SpynnakerMachineBitFieldOrderedCoveringCompressor</span><span class="p">(</span>
         <span class="n">AbstractMachineBitFieldRouterCompressor</span><span class="p">):</span>
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractMachineBitFieldRouterCompressor</span><span class="o">.</span><span class="n">_compressor_factory</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">_compressor_factory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">MachineBitFieldUnorderedRouterCompressor</span><span class="p">()</span></div>
+        <span class="k">return</span> <span class="n">MachineBitFieldOrderedCoveringCompressor</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="SpynnakerMachineBitFieldUnorderedRouterCompressor"><a class="viewcode-back" href="../../../../spynnaker.pyNN.extra_algorithms.html#spynnaker.pyNN.extra_algorithms.SpynnakerMachineBitFieldUnorderedRouterCompressor">[docs]</a><span class="k">class</span> <span class="nc">SpynnakerMachineBitFieldUnorderedRouterCompressor</span><span class="p">(</span>
+        <span class="n">AbstractMachineBitFieldRouterCompressor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; DEPRACATED use MachineBitFieldRouterCompressor &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;SpynnakerMachineBitFieldUnorderedRouterCompressor &quot;</span>
+            <span class="s2">&quot;algorithm name is deprecated. &quot;</span>
+            <span class="s2">&quot;Please use MachineBitFieldOrderedCoveringCompressor instead. &quot;</span>
+            <span class="s2">&quot;Remove algorithms from your cfg to use defaults&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span>
+            <span class="n">SpynnakerMachineBitFieldUnorderedRouterCompressor</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span>
+            <span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractMachineBitFieldRouterCompressor</span><span class="o">.</span><span class="n">_compressor_factory</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_compressor_factory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">MachineBitFieldOrderedCoveringCompressor</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="SpynnakerMachineBitFieldPairRouterCompressor"><a class="viewcode-back" href="../../../../spynnaker.pyNN.extra_algorithms.html#spynnaker.pyNN.extra_algorithms.SpynnakerMachineBitFieldPairRouterCompressor">[docs]</a><span class="k">class</span> <span class="nc">SpynnakerMachineBitFieldPairRouterCompressor</span><span class="p">(</span>

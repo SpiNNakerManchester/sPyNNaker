@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
-<tagfile doxygen_version="1.9.0">
+<tagfile doxygen_version="1.9.1">
   <compound kind="file">
     <name>bit_field_expander.c</name>
     <path>/github/workspace/neural_modelling/src/bit_field_expander/</path>
