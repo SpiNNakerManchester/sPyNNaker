@@ -160,7 +160,7 @@ static inline bool is_something_to_do(
         rewires_to_do--;
         spin1_mode_restore(cpsr);
         if (synaptogenesis_dynamics_rewire(time, spike, row,
-                n_bytes_to_transfer)) {
+                n_bytes_to_transfer, representation)) {
             *n_rewire += 1;
             return true;
         }
@@ -265,6 +265,7 @@ static void setup_synaptic_dma_read(dma_buffer *current_buffer,
             dma_n_spikes = 0;
         } else {
             log_error("failed to recognise representation %d", representation);
+            rt_error(RTE_SWERR);
         }
 
         // needs to be here to ensure that its only recording actual spike

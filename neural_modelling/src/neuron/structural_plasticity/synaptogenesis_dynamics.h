@@ -41,9 +41,11 @@ bool synaptogenesis_dynamics_initialise(
 //! \param[out] spike: variable to hold the spike
 //! \param[out] synaptic_row: variable to hold the address of the row
 //! \param[out] n_bytes: variable to hold the size of the row
+//! \param[out] representation: the data store rep.
 //! \return True if a row is to be transferred, false otherwise
 bool synaptogenesis_dynamics_rewire(uint32_t time,
-        spike_t *spike, synaptic_row_t *synaptic_row, uint32_t *n_bytes);
+        spike_t *spike, synaptic_row_t *synaptic_row, uint32_t *n_bytes,
+        uint32_t* representation);
 
 //! \brief Perform the actual restructuring of a row
 //! \param[in] time: The time of the restructure
