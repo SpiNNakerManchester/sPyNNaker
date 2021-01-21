@@ -142,7 +142,7 @@ static inline void update_master_pop_counters(void) {
     pop_table_config_t* store = (pop_table_config_t*) master_pop_base_address;
     store->n_array_blocks = n_array_blocks;
     store->n_binary_search_blocks = n_binary_search_blocks;
-    log_info(
+    log_debug(
         "setting array blocks of %d binary blocks to %d",
         n_array_blocks, n_binary_search_blocks);
 }
@@ -253,9 +253,9 @@ static inline int calculate_binary_search_size(
                 n_targets_in_words * BYTE_TO_WORD_CONVERSION);
             dtcm_used += overall_bytes + malloc_cost;
             n_valid_entries += 1;
-            log_info("dtcm used = %d", dtcm_used);
+            log_debug("dtcm used = %d", dtcm_used);
         } else {
-            log_info(
+            log_debug(
                 "row for atom %d has no targets, so not caching", atom_id);
         }
     }
@@ -263,7 +263,7 @@ static inline int calculate_binary_search_size(
     // accum size of binary search array
     dtcm_used += sizeof(binary_search_top) + malloc_cost;
     dtcm_used +=
-        n_valid_entries * sizeof(binary_search_element*) + malloc_cost;
+        n_valid_entries * sizeof(binary_search_element) + malloc_cost;
 
     // return dtcm used
     log_debug(
@@ -280,7 +280,7 @@ static inline uint32_t calculate_array_search_size(
         address_list_entry entry, uint32_t n_atoms) {
     // build stores
     uint32_t dtcm_used = 0;
-    dtcm_used += n_atoms * sizeof(uint32_t*) + malloc_cost;
+    dtcm_used += n_atoms * sizeof(synaptic_row_t) + malloc_cost;
 
     uint32_t address = population_table_get_address(entry.addr);
     uint32_t row_length = population_table_get_row_length(entry.addr);
@@ -453,7 +453,7 @@ static void print_store(void) {
 //! \brief reads in the bitfields
 static inline bool read_in_bitfields(void) {
     // get the bitfields in a copy form
-    log_info(
+    log_debug(
         "requires %d bytes for data store from %d and %d",
         sizeof(not_redundant_tracker_t) * bit_field_base_address->n_filters,
         sizeof(not_redundant_tracker_t), bit_field_base_address->n_filters);
@@ -554,17 +554,17 @@ static bool set_master_pop_sdram_entry_to_cache(uint32_t bit_field_index) {
 static inline void set_address_to_cache_reps(
         uint32_t address_entry_index, uint32_t rep) {
     if (rep == DEFAULT) {
-        log_info(
+        log_debug(
             "setting address entry %d to rep DEFAULT", address_entry_index);
     } else if (rep == DIRECT) {
-        log_info(
+        log_debug(
             "setting address entry %d to rep DIRECT", address_entry_index);
     } else if (rep == BINARY_SEARCH) {
-        log_info(
+        log_debug(
             "setting address entry %d to rep BINARY_SEARCH",
             address_entry_index);
     } else if (rep == ARRAY) {
-        log_info(
+        log_debug(
             "setting address entry %d to rep ARRAY", address_entry_index);
     } else {
         log_error("WTF unrecognised rep");
@@ -646,7 +646,7 @@ static inline bool cache_blocks(void) {
         uint32_t n_atoms = 0;
         bool success = population_table_set_start_and_count(
             master_entry, &start, &count, &n_atoms, bit_field_base_address);
-        log_info(
+        log_debug(
             "got start %d count %d with entry id %d n atoms %d",
             start, count, bit_field_index, n_atoms);
         if (!success) {
@@ -690,7 +690,7 @@ static inline bool cache_blocks(void) {
                     address_entry, n_atoms);
                 int array_search_size = calculate_array_search_size(
                     address_entry, n_atoms);
-                log_info(
+                log_debug(
                     "binary size = %d, array size = %d",
                     binary_search_size, array_search_size);
 
@@ -698,7 +698,7 @@ static inline bool cache_blocks(void) {
                 if (binary_search_size < array_search_size) {
                     // check if can be cached
                     if (dtcm_to_use_tmp + binary_search_size <= dtcm_to_use) {
-                        log_info(
+                        log_debug(
                             "setting reps %d to BINARY_SEARCH",
                             address_index - start);
                         reps[address_index - start] = BINARY_SEARCH;
@@ -715,7 +715,7 @@ static inline bool cache_blocks(void) {
                 }
                 else {  // array rep better. check if can be cached
                     if (dtcm_to_use_tmp + array_search_size <= dtcm_to_use) {
-                        log_info(
+                        log_debug(
                             "setting rep %d to ARRAY",
                             address_index - start);
                         reps[address_index - start] = ARRAY;
