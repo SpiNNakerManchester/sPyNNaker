@@ -52,7 +52,7 @@ def _we_dont_do_this_now(*args):  # pylint: disable=unused-argument
     raise NotImplementedError("sPyNNaker does not currently do this")
 
 
-class Population(Recorder, PopulationBase):
+class Population(PopulationBase):
     """ PyNN 0.9 population object.
     """
 
@@ -66,16 +66,17 @@ class Population(Recorder, PopulationBase):
         "__has_read_neuron_parameters_this_run",
         "__last_id",
         "_positions",
+        "_recorder",
         "__record_gsyn_file",
         "__record_spike_file",
         "__record_v_file",
         "_size",
         "__structure",
         "__vertex",
-        "_vertex_changeable_after_run",
-        "_vertex_contains_units",
-        "_vertex_population_initializable",
-        "_vertex_population_settable"]
+        "__vertex_changeable_after_run",
+        "__vertex_contains_units",
+        "__vertex_population_initializable",
+        "__vertex_population_settable"]
 
     def __init__(
             self, size, cellclass, cellparams=None, structure=None,
@@ -101,36 +102,12 @@ class Population(Recorder, PopulationBase):
         """
         # pylint: disable=too-many-arguments
 
-        # hard code initial values as required
-        if initial_values is None:
-            initial_values = {}
-
-        model = cellclass
-        if inspect.isclass(cellclass):
-            if cellparams is None:
-                model = cellclass()
-            else:
-                model = cellclass(**cellparams)
-        elif cellparams:
-            raise ConfigurationException(
-                "cellclass is an instance which includes params so "
-                "cellparams must be None")
-
-        size = self.__roundsize(size, label)
-
         # build our initial objects
+        model = self.__create_model(cellclass, cellparams)
+        size = self.__roundsize(size, label)
         self.__create_vertex(
             model, size, label, constraints, additional_parameters)
-
-        # Introspect properties of the vertex
-        self._vertex_population_settable = \
-            isinstance(self.__vertex, AbstractPopulationSettable)
-        self._vertex_population_initializable = \
-            isinstance(self.__vertex, AbstractPopulationInitializable)
-        self._vertex_changeable_after_run = \
-            isinstance(self.__vertex, AbstractChangableAfterRun)
-        self._vertex_contains_units = \
-            isinstance(self.__vertex, AbstractContainsUnits)
+        self._recorder = Recorder(population=self, vertex=self.__vertex)
 
         self.__delay_vertex = None
 
@@ -146,7 +123,10 @@ class Population(Recorder, PopulationBase):
         sim.add_application_vertex(self.__vertex)
 
         # initialise common stuff
+        if size is None:
+            size = self.__vertex.n_atoms
         self._size = size
+        self._annotations = dict()
         self.__record_spike_file = None
         self.__record_v_file = None
         self.__record_gsyn_file = None
@@ -165,14 +145,9 @@ class Population(Recorder, PopulationBase):
         sim.id_counter += size
 
         # set up initial values if given
-        for variable, value in iteritems(initial_values):
-            self._initialize(variable, value)
-
-        # annotations used by neo objects
-        self._annotations = dict()
-
-        # Set up the recorder
-        Recorder.__init__(self, population=self)
+        if initial_values:
+            for variable, value in iteritems(initial_values):
+                self._initialize(variable, value)
 
     def __iter__(self):
         """ Iterate over local cells
@@ -218,7 +193,8 @@ class Population(Recorder, PopulationBase):
         :param str variable: The variable to answer the question about
         :rtype: bool
         """
-        return variable in self._get_all_possible_recordable_variables()
+        return variable in \
+            self._recorder.get_all_possible_recordable_variables()
 
     def record(self, variables, to_file=None, sampling_interval=None,
                indexes=None):
@@ -287,7 +263,7 @@ class Population(Recorder, PopulationBase):
                     "set to record")
 
             # note that if record(None) is called, its a reset
-            self._turn_off_all_recording(indexes)
+            self._recorder.turn_off_all_recording(indexes)
             # handle one element vs many elements
         elif isinstance(variables, string_types):
             # handle special case of 'all'
@@ -296,19 +272,20 @@ class Population(Recorder, PopulationBase):
                     logger, 'record("all") is non-standard PyNN, and '
                     'therefore may not be portable to other simulators.')
 
-                # get all possible recordings for this vertex
-                variables = self._get_all_possible_recordable_variables()
-
-                # iterate though them
-                for variable in variables:
-                    self._record(variable, sampling_interval, to_file, indexes)
+                # iterate though all possible recordings for this vertex
+                for variable in self._recorder.\
+                        get_all_possible_recordable_variables():
+                    self._recorder.record(
+                        variable, sampling_interval, to_file, indexes)
             else:
                 # record variable
-                self._record(variables, sampling_interval, to_file, indexes)
+                self._recorder.record(
+                    variables, sampling_interval, to_file, indexes)
 
         else:  # list of variables, so just iterate though them
             for variable in variables:
-                self._record(variable, sampling_interval, to_file, indexes)
+                self._recorder.record(
+                    variable, sampling_interval, to_file, indexes)
 
     def sample(self, n, rng=None):
         """ Randomly sample `n` cells from the Population, and return a\
@@ -363,7 +340,8 @@ class Population(Recorder, PopulationBase):
         if isinstance(io, string_types):
             io = neo.get_io(io)
 
-        data = self._extract_neo_block(variables, None, clear, annotations)
+        data = self._recorder.extract_neo_block(
+            variables, None, clear, annotations)
         # write the neo block to the file
         io.write(data)
 
@@ -405,10 +383,10 @@ class Population(Recorder, PopulationBase):
     def _end(self):
         """ Do final steps at the end of the simulation
         """
-        for variable in self._write_to_files_indicators:
-            if self._write_to_files_indicators[variable] is not None:
+        for variable in self._recorder.write_to_files_indicators:
+            if self._recorder.write_to_files_indicators[variable]:
                 self.write_data(
-                    io=self._write_to_files_indicators[variable],
+                    io=self._recorder.write_to_files_indicators[variable],
                     variables=[variable])
 
     def get_data(
@@ -446,7 +424,8 @@ class Population(Recorder, PopulationBase):
                 logger, "annotations parameter is not standard PyNN so may "
                         "not be supported by all platforms.")
 
-        return self._extract_neo_block(variables, None, clear, annotations)
+        return self._recorder.extract_neo_block(
+            variables, None, clear, annotations)
 
     def get_data_by_indexes(
             self, variables, indexes, clear=False, annotations=None):
@@ -469,7 +448,8 @@ class Population(Recorder, PopulationBase):
             If the variable or variables have not been previously set to
             record.
         """
-        return self._extract_neo_block(variables, indexes, clear, annotations)
+        return self._recorder.extract_neo_block(
+            variables, indexes, clear, annotations)
 
     def spinnaker_get_data(self, variable):
         """ Public accessor for getting data as a numpy array, instead of\
@@ -493,8 +473,8 @@ class Population(Recorder, PopulationBase):
                     "Only one type of data at a time is supported")
             variable = variable[0]
         if variable == SPIKES:
-            return self._get_spikes()
-        return self._get_recorded_pynn7(variable)
+            return self._recorder.get_spikes()
+        return self._recorder.get_recorded_pynn7(variable)
 
     def get_spike_counts(self,  # pylint: disable=arguments-differ
                          gather=True):
@@ -502,7 +482,7 @@ class Population(Recorder, PopulationBase):
 
         :rtype: ~numpy.ndarray
         """
-        spikes = self._get_spikes()
+        spikes = self._recorder.get_spikes()
         return self._get_spike_counts(spikes, gather)
 
     def _get_spike_counts(self, spikes, gather=True):
@@ -558,7 +538,7 @@ class Population(Recorder, PopulationBase):
 
     def initialize(self, **kwargs):
         """ Set initial values of state variables, e.g. the membrane\
-        potential.  Values passed to ``initialize()`` may be:
+            potential.  Values passed to ``initialize()`` may be:
 
         * single numeric values (all neurons set to the same value), or
         * :py:class:`~pyNN.random.RandomDistribution` objects, or
@@ -584,7 +564,7 @@ class Population(Recorder, PopulationBase):
         """
         :rtype: dict
         """
-        if not self._vertex_population_initializable:
+        if not self.__vertex_population_initializable:
             raise KeyError(
                 "Population does not support the initialisation")
         return self._vertex.initial_values
@@ -601,7 +581,7 @@ class Population(Recorder, PopulationBase):
         :return: A list, or an object which acts like a list
         :rtype: iterable
         """
-        if not self._vertex_population_initializable:
+        if not self.__vertex_population_initializable:
             raise KeyError(
                 "Population does not support the initialisation of {}".format(
                     variable))
@@ -619,12 +599,12 @@ class Population(Recorder, PopulationBase):
             :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
         :type selector: None or slice or int or list(bool) or list(int)
         """
-        if not self._vertex_population_initializable:
+        if not self.__vertex_population_initializable:
             raise KeyError(
                 "Population does not support the initialisation of {}".format(
                     variable))
         if get_not_running_simulator().has_ran \
-                and not self._vertex_changeable_after_run:
+                and not self.__vertex_changeable_after_run:
             raise Exception("Population does not support changes after run")
         self._read_parameters_before_set()
         self._vertex.set_initial_value(variable, value, selector)
@@ -640,7 +620,7 @@ class Population(Recorder, PopulationBase):
         :return: dictionary from variable name to initial value(s)
         :rtype: dict(str,int or float or list(int) or list(float))
         """
-        if not self._vertex_population_initializable:
+        if not self.__vertex_population_initializable:
             raise KeyError("Population does not support the initialisation")
         return self._vertex.get_initial_values(selector)
 
@@ -667,7 +647,7 @@ class Population(Recorder, PopulationBase):
         self._positions = positions
 
         # state that something has changed in the population,
-        self._change_requires_mapping = True
+        self.__change_requires_mapping = True
 
     @property
     def all_cells(self):
@@ -736,12 +716,6 @@ class Population(Recorder, PopulationBase):
         self.__change_requires_mapping = False
         self.__has_read_neuron_parameters_this_run = False
 
-    def __add__(self, other):
-        """ Merges populations
-        """
-        # TODO: Make this add the neurons from another population to this one
-        _we_dont_do_this_now(other)
-
     @property
     def conductance_based(self):
         """ True if the population uses conductance inputs
@@ -773,7 +747,7 @@ class Population(Recorder, PopulationBase):
         if simplify is not True:
             warn_once(
                 logger, "The simplify value is ignored if not set to true")
-        if not self._vertex_population_settable:
+        if not self.__vertex_population_settable:
             raise KeyError("Population does not support setting")
         if isinstance(parameter_names, string_types):
             return self.__vertex.get_value(parameter_names)
@@ -799,7 +773,7 @@ class Population(Recorder, PopulationBase):
             is a list.
         :rtype: str or list(str) or dict(str,str) or dict(str,list(str))
         """
-        if not self._vertex_population_settable:
+        if not self.__vertex_population_settable:
             raise KeyError("Population does not support setting")
         if isinstance(parameter_names, string_types):
             return self.__vertex.get_value_by_selector(
@@ -870,12 +844,12 @@ class Population(Recorder, PopulationBase):
         :param value:
         :type value: float or int or list(float) or list(int)
         """
-        if not self._vertex_population_initializable:
+        if not self.__vertex_population_initializable:
             raise KeyError(
                 "Population does not support the initialisation of {}".format(
                     variable))
         if get_not_running_simulator().has_ran \
-                and not self._vertex_changeable_after_run:
+                and not self.__vertex_changeable_after_run:
             raise Exception("Population does not support changes after run")
         self._read_parameters_before_set()
         self.__vertex.initialize(variable, value)
@@ -920,12 +894,12 @@ class Population(Recorder, PopulationBase):
     def _set_check(self, parameter, value):
         """ Checks for various set methods.
         """
-        if not self._vertex_population_settable:
+        if not self.__vertex_population_settable:
             raise KeyError("Population does not have property {}".format(
                 parameter))
 
         if get_not_running_simulator().has_ran \
-                and not self._vertex_changeable_after_run:
+                and not self.__vertex_changeable_after_run:
             raise Exception(
                 " run has been called")
 
@@ -1095,16 +1069,9 @@ class Population(Recorder, PopulationBase):
         return self.__vertex.n_atoms
 
     @property
-    def _get_vertex(self):
-        """
-        :rtype: ~pacman.model.graphs.application.ApplicationVertex
-        """
-        # Overridden by PopulationView
-        return self.__vertex
-
-    @property
     def _internal_delay_vertex(self):
         """
+        :rtype: DelayExtensionVertex
         """
         return self.__delay_vertex
 
@@ -1120,10 +1087,38 @@ class Population(Recorder, PopulationBase):
         :return: the units in string form
         :rtype: str
         """
-        if self._vertex_contains_units:
+        if self.__vertex_contains_units:
             return self.__vertex.get_units(parameter_name)
         raise ConfigurationException(
             "This population does not support describing its units")
+
+    def _cache_data(self):
+        """ Store data for later extraction
+        """
+        self._recorder.cache_data()
+
+    @staticmethod
+    def __create_model(cellclass, cellparams):
+        """
+        :param cellclass: The implementation of the individual neurons.
+        :type cellclass: type or AbstractPyNNModel or ApplicationVertex
+        :param cellparams: Parameters to pass to ``cellclass`` if it
+            is a class to instantiate. Must be ``None`` if ``cellclass`` is an
+            instantiated object.
+        :type cellparams: dict(str,object) or None
+        :rtype: ApplicationVertex or AbstractPyNNModel
+        """
+        model = cellclass
+        if inspect.isclass(cellclass):
+            if cellparams is None:
+                model = cellclass()
+            else:
+                model = cellclass(**cellparams)
+        elif cellparams:
+            raise ConfigurationException(
+                "cellclass is an instance which includes params so "
+                "cellparams must be None")
+        return model
 
     def __create_vertex(
             self, model, size, label, constraints, additional_parameters):
@@ -1177,6 +1172,16 @@ class Population(Recorder, PopulationBase):
             raise ConfigurationException(
                 "Model must be either an AbstractPyNNModel or an"
                 " ApplicationVertex")
+
+        # Introspect properties of the vertex
+        self.__vertex_population_settable = \
+            isinstance(self.__vertex, AbstractPopulationSettable)
+        self.__vertex_population_initializable = \
+            isinstance(self.__vertex, AbstractPopulationInitializable)
+        self.__vertex_changeable_after_run = \
+            isinstance(self.__vertex, AbstractChangableAfterRun)
+        self.__vertex_contains_units = \
+            isinstance(self.__vertex, AbstractContainsUnits)
 
     @staticmethod
     def create(cellclass, cellparams=None, n=1):

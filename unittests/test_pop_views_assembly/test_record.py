@@ -24,11 +24,11 @@ class TestPopulation(BaseTestCase):
     def test_depricated(self):
         sim.setup(timestep=1.0)
         pop = sim.Population(4, sim.IF_curr_exp())
-        assert [] == pop._get_all_recording_variables()
+        assert [] == pop._recorder.get_all_recording_variables()
         pop.record_v()
         pop.record_gsyn()
         target = {"v", 'gsyn_exc', 'gsyn_inh'}
-        assert target == set(pop._get_all_recording_variables())
+        assert target == set(pop._recorder.get_all_recording_variables())
         sim.end()
 
     def test_set_many(self):
@@ -37,7 +37,7 @@ class TestPopulation(BaseTestCase):
         view = pop[2:5]
         view.record(["v", "spikes"])
         target = {"spikes", "v"}
-        assert target == set(pop._get_all_recording_variables())
+        assert target == set(pop._recorder.get_all_recording_variables())
         target1 = [2, 3, 4]
         assert target1 == pop._vertex.neuron_recorder._indexes["v"]
         view2 = pop[4:7]
@@ -53,7 +53,7 @@ class TestPopulation(BaseTestCase):
         view = pop[2:5]
         view.record(["v", "spikes"], sampling_interval=2)
         target = {"spikes", "v"}
-        assert target == set(pop._get_all_recording_variables())
+        assert target == set(pop._recorder.get_all_recording_variables())
         target1 = [2, 3, 4]
         assert target1 == pop._vertex.neuron_recorder._indexes["v"]
         view2 = pop[4:7]
@@ -88,7 +88,7 @@ class TestPopulation(BaseTestCase):
         pop = sim.Population(10, sim.IF_curr_exp())
         pop.record("v", indexes=[2, 3, 4])
         target = {"v"}
-        assert target == set(pop._get_all_recording_variables())
+        assert target == set(pop._recorder.get_all_recording_variables())
         target1 = [2, 3, 4]
         assert target1 == pop._vertex.neuron_recorder._indexes["v"]
         view2 = pop[4:7]
@@ -101,15 +101,15 @@ class TestPopulation(BaseTestCase):
         sim.setup(timestep=1.0)
         pop = sim.Population(5, sim.IF_curr_exp())
         pop.record("v")
-        assert {"v"} == set(pop._get_all_recording_variables())
+        assert {"v"} == set(pop._recorder.get_all_recording_variables())
         view1 = pop[0:3]
         view1.record(None)
         assert [3, 4] == pop._vertex.neuron_recorder._indexes["v"]
-        assert {"v"} == set(pop._get_all_recording_variables())
+        assert {"v"} == set(pop._recorder.get_all_recording_variables())
         view2 = pop[3:]
         view2.record(None)
         assert pop._vertex.neuron_recorder._indexes["v"] is None
-        assert len(pop._get_all_recording_variables()) == 0
+        assert len(pop._recorder.get_all_recording_variables()) == 0
         sim.end()
 
     def test_clash(self):

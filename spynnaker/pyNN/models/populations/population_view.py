@@ -148,8 +148,8 @@ class PopulationView(PopulationBase):
         return tuple(self.__indexes)
 
     @property
-    def _get_vertex(self):
-        return self.__population._get_vertex
+    def _vertex(self):
+        return self.__population._vertex
 
     def __getitem__(self, index):
         """ Return either a single cell (ID object) from the Population,\

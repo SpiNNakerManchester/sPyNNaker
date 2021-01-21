@@ -180,9 +180,9 @@ class SpynnakerExternalDevicePluginManager(object):
         device_vertex = device
         # pylint: disable=protected-access
         if isinstance(device, Population):
-            device_vertex = device._get_vertex
+            device_vertex = device._vertex
         SpynnakerExternalDevicePluginManager.add_edge(
-            population._get_vertex, device_vertex, partition_id)
+            population._vertex, device_vertex, partition_id)
 
     @staticmethod
     def add_socket_address(socket_address):
@@ -276,7 +276,7 @@ class SpynnakerExternalDevicePluginManager(object):
             used, False if SDP is to be used (default)
         """
         # pylint: disable=too-many-arguments, protected-access
-        vertex = poisson_population._get_vertex
+        vertex = poisson_population._vertex
         control_label = "{}{}".format(vertex.label, control_label_extension)
         controller = ReverseIpTagMultiCastSource(
             n_keys=vertex.n_atoms, label=control_label,

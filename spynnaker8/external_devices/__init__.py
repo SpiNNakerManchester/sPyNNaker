@@ -190,7 +190,7 @@ def EthernetControlPopulation(
     """
     # pylint: disable=protected-access, too-many-arguments, too-many-locals
     population = Population(n_neurons, model, label=label)
-    vertex = population._get_vertex
+    vertex = population._vertex
     if not isinstance(vertex, AbstractEthernetController):
         raise Exception(
             "Vertex must be an instance of AbstractEthernetController")
@@ -217,7 +217,7 @@ def EthernetControlPopulation(
             ethernet_command_connection.local_ip_address,
             ethernet_command_connection.local_port, database_ack_port_num)
     Plugins.update_live_packet_gather_tracker(
-        population._vertex, live_packet_gather_label,
+        vertex, live_packet_gather_label,
         port=__ethernet_control_connection.local_port,
         hostname=__ethernet_control_connection.local_ip_address,
         message_type=EIEIOType.KEY_PAYLOAD_32_BIT,

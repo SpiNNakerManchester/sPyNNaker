@@ -133,7 +133,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
         """ Reset the state of the current network to time t = 0.
         """
         for population in self._populations:
-            population.cache_data()
+            population._cache_data()
 
         self.__segment_counter += 1
 

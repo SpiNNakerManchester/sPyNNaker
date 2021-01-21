@@ -120,8 +120,8 @@ class Projection(object):
             space = PyNNSpace()
         connector.set_space(space)
 
-        pre_vertex = pre_synaptic_population._get_vertex
-        post_vertex = post_synaptic_population._get_vertex
+        pre_vertex = pre_synaptic_population._vertex
+        post_vertex = post_synaptic_population._vertex
 
         if not isinstance(post_vertex, AbstractAcceptsIncomingSynapses):
             raise ConfigurationException(

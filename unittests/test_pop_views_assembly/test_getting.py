@@ -20,19 +20,20 @@ import numpy
 import pytest
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.globals_variables import get_simulator
+from spynnaker.pyNN.models.recorder import Recorder
 import spynnaker8 as sim
 from spynnaker8.utilities import neo_convertor
 from p8_integration_tests.base_test_case import BaseTestCase
 
 
-def mock_spikes():
+def mock_spikes(_self):
     return numpy.array(
         [[0, 7], [0, 20], [0, 24], [0, 34], [0, 53], [0, 67], [0, 77],
          [1, 8], [1, 20], [1, 53],
          [2, 45], [2, 76]])
 
 
-def mock_v_all(variable):
+def mock_v_all(_self, _variable):
     indexes = [0, 1, 2, 3]
     data = numpy.empty((100, 4))
     for i in range(100):
@@ -42,7 +43,7 @@ def mock_v_all(variable):
     return (data, indexes, sampling_interval)
 
 
-def mock_v_one_two(variable):
+def mock_v_one_two(_self, _variable):
     indexes = [1, 2]
     data = numpy.empty((100, 2))
     for i in range(100):
@@ -61,30 +62,39 @@ def trim_spikes(spikes, indexes):
 
 
 class TestGetting(BaseTestCase):
+    def setUp(self):
+        """ Save the real methods that we mock out """
+        self.__get_spikes = Recorder.get_spikes
+        self.__get_recorded_matrix = Recorder.get_recorded_matrix
+
+    def tearDown(self):
+        """ Restore the real methods that we may have mocked out """
+        Recorder.get_spikes = self.__get_spikes
+        Recorder.get_recorded_matrix = self.__get_recorded_matrix
 
     def test_simple_spikes(self):
         sim.setup(timestep=1.0)
         pop = sim.Population(4, sim.IF_curr_exp(), label="a label")
-        pop._get_spikes = mock_spikes
-        pop._get_recorded_matrix = mock_v_all
+        Recorder.get_spikes = mock_spikes
+        Recorder.get_recorded_matrix = mock_v_all
         get_simulator().get_current_time = mock_time
 
         neo = pop.getSpikes()
         spikes = neo_convertor.convert_spikes(neo)
-        assert numpy.array_equal(spikes,  mock_spikes())
+        assert numpy.array_equal(spikes,  mock_spikes(None))
         spiketrains = neo.segments[0].spiketrains
         assert 4 == len(spiketrains)
 
         #  gather False has not effect testing that here
         neo = pop.get_data("spikes", gather=False)
         spikes = neo_convertor.convert_spikes(neo)
-        assert numpy.array_equal(spikes,  mock_spikes())
+        assert numpy.array_equal(spikes,  mock_spikes(None))
         spiketrains = neo.segments[0].spiketrains
         assert 4 == len(spiketrains)
 
         neo = pop.get_v()
         v = neo.segments[0].filter(name='v')[0].magnitude
-        (target, _, _) = mock_v_all("any")
+        (target, _, _) = mock_v_all(None, "any")
         assert numpy.array_equal(v,  target)
 
         neo = pop.get_gsyn()
@@ -100,12 +110,12 @@ class TestGetting(BaseTestCase):
         pop = sim.Population(4, sim.IF_curr_exp(), label="a label")
         pop.record("spikes")
 
-        pop._get_spikes = mock_spikes
+        Recorder.get_spikes = mock_spikes
         get_simulator().get_current_time = mock_time
 
         neo = pop.get_data_by_indexes("spikes", [1, 2])
         spikes = neo_convertor.convert_spikes(neo)
-        target = trim_spikes(mock_spikes(), [1, 2])
+        target = trim_spikes(mock_spikes(None), [1, 2])
         assert numpy.array_equal(spikes, target)
         spiketrains = neo.segments[0].spiketrains
         assert 2 == len(spiketrains)
@@ -115,14 +125,14 @@ class TestGetting(BaseTestCase):
     def test_get_spikes_by_view(self):
         sim.setup(timestep=1.0)
         pop = sim.Population(4, sim.IF_curr_exp(), label="a label")
-        pop._get_spikes = mock_spikes
+        Recorder.get_spikes = mock_spikes
         get_simulator().get_current_time = mock_time
 
         view = pop[1:3]
         view.record("spikes")
         neo = view.get_data("spikes", gather=False)
         spikes = neo_convertor.convert_spikes(neo)
-        target = trim_spikes(mock_spikes(), [1, 2])
+        target = trim_spikes(mock_spikes(None), [1, 2])
         assert numpy.array_equal(spikes, target)
         spiketrains = neo.segments[0].spiketrains
         assert 2 == len(spiketrains)
@@ -132,14 +142,14 @@ class TestGetting(BaseTestCase):
     def test_get_spikes_view_missing(self):
         sim.setup(timestep=1.0)
         pop = sim.Population(4, sim.IF_curr_exp(), label="a label")
-        pop._get_spikes = mock_spikes
-        pop._get_recorded_matrix = mock_v_all
+        Recorder.get_spikes = mock_spikes
+        Recorder.get_recorded_matrix = mock_v_all
         get_simulator().get_current_time = mock_time
 
         view = pop[2:4]
         neo = view.get_data("spikes")
         spikes = neo_convertor.convert_spikes(neo)
-        target = trim_spikes(mock_spikes(), [2])
+        target = trim_spikes(mock_spikes(None), [2])
         assert numpy.array_equal(spikes, target)
         spiketrains = neo.segments[0].spiketrains
         assert 2 == len(spiketrains)
@@ -154,14 +164,14 @@ class TestGetting(BaseTestCase):
         sim.setup(timestep=1.0)
         pop = sim.Population(4, sim.IF_curr_exp(), label="a label")
         pop.record("spikes")
-        pop._get_spikes = mock_spikes
-        pop._get_recorded_matrix = mock_v_all
+        Recorder.get_spikes = mock_spikes
+        Recorder.get_recorded_matrix = mock_v_all
         get_simulator().get_current_time = mock_time
 
         view = pop[1:3]
         neo = view.get_data("v")
         v = neo.segments[0].filter(name='v')[0].magnitude
-        (target, _, _) = mock_v_one_two("v")
+        (target, _, _) = mock_v_one_two(None, "v")
         assert v.shape == target.shape
         assert numpy.array_equal(v,  target)
 
@@ -170,13 +180,13 @@ class TestGetting(BaseTestCase):
     def test_get_v_missing(self):
         sim.setup(timestep=1.0)
         pop = sim.Population(4, sim.IF_curr_exp(), label="a label")
-        pop._get_recorded_matrix = mock_v_one_two
+        Recorder.get_recorded_matrix = mock_v_one_two
         get_simulator().get_current_time = mock_time
 
         view = pop[0:3]
         neo = view.get_data("v")
         v = neo.segments[0].filter(name='v')[0].magnitude
-        (target, _, _) = mock_v_one_two("v")
+        (target, _, _) = mock_v_one_two(None, "v")
         assert numpy.array_equal(
             [1, 2], neo.segments[0].filter(name='v')[0].channel_index.index)
         assert v.shape == target.shape
@@ -188,7 +198,7 @@ class TestGetting(BaseTestCase):
         sim.setup(timestep=1.0)
         pop = sim.Population(4, sim.IF_curr_exp(), label="a label")
         pop.record("spikes")
-        pop._get_spikes = mock_spikes
+        Recorder.get_spikes = mock_spikes
         get_simulator().get_current_time = mock_time
 
         assert {0: 7, 1: 3, 2: 2, 3: 0} == pop.get_spike_counts()
@@ -204,8 +214,8 @@ class TestGetting(BaseTestCase):
     def test_write(self):
         sim.setup(timestep=1.0)
         pop = sim.Population(4, sim.IF_curr_exp(), label="a label")
-        pop._get_spikes = mock_spikes
-        pop._get_recorded_matrix = mock_v_all
+        Recorder.get_spikes = mock_spikes
+        Recorder.get_recorded_matrix = mock_v_all
         get_simulator().get_current_time = mock_time
 
         # Note gather=False will be ignored just testing it can be
@@ -214,7 +224,7 @@ class TestGetting(BaseTestCase):
             with open("spikes.pkl") as pkl:
                 neo = pickle.load(pkl)
                 spikes = neo_convertor.convert_spikes(neo)
-                assert numpy.array_equal(spikes,  mock_spikes())
+                assert numpy.array_equal(spikes,  mock_spikes(None))
         except UnicodeDecodeError:
             raise SkipTest(
                 "https://github.com/NeuralEnsemble/python-neo/issues/529")
@@ -224,12 +234,12 @@ class TestGetting(BaseTestCase):
             with open("spikes.pkl") as pkl:
                 neo = pickle.load(pkl)
                 spikes = neo_convertor.convert_spikes(neo)
-                assert numpy.array_equal(spikes,  mock_spikes())
+                assert numpy.array_equal(spikes,  mock_spikes(None))
         except UnicodeDecodeError:
             raise SkipTest(
                 "https://github.com/NeuralEnsemble/python-neo/issues/529")
 
-        (target, _, _) = mock_v_all("any")
+        (target, _, _) = mock_v_all(None, "any")
 
         pop.print_v("v.pkl")
         with open("v.pkl") as pkl:
@@ -248,11 +258,11 @@ class TestGetting(BaseTestCase):
 
         sim.end()
 
-    def test_get_(self):
+    def test_spinnaker_get_data(self):
         sim.setup(timestep=1.0)
         pop = sim.Population(4, sim.IF_curr_exp(), label="a label")
-        pop._get_spikes = mock_spikes
-        pop._get_recorded_matrix = mock_v_all
+        Recorder.get_spikes = mock_spikes
+        Recorder.get_recorded_matrix = mock_v_all
         get_simulator().get_current_time = mock_time
 
         v = pop.spinnaker_get_data("v")

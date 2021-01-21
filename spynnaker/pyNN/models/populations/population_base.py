@@ -423,3 +423,10 @@ class PopulationBase(object):
         """
         _this_is_wholly_deprecated(
             "Use set(parametername=value_array) instead.", kwargs)
+
+    @abstractproperty
+    def _vertex(self):
+        """ The underlying application vertex.
+
+        :rtype: ~pacman.model.graphs.application.ApplicationVertex
+        """
