@@ -28,7 +28,6 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utility_models import CommandSender
 from spinn_front_end_common.utilities.utility_objs import ExecutableFinder
 from spinn_front_end_common.utilities import globals_variables
-from spinn_front_end_common.utilities.helpful_functions import read_config
 from spynnaker.pyNN import extra_algorithms, model_binaries
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.spynnaker_simulator_interface import (
