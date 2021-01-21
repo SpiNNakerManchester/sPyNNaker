@@ -457,7 +457,10 @@ bool spike_processing_initialise( // EXPORTED
     for (uint32_t i = 0; i < N_DMA_BUFFERS; i++) {
         dma_buffers[i].row = spin1_malloc(row_max_n_words * sizeof(uint32_t));
         if (dma_buffers[i].row == NULL) {
-            log_error("Could not initialise DMA buffers");
+            log_error(
+                "Could not initialise DMA buffers. needed %d bytes, had %d "
+                "available",
+                row_max_n_words * sizeof(uint32_t), sark_heap_max(sark.heap, 0));
             return false;
         }
         log_debug("DMA buffer %u allocated at 0x%08x",
