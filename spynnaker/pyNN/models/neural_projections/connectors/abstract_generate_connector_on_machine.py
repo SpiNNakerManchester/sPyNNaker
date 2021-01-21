@@ -20,6 +20,7 @@ from six import with_metaclass
 from spinn_utilities.abstract_base import abstractproperty, AbstractBase
 from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
 
@@ -103,8 +104,8 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         """
         key = (id(pre_vertex_slice), id(post_vertex_slice))
         if key not in self.__connector_seed:
-            self.__connector_seed[key] = [
-                int(i * 0xFFFFFFFF) for i in rng.next(n=4)]
+            self.__connector_seed[key] = utility_calls.create_mars_kiss_seeds(
+                rng)
         return self.__connector_seed[key]
 
     @staticmethod
@@ -123,7 +124,7 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
             return None
         key = (id(pre_vertex_slice), id(post_vertex_slice), id(values))
         if key not in seeds:
-            seeds[key] = [int(i * 0xFFFFFFFF) for i in values.rng.next(n=4)]
+            seeds[key] = utility_calls.create_mars_kiss_seeds(values.rng)
         return seeds[key]
 
     @staticmethod
