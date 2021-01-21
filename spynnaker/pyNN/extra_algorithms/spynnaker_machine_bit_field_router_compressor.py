@@ -25,7 +25,7 @@ from spinn_front_end_common.abstract_models import (
 from spinn_front_end_common.interface.interface_functions.\
     machine_bit_field_router_compressor import (
         MachineBitFieldPairRouterCompressor,
-        MachineBitFieldUnorderedRouterCompressor)
+        MachineBitFieldOrderedCoveringCompressor)
 from spinn_front_end_common.utilities.system_control_logic import (
     run_system_application)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
@@ -194,11 +194,30 @@ class AbstractMachineBitFieldRouterCompressor(object):
                 cls._RERUN_IOBUF_NAME_PATTERN)
 
 
-class SpynnakerMachineBitFieldUnorderedRouterCompressor(
+class SpynnakerMachineBitFieldOrderedCoveringCompressor(
         AbstractMachineBitFieldRouterCompressor):
     @overrides(AbstractMachineBitFieldRouterCompressor._compressor_factory)
     def _compressor_factory(self):
-        return MachineBitFieldUnorderedRouterCompressor()
+        return MachineBitFieldOrderedCoveringCompressor()
+
+
+class SpynnakerMachineBitFieldUnorderedRouterCompressor(
+        AbstractMachineBitFieldRouterCompressor):
+    """ DEPRACATED use MachineBitFieldRouterCompressor """
+
+    def __new__(cls, *args, **kwargs):
+        logger.warning(
+            "SpynnakerMachineBitFieldUnorderedRouterCompressor "
+            "algorithm name is deprecated. "
+            "Please use MachineBitFieldOrderedCoveringCompressor instead. "
+            "Remove algorithms from your cfg to use defaults")
+        return super(
+            SpynnakerMachineBitFieldUnorderedRouterCompressor, cls).__new__(
+            cls, *args, **kwargs)
+
+    @overrides(AbstractMachineBitFieldRouterCompressor._compressor_factory)
+    def _compressor_factory(self):
+        return MachineBitFieldOrderedCoveringCompressor()
 
 
 class SpynnakerMachineBitFieldPairRouterCompressor(
