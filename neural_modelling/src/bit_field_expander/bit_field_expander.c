@@ -84,9 +84,6 @@ uint32_t n_vertex_regions = 0;
 //!     master pop table. chicken vs egg.
 bit_field_t* fake_bit_fields;
 
-//! Says if we should run
-bool can_run = true;
-
 /*****************************stuff needed for structural stuff to work*/
 
 //! The instantiation of the rewiring data
@@ -193,7 +190,6 @@ bool initialise(void) {
     if (!direct_synapses_initialise(
             direct_matrix_region_base_address, &direct_synapses_address)) {
         log_error("Failed to init the synapses. failing");
-        can_run = false;
         return false;
     }
 
@@ -204,7 +200,6 @@ bool initialise(void) {
             direct_synapses_address, bit_field_base_address,
             &row_max_n_words, false)) {
         log_error("Failed to init the master pop table. failing");
-        can_run = false;
         return false;
     }
 
@@ -215,16 +210,8 @@ bool initialise(void) {
                 structural_matrix_region_base_address, &rewiring_data,
                 &pre_info, &post_to_pre_table)) {
             log_error("Failed to init the synaptogenesis");
-            can_run = false;
             return false;
         }
-    }
-
-    if (keys_to_max_atoms->n_pairs == 0) {
-         success_shut_down();
-         log_info("There were no bitfields to process.");
-         can_run = false;
-         return true;
     }
 
     // read in the correct key to max atom map
@@ -298,6 +285,11 @@ static void determine_redundancy(void) {
 //! \brief Create the bitfield for this master pop table and synaptic matrix.
 //! \return Whether it was successful at generating the bitfield
 bool generate_bit_field(void) {
+    if (keys_to_max_atoms->n_pairs == 0) {
+         log_info("There were no bitfields to process.");
+         return true;
+    }
+
     // write how many entries (thus bitfields) are to be generated into sdram
     log_debug("Update by pop length");
     bit_field_base_address->n_filters = keys_to_max_atoms->n_pairs;
@@ -448,19 +440,17 @@ void c_main(void) {
     // generate bit field for each vertex regions
     bool success_init = initialise();
 
-    if (!can_run) {
-        if (!success_init) {
-            log_error("Failed to init");
-            fail_shut_down();
-        }
+    if (!success_init) {
+        log_error("Failed to init");
+        fail_shut_down();
     } else {
         log_info("Generating bit field");
-        if (!generate_bit_field()) {
-            log_error("Failed to generate bitfield");
-            fail_shut_down();
-        } else {
+        if (generate_bit_field()) {
             success_shut_down();
             log_info("Successfully processed the bitfield");
+        } else {
+            log_error("Failed to generate bitfield");
+            fail_shut_down();
         }
     }
 }
