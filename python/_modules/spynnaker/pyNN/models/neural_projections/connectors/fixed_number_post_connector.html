@@ -338,8 +338,8 @@
         <span class="c1"># The same seed needs to be sent to each of the slices</span>
         <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">pre_vertex_slice</span><span class="p">),</span> <span class="nb">id</span><span class="p">(</span><span class="n">post_slices</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__post_connector_seed</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__post_connector_seed</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="nb">int</span><span class="p">(</span><span class="n">i</span> <span class="o">*</span> <span class="mh">0xFFFFFFFF</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rng</span><span class="o">.</span><span class="n">next</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">4</span><span class="p">)]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__post_connector_seed</span><span class="p">[</span>
+                <span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">utility_calls</span><span class="o">.</span><span class="n">create_mars_kiss_seeds</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rng</span><span class="p">)</span>
 
         <span class="c1"># Only deal with self-connections if the two populations are the same</span>
         <span class="n">self_connections</span> <span class="o">=</span> <span class="kc">True</span>

@@ -59,6 +59,7 @@
 <span class="kn">from</span> <span class="nn">spinn_utilities.abstract_base</span> <span class="kn">import</span> <span class="n">abstractproperty</span><span class="p">,</span> <span class="n">AbstractBase</span>
 <span class="kn">from</span> <span class="nn">data_specification.enums.data_type</span> <span class="kn">import</span> <span class="n">DataType</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities</span> <span class="kn">import</span> <span class="n">utility_calls</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neural_projections.connectors</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractConnector</span><span class="p">)</span>
 
@@ -142,8 +143,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">pre_vertex_slice</span><span class="p">),</span> <span class="nb">id</span><span class="p">(</span><span class="n">post_vertex_slice</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__connector_seed</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__connector_seed</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="nb">int</span><span class="p">(</span><span class="n">i</span> <span class="o">*</span> <span class="mh">0xFFFFFFFF</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">rng</span><span class="o">.</span><span class="n">next</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">4</span><span class="p">)]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__connector_seed</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">utility_calls</span><span class="o">.</span><span class="n">create_mars_kiss_seeds</span><span class="p">(</span>
+                <span class="n">rng</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__connector_seed</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 
     <span class="nd">@staticmethod</span>
@@ -162,7 +163,7 @@
             <span class="k">return</span> <span class="kc">None</span>
         <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">pre_vertex_slice</span><span class="p">),</span> <span class="nb">id</span><span class="p">(</span><span class="n">post_vertex_slice</span><span class="p">),</span> <span class="nb">id</span><span class="p">(</span><span class="n">values</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seeds</span><span class="p">:</span>
-            <span class="n">seeds</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span> <span class="o">*</span> <span class="mh">0xFFFFFFFF</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">values</span><span class="o">.</span><span class="n">rng</span><span class="o">.</span><span class="n">next</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">4</span><span class="p">)]</span>
+            <span class="n">seeds</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">utility_calls</span><span class="o">.</span><span class="n">create_mars_kiss_seeds</span><span class="p">(</span><span class="n">values</span><span class="o">.</span><span class="n">rng</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">seeds</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 
     <span class="nd">@staticmethod</span>
