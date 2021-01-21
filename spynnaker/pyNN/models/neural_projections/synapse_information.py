@@ -15,9 +15,9 @@
 
 from pyNN.random import NumpyRNG
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractGenerateConnectorOnMachine)
+    AbstractGenerateConnectorOnMachine, OneToOneConnector)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractGenerateOnMachine)
+    AbstractGenerateOnMachine, SynapseDynamicsStatic)
 
 
 class SynapseInformation(object):
@@ -194,6 +194,18 @@ class SynapseInformation(object):
             isinstance(self.synapse_dynamics, AbstractGenerateOnMachine) and
             self.synapse_dynamics.generate_on_machine())
         return connector_gen and synapse_gen
+
+    def may_use_direct_matrix(self):
+        """ Do the properties of the synaptic information all it to use the
+            direct matrix?
+
+        :rtype: bool
+        """
+        return (
+            isinstance(self.__connector, OneToOneConnector) and
+            isinstance(self.__synapse_dynamics,
+                       SynapseDynamicsStatic) and
+            not self.prepop_is_view and not self.postpop_is_view)
 
     @property
     def pre_run_connection_holders(self):

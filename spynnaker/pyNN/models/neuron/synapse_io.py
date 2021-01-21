@@ -23,8 +23,7 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
 from spynnaker.pyNN.exceptions import SynapseRowTooBigException
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractStaticSynapseDynamics, AbstractSynapseDynamicsStructural,
-    AbstractSynapseDynamics)
+    AbstractStaticSynapseDynamics, AbstractSynapseDynamics)
 from .master_pop_table import MasterPopTableAsBinarySearch
 
 _N_HEADER_WORDS = 3
@@ -250,8 +249,9 @@ def _get_allowed_row_length(n_words, dynamics, in_edge, n_synapses):
 
 
 def get_synapses(
-        synapse_info, n_delay_stages, n_synapse_types, weight_scales,
-        machine_edge, max_row_info, gen_undelayed, gen_delayed):
+        connections, synapse_info, n_delay_stages, n_synapse_types,
+        weight_scales, app_edge, pre_vertex_slice, post_vertex_slice,
+        max_row_info, gen_undelayed, gen_delayed):
     """ Get the synapses as an array of words for non-delayed synapses and\
         an array of words for delayed synapses. This is used to prepare\
         information for *deployment to SpiNNaker*.
@@ -290,18 +290,8 @@ def get_synapses(
     # pylint: disable=too-many-arguments, too-many-locals
     # pylint: disable=assignment-from-no-return
     # Get delays in timesteps
-    app_edge = machine_edge.app_edge
     machine_time_step = globals_variables.get_simulator().machine_time_step
     max_delay = app_edge.post_vertex.splitter.max_support_delay()
-
-    # Get the actual connections
-    pre_slices = app_edge.pre_vertex.vertex_slices
-    post_slices = app_edge.post_vertex.vertex_slices
-    pre_vertex_slice = machine_edge.pre_vertex.vertex_slice
-    post_vertex_slice = machine_edge.post_vertex.vertex_slice
-    connections = synapse_info.connector.create_synaptic_block(
-        pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
-        synapse_info.synapse_type, synapse_info)
 
     # Convert delays to timesteps
     connections["delay"] = numpy.rint(
@@ -311,13 +301,6 @@ def get_synapses(
     # Scale weights
     connections["weight"] = (connections["weight"] * weight_scales[
         synapse_info.synapse_type])
-
-    # Set connections for structural plasticity
-    if isinstance(synapse_info.synapse_dynamics,
-                  AbstractSynapseDynamicsStructural):
-        synapse_info.synapse_dynamics.set_connections(
-            connections, post_vertex_slice, app_edge, synapse_info,
-            machine_edge)
 
     # Split the connections up based on the delays
     if max_delay is not None:
@@ -330,7 +313,6 @@ def get_synapses(
         undelayed_connections = connections
         delayed_connections = numpy.zeros(
             0, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
-    del connections
 
     # Get the data for the connections
     row_data = numpy.zeros(0, dtype="uint32")
@@ -506,7 +488,8 @@ def convert_to_connections(
 
 def read_all_synapses(
         data, delayed_data, synapse_info, n_synapse_types,
-        weight_scales, machine_edge, max_row_info):
+        weight_scales, pre_vertex_slice, post_vertex_slice,
+        post_vertex_max_delay_ticks, max_row_info):
     """ Read the synapses for a given projection synapse information\
         object out of the given delayed and undelayed data.
 
@@ -529,10 +512,6 @@ def read_all_synapses(
     :rtype: ~numpy.ndarray
     """
     connections = []
-    pre_vertex_slice = machine_edge.pre_vertex.vertex_slice
-    post_vertex_slice = machine_edge.post_vertex.vertex_slice
-    post_splitter = machine_edge.post_vertex.app_vertex.splitter
-    post_vertex_max_delay_ticks = post_splitter.max_support_delay()
     max_row_length = max_row_info.undelayed_max_words
     delayed_max_row_length = max_row_info.delayed_max_words
     connections.append(convert_to_connections(

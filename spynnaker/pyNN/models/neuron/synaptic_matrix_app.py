@@ -19,13 +19,16 @@ from six import itervalues
 from pacman.model.graphs.common.slice import Slice
 
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
 
 from .synaptic_matrix import SynapticMatrix
-from .generator_data import SYN_REGION_UNUSED
-from .synapse_io import (
-    get_max_row_info, read_all_synapses, convert_to_connections)
+from .generator_data import GeneratorData, SYN_REGION_UNUSED
+from .synapse_io import read_all_synapses, convert_to_connections
+
+# The most pre-atoms that the generator can handle at once
+MAX_GENERATED_ATOMS = 1024
 
 
 class SynapticMatrixApp(object):
@@ -176,7 +179,8 @@ class SynapticMatrixApp(object):
             self.__poptable, self.__synapse_info,
             machine_edge, self.__app_edge, self.__n_synapse_types,
             self.__max_row_info, r_info, delayed_r_info, self.__weight_scales,
-            self.__all_syn_block_sz, self.__all_single_syn_sz)
+            self.__all_syn_block_sz, self.__all_single_syn_sz,
+            self.__is_direct_capable(machine_edge))
         self.__matrices[machine_edge] = matrix
         return matrix
 
@@ -201,11 +205,31 @@ class SynapticMatrixApp(object):
         """
         next_single_addr = single_addr
         for m_edge in self.__m_edges:
-            matrix = self.__get_matrix(m_edge)
-            is_direct, next_single_addr = matrix.is_direct(next_single_addr)
-            if not is_direct:
+            if not self.__is_direct_capable(m_edge):
+                return False
+            n_single_bytes = (
+                m_edge.pre_vertex.vertex_slice.n_atoms * BYTES_PER_WORD)
+            next_single_addr += n_single_bytes
+            if next_single_addr > self.__all_single_syn_sz:
                 return False
         return True
+
+    def __is_direct_capable(self, machine_edge):
+        """ Determine if the given connection can be done with a "direct"\
+            synaptic matrix - this must have an exactly 1 entry per row
+
+        :param int single_addr: The current offset of the direct matrix
+        :return: A tuple of a boolean indicating if the matrix is direct and
+            the next offset of the single matrix
+        :rtype: (bool, int)
+        """
+        pre_vertex_slice = machine_edge.pre_vertex.vertex_slice
+        post_vertex_slice = machine_edge.post_vertex.vertex_slice
+        return (
+            self.__app_edge.n_delay_stages == 0 and
+            self.__synapse_info.may_use_direct_matrix() and
+            (pre_vertex_slice.lo_atom == post_vertex_slice.lo_atom) and
+            (pre_vertex_slice.hi_atom == post_vertex_slice.hi_atom))
 
     def set_info(self, all_syn_block_sz, app_key_info, delay_app_key_info,
                  routing_info, weight_scales, m_edges):
@@ -399,37 +423,146 @@ class SynapticMatrixApp(object):
         :rtype: int
         """
 
-        # Reserve the space in the matrix for an application-level key,
-        # and tell the pop table
-        (block_addr, syn_addr, del_addr, syn_max_addr,
-         del_max_addr) = self.__reserve_app_blocks(block_addr)
+        if self.__use_app_keys:
+            # Reserve the space in the matrix for an application-level key,
+            # and tell the pop table
+            (block_addr, syn_addr, del_addr, syn_max_addr,
+             del_max_addr) = self.__reserve_app_blocks(block_addr)
+
+            pre_slices = self.__app_edge.pre_vertex.vertex_slices
+            if self.__max_row_info.delayed_max_n_synapses == 0:
+                # If we are not using delays (as we have to sync with delays)
+                # Generate for theoretical maximum pre-slices that the
+                # generator can handle; Note that the generator can't handle
+                # full pre-vertices without running out of memory in general,
+                # so we break it down, but as little as possible
+                max_atom = self.__app_edge.pre_vertex.n_atoms - 1
+                pre_slices = [
+                    Slice(
+                        lo_atom, min(lo_atom + MAX_GENERATED_ATOMS, max_atom))
+                    for lo_atom in range(0, max_atom + 1, MAX_GENERATED_ATOMS)]
+            for pre_slice in pre_slices:
+                syn_addr, syn_mat_offset = self.__next_app_on_chip_address(
+                    syn_addr, syn_max_addr, pre_slice)
+                del_addr, d_mat_offset = self.__next_app_delay_on_chip_address(
+                    del_addr, del_max_addr, pre_slice)
+                generator_data.append(self.__get_generator_data(
+                    syn_mat_offset, d_mat_offset, pre_slices, pre_slice))
+            for pre_slice in pre_slices:
+                self.__write_on_chip_delay_data(pre_slices, pre_slice)
+            return block_addr
 
         # Go through the edges of the application edge and write data for the
-        # generator; this has to be done on a machine-edge basis to avoid
-        # overloading the generator, even if an application matrix is generated
+        # generator
         for m_edge in self.__m_edges:
             matrix = self.__get_matrix(m_edge)
-
-            if self.__use_app_keys:
-                syn_addr, syn_mat_offset = matrix.next_app_on_chip_address(
-                    syn_addr, syn_max_addr)
-                del_addr, d_mat_offset = matrix.next_app_delay_on_chip_address(
-                    del_addr, del_max_addr)
-            else:
-                block_addr, syn_mat_offset = matrix.next_on_chip_address(
-                    block_addr)
-                block_addr, d_mat_offset = matrix.next_delay_on_chip_address(
-                    block_addr)
+            block_addr, syn_mat_offset = matrix.next_on_chip_address(
+                block_addr)
+            block_addr, d_mat_offset = matrix.next_delay_on_chip_address(
+                block_addr)
 
             # Create the generator data and note it exists for this post vertex
-            # Note generator data is written per machine-edge even when a whole
-            # application vertex matrix exists, because these are just appended
-            # to each other in the latter case; this makes it easier to
-            # generate since it is still doing it in chunks, so less local
-            # memory is needed.
             generator_data.append(matrix.get_generator_data(
                 syn_mat_offset, d_mat_offset))
         return block_addr
+
+    def __next_app_on_chip_address(
+            self, app_block_addr, max_app_addr, pre_vertex_slice):
+        """ Allocate a machine-level address of a matrix from within an
+            app-level allocation
+
+        :param int app_block_addr:
+            The current position in the application block
+        :param int max_app_addr:
+            The position of the end of the allocation
+        :return: The address after the allocation and the allocated address
+        :rtype: int, int
+        """
+        if self.__max_row_info.undelayed_max_n_synapses == 0:
+            return app_block_addr, SYN_REGION_UNUSED
+
+        # Get the matrix size
+        matrix_size = (
+            pre_vertex_slice.n_atoms *
+            self.__max_row_info.undelayed_max_bytes)
+
+        # Note: No master population table padding is needed here because
+        # the allocation is at the application level
+        addr = app_block_addr
+        app_block_addr = self.__next_addr(
+            app_block_addr, matrix_size, max_app_addr)
+        return app_block_addr, addr
+
+    def __next_app_delay_on_chip_address(
+            self, app_block_addr, max_app_addr, pre_vertex_slice):
+        """ Allocate a machine-level address of a delayed matrix from within an
+            app-level allocation
+
+        :param int app_block_addr:
+            The current position in the application block
+        :param int max_app_addr:
+            The position of the end of the allocation
+        :return: The address after the allocation and the allocated address
+        :rtype: int, int
+        """
+        if self.__max_row_info.delayed_max_n_synapses == 0:
+            return app_block_addr, SYN_REGION_UNUSED
+
+        # Get the matrix size
+        delay_matrix_size = (
+            pre_vertex_slice.n_atoms *
+            self.__app_edge.n_delay_stages *
+            self.__max_row_info.delayed_max_bytes)
+
+        # Note: No master population table padding is needed here because
+        # the allocation is at the application level
+        addr = app_block_addr
+        app_block_addr = self.__next_addr(
+            app_block_addr, delay_matrix_size, max_app_addr)
+        return app_block_addr, addr
+
+    def __get_generator_data(
+            self, syn_mat_offset, d_mat_offset, pre_vertex_slices,
+            pre_vertex_slice):
+        """ Get the generator data for this matrix
+
+        :param int syn_mat_offset:
+            The synaptic matrix offset to write the data to
+        :param int d_mat_offset:
+            The synaptic matrix offset to write the delayed data to
+        :rtype: GeneratorData
+        """
+        return GeneratorData(
+            syn_mat_offset, d_mat_offset,
+            self.__max_row_info.undelayed_max_words,
+            self.__max_row_info.delayed_max_words,
+            self.__max_row_info.undelayed_max_n_synapses,
+            self.__max_row_info.delayed_max_n_synapses,
+            pre_vertex_slices, self.__app_edge.post_vertex.vertex_slices,
+            pre_vertex_slice, self.__post_vertex_slice,
+            self.__synapse_info, self.__app_edge.n_delay_stages + 1,
+            self.__app_edge.post_vertex.splitter.max_support_delay(),
+            globals_variables.get_simulator().machine_time_step)
+
+    def __write_on_chip_delay_data(self, pre_vertex_slices, pre_vertex_slice):
+        """ Write data for delayed on-chip generation
+        """
+        # If delay edge exists, tell this about the data too, so it can
+        # generate its own data
+        if (self.__max_row_info.delayed_max_n_synapses > 0 and
+                self.__app_edge.delay_edge is not None):
+            self.__app_edge.delay_edge.pre_vertex.add_generator_data(
+                self.__max_row_info.undelayed_max_n_synapses,
+                self.__max_row_info.delayed_max_n_synapses,
+                pre_vertex_slices, self.__app_edge.post_vertex.vertex_slices,
+                pre_vertex_slice, self.__post_vertex_slice,
+                self.__synapse_info, self.__app_edge.n_delay_stages + 1,
+                self.__app_edge.post_vertex.splitter.max_support_delay(),
+                globals_variables.get_simulator().machine_time_step)
+        elif self.__max_row_info.delayed_max_n_synapses != 0:
+            raise Exception(
+                "Found delayed items but no delay machine edge for {}".format(
+                    self.__app_edge.label))
 
     def __reserve_app_blocks(self, block_addr):
         """ Reserve blocks for a whole-application-vertex matrix if possible,
@@ -522,14 +655,19 @@ class SynapticMatrixApp(object):
         :param ~pacman.model.graphs.machine.MachineEdge machine_edge:
             The machine edge the connections are for
         """
+        pre_vertex_slice = machine_edge.pre_vertex.vertex_slice
+        post_vertex_slice = machine_edge.post_vertex.vertex_slice
+        post_splitter = machine_edge.post_vertex.app_vertex.splitter
+        post_vertex_max_delay_ticks = post_splitter.max_support_delay()
         for conn_holder in self.__synapse_info.pre_run_connection_holders:
             conn_holder.add_connections(
                 read_all_synapses(
                     data, delayed_data, self.__synapse_info,
                     self.__n_synapse_types, self.__weight_scales,
-                    machine_edge, self.__max_row_info))
+                    pre_vertex_slice, post_vertex_slice,
+                    post_vertex_max_delay_ticks, self.__max_row_info))
 
-    def __next_addr(self, block_addr, size):
+    def __next_addr(self, block_addr, size, max_addr=None):
         """ Get the next address after a block, checking it is in range
 
         :param int block_addr: The address of the start of the block
@@ -538,11 +676,13 @@ class SynapticMatrixApp(object):
         :rtype: int
         :raises Exception: If the updated address is out of range
         """
+        if not max_addr:
+            max_addr = self.__all_syn_block_sz
         next_addr = block_addr + size
-        if next_addr > self.__all_syn_block_sz:
+        if next_addr > max_addr:
             raise Exception(
                 "Too much synaptic memory has been written: {} of {} "
-                .format(next_addr, self.__all_syn_block_sz))
+                .format(next_addr, max_addr))
         return next_addr
 
     def get_connections(self, transceiver, placement):
