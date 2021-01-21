@@ -53,7 +53,8 @@ class Recorder(object):
 
     def __init__(self, population):
         """
-        :param PyNNPopulationCommon population: the population to record for
+        :param population: the population to record for
+        :type population: ~spynnaker.pyNN.models.populations.Population
         """
         self.__population = population
 
@@ -68,10 +69,16 @@ class Recorder(object):
 
     @property
     def _population(self):
+        """
+        :rtype: ~spynnaker.pyNN.models.populations.Population
+        """
         return self.__population
 
     @property
     def _write_to_files_indicators(self):
+        """
+        :rtype: dict(str,str or None)
+        """
         return self.__write_to_files_indicators
 
     def _record(self, variable, sampling_interval=None, to_file=None,

@@ -24,7 +24,8 @@ from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint)
 from pacman.model.graphs.application.application_vertex import (
     ApplicationVertex)
-from spinn_front_end_common.utilities import globals_variables
+from spinn_front_end_common.utilities.globals_variables import (
+    get_simulator, get_not_running_simulator)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spynnaker.pyNN.models.abstract_models import (
@@ -55,7 +56,6 @@ class PyNNPopulationCommon(object):
         "__record_spike_file",
         "__record_v_file",
         "_size",
-        "__spinnaker_control",
         "__structure",
         "__vertex",
         "_vertex_changeable_after_run",
@@ -64,12 +64,9 @@ class PyNNPopulationCommon(object):
         "_vertex_population_settable"]
 
     def __init__(
-            self, spinnaker_control, size, label, constraints, model,
+            self, size, label, constraints, model,
             structure, initial_values, additional_parameters=None):
         """
-        :param spinnaker_control: The simulator engine core.
-        :type spinnaker_control:
-            ~spinn_front_end_common.interface.abstract_spinnaker_base.AbstractSpinnakerBase
         :param size: The size of the population; external devices may use None
         :type size: int or float or None
         :param label: The label for the population, or None for a default
@@ -83,7 +80,7 @@ class PyNNPopulationCommon(object):
         :param structure: How the neurons are arranged in space
         :type structure: ~pyNN.space.BaseStructure or None
         :param initial_values: Initialisation for model variables.
-        :type initial_values: dict(str, Any) or None
+        :type initial_values: dict(str, Any)
         :param additional_parameters:
             Any extra parameters to pass to the model's vertex creation \
             function.
@@ -139,7 +136,6 @@ class PyNNPopulationCommon(object):
         self._vertex_contains_units = \
             isinstance(self.__vertex, AbstractContainsUnits)
 
-        self.__spinnaker_control = spinnaker_control
         self.__delay_vertex = None
 
         # Internal structure now supported 23 November 2014 ADR
@@ -149,9 +145,9 @@ class PyNNPopulationCommon(object):
         self._positions = None
 
         # add objects to the SpiNNaker control class
-        self.__spinnaker_control.add_population(self)
-        self.__spinnaker_control.add_application_vertex(
-            self.__vertex)
+        sim = get_simulator()
+        sim.add_population(self)
+        sim.add_application_vertex(self.__vertex)
 
         # initialise common stuff
         self._size = size
@@ -164,20 +160,17 @@ class PyNNPopulationCommon(object):
         self.__has_read_neuron_parameters_this_run = False
 
         # things for pynn demands
-        self._all_ids = numpy.arange(
-            globals_variables.get_simulator().id_counter,
-            globals_variables.get_simulator().id_counter + size)
+        self._all_ids = numpy.arange(sim.id_counter, sim.id_counter + size)
         self.__first_id = self._all_ids[0]
         self.__last_id = self._all_ids[-1]
 
         # update the simulators id_counter for giving a unique ID for every
         # atom
-        globals_variables.get_simulator().id_counter += size
+        sim.id_counter += size
 
         # set up initial values if given
-        if initial_values is not None:
-            for variable, value in iteritems(initial_values):
-                self._initialize(variable, value)
+        for variable, value in iteritems(initial_values):
+            self._initialize(variable, value)
 
     @staticmethod
     def _process_additional_params(
@@ -385,7 +378,7 @@ class PyNNPopulationCommon(object):
             raise KeyError(
                 "Population does not support the initialisation of {}".format(
                     variable))
-        if globals_variables.get_not_running_simulator().has_ran \
+        if get_not_running_simulator().has_ran \
                 and not self._vertex_changeable_after_run:
             raise Exception("Population does not support changes after run")
         self._read_parameters_before_set()
@@ -435,7 +428,7 @@ class PyNNPopulationCommon(object):
             raise KeyError("Population does not have property {}".format(
                 parameter))
 
-        if globals_variables.get_not_running_simulator().has_ran \
+        if get_not_running_simulator().has_ran \
                 and not self._vertex_changeable_after_run:
             raise Exception(
                 " run has been called")
@@ -506,28 +499,24 @@ class PyNNPopulationCommon(object):
                 self.__vertex.set_value_by_selector(selector, key, value)
 
     def _read_parameters_before_set(self):
-        """ Reads parameters from the machine before "set" completes
-
-        :return: None
+        """ Reads parameters from the machine before :py:meth:`set` completes
         """
 
         # If the tools have run before, and not reset, and the read
         # hasn't already been done, read back the data
-        if (globals_variables.get_simulator().has_ran
+        sim = get_simulator()
+        if (sim.has_ran
                 and not self.__has_read_neuron_parameters_this_run
-                and not globals_variables.get_simulator().use_virtual_board):
+                and not sim.use_virtual_board):
             # go through each machine vertex and read the neuron parameters
             # it contains
-            for machine_vertex in self.__vertex.machine_vertices:
-                if isinstance(machine_vertex, AbstractReadParametersBeforeSet):
+            for vertex in self.__vertex.machine_vertices:
+                if isinstance(vertex, AbstractReadParametersBeforeSet):
                     # tell the core to rewrite neuron params back to the
                     # SDRAM space.
-                    placement = globals_variables.get_simulator().\
-                        placements.get_placement_of_vertex(machine_vertex)
-
-                    machine_vertex.read_parameters_from_machine(
-                        globals_variables.get_simulator().transceiver,
-                        placement, machine_vertex.vertex_slice)
+                    placement = sim.placements.get_placement_of_vertex(vertex)
+                    vertex.read_parameters_from_machine(
+                        sim.transceiver, placement, vertex.vertex_slice)
 
             self.__has_read_neuron_parameters_this_run = True
 
@@ -579,7 +568,7 @@ class PyNNPopulationCommon(object):
 
         :param ~pacman.model.constraints.AbstractConstraint constraint:
         """
-        globals_variables.get_simulator().verify_not_running()
+        get_simulator().verify_not_running()
         if not isinstance(constraint, AbstractConstraint):
             raise ConfigurationException(
                 "the constraint entered is not a recognised constraint")
@@ -596,7 +585,7 @@ class PyNNPopulationCommon(object):
         :param int y: The y-coordinate of the placement constraint
         :param int p: The processor ID of the placement constraint (optional)
         """
-        globals_variables.get_simulator().verify_not_running()
+        get_simulator().verify_not_running()
         self.__vertex.add_constraint(ChipAndCoreConstraint(x, y, p))
 
         # state that something has changed in the population,
@@ -610,7 +599,7 @@ class PyNNPopulationCommon(object):
             A dictionary containing "x", "y" and optionally "p" as keys, and
             ints as values
         """
-        globals_variables.get_simulator().verify_not_running()
+        get_simulator().verify_not_running()
         self.add_placement_constraint(**constraint_dict)
 
         # state that something has changed in the population,
@@ -623,7 +612,7 @@ class PyNNPopulationCommon(object):
         :param int max_atoms_per_core:
             the new value for the max atoms per core.
         """
-        globals_variables.get_simulator().verify_not_running()
+        get_simulator().verify_not_running()
         self.__vertex.add_constraint(
             MaxVertexAtomsConstraint(max_atoms_per_core))
         # state that something has changed in the population

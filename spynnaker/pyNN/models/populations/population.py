@@ -23,7 +23,7 @@ from pyNN.random import NumpyRNG
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities.globals_variables import (
-    get_simulator, get_not_running_simulator)
+    get_not_running_simulator)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.models.pynn_population_common import PyNNPopulationCommon
@@ -83,7 +83,6 @@ class Population(PyNNPopulationCommon, Recorder, PopulationBase):
 
         # build our initial objects
         super(Population, self).__init__(
-            spinnaker_control=get_simulator(),
             size=size, label=label, constraints=constraints,
             model=model, structure=structure, initial_values=initial_values,
             additional_parameters=additional_parameters)
@@ -421,7 +420,7 @@ class Population(PyNNPopulationCommon, Recorder, PopulationBase):
         :rtype: ~numpy.ndarray
         """
         spikes = self._get_spikes()
-        return PyNNPopulationCommon.get_spike_counts(self, spikes, gather)
+        return super(Population, self).get_spike_counts(self, spikes, gather)
 
     def find_units(self, variable):
         """ Get the units of a variable
