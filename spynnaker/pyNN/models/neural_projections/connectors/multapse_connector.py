@@ -74,7 +74,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
         """
         super(MultapseConnector, self).__init__(safe, callback, verbose)
         # We absolutely require an integer at this point!
-        self.__num_synapses = int(n)
+        self.__num_synapses = self._roundsize(n, "MultapseConnector")
         self.__allow_self_connections = allow_self_connections
         self.__with_replacement = with_replacement
         self.__pre_slices = None

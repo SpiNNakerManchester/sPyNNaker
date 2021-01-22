@@ -614,3 +614,26 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         :raises SpynnakerException: Always. Method not supported; profiled out.
         """
         raise SpynnakerException("Standard pyNN connect method not supported")
+
+    @staticmethod
+    def _roundsize(size, label):
+        """ Ensures that the ``size`` is an integer. Approximate integers are\
+            rounded; other values cause exceptions.
+
+        :param size: The value to be rounded
+        :type size: int or float
+        :param str label: The type-name of the connection, for messages
+        :rtype: int
+        :raises SpynnakerException: If the size is non-integer and not close
+        """
+        if isinstance(size, int):
+            return size
+        # Allow a float which has a near int value
+        temp = int(round(size))
+        if abs(temp - size) < 0.001:
+            logger.warning("Size of {} rounded from {} to {}. "
+                           "Please use int values for size",
+                           label, size, temp)
+            return temp
+        raise SpynnakerException(
+            "Size of {} must be an int, received {}".format(label, size))

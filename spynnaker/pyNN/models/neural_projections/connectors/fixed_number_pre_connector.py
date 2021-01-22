@@ -83,7 +83,7 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
         # weights or delays - not implemented
         super(FixedNumberPreConnector, self).__init__(safe, callback, verbose)
         # We absolutely require an integer at this point!
-        self.__n_pre = int(n)
+        self.__n_pre = self._roundsize(n, "FixedNumberPreConnector")
         PyNNFixedNumberPreConnector.__init__(
             self, self.__n_pre, allow_self_connections, with_replacement, rng,
             safe, callback)

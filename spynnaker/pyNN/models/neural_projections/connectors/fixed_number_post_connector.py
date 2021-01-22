@@ -82,7 +82,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         """
         super(FixedNumberPostConnector, self).__init__(safe, callback, verbose)
         # We absolutely require an integer at this point!
-        self.__n_post = int(n)
+        self.__n_post = self._roundsize(n, "FixedNumberPostConnector")
         PyNNFixedNumberPostConnector.__init__(
             self, self.__n_post, allow_self_connections, with_replacement, rng,
             safe, callback)
