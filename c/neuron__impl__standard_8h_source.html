@@ -305,7 +305,7 @@ $(function() {
 <div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160; </div>
 <div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;    <span class="comment">// Loop however many times requested; do this in reverse for efficiency,</span></div>
 <div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;    <span class="comment">// and because the index doesn&#39;t actually matter</span></div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;    <span class="keywordflow">for</span> (uint32_t i = <a class="code" href="neuron__impl__standard_8h.html#adc2145aaa2f8435401d2c077d42c7b91">n_steps_per_timestep</a>; i &gt; 0; i--) {</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;    <span class="keywordflow">for</span> (uint32_t i_step = <a class="code" href="neuron__impl__standard_8h.html#adc2145aaa2f8435401d2c077d42c7b91">n_steps_per_timestep</a>; i_step &gt; 0; i_step--) {</div>
 <div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;        <span class="comment">// Get the voltage</span></div>
 <div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;        <a class="code" href="neuron-typedefs_8h.html#ab5816efea940631eca6d71dd4ca99c17">state_t</a> soma_voltage = <a class="code" href="neuron__model_8h.html#a91774a9b87c1875fcb7659fe0f096857">neuron_model_get_membrane_voltage</a>(this_neuron);</div>
 <div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160; </div>
@@ -333,7 +333,7 @@ $(function() {
 <div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;        }</div>
 <div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160; </div>
 <div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;        <span class="comment">// Do recording if on the first step</span></div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;        <span class="keywordflow">if</span> (i == <a class="code" href="neuron__impl__standard_8h.html#adc2145aaa2f8435401d2c077d42c7b91">n_steps_per_timestep</a>) {</div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;        <span class="keywordflow">if</span> (i_step == <a class="code" href="neuron__impl__standard_8h.html#adc2145aaa2f8435401d2c077d42c7b91">n_steps_per_timestep</a>) {</div>
 <div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;            <a class="code" href="neuron__recording_8h.html#a4fc5af259d7905234a9637a9daef7150">neuron_recording_record_accum</a>(</div>
 <div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;                    <a class="code" href="neuron__impl__standard_8h.html#a68f96be069d7309d70ec3343afad2e03ab3af76b3ea8cdd3c68aaa7432e4acf96">V_RECORDING_INDEX</a>, neuron_index, soma_voltage);</div>
 <div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;            <a class="code" href="neuron__recording_8h.html#a4fc5af259d7905234a9637a9daef7150">neuron_recording_record_accum</a>(</div>
@@ -562,7 +562,7 @@ $(function() {
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Jan 22 2021 10:23:24 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Fri Jan 22 2021 11:35:41 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>
