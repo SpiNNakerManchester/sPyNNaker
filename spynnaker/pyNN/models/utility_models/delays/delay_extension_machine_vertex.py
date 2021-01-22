@@ -273,7 +273,7 @@ class DelayExtensionMachineVertex(
         # ###################################################################
         # Reserve SDRAM space for memory areas:
         delay_params_sz = self._app_vertex.delay_params_size(
-            self.__vertex_slice)
+            self._vertex_slice)
 
         spec.reserve_memory_region(
             region=self._DELAY_EXTENSION_REGIONS.SYSTEM.value,
