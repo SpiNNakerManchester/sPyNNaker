@@ -120,7 +120,7 @@
                     <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">connection_holder</span><span class="p">[</span><span class="n">edge</span><span class="p">,</span> <span class="n">info</span><span class="p">]))</span>
         <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Generate_placement_reports: Can&#39;t open file&quot;</span>
-                             <span class="s2">&quot; </span><span class="si">%s</span><span class="s2"> for writing.&quot;</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span></div>
+                             <span class="s2">&quot; </span><span class="si">{}</span><span class="s2"> for writing.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file_name</span><span class="p">))</span></div>
 </pre></div>
 
             <div class="clearer"></div>
