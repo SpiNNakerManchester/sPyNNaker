@@ -20,6 +20,8 @@ from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
+from spinn_front_end_common.utilities.constants import (
+    BITS_PER_WORD, BYTES_PER_WORD)
 from spinn_front_end_common.abstract_models import (
     AbstractProvidesOutgoingPartitionConstraints)
 from spinn_front_end_common.abstract_models.impl import (
@@ -32,6 +34,8 @@ from .delay_block import DelayBlock
 from .delay_generator_data import DelayGeneratorData
 
 logger = FormatAdapter(logging.getLogger(__name__))
+
+_DELAY_PARAM_HEADER_WORDS = 7
 
 
 class DelayExtensionVertex(
@@ -215,3 +219,14 @@ class DelayExtensionVertex(
 
     def delay_generator_data(self, vertex_slice):
         return self.__delay_generator_data.get(vertex_slice, None)
+
+    def delay_params_size(self, vertex_slice):
+        """ The size of the delay parameters for a given vertex slice
+
+        :param Slice slice: The slice to get the size of the parameters for
+        """
+        n_words_per_stage = int(
+            math.ceil(vertex_slice.n_atoms / BITS_PER_WORD))
+        return BYTES_PER_WORD * (
+            _DELAY_PARAM_HEADER_WORDS +
+            (self.__n_delay_stages * n_words_per_stage))

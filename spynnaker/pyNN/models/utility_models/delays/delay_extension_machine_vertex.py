@@ -12,13 +12,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import math
 from enum import Enum
 
 from pacman.executor.injection_decorator import inject_items
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.constants import (
-    BITS_PER_WORD, BYTES_PER_WORD, SIMULATION_N_BYTES)
+    BYTES_PER_WORD, SIMULATION_N_BYTES)
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.machine import MachineVertex
 from spinn_front_end_common.interface.provenance import (
@@ -31,8 +30,6 @@ from spinn_front_end_common.utilities.utility_objs import ExecutableType
 #  1. has_key 2. key 3. incoming_key 4. incoming_mask 5. n_atoms
 #  6. n_delay_stages, 7. the number of delay supported by each delay stage
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
-
-_DELAY_PARAM_HEADER_WORDS = 7
 
 _EXPANDER_BASE_PARAMS_SIZE = 3 * BYTES_PER_WORD
 
@@ -275,11 +272,7 @@ class DelayExtensionMachineVertex(
 
         # ###################################################################
         # Reserve SDRAM space for memory areas:
-        n_words_per_stage = int(
-            math.ceil(self._vertex_slice.n_atoms / BITS_PER_WORD))
-        delay_params_sz = BYTES_PER_WORD * (
-            _DELAY_PARAM_HEADER_WORDS +
-            (self._app_vertex.n_delay_stages * n_words_per_stage))
+        delay_params_sz = self._app_vertex.delay_params_size()
 
         spec.reserve_memory_region(
             region=self._DELAY_EXTENSION_REGIONS.SYSTEM.value,
