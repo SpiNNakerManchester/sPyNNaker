@@ -141,7 +141,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
             self.__synapses_per_edge = self.get_rng_next(
                 self.__num_synapses, prob_connect)
             if sum(self.__synapses_per_edge) != self.__num_synapses:
-                raise Exception("{} of {} synapses generated".format(
+                raise SpynnakerException("{} of {} synapses generated".format(
                     sum(self.__synapses_per_edge), self.__num_synapses))
             self.__pre_slices = pre_slices
             self.__post_slices = post_slices
