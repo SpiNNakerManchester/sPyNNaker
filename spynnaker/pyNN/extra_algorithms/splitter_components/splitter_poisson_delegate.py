@@ -39,8 +39,7 @@ class SplitterPoissonDelegate(SpynnakerSplitterSliceLegacy):
         "your vertex and try again.")
 
     def __init__(self):
-        super(SplitterPoissonDelegate, self).__init__(
-            "SplitterPoissonDelegate")
+        super(SplitterPoissonDelegate, self).__init__()
 
     @property
     def send_over_sdram(self):
