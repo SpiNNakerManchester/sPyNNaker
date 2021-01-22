@@ -81,10 +81,11 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
                 Not supported by sPyNNaker.
         """
         super(FixedNumberPostConnector, self).__init__(safe, callback, verbose)
+        # We absolutely require an integer at this point!
+        self.__n_post = int(n)
         PyNNFixedNumberPostConnector.__init__(
-            self, n, allow_self_connections, with_replacement, rng, safe,
-            callback)
-        self.__n_post = n
+            self, self.__n_post, allow_self_connections, with_replacement, rng,
+            safe, callback)
         self.__allow_self_connections = allow_self_connections
         self.__with_replacement = with_replacement
         self.__post_neurons = None

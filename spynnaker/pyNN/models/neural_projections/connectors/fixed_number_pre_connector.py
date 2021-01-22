@@ -82,10 +82,11 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
         # a Space object, needed if you wish to specify distance-dependent\
         # weights or delays - not implemented
         super(FixedNumberPreConnector, self).__init__(safe, callback, verbose)
+        # We absolutely require an integer at this point!
+        self.__n_pre = int(n)
         PyNNFixedNumberPreConnector.__init__(
-            self, n, allow_self_connections, with_replacement, rng, safe,
-            callback)
-        self.__n_pre = n
+            self, self.__n_pre, allow_self_connections, with_replacement, rng,
+            safe, callback)
         self.__allow_self_connections = allow_self_connections
         self.__with_replacement = with_replacement
         self.__pre_neurons_set = False

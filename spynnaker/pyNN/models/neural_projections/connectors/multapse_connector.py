@@ -73,7 +73,8 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
                 Not supported by sPyNNaker.
         """
         super(MultapseConnector, self).__init__(safe, callback, verbose)
-        self.__num_synapses = n
+        # We absolutely require an integer at this point!
+        self.__num_synapses = int(n)
         self.__allow_self_connections = allow_self_connections
         self.__with_replacement = with_replacement
         self.__pre_slices = None
