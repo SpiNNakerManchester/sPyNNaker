@@ -236,10 +236,8 @@ def write_bitfield_init_data(
         len(machine_graph.get_edges_ending_at_vertex(machine_vertex)))
 
     # load in key to max atoms map
-    for in_coming_edge in machine_graph.get_edges_ending_at_vertex(
-            machine_vertex):
-        out_going_partition = \
-            machine_graph.get_outgoing_partition_for_edge(in_coming_edge)
+    for out_going_partition in machine_graph.\
+            get_multicast_edge_partitions_ending_at_vertex(machine_vertex):
         spec.write_value(
             routing_info.get_first_key_from_partition(out_going_partition))
         spec.write_value(

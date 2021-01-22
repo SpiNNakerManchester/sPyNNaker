@@ -16,6 +16,7 @@
 from collections import defaultdict
 import logging
 import math
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
@@ -24,14 +25,13 @@ from spinn_front_end_common.abstract_models import (
 from spinn_front_end_common.abstract_models.impl import (
     TDMAAwareApplicationVertex)
 from spynnaker.pyNN.exceptions import DelayExtensionException
-from .delay_block import DelayBlock
 from spynnaker.pyNN.models.abstract_models import AbstractHasDelayStages
-
-from .delay_generator_data import DelayGeneratorData
 from spynnaker.pyNN.utilities.constants import (
     POP_TABLE_MAX_ROW_LENGTH)
+from .delay_block import DelayBlock
+from .delay_generator_data import DelayGeneratorData
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class DelayExtensionVertex(

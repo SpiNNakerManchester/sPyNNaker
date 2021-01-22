@@ -39,7 +39,7 @@ typedef struct input_type_t {
 //! \return Pointer to array of values of the receptor-based input after
 //!     scaling
 static inline input_t *input_type_get_input_value(
-        input_t *restrict value, UNUSED const input_type_t *input_type,
+        input_t *restrict value, UNUSED input_type_t *input_type,
         uint16_t num_receptors) {
     for (int i = 0; i < num_receptors; i++) {
         value[i] = value[i] >> 10;

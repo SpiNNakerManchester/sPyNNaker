@@ -17,6 +17,7 @@ import logging
 import math
 import numpy
 import ctypes
+from spinn_utilities.log import FormatAdapter
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.exceptions import (
@@ -25,7 +26,7 @@ from spynnaker.pyNN.utilities.constants import (
     POPULATION_BASED_REGIONS, POP_TABLE_MAX_ROW_LENGTH)
 from spynnaker.pyNN.utilities.bit_field_utilities import BIT_IN_A_WORD
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 # Scale factor for an address; allows more addresses to be represented, but
 # means addresses have to be aligned to these offsets
@@ -152,9 +153,6 @@ _EXTRA_INFO_ENTRY_SIZE_BYTES = ctypes.sizeof(_ExtraInfoCType)
 # Base size - 2 words for size of table and address list
 _BASE_SIZE_BYTES = 8
 
-# Over-scale of estimate for safety
-_OVERSCALE = 2
-
 # A ctypes pointer to a uint32
 _UINT32_PTR = ctypes.POINTER(ctypes.c_uint32)
 
@@ -213,9 +211,9 @@ class _MasterPopEntry(object):
     def append(self, address, row_length, is_single):
         """ Add a synaptic matrix pointer to the entry
 
-        :param address: The address of the synaptic matrix
-        :param row_length: The length of each row in the matrix
-        :param is_single: True if the address is to the direct matrix
+        :param int address: The address of the synaptic matrix
+        :param int row_length: The length of each row in the matrix
+        :param bool is_single: True if the address is to the direct matrix
         :return: The index of the pointer within the entry
         :rtype: int
         """
@@ -270,7 +268,8 @@ class _MasterPopEntry(object):
         :param _MasterPopEntryCType entry: The entry to write to
         :param _AddressListEntryCType_Array address_list:
             The address_list to write to
-        :param start: The index of the entry of the address list to start at
+        :param int start:
+            The index of the entry of the address list to start at
         :return: The number of entries written to the address list
         :rtype: int
         """
@@ -379,7 +378,7 @@ class MasterPopTableAsBinarySearch(object):
         return row_length
 
     def get_next_allowed_address(self, next_address):
-        """ Get the next allowed address
+        """ Get the next allowed address.
 
         :param int next_address: The next address that would be used
         :return: The next address that can be used following next_address
@@ -401,7 +400,7 @@ class MasterPopTableAsBinarySearch(object):
 
     def add_machine_entry(
             self, block_start_addr, row_length, key_and_mask, is_single=False):
-        """ Add an entry for a machine-edge to the population table
+        """ Add an entry for a machine-edge to the population table.
 
         :param int block_start_addr: where the synaptic matrix block starts
         :param int row_length: how long in words each row is
@@ -419,7 +418,7 @@ class MasterPopTableAsBinarySearch(object):
     def add_application_entry(
             self, block_start_addr, row_length, key_and_mask, core_mask,
             core_shift, n_neurons):
-        """ Add an entry for an application-edge to the population table
+        """ Add an entry for an application-edge to the population table.
 
         :param int block_start_addr: where the synaptic matrix block starts
         :param int row_length: how long in words each row is
@@ -508,7 +507,7 @@ class MasterPopTableAsBinarySearch(object):
             self, key_and_mask, core_mask=0, core_shift=0, n_neurons=0):
         """ Add an entry to the table that doesn't point to anywhere.  Used
             to keep indices in synchronisation between e.g. normal and delay
-            entries and between entries on different cores
+            entries and between entries on different cores.
 
         :param ~pacman.model.routing_info.BaseKeyAndMask key_and_mask:
             a key_and_mask object used as part of describing
@@ -580,7 +579,7 @@ class MasterPopTableAsBinarySearch(object):
 
     @property
     def max_n_neurons_per_core(self):
-        """ The maximum number of neurons per core supported when a core-mask
+        """ The maximum number of neurons per core supported when a core-mask\
             is > 0.
 
         :rtype: int
@@ -589,8 +588,8 @@ class MasterPopTableAsBinarySearch(object):
 
     @property
     def max_core_mask(self):
-        """ The maximum core mask supported when n_neurons is > 0; this is the
-            maximum number of cores that can be supported in a joined mask
+        """ The maximum core mask supported when n_neurons is > 0; this is the\
+            maximum number of cores that can be supported in a joined mask.
 
         :rtype: int
         """
@@ -605,8 +604,8 @@ class MasterPopTableAsBinarySearch(object):
         return _MAX_ADDRESS_COUNT
 
     def write_padding(self, spec, next_block_start_address):
-        """ Write padding to the data spec needed between blocks to align
-            addresses correctly
+        """ Write padding to the data spec needed between blocks to align\
+            addresses correctly.
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The spec to write to

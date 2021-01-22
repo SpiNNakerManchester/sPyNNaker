@@ -189,7 +189,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
 
         :param ~data_specification.DataSpecificationGenerator spec:
             the data spec
-        :param MachineVertex machine_vertex:
+        :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:
             the vertex for which data specs are being prepared
         :param int machine_time_step: the duration of a machine time step (ms)
         :param int n_pre_pops: the number of pre-populations
@@ -235,12 +235,15 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
             machine_time_step):
         """
         :param ~data_specification.DataSpecificationGenerator spec:
-        :param MachineVertex machine_vertex:
+        :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:
             the vertex for which data specs are being prepared
         :param list(tuple(ProjectionApplicationEdge,SynapseInformation)) \
                 structural_edges:
-        :param dict(AppEdge, list(MachineEdge) machine_edges_by_app: \
-                map of app edge to associated machine edges
+        :param machine_edges_by_app:
+            map of app edge to associated machine edges
+        :type machine_edges_by_app:
+            dict(~pacman.model.graphs.application.ApplicationEdge,
+            list(~pacman.model.graphs.machine.MachineEdge))
         :param RoutingInfo routing_info:
         :param dict(AbstractSynapseType,float) weight_scales:
         :param SynapticMatrices synaptic_matrices:
@@ -298,7 +301,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         :param ~data_specification.DataSpecificationGenerator spec:
         :param dict(tuple(AbstractPopulationVertex,SynapseInformation),int) \
                 pop_index:
-        :param MachineVertex machine_vertex:
+        :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:
             the vertex for which data specs are being prepared
         """
         # pylint: disable=unsubscriptable-object

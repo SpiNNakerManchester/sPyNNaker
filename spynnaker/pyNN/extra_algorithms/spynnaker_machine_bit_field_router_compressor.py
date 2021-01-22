@@ -16,6 +16,7 @@
 import logging
 from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
@@ -24,19 +25,20 @@ from spinn_front_end_common.abstract_models import (
 from spinn_front_end_common.interface.interface_functions.\
     machine_bit_field_router_compressor import (
         MachineBitFieldPairRouterCompressor,
-        MachineBitFieldUnorderedRouterCompressor)
+        MachineBitFieldOrderedCoveringCompressor)
 from spinn_front_end_common.utilities.system_control_logic import (
     run_system_application)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spynnaker.pyNN.models.abstract_models import (
     AbstractSynapseExpandable, SYNAPSE_EXPANDER_APLX)
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 @add_metaclass(AbstractBase)
 class AbstractMachineBitFieldRouterCompressor(object):
-    """ Adds in regeneration of synaptic matrices to bitfield compression.
+    """ Adds in regeneration of synaptic matrices to bitfield compression to\
+    :py:class:`spinn_front_end_common.interface.interface_functions.MachineBitFieldRouterCompressor`
     """
 
     _RERUN_IOBUF_NAME_PATTERN = "rerun_of_synaptic_expander_on_{}_{}_{}.txt"
@@ -48,25 +50,42 @@ class AbstractMachineBitFieldRouterCompressor(object):
             produce_report, default_report_folder, target_length,
             routing_infos, time_to_try_for_each_iteration, use_timer_cut_off,
             machine_time_step, time_scale_factor, threshold_percentage,
-            executable_targets, read_expander_iobuf,
+            retry_count, executable_targets, read_expander_iobuf,
             compress_as_much_as_possible=False, provenance_data_objects=None):
         """ entrance for routing table compression with bit field
 
-        :param ~.RoutingTables routing_tables: routing tables
-        :param ~.Transceiver transceiver: spinnman instance
-        :param ~.Machine machine: spinnMachine instance
+        :param routing_tables: routing tables
+        :type routing_tables:
+            ~pacman.model.routing_tables.MulticastRoutingTables
+        :param ~spinnman.transceiver.Transceiver transceiver: spinnman instance
+        :param ~spinn_machine.Machine machine: spinnMachine instance
         :param int app_id: app id of the application
         :param str provenance_file_path: file path for prov data
-        :param ~.MachineGraph machine_graph: machine graph
-        :param ~.Placements placements: placements on machine
+        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
+            machine graph
+        :param ~pacman.model.placements.Placements placements:
+            placements on machine
+        :param executable_finder: where are binaries are located
+        :type executable_finder:
+            ~spinn_front_end_common.utilities.utility_objs.ExecutableFinder
+        :param bool write_compressor_iobuf: flag saying if read iobuf
+        :param bool produce_report:
+        :param str default_report_folder:
+        :param int target_length:
+        :param ~pacman.model.routing_info.RoutingInfo routing_infos:
         :param int threshold_percentage:
             the percentage of bitfields to do on chip before its considered
             a success
-        :param executable_finder: where are binaries are located
+        :param retry_count:
+            Number of times that the sorters should set of the compressions
+            again. None for as much as needed
+        :type retry_count: int or None
         :param bool read_algorithm_iobuf: flag saying if read iobuf
         :param bool compress_as_much_as_possible:
-            whether to compress as much as possible
+            flag asking if should compress as much as possible
         :param bool read_expander_iobuf: reads the synaptic expander iobuf.
+        :rtype:
+            list(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)
         """
 
         # build machine compressor
@@ -87,8 +106,10 @@ class AbstractMachineBitFieldRouterCompressor(object):
                 machine_time_step=machine_time_step,
                 time_scale_factor=time_scale_factor,
                 threshold_percentage=threshold_percentage,
+                retry_count=retry_count,
                 compress_as_much_as_possible=compress_as_much_as_possible,
-                executable_targets=executable_targets)
+                executable_targets=executable_targets,
+                provenance_data_objects=provenance_data_objects)
 
         # adjust cores to exclude the ones which did not give sdram.
         expander_chip_cores = self._locate_expander_rerun_targets(
@@ -173,11 +194,30 @@ class AbstractMachineBitFieldRouterCompressor(object):
                 cls._RERUN_IOBUF_NAME_PATTERN)
 
 
-class SpynnakerMachineBitFieldUnorderedRouterCompressor(
+class SpynnakerMachineBitFieldOrderedCoveringCompressor(
         AbstractMachineBitFieldRouterCompressor):
     @overrides(AbstractMachineBitFieldRouterCompressor._compressor_factory)
     def _compressor_factory(self):
-        return MachineBitFieldUnorderedRouterCompressor()
+        return MachineBitFieldOrderedCoveringCompressor()
+
+
+class SpynnakerMachineBitFieldUnorderedRouterCompressor(
+        AbstractMachineBitFieldRouterCompressor):
+    """ DEPRACATED use MachineBitFieldRouterCompressor """
+
+    def __new__(cls, *args, **kwargs):
+        logger.warning(
+            "SpynnakerMachineBitFieldUnorderedRouterCompressor "
+            "algorithm name is deprecated. "
+            "Please use MachineBitFieldOrderedCoveringCompressor instead. "
+            "Remove algorithms from your cfg to use defaults")
+        return super(
+            SpynnakerMachineBitFieldUnorderedRouterCompressor, cls).__new__(
+            cls, *args, **kwargs)
+
+    @overrides(AbstractMachineBitFieldRouterCompressor._compressor_factory)
+    def _compressor_factory(self):
+        return MachineBitFieldOrderedCoveringCompressor()
 
 
 class SpynnakerMachineBitFieldPairRouterCompressor(

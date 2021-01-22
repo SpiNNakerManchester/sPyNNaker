@@ -17,8 +17,10 @@ from spinn_utilities.progress_bar import ProgressBar
 
 
 def finish_connection_holders(application_graph):
-    """ Finishes the connection holders after data has been generated within
-        them, allowing any waiting callbacks to be called
+    """ Finishes the connection holders after data has been generated within\
+        them, allowing any waiting callbacks to be called.
+
+    :param ~pacman.model.graphs.application.ApplicationGraph application_graph:
     """
     edges = application_graph.edges
     progress = ProgressBar(len(edges), "Finalising Retrieved Connections")

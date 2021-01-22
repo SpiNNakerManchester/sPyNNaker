@@ -33,9 +33,6 @@ from .key_space_tracker import KeySpaceTracker
 from .synaptic_matrix_app import SynapticMatrixApp
 
 
-# Amount to scale synapse SDRAM estimate by to make sure the synapses fit
-_SYNAPSE_SDRAM_OVERSCALE = 1.1
-
 # 1 for n_edges
 # 2 for post_vertex_slice.lo_atom, post_vertex_slice.n_atoms
 # 1 for n_synapse_types
@@ -314,7 +311,8 @@ class SynapticMatrices(object):
         """ Convert a list of machine edges to a dict of
             application edge -> list of machine edges, and a key tracker
 
-        :param list(MachineEdge) in_machine_edges: The incoming machine edges
+        :param list(~pacman.model.graphs.machine.MachineEdge) in_machine_edges:
+            The incoming machine edges
         :param RoutingInfo routing_info: Routing information for all edges
         :rtype: tuple(dict, KeySpaceTracker)
         """
@@ -546,7 +544,7 @@ class SynapticMatrices(object):
 
         :param ~spinnman.transceiver.Transceiver transceiver:
             Used to read the data from the machine
-        :param ~pacman.model.placements.Placements placements:
+        :param ~pacman.model.placements.Placement placement:
             Where the vertices are on the machine
         :param ProjectionApplicationEdge app_edge:
             The application edge of the projection
@@ -592,7 +590,7 @@ class SynapticMatrices(object):
             The application edge of the projection
         :param SynapseInformation synapse_info:
             The synapse information of the projection
-        :param MachineEdge machine_edge:
+        :param ~pacman.model.graphs.machine.MachineEdge machine_edge:
             The machine edge to get the index of
         """
         matrix = self.__app_matrix(app_edge, synapse_info)

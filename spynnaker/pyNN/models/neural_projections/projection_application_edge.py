@@ -15,13 +15,14 @@
 
 import logging
 
+from spinn_utilities.log import FormatAdapter
 from spinn_front_end_common.interface.provenance import \
     AbstractProvidesLocalProvenanceData
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationEdge
 from pacman.model.partitioner_interfaces import AbstractSlicesConnect
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 _DynamicsStructural = None
 
 
@@ -125,7 +126,7 @@ class ProjectionApplicationEdge(
             The vertex at the start of the machine edge
         :param PopulationMachineVertex post_vertex:
             The vertex at the end of the machine edge
-        :rtype: MachineEdge or None
+        :rtype: ~pacman.model.graphs.machine.MachineEdge or None
         """
         return self.__machine_edges_by_slices.get(
             (pre_vertex.vertex_slice, post_vertex.vertex_slice), None)

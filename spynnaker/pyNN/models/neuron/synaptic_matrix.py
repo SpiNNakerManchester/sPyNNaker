@@ -81,13 +81,12 @@ class SynapticMatrix(object):
                  delay_routing_info, weight_scales, all_syn_block_sz,
                  all_single_syn_sz):
         """
-
         :param SynapseIORowBased synapse_io: The reader and writer of synapses
         :param MasterPopTableAsBinarySearch poptable:
             The master population table
         :param SynapseInformation synapse_info:
             The projection synapse information
-        :param MachineEdge machine_edge:
+        :param ~pacman.model.graphs.machine.MachineEdge machine_edge:
             The projection machine edge
         :param ProjectionApplicationEdge app_edge:
             The projection application edge

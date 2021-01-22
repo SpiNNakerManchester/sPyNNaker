@@ -13,11 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import logging
-
+from spinn_utilities.log import FormatAdapter
+from spinn_utilities.progress_bar import ProgressBar
 from spinn_front_end_common.utilities.system_control_logic import \
     run_system_application
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
-from spinn_utilities.progress_bar import ProgressBar
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
 from spynnaker.pyNN.models.abstract_models import (
@@ -25,7 +25,7 @@ from spynnaker.pyNN.models.abstract_models import (
 from spynnaker.pyNN.models.utility_models.delays import (
     DelayExtensionMachineVertex, DELAY_EXPANDER_APLX)
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 def synapse_expander(
@@ -43,7 +43,7 @@ def synapse_expander(
     :param str provenance_file_path: Where provenance data should be written.
     :param executable_finder:
         How to find the synapse expander binaries.
-    :param extract_iobuf: bool flag for extracting iobuf
+    :param bool extract_iobuf: flag for extracting iobuf
     :type executable_finder:
         ~spinn_utilities.executable_finder.ExecutableFinder
     """

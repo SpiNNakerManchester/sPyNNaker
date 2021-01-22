@@ -50,6 +50,12 @@ class RedundantPacketCountReport(object):
     )
 
     def __call__(self, provenance_items, report_default_directory):
+        """
+        :param provenance_items:
+        :type provenance_items:
+            list(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)
+        :param str report_default_directory:
+        """
         file_name = os.path.join(report_default_directory, self._FILE_NAME)
 
         try:
