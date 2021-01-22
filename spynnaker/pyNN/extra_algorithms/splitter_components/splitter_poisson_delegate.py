@@ -21,11 +21,13 @@ from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 from spynnaker.pyNN.models.neural_projections.connectors import (
     OneToOneConnector)
+from spynnaker.pyNN.extra_algorithms.splitter_components import (
+    SpynnakerSplitterSliceLegacy)
 from .abstract_supports_one_to_one_sdram_input import (
     AbstractSupportsOneToOneSDRAMInput)
 
 
-class SplitterPoissonDelegate(SplitterSliceLegacy):
+class SplitterPoissonDelegate(SpynnakerSplitterSliceLegacy):
     """ A splitter for Poisson sources that will ignore sources that are
         one-to-one connected to a single Population
     """

@@ -16,6 +16,7 @@
 from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
 from .spynnaker_splitter_partitioner import SpynnakerSplitterPartitioner
 from .spynnaker_splitter_selector import SpynnakerSplitterSelector
+from .spynnaker_splitter_slice_legacy import SpynnakerSplitterSliceLegacy
 from .splitter_abstract_pop_vertex_slice import (
     SplitterAbstractPopulationVertexSlice)
 from .splitter_delay_vertex_slice import SplitterDelayVertexSlice
@@ -28,6 +29,6 @@ from .abstract_supports_one_to_one_sdram_input import (
 __all__ = [
     'AbstractSpynnakerSplitterDelay', 'SplitterAbstractPopulationVertexSlice',
     'SplitterDelayVertexSlice', 'SpynnakerSplitterPartitioner',
-    'SpynnakerSplitterSelector',
+    'SpynnakerSplitterSelector', 'SpynnakerSplitterSliceLegacy',
     'SplitterAbstractPopulationVertexNeuronsSynapses',
     'SplitterPoissonDelegate', 'AbstractSupportsOneToOneSDRAMInput']
