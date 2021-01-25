@@ -100,10 +100,6 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
         """
         return self.__tau_ca2
 
-    @tau_ca2.setter
-    def tau_ca2(self, tau_ca2):
-        self.__tau_ca2 = tau_ca2
-
     @property
     def i_ca2(self):
         r""" Settable model parameter: :math:`I_{\mathrm{Ca}^{+2}}`
@@ -112,10 +108,6 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
         """
         return self.__i_ca2
 
-    @i_ca2.setter
-    def i_ca2(self, i_ca2):
-        self.__i_ca2 = i_ca2
-
     @property
     def i_alpha(self):
         r""" Settable model parameter: :math:`I_{\alpha}`
@@ -123,7 +115,3 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
         :rtype: float
         """
         return self.__i_alpha
-
-    @i_alpha.setter
-    def i_alpha(self, i_alpha):
-        self.__i_alpha = i_alpha

@@ -151,46 +151,22 @@ class SynapseTypeDualExponential(AbstractSynapseType):
     def tau_syn_E(self):
         return self.__tau_syn_E
 
-    @tau_syn_E.setter
-    def tau_syn_E(self, tau_syn_E):
-        self.__tau_syn_E = tau_syn_E
-
     @property
     def tau_syn_E2(self):
         return self.__tau_syn_E2
-
-    @tau_syn_E2.setter
-    def tau_syn_E2(self, tau_syn_E2):
-        self.__tau_syn_E2 = tau_syn_E2
 
     @property
     def tau_syn_I(self):
         return self.__tau_syn_I
 
-    @tau_syn_I.setter
-    def tau_syn_I(self, tau_syn_I):
-        self.__tau_syn_I = tau_syn_I
-
     @property
     def isyn_exc(self):
         return self.__isyn_exc
-
-    @isyn_exc.setter
-    def isyn_exc(self, isyn_exc):
-        self.__isyn_exc = isyn_exc
 
     @property
     def isyn_inh(self):
         return self.__isyn_inh
 
-    @isyn_inh.setter
-    def isyn_inh(self, isyn_inh):
-        self.__isyn_inh = isyn_inh
-
     @property
     def isyn_exc2(self):
         return self.__isyn_exc2
-
-    @isyn_exc2.setter
-    def isyn_exc2(self, isyn_exc2):
-        self.__isyn_exc2 = isyn_exc2

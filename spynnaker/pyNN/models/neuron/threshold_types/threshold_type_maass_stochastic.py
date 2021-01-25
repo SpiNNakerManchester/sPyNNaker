@@ -89,8 +89,7 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
 
     @overrides(AbstractThresholdType.update_values)
     def update_values(self, values, parameters, state_variables):
-        # Read the data
-        (_du_th, _tau_th, _v_thresh, _time_step_ms_div_10) = values
+        pass
 
     @property
     def v_thresh(self):
@@ -99,10 +98,6 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
         """
         return self.__v_thresh
 
-    @v_thresh.setter
-    def v_thresh(self, v_thresh):
-        self.__v_thresh = v_thresh
-
     @property
     def du_th(self):
         """
@@ -110,17 +105,9 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
         """
         return self.__du_th
 
-    @du_th.setter
-    def du_th(self, du_th):
-        self.__du_th = du_th
-
     @property
     def tau_th(self):
         r"""
         :math:`\tau_{thresh}`
         """
         return self.__tau_th
-
-    @tau_th.setter
-    def tau_th(self, tau_th):
-        self.__tau_th = tau_th

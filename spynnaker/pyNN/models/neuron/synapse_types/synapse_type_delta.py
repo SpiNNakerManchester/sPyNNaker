@@ -100,14 +100,6 @@ class SynapseTypeDelta(AbstractSynapseType):
     def isyn_exc(self):
         return self.__isyn_exc
 
-    @isyn_exc.setter
-    def isyn_exc(self, isyn_exc):
-        self.__isyn_exc = isyn_exc
-
     @property
     def isyn_inh(self):
         return self.__isyn_inh
-
-    @isyn_inh.setter
-    def isyn_inh(self, isyn_inh):
-        self.__isyn_inh = isyn_inh

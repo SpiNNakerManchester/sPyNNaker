@@ -83,17 +83,9 @@ class InputTypeCurrentSEMD(AbstractInputType):
     def multiplicator(self):
         return self.__multiplicator
 
-    @multiplicator.setter
-    def multiplicator(self, multiplicator):
-        self.__multiplicator = multiplicator
-
     @property
     def inh_input_previous(self):
         return self.__inh_input_previous
-
-    @inh_input_previous.setter
-    def inh_input_previous(self, inh_input_previous):
-        self.__inh_input_previous = inh_input_previous
 
     def get_global_weight_scale(self):
         return 1.0

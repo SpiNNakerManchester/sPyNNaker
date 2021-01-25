@@ -64,9 +64,7 @@ class ThresholdTypeStatic(AbstractThresholdType):
 
     @overrides(AbstractThresholdType.update_values)
     def update_values(self, values, parameters, state_variables):
-
-        # Read the data
-        (_v_thresh,) = values
+        pass
 
     @property
     def v_thresh(self):
@@ -74,7 +72,3 @@ class ThresholdTypeStatic(AbstractThresholdType):
         :math:`V_{thresh}`
         """
         return self.__v_thresh
-
-    @v_thresh.setter
-    def v_thresh(self, v_thresh):
-        self.__v_thresh = v_thresh

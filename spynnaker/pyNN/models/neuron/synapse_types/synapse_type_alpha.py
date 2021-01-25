@@ -170,22 +170,10 @@ class SynapseTypeAlpha(AbstractSynapseType):
     def tau_syn_E(self):
         return self.__tau_syn_E
 
-    @tau_syn_E.setter
-    def tau_syn_E(self, tau_syn_E):
-        self.__tau_syn_E = tau_syn_E
-
     @property
     def inh_response(self):
         return self.__inh_response
 
-    @inh_response.setter
-    def inh_response(self, inh_response):
-        self.__inh_response = inh_response
-
     @property
     def tau_syn_I(self):
         return self.__tau_syn_I
-
-    @tau_syn_I.setter
-    def tau_syn_I(self, tau_syn_I):
-        self.__tau_syn_I = tau_syn_I
