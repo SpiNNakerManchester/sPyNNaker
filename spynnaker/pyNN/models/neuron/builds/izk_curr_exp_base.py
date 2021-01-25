@@ -26,17 +26,28 @@ _IZK_THRESHOLD = 30.0
 class IzkCurrExpBase(AbstractPyNNNeuronModelStandard):
     """ Izhikevich neuron model with current inputs.
 
-    :param float a: :math:`a`
-    :param float b: :math:`b`
-    :param float c: :math:`c`
-    :param float d: :math:`d`
-    :param float i_offset: :math:`I_{offset}`
-    :param float u: :math:`u_{init} = \\delta V_{init}`
-    :param float v: :math:`v_{init} = V_{init}`
-    :param float tau_syn_E: :math:`\\tau^{syn}_e`
-    :param float tau_syn_I: :math:`\\tau^{syn}_i`
-    :param float isyn_exc: :math:`I^{syn}_e`
-    :param float isyn_inh: :math:`I^{syn}_i`
+    :param a: :math:`a`
+    :type a: Float, iterable of Floats, RandomDistribution or function
+    :param b: :math:`b`
+    :type b: Float, iterable of Floats, RandomDistribution or function
+    :param c: :math:`c`
+    :type c: Float, iterable of Floats, RandomDistribution or function
+    :param d: :math:`d`
+    :type d: Float, iterable of Floats, RandomDistribution or function
+    :param i_offset: :math:`I_{offset}`
+    :type i_offset: Float, iterable of Floats, RandomDistribution or function
+    :param u: :math:`u_{init} = \\delta V_{init}`
+    :type u: Float, iterable of Floats, RandomDistribution or function
+    :param v: :math:`v_{init} = V_{init}`
+    :type v: Float, iterable of Floats, RandomDistribution or function
+    :param tau_syn_E: :math:`\\tau^{syn}_e`
+    :type tau_syn_E: Float, iterable of Floats, RandomDistribution or function
+    :param tau_syn_I: :math:`\\tau^{syn}_i`
+    :type tau_syn_I: Float, iterable of Floats, RandomDistribution or function
+    :param isyn_exc: :math:`I^{syn}_e`
+    :type isyn_exc: Float, iterable of Floats, RandomDistribution or function
+    :param isyn_inh: :math:`I^{syn}_i`
+    :type isyn_inh: Float, iterable of Floats, RandomDistribution or function
     """
 
     # noinspection PyPep8Naming

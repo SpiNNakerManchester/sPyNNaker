@@ -26,18 +26,30 @@ class IFCurrExpBase(AbstractPyNNNeuronModelStandard):
     """ Leaky integrate and fire neuron with an exponentially decaying \
         current input.
 
-    :param float tau_m: :math:`\\tau_m`
-    :param float cm: :math:`C_m`
-    :param float v_rest: :math:`V_{rest}`
-    :param float v_reset: :math:`V_{reset}`
-    :param float v_thresh: :math:`V_{thresh}`
-    :param float tau_syn_E: :math:`\\tau^{syn}_e`
-    :param float tau_syn_I: :math:`\\tau^{syn}_i`
-    :param float tau_refrac: :math:`\\tau_{refrac}`
-    :param float i_offset: :math:`I_{offset}`
-    :param float v: :math:`V_{init}`
-    :param float isyn_exc: :math:`I^{syn}_e`
-    :param float isyn_inh: :math:`I^{syn}_i`
+    :param tau_m: :math:`\\tau_m`
+    :type tau_m: Float, iterable of Floats, RandomDistribution or function
+    :param cm: :math:`C_m`
+    :type cm: Float, iterable of Floats, RandomDistribution or function
+    :param v_rest: :math:`V_{rest}`
+    :type v_rest: Float, iterable of Floats, RandomDistribution or function
+    :param v_reset: :math:`V_{reset}`
+    :type v_reset: Float, iterable of Floats, RandomDistribution or function
+    :param v_thresh: :math:`V_{thresh}`
+    :type v_thresh: Float, iterable of Floats, RandomDistribution or function
+    :param tau_syn_E: :math:`\\tau^{syn}_e`
+    :type tau_syn_E: Float, iterable of Floats, RandomDistribution or function
+    :param tau_syn_I: :math:`\\tau^{syn}_i`
+    :type tau_syn_I: Float, iterable of Floats, RandomDistribution or function
+    :param tau_refrac: :math:`\\tau_{refrac}`
+    :type tau_refrac: Float, iterable of Floats, RandomDistribution or function
+    :param i_offset: :math:`I_{offset}`
+    :type i_offset: Float, iterable of Floats, RandomDistribution or function
+    :param v: :math:`V_{init}`
+    :type v: Float, iterable of Floats, RandomDistribution or function
+    :param isyn_exc: :math:`I^{syn}_e`
+    :type isyn_exc: Float, iterable of Floats, RandomDistribution or function
+    :param isyn_inh: :math:`I^{syn}_i`
+    :type isyn_inh: Float, iterable of Floats, RandomDistribution or function
     """
 
     @default_initial_values({"v", "isyn_exc", "isyn_inh"})
