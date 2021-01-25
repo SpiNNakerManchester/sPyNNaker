@@ -37,9 +37,15 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
 
     def __init__(self,  tau_ca2, i_ca2, i_alpha):
         r"""
-        :param float tau_ca2: :math:`\tau_{\mathrm{Ca}^{+2}}`
-        :param float i_ca2: :math:`I_{\mathrm{Ca}^{+2}}`
-        :param float i_alpha: :math:`I_{\alpha}`
+        :param tau_ca2: :math:`\tau_{\mathrm{Ca}^{+2}}`
+        :type tau_ca2: Float, iterable of Floats, RandomDistribution or \
+                       function
+        :param i_ca2: :math:`I_{\mathrm{Ca}^{+2}}`
+        :type i_ca2: Float, iterable of Floats, RandomDistribution or \
+                     function
+        :param i_alpha: :math:`I_{\alpha}`
+        :type i_alpha: Float, iterable of Floats, RandomDistribution or \
+                       function
         """
         super(AdditionalInputCa2Adaptive, self).__init__([
             DataType.S1615,   # e^(-ts / tau_ca2)

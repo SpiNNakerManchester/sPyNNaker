@@ -59,15 +59,33 @@ class SynapseTypeSEMD(AbstractSynapseType):
             self, tau_syn_E, tau_syn_E2, tau_syn_I, isyn_exc, isyn_exc2,
             isyn_inh, multiplicator, exc2_old, scaling_factor):
         r"""
-        :param float tau_syn_E: :math:`\tau^{syn}_{e_1}`
-        :param float tau_syn_E2: :math:`\tau^{syn}_{e_2}`
-        :param float tau_syn_I: :math:`\tau^{syn}_i`
-        :param float isyn_exc: :math:`I^{syn}_{e_1}`
-        :param float isyn_exc2: :math:`I^{syn}_{e_2}`
-        :param float isyn_inh: :math:`I^{syn}_i`
+        :param tau_syn_E: :math:`\tau^{syn}_{e_1}`
+        :type tau_syn_E: Float, iterable of Floats, RandomDistribution or \
+                         function
+        :param tau_syn_E2: :math:`\tau^{syn}_{e_2}`
+        :type tau_syn_E2: Float, iterable of Floats, RandomDistribution or \
+                          function
+        :param tau_syn_I: :math:`\tau^{syn}_i`
+        :type tau_syn_I: Float, iterable of Floats, RandomDistribution or \
+                        function
+        :param isyn_exc: :math:`I^{syn}_{e_1}`
+        :type isyn_exc: Float, iterable of Floats, RandomDistribution or \
+                        function
+        :param isyn_exc2: :math:`I^{syn}_{e_2}`
+        :type isyn_exc2: Float, iterable of Floats, RandomDistribution or \
+                         function
+        :param isyn_inh: :math:`I^{syn}_i`
+        :type isyn_inh: Float, iterable of Floats, RandomDistribution or \
+                        function
         :param float multiplicator:
-        :param float exc2_old:
-        :param float scaling_factor:
+        :type multiplicator: Float, iterable of Floats, RandomDistribution or \
+                             function
+        :param exc2_old:
+        :type exc2_old: Float, iterable of Floats, RandomDistribution or \
+                        function
+        :param scaling_factor:
+        :type scaling_factor: Float, iterable of Floats, \
+                              RandomDistribution or function
         """
         super(SynapseTypeSEMD, self).__init__(
             [DataType.U032,    # decay_E

@@ -53,12 +53,24 @@ class SynapseTypeAlpha(AbstractSynapseType):
     def __init__(self, exc_response, exc_exp_response,
                  tau_syn_E, inh_response, inh_exp_response, tau_syn_I):
         r"""
-        :param float exc_response: :math:`response^\mathrm{linear}_e`
-        :param float exc_exp_response: :math:`response^\mathrm{exponential}_e`
-        :param float tau_syn_E: :math:`\tau^{syn}_e`
-        :param float inh_response: :math:`response^\mathrm{linear}_i`
-        :param float inh_exp_response: :math:`response^\mathrm{exponential}_i`
-        :param float tau_syn_I: :math:`\tau^{syn}_i`
+        :param exc_response: :math:`response^\mathrm{linear}_e`
+        :type exc_response: Float, iterable of Floats, RandomDistribution or \
+                            function
+        :param exc_exp_response: :math:`response^\mathrm{exponential}_e`
+        :type exc_exp_response: Float, iterable of Floats, \
+                                RandomDistribution or function
+        :param tau_syn_E: :math:`\tau^{syn}_e`
+        :type tau_syn_E: Float, iterable of Floats, RandomDistribution or \
+                         function
+        :param inh_response: :math:`response^\mathrm{linear}_i`
+        :type inh_response: Float, iterable of Floats, RandomDistribution or \
+                            function
+        :param inh_exp_response: :math:`response^\mathrm{exponential}_i`
+        :type inh_exp_response: Float, iterable of Floats, \
+                                RandomDistribution or function
+        :param tau_syn_I: :math:`\tau^{syn}_i`
+        :type tau_syn_I: Float, iterable of Floats, RandomDistribution or \
+                         function
         """
         super(SynapseTypeAlpha, self).__init__([
             DataType.S1615,   # exc_response
