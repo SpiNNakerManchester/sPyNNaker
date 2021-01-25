@@ -190,7 +190,7 @@ endif
 
 SYNGEN_ENABLED = 1
 ifndef SYNAPTOGENESIS_DYNAMICS
-    SYNAPTOGENESIS_DYNAMICS := neuron/structural_plasticity/synaptogenesis_dynamics_static_impl.c
+    SYNAPTOGENESIS_DYNAMICS := synapse/structural_plasticity/synaptogenesis_dynamics_static_impl.c
     SYNAPTOGENESIS_DYNAMICS_C := $(MODIFIED_DIR)$(SYNAPTOGENESIS_DYNAMICS)
     SYNGEN_ENABLED = 0
 else

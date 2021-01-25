@@ -23,7 +23,7 @@ from pacman.model.graphs.application.application_edge \
 from spinn_utilities.overrides import overrides
 
 
-DEFAULT_MAX_ATOMS_PER_SYN_CORE = 64
+DEFAULT_MAX_ATOMS_PER_SYN_CORE = 8
 SYN_CORES_PER_NEURON_CORE = 1
 DEFAULT_MAX_ATOMS_PER_NEURON_CORE = DEFAULT_MAX_ATOMS_PER_SYN_CORE * SYN_CORES_PER_NEURON_CORE
 
@@ -84,29 +84,13 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
 
             for index in range(self._n_syn_types):
 
-                if self._n_syn_types > 1 and index == 0:
-
-                    # Ensures to have at least two synaptic excitatory vertices, MAYBE IT CAN BE REMOVED NOW THAT IT IS PARAMETRISED
-                    partition_vertices = self._n_incoming_partitions if self._n_incoming_partitions > 1 else 2
-
-                    for j in range(partition_vertices):
-
-                        vertex = SynapticManager(1, 0, self._neurons_partition[i], offset, syn_constraints,
-                                                label + "_p" + str(i) + "_e" + str(j) + "_syn_vertex_" + str(index),
-                                                max_atoms_neuron_core, neuron_model.get_global_weight_scale(),
-                                                ring_buffer_sigma, spikes_per_second, incoming_spike_buffer_size,
-                                                self._n_syn_types)
-
-                        vertex.connected_app_vertices = [self._neuron_vertices[i]]
-                        syn_vertices.append(vertex)
-
-                else:
+                for j in range(self._n_incoming_partitions[index]):
 
                     vertex = SynapticManager(1, index, self._neurons_partition[i], offset, syn_constraints,
-                                             label + "_p" + str(i) + "_i1" + "_syn_vertex_" + str(index),
-                                             max_atoms_neuron_core, neuron_model.get_global_weight_scale(),
-                                             ring_buffer_sigma, spikes_per_second, incoming_spike_buffer_size,
-                                             self._n_syn_types)
+                                            label + "_p" + str(i) + "_v" + str(j) + "_syn_type_" + str(index),
+                                            max_atoms_neuron_core, neuron_model.get_global_weight_scale(),
+                                            ring_buffer_sigma, spikes_per_second, incoming_spike_buffer_size,
+                                            self._n_syn_types)
 
                     vertex.connected_app_vertices = [self._neuron_vertices[i]]
                     syn_vertices.append(vertex)
@@ -173,6 +157,10 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
     @property
     def n_syn_types(self):
         return self._n_syn_types
+
+    @property
+    def n_incoming_partitions(self):
+        return self._n_incoming_partitions
 
     def add_internal_edges_and_vertices(self, spinnaker_control):
 
@@ -259,7 +247,7 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
 
             offset += self._neurons_partition[i]
 
-    # SHOULD BE THE SAME FOR BOTH THE VERTICES!!!!
+    # SHOULD BE THE SAME FOR ALL THE VERTICES!!!!
     def get_initial_value(self, variable, selector=None):
         return self._neuron_vertices[0].get_initial_value(variable, selector)
 

@@ -33,7 +33,7 @@
  *
  */
 
-#include <common/in_spikes.h>
+#include <common/in_rates.h>
 #include "neuron/regions.h"
 #include "synapses.h"
 #include "spike_processing.h"
@@ -65,19 +65,7 @@ struct synapse_provenance {
     uint32_t max_flushed_spikes;
     uint32_t max_time;
     uint32_t cb_calls;
-}
-
-typedef enum extra_provenance_data_region_entries{
-    NUMBER_OF_PRE_SYNAPTIC_EVENT_COUNT = 0,
-    SYNAPTIC_WEIGHT_SATURATION_COUNT = 1,
-    INPUT_BUFFER_OVERFLOW_COUNT = 2,
-    CURRENT_TIMER_TICK = 3,
-    PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT = 4,
-    FLUSHED_SPIKES = 5,
-    MAX_FLUSHED_SPIKES = 6,
-    MAX_TIME = 7,
-    CB_CALLS = 8
-} extra_provenance_data_region_entries;
+};
 
 //! values for the priority for each callback
 typedef enum callback_priorities{
@@ -92,8 +80,6 @@ typedef enum callback_priorities{
 //! the current timer tick value
 //! the timer tick callback returning the same value.
 uint32_t time;
-
-volatile uint8_t end_of_timestep;
 
 //! The number of timer ticks to run for before being expected to exit
 static uint32_t simulation_ticks = 0;
@@ -115,12 +101,6 @@ static uint32_t spikes_remaining = 0;
 uint32_t spikes_remaining_this_tick = 0;
 static uint32_t max_time = UINT32_MAX;
 static uint32_t cb_calls = 0;
-
-
-//uint32_t measurement_in[1000];
-//uint32_t measurement_out[1000];
-//uint32_t measurement_index = 0;
-
 
 //! \brief Initialises the recording parts of the model
 //! \param[in] recording_address: the address in SDRAM where to store
@@ -156,30 +136,22 @@ void write_contributions(uint unused1, uint unused2) {
         use(unused1);
         use(unused2);
 
+        io_printf(IO_BUF, "write contr\n");
+
         uint32_t state = spin1_int_disable();
 
-        spin1_dma_flush();
-
         cb_calls++;
-
-        spikes_remaining_this_tick = spike_processing_flush_in_buffer();
-        spikes_remaining += spikes_remaining_this_tick;
-
-//        volatile uint32_t temp = tc[T1_COUNT];
-//        io_printf(IO_BUF, "w_c s: %u, %u\n", temp, tc[T2_COUNT]);
 
         //Start DMA Writing procedure for the contribution of this timestep
         synapses_do_timestep_update(time);
 
-//        spikes_remaining += spike_processing_flush_in_buffer();
-
+        spikes_remaining_this_tick = spike_processing_flush_in_buffer();
+        spikes_remaining += spikes_remaining_this_tick;
 
         if(spikes_remaining_this_tick > max_spikes_remaining) {
             max_spikes_remaining = spikes_remaining_this_tick;
             max_time = time;
         }
-
-        end_of_timestep = true;
 
         spin1_mode_restore(state);
 }
@@ -227,14 +199,17 @@ static bool initialise(uint32_t *timer_period) {
     address_t indirect_synapses_address = data_specification_get_region(
         SYNAPTIC_MATRIX_REGION, ds_regions);
 
-    address_t direct_synapses_address;
+    address_t dtcm_synaptic_matrix;
+    REAL starting_rate = 0;
+
     if (!synapses_initialise(
             data_specification_get_region(SYNAPSE_PARAMS_REGION, ds_regions),
             data_specification_get_region(DIRECT_MATRIX_REGION, ds_regions),
             &n_neurons, &n_synapse_types,
             &incoming_spike_buffer_size,
             &ring_buffer_to_input_buffer_left_shifts,
-            &direct_synapses_address)) {
+            &dtcm_synaptic_matrix, starting_rate,
+            indirect_synapses_address)) {
         return false;
     }
 
@@ -242,7 +217,7 @@ static bool initialise(uint32_t *timer_period) {
     uint32_t row_max_n_words;
     if (!population_table_initialise(
             data_specification_get_region(POPULATION_TABLE_REGION, ds_regions),
-            indirect_synapses_address, direct_synapses_address,
+            indirect_synapses_address, dtcm_synaptic_matrix,
             &row_max_n_words)) {
         return false;
     }
@@ -278,15 +253,9 @@ static bool initialise(uint32_t *timer_period) {
     // Register timer2 for periodic events(used to write contributions in SDRAM)
     tc[T2_INT_CLR] = 1; // clear any interrupts on T2
     //event_register_timer(SLOT_9);
-    event_register_timer(SLOT_1);
+    event_register_timer(SLOT_9);
 
 //    io_printf(IO_BUF, "timer period: %u\n", *timer_period);
-
-    // Clear all the DMAs when the simulation starts
-    spin1_dma_flush();
-    dma[DMA_CTRL] = 0x08;
-
-    end_of_timestep = false;
 
     return true;
 }
@@ -305,10 +274,8 @@ void timer_callback(uint timer_count, uint unused) {
 //	io_printf(IO_BUF, "t_c s: %u, %u\n", tc[T1_COUNT], tc[T2_COUNT]);
 //	io_printf(IO_BUF, "t_c s: %u\n", timer_period-40);
 
-    // Disable DMA_DONE interrupts for the simulation
-    vic[VIC_DISABLE] = (1 << DMA_DONE_INT);
-
-    end_of_timestep = false;
+    use(timer_count);
+    use(unused);
 
 //    if(!timer_schedule_proc(write_contributions, 0, 0, timer_period-40)) {
 //
@@ -316,20 +283,22 @@ void timer_callback(uint timer_count, uint unused) {
 //    }
 
 //    Sould this be done in a safer way?
+//    THESE TIMES ARE FOR 0.1MS TIMESTEPS
     uint32_t state = spin1_int_disable();
     uint32_t wc_reg = tc[T1_COUNT] * 0.005 - 10;
 
     //Schedule event 20 microseconds before the end of the timer period
     if(!timer_schedule_proc(write_contributions, 0, 0, wc_reg)) {
 
-    	// rt_error(RTE_API);
+    	rt_error(RTE_API);
     }
-//    io_printf(IO_BUF, "wc_reg: %u", wc_reg);
     spin1_mode_restore(state);
 
     profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
 
     time++;
+
+    io_printf(IO_BUF, "time %d, wc_reg: %u", time, wc_reg);
 
     log_debug("Timer tick %u \n", time);
 
@@ -346,21 +315,10 @@ void timer_callback(uint timer_count, uint unused) {
 
     if(infinite_run != TRUE && time >= simulation_ticks) {
 
-        // Enable DMA_DONE interrupt when the simulation ends
-        vic[VIC_ENABLE] = (1 << DMA_DONE_INT);
-
         // Enter pause and resume state to avoid another tick
         simulation_handle_pause_resume(resume_callback);
 
         log_debug("Completed a run");
-
-//                for (int i=0; i< 1000; i++){
-//                	io_printf(IO_BUF, "In: %u  Out: %u  Diff: %u\n",
-//                			measurement_in[i],
-//        					measurement_out[i],
-//        					(measurement_in[i] - measurement_out[i]));
-//                }
-//                io_printf(IO_BUF, " Job Done ");
 
         profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 
@@ -388,12 +346,6 @@ void timer_callback(uint timer_count, uint unused) {
     }
 
     profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
-
-    use(timer_count);
-    use(unused);
-
-    // Clear DMA controller from T2 DMA write
-    dma[DMA_CTRL] = 0x08;
 }
 
 //! \brief The entry point for this model.

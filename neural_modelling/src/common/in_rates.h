@@ -18,8 +18,8 @@
 #ifndef _IN_SPIKES_H_
 #define _IN_SPIKES_H_
 
-#include "neuron-typedefs.h"
-#include "rate_buffer.h"
+#include "common/neuron-typedefs.h"
+#include "common/rate_buffer.h"
 
 static rate_buffer buffer;
 
@@ -81,6 +81,14 @@ static inline uint32_t in_rates_real_size(void) {
 
 static inline rate_t in_rates_value_at_index(uint32_t index) {
     return rate_buffer_value_at_index(buffer, index);
+}
+
+static inline uint32_t in_rates_flush_buffer() {
+
+	uint32_t num_spikes_left = rate_buffer_size(buffer);
+	rate_buffer_clear(buffer);
+
+	return num_spikes_left;
 }
 
 #endif // _IN_SPIKES_H_

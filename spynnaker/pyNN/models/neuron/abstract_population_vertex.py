@@ -331,7 +331,8 @@ class AbstractPopulationVertex(
 
         return (
             self.BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
-            self.__neuron_impl.get_n_synapse_types() * 4 +
+            # 2 times for the in_partition array
+            2 * (self.__neuron_impl.get_n_synapse_types() * 4) +
             self.__neuron_recorder.get_sdram_usage_in_bytes(vertex_slice) +
             self.__neuron_impl.get_sdram_usage_in_bytes(vertex_slice.n_atoms) +
             base)
@@ -573,20 +574,21 @@ class AbstractPopulationVertex(
         # Write the SDRAM tag for the contribution area
         spec.write_value(data=index)
 
-        # Write the number of incoming partitions to allocate a sufficiently big contribution area
-        # for all the synapse cores.
-        spec.write_value(data=(self._incoming_partitions))
-
         # Write the number of variables that can be recorded
         spec.write_value(
             data=len(self.__neuron_impl.get_recordable_variables()))
 
+        # Write the number of incoming partitions per synapse type 
+        # to allocate a sufficiently big contribution area for all
+        # the synapse cores.
+        spec.write_array(self._incoming_partitions)
+
         # Write Synaptic contribution left shift
         #AGAIN POSSIBLE DELETE
-        ring_buffer_shifts = self._get_ring_buffer_shifts(
-            application_graph, machine_time_step)
+        # ring_buffer_shifts = self._get_ring_buffer_shifts(
+        #     application_graph, machine_time_step)
 
-        spec.write_array(ring_buffer_shifts)
+        # spec.write_array(ring_buffer_shifts)
 
         # Write the recording data
         recording_data = self.__neuron_recorder.get_data(vertex_slice)

@@ -19,9 +19,9 @@
 #define _SYNAPSES_H_
 
 #include <common/neuron-typedefs.h>
-#include <neuron/structural_plasticity/sp_structs.h>
+#include <synapse/structural_plasticity/sp_structs.h>
 #include "synapse_row.h"
-#include "neuron.h"
+#include "neuron/neuron.h"
 
 // Get the index of the ring buffer for a given timestep, synapse type and
 // neuron index
@@ -66,8 +66,9 @@ static inline void synapses_print_weight(
 }
 
 bool synapses_initialise(
-        address_t synapse_params_address, address_t direct_matrix_address,
-        uint32_t n_neurons, uint32_t n_synapse_types,
+        address_t address, address_t direct_matrix_address,
+        uint32_t *n_neurons_value, uint32_t *n_synapse_types_value,
+        uint32_t *incoming_rate_buffer_size,
         uint32_t **ring_buffer_to_input_buffer_left_shifts,
         address_t *dtcm_synaptic_matrix, REAL starting_rate,
         address_t synaptic_matrix_address);
@@ -127,5 +128,9 @@ bool remove_static_neuron_at_offset(uint32_t offset, address_t row);
 bool add_static_neuron_with_id(
         uint32_t id, address_t row, uint32_t weight, uint32_t delay,
         uint32_t type);
+
+void synapses_set_contribution_region();
+
+void synapses_flush_ring_buffer(uint32_t timestep);
 
 #endif // _SYNAPSES_H_

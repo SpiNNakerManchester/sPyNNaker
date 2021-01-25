@@ -21,7 +21,7 @@
 #include "neuron_impl.h"
 
 // Includes for model parts used in this implementation
-#include <neuron/synapse_types/synapse_types_pyramidal_impl.h>
+#include <synapse/synapse_types/synapse_types_pyramidal_impl.h>
 #include <neuron/models/neuron_model_pyramidal_impl.h>
 #include <neuron/input_types/input_type_pyramidal.h>
 #include <neuron/additional_inputs/additional_input_none_impl.h>

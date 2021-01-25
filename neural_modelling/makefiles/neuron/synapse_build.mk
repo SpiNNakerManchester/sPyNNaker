@@ -139,7 +139,8 @@ SYNAPTOGENESIS_DYNAMICS_O := $(BUILD_DIR)$(SYNAPTOGENESIS_DYNAMICS:%.c=%.o)
 OTHER_SOURCES_CONVERTED := $(call strip_source_dirs,$(OTHER_SOURCES))
 
 # List all the sources relative to one of SOURCE_DIRS
-SOURCES = common/out_spikes.c \
+SOURCES = common/rate_buffer.c \
+        common/out_spikes.c \
 		synapse/c_main.c \
 		synapse/synapses.c \
 		synapse/spike_processing.c \

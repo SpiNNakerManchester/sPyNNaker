@@ -192,6 +192,8 @@ static void multicast_packet_received_callback(uint key, uint payload) {
     any_spike = true;
     log_debug("Received spike %x at %d, DMA Busy = %d", key, time, dma_busy);
 
+    io_printf(IO_BUF, "rcvd %k from %d\n", payload, key);
+
     //io_printf(IO_BUF, "recv %x %k\n", key, payload);
 
     // If there was space to add spike to incoming spike queue
@@ -298,4 +300,9 @@ bool do_rewiring(int number_of_rew) { // EXPORTED
 //! \return bool
 bool received_any_spike(void) { // EXPORTED
     return any_spike;
+}
+
+uint32_t spike_processing_flush_in_buffer() {
+
+    return in_rates_flush_buffer();
 }

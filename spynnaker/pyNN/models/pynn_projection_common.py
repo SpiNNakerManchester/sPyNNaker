@@ -71,21 +71,16 @@ class PyNNProjectionCommon(object):
         self.__requires_mapping = True
         self.__label = None
 
-        if not isinstance(post_synaptic_population._get_vertex,
-                          AbstractAcceptsIncomingSynapses):
-            raise ConfigurationException(
-                "postsynaptic population is not designed to receive"
-                " synaptic projections")
-
         # sort out synapse type
         synapse_type = post_synaptic_population.get_synapse_id_by_target(target)
+
         if synapse_type is None:
             raise ConfigurationException(
                 "Synapse target {} not found in {}".format(
                     target, post_synaptic_population.label))
 
-        pre_vertex = pre_synaptic_population.get_vertex
-        post_vertex = post_synaptic_population.get_vertex
+        pre_vertex = pre_synaptic_population._get_vertex
+        post_vertex = post_synaptic_population._get_vertex
 
         # round the delays to multiples of full timesteps
         # (otherwise SDRAM estimation calculations can go wrong)

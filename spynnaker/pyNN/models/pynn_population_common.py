@@ -60,7 +60,8 @@ class PyNNPopulationCommon(object):
         "_vertex_contains_units",
         "_vertex_population_initializable",
         "_vertex_population_settable",
-        "_vertex_read_parameters_before_set"]
+        "_vertex_read_parameters_before_set",
+        "__label"]
 
     def __init__(
             self, spinnaker_control, size, label, constraints, model,
@@ -68,6 +69,10 @@ class PyNNPopulationCommon(object):
             in_partitions=None, out_partitions=None):
         # pylint: disable=too-many-arguments
         size = self._roundsize(size, label)
+
+        self.__spinnaker_control = spinnaker_control
+        self.__delay_vertex = None
+        self.__label = label
 
         # Use a provided model to create a vertex
         if isinstance(model, AbstractPyNNModel):
@@ -132,9 +137,6 @@ class PyNNPopulationCommon(object):
             isinstance(self.__vertex[0], AbstractReadParametersBeforeSet)
         self._vertex_contains_units = \
             isinstance(self.__vertex[0], AbstractContainsUnits)
-
-        self.__spinnaker_control = spinnaker_control
-        self.__delay_vertex = None
 
         # Internal structure now supported 23 November 2014 ADR
         # structure should be a valid Space.py structure type.
@@ -353,7 +355,7 @@ class PyNNPopulationCommon(object):
     def label(self):
         """ The label of the population
         """
-        return self._vertex[0].label
+        return self.__label
 
     @label.setter
     def label(self, label):

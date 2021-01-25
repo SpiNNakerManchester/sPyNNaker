@@ -28,19 +28,20 @@ class PyNNPartitionEdge():
         pre_app_vertices = self._pre_vertex.out_vertices
         post_app_vertices = self._post_vertex.in_vertices
         synapse_type = synapse_information.synapse_type
+        vertices_per_partition = self._post_vertex.n_incoming_partitions
 
         __offset = 0
 
         for index in range(len(pre_app_vertices)):
-            for syn_index in range(len(post_app_vertices)):
-                # Check offset for multiple exc syn types(2nd exc)
-                if synapse_type == 0:
-                    dest = index
-                else:
-                    #dest = synapse_type + 1
-                    dest = len(post_app_vertices[syn_index]) - 1
 
-                if not isinstance(post_app_vertices[syn_index][dest],
+            partition_offset = index
+            for i in range(len(vertices_per_partition)):
+                if i < synapse_type:
+                    partition_offset += vertices_per_partition[i]
+
+            for dest_partition in range(len(post_app_vertices)):
+
+                if not isinstance(post_app_vertices[dest_partition][partition_offset],
                                   AbstractAcceptsIncomingSynapses):
                     raise ConfigurationException(
                         "postsynaptic population is not designed to receive"
@@ -58,14 +59,14 @@ class PyNNPartitionEdge():
                     __offset += 1
 
                 edge_to_merge = self._find_existing_edge(
-                    pre_app_vertices[index], post_app_vertices[syn_index][dest], spinnaker_control)
+                    pre_app_vertices[index], post_app_vertices[dest_partition][partition_offset], spinnaker_control)
 
                 if edge_to_merge is not None:
                     edge_to_merge.add_synapse_information(self._synapse_information)
                     edge = edge_to_merge
                 else:
                     edge = ProjectionApplicationEdge(
-                        pre_app_vertices[index], post_app_vertices[syn_index][dest], synapse_information, name)
+                        pre_app_vertices[index], post_app_vertices[dest_partition][partition_offset], synapse_information, name)
 
                 # add edge to the graph
                 spinnaker_control.add_application_edge(edge, constants.SPIKE_PARTITION_ID)

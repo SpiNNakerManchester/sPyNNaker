@@ -26,6 +26,7 @@
 #include "synapse/plasticity/synapse_dynamics.h"
 #include <common/out_spikes.h>
 #include <debug.h>
+#include <simulation.h>
 
 // declare spin1_wfi
 extern void spin1_wfi(void);
@@ -107,6 +108,8 @@ static uint32_t memory_index;
 
 static timer_t current_time;
 
+static uint32_t n_neurons_power_2;
+
 //! Size of DMA read for synaptic contributions
 static size_t dma_size;
 
@@ -118,8 +121,9 @@ static REAL *synaptic_region;
 static uint32_t contribution_offset;
 static uint32_t poisson_offset;
 
-//! Placeholder for synaptic contributions sum
-static REAL sum;
+static uint32_t *incoming_partitions;
+
+static uint32_t start_of_global_parameters;
 
 //! parameters that reside in the neuron_parameter_data_region
 struct neuron_parameters {
@@ -129,11 +133,10 @@ struct neuron_parameters {
     uint32_t transmission_key;
     uint32_t n_neurons_to_simulate;
     uint32_t n_synapse_types;
-    uint32_t n_synapse_types;
     uint32_t mem_index;
     uint32_t n_recorded_variables;
 };
-#define START_OF_GLOBAL_PARAMETERS \
+#define INCOMING_PARTITIONS_PTR \
     (sizeof(struct neuron_parameters) / sizeof(uint32_t))
 
 static void reset_record_counter(void) {
@@ -173,7 +176,7 @@ static void reset_record_counter(void) {
 //! \return bool which is true if the mem copy's worked, false otherwise
 static bool neuron_load_neuron_parameters(address_t address) {
 
-    uint32_t next = START_OF_GLOBAL_PARAMETERS;
+    uint32_t next = start_of_global_parameters;
 
     log_debug("loading parameters");
     uint32_t n_words_for_n_neurons = (n_neurons + 3) >> 2;
@@ -251,12 +254,15 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
     n_neurons = params->n_neurons_to_simulate;
     n_synapse_types = params->n_synapse_types;
 
+    start_of_global_parameters = INCOMING_PARTITIONS_PTR + n_synapse_types;
+
     memory_index = params->mem_index;
 
     // Read number of recorded variables
     n_recorded_vars = params->n_recorded_variables;
 
-    uint32_t n_neurons_power_2 = n_neurons;
+     // Avoids offset problems with a single neuron assuming min power = 2
+    n_neurons_power_2 = (n_neurons == 1) ? 2 : n_neurons;
     uint32_t log_n_neurons = 1;
     if (n_neurons != 1) {
         if (!is_power_of_2(n_neurons)) {
@@ -274,11 +280,30 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
     synapse_type_index_bits = log_n_neurons + log_n_synapse_types;
     synapse_index_bits = log_n_neurons;
 
-    uint32_t contribution_bits =
-        log_n_neurons + log_n_synapse_types;
-    uint32_t contribution_size = (1 << (contribution_bits));
+    incoming_partitions = (uint32_t *) spin1_malloc(n_synapse_types * sizeof(uint32_t));
+    if (incoming_partitions == NULL) {
+        log_error("Could not allocate space for incoming_partitions");
+        return false;
+    }
 
-    contribution_offset = 2 * n_neurons_power_2;
+    uint8_t total_partitions = 0;
+    
+    for (index_t i = 0; i < n_synapse_types; i++) {
+
+        incoming_partitions[i] =
+            *(address + INCOMING_PARTITIONS_PTR + i);
+        total_partitions += incoming_partitions[i];
+    }
+
+    uint32_t incoming_partitions_power_2 = total_partitions;
+    if (!is_power_of_2(total_partitions)) {
+        incoming_partitions_power_2 = next_power_of_2(total_partitions);
+    }
+    uint32_t log_incoming_partitions = ilog_2(incoming_partitions_power_2);
+
+    uint32_t contribution_bits =
+        log_n_neurons + log_incoming_partitions;
+    uint32_t contribution_size = 1 << contribution_bits;
 
     dma_size = contribution_size * sizeof(REAL);
 
@@ -377,7 +402,7 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
 //! \brief stores neuron parameter back into SDRAM
 //! \param[in] address: the address in SDRAM to start the store
 void neuron_store_neuron_parameters(address_t address) { // EXPORTED
-    uint32_t next = START_OF_GLOBAL_PARAMETERS;
+    uint32_t next = start_of_global_parameters;
 
     uint32_t n_words_for_n_neurons = (n_neurons + 3) >> 2;
     next += (n_words_for_n_neurons + 2) * (n_recorded_vars + 1);
@@ -402,7 +427,11 @@ void neuron_do_timestep_update( // EXPORTED
         DMA_TAG_READ_SYNAPTIC_CONTRIBUTION, synaptic_region,
         synaptic_contributions, DMA_READ, dma_size);
 
+    io_printf(IO_BUF, "sent dma\n");
+    
     while (!dma_finished);
+
+    io_printf(IO_BUF, "dma finihsed\n");
 
     dma_finished = false;
 
@@ -420,15 +449,23 @@ void neuron_do_timestep_update( // EXPORTED
     // Set up an array for storing the recorded variable values
     state_t recorded_variable_values[n_recorded_vars];
 
+    register REAL sum;
+
     // update each neuron individually
     for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
         
         for (index_t synapse_type_index = 0; synapse_type_index < n_synapse_types; synapse_type_index++) {
 
-            uint32_t buff_index = ((synapse_type_index << synapse_index_bits) | neuron_index);
+            register uint32_t buff_index = ((synapse_type_index << synapse_index_bits) | neuron_index);
 
             //Add the values from synaptic_contributions
-            sum = 0;
+            sum = synaptic_contributions[buff_index];
+
+            for (index_t i = 1; i < incoming_partitions[synapse_type_index]; i++) {
+
+                buff_index += n_neurons_power_2;
+                sum += synaptic_contributions[buff_index];
+            }
 
             //MAKE IT INLINE?
             neuron_impl_add_inputs(synapse_type_index, neuron_index, sum);
@@ -473,7 +510,7 @@ void neuron_do_timestep_update( // EXPORTED
             log_debug("the neuron %d has been determined to not spike",
                     neuron_index);
         }
-            //io_printf(IO_BUF, "Sent\n");
+            io_printf(IO_BUF, "Sent %k , neuron %d\n",neuron_impl_get_v(neuron_index), neuron_index);
     }
 
     // Disable interrupts to avoid possible concurrent access

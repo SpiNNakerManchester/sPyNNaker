@@ -113,7 +113,7 @@ struct synapse_parameters {
     uint32_t is_recording;
 };
 #define START_OF_GLOBAL_PARAMETERS \
-    (sizeof(struct neuron_parameters) / sizeof(uint32_t))
+    (sizeof(struct synapse_parameters) / sizeof(uint32_t))
 
 /* PRIVATE FUNCTIONS */
 
@@ -295,7 +295,7 @@ static inline void process_fixed_synapses(
 
         // io_printf(IO_BUF, "acc %k index %d\n", accumulation, ring_buffer_index);
 
-        // io_printf(IO_BUF, "weight %k in rate %k\n", synaptic_weight, rate);
+        io_printf(IO_BUF, "weight %k in rate %k\n", synaptic_weight, rate);
     }
 }
 
@@ -511,13 +511,7 @@ static inline void write_recording(timer_t time) {
     for(uint32_t i = 0; i < n_recorded_vars; i++) {
        uint32_t index = var_recording_indexes[i];
 
-		syn_rec.spikes_a = num_fixed_pre_synaptic_events_per_timestep & 0xFF;
-		syn_rec.spikes_b = spikes_remaining_this_tick & 0xFF;
-		syn_rec.spikes_c = kickstarts;
-		syn_rec.spikes_d = zero_target_spikes_per_dt;
-
-
-       var_recording_values[i]->states[index] = spike_profiling_get_spike_holder_as_accum(syn_rec);
+       var_recording_values[i]->states[index] = num_fixed_pre_synaptic_events_per_timestep;
 
        if (var_recording_count[i] == var_recording_rate[i]) {
             var_recording_count[i] = 1;
@@ -623,7 +617,7 @@ bool find_static_neuron_with_id(
         uint32_t id, address_t row, structural_plasticity_data_t *sp_data) {
     address_t fixed_region = synapse_row_fixed_region(row);
     int32_t fixed_synapse = synapse_row_num_fixed_synapses(fixed_region);
-    uint32_t *synaptic_words =
+    REAL *synaptic_words =
             synapse_row_fixed_weight_controls(fixed_region);
 
     uint32_t weight, delay;
@@ -666,7 +660,7 @@ bool find_static_neuron_with_id(
 bool remove_static_neuron_at_offset(uint32_t offset, address_t row) {
     address_t fixed_region = synapse_row_fixed_region(row);
     int32_t fixed_synapse = synapse_row_num_fixed_synapses(fixed_region);
-    uint32_t *synaptic_words =
+    REAL *synaptic_words =
             synapse_row_fixed_weight_controls(fixed_region);
 
     // Delete control word at offset (contains weight)
@@ -701,7 +695,7 @@ bool add_static_neuron_with_id(
         uint32_t id, address_t row, uint32_t weight, uint32_t delay, uint32_t type) {
     address_t fixed_region = synapse_row_fixed_region(row);
     int32_t fixed_synapse = synapse_row_num_fixed_synapses(fixed_region);
-    uint32_t *synaptic_words =
+    REAL *synaptic_words =
             synapse_row_fixed_weight_controls(fixed_region);
     uint32_t new_synapse = fixed_synapse_convert(id, weight, delay, type);
 

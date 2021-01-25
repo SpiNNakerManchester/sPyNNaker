@@ -18,7 +18,7 @@
 #ifndef _SYNAPSE_STRUCTURE_H_
 #define _SYNAPSE_STRUCTURE_H_
 
-#include <neuron/plasticity/stdp/weight_dependence/weight.h>
+#include <synapse/plasticity/stdp/weight_dependence/weight.h>
 
 static update_state_t synapse_structure_get_update_state(
         plastic_synapse_t synaptic_word, index_t synapse_type);

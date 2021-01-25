@@ -75,7 +75,6 @@ from spynnaker.pyNN.models.abstract_models import (
     AbstractAcceptsIncomingSynapses)
 from spynnaker.pyNN.models.common import (
     AbstractSynapseRecordable, SynapseRecorder)
-from .key_space_tracker import KeySpaceTracker
 from pacman.model.routing_info import BaseKeyAndMask
 
 TIME_STAMP_BYTES = 4
@@ -152,7 +151,7 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
 
     def __init__(self, n_synapse_types, synapse_index, n_neurons, atoms_offset,
                  constraints, label, max_atoms_per_core, weight_scale, ring_buffer_sigma,
-                 spikes_per_second, incoming_spike_buffer_size, model_syn_types, config,
+                 spikes_per_second, incoming_spike_buffer_size, model_syn_types,
                  population_table_type=None, synapse_io=None, synapse_rescale = False):
 
         self._implemented_synapse_types = n_synapse_types
@@ -169,6 +168,9 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
         # Hardcoded, avoids the function call and is set to the same value for all the partitions
         self._ring_buffer_shifts = [7]
         self._slice_list = None
+
+        # get config from simulator
+        config = globals_variables.get_simulator().config
 
         #FOR RECORDING
         recordables = ["synapse"]
@@ -267,8 +269,7 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
     def synapse_dynamics(self):
         return self.__synapse_dynamics
 
-    @synapse_dynamics.setter
-    def synapse_dynamics(self, synapse_dynamics):
+    def set_synapse_dynamics(self, synapse_dynamics):
 
         # We can always override static dynamics or None
         if isinstance(self.__synapse_dynamics, SynapseDynamicsStatic):
@@ -282,7 +283,7 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
         elif not synapse_dynamics.is_same_as(self.__synapse_dynamics):
             raise SynapticConfigurationException(
                 "Synapse dynamics must match exactly when using multiple edges"
-                " to the same population")
+                "to the same population")
 
     @property
     def ring_buffer_sigma(self):
@@ -360,7 +361,7 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
     def get_binary_file_name(self):
         #return self.vertex_executable_suffix + "_syn.aplx"
-        return "Static_synapse.aplx"
+        return "Static_synapse_pyramidal_rate.aplx"
 
     @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
     def get_binary_start_type(self):
@@ -517,7 +518,7 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
                         size += gen_size * n_edge_vertices
         if gen_on_machine:
             size += _SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES
-            size += self._implemented_synapse_types * 4
+            size += self._model_synapse_types * 4
         return size
 
     def _get_synapse_dynamics_parameter_size(self, vertex_slice,
@@ -536,8 +537,9 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
                 vertex_slice.n_atoms, self._implemented_synapse_types)
 
     def get_sdram_usage_in_bytes(
-            self, vertex_slice, in_edges, graph, machine_time_step):
+            self, vertex_slice, graph, machine_time_step):
         n_record = len(self.RECORDABLES)
+        in_edges = graph.get_edges_ending_at_vertex(self)
         return (
             common_constants.SYSTEM_BYTES_REQUIREMENT +
             self._get_synapse_params_size(vertex_slice) +
@@ -1306,7 +1308,7 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
             vertex.vertex_index, all_syn_block_sz)
 
         scales = numpy.array([
-            self._get_weight_scale(r) * self._weight_scale
+            self._get_weight_scale(r, self.__synapse_rescale) * self._weight_scale
             for r in self._ring_buffer_shifts])
 
         # post_slices = graph_mapper.get_slices(self)
@@ -1533,7 +1535,7 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
     # inherited from AbstractProvidesIncomingPartitionConstraints
     @overrides(AbstractProvidesIncomingPartitionConstraints.
                get_incoming_partition_constraints)
-    def get_incoming_partition_constraints(self):
+    def get_incoming_partition_constraints(self, partition):
         return self.__poptable_type.get_edge_constraints()
 
     def _write_on_machine_data_spec(
@@ -1559,7 +1561,7 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
 
         n_bytes = (
             _SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES +
-            (self._implemented_synapse_types * 4))
+            (self._model_synapse_types * 4))
         for data in generator_data:
             n_bytes += data.size
 

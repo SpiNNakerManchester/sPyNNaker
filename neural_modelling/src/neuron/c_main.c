@@ -32,7 +32,7 @@
  *
  */
 
-#include <common/in_spikes.h>
+#include <common/in_rates.h>
 #include "regions.h"
 #include "neuron.h"
 #include "synapse/synapses.h"
@@ -56,16 +56,12 @@
 #endif
 
 struct neuron_provenance {
-    uint32_t n_pre_synaptic_events;
-    uint32_t n_synaptic_weight_saturations;
-    uint32_t n_input_buffer_overflows;
     uint32_t current_timer_tick;
-    uint32_t n_plastic_synaptic_weight_saturations;
 };
 
 //! values for the priority for each callback
 typedef enum callback_priorities {
-    MC = -1, DMA = 0, USER = 0, SDP = 1, TIMER = 0
+    MC = -1, DMA = 0, USER = 1, SDP = 2, TIMER = 1
 } callback_priorities;
 
 //! The number of regions that are to be used for recording
@@ -117,12 +113,7 @@ void c_main_store_provenance_data(address_t provenance_region) {
     struct neuron_provenance *prov = (void *) provenance_region;
 
     // store the data into the provenance data region
-    prov->n_pre_synaptic_events = synapses_get_pre_synaptic_events();
-    prov->n_synaptic_weight_saturations = synapses_get_saturation_count();
-    prov->n_input_buffer_overflows = spike_processing_get_buffer_overflows();
     prov->current_timer_tick = time;
-    prov->n_plastic_synaptic_weight_saturations =
-            synapse_dynamics_get_plastic_saturation_count();
     log_debug("finished other provenance data");
 }
 
@@ -201,6 +192,8 @@ void timer_callback(uint timer_count, uint unused) {
 
     time++;
     last_rewiring_time++;
+
+    io_printf(IO_BUF, "time %d\n", time);
 
     // This is the part where I save the input and output indices
     //   from the circular buffer

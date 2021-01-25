@@ -72,4 +72,6 @@ void setup_synaptic_dma_read(void);
 //! \return bool
 bool received_any_spike(void);
 
+uint32_t spike_processing_flush_in_buffer();
+
 #endif // _SPIKE_PROCESSING_H_

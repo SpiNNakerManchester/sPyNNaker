@@ -24,7 +24,7 @@
 typedef int16_t post_trace_t;
 typedef int16_t pre_trace_t;
 
-#include <neuron/plasticity/stdp/synapse_structure/synapse_structure_weight_impl.h>
+#include <synapse/plasticity/stdp/synapse_structure/synapse_structure_weight_impl.h>
 #include "timing.h"
 
 // Include debug header for log_info etc
@@ -33,8 +33,8 @@ typedef int16_t pre_trace_t;
 #include <round.h>
 
 // Include generic plasticity maths functions
-#include <neuron/plasticity/stdp/maths.h>
-#include <neuron/plasticity/stdp/stdp_typedefs.h>
+#include <synapse/plasticity/stdp/maths.h>
+#include <synapse/plasticity/stdp/stdp_typedefs.h>
 
 //---------------------------------------
 // Macros

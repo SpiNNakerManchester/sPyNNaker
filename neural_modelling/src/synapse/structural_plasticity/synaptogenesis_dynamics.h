@@ -26,7 +26,7 @@
 #ifndef _SYNAPTOGENESIS_DYNAMICS_H_
 #define _SYNAPTOGENESIS_DYNAMICS_H_
 
-#include <neuron/spike_processing.h>
+#include <synapse/spike_processing.h>
 
 //! \brief Initialisation of synaptic rewiring (synaptogenesis)
 //! parameters (random seed, spread of receptive field etc.)
