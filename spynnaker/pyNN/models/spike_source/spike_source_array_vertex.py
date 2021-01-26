@@ -106,13 +106,13 @@ class SpikeSourceArrayVertex(
         :param iterable(int spike_times:
         """
         current_time = globals_variables.get_simulator().get_current_time()
-        for neuron_id in range(0, self.n_atoms):
-            if spike_times[neuron_id] > current_time:
+        for i in range(len(spike_times)):
+            if spike_times[i] > current_time:
                 logger.warning(
                     "SpikeSourceArray {} has spike_times that are lower than "
                     "the current time {} For example {} - "
                     "these will be ignored.".format(
-                        self, current_time, float(spike_times[neuron_id])))
+                        self, current_time, float(spike_times[i])))
                 return
 
     def _check_spikes_double_list(self, spike_times):
@@ -126,13 +126,13 @@ class SpikeSourceArrayVertex(
         current_time = globals_variables.get_simulator().get_current_time()
         for neuron_id in range(0, self.n_atoms):
             id_times = spike_times[neuron_id]
-            for n in range(len(id_times)):
-                if id_times[n] > current_time:
+            for i in range(len(id_times)):
+                if id_times[i] > current_time:
                     logger.warning(
                        "SpikeSourceArray {} has spike_times that are lower "
                        "than the current time {} For example {} - "
                        "these will be ignored.".format(
-                            self, current_time, float(id_times[n])))
+                            self, current_time, float(id_times[i])))
                     return
 
     @spike_times.setter
