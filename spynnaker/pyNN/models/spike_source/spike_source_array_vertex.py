@@ -17,6 +17,7 @@ import logging
 import numpy
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
+from spinn_utilities.ranged import RangedListOfList
 from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spinn_front_end_common.abstract_models.impl import (
@@ -180,3 +181,20 @@ class SpikeSourceArrayVertex(
             "parameters": parameters,
         }
         return context
+
+    @overrides(SimplePopulationSettable.set_value_by_selector)
+    def set_value_by_selector(self, selector, key, value):
+        if key == "spike_times":
+            old_values = self.get_value(key)
+            if isinstance(old_values, RangedListOfList):
+                ranged_list = old_values
+            else:
+                # Keep all the setting stuff in one place by creating a RangedList
+                ranged_list = RangedListOfList(
+                    size=self.n_atoms, value=old_values)
+            ranged_list.set_value_by_selector(
+                selector, value, ranged_list.is_list(value, self.n_atoms))
+            self.set_value(key, ranged_list)
+        else:
+            SimplePopulationSettable.set_value_by_selector(
+                self, selector, key, value)
