@@ -30,6 +30,7 @@
 import mock
 import os
 import sys
+from sphinx.ext import apidoc
 
 autodoc_mock_imports = ['_tkinter']
 
@@ -440,11 +441,5 @@ explicit_wanted_files = [
     ]
 options = ['-o', output_dir, "spynnaker"]
 options.extend(filtered_files("spynnaker", explicit_wanted_files))
-try:
-    # Old style API; Python 2.7
-    from sphinx import apidoc
-    options = [None] + options
-except ImportError:
-    # New style API; Python 3.6 onwards
-    from sphinx.ext import apidoc
+
 apidoc.main(options)

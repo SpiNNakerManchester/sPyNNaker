@@ -13,8 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import division
 import logging
+import os
 import struct
 import numpy
 from spinn_utilities.log import FormatAdapter
@@ -25,7 +25,6 @@ from spynnaker.pyNN.exceptions import MemReadException
 
 logger = FormatAdapter(logging.getLogger(__name__))
 _RECORDING_COUNT = struct.Struct("<I")
-_SEEK_END = 2  # Define here for Py2.7 compatibility
 
 
 def get_recording_region_size_in_bytes(
@@ -86,7 +85,7 @@ def pull_off_cached_lists(no_loads, cache_file):
     if no_loads == 1:
         values = numpy.load(cache_file)
         # Seek to the end of the file (for windows compatibility)
-        cache_file.seek(0, _SEEK_END)
+        cache_file.seek(0, os.SEEK_END)
         return values
     elif no_loads == 0:
         return []
@@ -95,7 +94,7 @@ def pull_off_cached_lists(no_loads, cache_file):
     for _ in range(0, no_loads):
         lists.append(numpy.load(cache_file))
     # Seek to the end of the file (for windows compatibility)
-    cache_file.seek(0, _SEEK_END)
+    cache_file.seek(0, os.SEEK_END)
     return numpy.concatenate(lists)
 
 
