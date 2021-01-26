@@ -31,6 +31,8 @@ logger = FormatAdapter(logging.getLogger(__name__))
 class CSAConnector(AbstractConnector):
     """ Make connections using a Connection Set Algebra (Djurfeldt 2012)\
         description between the neurons in the pre- and post-populations.
+
+    .. note::
         If you get TypeError in Python 3 see:
         https://github.com/INCF/csa/issues/10
     """
