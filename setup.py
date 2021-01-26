@@ -14,8 +14,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-from setuptools import setup
 from collections import defaultdict
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
 
 __version__ = None
 exec(open("spynnaker/_version.py").read())
