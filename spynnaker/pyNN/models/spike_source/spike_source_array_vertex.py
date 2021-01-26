@@ -64,7 +64,6 @@ class SpikeSourceArrayVertex(
         # pylint: disable=too-many-arguments
         self.__model_name = "SpikeSourceArray"
         self.__model = model
-
         if spike_times is None:
             spike_times = []
         self._spike_times = spike_times
@@ -96,7 +95,45 @@ class SpikeSourceArrayVertex(
     def spike_times(self):
         """ The spike times of the spike source array
         """
-        return self._spike_times
+        return list(self._spike_times)
+
+    def _to_early_spikes_single_list(self, spike_times):
+        """
+        Checks if there is one or more spike_times before the current time
+
+        Logs a warning for the first oen found
+
+        :param iterable(int spike_times:
+        """
+        current_time = globals_variables.get_simulator().get_current_time()
+        for neuron_id in range(0, self.n_atoms):
+            if spike_times[neuron_id] > current_time:
+                logger.warning(
+                    "SpikeSourceArray {} has spike_times that are lower than "
+                    "the current time {} For example {} - "
+                    "these will be ignored.".format(
+                        self, current_time, float(spike_times[neuron_id])))
+                return
+
+    def _check_spikes_double_list(self, spike_times):
+        """
+        Checks if there is one or more spike_times before the current time
+
+        Logs a warning for the first oen found
+
+        :param iterable(iterable(int) spike_times:
+        """
+        current_time = globals_variables.get_simulator().get_current_time()
+        for neuron_id in range(0, self.n_atoms):
+            id_times = spike_times[neuron_id]
+            for n in range(len(id_times)):
+                if id_times[n] > current_time:
+                    logger.warning(
+                       "SpikeSourceArray {} has spike_times that are lower "
+                       "than the current time {} For example {} - "
+                       "these will be ignored.".format(
+                            self, current_time, float(id_times[n])))
+                    return
 
     @spike_times.setter
     def spike_times(self, spike_times):
@@ -105,19 +142,13 @@ class SpikeSourceArrayVertex(
 
         """
         time_step = self.get_spikes_sampling_interval()
-        current_time = globals_variables.get_simulator().get_current_time()
-        numpy_spike_times = _send_buffer_times(spike_times, time_step)
         # warn the user if they are asking for a spike time out of range
-        for neuron_id in range(0, self.n_atoms):
-            neuron_spike_times = numpy_spike_times[neuron_id]
-            for n in range(len(neuron_spike_times)):
-                if neuron_spike_times[n] < current_time:
-                    logger.warning(
-                        "A spike time of {} was specified for the "
-                        "SpikeSourceArray {} that is lower than the current "
-                        "time {} - this will be ignored.".format(
-                            float(neuron_spike_times[n]), self, current_time))
-        self.send_buffer_times = numpy_spike_times
+        if spike_times:  # in case of empty list do not check
+            if hasattr(spike_times[0], '__iter__'):
+                self._check_spikes_double_list(spike_times)
+            else:
+                self._to_early_spikes_single_list(spike_times)
+        self.send_buffer_times = _send_buffer_times(spike_times, time_step)
         self._spike_times = spike_times
 
     @overrides(AbstractSpikeRecordable.is_recording_spikes)
