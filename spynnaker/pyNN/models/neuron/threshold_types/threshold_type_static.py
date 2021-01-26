@@ -30,8 +30,9 @@ class ThresholdTypeStatic(AbstractThresholdType):
     def __init__(self, v_thresh):
         """
         :param v_thresh: :math:`V_{thresh}`
-        :type v_thresh: Float, iterable of Floats, RandomDistribution or \
-                        function
+        :type v_thresh: \
+            float, iterable(float), ~pyNN.random.RandomDistribution \
+            or (mapping) function
         """
         super(ThresholdTypeStatic, self).__init__([
             DataType.S1615])  # v_thresh

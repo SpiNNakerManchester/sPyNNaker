@@ -47,22 +47,38 @@ class IFCondExpStoc(AbstractPyNNNeuronModelStandard):
     :param v: :math:`V_{init}`
     :param isyn_exc: :math:`I^{syn}_e`
     :param isyn_inh: :math:`I^{syn}_i`
-    :type tau_m: Float, iterable of Floats, RandomDistribution or function
-    :type cm: Float, iterable of Floats, RandomDistribution or function
-    :type v_rest: Float, iterable of Floats, RandomDistribution or function
-    :type v_reset: Float, iterable of Floats, RandomDistribution or function
-    :type v_thresh: Float, iterable of Floats, RandomDistribution or function
-    :type tau_syn_E: Float, iterable of Floats, RandomDistribution or function
-    :type tau_syn_I: Float, iterable of Floats, RandomDistribution or function
-    :type tau_refrac: Float, iterable of Floats, RandomDistribution or function
-    :type i_offset: Float, iterable of Floats, RandomDistribution or function
-    :type e_rev_E: Float, iterable of Floats, RandomDistribution or function
-    :type e_rev_I: Float, iterable of Floats, RandomDistribution or function
-    :type du_th: Float, iterable of Floats, RandomDistribution or function
-    :type tau_th: Float, iterable of Floats, RandomDistribution or function
-    :type v: Float, iterable of Floats, RandomDistribution or function
-    :type isyn_exc: Float, iterable of Floats, RandomDistribution or function
-    :type isyn_inh: Float, iterable of Floats, RandomDistribution or function
+    :type tau_m: float, iterable(float), ~pyNN.random.RandomDistribution \
+                 or (mapping) function
+    :type cm: float, iterable(float), ~pyNN.random.RandomDistribution \
+              or (mapping) function
+    :type v_rest: float, iterable(float), ~pyNN.random.RandomDistribution \
+                  or (mapping) function
+    :type v_reset: float, iterable(float), ~pyNN.random.RandomDistribution \
+                   or (mapping) function
+    :type v_thresh: float, iterable(float), ~pyNN.random.RandomDistribution \
+                    or (mapping) function
+    :type tau_syn_E: float, iterable(float), ~pyNN.random.RandomDistribution \
+                     or (mapping) function
+    :type tau_syn_I: float, iterable(float), ~pyNN.random.RandomDistribution \
+                     or (mapping) function
+    :type tau_refrac: float, iterable(float), ~pyNN.random.RandomDistribution \
+                      or (mapping) function
+    :type i_offset: float, iterable(float), ~pyNN.random.RandomDistribution \
+                    or (mapping) function
+    :type e_rev_E: float, iterable(float), ~pyNN.random.RandomDistribution \
+                   or (mapping) function
+    :type e_rev_I: float, iterable(float), ~pyNN.random.RandomDistribution \
+                   or (mapping) function
+    :type du_th: float, iterable(float), ~pyNN.random.RandomDistribution \
+                 or (mapping) function
+    :type tau_th: float, iterable(float), ~pyNN.random.RandomDistribution \
+                  or (mapping) function
+    :type v: Float, float, iterable(float), ~pyNN.random.RandomDistribution \
+                    or (mapping) function
+    :type isyn_exc: float, iterable(float), ~pyNN.random.RandomDistribution \
+                    or (mapping) function
+    :type isyn_inh: float, iterable(float), ~pyNN.random.RandomDistribution \
+                    or (mapping) function
     """
 
     @default_initial_values({"v", "isyn_exc", "isyn_inh"})

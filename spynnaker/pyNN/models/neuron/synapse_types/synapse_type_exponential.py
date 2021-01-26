@@ -41,17 +41,21 @@ class SynapseTypeExponential(AbstractSynapseType):
     def __init__(self, tau_syn_E, tau_syn_I, isyn_exc, isyn_inh):
         r"""
         :param tau_syn_E: :math:`\tau^{syn}_e`
-        :type tau_syn_E: Float, iterable of Floats, RandomDistribution or \
-                        function
+        :type tau_syn_E: \
+            float, iterable(float), ~pyNN.random.RandomDistribution \
+            or (mapping) function
         :param tau_syn_I: :math:`\tau^{syn}_i`
-        :type tau_syn_I: Float, iterable of Floats, RandomDistribution or \
-                        function
+        :type tau_syn_I: \
+            float, iterable(float), ~pyNN.random.RandomDistribution \
+            or (mapping) function
         :param isyn_exc: :math:`I^{syn}_e`
-        :type isyn_exc: Float, iterable of Floats, RandomDistribution or \
-                        function
+        :type isyn_exc: /
+            float, iterable(float), ~pyNN.random.RandomDistribution \
+            or (mapping) function
         :param isyn_inh: :math:`I^{syn}_i`
-        :type isyn_inh: Float, iterable of Floats, RandomDistribution or \
-                        function
+        :type isyn_inh: \
+            float, iterable(float), ~pyNN.random.RandomDistribution \
+            or (mapping) function
         """
         super(SynapseTypeExponential, self).__init__([
             DataType.U032,    # decay_E

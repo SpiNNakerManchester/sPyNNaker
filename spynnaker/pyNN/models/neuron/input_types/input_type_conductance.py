@@ -37,12 +37,14 @@ class InputTypeConductance(AbstractInputType):
         """
         :param e_rev_E: Reversal potential for excitatory input;
             :math:`E^{rev}_e`
-        :type e_rev_E: Float, iterable of Floats, RandomDistribution or \
-                       function
+        :type e_rev_E: /
+            float, iterable(float), ~pyNN.random.RandomDistribution \
+            or (mapping) function
         :param e_rev_I: Reversal potential for inhibitory input;
             :math:`E^{rev}_i`
-        :type e_rev_I: Float, iterable of Floats, RandomDistribution or \
-                       function
+        :type e_rev_I: \
+            float, iterable(float), ~pyNN.random.RandomDistribution \
+            or (mapping) function
         """
         super(InputTypeConductance, self).__init__([
             DataType.S1615,   # e_rev_E

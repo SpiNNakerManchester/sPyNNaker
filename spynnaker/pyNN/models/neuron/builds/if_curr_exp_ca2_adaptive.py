@@ -32,35 +32,50 @@ class IFCurrExpCa2Adaptive(AbstractPyNNNeuronModelStandard):
         <https://doi.org/10.1023/A:1008916026143>`_
 
     :param tau_m: :math:`\\tau_m`
-    :type tau_m: Float, iterable of Floats, RandomDistribution or function
+    :type tau_m: float, iterable(float), ~pyNN.random.RandomDistribution \
+                 or (mapping) function
     :param cm: :math:`C_m`
-    :type cm: Float, iterable of Floats, RandomDistribution or function
+    :type cm: float, iterable(float), ~pyNN.random.RandomDistribution \
+              or (mapping) function
     :param v_rest: :math:`V_{rest}`
-    :type v_rest: Float, iterable of Floats, RandomDistribution or function
+    :type v_rest: float, iterable(float), ~pyNN.random.RandomDistribution \
+                  or (mapping) function
     :param v_reset: :math:`V_{reset}`
-    :type v_reset: Float, iterable of Floats, RandomDistribution or function
+    :type v_reset: float, iterable(float), ~pyNN.random.RandomDistribution \
+                   or (mapping) function
     :param v_thresh: :math:`V_{thresh}`
-    :type v_thresh: Float, iterable of Floats, RandomDistribution or function
+    :type v_thresh: float, iterable(float), ~pyNN.random.RandomDistribution \
+                    or (mapping) function
     :param tau_syn_E: :math:`\\tau^{syn}_e`
-    :type tau_syn_E: Float, iterable of Floats, RandomDistribution or function
+    :type tau_syn_E: float, iterable(float), ~pyNN.random.RandomDistribution \
+                     or (mapping) function
     :param tau_syn_I: :math:`\\tau^{syn}_i`
-    :type tau_syn_I: Float, iterable of Floats, RandomDistribution or function
+    :type tau_syn_I: float, iterable(float), ~pyNN.random.RandomDistribution \
+                     or (mapping) function
     :param tau_refrac: :math:`\\tau_{refrac}`
-    :type tau_refrac: Float, iterable of Floats, RandomDistribution or function
+    :type tau_refrac: float, iterable(float), ~pyNN.random.RandomDistribution \
+                      or (mapping) function
     :param i_offset: :math:`I_{offset}`
-    :type i_offset: Float, iterable of Floats, RandomDistribution or function
+    :type i_offset: float, iterable(float), ~pyNN.random.RandomDistribution \
+                    or (mapping) function
     :param tau_ca2: :math:`\\tau_{\\mathrm{Ca}^{+2}}`
-    :type tau_ca2: Float, iterable of Floats, RandomDistribution or function
+    :type tau_ca2: float, iterable(float), ~pyNN.random.RandomDistribution \
+                   or (mapping) function
     :param i_ca2: :math:`I_{\\mathrm{Ca}^{+2}}`
-    :type i_ca2: Float, iterable of Floats, RandomDistribution or function
+    :type i_ca2: float, iterable(float), ~pyNN.random.RandomDistribution \
+                 or (mapping) function
     :param i_alpha: :math:`\\tau_\\alpha`
-    :type i_alpha: Float, iterable of Floats, RandomDistribution or function
+    :type i_alpha: float, iterable(float), ~pyNN.random.RandomDistribution \
+                   or (mapping) function
     :param v: :math:`V_{init}`
-    :type v: Float, iterable of Floats, RandomDistribution or function
+    :type v: float, iterable(float), ~pyNN.random.RandomDistribution \
+             or (mapping) function
     :param isyn_exc: :math:`I^{syn}_e`
-    :type isyn_exc: Float, iterable of Floats, RandomDistribution or function
+    :type isyn_exc: float, iterable(float), ~pyNN.random.RandomDistribution \
+                    or (mapping) function
     :param isyn_inh: :math:`I^{syn}_i`
-    :type isyn_inh: Float, iterable of Floats, RandomDistribution or function
+    :type isyn_inh: float, iterable(float), ~pyNN.random.RandomDistribution \
+                    or (mapping) function
     """
 
     @default_initial_values({"v", "isyn_exc", "isyn_inh", "i_ca2"})
