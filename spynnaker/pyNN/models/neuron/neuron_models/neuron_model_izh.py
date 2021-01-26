@@ -48,13 +48,30 @@ class NeuronModelIzh(AbstractNeuronModel):
 
     def __init__(self, a, b, c, d, v_init, u_init, i_offset):
         """
-        :param float a: :math:`a`
-        :param float b: :math:`b`
-        :param float c: :math:`c`
-        :param float d: :math:`d`
-        :param float v_init: :math:`v_{init}`
-        :param float u_init: :math:`u_{init}`
-        :param float i_offset: :math:`I_{offset}`
+        :param a: :math:`a`
+        :type a: float, iterable(float), ~pyNN.random.RandomDistribution or \
+                 (mapping) function
+        :param b: :math:`b`
+        :type b: float, iterable(float), ~pyNN.random.RandomDistribution or \
+                 (mapping) function
+        :param c: :math:`c`
+        :type c: float, iterable(float), ~pyNN.random.RandomDistribution or \
+                 (mapping) function
+        :param d: :math:`d`
+        :type d: float, iterable(float), ~pyNN.random.RandomDistribution or \
+                 (mapping) function
+        :param v_init: :math:`v_{init}`
+        :type v_init: \
+            float, iterable(float), ~pyNN.random.RandomDistribution or \
+            (mapping) function
+        :param u_init: :math:`u_{init}`
+        :type u_init: \
+            float, iterable(float), ~pyNN.random.RandomDistribution or \
+            (mapping) function
+        :param i_offset: :math:`I_{offset}`
+        :type i_offset: \
+            float, iterable(float), ~pyNN.random.RandomDistribution or \
+            (mapping) function
         """
         super(NeuronModelIzh, self).__init__(
             [DataType.S1615,   # a
