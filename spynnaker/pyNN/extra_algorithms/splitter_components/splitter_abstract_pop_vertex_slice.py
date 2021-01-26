@@ -19,7 +19,8 @@ from pacman.model.constraints.partitioner_constraints import (
     AbstractPartitionerConstraint)
 from pacman.model.graphs.machine import MachineEdge
 from pacman.model.resources import (
-    ResourceContainer, ConstantSDRAM, DTCMResource, CPUCyclesPerTickResource)
+    ResourceContainer, DTCMResource, CPUCyclesPerTickResource,
+    MultiRegionSDRAM)
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterSlice)
 from pacman.utilities import utility_calls
@@ -111,11 +112,13 @@ class SplitterAbstractPopulationVertexSlice(
         """
         variable_sdram = self.__get_variable_sdram(vertex_slice)
         constant_sdram = self.__get_constant_sdram(vertex_slice)
+        sdram = MultiRegionSDRAM()
+        sdram.nest(len(PopulationMachineVertex.REGIONS) + 1, variable_sdram)
+        sdram.merge(constant_sdram)
 
         # set resources required from this object
         container = ResourceContainer(
-            sdram=variable_sdram + constant_sdram,
-            dtcm=self.__get_dtcm_cost(vertex_slice),
+            sdram=sdram, dtcm=self.__get_dtcm_cost(vertex_slice),
             cpu_cycles=self.__get_cpu_cost(vertex_slice))
 
         # return the total resources.
@@ -145,11 +148,13 @@ class SplitterAbstractPopulationVertexSlice(
             len(self._governed_app_vertex.neuron_recordables) +
             len(self._governed_app_vertex.synapse_recordables))
         n_provenance = NeuronProvenance.N_ITEMS + SynapseProvenance.N_ITEMS
-        return ConstantSDRAM(
-            self._governed_app_vertex.get_common_constant_sdram(
-                n_record, n_provenance) +
-            self._governed_app_vertex.get_neuron_constant_sdram(vertex_slice) +
-            self.__get_synapse_constant_sdram(vertex_slice))
+        sdram = MultiRegionSDRAM()
+        sdram.merge(self._governed_app_vertex.get_common_constant_sdram(
+            n_record, n_provenance, PopulationMachineVertex.COMMON_REGIONS))
+        sdram.merge(self._governed_app_vertex.get_neuron_constant_sdram(
+            vertex_slice, PopulationMachineVertex.NEURON_REGIONS))
+        sdram.merge(self.__get_synapse_constant_sdram(vertex_slice))
+        return sdram
 
     def __get_synapse_constant_sdram(self, vertex_slice):
 
@@ -160,16 +165,32 @@ class SplitterAbstractPopulationVertexSlice(
 
         :rtype: int
         """
+        sdram = MultiRegionSDRAM()
         app_vertex = self._governed_app_vertex
-        return (
-            app_vertex.get_synapse_params_size() +
-            app_vertex.get_synapse_dynamics_size(vertex_slice) +
-            self.__structural_size(vertex_slice) +
-            self.__all_syn_block_size(vertex_slice) +
+        sdram.add_cost(
+            PopulationMachineVertex.SYNAPSE_REGIONS.synapse_params,
+            app_vertex.get_synapse_params_size())
+        sdram.add_cost(
+            PopulationMachineVertex.SYNAPSE_REGIONS.synapse_dynamics,
+            app_vertex.get_synapse_dynamics_size(vertex_slice))
+        sdram.add_cost(
+            PopulationMachineVertex.SYNAPSE_REGIONS.structural_dynamics,
+            self.__structural_size(vertex_slice))
+        sdram.add_cost(
+            PopulationMachineVertex.SYNAPSE_REGIONS.synaptic_matrix,
+            self.__all_syn_block_size(vertex_slice))
+        sdram.add_cost(
+            PopulationMachineVertex.SYNAPSE_REGIONS.direct_matrix,
+            app_vertex.all_single_syn_size)
+        sdram.add_cost(
+            PopulationMachineVertex.SYNAPSE_REGIONS.pop_table,
             MasterPopTableAsBinarySearch.get_master_population_table_size(
-                app_vertex.incoming_projections) +
-            self.__synapse_expander_size() +
-            self.__bitfield_size())
+                app_vertex.incoming_projections))
+        sdram.add_cost(
+            PopulationMachineVertex.SYNAPSE_REGIONS.connection_builder,
+            self.__synapse_expander_size())
+        sdram.merge(self.__bitfield_size())
+        return sdram
 
     def __all_syn_block_size(self, vertex_slice):
         if vertex_slice in self.__all_syn_block_sz:
@@ -196,11 +217,18 @@ class SplitterAbstractPopulationVertexSlice(
 
     def __bitfield_size(self):
         if self.__bitfield_sz is None:
+            sdram = MultiRegionSDRAM()
             projections = self._governed_app_vertex.incoming_projections
-            self.__bitfield_sz = (
-                get_estimated_sdram_for_bit_field_region(projections) +
-                get_estimated_sdram_for_key_region(projections) +
+            sdram.add_cost(
+                PopulationMachineVertex.SYNAPSE_REGIONS.bitfield_filter,
+                get_estimated_sdram_for_bit_field_region(projections))
+            sdram.add_cost(
+                PopulationMachineVertex.SYNAPSE_REGIONS.bitfield_key_map,
+                get_estimated_sdram_for_key_region(projections))
+            sdram.add_cost(
+                PopulationMachineVertex.SYNAPSE_REGIONS.bitfield_builder,
                 exact_sdram_for_bit_field_builder_region())
+            self.__bitfield_sz = sdram
         return self.__bitfield_sz
 
     def __get_dtcm_cost(self, vertex_slice):

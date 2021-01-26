@@ -49,7 +49,7 @@ def get_estimated_sdram_for_bit_field_region(incoming_projections):
     :return: the estimated number of bytes used by the bit field region
     :rtype: int
     """
-    sdram = 0
+    sdram = ELEMENTS_USED_IN_BIT_FIELD_HEADER * BYTES_PER_WORD
     seen_app_edges = set()
     for proj in incoming_projections:
         app_edge = proj._projection_edge
@@ -66,10 +66,10 @@ def get_estimated_sdram_for_bit_field_region(incoming_projections):
             if isinstance(app_edge.pre_vertex, AbstractHasDelayStages):
                 atoms_per_core *= app_edge.pre_vertex.n_delay_stages
             n_words_for_atoms = int(math.ceil(atoms_per_core / BIT_IN_A_WORD))
+
             sdram += (
-                (ELEMENTS_USED_IN_EACH_BIT_FIELD + (
-                    n_words_for_atoms * n_machine_vertices)) *
-                BYTES_PER_WORD)
+                ((ELEMENTS_USED_IN_EACH_BIT_FIELD + n_words_for_atoms) *
+                 n_machine_vertices) * BYTES_PER_WORD)
     return sdram
 
 

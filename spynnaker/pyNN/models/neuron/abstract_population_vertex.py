@@ -23,6 +23,7 @@ from spinn_utilities.overrides import overrides
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
+from pacman.model.resources import MultiRegionSDRAM
 from spinn_front_end_common.abstract_models import (
     AbstractChangableAfterRun, AbstractProvidesOutgoingPartitionConstraints,
     AbstractCanReset, AbstractRewritesDataSpecification)
@@ -1155,21 +1156,29 @@ class AbstractPopulationVertex(
         """
         return self.__synapse_recorder.get_recordable_variables()
 
-    def get_common_constant_sdram(self, n_record, n_provenance):
+    def get_common_constant_sdram(
+            self, n_record, n_provenance, common_regions):
         """ Get the amount of SDRAM used by common parts
 
         :param int n_record: The number of recording regions
         :param int n_provenance: The number of provenance items
-
+        :param CommonRegions common_regions: Region IDs
         :rtype: int
         """
-        return (
-            SYSTEM_BYTES_REQUIREMENT +
+        sdram = MultiRegionSDRAM()
+        sdram.add_cost(common_regions.system, SYSTEM_BYTES_REQUIREMENT)
+        sdram.add_cost(
+            common_regions.recording,
             get_recording_header_size(n_record) +
-            get_recording_data_constant_size(n_record) +
+            get_recording_data_constant_size(n_record))
+        sdram.add_cost(
+            common_regions.provenance,
             ProvidesProvenanceDataFromMachineImpl.get_provenance_data_size(
-                n_provenance) +
+                n_provenance))
+        sdram.add_cost(
+            common_regions.profile,
             get_profile_region_size(self.__n_profile_samples))
+        return sdram
 
     def get_neuron_variable_sdram(self, vertex_slice):
         """ Get the amount of SDRAM per timestep used by neuron parts
@@ -1192,19 +1201,24 @@ class AbstractPopulationVertex(
         """
         return self.__synapse_recorder.get_variable_sdram_usage(vertex_slice)
 
-    def get_neuron_constant_sdram(self, vertex_slice):
+    def get_neuron_constant_sdram(self, vertex_slice, neuron_regions):
 
         """ Get the amount of fixed SDRAM used by neuron parts
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of neurons to get the size of
-
+        :param NeuronRegions neuron_regions: Region IDs
         :rtype: int
         """
-        return (
-            self.get_sdram_usage_for_neuron_params(vertex_slice) +
+        sdram = MultiRegionSDRAM()
+        sdram.add_cost(
+            neuron_regions.neuron_params,
+            self.get_sdram_usage_for_neuron_params(vertex_slice))
+        sdram.add_cost(
+            neuron_regions.neuron_recording,
             self.__neuron_recorder.get_metadata_sdram_usage_in_bytes(
                 vertex_slice))
+        return sdram
 
     def get_common_dtcm(self):
         """ Get the amount of DTCM used by common parts

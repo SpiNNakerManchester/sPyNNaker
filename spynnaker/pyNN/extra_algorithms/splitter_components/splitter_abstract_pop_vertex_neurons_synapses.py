@@ -17,7 +17,8 @@ import numpy
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.resources import (
-    ResourceContainer, ConstantSDRAM, DTCMResource, CPUCyclesPerTickResource)
+    ResourceContainer, DTCMResource, CPUCyclesPerTickResource,
+    MultiRegionSDRAM)
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
 from pacman.model.graphs.common.slice import Slice
@@ -166,7 +167,6 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
             # Create the neuron an synapse vertices
             neuron_resources = self.__get_neuron_resources(vertex_slice)
-            all_resources = [neuron_resources]
             neuron_label = "{}_Neurons:{}-{}".format(
                 label, vertex_slice.lo_atom, vertex_slice.hi_atom)
             neuron_vertex = PopulationNeuronsMachineVertex(
@@ -176,6 +176,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             self.__neuron_vertices.append(neuron_vertex)
             synapse_vertices = list()
             self.__synapse_verts_by_neuron[neuron_vertex] = synapse_vertices
+            all_resources = []
             for i in range(self.__n_synapse_vertices):
                 synapse_label = "{}_Synapses:{}-{}({})".format(
                     label, vertex_slice.lo_atom, vertex_slice.hi_atom, i)
@@ -187,7 +188,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                     vertex_slice, projs)
                 synapse_resources = self.__get_synapse_resources(
                     independent_sdram, proj_sdram, all_syn_block_sz,
-                    structural_sz, vertex_slice, projs)
+                    structural_sz, vertex_slice)
                 synapse_vertex = PopulationSynapsesMachineVertex(
                     synapse_resources, synapse_label, None, app_vertex,
                     vertex_slice, max_rb_shifts, weight_scales,
@@ -227,8 +228,17 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
             # Add SDRAM edge requirements to the neuron SDRAM, as the resource
             # tracker will otherwise try to add another core for it
-            neuron_resources.extend(ResourceContainer(sdram=ConstantSDRAM(
-                sdram_partition.total_sdram_requirements())))
+            extra_sdram = MultiRegionSDRAM()
+            extra_sdram.merge(neuron_resources.sdram)
+            extra_sdram.add_cost(
+                len(extra_sdram.regions) + 1,
+                sdram_partition.total_sdram_requirements())
+            neuron_resources_plus = ResourceContainer(
+                sdram=extra_sdram, dtcm=neuron_resources.dtcm,
+                cpu_cycles=neuron_resources.cpu_cycles,
+                iptags=neuron_resources.iptags,
+                reverse_iptags=neuron_resources.reverse_iptags)
+            all_resources.append(neuron_resources_plus)
 
             # Allocate all the resources to ensure they all fit
             resource_tracker.allocate_group_resources(all_resources)
@@ -310,10 +320,14 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         n_record = len(self._governed_app_vertex.neuron_recordables)
         variable_sdram = self._governed_app_vertex.get_neuron_variable_sdram(
             vertex_slice)
-        constant_sdram = self._governed_app_vertex.get_common_constant_sdram(
-            n_record, NeuronProvenance.N_ITEMS)
-        constant_sdram += self._governed_app_vertex.get_neuron_constant_sdram(
-            vertex_slice)
+        sdram = MultiRegionSDRAM()
+        sdram.merge(self._governed_app_vertex.get_common_constant_sdram(
+            n_record, NeuronProvenance.N_ITEMS,
+            PopulationNeuronsMachineVertex.COMMON_REGIONS))
+        sdram.merge(self._governed_app_vertex.get_neuron_constant_sdram(
+            vertex_slice, PopulationNeuronsMachineVertex.NEURON_REGIONS))
+        sdram.nest(
+            len(PopulationNeuronsMachineVertex.REGIONS) + 1, variable_sdram)
         dtcm = self._governed_app_vertex.get_common_dtcm()
         dtcm += self._governed_app_vertex.get_neuron_dtcm(vertex_slice)
         cpu_cycles = self._governed_app_vertex.get_common_cpu()
@@ -321,8 +335,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
         # set resources required from this object
         container = ResourceContainer(
-            sdram=variable_sdram + ConstantSDRAM(constant_sdram),
-            dtcm=DTCMResource(dtcm),
+            sdram=sdram, dtcm=DTCMResource(dtcm),
             cpu_cycles=CPUCyclesPerTickResource(cpu_cycles))
 
         # return the total resources.
@@ -330,7 +343,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
     def __get_synapse_resources(
             self, independent_sdram, proj_dependent_sdram, all_syn_block_sz,
-            structural_sz, vertex_slice, incoming_projections):
+            structural_sz, vertex_slice):
         """  Gets the resources of the synapses of a slice of atoms from a
              given app vertex.
 
@@ -340,12 +353,27 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         n_record = len(self._governed_app_vertex.synapse_recordables)
         variable_sdram = self._governed_app_vertex.get_synapse_variable_sdram(
             vertex_slice)
-        constant_sdram = self._governed_app_vertex.get_common_constant_sdram(
-            n_record, SynapseProvenance.N_ITEMS)
-        constant_sdram += independent_sdram + proj_dependent_sdram
-        constant_sdram += all_syn_block_sz + structural_sz
-        constant_sdram += self._governed_app_vertex.get_synapse_dynamics_size(
-            vertex_slice)
+        sdram = MultiRegionSDRAM()
+        sdram.merge(self._governed_app_vertex.get_common_constant_sdram(
+            n_record, SynapseProvenance.N_ITEMS,
+            PopulationSynapsesMachineVertex.COMMON_REGIONS))
+        sdram.merge(independent_sdram)
+        sdram.merge(proj_dependent_sdram)
+        sdram.add_cost(
+            PopulationSynapsesMachineVertex.SYNAPSE_REGIONS.synaptic_matrix,
+            all_syn_block_sz)
+        sdram.add_cost(
+            PopulationSynapsesMachineVertex.SYNAPSE_REGIONS.direct_matrix,
+            self._governed_app_vertex.all_single_syn_size)
+        sdram.add_cost(
+            PopulationSynapsesMachineVertex.SYNAPSE_REGIONS
+            .structural_dynamics, structural_sz)
+        sdram.add_cost(
+            PopulationSynapsesMachineVertex.SYNAPSE_REGIONS.synapse_dynamics,
+            self._governed_app_vertex.get_synapse_dynamics_size(vertex_slice))
+        sdram.nest(
+            len(PopulationSynapsesMachineVertex.REGIONS) + 1,
+            variable_sdram)
         dtcm = self._governed_app_vertex.get_common_dtcm()
         dtcm += self._governed_app_vertex.get_synapse_dtcm(vertex_slice)
         cpu_cycles = self._governed_app_vertex.get_common_cpu()
@@ -353,8 +381,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
         # set resources required from this object
         container = ResourceContainer(
-            sdram=variable_sdram + ConstantSDRAM(constant_sdram),
-            dtcm=DTCMResource(dtcm),
+            sdram=sdram, dtcm=DTCMResource(dtcm),
             cpu_cycles=CPUCyclesPerTickResource(cpu_cycles))
 
         # return the total resources.
@@ -362,18 +389,32 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
     def __independent_synapse_sdram(self):
         app_vertex = self._governed_app_vertex
-        return (
-            app_vertex.get_synapse_params_size() +
+        sdram = MultiRegionSDRAM()
+        sdram.add_cost(
+            PopulationSynapsesMachineVertex.SYNAPSE_REGIONS.synapse_params,
+            app_vertex.get_synapse_params_size())
+        sdram.add_cost(
+            PopulationSynapsesMachineVertex.SYNAPSE_REGIONS.bitfield_builder,
             exact_sdram_for_bit_field_builder_region())
+        return sdram
 
     def __proj_dependent_synapse_sdram(self, incoming_projections):
         app_vertex = self._governed_app_vertex
-        return (
+        sdram = MultiRegionSDRAM()
+        sdram.add_cost(
+            PopulationSynapsesMachineVertex.SYNAPSE_REGIONS.pop_table,
             MasterPopTableAsBinarySearch.get_master_population_table_size(
-                incoming_projections) +
-            app_vertex.get_synapse_expander_size(incoming_projections) +
-            get_estimated_sdram_for_bit_field_region(incoming_projections) +
+                incoming_projections))
+        sdram.add_cost(
+            PopulationSynapsesMachineVertex.SYNAPSE_REGIONS.connection_builder,
+            app_vertex.get_synapse_expander_size(incoming_projections))
+        sdram.add_cost(
+            PopulationSynapsesMachineVertex.SYNAPSE_REGIONS.bitfield_filter,
+            get_estimated_sdram_for_bit_field_region(incoming_projections))
+        sdram.add_cost(
+            PopulationSynapsesMachineVertex.SYNAPSE_REGIONS.bitfield_key_map,
             get_estimated_sdram_for_key_region(incoming_projections))
+        return sdram
 
     @overrides(AbstractSpynnakerSplitterDelay.max_support_delay)
     def max_support_delay(self):
