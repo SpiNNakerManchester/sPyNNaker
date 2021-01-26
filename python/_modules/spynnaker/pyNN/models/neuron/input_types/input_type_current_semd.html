@@ -74,8 +74,14 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiplicator</span><span class="p">,</span> <span class="n">inh_input_previous</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param float multiplicator:</span>
-<span class="sd">        :param float inh_input_previous:</span>
+<span class="sd">        :param multiplicator:</span>
+<span class="sd">        :type multiplicator: \</span>
+<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution \</span>
+<span class="sd">            or (mapping) function</span>
+<span class="sd">        :param inh_input_previous:</span>
+<span class="sd">        :type inh_input_previous: \</span>
+<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution \</span>
+<span class="sd">            or (mapping) function</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">InputTypeCurrentSEMD</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">([</span>
             <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># multiplicator</span>
@@ -122,17 +128,9 @@
     <span class="k">def</span> <span class="nf">multiplicator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__multiplicator</span>
 
-    <span class="nd">@multiplicator</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">multiplicator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiplicator</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__multiplicator</span> <span class="o">=</span> <span class="n">multiplicator</span>
-
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">inh_input_previous</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__inh_input_previous</span>
-
-    <span class="nd">@inh_input_previous</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">inh_input_previous</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inh_input_previous</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__inh_input_previous</span> <span class="o">=</span> <span class="n">inh_input_previous</span>
 
 <div class="viewcode-block" id="InputTypeCurrentSEMD.get_global_weight_scale"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.input_types.html#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrentSEMD.get_global_weight_scale">[docs]</a>    <span class="k">def</span> <span class="nf">get_global_weight_scale</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="mf">1.0</span></div></div>

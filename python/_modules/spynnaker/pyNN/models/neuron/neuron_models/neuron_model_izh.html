@@ -87,13 +87,30 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">v_init</span><span class="p">,</span> <span class="n">u_init</span><span class="p">,</span> <span class="n">i_offset</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param float a: :math:`a`</span>
-<span class="sd">        :param float b: :math:`b`</span>
-<span class="sd">        :param float c: :math:`c`</span>
-<span class="sd">        :param float d: :math:`d`</span>
-<span class="sd">        :param float v_init: :math:`v_{init}`</span>
-<span class="sd">        :param float u_init: :math:`u_{init}`</span>
-<span class="sd">        :param float i_offset: :math:`I_{offset}`</span>
+<span class="sd">        :param a: :math:`a`</span>
+<span class="sd">        :type a: float, iterable(float), ~pyNN.random.RandomDistribution or \</span>
+<span class="sd">                 (mapping) function</span>
+<span class="sd">        :param b: :math:`b`</span>
+<span class="sd">        :type b: float, iterable(float), ~pyNN.random.RandomDistribution or \</span>
+<span class="sd">                 (mapping) function</span>
+<span class="sd">        :param c: :math:`c`</span>
+<span class="sd">        :type c: float, iterable(float), ~pyNN.random.RandomDistribution or \</span>
+<span class="sd">                 (mapping) function</span>
+<span class="sd">        :param d: :math:`d`</span>
+<span class="sd">        :type d: float, iterable(float), ~pyNN.random.RandomDistribution or \</span>
+<span class="sd">                 (mapping) function</span>
+<span class="sd">        :param v_init: :math:`v_{init}`</span>
+<span class="sd">        :type v_init: \</span>
+<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution or \</span>
+<span class="sd">            (mapping) function</span>
+<span class="sd">        :param u_init: :math:`u_{init}`</span>
+<span class="sd">        :type u_init: \</span>
+<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution or \</span>
+<span class="sd">            (mapping) function</span>
+<span class="sd">        :param i_offset: :math:`I_{offset}`</span>
+<span class="sd">        :type i_offset: \</span>
+<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution or \</span>
+<span class="sd">            (mapping) function</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">NeuronModelIzh</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="p">[</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># a</span>
@@ -176,10 +193,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__a</span>
 
-    <span class="nd">@a</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">a</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__a</span> <span class="o">=</span> <span class="n">a</span>
-
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">b</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`b`</span>
@@ -187,10 +200,6 @@
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__b</span>
-
-    <span class="nd">@b</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">b</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__b</span> <span class="o">=</span> <span class="n">b</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">c</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -200,10 +209,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__c</span>
 
-    <span class="nd">@c</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">c</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__c</span> <span class="o">=</span> <span class="n">c</span>
-
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">d</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`d`</span>
@@ -211,10 +216,6 @@
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__d</span>
-
-    <span class="nd">@d</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__d</span> <span class="o">=</span> <span class="n">d</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">i_offset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -224,10 +225,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__i_offset</span>
 
-    <span class="nd">@i_offset</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">i_offset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i_offset</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__i_offset</span> <span class="o">=</span> <span class="n">i_offset</span>
-
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">v_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`v_{init}`</span>
@@ -236,21 +233,13 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__v_init</span>
 
-    <span class="nd">@v_init</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">v_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v_init</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__v_init</span> <span class="o">=</span> <span class="n">v_init</span>
-
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">u_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`u_{init}`</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__u_init</span>
-
-    <span class="nd">@u_init</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">u_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u_init</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__u_init</span> <span class="o">=</span> <span class="n">u_init</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__u_init</span></div>
 </pre></div>
 
             <div class="clearer"></div>

@@ -87,12 +87,30 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">tau_syn_E</span><span class="p">,</span> <span class="n">tau_syn_E2</span><span class="p">,</span> <span class="n">tau_syn_I</span><span class="p">,</span> <span class="n">isyn_exc</span><span class="p">,</span> <span class="n">isyn_exc2</span><span class="p">,</span>
             <span class="n">isyn_inh</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param float tau_syn_E: :math:`\tau^{syn}_{e_1}`</span>
-<span class="sd">        :param float tau_syn_E2: :math:`\tau^{syn}_{e_2}`</span>
-<span class="sd">        :param float tau_syn_I: :math:`\tau^{syn}_i`</span>
-<span class="sd">        :param float isyn_exc: :math:`I^{syn}_{e_1}`</span>
-<span class="sd">        :param float isyn_exc2: :math:`I^{syn}_{e_2}`</span>
-<span class="sd">        :param float isyn_inh: :math:`I^{syn}_i`</span>
+<span class="sd">        :param tau_syn_E: :math:`\tau^{syn}_{e_1}`</span>
+<span class="sd">        :type tau_syn_E: \</span>
+<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution \</span>
+<span class="sd">            or (mapping) function</span>
+<span class="sd">        :param tau_syn_E2: :math:`\tau^{syn}_{e_2}`</span>
+<span class="sd">        :type tau_syn_E2: \</span>
+<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution \</span>
+<span class="sd">            or (mapping) function</span>
+<span class="sd">        :param tau_syn_I: :math:`\tau^{syn}_i`</span>
+<span class="sd">        :type tau_syn_I: \</span>
+<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution \</span>
+<span class="sd">            or (mapping) function</span>
+<span class="sd">        :param isyn_exc: :math:`I^{syn}_{e_1}`</span>
+<span class="sd">        :type isyn_exc: \</span>
+<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution \</span>
+<span class="sd">            or (mapping) function</span>
+<span class="sd">        :param isyn_exc2: :math:`I^{syn}_{e_2}`</span>
+<span class="sd">        :type isyn_exc2: \</span>
+<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution \</span>
+<span class="sd">            or (mapping) function</span>
+<span class="sd">        :param isyn_inh: :math:`I^{syn}_i`</span>
+<span class="sd">        :type isyn_inh: \</span>
+<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution \</span>
+<span class="sd">            or (mapping) function</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">SynapseTypeDualExponential</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="p">[</span><span class="n">DataType</span><span class="o">.</span><span class="n">U032</span><span class="p">,</span>    <span class="c1"># decay_E</span>
@@ -190,49 +208,25 @@
     <span class="k">def</span> <span class="nf">tau_syn_E</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tau_syn_E</span>
 
-    <span class="nd">@tau_syn_E</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">tau_syn_E</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tau_syn_E</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__tau_syn_E</span> <span class="o">=</span> <span class="n">tau_syn_E</span>
-
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">tau_syn_E2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tau_syn_E2</span>
-
-    <span class="nd">@tau_syn_E2</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">tau_syn_E2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tau_syn_E2</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__tau_syn_E2</span> <span class="o">=</span> <span class="n">tau_syn_E2</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">tau_syn_I</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tau_syn_I</span>
 
-    <span class="nd">@tau_syn_I</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">tau_syn_I</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tau_syn_I</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__tau_syn_I</span> <span class="o">=</span> <span class="n">tau_syn_I</span>
-
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">isyn_exc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__isyn_exc</span>
-
-    <span class="nd">@isyn_exc</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">isyn_exc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">isyn_exc</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__isyn_exc</span> <span class="o">=</span> <span class="n">isyn_exc</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">isyn_inh</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__isyn_inh</span>
 
-    <span class="nd">@isyn_inh</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">isyn_inh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">isyn_inh</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__isyn_inh</span> <span class="o">=</span> <span class="n">isyn_inh</span>
-
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">isyn_exc2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__isyn_exc2</span>
-
-    <span class="nd">@isyn_exc2</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">isyn_exc2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">isyn_exc2</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__isyn_exc2</span> <span class="o">=</span> <span class="n">isyn_exc2</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__isyn_exc2</span></div>
 </pre></div>
 
             <div class="clearer"></div>

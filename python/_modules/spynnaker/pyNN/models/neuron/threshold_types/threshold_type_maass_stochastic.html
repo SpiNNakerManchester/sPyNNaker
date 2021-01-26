@@ -82,9 +82,16 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">du_th</span><span class="p">,</span> <span class="n">tau_th</span><span class="p">,</span> <span class="n">v_thresh</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param float du_th: :math:`du_{thresh}`</span>
-<span class="sd">        :param float tau_th: :math:`\tau_{thresh}`</span>
-<span class="sd">        :param float v_thresh: :math:`V_{thresh}`</span>
+<span class="sd">        :param du_th: :math:`du_{thresh}`</span>
+<span class="sd">        :type du_th: float, iterable(float), ~pyNN.random.RandomDistribution \</span>
+<span class="sd">                     or (mapping) function</span>
+<span class="sd">        :param tau_th: :math:`\tau_{thresh}`</span>
+<span class="sd">        :type tau_th: float, iterable(float), ~pyNN.random.RandomDistribution \</span>
+<span class="sd">                      or (mapping) function</span>
+<span class="sd">        :param v_thresh: :math:`V_{thresh}`</span>
+<span class="sd">        :type v_thresh: \</span>
+<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution \</span>
+<span class="sd">            or (mapping) function</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ThresholdTypeMaassStochastic</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">([</span>
             <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># 1 / du_th</span>
@@ -128,8 +135,7 @@
 
 <div class="viewcode-block" id="ThresholdTypeMaassStochastic.update_values"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.threshold_types.html#spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeMaassStochastic.update_values">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractThresholdType</span><span class="o">.</span><span class="n">update_values</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">update_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">):</span>
-        <span class="c1"># Read the data</span>
-        <span class="p">(</span><span class="n">_du_th</span><span class="p">,</span> <span class="n">_tau_th</span><span class="p">,</span> <span class="n">_v_thresh</span><span class="p">,</span> <span class="n">_time_step_ms_div_10</span><span class="p">)</span> <span class="o">=</span> <span class="n">values</span></div>
+        <span class="k">pass</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">v_thresh</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -138,10 +144,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__v_thresh</span>
 
-    <span class="nd">@v_thresh</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">v_thresh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v_thresh</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__v_thresh</span> <span class="o">=</span> <span class="n">v_thresh</span>
-
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">du_th</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -149,20 +151,12 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__du_th</span>
 
-    <span class="nd">@du_th</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">du_th</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">du_th</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__du_th</span> <span class="o">=</span> <span class="n">du_th</span>
-
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">tau_th</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :math:`\tau_{thresh}`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tau_th</span>
-
-    <span class="nd">@tau_th</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">tau_th</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tau_th</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__tau_th</span> <span class="o">=</span> <span class="n">tau_th</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tau_th</span></div>
 </pre></div>
 
             <div class="clearer"></div>

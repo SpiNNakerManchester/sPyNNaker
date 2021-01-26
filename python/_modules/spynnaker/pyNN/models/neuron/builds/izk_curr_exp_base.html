@@ -65,17 +65,39 @@
 <div class="viewcode-block" id="IzkCurrExpBase"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.builds.html#spynnaker.pyNN.models.neuron.builds.IzkCurrExpBase">[docs]</a><span class="k">class</span> <span class="nc">IzkCurrExpBase</span><span class="p">(</span><span class="n">AbstractPyNNNeuronModelStandard</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Izhikevich neuron model with current inputs.</span>
 
-<span class="sd">    :param float a: :math:`a`</span>
-<span class="sd">    :param float b: :math:`b`</span>
-<span class="sd">    :param float c: :math:`c`</span>
-<span class="sd">    :param float d: :math:`d`</span>
-<span class="sd">    :param float i_offset: :math:`I_{offset}`</span>
-<span class="sd">    :param float u: :math:`u_{init} = \\delta V_{init}`</span>
-<span class="sd">    :param float v: :math:`v_{init} = V_{init}`</span>
-<span class="sd">    :param float tau_syn_E: :math:`\\tau^{syn}_e`</span>
-<span class="sd">    :param float tau_syn_I: :math:`\\tau^{syn}_i`</span>
-<span class="sd">    :param float isyn_exc: :math:`I^{syn}_e`</span>
-<span class="sd">    :param float isyn_inh: :math:`I^{syn}_i`</span>
+<span class="sd">    :param a: :math:`a`</span>
+<span class="sd">    :type a: float, iterable(float), ~pyNN.random.RandomDistribution \</span>
+<span class="sd">             or (mapping) function</span>
+<span class="sd">    :param b: :math:`b`</span>
+<span class="sd">    :type b: float, iterable(float), ~pyNN.random.RandomDistribution \</span>
+<span class="sd">             or (mapping) function</span>
+<span class="sd">    :param c: :math:`c`</span>
+<span class="sd">    :type c: float, iterable(float), ~pyNN.random.RandomDistribution \</span>
+<span class="sd">             or (mapping) function</span>
+<span class="sd">    :param d: :math:`d`</span>
+<span class="sd">    :type d: float, iterable(float), ~pyNN.random.RandomDistribution \</span>
+<span class="sd">             or (mapping) function</span>
+<span class="sd">    :param i_offset: :math:`I_{offset}`</span>
+<span class="sd">    :type i_offset: float, iterable(float), ~pyNN.random.RandomDistribution \</span>
+<span class="sd">                    or (mapping) function</span>
+<span class="sd">    :param u: :math:`u_{init} = \\delta V_{init}`</span>
+<span class="sd">    :type u: float, iterable(float), ~pyNN.random.RandomDistribution \</span>
+<span class="sd">             or (mapping) function</span>
+<span class="sd">    :param v: :math:`v_{init} = V_{init}`</span>
+<span class="sd">    :type v: float, iterable(float), ~pyNN.random.RandomDistribution \</span>
+<span class="sd">             or (mapping) function</span>
+<span class="sd">    :param tau_syn_E: :math:`\\tau^{syn}_e`</span>
+<span class="sd">    :type tau_syn_E: float, iterable(float), ~pyNN.random.RandomDistribution \</span>
+<span class="sd">                     or (mapping) function</span>
+<span class="sd">    :param tau_syn_I: :math:`\\tau^{syn}_i`</span>
+<span class="sd">    :type tau_syn_I: float, iterable(float), ~pyNN.random.RandomDistribution \</span>
+<span class="sd">                     or (mapping) function</span>
+<span class="sd">    :param isyn_exc: :math:`I^{syn}_e`</span>
+<span class="sd">    :type isyn_exc: float, iterable(float), ~pyNN.random.RandomDistribution \</span>
+<span class="sd">                    or (mapping) function</span>
+<span class="sd">    :param isyn_inh: :math:`I^{syn}_i`</span>
+<span class="sd">    :type isyn_inh: float, iterable(float), ~pyNN.random.RandomDistribution \</span>
+<span class="sd">                    or (mapping) function</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># noinspection PyPep8Naming</span>
