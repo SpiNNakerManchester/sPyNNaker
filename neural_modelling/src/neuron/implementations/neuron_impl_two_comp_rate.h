@@ -26,6 +26,7 @@
 #include <neuron/input_types/input_type_two_comp_rate.h>
 #include <neuron/additional_inputs/additional_input_none_impl.h>
 #include <neuron/threshold_types/threshold_type_static.h>
+#include <synapse/plasticity/stdp/post_events_rate.h>
 
 // Further includes
 #include <common/out_spikes.h>
@@ -50,6 +51,8 @@
 	shaping include
 #endif
 
+#define DMA_TAG_WRITE_POSTSYNAPTIC_BUFFER 2
+
 //! Array of neuron states
 static neuron_pointer_t neuron_array;
 
@@ -72,7 +75,11 @@ static synapse_param_t *neuron_synapse_shaping_params;
 static REAL *rate_lut;
 static uint32_t rate_lut_size;
 
-static REAL postsynaptic_rates;
+//! Array containing the postsynaptic rates
+static post_event_history_t *postsynaptic_rates;
+
+//! Pointer to the SDRAM region for the postsynaptic rates
+static post_event_history_t *postsynaptic_buffer;
 
 static bool neuron_impl_initialise(uint32_t n_neurons) {
     // allocate DTCM for the global parameter details
@@ -135,7 +142,7 @@ static bool neuron_impl_initialise(uint32_t n_neurons) {
         }
     }
 
-    postsynaptic_rates = 0;
+    postsynaptic_rates = post_events_init_buffers(n_neurons);
 
     return true;
 }
@@ -460,20 +467,28 @@ uint32_t neuron_impl_get_starting_rate() {
     return neuron_array[0].rate_at_last_setting;;
 }
 
-static inline REAL* neuron_impl_post_rates(index_t neuron_index) {
+static inline void neuron_impl_process_post_synaptic_event(index_t neuron_index) {
 
     neuron_pointer_t neuron = &neuron_array[neuron_index];
+    
+    post_events_update(&postsynaptic_rates[neuron_index],
+        set_spike_source_rate(neuron->U_membrane * neuron->plasticity_rate_multiplier) -
+        set_spike_source_rate(neuron->V));
 
-    postsynaptic_rates =
-        set_spike_source_rate(neuron->U_membrane * neuron->plasticity_rate_multiplier) - set_spike_source_rate(neuron->V);
+}
 
-    io_printf(IO_BUF, "v %k, u %k\n", neuron->V, neuron->U_membrane);
-    io_printf(IO_BUF, "Rates diff %k\n", postsynaptic_rates);
+static inline void neuron_impl_send_postsynaptic_buffer(uint32_t n_neurons) {
 
-    //io_printf(IO_BUF, "Rate(V) %k\n", a);
+    spin1_dma_transfer(
+        DMA_TAG_WRITE_POSTSYNAPTIC_BUFFER, postsynaptic_buffer, postsynaptic_rates,
+        DMA_WRITE, n_neurons * sizeof(post_event_history_t));
+}
 
-    return &postsynaptic_rates;
+static void neuron_impl_allocate_postsynaptic_region(uint tag, uint n_neurons) {
 
+    postsynaptic_buffer = 
+        (post_event_history_t *) sark_xalloc(
+            sv->sdram_heap, n_neurons * sizeof(post_event_history_t), tag, 1);
 }
 
 #if LOG_LEVEL >= LOG_DEBUG

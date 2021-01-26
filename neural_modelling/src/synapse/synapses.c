@@ -735,4 +735,6 @@ void synapses_set_contribution_region(){
 
     synaptic_region = sark_tag_ptr(memory_index, 0);
     synaptic_region += (offset << synapse_index_bits);
+
+    synapse_dynamics_set_post_buffer_region(memory_index+1);
 }

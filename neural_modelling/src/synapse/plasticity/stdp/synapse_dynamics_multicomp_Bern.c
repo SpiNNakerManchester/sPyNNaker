@@ -32,6 +32,8 @@
 #include <synapse/plasticity/synapse_dynamics.h>
 #include <round.h>
 
+#define DMA_TAG_READ_POST_BUFFER 2
+
 static uint32_t synapse_type_index_bits;
 static uint32_t synapse_index_bits;
 static uint32_t synapse_index_mask;
@@ -41,6 +43,8 @@ static uint32_t synapse_type_mask;
 
 uint32_t num_plastic_pre_synaptic_events = 0;
 uint32_t plastic_saturation_count = 0;
+
+static uint32_t post_events_size;
 
 //---------------------------------------
 // Macros
@@ -81,6 +85,9 @@ typedef struct {
 } pre_event_history_t;
 
 post_event_history_t *post_event_history;
+
+//SDRAM address for postsynaptic buffers
+post_event_history_t *post_event_region;
 
 /* PRIVATE FUNCTIONS */
 
@@ -174,7 +181,7 @@ static inline index_t sparse_axonal_delay(uint32_t x) {
 
 address_t synapse_dynamics_initialise(
         address_t address, uint32_t n_neurons, uint32_t n_synapse_types,
-        uint32_t *ring_buffer_to_input_buffer_left_shifts) {
+        uint32_t *ring_buffer_to_input_buffer_left_shifts, bool *has_plastic_synapses) {
     // Load timing dependence data
     address_t weight_region_address = timing_initialise(address);
     if (address == NULL) {
@@ -193,6 +200,9 @@ address_t synapse_dynamics_initialise(
     if (post_event_history == NULL) {
         return NULL;
     }
+
+    // Used for DMA read
+    post_events_size = n_neurons * sizeof(post_event_history_t);
 
     uint32_t n_neurons_power_2 = n_neurons;
     uint32_t log_n_neurons = 1;
@@ -216,6 +226,8 @@ address_t synapse_dynamics_initialise(
     synapse_delay_index_type_bits =
             SYNAPSE_DELAY_BITS + synapse_type_index_bits;
     synapse_type_mask = (1 << log_n_synapse_types) - 1;
+
+    *has_plastic_synapses = true;
 
     return weight_result;
 }
@@ -339,6 +351,19 @@ void synapse_dynamics_process_post_synaptic_event(index_t neuron_index, REAL *ra
     post_event_history_t *history = &post_event_history[neuron_index];
 
     post_events_update(history, *rates);
+}
+
+// Can we make this inline?
+void synapse_dynamics_set_post_buffer_region(uint32_t tag) {
+
+    post_event_region = sark_tag_ptr(tag, 0);
+}
+
+void synapse_dynamics_read_post_buffer() {
+
+    spin1_dma_transfer(
+        DMA_TAG_READ_POST_BUFFER, post_event_region,
+        post_event_history, DMA_READ, post_events_size);
 }
 
 input_t synapse_dynamics_get_intrinsic_bias(

@@ -180,4 +180,50 @@ $(BUILD_DIR)synapse/population_table/population_table_binary_search_impl.o: $(MO
 	-mkdir -p $(dir $@)
 	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
 
+#STDP Build rules If and only if STDP used
+ifeq ($(STDP_ENABLED), 1)
+    STDP_INCLUDES:= -include $(WEIGHT_DEPENDENCE_H) -include $(TIMING_DEPENDENCE_H)
+    STDP_COMPILE = $(CC) -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) -DSTDP_ENABLED=$(STDP_ENABLED) -DSYNGEN_ENABLED=$(SYNGEN_ENABLED) $(STDP_INCLUDES)
+
+    $(SYNAPSE_DYNAMICS_O): $(SYNAPSE_DYNAMICS_C)
+	# SYNAPSE_DYNAMICS_O stdp
+	-@mkdir -p $(dir $@)
+	$(STDP_COMPILE) -o $@ $<
+
+    $(SYNAPTOGENESIS_DYNAMICS_O): $(SYNAPTOGENESIS_DYNAMICS_C)
+	# SYNAPTOGENESIS_DYNAMICS_O stdp
+	-@mkdir -p $(dir $@)
+	$(STDP_COMPILE) -o $@ $<
+
+    $(BUILD_DIR)synapse/plasticity/common/post_events.o: $(MODIFIED_DIR)synapse/plasticity/common/post_events.c
+	# plasticity/common/post_events.c
+	-@mkdir -p $(dir $@)
+	$(STDP_COMPILE) -o $@ $<
+
+else
+    $(SYNAPTOGENESIS_DYNAMICS_O): $(SYNAPTOGENESIS_DYNAMICS_C)
+	# $(SYNAPTOGENESIS_DYNAMICS) Synapese
+	-@mkdir -p $(dir $@)
+	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
+
+    $(SYNAPSE_DYNAMICS_O): $(SYNAPSE_DYNAMICS_C)
+	# SYNAPSE_DYNAMICS_O Synapese
+	-@mkdir -p $(dir $@)
+	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
+
+endif
+
+$(WEIGHT_DEPENDENCE_O): $(WEIGHT_DEPENDENCE_C) $(SYNAPSE_TYPE_H)
+	# WEIGHT_DEPENDENCE_O
+	-@mkdir -p $(dir $@)
+	$(CC) -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
+	        -o $@ $<
+
+$(TIMING_DEPENDENCE_O): $(TIMING_DEPENDENCE_C) $(SYNAPSE_TYPE_H) \
+                        $(WEIGHT_DEPENDENCE_H)
+	# TIMING_DEPENDENCE_O
+	-@mkdir -p $(dir $@)
+	$(CC) -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
+	        -include $(WEIGHT_DEPENDENCE_H) -o $@ $<
+
 .PRECIOUS: $(MODIFIED_DIR)%.c $(MODIFIED_DIR)%.h $(LOG_DICT_FILE) $(EXTRA_PRECIOUS)

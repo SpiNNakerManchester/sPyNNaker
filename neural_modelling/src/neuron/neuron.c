@@ -324,6 +324,9 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
         return false;
     }
 
+    // Tag the postsynaptic region with memory_index+1. Still a unique id and saves space in DTCM
+    neuron_impl_allocate_postsynaptic_region(memory_index+1, n_neurons);
+
     // Allocate space for the synaptic contribution buffer
     synaptic_contributions = (REAL *) spin1_malloc(dma_size);
     if (synaptic_contributions == NULL) {
@@ -494,7 +497,7 @@ void neuron_do_timestep_update( // EXPORTED
             out_spikes_set_spike(spike_recording_indexes[neuron_index]);
 
             // Do any required synapse processing
-            synapse_dynamics_process_post_synaptic_event(neuron_index, neuron_impl_post_rates(neuron_index));
+            neuron_impl_process_post_synaptic_event(neuron_index);
 
               //io_printf(IO_BUF, "ur %k, vr %k, t %d\n", neuron_impl_post_syn_urate(neuron_index), neuron_impl_post_syn_vrate(neuron_index), time);
 
@@ -512,6 +515,9 @@ void neuron_do_timestep_update( // EXPORTED
         }
             io_printf(IO_BUF, "Sent %k , neuron %d\n",neuron_impl_get_v(neuron_index), neuron_index);
     }
+
+    // Start the DMA with the postsynaptic contributions for the syn cores
+    neuron_impl_send_postsynaptic_buffer(n_neurons);
 
     // Disable interrupts to avoid possible concurrent access
     uint cpsr = 0;

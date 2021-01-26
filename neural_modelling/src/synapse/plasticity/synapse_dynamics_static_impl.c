@@ -30,11 +30,14 @@
 
 address_t synapse_dynamics_initialise(
         address_t address, uint32_t n_neurons, uint32_t n_synapse_types,
-        uint32_t *ring_buffer_to_input_buffer_left_shifts) {
+        uint32_t *ring_buffer_to_input_buffer_left_shifts, bool *has_plastic_synapses) {
     use(address);
     use(n_neurons);
     use(n_synapse_types);
     use(ring_buffer_to_input_buffer_left_shifts);
+
+    *has_plastic_synapses = false;
+    
     return address;
 }
 
@@ -125,4 +128,12 @@ bool add_plastic_neuron_with_id(
     use(delay);
     use(type);
     return false;
+}
+
+void synapse_dynamics_set_post_buffer_region(uint32_t tag) {
+    use(tag);
+}
+
+void synapse_dynamics_read_post_buffer() {
+
 }

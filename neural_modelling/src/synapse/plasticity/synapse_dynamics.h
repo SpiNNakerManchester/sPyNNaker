@@ -22,9 +22,14 @@
 #include <synapse/synapse_row.h>
 #include <synapse/structural_plasticity/sp_structs.h>
 
+// Used for post event buffer DMA read
+//Maybe move inside a syn typedef with the other defines?
+// Defined in spike_processing.c as well!!!!
+#define DMA_TAG_READ_POST_BUFFER 2
+
 address_t synapse_dynamics_initialise(
         address_t address, uint32_t n_neurons, uint32_t n_synapse_types,
-        uint32_t *ring_buffer_to_input_buffer_left_shifts);
+        uint32_t *ring_buffer_to_input_buffer_left_shifts, bool *has_plastic_synapses);
 
 bool synapse_dynamics_process_plastic_synapses(
         address_t plastic_region_address, address_t fixed_region_address,
@@ -81,5 +86,15 @@ bool remove_plastic_neuron_at_offset(uint32_t offset, address_t row);
 //! \return bool: was the addition successful?
 bool add_plastic_neuron_with_id(
         uint32_t id, address_t row, uint32_t weight, uint32_t delay, uint32_t type);
+
+
+//! \brief  Get the address for the postsynaptic buffer in SDRAM
+//! \param[in] tag: the memory tag for the address
+//! \return None
+void synapse_dynamics_set_post_buffer_region(uint32_t tag);
+
+//! \brief Read the postsynaptic buffer
+//! \return None
+void synapse_dynamics_read_post_buffer();
 
 #endif // _SYNAPSE_DYNAMICS_H_

@@ -29,7 +29,8 @@
 // DMA tags
 enum spike_processing_dma_tags {
     DMA_TAG_READ_SYNAPTIC_ROW,
-    DMA_TAG_WRITE_PLASTIC_REGION
+    DMA_TAG_WRITE_PLASTIC_REGION,
+    DMA_TAG_READ_POST_BUFFER
 };
 
 extern uint32_t time;
@@ -194,8 +195,6 @@ static void multicast_packet_received_callback(uint key, uint payload) {
 
     io_printf(IO_BUF, "rcvd %k from %d\n", payload, key);
 
-    //io_printf(IO_BUF, "recv %x %k\n", key, payload);
-
     // If there was space to add spike to incoming spike queue
     if (in_rates_add_rate((rate_t){key, payload})) {
         // If we're not already processing synaptic DMAs,
@@ -220,11 +219,23 @@ static void user_event_callback(uint unused0, uint unused1) {
     setup_synaptic_dma_read();
 }
 
+static void post_buffer_complete_callback(uint unused1, uint unused2) {
+
+    use(unused1);
+    use(unused2);
+
+    if(!spin1_trigger_user_event(0, 0)) {
+        log_debug("Could not trigger user event \n");
+    }
+
+}
+
 /* INTERFACE FUNCTIONS - cannot be static */
 
 bool spike_processing_initialise( // EXPORTED
         size_t row_max_n_words, uint mc_packet_callback_priority,
-        uint user_event_priority, uint incoming_spike_buffer_size) {
+        uint user_event_priority, uint incoming_spike_buffer_size,
+        bool has_plastic_synapses) {
     // Allocate the DMA buffers
     for (uint32_t i = 0; i < N_DMA_BUFFERS; i++) {
         dma_buffers[i].row = spin1_malloc(row_max_n_words * sizeof(uint32_t));
@@ -235,7 +246,6 @@ bool spike_processing_initialise( // EXPORTED
         log_debug("DMA buffer %u allocated at 0x%08x",
                 i, dma_buffers[i].row);
     }
-    dma_busy = false;
     next_buffer_to_fill = 0;
     buffer_being_read = N_DMA_BUFFERS;
     max_n_words = row_max_n_words;
@@ -254,6 +264,21 @@ bool spike_processing_initialise( // EXPORTED
     spin1_callback_on(MCPL_PACKET_RECEIVED,
             multicast_packet_received_callback, mc_packet_callback_priority);
     spin1_callback_on(USER_EVENT, user_event_callback, user_event_priority);
+
+    // Register the post buffer read callback for plastic synapses only
+    // This prevents multicast_packet_received_cb to trigger the first user event.
+    // Synapse_dynamics will trigger the first after reading the post_event buffer
+    // then the behaviour is as usual
+    if(has_plastic_synapses) {
+        
+        simulation_dma_transfer_done_callback_on(
+            DMA_TAG_READ_POST_BUFFER, post_buffer_complete_callback);
+            dma_busy = true;
+    }
+    else{
+
+        dma_busy = false;
+    }
 
     return true;
 }

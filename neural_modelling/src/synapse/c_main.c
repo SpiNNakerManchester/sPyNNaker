@@ -101,6 +101,7 @@ static uint32_t spikes_remaining = 0;
 uint32_t spikes_remaining_this_tick = 0;
 static uint32_t max_time = UINT32_MAX;
 static uint32_t cb_calls = 0;
+static bool has_plastic_synapses = false;
 
 //! \brief Initialises the recording parts of the model
 //! \param[in] recording_address: the address in SDRAM where to store
@@ -131,6 +132,10 @@ void c_main_store_provenance_data(address_t provenance_region){
     log_debug("finished other provenance data");
 }
 
+//! \brief Callback used to write the synaptic contributions for the neuron core
+//! \param[in] unused1 unused parameter kept for API consistency
+//! \param[in] unused2 unused parameter kept for API consistency
+//! \return None
 void write_contributions(uint unused1, uint unused2) {
 
         use(unused1);
@@ -154,6 +159,19 @@ void write_contributions(uint unused1, uint unused2) {
         }
 
         spin1_mode_restore(state);
+}
+
+//! \brief Callback used to read the postsynaptic buffer from the neuron core
+//!        for plastic synapses
+//! \param[in] unused1 unused parameter kept for API consistency
+//! \param[in] unused2 unused parameter kept for API consistency
+//! \return None
+void read_contributions(uint unused1, uint unused2) {
+
+    use(unused1);
+    use(unused2);
+
+    synapse_dynamics_read_post_buffer();
 }
 
 //! \brief Initialises the model by reading in the regions and checking
@@ -221,12 +239,13 @@ static bool initialise(uint32_t *timer_period) {
             &row_max_n_words)) {
         return false;
     }
+
     // Set up the synapse dynamics
     address_t synapse_dynamics_region_address =
         data_specification_get_region(SYNAPSE_DYNAMICS_REGION, ds_regions);
     address_t syn_dyn_end_address = synapse_dynamics_initialise(
             synapse_dynamics_region_address, n_neurons, n_synapse_types,
-            ring_buffer_to_input_buffer_left_shifts);
+            ring_buffer_to_input_buffer_left_shifts, &has_plastic_synapses);
 
     if (synapse_dynamics_region_address && !syn_dyn_end_address) {
         return false;
@@ -240,7 +259,8 @@ static bool initialise(uint32_t *timer_period) {
 
     if (!spike_processing_initialise(
             row_max_n_words, MC, USER, 
-            incoming_spike_buffer_size)) {
+            incoming_spike_buffer_size,
+            has_plastic_synapses)) {
         return false;
     }
 
@@ -252,7 +272,6 @@ static bool initialise(uint32_t *timer_period) {
 
     // Register timer2 for periodic events(used to write contributions in SDRAM)
     tc[T2_INT_CLR] = 1; // clear any interrupts on T2
-    //event_register_timer(SLOT_9);
     event_register_timer(SLOT_9);
 
 //    io_printf(IO_BUF, "timer period: %u\n", *timer_period);
@@ -283,11 +302,20 @@ void timer_callback(uint timer_count, uint unused) {
 //    }
 
 //    Sould this be done in a safer way?
-//    THESE TIMES ARE FOR 0.1MS TIMESTEPS
     uint32_t state = spin1_int_disable();
+    
     uint32_t wc_reg = tc[T1_COUNT] * 0.005 - 10;
 
-    //Schedule event 20 microseconds before the end of the timer period
+    //Schedule event 10 microseconds from now
+    if(has_plastic_synapses) {
+        
+        if(!timer_schedule_proc(read_contributions, 0, 0, 10)) {
+
+            rt_error(RTE_API);
+        }
+    }
+
+    //Schedule event 10 microseconds before the end of the timer period
     if(!timer_schedule_proc(write_contributions, 0, 0, wc_reg)) {
 
     	rt_error(RTE_API);

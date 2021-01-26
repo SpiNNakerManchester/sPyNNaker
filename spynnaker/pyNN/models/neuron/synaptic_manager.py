@@ -147,8 +147,6 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
 
     _n_vertices = 0
 
-    RECORDABLES = ["synapse"]
-
     def __init__(self, n_synapse_types, synapse_index, n_neurons, atoms_offset,
                  constraints, label, max_atoms_per_core, weight_scale, ring_buffer_sigma,
                  spikes_per_second, incoming_spike_buffer_size, model_syn_types,
