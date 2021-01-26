@@ -35,8 +35,14 @@ class SynapseTypeDelta(AbstractSynapseType):
 
     def __init__(self, isyn_exc, isyn_inh):
         """
-        :param float isyn_exc: :math:`I^{syn}_e`
-        :param float isyn_inh: :math:`I^{syn}_i`
+        :param isyn_exc: :math:`I^{syn}_e`
+        :type isyn_exc: \
+            float, iterable(float), ~pyNN.random.RandomDistribution \
+            or (mapping) function
+        :param isyn_inh: :math:`I^{syn}_i`
+        :type isyn_inh: \
+            float, iterable(float), ~pyNN.random.RandomDistribution \
+            or (mapping) function
         """
         super(SynapseTypeDelta, self).__init__([
             DataType.S1615,   # isyn_exc
@@ -100,14 +106,6 @@ class SynapseTypeDelta(AbstractSynapseType):
     def isyn_exc(self):
         return self.__isyn_exc
 
-    @isyn_exc.setter
-    def isyn_exc(self, isyn_exc):
-        self.__isyn_exc = isyn_exc
-
     @property
     def isyn_inh(self):
         return self.__isyn_inh
-
-    @isyn_inh.setter
-    def isyn_inh(self, isyn_inh):
-        self.__isyn_inh = isyn_inh
