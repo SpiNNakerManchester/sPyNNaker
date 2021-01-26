@@ -16,7 +16,6 @@
 import math
 from pacman.utilities.constants import FULL_MASK
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from spynnaker.pyNN.models.abstract_models import AbstractHasDelayStages
 
 #: number of elements
 ELEMENTS_USED_IN_EACH_BIT_FIELD = 3  # n words, key, pointer to bitfield
@@ -58,17 +57,17 @@ def get_estimated_sdram_for_bit_field_region(incoming_projections):
             slices, _ = app_edge.pre_vertex.splitter.get_out_going_slices()
             n_machine_vertices = len(slices)
 
-            slice_atoms = list()
-            for vertex_slice in slices:
-                slice_atoms.append(vertex_slice.n_atoms)
-            atoms_per_core = max(slice_atoms)
-
-            if isinstance(app_edge.pre_vertex, AbstractHasDelayStages):
-                atoms_per_core *= app_edge.pre_vertex.n_delay_stages
+            atoms_per_core = max(
+                vertex_slice.n_atoms for vertex_slice in slices)
             n_words_for_atoms = int(math.ceil(atoms_per_core / BIT_IN_A_WORD))
-
             sdram += (
                 ((ELEMENTS_USED_IN_EACH_BIT_FIELD + n_words_for_atoms) *
+                 n_machine_vertices) * BYTES_PER_WORD)
+            # Also add for delay vertices if needed
+            n_words_for_delays = int(math.ceil(
+                atoms_per_core * app_edge.n_delay_stages / BIT_IN_A_WORD))
+            sdram += (
+                ((ELEMENTS_USED_IN_EACH_BIT_FIELD + n_words_for_delays) *
                  n_machine_vertices) * BYTES_PER_WORD)
     return sdram
 
@@ -95,6 +94,9 @@ def get_estimated_sdram_for_key_region(incoming_projections):
             slices, _ = in_edge.pre_vertex.splitter.get_out_going_slices()
             sdram += (len(slices) * N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP *
                       BYTES_PER_WORD)
+            if in_edge.n_delay_stages:
+                sdram += (len(slices) * N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP *
+                          BYTES_PER_WORD)
     return sdram
 
 
