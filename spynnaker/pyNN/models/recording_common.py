@@ -15,7 +15,6 @@
 
 import logging
 import numpy
-from six.moves import xrange
 from spinn_utilities import logger_utils
 from spinn_utilities.log import FormatAdapter
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
@@ -111,7 +110,7 @@ class RecordingCommon(object):
         n_neurons = len(ids)
         column_length = n_machine_time_steps * n_neurons
         times = [i * sampling_interval
-                 for i in xrange(0, n_machine_time_steps)]
+                 for i in range(0, n_machine_time_steps)]
         return numpy.column_stack((
                 numpy.repeat(ids, n_machine_time_steps, 0),
                 numpy.tile(times, n_neurons),

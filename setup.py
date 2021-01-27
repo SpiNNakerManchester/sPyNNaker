@@ -35,7 +35,7 @@ install_requires = [
     "numpy > 1.13, < 1.20; python_version == '3.6'",
     "numpy > 1.13, < 1.21; python_version == '3.7'",
     "numpy; python_version >= '3.8'",
-    'lxml', 'six']
+    'lxml']
 if os.environ.get('READTHEDOCS', None) != 'True':
 
     # scipy must be added in config.py as a mock

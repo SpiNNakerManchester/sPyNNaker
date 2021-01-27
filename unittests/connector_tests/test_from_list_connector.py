@@ -13,14 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    FromListConnector)
 import numpy
 import pytest
 from pacman.model.graphs.common.slice import Slice
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    FromListConnector)
 from unittests.mocks import MockSimulator, MockSynapseInfo, MockPopulation
-from six import reraise
-import sys
 
 
 @pytest.mark.parametrize(
@@ -141,9 +139,9 @@ def test_connector_split():
 
         # Check the split only happens once
         assert connector._split_count == 1
-    except AssertionError:
+    except AssertionError as e:
         print(connection_list)
-        reraise(*sys.exc_info())
+        raise e
 
 
 def test_could_connect():

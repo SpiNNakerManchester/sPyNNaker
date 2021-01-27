@@ -13,13 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import add_metaclass
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
 
 
-@add_metaclass(AbstractBase)
-class AbstractPopulationInitializable(object):
+class AbstractPopulationInitializable(object, metaclass=AbstractBase):
     """ Indicates that this object has properties that can be initialised by a\
         PyNN Population
     """

@@ -13,15 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import with_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.utilities.struct import Struct
 from .ranged_dict_vertex_slice import RangedDictVertexSlice
 
 
-# with_metaclass due to https://github.com/benjaminp/six/issues/219
-class AbstractStandardNeuronComponent(with_metaclass(AbstractBase, object)):
+class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
     """ Represents a component of a standard neural model.
     """
 

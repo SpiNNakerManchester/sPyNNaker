@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
@@ -35,8 +34,7 @@ from spynnaker.pyNN.models.abstract_models import (
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-@add_metaclass(AbstractBase)
-class AbstractMachineBitFieldRouterCompressor(object):
+class AbstractMachineBitFieldRouterCompressor(object, metaclass=AbstractBase):
     """ Adds in regeneration of synaptic matrices to bitfield compression to\
     :py:class:`spinn_front_end_common.interface.interface_functions.MachineBitFieldRouterCompressor`
     """
@@ -203,7 +201,7 @@ class SpynnakerMachineBitFieldOrderedCoveringCompressor(
 
 class SpynnakerMachineBitFieldUnorderedRouterCompressor(
         AbstractMachineBitFieldRouterCompressor):
-    """ DEPRACATED use MachineBitFieldRouterCompressor """
+    """ DEPRECATED use MachineBitFieldRouterCompressor """
 
     def __new__(cls, *args, **kwargs):
         logger.warning(

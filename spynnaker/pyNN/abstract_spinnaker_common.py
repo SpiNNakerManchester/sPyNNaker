@@ -16,14 +16,12 @@
 import logging
 import math
 import os
-from six import with_metaclass
-
-from spinn_front_end_common.utilities.constants import \
-    MICRO_TO_MILLISECOND_CONVERSION
 from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.log import FormatAdapter
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
     AbstractSpinnakerBase)
+from spinn_front_end_common.utilities.constants import (
+    MICRO_TO_MILLISECOND_CONVERSION)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utility_models import CommandSender
 from spinn_front_end_common.utilities.utility_objs import ExecutableFinder
@@ -38,8 +36,9 @@ from spynnaker import __version__ as version
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-class AbstractSpiNNakerCommon(with_metaclass(
-        AbstractBase, AbstractSpinnakerBase, SpynnakerSimulatorInterface)):
+class AbstractSpiNNakerCommon(
+        AbstractSpinnakerBase, SpynnakerSimulatorInterface,
+        metaclass=AbstractBase):
     """ Main interface for neural code.
     """
     __slots__ = [

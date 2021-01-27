@@ -13,15 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import add_metaclass
-
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from pacman.model.graphs.machine import MachineVertex
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
-@add_metaclass(AbstractBase)
-class AbstractReadParametersBeforeSet(object):
+class AbstractReadParametersBeforeSet(object, metaclass=AbstractBase):
     """ A vertex whose parameters must be read before any can be set.
     """
 

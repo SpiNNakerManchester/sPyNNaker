@@ -13,13 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import add_metaclass
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
 
 
-@add_metaclass(AbstractBase)
-class AbstractWeightDependence(object):
+class AbstractWeightDependence(object, metaclass=AbstractBase):
     __slots__ = ()
 
     def get_provenance_data(self, pre_population_label, post_population_label):

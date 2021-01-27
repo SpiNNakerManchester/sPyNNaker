@@ -15,7 +15,6 @@
 
 import collections
 import numpy
-from six import add_metaclass
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
 from spinn_utilities.overrides import overrides
@@ -43,8 +42,8 @@ DEFAULT_INITIAL_DELAY = 1
 DEFAULT_S_MAX = 32
 
 
-@add_metaclass(AbstractBase)
-class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
+class SynapseDynamicsStructuralCommon(
+        AbstractSynapseDynamicsStructural, metaclass=AbstractBase):
 
     # 7 32-bit numbers (fast; p_rew; s_max; app_no_atoms; machine_no_atoms;
     # low_atom; high_atom) + 2 4-word RNG seeds (shared_seed; local_seed)

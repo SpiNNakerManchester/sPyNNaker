@@ -12,31 +12,34 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from __future__ import division
 
+import io
+import math
 import os
 import tempfile
-import math
 import shutil
 import numpy
 import pytest
-
 from tempfile import mkdtemp
 
 import spinn_utilities.conf_loader as conf_loader
-from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
 from spinn_utilities.overrides import overrides
 from spinn_machine import SDRAM
+from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
 from pacman.model.placements import Placement
 from pacman.model.resources import ResourceContainer
 from pacman.model.graphs.common import Slice
-from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex, \
-    MachineEdge
+from pacman.model.graphs.machine import (
+    MachineGraph, SimpleMachineVertex, MachineEdge)
 from pacman.model.routing_info import (
     RoutingInfo, PartitionRoutingInfo, BaseKeyAndMask)
 from pacman.model.graphs.application import ApplicationVertex
+from pacman.model.placements.placements import Placements
+from pacman.model.graphs.application.application_graph import ApplicationGraph
+from pacman.model.partitioner_splitters import SplitterSliceLegacy
 from data_specification import (
     DataSpecificationGenerator, DataSpecificationExecutor)
+from data_specification.constants import MAX_MEM_REGIONS
 from spynnaker.pyNN.models.neuron import SynapticManager
 from spynnaker.pyNN.abstract_spinnaker_common import AbstractSpiNNakerCommon
 import spynnaker.pyNN.abstract_spinnaker_common as abstract_spinnaker_common
@@ -53,25 +56,23 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
 from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
     WeightDependenceAdditive, WeightDependenceMultiplicative)
 from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
-    .partner_selection import LastNeuronSelection, RandomSelection
+    .partner_selection import (
+        LastNeuronSelection, RandomSelection)
 from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
-    .formation import DistanceDependentFormation
+    .formation import (
+        DistanceDependentFormation)
 from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
-    .elimination import RandomByWeightElimination
+    .elimination import (
+        RandomByWeightElimination)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.utility_models.delays import (
     DelayExtensionVertex, DelayExtensionMachineVertex)
-from spynnaker.pyNN.extra_algorithms.splitter_components.\
-    splitter_delay_vertex_slice import SplitterDelayVertexSlice
-from pacman.model.placements.placements import Placements
-from pacman.model.graphs.application.application_graph import ApplicationGraph
-from data_specification.constants import MAX_MEM_REGIONS
+from spynnaker.pyNN.extra_algorithms.splitter_components import (
+    SplitterDelayVertexSlice)
 from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
-import io
-from unittests.mocks import MockSimulator, MockPopulation
-from pacman.model.partitioner_splitters import SplitterSliceLegacy
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
     AbstractSpynnakerSplitterDelay)
+from unittests.mocks import MockSimulator, MockPopulation
 
 
 class MockSynapseIO(object):

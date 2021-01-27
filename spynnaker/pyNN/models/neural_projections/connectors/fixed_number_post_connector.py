@@ -12,8 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-from __future__ import print_function
 import logging
 import math
 import numpy
@@ -28,7 +26,6 @@ from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
 
 N_GEN_PARAMS = 8
-
 logger = logging.getLogger(__file__)
 
 

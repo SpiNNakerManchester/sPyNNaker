@@ -13,13 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import add_metaclass
-from spinn_utilities.abstract_base import (
-    AbstractBase, abstractproperty)
+from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 
 
-@add_metaclass(AbstractBase)
-class AbstractHasDelayStages(object):
+class AbstractHasDelayStages(object, metaclass=AbstractBase):
     """ Indicates that this object (a vertex) has delay stages that are used \
         to increase the space required for bitfields in \
         :py:func:`spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_bit_field_region`

@@ -13,13 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from pacman.exceptions import PacmanConfigurationException
 
 
-@add_metaclass(AbstractBase)
-class AbstractAcceptsIncomingSynapses(object):
+class AbstractAcceptsIncomingSynapses(object, metaclass=AbstractBase):
     """ Indicates an object that can be a post-vertex in a PyNN projection.
 
     Note: See verify_splitter

@@ -15,7 +15,6 @@
 
 import logging
 import numpy
-from six import string_types, iteritems
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.log import FormatAdapter
 from pacman.model.constraints import AbstractConstraint
@@ -176,7 +175,7 @@ class PyNNPopulationCommon(object):
 
         # set up initial values if given
         if initial_values is not None:
-            for variable, value in iteritems(initial_values):
+            for variable, value in initial_values.items():
                 self._initialize(variable, value)
 
     @staticmethod
@@ -286,7 +285,7 @@ class PyNNPopulationCommon(object):
                 logger, "The simplify value is ignored if not set to true")
         if not self._vertex_population_settable:
             raise KeyError("Population does not support setting")
-        if isinstance(parameter_names, string_types):
+        if isinstance(parameter_names, str):
             return self.__vertex.get_value(parameter_names)
         results = dict()
         for parameter_name in parameter_names:
@@ -312,7 +311,7 @@ class PyNNPopulationCommon(object):
         """
         if not self._vertex_population_settable:
             raise KeyError("Population does not support setting")
-        if isinstance(parameter_names, string_types):
+        if isinstance(parameter_names, str):
             return self.__vertex.get_value_by_selector(
                 selector, parameter_names)
         results = dict()
@@ -440,7 +439,7 @@ class PyNNPopulationCommon(object):
             raise Exception(
                 " run has been called")
 
-        if isinstance(parameter, string_types):
+        if isinstance(parameter, str):
             if value is None:
                 raise Exception("A value (not None) must be specified")
         elif type(parameter) is not dict:
@@ -468,7 +467,7 @@ class PyNNPopulationCommon(object):
         self._set_check(parameter, value)
 
         # set new parameters
-        if isinstance(parameter, string_types):
+        if isinstance(parameter, str):
             if value is None:
                 raise Exception("A value (not None) must be specified")
             self.__vertex.set_value(parameter, value)
@@ -499,7 +498,7 @@ class PyNNPopulationCommon(object):
         self._set_check(parameter, value)
 
         # set new parameters
-        if type(parameter) is str:
+        if isinstance(parameter, str):
             self.__vertex.set_value_by_selector(selector, parameter, value)
         else:
             for (key, value) in parameter.iteritems():

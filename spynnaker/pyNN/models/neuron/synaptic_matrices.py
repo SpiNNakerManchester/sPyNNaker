@@ -15,20 +15,15 @@
 
 import math
 import numpy
-from six import iteritems, itervalues
 from collections import defaultdict
 
 from spinn_utilities.ordered_set import OrderedSet
-
 from pacman.model.routing_info import BaseKeyAndMask
-
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-
 from spynnaker.pyNN.models.neural_projections import (
     ProjectionApplicationEdge, DelayedApplicationEdge)
 from spynnaker.pyNN.models.neuron.master_pop_table import (
     MasterPopTableAsBinarySearch)
-
 from .key_space_tracker import KeySpaceTracker
 from .synaptic_matrix_app import SynapticMatrixApp
 
@@ -254,7 +249,7 @@ class SynapticMatrices(object):
         generate_on_machine = list()
 
         # For each machine edge in the vertex, create a synaptic list
-        for app_edge, m_edges in iteritems(in_edges_by_app_edge):
+        for app_edge, m_edges in in_edges_by_app_edge.items():
 
             spec.comment("\nWriting matrix for edge:{}\n".format(
                 app_edge.label))
@@ -566,13 +561,13 @@ class SynapticMatrices(object):
         :param ~pacman.model.placements.Placement placement:
             where the data is to be read from
         """
-        for matrix in itervalues(self.__matrices):
+        for matrix in self.__matrices.values():
             matrix.read_generated_connection_holders(transceiver, placement)
 
     def clear_connection_cache(self):
         """ Clear any values read from the machine
         """
-        for matrix in itervalues(self.__matrices):
+        for matrix in self.__matrices.values():
             matrix.clear_connection_cache()
 
     @property

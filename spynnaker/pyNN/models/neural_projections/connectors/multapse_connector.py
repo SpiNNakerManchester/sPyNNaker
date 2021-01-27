@@ -16,7 +16,6 @@
 import logging
 import math
 import numpy.random
-from six import raise_from
 from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
@@ -218,10 +217,10 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
                 pairs.shape[0], size=n_connections,
                 replace=self.__with_replacement)
         except Exception as e:  # pylint: disable=broad-except
-            raise_from(SpynnakerException(
+            raise SpynnakerException(
                 "MultapseConnector: The number of connections is too large "
                 "for sampling without replacement; "
-                "reduce the value specified in the connector"), e)
+                "reduce the value specified in the connector") from e
 
         # Set up synaptic block
         block["source"] = pairs[chosen, 0]

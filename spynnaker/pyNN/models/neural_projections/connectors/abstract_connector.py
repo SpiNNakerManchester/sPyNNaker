@@ -19,12 +19,11 @@ import re
 import numpy
 from spinn_utilities.log import FormatAdapter
 from pyNN.random import NumpyRNG, RandomDistribution
-from six import string_types, with_metaclass
 
-from spinn_front_end_common.utilities.constants import \
-    MICRO_TO_MILLISECOND_CONVERSION
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.safe_eval import SafeEval
+from spinn_front_end_common.utilities.constants import (
+    MICRO_TO_MILLISECOND_CONVERSION)
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spynnaker.pyNN.utilities import utility_calls
@@ -39,8 +38,7 @@ _expr_context = SafeEval(
     numpy.maximum, numpy.minimum, e=numpy.e, pi=numpy.pi)
 
 
-# with_metaclass due to https://github.com/benjaminp/six/issues/219
-class AbstractConnector(with_metaclass(AbstractBase, object)):
+class AbstractConnector(object, metaclass=AbstractBase):
     """ Abstract class that all PyNN Connectors extend.
     """
 
@@ -414,7 +412,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
             return numpy.concatenate([
                 values[connection_slice]
                 for connection_slice in connection_slices]).astype("float64")
-        elif isinstance(values, string_types) or callable(values):
+        elif isinstance(values, str) or callable(values):
             if self.__space is None:
                 raise Exception(
                     "No space object specified in projection {}-{}".format(
@@ -422,7 +420,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
                         synapse_info.post_population))
 
             expand_distances = True
-            if isinstance(values, string_types):
+            if isinstance(values, str):
                 expand_distances = self._expand_distances(values)
 
             d = self.__space.distances(
@@ -430,7 +428,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
                 synapse_info.post_population.positions,
                 expand_distances)
 
-            if isinstance(values, string_types):
+            if isinstance(values, str):
                 return _expr_context.eval(values)
             return values(d)
         raise Exception("what on earth are you giving me?")

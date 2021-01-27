@@ -13,13 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import Iterator
 from spinn_utilities.ranged.abstract_list import AbstractList
 from data_specification.enums import DataType, Commands
 from data_specification.exceptions import UnknownTypeException
 
 
-class _Range_Iterator(Iterator):
+class _Range_Iterator(object):
     __slots__ = [
         "__cmd_pair",
         "__datatype",
@@ -65,7 +64,7 @@ class _Range_Iterator(Iterator):
         return self.__cmd_pair
 
 
-class _Get_Iterator(Iterator):
+class _Get_Iterator(object):
     __slots__ = [
         "__datatype",
         "__index",
@@ -101,7 +100,7 @@ class _Get_Iterator(Iterator):
         return cmd_pair
 
 
-class _SingleValue_Iterator(Iterator):
+class _SingleValue_Iterator(object):
     __slots__ = [
         "__cmd_pair",
         "__index",
@@ -188,7 +187,7 @@ class NeuronParameter(object):
             (Note that this does not actually do the write).
         :return: Iterator that produces a command to write to the\
             specification for each element in the slice.
-        :rtype: six.Iterator(tuple(bytearray, str))
+        :rtype: iterator(tuple(bytearray, str))
         """
         if isinstance(self.__value, AbstractList):
             return _Range_Iterator(
