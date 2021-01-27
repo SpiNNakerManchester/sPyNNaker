@@ -163,9 +163,9 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
             DataType.S1615,   # B
             DataType.S1615,   # b
             DataType.S1615,   # b_0
-            DataType.U032,    # tau_a (apply operation to input val giving UFRACT)
+            DataType.UINT32,    # tau_a (apply operation to input val giving UFRACT)
             DataType.S1615,   # beta
-            DataType.U032,    # adpt (apply operation to input val giving UFRACT)
+            DataType.UINT32,    # adpt (apply operation to input val giving UFRACT)
             DataType.S1615,   # scalar
             # Learning signal
             DataType.S1615,   #  L
@@ -259,7 +259,7 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
         parameters[NEURON_RATE] = self.__neuron_rate
 #         print('w_fb: ', self.__w_fb)
         for n in range(10):
-            parameters[W_FB+str(n)] = self.__w_fb[n].next()
+            parameters[W_FB+str(n)] = self.__w_fb[n]#.next()
 
 
     @overrides(AbstractNeuronModel.add_state_variables)

@@ -5,7 +5,7 @@ from pacman.executor.injection_decorator import inject_items
 from .abstract_neuron_model import AbstractNeuronModel
 
 # constants
-SYNAPSES_PER_NEURON = 100  # 250   # around 415 with only 3 in syn_state
+SYNAPSES_PER_NEURON = 256  # 250   # around 415 with only 3 in syn_state
 
 MICROSECONDS_PER_SECOND = 1000000.0
 MICROSECONDS_PER_MILLISECOND = 1000.0
@@ -106,8 +106,8 @@ class NeuronModelLeakyIntegrateAndFireSHDReadout(AbstractNeuronModel):
         data_types.extend(eprop_syn_state * SYNAPSES_PER_NEURON)
 
         global_data_types=[]
-        global_data_types.extend([DataType.UINT32 for i in range(4011)])
         global_data_types.extend([DataType.S1615])    # eta (learning rate)
+        global_data_types.extend([DataType.UINT32 for i in range(1000)])
 
 
         super(NeuronModelLeakyIntegrateAndFireSHDReadout, self).__init__(
@@ -259,8 +259,8 @@ class NeuronModelLeakyIntegrateAndFireSHDReadout(AbstractNeuronModel):
     def get_global_values(self, machine_time_step):
         vals = []
 
-        vals.extend(self._target_data)
         vals.extend([self._eta])
+        vals.extend(self._target_data)
         return vals
 
     @property

@@ -5,6 +5,8 @@
 extern uint32_t time;
 extern REAL learning_signal[20];
 REAL local_eta;
+REAL v_mem_error;
+bool printed_variables = false;
 
 // simple Leaky I&F ODE
 static inline void _lif_neuron_closed_form(
@@ -60,11 +62,26 @@ state_t neuron_model_state_update(
         neuron->refract_timer -= 1;
     }
 
-    uint32_t total_synapses_per_neuron = 100; //todo should this be fixed?
+    uint32_t total_synapses_per_neuron = 256; //todo should this be fixed?
 
-    neuron->L = 0.0k;
+    if (neuron->V_membrane > 9.k){
+        v_mem_error = neuron->V_membrane - 9.k;
+//        io_printf(IO_BUF, "> %k = %k - %k\n", v_mem_error, neuron->V_membrane, neuron->B);
+    }
+    else if (neuron->V_membrane < -9.k){
+        v_mem_error = neuron->V_membrane + 9.k;
+//        io_printf(IO_BUF, "< %k = %k - %k\n", v_mem_error, -neuron->V_membrane, neuron->B);
+    }
+    else{
+        v_mem_error = 0.k;
+    }
+
+    neuron->L = v_mem_error * 0.1k;
     for (uint32_t n_ind=0; n_ind < 10; n_ind++){
         neuron->L += learning_signal[n_ind];// * neuron->w_fb[n_ind];
+    }
+    if (time % 1000 == 0 || time % 1000 == 1){
+        neuron->V_membrane = neuron->V_reset;
     }
 
     // All operations now need doing once per eprop synapse
@@ -74,8 +91,8 @@ state_t neuron_model_state_update(
 		// ******************************************************************
     	neuron->syn_state[syn_ind].z_bar =
     			neuron->syn_state[syn_ind].z_bar * neuron->exp_TC
-//    			+ (1 - neuron->exp_TC) *
-    			+
+    			+ (1 - neuron->exp_TC) *
+//    			+
     			neuron->syn_state[syn_ind].z_bar_inp; // updating z_bar is problematic, if spike could come and interrupt neuron update
 
 
@@ -106,20 +123,24 @@ state_t neuron_model_state_update(
     			local_eta * neuron->L * neuron->syn_state[syn_ind].z_bar;
 
     	neuron->syn_state[syn_ind].delta_w -= this_dt_weight_change;
-//    	if (!syn_ind || neuron->syn_state[syn_ind].z_bar){// || neuron->syn_state[syn_ind].z_bar_inp){
+//    	if ((time % 51 == 0 && !syn_ind && !printed_variables) || this_dt_weight_change > 1.k){// || neuron->syn_state[syn_ind].z_bar){// || neuron->syn_state[syn_ind].z_bar_inp){
 //            io_printf(IO_BUF, "total synapses = %u \t syn_ind = %u \t "
 //                              "z_bar_inp = %k \t z_bar = %k \t time:%u\n"
-//                              "L = %k = %k * %k = l * w_fb\n"
-//                              "this dw = %k \t tot dw %k\n"
+//                              "L = %k & %k = v_merr\n"
+//                              "this dw = %k \t tot dw %k\n\n"
 //                              ,
 //                total_synapses_per_neuron,
 //                syn_ind,
 //                neuron->syn_state[syn_ind].z_bar_inp,
 //                neuron->syn_state[syn_ind].z_bar,
 //                time,
-//                neuron->L, learning_signal, neuron -> w_fb,
+//                neuron->L, v_mem_error,
 //                this_dt_weight_change, neuron->syn_state[syn_ind].delta_w
 //                );
+//            printed_variables = true;
+//        }
+//        if (time % 51 == 1){
+//            printed_variables = false;
 //        }
     	// reset input (can't have more than one spike per timestep
         neuron->syn_state[syn_ind].z_bar_inp = 0;
@@ -166,12 +187,12 @@ void neuron_model_print_parameters(restrict neuron_pointer_t neuron) {
     io_printf(IO_BUF, "learning      = %k n/a\n", neuron->L);
 
 //    io_printf(IO_BUF, "feedback w    = %k n/a\n\n", neuron->w_fb);
-
+//
 //    io_printf(IO_BUF, "T refract     = %u timesteps\n", neuron->T_refract);
 //    io_printf(IO_BUF, "mean_isi_ticks  = %k\n", neuron->mean_isi_ticks);
 //    io_printf(IO_BUF, "time_to_spike_ticks  = %k \n",
 //    		neuron->time_to_spike_ticks);
-
+//
 //    io_printf(IO_BUF, "Seed 1: %u\n", neuron->spike_source_seed[0]);
 //    io_printf(IO_BUF, "Seed 2: %u\n", neuron->spike_source_seed[1]);
 //    io_printf(IO_BUF, "Seed 3: %u\n", neuron->spike_source_seed[2]);

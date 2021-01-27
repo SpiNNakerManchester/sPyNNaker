@@ -4,7 +4,7 @@
 #include "neuron_model.h"
 #include "random.h"
 
-#define SYNAPSES_PER_NEURON 100
+#define SYNAPSES_PER_NEURON 256
 
 
 typedef struct eprop_syn_state_t {
@@ -72,8 +72,8 @@ typedef struct global_neuron_params_t {
 // 	mars_kiss64_seed_t spike_source_seed; // array of 4 values
 //	REAL ticks_per_second;
 //	REAL readout_V[20];
-	uint32_t target_V[4011];
 	REAL eta;
+	uint32_t target_V[1000];
 } global_neuron_params_t;
 
 #endif // _NEURON_MODEL_SINUSOID_READOUT_IMPL_H_
