@@ -71,8 +71,7 @@ class AbstractPopulationVertex(
         "__units",
         "__n_data_specs",
         "__initial_state_variables",
-        "__has_reset_last",
-        "__updated_state_variables"]
+        "__has_reset_last"]
 
     #: recording region IDs
     _SPIKE_RECORDING_REGION = 0
@@ -141,8 +140,8 @@ class AbstractPopulationVertex(
         self._state_variables = SpynnakerRangeDictionary(n_neurons)
         self.__neuron_impl.add_parameters(self._parameters)
         self.__neuron_impl.add_state_variables(self._state_variables)
-        self.__initial_state_variables = None
-        self.__updated_state_variables = set()
+        self.__initial_state_variables = self.__copy_ranged_dict(
+            self._state_variables)
 
         # Set up for recording
         recordable_variables = list(
@@ -212,23 +211,18 @@ class AbstractPopulationVertex(
 
         :rtype: None
         """
+        self._update_state_variables()
+        self.__has_reset_last = False
 
+    def _update_state_variables(self):
+        """ processes any changes since init
+
+        :rtype: None
+        """
         # If resetting
         if self.__has_reset_last:
-            # reset any state variables that need to be reset
-            if self.__initial_state_variables is not None:
-                self._state_variables = self.__copy_ranged_dict(
-                    self.__initial_state_variables, self._state_variables,
-                    self.__updated_state_variables)
-                self.__initial_state_variables = None
-            else:
-                # If no initial state variables, copy them now
-                self.__initial_state_variables = self.__copy_ranged_dict(
-                    self._state_variables)
-
-        # Reset things that need resetting
-        self.__has_reset_last = False
-        self.__updated_state_variables.clear()
+            self._state_variables = self.__copy_ranged_dict(
+                self.__initial_state_variables)
 
     @property
     @overrides(AbstractChangableAfterRun.requires_mapping)
@@ -325,17 +319,19 @@ class AbstractPopulationVertex(
         return self.__neuron_recorder.get_neuron_sampling_interval("spikes")
 
     @overrides(AbstractPopulationInitializable.initialize)
-    def initialize(self, variable, value):
-        if not self.__has_reset_last:
-            raise Exception(
-                "initialize can only be called before the first call to run, "
-                "or before the first call to run after a reset")
+    def initialize(self, variable, value, selector=None):
         if variable not in self._state_variables:
             raise KeyError(
                 "Vertex does not support initialisation of"
                 " parameter {}".format(variable))
-        self._state_variables.set_value(variable, value)
-        self.__updated_state_variables.add(variable)
+        if self.__has_reset_last:
+            self.__initial_state_variables[variable].set_value_by_selector(selector, value)
+            self._update_state_variables()
+        else:
+            self._state_variables[variable].set_value_by_selector(selector, value)
+            logger.warning(
+                "initializing {} after run and before reset only changes the "
+                "current state and will be lost after reset".format(variable))
         for vertex in self.machine_vertices:
             if isinstance(vertex, AbstractRewritesDataSpecification):
                 vertex.set_reload_required(True)
@@ -379,20 +375,6 @@ class AbstractPopulationVertex(
         if selector is None:
             return ranged_list
         return ranged_list.get_values(selector)
-
-    @overrides(AbstractPopulationInitializable.set_initial_value)
-    def set_initial_value(self, variable, value, selector=None):
-        if variable not in self._state_variables:
-            raise KeyError(
-                "Vertex does not support initialisation of"
-                " parameter {}".format(variable))
-
-        parameter = self._get_parameter(variable)
-        ranged_list = self._state_variables[parameter]
-        ranged_list.set_value_by_selector(selector, value)
-        for vertex in self.machine_vertices:
-            if isinstance(vertex, AbstractRewritesDataSpecification):
-                vertex.set_reload_required(True)
 
     @property
     def conductance_based(self):
