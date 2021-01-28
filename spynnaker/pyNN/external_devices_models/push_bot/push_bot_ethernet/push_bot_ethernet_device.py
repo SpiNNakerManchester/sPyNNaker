@@ -23,11 +23,12 @@ class PushBotEthernetDevice(
         AbstractMulticastControllableDevice, metaclass=AbstractBase):
     """ An arbitrary PushBot device
     """
-    __slots__ = [
-        "__device",
-        "__protocol",
-        "__time_between_send",
-        "__uses_payload"]
+    # No slots: causes Python error with multiple inheritance
+    # __slots__ = [
+    #     "__device",
+    #     "__protocol",
+    #     "__time_between_send",
+    #     "__uses_payload"]
 
     def __init__(
             self, protocol, device, uses_payload, time_between_send):
