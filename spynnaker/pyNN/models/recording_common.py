@@ -259,7 +259,7 @@ class RecordingCommon(object):
                 "This population has not got the capability to record {}"
                 .format(variable))
 
-        if vertex.is_recording(variable):
+        if not vertex.is_recording(variable):
             raise ConfigurationException(
                 "This population has not been set to record {}"
                 .format(variable))

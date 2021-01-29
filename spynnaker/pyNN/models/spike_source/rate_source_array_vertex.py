@@ -59,7 +59,7 @@ _REGIONS = RateSourceArrayMachineVertex.RATE_SOURCE_REGIONS
 
 class RateSourceArrayVertex(ApplicationVertex, AbstractGeneratesDataSpecification,
         AbstractHasAssociatedBinary, AbstractChangableAfterRun, AbstractRewritesDataSpecification,
-                            SimplePopulationSettable,ProvidesKeyToAtomMappingImpl):
+        SimplePopulationSettable, ProvidesKeyToAtomMappingImpl):
 
     RATE_RECORDING_REGION_ID = 0
 
@@ -123,6 +123,8 @@ class RateSourceArrayVertex(ApplicationVertex, AbstractGeneratesDataSpecificatio
         other = ConstantSDRAM(
             SYSTEM_BYTES_REQUIREMENT +
             rate_params_sz +
+            RateSourceArrayMachineVertex.get_provenance_data_size(
+                RateSourceArrayMachineVertex.N_ADDITIONAL_PROVENANCE_DATA_ITEMS) +
             profile_utils.get_profile_region_size(self.__n_profile_samples))
 
         container = ResourceContainer(

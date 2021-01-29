@@ -53,6 +53,8 @@ state_t neuron_model_state_update(
     neuron->U_membrane = (neuron->g_B * neuron->Vb + neuron->g_A * neuron->Va) /
                             (neuron->g_L + neuron->g_B + neuron->g_A);
 
+    io_printf(IO_BUF, "va %k, vb %k, u %k\n", apical_dendrite_input_this_timestep, basal_dendrite_input_this_timestep, neuron->U_membrane);
+
     return neuron->U_membrane;
 }
 

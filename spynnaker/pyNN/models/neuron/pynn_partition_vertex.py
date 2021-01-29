@@ -82,6 +82,9 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
 
             syn_constraints.append(SameAtomsAsVertexConstraint(self._neuron_vertices[i]))
 
+            # memory offset for the synaptic contributions
+            mem_offset = 0
+
             for index in range(self._n_syn_types):
 
                 for j in range(self._n_incoming_partitions[index]):
@@ -90,10 +93,12 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
                                             label + "_p" + str(i) + "_v" + str(j) + "_syn_type_" + str(index),
                                             max_atoms_neuron_core, neuron_model.get_global_weight_scale(),
                                             ring_buffer_sigma, spikes_per_second, incoming_spike_buffer_size,
-                                            self._n_syn_types)
+                                            self._n_syn_types, mem_offset)
 
                     vertex.connected_app_vertices = [self._neuron_vertices[i]]
                     syn_vertices.append(vertex)
+
+                    mem_offset += 1
 
             self._neuron_vertices[i].incoming_partitions = self._n_incoming_partitions
 

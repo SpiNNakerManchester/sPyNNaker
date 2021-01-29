@@ -316,7 +316,7 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
 
     //set the region to 0 (necessary for the first timestep and for syn cores that never receive spikes)
     for(index_t i = 0; i < contribution_size; i++) {
-        synaptic_region[i] = 0;
+        synaptic_region[i] = 0.0k;
     }
 
     // Call the neuron implementation initialise function to setup DTCM etc.
@@ -325,7 +325,7 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
     }
 
     // Tag the postsynaptic region with memory_index+1. Still a unique id and saves space in DTCM
-    neuron_impl_allocate_postsynaptic_region(memory_index+1, n_neurons);
+    //neuron_impl_allocate_postsynaptic_region(memory_index+1, n_neurons);
 
     // Allocate space for the synaptic contribution buffer
     synaptic_contributions = (REAL *) spin1_malloc(dma_size);
@@ -431,8 +431,11 @@ void neuron_do_timestep_update( // EXPORTED
         synaptic_contributions, DMA_READ, dma_size);
 
     io_printf(IO_BUF, "sent dma\n");
+    io_printf(IO_BUF, "syn contr %x\n", synaptic_region);
     
     while (!dma_finished);
+
+    io_printf(IO_BUF, "mem value %k\n", *synaptic_region);
 
     io_printf(IO_BUF, "dma finihsed\n");
 
@@ -461,13 +464,17 @@ void neuron_do_timestep_update( // EXPORTED
 
             register uint32_t buff_index = ((synapse_type_index << synapse_index_bits) | neuron_index);
 
+            io_printf(IO_BUF, "syn type %d, neuron %d, buff_index %d\n", synapse_type_index, neuron_index, buff_index);
+
             //Add the values from synaptic_contributions
-            sum = synaptic_contributions[buff_index];
+            sum = 0;
 
-            for (index_t i = 1; i < incoming_partitions[synapse_type_index]; i++) {
+            for (index_t i = 0; i < incoming_partitions[synapse_type_index]; i++) {
 
-                buff_index += n_neurons_power_2;
                 sum += synaptic_contributions[buff_index];
+                buff_index += n_neurons_power_2;
+
+                io_printf(IO_BUF, "sum %k\n incoming partitions %d\n", sum, incoming_partitions[synapse_type_index]);
             }
 
             //MAKE IT INLINE?
@@ -517,7 +524,7 @@ void neuron_do_timestep_update( // EXPORTED
     }
 
     // Start the DMA with the postsynaptic contributions for the syn cores
-    neuron_impl_send_postsynaptic_buffer(n_neurons);
+    //neuron_impl_send_postsynaptic_buffer(n_neurons);
 
     // Disable interrupts to avoid possible concurrent access
     uint cpsr = 0;

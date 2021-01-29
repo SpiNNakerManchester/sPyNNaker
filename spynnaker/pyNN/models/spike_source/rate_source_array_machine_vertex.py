@@ -17,6 +17,7 @@ from enum import Enum
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.machine import MachineVertex
 from spinn_front_end_common.abstract_models import AbstractRecordable
+from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 from spinn_front_end_common.interface.provenance import (
     ProvidesProvenanceDataFromMachineImpl)
 from spinn_front_end_common.interface.buffer_management.buffer_models import (
@@ -38,6 +39,10 @@ class RateSourceArrayMachineVertex(
         "__minimum_buffer_sdram",
         "__resources"]
 
+    EXTRA_PROVENANCE_DATA_ENTRIES = Enum(
+        value="EXTRA_PROVENANCE_DATA_ENTRIES",
+        names=[("CURRENT_TIMER_TICK", 0)])
+
     RATE_SOURCE_REGIONS = Enum(
         value="RATE_SOURCE_REGIONS",
         names=[('SYSTEM_REGION', 0),
@@ -48,6 +53,8 @@ class RateSourceArrayMachineVertex(
     PROFILE_TAG_LABELS = {
         0: "TIMER",
         1: "PROB_FUNC"}
+
+    N_ADDITIONAL_PROVENANCE_DATA_ITEMS = len(EXTRA_PROVENANCE_DATA_ENTRIES)
 
     def __init__(
             self, resources_required, is_recording, constraints=None,
@@ -72,11 +79,32 @@ class RateSourceArrayMachineVertex(
     @overrides(
         ProvidesProvenanceDataFromMachineImpl._n_additional_data_items)
     def _n_additional_data_items(self):
-        return 0
+        return self.N_ADDITIONAL_PROVENANCE_DATA_ITEMS
 
     @overrides(AbstractRecordable.is_recording)
     def is_recording(self):
         return self.__is_recording
+
+    @overrides(ProvidesProvenanceDataFromMachineImpl.
+               get_provenance_data_from_machine)
+    def get_provenance_data_from_machine(self, transceiver, placement):
+        provenance_data = self._read_provenance_data(transceiver, placement)
+        provenance_items = self._read_basic_provenance_items(
+            provenance_data, placement)
+        provenance_data = self._get_remaining_provenance_data_items(
+            provenance_data)
+
+        last_timer_tick = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.CURRENT_TIMER_TICK.value]
+
+        label, x, y, p, names = self._get_placement_details(placement)
+
+        # translate into provenance data items
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names, "Last_timer_tick_the_core_ran_to"),
+            last_timer_tick))
+
+        return provenance_items
 
     @overrides(AbstractReceiveBuffersToHost.get_recorded_region_ids)
     def get_recorded_region_ids(self):

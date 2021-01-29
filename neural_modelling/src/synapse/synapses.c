@@ -69,7 +69,7 @@ static uint32_t synapse_type_mask;
 static uint32_t memory_index;
 static uint32_t offset;
 
-static weight_t *synaptic_region;
+static REAL *synaptic_region;
 
 // Size of the memory chunk containing the ring buffers to be sent to neuron core
 static size_t size_to_be_transferred;
@@ -276,7 +276,7 @@ static inline void process_fixed_synapses(
         // Convert into ring buffer offset. The time & 1 mask is used to write in the safe ring buffer
         // THE FUNCTION SHFITS TO INCLUDE THE DELAY. MAYBE STRIP OFF FOR US MODEL EXTREME PERFORMANCE GAIN
         uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
-                0, combined_synapse_neuron_index,
+                0, combined_synapse_neuron_index & synapse_index_mask,
                 synapse_type_index_bits);
 
         // Add weight to current ring buffer value
@@ -295,7 +295,7 @@ static inline void process_fixed_synapses(
 
         // io_printf(IO_BUF, "acc %k index %d\n", accumulation, ring_buffer_index);
 
-        io_printf(IO_BUF, "weight %k in rate %k\n", synaptic_weight, rate);
+        io_printf(IO_BUF, "weight %k in rate %k, saved %k\n", synaptic_weight, rate, ring_buffers[ring_buffer_index]);
     }
 }
 
@@ -477,6 +477,8 @@ bool synapses_initialise(
             
     uint32_t ring_buffer_size = 1 << (n_ring_buffer_bits);
 
+    io_printf(IO_BUF, "ring buffer size %d\n", ring_buffer_size);
+
     ring_buffers = spin1_malloc(ring_buffer_size * sizeof(REAL));
 
     if (ring_buffers == NULL) {
@@ -531,11 +533,9 @@ void synapses_do_timestep_update(timer_t time) {
     // Disable interrupts to stop DMAs interfering with the ring buffers
     //uint32_t state = spin1_irq_disable();
 
-    // THIS CAN PROBABLY BE REMOVED FOR THE RATE-BASED AND PASS DIRECTLY THE POINTER TO RING_BUFFER
-    uint32_t ring_buffer_index = synapses_get_ring_buffer_index(
-                0, 0, 0,synapse_index_bits, synapse_index_bits);
+    io_printf(IO_BUF, "writing %k to %x\n", *ring_buffers, synaptic_region);
 
-    spin1_dma_transfer(DMA_TAG_WRITE_SYNAPTIC_CONTRIBUTION, synaptic_region, &ring_buffers[ring_buffer_index],
+    spin1_dma_transfer(DMA_TAG_WRITE_SYNAPTIC_CONTRIBUTION, synaptic_region, ring_buffers,
                 DMA_WRITE, size_to_be_transferred);
 
     print_inputs();
@@ -657,14 +657,14 @@ bool find_static_neuron_with_id(
 //! \param[in] offset: the offset in the row at which to remove the entry
 //! \param[in] row: the core-local address of the synaptic row
 //! \return bool: was the removal successful?
-bool remove_static_neuron_at_offset(uint32_t offset, address_t row) {
+bool remove_static_neuron_at_offset(uint32_t sp_offset, address_t row) {
     address_t fixed_region = synapse_row_fixed_region(row);
     int32_t fixed_synapse = synapse_row_num_fixed_synapses(fixed_region);
     REAL *synaptic_words =
             synapse_row_fixed_weight_controls(fixed_region);
 
     // Delete control word at offset (contains weight)
-    synaptic_words[offset] = synaptic_words[fixed_synapse - 1];
+    synaptic_words[sp_offset] = synaptic_words[fixed_synapse - 1];
 
     // Decrement FF
     fixed_region[0]--;
@@ -714,19 +714,14 @@ void synapses_flush_ring_buffer(uint32_t timestep) {
     for (uint32_t neuron_index = 0; neuron_index < n_neurons;
             neuron_index++) {
 
-        // Loop through all synapse types
-        for (uint32_t synapse_type_index = 0;
-                synapse_type_index < n_synapse_types; synapse_type_index++) {
+        // Get index in the ring buffers for the previous time slot for
+        // this synapse type and neuron
+        ring_buffer_index = synapses_get_ring_buffer_index(
+            0, 0, neuron_index, synapse_index_bits,
+            synapse_index_bits);
 
-            // Get index in the ring buffers for the previous time slot for
-            // this synapse type and neuron
-            ring_buffer_index = synapses_get_ring_buffer_index(
-                timestep, synapse_type_index, neuron_index, synapse_index_bits,
-                synapse_index_bits);
-
-            // Clear ring buffer
-            ring_buffers[ring_buffer_index] = 0;
-        }
+        // Clear ring buffer
+        ring_buffers[neuron_index] = 0.0k;
     }
 
 }
@@ -736,5 +731,12 @@ void synapses_set_contribution_region(){
     synaptic_region = sark_tag_ptr(memory_index, 0);
     synaptic_region += (offset << synapse_index_bits);
 
+    io_printf(IO_BUF, "syn contr %x\n", synaptic_region);
+
     synapse_dynamics_set_post_buffer_region(memory_index+1);
+}
+
+void s() {
+
+    io_printf(IO_BUF, "value in SDRAM %k\n", *synaptic_region);
 }

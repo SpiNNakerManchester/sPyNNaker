@@ -70,9 +70,9 @@ static inline void do_dma_read(
     // Start a DMA transfer to fetch this synaptic row into current
     // buffer
     buffer_being_read = next_buffer_to_fill;
-    spin1_dma_transfer(
-            DMA_TAG_READ_SYNAPTIC_ROW, row_address, next_buffer->row, DMA_READ,
-            n_bytes_to_transfer);
+    // spin1_dma_transfer(
+    //         DMA_TAG_READ_SYNAPTIC_ROW, row_address, next_buffer->row, DMA_READ,
+    //         n_bytes_to_transfer);
     next_buffer_to_fill = (next_buffer_to_fill + 1) % N_DMA_BUFFERS;
 }
 
@@ -181,10 +181,10 @@ static inline void setup_synaptic_dma_write(uint32_t dma_buffer_index) {
             n_plastic_region_bytes, buffer->sdram_writeback_address + 1);
 
     // Start transfer
-    spin1_dma_transfer(
-            DMA_TAG_WRITE_PLASTIC_REGION, buffer->sdram_writeback_address + 1,
-            synapse_row_plastic_region(buffer->row),
-            DMA_WRITE, n_plastic_region_bytes);
+    // spin1_dma_transfer(
+    //         DMA_TAG_WRITE_PLASTIC_REGION, buffer->sdram_writeback_address + 1,
+    //         synapse_row_plastic_region(buffer->row),
+    //         DMA_WRITE, n_plastic_region_bytes);
 }
 
 // Called when a multicast packet is received

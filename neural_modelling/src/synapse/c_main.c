@@ -306,8 +306,12 @@ void timer_callback(uint timer_count, uint unused) {
     
     uint32_t wc_reg = tc[T1_COUNT] * 0.005 - 10;
 
+    s();
+
     //Schedule event 10 microseconds from now
     if(has_plastic_synapses) {
+
+        io_printf(IO_BUF, "Plast");
         
         if(!timer_schedule_proc(read_contributions, 0, 0, 10)) {
 
@@ -326,7 +330,7 @@ void timer_callback(uint timer_count, uint unused) {
 
     time++;
 
-    io_printf(IO_BUF, "time %d, wc_reg: %u", time, wc_reg);
+    io_printf(IO_BUF, "time %d, wc_reg: %u\n", time, wc_reg);
 
     log_debug("Timer tick %u \n", time);
 

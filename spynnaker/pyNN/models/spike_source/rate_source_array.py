@@ -15,7 +15,7 @@
 
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
-from .rate_source_array_vertex import RateSourceArrayVertex
+from .rate_source_array_partition import RateSourceArrayPartition
 
 DEFAULT_MAX_ATOMS_PER_CORE = 500
 
@@ -23,31 +23,22 @@ class RateSourceArray(AbstractPyNNModel):
 
     default_population_parameters = {}
 
-    def __init__(self, rate_times=[], rate_values=[], looping=0):
+    def __init__(self, rate_times=[], rate_values=[], looping=0, partitions=1):
 
         if len(rate_times) != len(rate_values):
             raise Exception("Rate Source Array Error: Rate times and Rate Values must have the same length.")
         self.__rate_times = rate_times
         self.__rate_values = rate_values
         self.__looping = looping
-
-    @classmethod
-    def set_model_max_atoms_per_core(cls, n_atoms=DEFAULT_MAX_ATOMS_PER_CORE):
-        super(RateSourceArray, cls).set_model_max_atoms_per_core(
-            n_atoms)
-
-    @classmethod
-    def get_max_atoms_per_core(cls):
-        if cls not in super(RateSourceArray, cls)._max_atoms_per_core:
-            return DEFAULT_MAX_ATOMS_PER_CORE
-        return super(RateSourceArray, cls).get_max_atoms_per_core()
+        self.__partitions = partitions
 
     @overrides(AbstractPyNNModel.create_vertex)
     def create_vertex(
             self, n_neurons, label, constraints):
         max_atoms = self.get_max_atoms_per_core()
-        return RateSourceArrayVertex(
-            n_neurons, self.__rate_times, self.__rate_values, constraints, label, max_atoms, self, self.__looping)
+        return RateSourceArrayPartition(
+            n_neurons, self.__rate_times, self.__rate_values,
+            constraints, label, max_atoms, self, self.__looping, self.__partitions)
 
     @property
     def _rate_times(self):

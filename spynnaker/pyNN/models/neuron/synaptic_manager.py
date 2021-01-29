@@ -138,7 +138,9 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
         "_atoms_offset",
         "_ring_buffer_shifts",
         "_slice_list",
-        "__change_requires_mapping"]
+        "__change_requires_mapping",
+        "_recordables",
+        "__mem_offset"]
 
     BASIC_MALLOC_USAGE = 2
 
@@ -149,7 +151,7 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
 
     def __init__(self, n_synapse_types, synapse_index, n_neurons, atoms_offset,
                  constraints, label, max_atoms_per_core, weight_scale, ring_buffer_sigma,
-                 spikes_per_second, incoming_spike_buffer_size, model_syn_types,
+                 spikes_per_second, incoming_spike_buffer_size, model_syn_types, mem_offset,
                  population_table_type=None, synapse_io=None, synapse_rescale = False):
 
         self._implemented_synapse_types = n_synapse_types
@@ -166,13 +168,14 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
         # Hardcoded, avoids the function call and is set to the same value for all the partitions
         self._ring_buffer_shifts = [7]
         self._slice_list = None
+        self.__mem_offset = mem_offset
 
         # get config from simulator
         config = globals_variables.get_simulator().config
 
         #FOR RECORDING
-        recordables = ["synapse"]
-        self.__synapse_recorder = SynapseRecorder(recordables, n_neurons)
+        self._recordables = ["synapse"]
+        self.__synapse_recorder = SynapseRecorder(self._recordables, n_neurons)
         self.__change_requires_mapping = True
 
         if self._implemented_synapse_types > 1:
@@ -536,7 +539,7 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
 
     def get_sdram_usage_in_bytes(
             self, vertex_slice, graph, machine_time_step):
-        n_record = len(self.RECORDABLES)
+        n_record = len(self._recordables)
         in_edges = graph.get_edges_ending_at_vertex(self)
         return (
             common_constants.SYSTEM_BYTES_REQUIREMENT +
@@ -579,7 +582,7 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
         spec.reserve_memory_region(
             region=constants.POPULATION_BASED_REGIONS.RECORDING.value,
             size=recording_utilities.get_recording_header_size(
-                len(self.RECORDABLES)))
+                len(self._recordables)))
 
         master_pop_table_sz = \
             self.__poptable_type.get_exact_master_population_table_size(
@@ -1200,11 +1203,8 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
         # Write the SDRAM tag for the contribution area
         spec.write_value(data=index)
 
-        # Write the offset for SDRAM (CHECK FOR DUAL EXC SYN TYPES)
-        if self._synapse_index > 0:
-            spec.write_value(data=self._synapse_index)
-        else:
-            spec.write_value(data=self.__partition)
+        # Write the offset for SDRAM
+        spec.write_value(data=self.__mem_offset)
 
         spec.write_value(int(math.ceil(float(all_syn_block_sz) / 4.0)),
             data_type=DataType.UINT32)
@@ -1214,11 +1214,11 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
         #    self, application_graph, machine_time_step)
 
         # Number of variables that can be recorded
-        spec.write_value(len(self.RECORDABLES))
+        spec.write_value(len(self._recordables))
 
         # Check if we are recording something
         recording = False
-        for v in self.RECORDABLES:
+        for v in self._recordables:
             if self.is_recording_synapses(v):
                 recording = True
 
@@ -1573,7 +1573,7 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
         spec.write_value(post_vertex_slice.lo_atom)
         spec.write_value(post_vertex_slice.n_atoms)
         spec.write_value(self._model_synapse_types)
-        spec.write_value(get_n_bits(self._implemented_synapse_types))
+        spec.write_value(get_n_bits(self._model_synapse_types))
         n_neuron_id_bits = get_n_bits(post_vertex_slice.n_atoms)
         spec.write_value(n_neuron_id_bits)
         for w in tmp_weight_scales:
@@ -1590,7 +1590,7 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
 
     def _get_buffered_sdram(self, vertex_slice, n_machine_time_steps):
         values = list()
-        for variable in self.RECORDABLES:
+        for variable in self._recordables:
             values.append(
                 self.__synapse_recorder.get_buffered_sdram(
                     variable, vertex_slice, n_machine_time_steps))
@@ -1668,7 +1668,7 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
                 placement.x, placement.y, placement.p, recording_region_id)
 
     def get_units(self, variable):
-        if variable in self.RECORDABLES:
+        if variable in self._recordables:
             return self._synapse_recorder.get_recordable_units(variable)
         raise Exception("Population does not have parameter {}".format(variable))
 
