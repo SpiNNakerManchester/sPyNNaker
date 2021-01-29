@@ -27,6 +27,10 @@ from pacman.model.graphs.machine import (
 from spynnaker.pyNN.models.neuron import (
     PopulationNeuronsMachineVertex, PopulationSynapsesMachineVertex,
     NeuronProvenance, SynapseProvenance, AbstractPopulationVertex)
+from spynnaker.pyNN.models.neuron.population_neurons_machine_vertex import (
+    SDRAM_PARAMS_SIZE as NEURONS_SDRAM_PARAMS_SIZE)
+from spynnaker.pyNN.models.neuron.population_synapses_machine_vertex import (
+    SDRAM_PARAMS_SIZE as SYNAPSES_SDRAM_PARAMS_SIZE)
 from spynnaker.pyNN.utilities.constants import SYNAPSE_SDRAM_PARTITION_ID
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
 from spynnaker.pyNN.models.neural_projections.connectors import (
@@ -326,6 +330,9 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             PopulationNeuronsMachineVertex.COMMON_REGIONS))
         sdram.merge(self._governed_app_vertex.get_neuron_constant_sdram(
             vertex_slice, PopulationNeuronsMachineVertex.NEURON_REGIONS))
+        sdram.add_cost(
+            PopulationNeuronsMachineVertex.REGIONS.SDRAM_EDGE_PARAMS,
+            NEURONS_SDRAM_PARAMS_SIZE)
         sdram.nest(
             len(PopulationNeuronsMachineVertex.REGIONS) + 1, variable_sdram)
         dtcm = self._governed_app_vertex.get_common_dtcm()
@@ -371,6 +378,9 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         sdram.add_cost(
             PopulationSynapsesMachineVertex.SYNAPSE_REGIONS.synapse_dynamics,
             self._governed_app_vertex.get_synapse_dynamics_size(vertex_slice))
+        sdram.add_cost(
+            PopulationSynapsesMachineVertex.REGIONS.SDRAM_EDGE_PARAMS,
+            SYNAPSES_SDRAM_PARAMS_SIZE)
         sdram.nest(
             len(PopulationSynapsesMachineVertex.REGIONS) + 1,
             variable_sdram)
