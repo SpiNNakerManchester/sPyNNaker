@@ -306,8 +306,6 @@ void timer_callback(uint timer_count, uint unused) {
     
     uint32_t wc_reg = tc[T1_COUNT] * 0.005 - 10;
 
-    s();
-
     //Schedule event 10 microseconds from now
     if(has_plastic_synapses) {
 

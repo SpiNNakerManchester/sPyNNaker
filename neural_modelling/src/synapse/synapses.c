@@ -492,7 +492,7 @@ bool synapses_initialise(
     }
 
     // Since we don't have delay slots, we send the whole ring buffer
-    size_to_be_transferred = ring_buffer_size;
+    size_to_be_transferred = ring_buffer_size * sizeof(REAL);
 
     synapse_type_index_bits = log_n_neurons + log_n_synapse_types;
     synapse_type_index_mask = (1 << synapse_type_index_bits) - 1;
@@ -734,9 +734,4 @@ void synapses_set_contribution_region(){
     io_printf(IO_BUF, "syn contr %x\n", synaptic_region);
 
     synapse_dynamics_set_post_buffer_region(memory_index+1);
-}
-
-void s() {
-
-    io_printf(IO_BUF, "value in SDRAM %k\n", *synaptic_region);
 }

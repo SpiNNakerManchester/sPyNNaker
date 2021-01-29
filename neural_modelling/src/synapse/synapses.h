@@ -133,6 +133,4 @@ void synapses_set_contribution_region();
 
 void synapses_flush_ring_buffer(uint32_t timestep);
 
-void s();
-
 #endif // _SYNAPSES_H_
