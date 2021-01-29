@@ -16,7 +16,7 @@
 from pyNN.random import available_distributions, RandomDistribution
 from enum import Enum
 import numpy
-from six import with_metaclass
+from six import string_types, with_metaclass
 from spinn_utilities.abstract_base import abstractproperty, AbstractBase
 from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
@@ -83,6 +83,9 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         :type values: int or ~pyNN.random.NumpyRNG
         :rtype: bool
         """
+        # Strings (i.e. for distance-dependent weights/delays) not supported
+        if isinstance(values, string_types):
+            return False
 
         # Scalars are fine on the machine
         if numpy.isscalar(values):

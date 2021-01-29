@@ -141,11 +141,11 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
                 post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1),
                 pre_vertex_slice.n_atoms)
         block["weight"] = self._generate_weights(
-            n_connections, connection_slices, pre_vertex_slice,
-            post_vertex_slice, synapse_info)
+            block["source"], block["target"], n_connections, connection_slices,
+            pre_vertex_slice, post_vertex_slice, synapse_info)
         block["delay"] = self._generate_delays(
-            n_connections, connection_slices, pre_vertex_slice,
-            post_vertex_slice, synapse_info)
+            block["source"], block["target"], n_connections, connection_slices,
+            pre_vertex_slice, post_vertex_slice, synapse_info)
         block["synapse_type"] = synapse_type
         return block
 

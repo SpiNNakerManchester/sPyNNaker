@@ -247,8 +247,8 @@ class FromListConnector(AbstractConnector):
                 block["weight"] = numpy.array(synapse_info.weights)[indices]
             else:
                 block["weight"] = self._generate_weights(
-                    len(indices), None, pre_vertex_slice,
-                    post_vertex_slice, synapse_info)
+                    block["source"], block["target"], len(indices), None,
+                    pre_vertex_slice, post_vertex_slice, synapse_info)
         else:
             block["weight"] = self.__weights[indices]
         # check that conn_list has delays, if not then use the value passed in
@@ -257,8 +257,8 @@ class FromListConnector(AbstractConnector):
                 block["delay"] = numpy.array(synapse_info.delays)[indices]
             else:
                 block["delay"] = self._generate_delays(
-                    len(indices), None, pre_vertex_slice,
-                    post_vertex_slice, synapse_info)
+                    block["source"], block["target"], len(indices), None,
+                    pre_vertex_slice, post_vertex_slice, synapse_info)
         else:
             block["delay"] = self._clip_delays(self.__delays[indices])
         block["synapse_type"] = synapse_type

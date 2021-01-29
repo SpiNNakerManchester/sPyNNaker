@@ -16,6 +16,7 @@
 import logging
 import numpy
 from pyNN.random import RandomDistribution
+from six import string_types
 from spinn_utilities.log import FormatAdapter
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION)
@@ -100,7 +101,9 @@ class PyNNProjectionCommon(object):
 
         # round the delays to multiples of full timesteps
         # (otherwise SDRAM estimation calculations can go wrong)
-        if not isinstance(synapse_dynamics_stdp.delay, RandomDistribution):
+        if ((not isinstance(synapse_dynamics_stdp.delay, RandomDistribution))
+                and (not isinstance(
+                    synapse_dynamics_stdp.delay, string_types))):
             synapse_dynamics_stdp.set_delay(
                 numpy.rint(
                     numpy.array(synapse_dynamics_stdp.delay) *

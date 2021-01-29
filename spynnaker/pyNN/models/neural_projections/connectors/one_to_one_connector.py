@@ -15,6 +15,7 @@
 
 import logging
 import numpy
+from six import string_types
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
@@ -67,6 +68,9 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
 
         delays = synapse_info.delays
 
+        if isinstance(delays, string_types):
+            # evaluate delays... gah
+            return int(min_delay <= delays <= max_delay)
         if numpy.isscalar(delays):
             return int(min_delay <= delays <= max_delay)
         if isinstance(delays, self.__random_number_class):
@@ -109,11 +113,13 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
         block["source"] = numpy.arange(max_lo_atom, min_hi_atom + 1)
         block["target"] = numpy.arange(max_lo_atom, min_hi_atom + 1)
         block["weight"] = self._generate_weights(
-            n_connections, [connection_slice], pre_vertex_slice,
-            post_vertex_slice, synapse_info)
+            block["source"], block["target"], n_connections,
+            [connection_slice], pre_vertex_slice, post_vertex_slice,
+            synapse_info)
         block["delay"] = self._generate_delays(
-            n_connections, [connection_slice], pre_vertex_slice,
-            post_vertex_slice, synapse_info)
+            block["source"], block["target"], n_connections,
+            [connection_slice], pre_vertex_slice, post_vertex_slice,
+            synapse_info)
         block["synapse_type"] = synapse_type
         return block
 
