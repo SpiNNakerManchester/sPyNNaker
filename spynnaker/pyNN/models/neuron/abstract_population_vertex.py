@@ -137,11 +137,10 @@ class AbstractPopulationVertex(
         self.__neuron_impl = neuron_impl
         self.__pynn_model = pynn_model
         self._parameters = SpynnakerRangeDictionary(n_neurons)
-        self._state_variables = SpynnakerRangeDictionary(n_neurons)
         self.__neuron_impl.add_parameters(self._parameters)
-        self.__neuron_impl.add_state_variables(self._state_variables)
-        self.__initial_state_variables = self.__copy_ranged_dict(
-            self._state_variables)
+        self.__initial_state_variables = SpynnakerRangeDictionary(n_neurons)
+        self.__neuron_impl.add_state_variables(self.__initial_state_variables)
+        self._state_variables = self.__initial_state_variables.copy()
 
         # Set up for recording
         recordable_variables = list(
@@ -212,8 +211,7 @@ class AbstractPopulationVertex(
         :rtype: None
         """
         if self.__has_reset_last:
-            self._state_variables = self.__copy_ranged_dict(
-                self.__initial_state_variables)
+            self._state_variables.copy_into(self.__initial_state_variables)
         self.__has_reset_last = False
 
     @property
@@ -245,22 +243,6 @@ class AbstractPopulationVertex(
             self.BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
             self.tdma_sdram_size_in_bytes +
             self.__neuron_impl.get_sdram_usage_in_bytes(vertex_slice.n_atoms))
-
-    @staticmethod
-    def __copy_ranged_dict(source, merge=None, merge_keys=None):
-        target = SpynnakerRangeDictionary(len(source))
-        for key in source.keys():
-            copy_list = SpynnakerRangedList(len(source))
-            if merge_keys is None or key not in merge_keys:
-                init_list = source.get_list(key)
-            else:
-                init_list = merge.get_list(key)
-            for start, stop, value in init_list.iter_ranges():
-                is_list = (hasattr(value, '__iter__') and
-                           not isinstance(value, str))
-                copy_list.set_value_by_slice(start, stop, value, is_list)
-            target[key] = copy_list
-        return target
 
     @overrides(AbstractSpikeRecordable.is_recording_spikes)
     def is_recording_spikes(self):
@@ -321,8 +303,7 @@ class AbstractPopulationVertex(
             self.__initial_state_variables[variable].set_value_by_selector(
                 selector, value)
             # Update the sate variables in case asked for
-            self._state_variables = self.__copy_ranged_dict(
-                self.__initial_state_variables)
+            self._state_variables.copy_into(self.__initial_state_variables)
         else:
             self._state_variables[variable].set_value_by_selector(
                 selector, value)
