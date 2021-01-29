@@ -207,22 +207,14 @@ class AbstractPopulationVertex(
         return self.__synapse_manager
 
     def update_state_variables(self):
-        """ processes any changes since init
+        """ Res the state variables to the init position
 
         :rtype: None
         """
-        self._update_state_variables()
-        self.__has_reset_last = False
-
-    def _update_state_variables(self):
-        """ processes any changes since init
-
-        :rtype: None
-        """
-        # If resetting
         if self.__has_reset_last:
             self._state_variables = self.__copy_ranged_dict(
                 self.__initial_state_variables)
+        self.__has_reset_last = False
 
     @property
     @overrides(AbstractChangableAfterRun.requires_mapping)
@@ -325,10 +317,15 @@ class AbstractPopulationVertex(
                 "Vertex does not support initialisation of"
                 " parameter {}".format(variable))
         if self.__has_reset_last:
-            self.__initial_state_variables[variable].set_value_by_selector(selector, value)
-            self._update_state_variables()
+            # set the inital values
+            self.__initial_state_variables[variable].set_value_by_selector(
+                selector, value)
+            # Update the sate variables in case asked for
+            self._state_variables = self.__copy_ranged_dict(
+                self.__initial_state_variables)
         else:
-            self._state_variables[variable].set_value_by_selector(selector, value)
+            self._state_variables[variable].set_value_by_selector(
+                selector, value)
             logger.warning(
                 "initializing {} after run and before reset only changes the "
                 "current state and will be lost after reset".format(variable))
