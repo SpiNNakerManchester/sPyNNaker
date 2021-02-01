@@ -331,7 +331,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         sdram.merge(self._governed_app_vertex.get_neuron_constant_sdram(
             vertex_slice, PopulationNeuronsMachineVertex.NEURON_REGIONS))
         sdram.add_cost(
-            PopulationNeuronsMachineVertex.REGIONS.SDRAM_EDGE_PARAMS,
+            PopulationNeuronsMachineVertex.REGIONS.SDRAM_EDGE_PARAMS.value,
             NEURONS_SDRAM_PARAMS_SIZE)
         sdram.nest(
             len(PopulationNeuronsMachineVertex.REGIONS) + 1, variable_sdram)
@@ -379,7 +379,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             PopulationSynapsesMachineVertex.SYNAPSE_REGIONS.synapse_dynamics,
             self._governed_app_vertex.get_synapse_dynamics_size(vertex_slice))
         sdram.add_cost(
-            PopulationSynapsesMachineVertex.REGIONS.SDRAM_EDGE_PARAMS,
+            PopulationSynapsesMachineVertex.REGIONS.SDRAM_EDGE_PARAMS.value,
             SYNAPSES_SDRAM_PARAMS_SIZE)
         sdram.nest(
             len(PopulationSynapsesMachineVertex.REGIONS) + 1,
