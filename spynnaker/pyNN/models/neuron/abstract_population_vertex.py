@@ -33,7 +33,7 @@ from spynnaker.pyNN.models.abstract_models import (
     AbstractPopulationSettable, AbstractContainsUnits)
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.utilities.ranged import (
-    SpynnakerRangeDictionary, SpynnakerRangedList)
+    SpynnakerRangeDictionary)
 from .synaptic_manager import SynapticManager
 
 logger = FormatAdapter(logging.getLogger(__name__))
