@@ -136,7 +136,7 @@ class AbstractStandardNeuronComponent(with_metaclass(AbstractBase, object)):
             *from the given data* (read from the machine)
 
         :param data: The data to be read
-        :type data: bytes or bytearray or memoryview
+        :type data: bytes or bytearray
         :param int offset: The offset where the data should be read from
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of the vertex to read parameters for
