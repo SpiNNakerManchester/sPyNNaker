@@ -60,6 +60,10 @@ class SynapseDynamicsStatic(
         # Nothing to do here
         pass
 
+    @property
+    def executable_prefix(self):
+        return "Static_synapse_"
+    
     @overrides(
         AbstractStaticSynapseDynamics.get_n_words_for_static_connections)
     def get_n_words_for_static_connections(self, n_connections):

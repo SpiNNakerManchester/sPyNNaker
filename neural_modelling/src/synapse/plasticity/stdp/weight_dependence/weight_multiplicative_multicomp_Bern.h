@@ -90,19 +90,13 @@ static inline weight_t weight_get_final(weight_state_t new_state) {
 //---------------------------------------
 static inline weight_state_t weight_one_term_apply_update(weight_state_t state, REAL total_rate) {
 
-    //io_printf(IO_BUF, "pre weight %k, learning rate %k\n", state.weight, state.weight_region->learning_rate);
-
     REAL delta = state.weight_region->learning_rate * total_rate;
 
     // LP tmp manual truncation to 2^-13 to avoid drifting caused by fixed point truncation. Possibly move to 2-15
     if(delta < 0 && delta >= -0.000122k)
         delta = 0;
 
-    // io_printf(IO_BUF, "Delta w %k, weight shift %d\n", delta, state.weight_shift);
-
     state.weight = state.weight + delta;
-
-    // io_printf(IO_BUF, "weight updated %k\n", state.weight);
 
     //MORE EFFICIENT WAY TO DO THIS?
     if(state.weight < state.weight_region->min_weight) {
@@ -113,8 +107,6 @@ static inline weight_state_t weight_one_term_apply_update(weight_state_t state, 
 
         state.weight = state.weight_region->max_weight;
     }
-
-    //io_printf(IO_BUF, "max %k min %k\n", state.weight_region->max_weight, state.weight_region->min_weight);
 
     return state;
 }

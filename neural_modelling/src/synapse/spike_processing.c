@@ -193,8 +193,6 @@ static void multicast_packet_received_callback(uint key, uint payload) {
     any_spike = true;
     log_debug("Received spike %x at %d, DMA Busy = %d", key, time, dma_busy);
 
-    io_printf(IO_BUF, "rcvd %k from %d\n", payload, key);
-
     // If there was space to add spike to incoming spike queue
     if (in_rates_add_rate((rate_t){key, payload})) {
         // If we're not already processing synaptic DMAs,

@@ -292,10 +292,6 @@ static inline void process_fixed_synapses(
         ring_buffers[ring_buffer_index] = accumulation;
 
         //io_printf(IO_BUF,"acc %k, t%d\n", accumulation, time);
-
-        // io_printf(IO_BUF, "acc %k index %d\n", accumulation, ring_buffer_index);
-
-        io_printf(IO_BUF, "weight %k in rate %k, saved %k\n", synaptic_weight, rate, ring_buffers[ring_buffer_index]);
     }
 }
 
@@ -477,8 +473,6 @@ bool synapses_initialise(
             
     uint32_t ring_buffer_size = 1 << (n_ring_buffer_bits);
 
-    io_printf(IO_BUF, "ring buffer size %d\n", ring_buffer_size);
-
     ring_buffers = spin1_malloc(ring_buffer_size * sizeof(REAL));
 
     if (ring_buffers == NULL) {
@@ -532,8 +526,6 @@ void synapses_do_timestep_update(timer_t time) {
 
     // Disable interrupts to stop DMAs interfering with the ring buffers
     //uint32_t state = spin1_irq_disable();
-
-    io_printf(IO_BUF, "writing %k to %x\n", *ring_buffers, synaptic_region);
 
     spin1_dma_transfer(DMA_TAG_WRITE_SYNAPTIC_CONTRIBUTION, synaptic_region, ring_buffers,
                 DMA_WRITE, size_to_be_transferred);
@@ -731,7 +723,5 @@ void synapses_set_contribution_region(){
     synaptic_region = sark_tag_ptr(memory_index, 0);
     synaptic_region += (offset << synapse_index_bits);
 
-    io_printf(IO_BUF, "syn contr %x\n", synaptic_region);
-
-    synapse_dynamics_set_post_buffer_region(memory_index+1);
+    synapse_dynamics_set_post_buffer_region(memory_index+18);
 }

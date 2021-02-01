@@ -91,7 +91,7 @@ class PyNNProjectionCommon(object):
 
         # set the plasticity dynamics for the post pop (allows plastic stuff
         #  when needed)
-        post_vertex.set_synapse_dynamics(synapse_dynamics_stdp)
+        post_vertex.set_synapse_dynamics(synapse_dynamics_stdp, synapse_type)
 
         # Set and store synapse information for future processing
         self.__synapse_information = SynapseInformation(

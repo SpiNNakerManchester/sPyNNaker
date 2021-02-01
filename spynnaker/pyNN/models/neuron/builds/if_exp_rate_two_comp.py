@@ -62,6 +62,6 @@ class IFExpRateTwoComp(AbstractPyNNNeuronModelStandard):
         self._rate_based = True
 
         super(IFExpRateTwoComp, self).__init__(
-            model_name="IF_exp_rate_two_comp", binary="IF_exp_two_comp_rate.aplx",
+            model_name="IF_exp_rate_two_comp", binary="Two_comp_rate.aplx",
             neuron_model=neuron_model, input_type=input_type,
             synapse_type=synapse_type, threshold_type=threshold_type)

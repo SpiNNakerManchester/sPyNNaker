@@ -69,7 +69,7 @@ struct synapse_provenance {
 
 //! values for the priority for each callback
 typedef enum callback_priorities{
-    MC = -1, TIMER = 0, DMA = 0, USER = 0, SDP = 1
+    MC = -1, TIMER = 1, DMA = 0, USER = 1, SDP = 2
 } callback_priorities;
 
 //! The number of regions that are to be used for recording
@@ -141,14 +141,16 @@ void write_contributions(uint unused1, uint unused2) {
         use(unused1);
         use(unused2);
 
-        io_printf(IO_BUF, "write contr\n");
-
         uint32_t state = spin1_int_disable();
 
         cb_calls++;
 
         //Start DMA Writing procedure for the contribution of this timestep
         synapses_do_timestep_update(time);
+
+        // Set DMA busy true for plastic synapses to force the post_buffer download
+        // before the spike processing
+        set_dma_busy(has_plastic_synapses);
 
         spikes_remaining_this_tick = spike_processing_flush_in_buffer();
         spikes_remaining += spikes_remaining_this_tick;
@@ -304,14 +306,15 @@ void timer_callback(uint timer_count, uint unused) {
 //    Sould this be done in a safer way?
     uint32_t state = spin1_int_disable();
     
-    uint32_t wc_reg = tc[T1_COUNT] * 0.005 - 10;
+    // 40 for test purposes, to add prints. It was 10 before
+    uint32_t wc_reg = tc[T1_COUNT] * 0.005 - 40;
+
+    //io_printf(IO_BUF, "Che bella burdella bella che abbiamo qui\n");
 
     //Schedule event 10 microseconds from now
     if(has_plastic_synapses) {
-
-        io_printf(IO_BUF, "Plast");
         
-        if(!timer_schedule_proc(read_contributions, 0, 0, 10)) {
+        if(!timer_schedule_proc(read_contributions, 0, 0, 200)) {
 
             rt_error(RTE_API);
         }
@@ -327,8 +330,6 @@ void timer_callback(uint timer_count, uint unused) {
     profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
 
     time++;
-
-    io_printf(IO_BUF, "time %d, wc_reg: %u\n", time, wc_reg);
 
     log_debug("Timer tick %u \n", time);
 

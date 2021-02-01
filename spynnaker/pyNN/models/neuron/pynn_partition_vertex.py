@@ -56,6 +56,10 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
         self._synapse_vertices = list()
         self._n_syn_types = neuron_model.get_n_synapse_types()
 
+        if len(self._n_incoming_partitions) < self._n_syn_types:
+            raise Exception("Incorrect number of incoming partitions."
+                            " Each synapse type must have at least 1 incoming partition.")
+
         self._neurons_partition = self._compute_partition_and_offset_size()
 
         offset = 0
@@ -263,10 +267,16 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
     def get_synapse_id_by_target(self, target):
         return self._neuron_vertices[0].get_synapse_id_by_target(target)
 
-    def set_synapse_dynamics(self, synapse_dynamics):
-        for vertex_list in self._synapse_vertices:
-            for vertex in vertex_list:
-                vertex.set_synapse_dynamics(synapse_dynamics)
+    def set_synapse_dynamics(self, synapse_dynamics, synapse_type):
+
+        offset = 0
+        vertices = self._n_incoming_partitions[synapse_type]
+        for i in range(synapse_type):
+            offset += self._n_incoming_partitions[i]
+
+        for out_partition in self._synapse_vertices:
+            for i in range(offset, offset + vertices):
+                out_partition[i].set_synapse_dynamics(synapse_dynamics, synapse_type)
 
     def get_maximum_delay_supported_in_ms(self, machine_time_step):
         return self._synapse_vertices[0][0].\

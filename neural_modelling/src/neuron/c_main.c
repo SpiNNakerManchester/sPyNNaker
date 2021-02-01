@@ -193,8 +193,6 @@ void timer_callback(uint timer_count, uint unused) {
     time++;
     last_rewiring_time++;
 
-    io_printf(IO_BUF, "time %d\n", time);
-
     // This is the part where I save the input and output indices
     //   from the circular buffer
     // If time == 0 as well as output == input == 0  then no rewire is

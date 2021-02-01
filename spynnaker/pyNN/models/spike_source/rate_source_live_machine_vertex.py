@@ -28,7 +28,7 @@ from spinn_front_end_common.interface.profiling import AbstractHasProfileData
 from spinn_front_end_common.interface.profiling.profile_utils import (
     get_profiling_data)
 
-class RateSourceArrayMachineVertex(
+class RateSourceLiveMachineVertex(
         MachineVertex, AbstractReceiveBuffersToHost,
         ProvidesProvenanceDataFromMachineImpl, AbstractRecordable,
         AbstractHasProfileData):
@@ -60,7 +60,7 @@ class RateSourceArrayMachineVertex(
             self, resources_required, is_recording, constraints=None,
             label=None):
         # pylint: disable=too-many-arguments
-        super(RateSourceArrayMachineVertex, self).__init__(
+        super(RateSourceLiveMachineVertex, self).__init__(
             label, constraints=constraints)
         self.__is_recording = is_recording
         self.__resources = resources_required

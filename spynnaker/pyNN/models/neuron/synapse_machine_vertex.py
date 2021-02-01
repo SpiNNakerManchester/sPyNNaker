@@ -211,12 +211,7 @@ class SynapseMachineVertex(
 
         provenance_items.append(ProvenanceDataItem(
             self._add_name(names, "Number of calls for the write contribution callback"),
-            cb_calls,
-            report=cb_calls > 0,
-            message=(
-                "write_contributions cb calls: {}, for {} on {}, {}, {}".format(
-                    cb_calls, label, x, y, p)
-            )))
+            cb_calls))
 
         return provenance_items
 

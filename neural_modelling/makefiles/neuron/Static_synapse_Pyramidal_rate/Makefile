@@ -13,12 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .spike_source_array import SpikeSourceArray
-from .spike_source_from_file import SpikeSourceFromFile
-from .spike_source_poisson import SpikeSourcePoisson
-from .rate_source_array import RateSourceArray
-from .rate_source_live import RateSourceLive
 
-__all__ = ["SpikeSourceArray", "SpikeSourceFromFile",
-        "SpikeSourcePoisson", "RateSourceArray",
-        "RateSourceLive"]
+APP = $(notdir $(CURDIR))
+
+SYNAPSE_DYNAMICS = $(NEURON_DIR)/synapse/plasticity/synapse_dynamics_static_impl.c
+
+COMPARTMENT_TYPE_H = $(NEURON_DIR)/synapse/compartment_type/compartment_type_pyramidal_model.h
+
+include ../synapse_build.mk

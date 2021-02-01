@@ -21,6 +21,7 @@ except ImportError:
 import math
 import struct
 import numpy
+import os
 import scipy.stats  # @UnresolvedImport
 from scipy import special  # @UnresolvedImport
 
@@ -270,7 +271,7 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
     def synapse_dynamics(self):
         return self.__synapse_dynamics
 
-    def set_synapse_dynamics(self, synapse_dynamics):
+    def set_synapse_dynamics(self, synapse_dynamics, synapse_type):
 
         # We can always override static dynamics or None
         if isinstance(self.__synapse_dynamics, SynapseDynamicsStatic):
@@ -361,8 +362,12 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
     def get_binary_file_name(self):
-        #return self.vertex_executable_suffix + "_syn.aplx"
-        return "Static_synapse_pyramidal_rate.aplx"
+
+        dynamics = self.__synapse_dynamics.executable_prefix
+        synapse_suffix = self.__synapse_dynamics.get_vertex_executable_suffix()
+        neuron_suffix, extension = os.path.splitext(
+            self._connected_app_vertices[0].get_binary_file_name())
+        return dynamics + neuron_suffix + synapse_suffix + extension
 
     @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
     def get_binary_start_type(self):

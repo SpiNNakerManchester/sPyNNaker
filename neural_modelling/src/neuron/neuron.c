@@ -292,7 +292,15 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
 
         incoming_partitions[i] =
             *(address + INCOMING_PARTITIONS_PTR + i);
-        total_partitions += incoming_partitions[i];
+
+        if(incoming_partitions[i] == 0) {
+            // Should be a very rare case, ensures we don't break
+            // the memory offset for syn cores and keeps max efficiency
+            total_partitions++;
+        }
+        else {
+            total_partitions += incoming_partitions[i];
+        }
     }
 
     uint32_t incoming_partitions_power_2 = total_partitions;
@@ -324,8 +332,9 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
         return false;
     }
 
-    // Tag the postsynaptic region with memory_index+1. Still a unique id and saves space in DTCM
-    //neuron_impl_allocate_postsynaptic_region(memory_index+1, n_neurons);
+    // Tag the postsynaptic region with memory_index+18. Still a unique id and saves space in DTCM
+    // Memory_index is the core ID, +18 guarantees not to replicate a tag with another core ID
+    neuron_impl_allocate_postsynaptic_region(memory_index+18, n_neurons);
 
     // Allocate space for the synaptic contribution buffer
     synaptic_contributions = (REAL *) spin1_malloc(dma_size);
@@ -429,15 +438,8 @@ void neuron_do_timestep_update( // EXPORTED
     spin1_dma_transfer (
         DMA_TAG_READ_SYNAPTIC_CONTRIBUTION, synaptic_region,
         synaptic_contributions, DMA_READ, dma_size);
-
-    io_printf(IO_BUF, "sent dma\n");
-    io_printf(IO_BUF, "syn contr %x\n", synaptic_region);
     
     while (!dma_finished);
-
-    io_printf(IO_BUF, "mem value %k\n", *synaptic_region);
-
-    io_printf(IO_BUF, "dma finihsed\n");
 
     dma_finished = false;
 
@@ -464,8 +466,6 @@ void neuron_do_timestep_update( // EXPORTED
 
             register uint32_t buff_index = ((synapse_type_index << synapse_index_bits) | neuron_index);
 
-            io_printf(IO_BUF, "syn type %d, neuron %d, buff_index %d\n", synapse_type_index, neuron_index, buff_index);
-
             //Add the values from synaptic_contributions
             sum = 0;
 
@@ -473,8 +473,6 @@ void neuron_do_timestep_update( // EXPORTED
 
                 sum += synaptic_contributions[buff_index];
                 buff_index += n_neurons_power_2;
-
-                io_printf(IO_BUF, "sum %k\n incoming partitions %d\n", sum, incoming_partitions[synapse_type_index]);
             }
 
             //MAKE IT INLINE?
@@ -520,11 +518,10 @@ void neuron_do_timestep_update( // EXPORTED
             log_debug("the neuron %d has been determined to not spike",
                     neuron_index);
         }
-            io_printf(IO_BUF, "Sent %k , neuron %d\n",neuron_impl_get_v(neuron_index), neuron_index);
     }
 
     // Start the DMA with the postsynaptic contributions for the syn cores
-    //neuron_impl_send_postsynaptic_buffer(n_neurons);
+    neuron_impl_send_postsynaptic_buffer(n_neurons);
 
     // Disable interrupts to avoid possible concurrent access
     uint cpsr = 0;

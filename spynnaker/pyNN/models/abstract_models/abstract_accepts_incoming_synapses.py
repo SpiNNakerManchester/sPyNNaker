@@ -34,7 +34,7 @@ class AbstractAcceptsIncomingSynapses(object):
         """
 
     @abstractmethod
-    def set_synapse_dynamics(self, synapse_dynamics):
+    def set_synapse_dynamics(self, synapse_dynamics, synapse_type):
         """ Set the synapse dynamics of this vertex.
         """
 

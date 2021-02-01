@@ -45,6 +45,7 @@ typedef enum region {
 
 #define NUMBER_OF_REGIONS_TO_RECORD 1
 #define BYTE_TO_WORD_CONVERTER 4
+#define DMA_READ_TAG 0
 
 typedef enum callback_priorities {
     MULTICAST = -1,
@@ -60,34 +61,28 @@ typedef struct global_parameters {
     //! The base key to send with (neuron ID to be added to it), or 0 if no key
     uint32_t key;
     //! The number of rates
-    uint32_t elements;
+    uint32_t generators;
     //! The offset of the timer ticks to desynchronize sources
     uint32_t timer_offset;
+    //! The refresh rate for the input sequence in timesteps
+    uint32_t refresh;
 
 } global_parameters;
 
 //! The global_parameters for the sub-population
 static global_parameters params;
 
-typedef struct rate_value {
-    uint32_t time;
-    uint32_t rate;
-}rate_value;
-
 struct config {
 
     global_parameters globals;
-    uint32_t loop;
-    rate_value rates[];
+    
+    REAL *rates;
 };
 
 struct source_provenance {
 
     uint32_t current_timer_tick;
 };
-
-//! global variable which contains all the data for neurons
-static rate_value *rates = NULL;
 
 //! the time interval parameter TODO this variable could be removed and use the
 //! timer tick callback timer value.
@@ -102,15 +97,29 @@ static uint32_t infinite_run;
 //! The timer period
 static uint32_t timer_period;
 
-static uint32_t index;
+static uint32_t key;
 
-static uint32_t looping;
-static uint32_t n_rates;
+//! Refresh frequency for the inputs
+static uint32_t refresh;
 
-static uint32_t iteration;
-static uint32_t expected;
+static uint32_t refresh_counter;
+static uint32_t refresh_timer;
 
-static uint32_t last_rate_sent;
+static uint32_t generators;
+
+static REAL *rate_values;
+static REAL *memory_values;
+
+static inline void read_rate_values() {
+
+    refresh_timer = 0;
+
+    spin1_dma_transfer(
+        DMA_READ_TAG, memory_values + (refresh_counter * generators),
+        rate_values, DMA_READ, generators * sizeof(REAL));
+
+    refresh_counter++;
+}
 
 
 //! \brief method for reading the parameters stored in Poisson parameter region
@@ -123,29 +132,21 @@ static bool read_rate_parameters(struct config *config) {
 
     spin1_memcpy(&params, &config->globals, sizeof(params));
 
-    io_printf(IO_BUF, "key %d, elems %d\n", params.key, params.elements);
-    if (params.elements > 0) {
-        // the first time around, the array is set to NULL, afterwards,
-        // assuming all goes well, there's an address here.
-        if (rates == NULL) {
-            rates = spin1_malloc(params.elements * sizeof(rate_value));
-            // if failed to alloc memory, report and fail.
-            if (rates == NULL) {
-                log_error("Failed to allocate rates");
-                return false;
-            }
-        }
+    generators = params.generators;
+    refresh_timer = 0;
+    refresh_counter = 1;
+    refresh = params.refresh;
+    key = params.key;
 
-        // store spike source data into DTCM
-        spin1_memcpy(rates, config->rates,
-                params.elements * sizeof(rate_value));
+    memory_values = config->rates;
 
-        looping = config->loop;
-        n_rates = params.elements;
+    rate_values = spin1_malloc(generators * sizeof(REAL));
+    if (rate_values == NULL) {
+        log_error("Could not allocate space for the rate values");
+        return false;
     }
 
-    iteration = 0;
-    expected = 0;
+    spin1_memcpy(rate_values, memory_values, generators * sizeof(REAL));
 
     log_info("read_rate_parameters: completed successfully");
     return true;
@@ -239,6 +240,7 @@ static void timer_callback(uint timer_count, uint unused) {
     profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
 
     time++;
+    refresh_timer++;
 
     log_debug("Timer tick %u", time);
 
@@ -258,79 +260,15 @@ static void timer_callback(uint timer_count, uint unused) {
         return;
     }
 
-    //io_printf(IO_BUF, "%d %d %d\n", rates[index].time, rates[index].rate, time);
+    for(uint32_t i = 0; i < generators; i++) {
 
-    uint32_t time_to_check;
-
-    //LP TMP for US replica
-    if(looping == 2 &&  time >= 20000) {
-
-        return;
-
-    }
-
-    if(looping < 4) {
-
-        if(index >= n_rates) {
-
-            if(!iteration) {
-
-                //FOR TESTING THE DELAYED EXC START, KEEP ONLY WHAT'S INSIDE THE IF CONDITION
-                if(looping == 1)
-                    expected = time;
-                else
-                    expected = index;
-            }
-
-            index = 0;
-            iteration += expected;
-        }
-
-        time_to_check = rates[index].time + iteration;
-    }
-    else {
-
-        time_to_check = rates[index].time;
-    }
-
-    if(time_to_check == time) {
-
-        //URBANCZIK-SENN RESULTS, THIS IS TO HAVE A NON 0 INPUT AT EVERY TIMESTEP. REMOVE THE IF FOR NORMAL SIMS!
-        if((time_to_check == 0) && (rates[index].rate == 0)) {
-
-            while (!spin1_send_mc_packet(params.key, 0, WITH_PAYLOAD)) {
-            spin1_delay_us(1);
-            }
-
-            //io_printf(IO_BUF, "%k t %d\n", 0, time);
-        }
-        else {
-
-            while (!spin1_send_mc_packet(params.key, rates[index].rate, WITH_PAYLOAD)) {
+        while (!spin1_send_mc_packet(key, rate_values[i], WITH_PAYLOAD)) {
                 spin1_delay_us(1);
             }
-
-            //io_printf(IO_BUF, "%k t %d\n", rates[index].rate, time);
-
-            last_rate_sent = rates[index].rate;
-        }
-
-        index++;
     }
-    else if (looping < 4){
 
-        while (!spin1_send_mc_packet(params.key, last_rate_sent, WITH_PAYLOAD)) {
-            spin1_delay_us(1);
-        }
-
-
-       //io_printf(IO_BUF, "%k t %d\n", last_rate_sent, time);
-    }
-    else{
-
-       while (!spin1_send_mc_packet(params.key, 0, WITH_PAYLOAD)) {
-            spin1_delay_us(1);
-        }
+    if(refresh_timer > refresh) {
+        read_rate_values();
     }
 
     profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
@@ -347,8 +285,6 @@ void c_main(void) {
 
     // Start the time at "-1" so that the first tick will be 0
     time = UINT32_MAX;
-
-    index = 0;
 
     // Set timer tick (in microseconds)
     spin1_set_timer_tick_and_phase(timer_period, params.timer_offset);

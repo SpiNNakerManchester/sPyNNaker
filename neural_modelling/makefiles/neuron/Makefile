@@ -13,13 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-MODELS = Static_synapse_pyramidal_rate \
-		 Static_synapse_two_comp_rate \
-		 Plastic_synapse_pyramidal_stdp_mad_Bern_plasticity \
-		 Plastic_synapse_two_comp_stdp_mad_Bern_plasticity \
-		 IF_exp_two_comp_rate \
+MODELS = Static_synapse_Pyramidal_rate \
+		 Static_synapse_Two_comp_rate \
+		 Plastic_synapse_Pyramidal_rate_stdp_mad_Bern_plasticity \
+		 Plastic_synapse_Two_comp_rate_stdp_mad_Bern_plasticity \
+		 Two_comp_rate \
 		 Pyramidal_rate \
-		 IF_exp_two_comp_rate_stdp_mad_Bern_plasticity \
+		 Two_comp_rate_stdp_mad_Bern_plasticity \
 		 Pyramidal_rate_stdp_mad_Bern_plasticity \
 #         IF_curr_exp \
 #         IF_cond_exp \

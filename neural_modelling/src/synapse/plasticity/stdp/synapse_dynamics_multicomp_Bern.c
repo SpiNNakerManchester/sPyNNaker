@@ -296,7 +296,7 @@ bool synapse_dynamics_process_plastic_synapses(
 
         // Create update state from the plastic synaptic word
         update_state_t current_state =
-                synapse_structure_get_update_state(*plastic_words, type);
+                synapse_structure_get_update_state(*plastic_words, 0);
 
         // Update the synapse state
         final_state_t final_state = plasticity_update_synapse(
@@ -304,13 +304,10 @@ bool synapse_dynamics_process_plastic_synapses(
 
         // THE FUNCTION SHFITS TO INCLUDE THE DELAY. MAYBE STRIP OFF FOR US MODEL EXTREME PERFORMANCE GAIN
         uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
-                0, type_index, synapse_type_index_bits);
+                0, type_index & synapse_index_mask, synapse_type_index_bits);
 
         // EDIT THIS TO BE *plastic_words ONCE THE WEIGHT UPDATE IS ADAPTED
         REAL curr_weight = synapse_structure_get_final_weight(final_state);
-
-        io_printf(IO_BUF, "plast ring buff index %d, syn type %d, neu index %d\n", ring_buffer_index);
-        io_printf(IO_BUF, "IP %k t %d\n", curr_weight, time);
 
         // Add the current rate contribution with the new rate
         REAL accumulation = ring_buffers[ring_buffer_index] +

@@ -169,6 +169,10 @@ class SynapseDynamicsSTDP(
             self.__timing_dependence.n_weight_terms)
 
     @property
+    def executable_prefix(self):
+        return "Plastic_synapse_"
+
+    @property
     def _n_header_bytes(self):
         # The header contains a single timestamp and pre-trace
         n_bytes = (
