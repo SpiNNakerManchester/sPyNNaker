@@ -441,6 +441,7 @@ class SynapticMatrixApp(object):
                     Slice(lo_atom,
                           min(lo_atom + MAX_GENERATED_ATOMS - 1, max_atom))
                     for lo_atom in range(0, max_atom + 1, MAX_GENERATED_ATOMS)]
+                print("Using optimum slices: {}".format(pre_slices))
             for pre_slice in pre_slices:
                 syn_addr, syn_mat_offset = self.__next_app_on_chip_address(
                     syn_addr, syn_max_addr, pre_slice)
