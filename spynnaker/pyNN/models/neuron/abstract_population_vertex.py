@@ -71,7 +71,7 @@ class AbstractPopulationVertex(
         "__units",
         "__n_data_specs",
         "__initial_state_variables",
-        "__has_reset_last"]
+        "__has_run"]
 
     #: recording region IDs
     _SPIKE_RECORDING_REGION = 0
@@ -160,7 +160,7 @@ class AbstractPopulationVertex(
         # bool for if state has changed.
         self.__change_requires_mapping = True
         self.__change_requires_data_generation = False
-        self.__has_reset_last = True
+        self.__has_run = False
 
         # Set up for profiling
         self.__n_profile_samples = helpful_functions.read_config_int(
@@ -205,14 +205,12 @@ class AbstractPopulationVertex(
     def synapse_manager(self):
         return self.__synapse_manager
 
-    def update_state_variables(self):
-        """ Res the state variables to the init position
+    def set_has_run(self):
+        """ Set the flag has run so initialize only affects state variables
 
         :rtype: None
         """
-        if self.__has_reset_last:
-            self._state_variables.copy_into(self.__initial_state_variables)
-        self.__has_reset_last = False
+        self.__has_run = True
 
     @property
     @overrides(AbstractChangableAfterRun.requires_mapping)
@@ -298,18 +296,18 @@ class AbstractPopulationVertex(
             raise KeyError(
                 "Vertex does not support initialisation of"
                 " parameter {}".format(variable))
-        if self.__has_reset_last:
-            # set the inital values
-            self.__initial_state_variables[variable].set_value_by_selector(
-                selector, value)
-            # Update the sate variables in case asked for
-            self._state_variables.copy_into(self.__initial_state_variables)
-        else:
+        if self.__has_run:
             self._state_variables[variable].set_value_by_selector(
                 selector, value)
             logger.warning(
                 "initializing {} after run and before reset only changes the "
                 "current state and will be lost after reset".format(variable))
+        else:
+            # set the inital values
+            self.__initial_state_variables[variable].set_value_by_selector(
+                selector, value)
+            # Update the sate variables in case asked for
+            self._state_variables.copy_into(self.__initial_state_variables)
         for vertex in self.machine_vertices:
             if isinstance(vertex, AbstractRewritesDataSpecification):
                 vertex.set_reload_required(True)
@@ -525,7 +523,8 @@ class AbstractPopulationVertex(
     @overrides(AbstractCanReset.reset_to_first_timestep)
     def reset_to_first_timestep(self):
         # Mark that reset has been done, and reload state variables
-        self.__has_reset_last = True
+        self.__has_run = False
+        self._state_variables.copy_into(self.__initial_state_variables)
         for vertex in self.machine_vertices:
             if isinstance(vertex, AbstractRewritesDataSpecification):
                 vertex.set_reload_required(True)
