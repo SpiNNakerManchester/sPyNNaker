@@ -373,7 +373,7 @@ class PyNNPopulationCommon(object):
         # TODO: Need __getitem__
         _we_dont_do_this_now(cell_id)
 
-    def _initialize(self, variable, value):
+    def _initialize(self, variable, value, selector=None):
         """ Set the initial value of one of the state variables of the neurons\
             in this population.
 
@@ -389,7 +389,7 @@ class PyNNPopulationCommon(object):
                 and not self._vertex_changeable_after_run:
             raise Exception("Population does not support changes after run")
         self._read_parameters_before_set()
-        self.__vertex.initialize(variable, value)
+        self.__vertex.initialize(variable, value, selector)
 
     def inject(self, current_source):
         """ Connect a current source to all cells in the Population.
