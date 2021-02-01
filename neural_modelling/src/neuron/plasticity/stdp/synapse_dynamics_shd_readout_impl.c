@@ -400,34 +400,34 @@ bool synapse_dynamics_process_plastic_synapses(
         // Perform weight update: only if batch time has elapsed
     	final_state_t final_state;
 
-//    	if (neuron->syn_state[syn_ind_from_delay].update_ready <= 0){
-//
-//    		// enough time has elapsed - perform weight update
-//    		if (PRINT_PLASTICITY){
-//    			io_printf(IO_BUF, "update_ready=0\n");
-//    		}
+    	if (neuron->syn_state[syn_ind_from_delay].update_ready <= 0){
 
-        // Go through typical weight update process to clip to limits
-        final_state = eprop_plasticity_update(current_state,
-            neuron->syn_state[syn_ind_from_delay].delta_w);
+    		// enough time has elapsed - perform weight update
+    		if (PRINT_PLASTICITY){
+    			io_printf(IO_BUF, "update_ready=0\n");
+    		}
 
-        // reset delta_w as weight change has now been applied
-        neuron->syn_state[syn_ind_from_delay].delta_w = 0.0k;
+            // Go through typical weight update process to clip to limits
+            final_state = eprop_plasticity_update(current_state,
+                neuron->syn_state[syn_ind_from_delay].delta_w);
+
+            // reset delta_w as weight change has now been applied
+            neuron->syn_state[syn_ind_from_delay].delta_w = 0.0k;
 
     		// reset update_ready counter based on pattern cycle time
-//    		neuron->syn_state[syn_ind_from_delay].update_ready += 1000;
-//
-//    	} else {
-//    		if (PRINT_PLASTICITY){
-//    			io_printf(IO_BUF, "update_ready: %u - no update performed\n",
-//    					neuron->syn_state[syn_ind_from_delay].update_ready);
-//    		}
-//    		// don't update weight - get update state based on state cached in SDRAM
-//    		// assume reg rate is zero to avoid
-//
-//    		final_state = synapse_structure_get_final_state(current_state, 0);
-//    		// Don't reset delta_w -> keep this accumulating and apply weight change in future
-//    	}
+            neuron->syn_state[syn_ind_from_delay].update_ready += 1000;
+
+        } else {
+            if (PRINT_PLASTICITY){
+                io_printf(IO_BUF, "update_ready: %u - no update performed\n",
+                        neuron->syn_state[syn_ind_from_delay].update_ready);
+            }
+            // don't update weight - get update state based on state cached in SDRAM
+            // assume reg rate is zero to avoid
+
+            final_state = synapse_structure_get_final_state(current_state, 0);
+            // Don't reset delta_w -> keep this accumulating and apply weight change in future
+        }
 
         // Add contribution to synaptic input
         // Convert into ring buffer offset
