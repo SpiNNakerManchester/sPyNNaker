@@ -293,8 +293,7 @@ class PyNNPopulationCommon(object):
             results[parameter_name] = self.__vertex.get_value(parameter_name)
         return results
 
-    # NON-PYNN API CALL
-    def get_by_selector(self, selector, parameter_names):
+    def _get_by_selector(self, selector, parameter_names):
         """ Get the values of a parameter for the selected cell in the\
             population.
 
