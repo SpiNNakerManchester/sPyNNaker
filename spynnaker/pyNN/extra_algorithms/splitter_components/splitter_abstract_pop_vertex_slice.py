@@ -48,7 +48,8 @@ class SplitterAbstractPopulationVertexSlice(
         "__all_syn_block_sz",
         "__structural_sz",
         "__synapse_expander_sz",
-        "__bitfield_sz"
+        "__bitfield_sz",
+        "__next_index"
     ]
 
     SPLITTER_NAME = "SplitterAbstractPopulationVertexSlice"
@@ -69,6 +70,7 @@ class SplitterAbstractPopulationVertexSlice(
         self.__structural_sz = dict()
         self.__synapse_expander_sz = None
         self.__bitfield_sz = None
+        self.__next_index = 0
 
     @overrides(AbstractSplitterSlice.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
@@ -89,6 +91,7 @@ class SplitterAbstractPopulationVertexSlice(
     @overrides(AbstractSplitterSlice.create_machine_vertex)
     def create_machine_vertex(
             self, vertex_slice, resources, label, remaining_constraints):
+
         if self.__ring_buffer_shifts is None:
             app_vertex = self._governed_app_vertex
             self.__ring_buffer_shifts = app_vertex.get_ring_buffer_shifts(
@@ -96,10 +99,12 @@ class SplitterAbstractPopulationVertexSlice(
             self.__weight_scales = app_vertex.get_weight_scales(
                 self.__ring_buffer_shifts)
 
+        index = self.__next_index
+        self.__next_index += 1
         return PopulationMachineVertex(
             resources, label, remaining_constraints, self._governed_app_vertex,
-            vertex_slice, self.__ring_buffer_shifts, self.__weight_scales,
-            self.__all_syn_block_size(vertex_slice),
+            vertex_slice, index, self.__ring_buffer_shifts,
+            self.__weight_scales, self.__all_syn_block_size(vertex_slice),
             self.__structural_size(vertex_slice))
 
     @overrides(AbstractSplitterSlice.get_resources_used_by_atoms)
@@ -268,3 +273,4 @@ class SplitterAbstractPopulationVertexSlice(
         self.__weight_scales = None
         self.__all_syn_block_sz = dict()
         self.__structural_sz = dict()
+        self.__next_index = 0

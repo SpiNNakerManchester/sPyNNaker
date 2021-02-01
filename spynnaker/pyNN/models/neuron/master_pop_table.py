@@ -343,21 +343,13 @@ class MasterPopTableAsBinarySearch(object):
             if in_edge not in seen_edges:
                 seen_edges.add(in_edge)
                 vertex = in_edge.pre_vertex
-
-                # If the pre-vertex not been partitioned, estimate
-                if not vertex.machine_vertices:
-                    edge_vertices = len(vertex.splitter.get_out_going_slices())
-
-                # If it has been partitioned, use the actual number of
-                # pre-vertices
-                else:
-                    edge_vertices = len(vertex.machine_vertices)
+                n_cores = len(vertex.splitter.get_out_going_slices()[0])
 
                 # If there are also delays, double it
                 if in_edge.n_delay_stages:
-                    edge_vertices *= _DELAY_SCALE
+                    n_cores *= _DELAY_SCALE
 
-                n_vertices += edge_vertices
+                n_vertices += n_cores
 
         return (
             _BASE_SIZE_BYTES +

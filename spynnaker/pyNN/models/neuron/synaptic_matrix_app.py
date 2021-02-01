@@ -433,7 +433,8 @@ class SynapticMatrixApp(object):
                   .format(self.__app_edge.pre_vertex.n_atoms,
                           syn_addr, syn_max_addr, del_addr, del_max_addr))
 
-            pre_slices = self.__app_edge.pre_vertex.vertex_slices
+            pre_slices =\
+                self.__app_edge.pre_vertex.splitter.get_out_going_slices()[0]
             if self.__max_row_info.delayed_max_n_synapses == 0:
                 # If we are not using delays (as we have to sync with delays)
                 # Generate for theoretical maximum pre-slices that the
@@ -538,14 +539,15 @@ class SynapticMatrixApp(object):
             The synaptic matrix offset to write the delayed data to
         :rtype: GeneratorData
         """
+        post_slices =\
+            self.__app_edge.post_vertex.splitter.get_in_coming_slices()[0]
         return GeneratorData(
             syn_mat_offset, d_mat_offset,
             self.__max_row_info.undelayed_max_words,
             self.__max_row_info.delayed_max_words,
             self.__max_row_info.undelayed_max_n_synapses,
-            self.__max_row_info.delayed_max_n_synapses,
-            pre_vertex_slices, self.__app_edge.post_vertex.vertex_slices,
-            pre_vertex_slice, self.__post_vertex_slice,
+            self.__max_row_info.delayed_max_n_synapses, pre_vertex_slices,
+            post_slices, pre_vertex_slice, self.__post_vertex_slice,
             self.__synapse_info, self.__app_edge.n_delay_stages + 1,
             self.__app_edge.post_vertex.splitter.max_support_delay(),
             globals_variables.get_simulator().machine_time_step)
@@ -555,13 +557,14 @@ class SynapticMatrixApp(object):
         """
         # If delay edge exists, tell this about the data too, so it can
         # generate its own data
+        post_slices =\
+            self.__app_edge.post_vertex.splitter.get_in_coming_slices()[0]
         if (self.__max_row_info.delayed_max_n_synapses > 0 and
                 self.__app_edge.delay_edge is not None):
             self.__app_edge.delay_edge.pre_vertex.add_generator_data(
                 self.__max_row_info.undelayed_max_n_synapses,
-                self.__max_row_info.delayed_max_n_synapses,
-                pre_vertex_slices, self.__app_edge.post_vertex.vertex_slices,
-                pre_vertex_slice, self.__post_vertex_slice,
+                self.__max_row_info.delayed_max_n_synapses, pre_vertex_slices,
+                post_slices, pre_vertex_slice, self.__post_vertex_slice,
                 self.__synapse_info, self.__app_edge.n_delay_stages + 1,
                 self.__app_edge.post_vertex.splitter.max_support_delay(),
                 globals_variables.get_simulator().machine_time_step)

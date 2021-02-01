@@ -41,7 +41,8 @@ class DelayExtensionMachineVertex(
         AbstractHasAssociatedBinary, AbstractGeneratesDataSpecification):
 
     __slots__ = [
-        "__resources"]
+        "__resources",
+        "__slice_index"]
 
     class _DELAY_EXTENSION_REGIONS(Enum):
         SYSTEM = 0
@@ -116,7 +117,7 @@ class DelayExtensionMachineVertex(
     DELAYED_FOR_TRAFFIC_NAME = "Number_of_times_delayed_to_spread_traffic"
 
     def __init__(self, resources_required, label, constraints=None,
-                 app_vertex=None, vertex_slice=None):
+                 app_vertex=None, vertex_slice=None, slice_index=None):
         """
         :param ~pacman.model.resources.ResourceContainer resources_required:
             The resources required by the vertex
@@ -134,6 +135,7 @@ class DelayExtensionMachineVertex(
         super(DelayExtensionMachineVertex, self).__init__(
             label, constraints=constraints, app_vertex=app_vertex,
             vertex_slice=vertex_slice)
+        self.__slice_index = slice_index
         self.__resources = resources_required
 
     @property
@@ -336,7 +338,7 @@ class DelayExtensionMachineVertex(
             self._DELAY_EXTENSION_REGIONS.TDMA_REGION.value)
         spec.write_array(
             self._app_vertex.generate_tdma_data_specification_data(
-                self._app_vertex.vertex_slices.index(self._vertex_slice)))
+                self.__slice_index))
 
         # End-of-Spec:
         spec.end_specification()

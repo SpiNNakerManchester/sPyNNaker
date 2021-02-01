@@ -495,10 +495,11 @@ class SpikeSourcePoissonVertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
         # pylint: disable=too-many-arguments, arguments-differ
+        index = self.__n_subvertices
         self.__n_subvertices += 1
         return SpikeSourcePoissonMachineVertex(
             resources_required, self.__spike_recorder.record,
-            constraints, label, self, vertex_slice)
+            constraints, label, self, vertex_slice, index)
 
     @property
     def max_rate(self):
@@ -602,3 +603,7 @@ class SpikeSourcePoissonVertex(
             "parameters": parameters,
         }
         return context
+
+    @overrides(TDMAAwareApplicationVertex.get_n_cores)
+    def get_n_cores(self):
+        return len(self._splitter.get_out_going_slices()[0])

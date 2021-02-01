@@ -230,3 +230,7 @@ class DelayExtensionVertex(
         return BYTES_PER_WORD * (
             _DELAY_PARAM_HEADER_WORDS +
             (self.__n_delay_stages * n_words_per_stage))
+
+    @overrides(TDMAAwareApplicationVertex.get_n_cores)
+    def get_n_cores(self):
+        return len(self._splitter.get_out_going_slices()[0])

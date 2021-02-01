@@ -158,8 +158,10 @@ class SynapticMatrix(object):
         """
 
         # Get the actual connections
-        pre_slices = self.__app_edge.pre_vertex.vertex_slices
-        post_slices = self.__app_edge.post_vertex.vertex_slices
+        pre_slices =\
+            self.__app_edge.pre_vertex.splitter.get_out_going_slices()[0]
+        post_slices =\
+            self.__app_edge.post_vertex.splitter.get_in_coming_slices()[0]
         pre_vertex_slice = self.__machine_edge.pre_vertex.vertex_slice
         post_vertex_slice = self.__machine_edge.post_vertex.vertex_slice
         connections = self.__synapse_info.connector.create_synaptic_block(
@@ -375,8 +377,8 @@ class SynapticMatrix(object):
             self.__max_row_info.delayed_max_words,
             self.__max_row_info.undelayed_max_n_synapses,
             self.__max_row_info.delayed_max_n_synapses,
-            self.__app_edge.pre_vertex.vertex_slices,
-            self.__app_edge.post_vertex.vertex_slices,
+            self.__app_edge.pre_vertex.splitter.get_out_going_slices()[0],
+            self.__app_edge.post_vertex.splitter.get_in_coming_slices()[0],
             self.__machine_edge.pre_vertex.vertex_slice,
             self.__machine_edge.post_vertex.vertex_slice,
             self.__synapse_info, self.__app_edge.n_delay_stages + 1,
@@ -393,8 +395,8 @@ class SynapticMatrix(object):
             self.__app_edge.delay_edge.pre_vertex.add_generator_data(
                 self.__max_row_info.undelayed_max_n_synapses,
                 self.__max_row_info.delayed_max_n_synapses,
-                self.__app_edge.pre_vertex.vertex_slices,
-                self.__app_edge.post_vertex.vertex_slices,
+                self.__app_edge.pre_vertex.splitter.get_out_going_slices()[0],
+                self.__app_edge.post_vertex.splitter.get_in_coming_slices()[0],
                 self.__machine_edge.pre_vertex.vertex_slice,
                 self.__machine_edge.post_vertex.vertex_slice,
                 self.__synapse_info, self.__app_edge.n_delay_stages + 1,

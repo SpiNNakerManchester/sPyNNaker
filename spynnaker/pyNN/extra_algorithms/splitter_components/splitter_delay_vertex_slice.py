@@ -106,9 +106,9 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
                 self.NEED_EXACT_ERROR_MESSAGE)
 
         # create vertices correctly
-        for vertex_slice in pre_slices:
+        for index, vertex_slice in enumerate(pre_slices):
             vertex = self.create_machine_vertex(
-                vertex_slice, resource_tracker,
+                vertex_slice, index, resource_tracker,
                 self.DELAY_EXTENSION_SLICE_LABEL.format(
                     self._other_splitter.governed_app_vertex, vertex_slice),
                 get_remaining_constraints(self._governed_app_vertex),
@@ -138,7 +138,7 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
                 self.INVALID_POP_ERROR_MESSAGE.format(app_vertex))
 
     def create_machine_vertex(
-            self, vertex_slice, resource_tracker, label,
+            self, vertex_slice, index, resource_tracker, label,
             remaining_constraints, graph):
         """ creates a delay extension machine vertex and adds to the tracker.
 
@@ -158,7 +158,7 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
 
         machine_vertex = DelayExtensionMachineVertex(
             resources, label, remaining_constraints,
-            self._governed_app_vertex, vertex_slice)
+            self._governed_app_vertex, vertex_slice, index)
 
         self._machine_vertex_by_slice[vertex_slice] = machine_vertex
         return machine_vertex

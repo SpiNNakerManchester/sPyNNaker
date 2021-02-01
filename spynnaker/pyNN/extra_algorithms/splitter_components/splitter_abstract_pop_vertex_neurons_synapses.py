@@ -167,7 +167,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         self.__synapse_vertices = list()
         self.__synapse_verts_by_neuron = defaultdict(list)
         self.__synapse_verts_for_edge = defaultdict(list)
-        for vertex_slice in self.__get_fixed_slices():
+        for index, vertex_slice in enumerate(self.__get_fixed_slices()):
 
             # Create the neuron an synapse vertices
             neuron_resources = self.__get_neuron_resources(vertex_slice)
@@ -175,7 +175,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 label, vertex_slice.lo_atom, vertex_slice.hi_atom)
             neuron_vertex = PopulationNeuronsMachineVertex(
                 neuron_resources, neuron_label, None, app_vertex, vertex_slice,
-                max_rb_shifts, weight_scales)
+                index, max_rb_shifts, weight_scales)
             machine_graph.add_vertex(neuron_vertex)
             self.__neuron_vertices.append(neuron_vertex)
             synapse_vertices = list()

@@ -172,7 +172,7 @@ class SpikeSourcePoissonMachineVertex(
 
     def __init__(
             self, resources_required, is_recording, constraints=None,
-            label=None, app_vertex=None, vertex_slice=None):
+            label=None, app_vertex=None, vertex_slice=None, slice_index=None):
         # pylint: disable=too-many-arguments
         super(SpikeSourcePoissonMachineVertex, self).__init__(
             label, constraints=constraints, app_vertex=app_vertex,
@@ -181,6 +181,7 @@ class SpikeSourcePoissonMachineVertex(
         self.__resources = resources_required
         self.__change_requires_neuron_parameters_reload = False
         self.__sdram_partition = None
+        self.__slice_index = slice_index
 
     def set_sdram_partition(self, sdram_partition):
         self.__sdram_partition = sdram_partition
@@ -392,7 +393,7 @@ class SpikeSourcePoissonMachineVertex(
             self.POISSON_SPIKE_SOURCE_REGIONS.TDMA_REGION.value)
         spec.write_array(
             self._app_vertex.generate_tdma_data_specification_data(
-                self._app_vertex.vertex_slices.index(self.vertex_slice)))
+                self.__slice_index))
 
         # write SDRAM edge parameters
         spec.switch_write_focus(

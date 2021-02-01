@@ -77,6 +77,13 @@ class PopulationMachineNeurons(AbstractReadParametersBeforeSet):
         """
 
     @abstractproperty
+    def _slice_index(self):
+        """ The index of the slice of this vertex in the list of slices
+
+        :rtype: int
+        """
+
+    @abstractproperty
     def _key(self):
         """ The key for spikes.
 
@@ -176,7 +183,7 @@ class PopulationMachineNeurons(AbstractReadParametersBeforeSet):
 
         # store the tdma data here for this slice.
         data = self._app_vertex.generate_tdma_data_specification_data(
-            self._app_vertex.vertex_slices.index(self._vertex_slice))
+            self._slice_index)
         spec.write_array(data)
 
         # Write whether the key is to be used, and then the key, or 0 if it

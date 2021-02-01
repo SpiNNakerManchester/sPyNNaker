@@ -282,6 +282,10 @@ class AbstractPopulationVertex(
     def n_atoms(self):
         return self.__n_atoms
 
+    @overrides(TDMAAwareApplicationVertex.get_n_cores)
+    def get_n_cores(self):
+        return len(self._splitter.get_out_going_slices()[0])
+
     @property
     def size(self):
         """ The number of neurons in the vertex

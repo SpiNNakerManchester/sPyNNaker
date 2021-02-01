@@ -49,7 +49,8 @@ class PopulationNeuronsMachineVertex(
         "__key",
         "__sdram_partition",
         "__ring_buffer_shifts",
-        "__weight_scales"]
+        "__weight_scales",
+        "__slice_index"]
 
     class REGIONS(Enum):
         """Regions for populations."""
@@ -79,7 +80,7 @@ class PopulationNeuronsMachineVertex(
 
     def __init__(
             self, resources_required, label, constraints, app_vertex,
-            vertex_slice, ring_buffer_shifts, weight_scales):
+            vertex_slice, slice_index, ring_buffer_shifts, weight_scales):
         """
         :param ~pacman.model.resources.ResourceContainer resources_required:
             The resources used by the vertex
@@ -99,8 +100,14 @@ class PopulationNeuronsMachineVertex(
         self.__key = None
         self.__change_requires_neuron_parameters_reload = False
         self.__sdram_partition = None
+        self.__slice_index = slice_index
         self.__ring_buffer_shifts = ring_buffer_shifts
         self.__weight_scales = weight_scales
+
+    @property
+    @overrides(PopulationMachineNeurons._slice_index)
+    def _slice_index(self):
+        return self.__slice_index
 
     @property
     @overrides(PopulationMachineNeurons._key)
