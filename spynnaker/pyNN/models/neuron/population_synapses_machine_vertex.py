@@ -36,7 +36,7 @@ SDRAM_PARAMS_SIZE = 3 * BYTES_PER_WORD
 SYNAPTIC_INPUT_BYTES = BYTES_PER_SHORT
 
 # Overhead in time to write, which includes the clearing of input spikes
-TIME_TO_CLEAR_SPIKES = 5
+TIME_TO_CLEAR_SPIKES = 50
 
 
 class PopulationSynapsesMachineVertex(
