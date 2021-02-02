@@ -428,10 +428,6 @@ class SynapticMatrixApp(object):
             # and tell the pop table
             (block_addr, syn_addr, del_addr, syn_max_addr,
              del_max_addr) = self.__reserve_app_blocks(block_addr)
-            print("Allocated app blocks for {} atoms: "
-                  "undelayed: {} - {}, delayed: {} - {}"
-                  .format(self.__app_edge.pre_vertex.n_atoms,
-                          syn_addr, syn_max_addr, del_addr, del_max_addr))
 
             pre_slices =\
                 self.__app_edge.pre_vertex.splitter.get_out_going_slices()[0]
@@ -446,9 +442,7 @@ class SynapticMatrixApp(object):
                     Slice(lo_atom,
                           min(lo_atom + MAX_GENERATED_ATOMS - 1, max_atom))
                     for lo_atom in range(0, max_atom + 1, MAX_GENERATED_ATOMS)]
-                print("Using optimum slices: {}".format(pre_slices))
             for pre_slice in pre_slices:
-                print("Using block for slice {}".format(pre_slice))
                 syn_addr, syn_mat_offset = self.__next_app_on_chip_address(
                     syn_addr, syn_max_addr, pre_slice)
                 del_addr, d_mat_offset = self.__next_app_delay_on_chip_address(
