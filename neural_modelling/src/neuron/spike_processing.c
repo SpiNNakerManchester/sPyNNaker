@@ -415,7 +415,8 @@ void user_event_callback(UNUSED uint unused0, UNUSED uint unused1) {
 }
 
 /* INTERFACE FUNCTIONS - cannot be static */
-
+uint32_t latest_clear = 0xFFFFFFFFF;
+uint32_t earliest_clear = 0;
 //! \brief clears the input buffer of packets and records them
 void spike_processing_clear_input_buffer(timer_t time) {
 
@@ -424,13 +425,16 @@ void spike_processing_clear_input_buffer(timer_t time) {
     recording_record(p_per_ts_region, &p_per_ts_struct, sizeof(p_per_ts_struct));
     p_per_ts_struct.packets_this_time_step = 0;
 
+    uint32_t timer_time = tc[T1_COUNT];
+    if (timer_time > earliest_clear) {
+        earliest_clear = timer_time;
+    }
+    if (timer_time < latest_clear) {
+        latest_clear = timer_time;
+    }
+
     // Record the count whether clearing or not for provenance
     count_input_buffer_packets_late += in_spikes_size();
-
-    if (in_spikes_size() && !dma_busy) {
-        log_error("Spikes were found in the input buffer, but the DMA is not busy!");
-        rt_error(RTE_SWERR);
-    }
 
     if (clear_input_buffers_of_late_packets) {
         in_spikes_clear();

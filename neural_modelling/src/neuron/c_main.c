@@ -319,6 +319,9 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
         // run
         time--;
 
+        log_info("Earliest send = %d, latest send = %d, earliest clear = %d, latest clear = %d",
+                earliest_send_time, latest_send_time, earliest_clear, latest_clear);
+
         log_debug("Rewire tries = %d", count_rewire_attempts);
         simulation_ready_to_read();
         return;
