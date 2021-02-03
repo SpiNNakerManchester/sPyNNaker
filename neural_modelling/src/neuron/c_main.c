@@ -279,6 +279,9 @@ void resume_callback(void) {
 
 }
 
+extern uint32_t earliest_clear;
+extern uint32_t latest_clear;
+
 //! \brief Timer interrupt callback
 //! \param[in] timer_count: the number of times this call back has been
 //!            executed since start of simulation
