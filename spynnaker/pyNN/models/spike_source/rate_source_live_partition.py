@@ -13,7 +13,7 @@ class RateSourceLivePartition(SimplePopulationSettable, AbstractChangableAfterRu
         "__partitions"]
 
     def __init__(self, sources,
-        constraints, label, max_atoms, rate_source_array, looping, partitions):
+        constraints, label, max_atoms, rate_source_live, partitions):
 
         self.__n_atoms = sources
         self.__vertices = list()
@@ -23,8 +23,8 @@ class RateSourceLivePartition(SimplePopulationSettable, AbstractChangableAfterRu
 
         for i in range(self.__partitions):
             self.__vertices.append(RateSourceLiveVertex(
-                self.__n_atoms, rate_times, rate_values, constraints,
-                label+str(i), max_atoms, rate_source_array, looping))
+                self.__atoms_per_partition[i], constraints,
+                label+str(i), max_atoms, rate_source_live))
 
     @property
     def n_atoms(self):
@@ -36,18 +36,14 @@ class RateSourceLivePartition(SimplePopulationSettable, AbstractChangableAfterRu
 
     def _compute_partition_and_offset_size(self):
 
-        min_neurons_per_partition = int(math.floor((self._n_atoms / self.__partitions) / DEFAULT_MAX_ATOMS_PER_NEURON_CORE) * DEFAULT_MAX_ATOMS_PER_NEURON_CORE)
+        min_neurons_per_partition = int(math.floor(self._n_atoms / self.__partitions))
 
-        remaining_neurons = self._n_atoms - (min_neurons_per_partition * self._n_outgoing_partitions)
+        remaining_neurons = self._n_atoms - (min_neurons_per_partition * self.__partitions)
 
-        contents = [min_neurons_per_partition for i in range(self._n_outgoing_partitions)]
-        for i in range(self._n_outgoing_partitions):
-            if remaining_neurons - DEFAULT_MAX_ATOMS_PER_NEURON_CORE >= 0:
-                remaining_neurons -= DEFAULT_MAX_ATOMS_PER_NEURON_CORE
-                contents[i] += DEFAULT_MAX_ATOMS_PER_NEURON_CORE
-            else:
-                contents[self._n_outgoing_partitions - 1] += remaining_neurons
-                break
+        contents = [min_neurons_per_partition if i < self.__partitions 
+            else min_neurons_per_partition + remaining_neurons 
+            for i in range(self.__partitions)]
+
         return contents
 
     @overrides(SimplePopulationSettable.set_value)

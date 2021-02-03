@@ -69,7 +69,7 @@ struct synapse_provenance {
 
 //! values for the priority for each callback
 typedef enum callback_priorities{
-    MC = -1, TIMER = 1, DMA = 0, USER = 1, SDP = 2
+    MC = -1, TIMER = 0, DMA = 0, USER = 1, SDP = 2
 } callback_priorities;
 
 //! The number of regions that are to be used for recording

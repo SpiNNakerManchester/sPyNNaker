@@ -29,9 +29,8 @@ class RateSourceLive(AbstractPyNNModel):
     @overrides(AbstractPyNNModel.create_vertex)
     def create_vertex(
             self, n_neurons, label, constraints):
-        max_atoms = self.get_max_atoms_per_core()
         return RateSourceLivePartition(
-            self.__sources, constraints, label, max_atoms, self, self.__looping, self.__partitions)
+            self.__sources, constraints, label, self, self.__partitions)
 
     @property
     def _sources(self):
