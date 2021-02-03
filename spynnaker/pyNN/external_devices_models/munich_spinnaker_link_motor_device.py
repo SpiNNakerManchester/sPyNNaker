@@ -14,14 +14,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.overrides import overrides
-from pacman.model.constraints.key_allocator_constraints import (
-    FixedMaskConstraint)
 from pacman.model.graphs.application import (
     ApplicationSpiNNakerLinkVertex)
 from pacman.model.graphs.application.abstract import (
     AbstractOneAppOneMachineVertex)
 from spinn_front_end_common.abstract_models import (
-    AbstractProvidesOutgoingPartitionConstraints,
     AbstractVertexWithEdgeToDependentVertices)
 from spynnaker.pyNN.models.defaults import defaults
 from .machine_munich_motor_device import MachineMunichMotorDevice
@@ -40,7 +37,6 @@ class _MunichMotorDevice(ApplicationSpiNNakerLinkVertex):
 @defaults
 class MunichMotorDevice(
         AbstractOneAppOneMachineVertex,
-        AbstractProvidesOutgoingPartitionConstraints,
         AbstractVertexWithEdgeToDependentVertices):
     """ An Omnibot motor control device. This has a real vertex and an \
         external device vertex.
@@ -83,13 +79,4 @@ class MunichMotorDevice(
     @overrides(AbstractVertexWithEdgeToDependentVertices.
                edge_partition_identifiers_for_dependent_vertex)
     def edge_partition_identifiers_for_dependent_vertex(self, vertex):
-        return [MachineMunichMotorDevice._MOTOR_PARTITION_ID]
-
-    @overrides(AbstractProvidesOutgoingPartitionConstraints.
-               get_outgoing_partition_constraints)
-    def get_outgoing_partition_constraints(self, partition):
-
-        # Any key to the device will work, as long as it doesn't set the
-        # management bit.  We also need enough for the configuration bits
-        # and the management bit anyway
-        return list([FixedMaskConstraint(0xFFFFF800)])
+        yield self.machine_vertex.MOTOR_PARTITION_ID
