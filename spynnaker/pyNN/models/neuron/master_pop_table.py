@@ -17,13 +17,14 @@ import logging
 import math
 import numpy
 import ctypes
+from spinn_utilities.log import FormatAdapter
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.exceptions import (
     SynapseRowTooBigException, SynapticConfigurationException)
 from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
 from spynnaker.pyNN.utilities.bit_field_utilities import BIT_IN_A_WORD
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 # Scale factor for an address; allows more addresses to be represented, but
 # means addresses have to be aligned to these offsets

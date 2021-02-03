@@ -18,6 +18,7 @@ import math
 import numpy
 from scipy import special  # @UnresolvedImport
 
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.constraints.key_allocator_constraints import (
@@ -61,7 +62,7 @@ from .master_pop_table import MasterPopTableAsBinarySearch
 from .generator_data import GeneratorData
 from .synaptic_matrices import SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 # TODO: Make sure these values are correct (particularly CPU cycles)
 _NEURON_BASE_DTCM_USAGE_IN_BYTES = 9 * BYTES_PER_WORD
