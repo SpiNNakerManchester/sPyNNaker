@@ -52,6 +52,10 @@ class MachineMunichMotorDevice(
 
     MOTOR_PARTITION_ID = "MOTOR"
 
+    # By asking for this number of keys, we will get a mask of 0xFFFFF800,
+    # which works with the motor control protocol correctly
+    MOTOR_N_KEYS = 2048
+
     N_ATOMS = 6
 
     SYSTEM_REGION = 0
@@ -214,3 +218,9 @@ class MachineMunichMotorDevice(
             self.PARAMS_REGION, self.PARAMS_SIZE, label='params')
 
         self.reserve_provenance_data_region(spec)
+
+    @overrides(MachineVertex.get_n_keys_for_partition)
+    def get_n_keys_for_partition(self, _partition):
+        if _partition == self.MOTOR_PARTITION_ID:
+            return self.MOTOR_N_KEYS
+        return super(MachineMunichMotorDevice, self).get_n_keys_for_partition()
