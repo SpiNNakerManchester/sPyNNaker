@@ -195,10 +195,11 @@ bool initialise(void) {
 
     // init the master pop table
     log_info("Pop table init");
+    bool all_in_dtcm;
     if (!population_table_initialise(
             master_pop_base_address, synaptic_matrix_base_address,
             direct_synapses_address, bit_field_base_address,
-            &row_max_n_words, false)) {
+            &row_max_n_words, false, &all_in_dtcm)) {
         log_error("Failed to init the master pop table. failing");
         return false;
     }

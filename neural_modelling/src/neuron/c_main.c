@@ -222,12 +222,13 @@ static bool initialise(void) {
 
     // Set up the population table
     uint32_t row_max_n_words;
+    bool all_in_dtcm;
     if (!population_table_initialise(
             data_specification_get_region(POPULATION_TABLE_REGION, ds_regions),
             data_specification_get_region(SYNAPTIC_MATRIX_REGION, ds_regions),
             direct_synapses_address,
             data_specification_get_region(BIT_FIELD_FILTER_REGION, ds_regions),
-            &row_max_n_words, true)) {
+            &row_max_n_words, true, &all_in_dtcm)) {
         return false;
     }
     print_cache_arrays(
@@ -268,9 +269,11 @@ static bool initialise(void) {
     virtual_processor_table[spin1_get_core_id()].user2 = dtcm_free_block;
 
     // Do bitfield configuration last to only use any unused memory
-    if (!population_table_load_bitfields(
-            data_specification_get_region(BIT_FIELD_FILTER_REGION, ds_regions))) {
-        return false;
+    if (!all_in_dtcm) {
+        if (!population_table_load_bitfields(data_specification_get_region(
+                BIT_FIELD_FILTER_REGION, ds_regions))) {
+            return false;
+        }
     }
 
     print_post_to_pre_entry();

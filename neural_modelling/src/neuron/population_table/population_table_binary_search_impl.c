@@ -422,11 +422,15 @@ static inline bool cached_in_binary_search(
 //! \param[in] filter_region: the bitfield region base address.
 //! \param[in/out] array_index: the current index in the array store.
 //! \param[in/out] binary_index: the current index in the binary store.
+//! \param[out] all_in_dtcm: if all blocks in dtcm.
 //! \return bool which states if successful or not.
 static inline bool process_pop_entry_for_caching(
         master_population_table_entry pop_entry,
         filter_region_t * filter_region, uint32_t* array_index,
-        uint32_t* binary_index) {
+        uint32_t* binary_index, bool* all_in_dtcm) {
+
+    // bool for if the entire matrix's are in dtcm
+    *all_in_dtcm = true;
 
     // if an extra info flag is set, skip it as that is not cachable.
     uint32_t start = 0;
@@ -469,7 +473,9 @@ static inline bool process_pop_entry_for_caching(
                 *array_index = *array_index + 1;
                 log_debug("success array cache");
             }
-        } else if (correct_rep == DEFAULT || correct_rep == DIRECT) {
+        } else if (correct_rep == DEFAULT) {
+            *all_in_dtcm = false;
+        } else if (correct_rep == DIRECT) {
             // ignore, as these are not cacheable
         } else {
             log_error("dont recognise the rep %d", correct_rep);
@@ -492,9 +498,11 @@ static inline bool process_pop_entry_for_caching(
 //! \brief caches synaptic blocks into DTCM as required.
 //! \param[in] table_address: master pop base address
 //! \param[in] filter_region: bitfield region base address.
+//! \param[out] all_in_dtcm: all blocks cached in dtcm
 //! \return bool stating if successful or not
 static inline bool cache_synaptic_blocks(
-        address_t table_address, filter_region_t *filter_region) {
+        address_t table_address, filter_region_t *filter_region,
+        bool* all_in_dtcm) {
     // build stores.
     pop_table_config_t* store = (pop_table_config_t*) table_address;
 
@@ -536,7 +544,8 @@ static inline bool cache_synaptic_blocks(
         if (pop_entry.cache_in_dtcm) {
             log_debug("attempting to cach entry at %d", pop_entry_index);
             bool success = process_pop_entry_for_caching(
-                pop_entry, filter_region, &array_index, &binary_index);
+                pop_entry, filter_region, &array_index, &binary_index,
+                all_in_dtcm);
             if (!success) {
                 log_error(
                     "failed to process entry with index %d with key %d",
@@ -572,7 +581,8 @@ void print_max_core_map(void) {
 bool population_table_initialise(
         address_t table_address, address_t synapse_rows_address,
         address_t direct_rows_address, filter_region_t *filter_region,
-        uint32_t *row_max_n_words, bool free_max_cores_map) {
+        uint32_t *row_max_n_words, bool free_max_cores_map,
+        bool* all_in_dtcm) {
     log_debug("Population_table_initialise: starting");
     pop_table_config_t *config = (pop_table_config_t *) table_address;
 
@@ -652,7 +662,7 @@ bool population_table_initialise(
     print_max_core_map();
 
     // start the caching process.
-    if (!cache_synaptic_blocks(table_address, filter_region)) {
+    if (!cache_synaptic_blocks(table_address, filter_region, all_in_dtcm)) {
         log_error("failed to cache into DTCM");
         return false;
     }

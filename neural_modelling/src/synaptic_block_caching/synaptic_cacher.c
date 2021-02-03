@@ -160,7 +160,7 @@ static inline bool synapses_are_plastic_or_structural_or_direct(
 
     // if a direct synapse do not cache
     if (entry.addr.representation == DIRECT) {
-        log_debug(
+        log_info(
             "REJECTED for caching as is a DIRECT connection on index %d",
             address_index);
         *result = true;
@@ -173,7 +173,7 @@ static inline bool synapses_are_plastic_or_structural_or_direct(
     // check for invalid master pop entries, coz they dont need caching coz
     // they invalid.
     if (entry.addr.address == INVALID_ADDRESS) {
-        log_debug("REJECTED as entry is a invalid entry.");
+        log_info("REJECTED as entry is a invalid entry.");
         *result = true;
         return true;
     }
@@ -199,7 +199,7 @@ static inline bool synapses_are_plastic_or_structural_or_direct(
 
         // plastic
         if (synapse_row_plastic_size(row) > 0) {
-            log_debug(
+            log_info(
                 "REJECTED for caching as it contains plastic synapses index %d",
                 address_index);
             *result = true;
@@ -214,7 +214,7 @@ static inline bool synapses_are_plastic_or_structural_or_direct(
                     &dummy1, &dummy2, &dummy3, &dummy4);
         }
         if (bit_found) {
-            log_debug(
+            log_info(
                 "REJECTED for caching as it contains a structural synapses at"
                 " index  %d", address_index);
             *result = true;
@@ -400,10 +400,11 @@ static inline bool initialise(void) {
 
     // init the master pop table
     log_info("Pop table init");
+    bool all_in_dtcm;
     if (!population_table_initialise(
             master_pop_base_address, synaptic_matrix_base_address,
             direct_synapses_address, bit_field_base_address,
-            &row_max_n_words, false)) {
+            &row_max_n_words, false, &all_in_dtcm)) {
         log_error("Failed to init the master pop table. failing");
         return false;
     }
@@ -626,6 +627,7 @@ static inline bool cache_blocks(void) {
     bool added_array_base_cost = false;
     bool used_binary_rep = false;
     bool used_array_rep = false;
+    bool cached_all = true;
 
     // search all the bitfields.
     for (uint32_t bit_field_index = 0;
@@ -762,6 +764,7 @@ static inline bool cache_blocks(void) {
                     address_index ++) {
                 log_debug("wont cache address index %d", address_index);
             }
+            cached_all = false;
         } else {
             // set master pop table to cache. and remove dtcm usage.
             bool success = set_master_pop_sdram_entry_to_cache(bit_field_index);
@@ -789,7 +792,70 @@ static inline bool cache_blocks(void) {
         FREE(reps);
     }
 
+    // if cached all, maybe worth seeing if we can utilise the extra dtcm to
+    // increase performance by moving binary searches to array format
     log_info("dtcm left over should be %d", dtcm_to_use);
+    if (cached_all) {
+        log_info("looking to switch between binary and array");
+        // search all the bitfields.
+        for (uint32_t bit_field_index = 0;
+                bit_field_index < bit_field_base_address->n_filters;
+                bit_field_index++) {
+            master_population_table_entry master_entry;
+            if (!find_master_pop_entry(bit_field_index, &master_entry)) {
+                return false;
+            }
+
+            // if an extra info flag is set, skip it as that is not cachable.
+            uint32_t start = 0;
+            uint32_t count = 0;
+            uint32_t n_atoms = 0;
+            bool success = population_table_set_start_and_count(
+                master_entry, &start, &count, &n_atoms, bit_field_base_address);
+            log_debug(
+                "got start %d count %d with entry id %d n atoms %d",
+                start, count, bit_field_index, n_atoms);
+            if (!success) {
+                log_error("failed to set start and count");
+                return false;
+            }
+
+            // test all the blocks. all or nothing due to bitfield
+            for (uint32_t address_index = start; address_index < count + start;
+                    address_index ++) {
+                address_list_entry address_entry =
+                    population_table_get_address_entry(address_index);
+
+                // only test if the store was set to binary
+                if (population_table_get_address_entry(
+                        address_index).addr.representation == BINARY_SEARCH) {
+                    // test memory requirements of the 2 reps.
+                    int binary_search_size = calculate_binary_search_size(
+                        address_entry, n_atoms);
+                    int array_search_size = calculate_array_search_size(
+                        address_entry, n_atoms);
+                    int difference = array_search_size - binary_search_size;
+                    log_info(
+                        "address index %d binary size = %d, array size = %d, "
+                        "diff is %d",
+                        address_index, binary_search_size, array_search_size,
+                        difference);
+                    if (dtcm_to_use - difference > 0) {
+                        set_address_to_cache_reps(address_index + start, ARRAY);
+                        dtcm_to_use -= difference;
+                        log_info(
+                            "set address %d to array as it reduces dtcm to use "
+                            "to %d", address_index, dtcm_to_use);
+                    }
+                    else {
+                        log_info("failed to convert address %d", address_index);
+                    }
+                }
+            }
+        }
+    }
+
+    log_info("dtcm left over should be %d after all array", dtcm_to_use);
     return true;
 }
 
