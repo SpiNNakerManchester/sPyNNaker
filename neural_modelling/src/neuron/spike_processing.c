@@ -415,7 +415,7 @@ void user_event_callback(UNUSED uint unused0, UNUSED uint unused1) {
 }
 
 /* INTERFACE FUNCTIONS - cannot be static */
-uint32_t latest_clear = 0xFFFFFFFFF;
+uint32_t latest_clear = 0xFFFFFFFF;
 uint32_t earliest_clear = 0;
 //! \brief clears the input buffer of packets and records them
 void spike_processing_clear_input_buffer(timer_t time) {
