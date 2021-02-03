@@ -427,6 +427,11 @@ void spike_processing_clear_input_buffer(timer_t time) {
     // Record the count whether clearing or not for provenance
     count_input_buffer_packets_late += in_spikes_size();
 
+    if (in_spikes_size() && !dma_busy) {
+        log_error("Spikes were found in the input buffer, but the DMA is not busy!");
+        rt_error(RTE_SWERR);
+    }
+
     if (clear_input_buffers_of_late_packets) {
         in_spikes_clear();
     }
