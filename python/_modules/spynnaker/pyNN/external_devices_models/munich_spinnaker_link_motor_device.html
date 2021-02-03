@@ -55,14 +55,11 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
-<span class="kn">from</span> <span class="nn">pacman.model.constraints.key_allocator_constraints</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">FixedMaskConstraint</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pacman.model.graphs.application</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ApplicationSpiNNakerLinkVertex</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pacman.model.graphs.application.abstract</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractOneAppOneMachineVertex</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">AbstractProvidesOutgoingPartitionConstraints</span><span class="p">,</span>
     <span class="n">AbstractVertexWithEdgeToDependentVertices</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.defaults</span> <span class="kn">import</span> <span class="n">defaults</span>
 <span class="kn">from</span> <span class="nn">.machine_munich_motor_device</span> <span class="kn">import</span> <span class="n">MachineMunichMotorDevice</span>
@@ -83,7 +80,6 @@
 <div class="viewcode-block" id="MunichMotorDevice"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.MunichMotorDevice">[docs]</a><span class="nd">@defaults</span>
 <span class="k">class</span> <span class="nc">MunichMotorDevice</span><span class="p">(</span>
         <span class="n">AbstractOneAppOneMachineVertex</span><span class="p">,</span>
-        <span class="n">AbstractProvidesOutgoingPartitionConstraints</span><span class="p">,</span>
         <span class="n">AbstractVertexWithEdgeToDependentVertices</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; An Omnibot motor control device. This has a real vertex and an \</span>
 <span class="sd">        external device vertex.</span>
@@ -128,16 +124,7 @@
     <span class="k">def</span> <span class="nf">edge_partition_identifiers_for_dependent_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Return the dependent edge identifier</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">machine_vertex</span><span class="o">.</span><span class="n">MOTOR_PARTITION_ID</span><span class="p">]</span></div>
-
-<div class="viewcode-block" id="MunichMotorDevice.get_outgoing_partition_constraints"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.MunichMotorDevice.get_outgoing_partition_constraints">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractProvidesOutgoingPartitionConstraints</span><span class="o">.</span>
-               <span class="n">get_outgoing_partition_constraints</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_outgoing_partition_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">partition</span><span class="p">):</span>
-
-        <span class="c1"># Any key to the device will work, as long as it doesn&#39;t set the</span>
-        <span class="c1"># management bit.  We also need enough for the configuration bits</span>
-        <span class="c1"># and the management bit anyway</span>
-        <span class="k">return</span> <span class="nb">list</span><span class="p">([</span><span class="n">FixedMaskConstraint</span><span class="p">(</span><span class="mh">0xFFFFF800</span><span class="p">)])</span></div></div>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">machine_vertex</span><span class="o">.</span><span class="n">MOTOR_PARTITION_ID</span><span class="p">]</span></div></div>
 </pre></div>
 
             <div class="clearer"></div>
