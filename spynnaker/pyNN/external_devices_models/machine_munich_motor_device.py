@@ -223,4 +223,5 @@ class MachineMunichMotorDevice(
     def get_n_keys_for_partition(self, _partition):
         if _partition == self.MOTOR_PARTITION_ID:
             return self.MOTOR_N_KEYS
-        return super(MachineMunichMotorDevice, self).get_n_keys_for_partition()
+        return super(MachineMunichMotorDevice, self).get_n_keys_for_partition(
+            _partition)
