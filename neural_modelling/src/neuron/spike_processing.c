@@ -190,6 +190,7 @@ static inline bool is_something_to_do(
         if (spikes_pushed - spikes_popped != in_spikes_size()) {
             log_error("Mismatch between spikes pushed %d and popped %d and size %d",
                     spikes_pushed, spikes_popped, in_spikes_size());
+            rt_error(RTE_SWERR);
         }
         spin1_mode_restore(cpsr);
         if (population_table_get_first_address(
@@ -329,6 +330,7 @@ static void multicast_packet_received_callback(uint key, uint payload) {
     if (spikes_pushed - spikes_popped != in_spikes_size()) {
         log_error("Mismatch between spikes pushed %d and popped %d and size %d",
                 spikes_pushed, spikes_popped, in_spikes_size());
+        rt_error(RTE_SWERR);
     }
 
     // If we're not already processing synaptic DMAs,
@@ -463,15 +465,16 @@ void spike_processing_clear_input_buffer(timer_t time) {
     if (spikes_pushed - spikes_popped != n_spikes) {
         log_error("Mismatch between spikes pushed %d and popped %d and size %d",
                 spikes_pushed, spikes_popped, n_spikes);
+        rt_error(RTE_SWERR);
     }
-    spikes_pushed = 0;
-    spikes_popped = 0;
 
     // Record the count whether clearing or not for provenance
     count_input_buffer_packets_late += n_spikes;
 
     if (clear_input_buffers_of_late_packets) {
         in_spikes_clear();
+        spikes_pushed = 0;
+        spikes_popped = 0;
     }
 }
 
