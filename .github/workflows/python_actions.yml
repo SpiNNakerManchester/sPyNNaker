@@ -17,8 +17,11 @@
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
 name: Python Actions
-
 on: [push]
+
+env:
+  # Magic to make matplotlib behave nicely
+  MPLBACKEND: module://matplotlib.backends.backend_agg
 
 jobs:
   test:
@@ -54,6 +57,10 @@ jobs:
       uses: ./support/actions/run-setup
       with:
         preinstall: ${{ matrix.python-version == 2.7 }}
+    - name: Checkout Spinnaker Test Cases
+      uses: ./support/actions/checkout-spinn-deps
+      with:
+        repositories: IntroLab PyNN8Examples
 
     - name: Create a spynnaker.cfg
       uses: ./support/actions/configure-spynnaker
