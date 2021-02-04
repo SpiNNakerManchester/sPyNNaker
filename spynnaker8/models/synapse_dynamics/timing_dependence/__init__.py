@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2021 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,11 +20,13 @@
     instead.
 """
 
-from .spike_pair import TimingDependenceSpikePair
-from .pfister_spike_triplet import TimingDependencePfisterSpikeTriplet
-from .recurrent import TimingDependenceRecurrent
-from .spike_nearest_pair import TimingDependenceSpikeNearestPair
-from .vogels_2011 import TimingDependenceVogels2011
+from .timing_dependence_spike_pair import TimingDependenceSpikePair
+from .timing_dependence_pfister_spike_triplet import (
+    TimingDependencePfisterSpikeTriplet)
+from .timing_dependence_recurrent import TimingDependenceRecurrent
+from .timing_dependence_spike_nearest_pair import (
+    TimingDependenceSpikeNearestPair)
+from .timing_dependence_vogels_2011 import TimingDependenceVogels2011
 
 __all__ = ["TimingDependenceSpikePair",
            "TimingDependencePfisterSpikeTriplet", "TimingDependenceRecurrent",

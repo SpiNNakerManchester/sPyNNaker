@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2021 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,33 +13,32 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import logging
-from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
-    TimingDependenceVogels2011 as
+from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
+    WeightDependenceAdditiveTriplet as
     _BaseClass)
-
-_defaults = _BaseClass.default_parameters
 logger = logging.getLogger(__name__)
 
 
-class TimingDependenceVogels2011(_BaseClass):
+class WeightDependenceAdditiveTriplet(_BaseClass):
     """
     .. deprecated:: 6.0
         Use
-        :py:class:`spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceVogels2011`
+        :py:class:`spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditiveTriplet`
         instead.
     """
     __slots__ = []
 
+    # noinspection PyPep8Naming
     def __init__(
-            self, alpha, tau=_defaults['tau'], A_plus=0.01, A_minus=0.01):
+            self, w_min=0.0, w_max=1.0, A3_plus=0.01, A3_minus=0.01):
         r"""
-        :param float alpha: :math:`\alpha`
-        :param float tau: :math:`\tau`
-        :param float A_plus: :math:`A^+`
-        :param float A_minus: :math:`A^-`
+        :param float w_min: :math:`w_\mathrm{min}`
+        :param float w_max: :math:`w_\mathrm{max}`
+        :param float A3_plus: :math:`A_3^+`
+        :param float A3_minus: :math:`A_3^-`
         """
-        super(TimingDependenceVogels2011, self).__init__(
-            tau=tau, alpha=alpha, A_plus=A_plus, A_minus=A_minus)
+        super(WeightDependenceAdditiveTriplet, self).__init__(
+            w_max=w_max, w_min=w_min, A3_plus=A3_plus, A3_minus=A3_minus)
         logger.warning(
             "please use spynnaker.pyNN.models.neuron.plasticity.stdp."
-            "timing_dependence.TimingDependenceVogels2011 instead")
+            "weight_dependence.WeightDependenceAdditiveTriplet instead")
