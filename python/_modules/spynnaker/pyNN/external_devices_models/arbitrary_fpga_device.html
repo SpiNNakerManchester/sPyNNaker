@@ -57,7 +57,7 @@
     <span class="n">ProvidesKeyToAtomMappingImpl</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="ArbitraryFPGADevice"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.ArbitraryFPGADevice">[docs]</a><span class="k">class</span> <span class="nc">ArbitraryFPGADevice</span><span class="p">(</span>
+<div class="viewcode-block" id="ArbitraryFPGADevice"><a class="viewcode-back" href="../../../../spynnaker8.external_devices.html#spynnaker.pyNN.external_devices_models.ArbitraryFPGADevice">[docs]</a><span class="k">class</span> <span class="nc">ArbitraryFPGADevice</span><span class="p">(</span>
         <span class="n">ApplicationFPGAVertex</span><span class="p">,</span> <span class="n">ProvidesKeyToAtomMappingImpl</span><span class="p">):</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -65,11 +65,13 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">fpga_link_id</span><span class="p">,</span> <span class="n">fpga_id</span><span class="p">,</span> <span class="n">board_address</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param n_neurons: Number of neurons</span>
-<span class="sd">        :param fpga_link_id:</span>
-<span class="sd">        :param fpga_id:</span>
+<span class="sd">        :param int n_neurons: Number of neurons</span>
+<span class="sd">        :param int fpga_link_id:</span>
+<span class="sd">        :param int fpga_id:</span>
 <span class="sd">        :param board_address:</span>
+<span class="sd">        :type board_address: str or None</span>
 <span class="sd">        :param label:</span>
+<span class="sd">        :type label: str or None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ArbitraryFPGADevice</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
@@ -111,7 +113,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2017.
+        &#169; Copyright 2014-2021.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
     </div>
   </body>

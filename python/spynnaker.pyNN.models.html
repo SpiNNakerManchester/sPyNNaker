@@ -133,6 +133,10 @@
 <li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.neuron.html#module-spynnaker.pyNN.models.neuron">Module contents</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="spynnaker.pyNN.models.populations.html">spynnaker.pyNN.models.populations package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.populations.html#module-spynnaker.pyNN.models.populations">Module contents</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="spynnaker.pyNN.models.spike_source.html">spynnaker.pyNN.models.spike_source package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.spike_source.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.spike_source.html#module-spynnaker.pyNN.models.spike_source.spike_source_array_vertex">spynnaker.pyNN.models.spike_source.spike_source_array_vertex module</a></li>
@@ -161,6 +165,108 @@
 </div>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-spynnaker.pyNN.models.abstract_pynn_model">
+<span id="spynnaker-pynn-models-abstract-pynn-model-module"></span><h2>spynnaker.pyNN.models.abstract_pynn_model module<a class="headerlink" href="#module-spynnaker.pyNN.models.abstract_pynn_model" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.abstract_pynn_model.</code><code class="sig-name descname">AbstractPyNNModel</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_pynn_model.html#AbstractPyNNModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>A Model that can be passed in to a Population object in PyNN</p>
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.create_vertex">
+<em class="property">abstract </em><code class="sig-name descname">create_vertex</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n_neurons</span></em>, <em class="sig-param"><span class="n">label</span></em>, <em class="sig-param"><span class="n">constraints</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_pynn_model.html#AbstractPyNNModel.create_vertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.create_vertex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a vertex for a population of the model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – The number of neurons in the population</p></li>
+<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The label to give to the vertex</p></li>
+<li><p><strong>constraints</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN)"><em>AbstractConstraint</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – A list of constraints to give to the vertex, or None</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An application vertex for the population</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN)">ApplicationVertex</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.default_initial_values">
+<code class="sig-name descname">default_initial_values</code><em class="property"> = {}</em><a class="headerlink" href="#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.default_initial_values" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.default_parameters">
+<code class="sig-name descname">default_parameters</code><em class="property"> = {}</em><a class="headerlink" href="#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.default_parameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.default_population_parameters">
+<em class="property">abstract property </em><code class="sig-name descname">default_population_parameters</code><a class="headerlink" href="#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.default_population_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Get the default values for the parameters at the population level</dt><dd><p>These are parameters that can be passed in to the Population            constructor in addition to the standard PyNN options</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>, Any)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.get_max_atoms_per_core">
+<em class="property">classmethod </em><code class="sig-name descname">get_max_atoms_per_core</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_pynn_model.html#AbstractPyNNModel.get_max_atoms_per_core"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.get_max_atoms_per_core" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the maximum number of atoms per core for this model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.get_parameter_names">
+<em class="property">classmethod </em><code class="sig-name descname">get_parameter_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_pynn_model.html#AbstractPyNNModel.get_parameter_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.get_parameter_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the names of the parameters of the model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.has_parameter">
+<em class="property">classmethod </em><code class="sig-name descname">has_parameter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_pynn_model.html#AbstractPyNNModel.has_parameter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.has_parameter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if the model has a parameter with the given name</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name of the parameter to check for</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.set_model_max_atoms_per_core">
+<em class="property">classmethod </em><code class="sig-name descname">set_model_max_atoms_per_core</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n_atoms</span><span class="o">=</span><span class="default_value">9223372036854775807</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_pynn_model.html#AbstractPyNNModel.set_model_max_atoms_per_core"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.set_model_max_atoms_per_core" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the maximum number of atoms per core for this model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>n_atoms</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – The new maximum, or None for the largest possible</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="module-spynnaker.pyNN.models.defaults">
 <span id="spynnaker-pynn-models-defaults-module"></span><h2>spynnaker.pyNN.models.defaults module<a class="headerlink" href="#module-spynnaker.pyNN.models.defaults" title="Permalink to this headline">¶</a></h2>
@@ -214,192 +320,83 @@
 </dd></dl>
 
 </div>
-<div class="section" id="module-spynnaker.pyNN.models.pynn_population_common">
-<span id="spynnaker-pynn-models-pynn-population-common-module"></span><h2>spynnaker.pyNN.models.pynn_population_common module<a class="headerlink" href="#module-spynnaker.pyNN.models.pynn_population_common" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-spynnaker.pyNN.models.projection">
+<span id="spynnaker-pynn-models-projection-module"></span><h2>spynnaker.pyNN.models.projection module<a class="headerlink" href="#module-spynnaker.pyNN.models.projection" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon">
-<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.pynn_population_common.</code><code class="sig-name descname">PyNNPopulationCommon</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">spinnaker_control</span></em>, <em class="sig-param"><span class="n">size</span></em>, <em class="sig-param"><span class="n">label</span></em>, <em class="sig-param"><span class="n">constraints</span></em>, <em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">structure</span></em>, <em class="sig-param"><span class="n">initial_values</span></em>, <em class="sig-param"><span class="n">additional_parameters</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/pynn_population_common.html#PyNNPopulationCommon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon" title="Permalink to this definition">¶</a></dt>
+<dt id="spynnaker.pyNN.models.projection.Projection">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.projection.</code><code class="sig-name descname">Projection</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pre_synaptic_population</span></em>, <em class="sig-param"><span class="n">post_synaptic_population</span></em>, <em class="sig-param"><span class="n">connector</span></em>, <em class="sig-param"><span class="n">synapse_type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">source</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">receptor_type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">space</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/projection.html#Projection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.projection.Projection" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<p>Base class for PyNN populations.</p>
+<p>A container for all the connections of a given type (same synapse type and
+plasticity mechanisms) between two populations, together with methods to
+set parameters of those connections, including of plasticity mechanisms.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>spinnaker_control</strong> (<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.interface.html#spinn_front_end_common.interface.abstract_spinnaker_base.AbstractSpinnakerBase" title="(in SpiNNFrontEndCommon)"><em>AbstractSpinnakerBase</em></a>) – The simulator engine core.</p></li>
-<li><p><strong>size</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – The size of the population; external devices may use None</p></li>
-<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – The label for the population, or None for a default</p></li>
-<li><p><strong>constraints</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN)"><em>AbstractConstraint</em></a><em>)</em>) – How do we constrain where to put things on SpiNNaker</p></li>
-<li><p><strong>model</strong> (<em>AbstractPyNNModel</em><em> or
-</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN)"><em>ApplicationVertex</em></a>) – What neuron model is being run by this population</p></li>
-<li><p><strong>structure</strong> (<a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/space.html#pyNN.space.BaseStructure" title="(in PyNN v0.9)"><em>BaseStructure</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – How the neurons are arranged in space</p></li>
-<li><p><strong>initial_values</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>Any</em><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – Initialisation for model variables.</p></li>
-<li><p><strong>additional_parameters</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>Any</em><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – Any extra parameters to pass to the model’s vertex creation             function.</p></li>
+<li><p><strong>pre_synaptic_population</strong> (<a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.PopulationBase" title="spynnaker.pyNN.models.populations.PopulationBase"><em>PopulationBase</em></a>) – </p></li>
+<li><p><strong>post_synaptic_population</strong> (<a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.PopulationBase" title="spynnaker.pyNN.models.populations.PopulationBase"><em>PopulationBase</em></a>) – </p></li>
+<li><p><strong>connector</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector" title="spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector"><em>AbstractConnector</em></a>) – </p></li>
+<li><p><strong>synapse_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics" title="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics"><em>AbstractSynapseDynamics</em></a>) – </p></li>
+<li><p><strong>source</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – Unsupported; must be None</p></li>
+<li><p><strong>receptor_type</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – </p></li>
+<li><p><strong>space</strong> (<a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/space.html#pyNN.space.Space" title="(in PyNN v0.9)"><em>Space</em></a>) – </p></li>
+<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – </p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.add_placement_constraint">
-<code class="sig-name descname">add_placement_constraint</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">p</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/pynn_population_common.html#PyNNPopulationCommon.add_placement_constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.add_placement_constraint" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add a placement constraint</p>
+<dt id="spynnaker.pyNN.models.projection.Projection.get">
+<code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">attribute_names</span></em>, <em class="sig-param"><span class="n">format</span></em>, <em class="sig-param"><span class="n">gather</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">with_address</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">multiple_synapses</span><span class="o">=</span><span class="default_value">'last'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/projection.html#Projection.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.projection.Projection.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a parameter/attribute of the projection.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>SpiNNaker always gathers.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – The x-coordinate of the placement constraint</p></li>
-<li><p><strong>y</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – The y-coordinate of the placement constraint</p></li>
-<li><p><strong>p</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – The processor ID of the placement constraint (optional)</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.conductance_based">
-<em class="property">property </em><code class="sig-name descname">conductance_based</code><a class="headerlink" href="#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.conductance_based" title="Permalink to this definition">¶</a></dt>
-<dd><p>True if the population uses conductance inputs</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.first_id">
-<em class="property">property </em><code class="sig-name descname">first_id</code><a class="headerlink" href="#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.first_id" title="Permalink to this definition">¶</a></dt>
-<dd><p>The ID of the first member of the population.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.get">
-<code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parameter_names</span></em>, <em class="sig-param"><span class="n">gather</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">simplify</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/pynn_population_common.html#PyNNPopulationCommon.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.get" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the values of a parameter for every local cell in the            population.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>parameter_names</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>)</em>) – Name of parameter. This is either a single
-string or a list of strings</p></li>
-<li><p><strong>gather</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – pointless on sPyNNaker</p></li>
-<li><p><strong>simplify</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – ignored</p></li>
+<li><p><strong>attribute_names</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>)</em>) – list of attributes to gather</p></li>
+<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – <code class="docutils literal notranslate"><span class="pre">&quot;list&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;array&quot;</span></code></p></li>
+<li><p><strong>gather</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – gather over all nodes</p></li>
+<li><p><strong>with_address</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – True if the source and target are to be included</p></li>
+<li><p><strong>multiple_synapses</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – What to do with the data if format=”array” and if the multiple
+source-target pairs with the same values exist.  Currently only
+“last” is supported</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A single list of values (or possibly a single value) if
-paramter_names is a string, or a dict of these if parameter names
-is a list.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a> or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>) or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>,<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>) or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>,<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>))</p>
+<dd class="field-even"><p>values selected</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.get_by_selector">
-<code class="sig-name descname">get_by_selector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">selector</span></em>, <em class="sig-param"><span class="n">parameter_names</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/pynn_population_common.html#PyNNPopulationCommon.get_by_selector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.get_by_selector" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the values of a parameter for the selected cell in the            population.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>selector</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#slice" title="(in Python v3.6)"><em>slice</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>) or </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em>) – a description of the subrange to accept.
-Or None for all. See:
-<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.AbstractSized.selector_to_ids" title="(in SpiNNUtils)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">selector_to_ids()</span></code></a></p></li>
-<li><p><strong>parameter_names</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>)</em>) – Name of parameter. This is either a
-single string or a list of strings</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A single list of values (or possibly a single value) if
-paramter_names is a string or a dict of these if parameter names
-is a list.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a> or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>) or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>,<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>) or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>,<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>))</p>
-</dd>
-</dl>
+<dt id="spynnaker.pyNN.models.projection.Projection.getDelays">
+<code class="sig-name descname">getDelays</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">format</span><span class="o">=</span><span class="default_value">'list'</span></em>, <em class="sig-param"><span class="n">gather</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/projection.html#Projection.getDelays"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.projection.Projection.getDelays" title="Permalink to this definition">¶</a></dt>
+<dd><div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 5.0: </span>Use <code class="docutils literal notranslate"><span class="pre">get('delay')</span></code> instead.</p>
+</div>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.get_spike_counts">
-<code class="sig-name descname">get_spike_counts</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">spikes</span></em>, <em class="sig-param"><span class="n">gather</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/pynn_population_common.html#PyNNPopulationCommon.get_spike_counts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.get_spike_counts" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the number of spikes for each neuron.</p>
-<p>Defined by
-<a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/populations.html">http://neuralensemble.org/docs/PyNN/reference/populations.html</a></p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>spikes</strong> (<a class="reference external" href="https://numpy.org/doc/1.19/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a>) – </p></li>
-<li><p><strong>gather</strong> – pointless on sPyNNaker</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>,<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>)</p>
-</dd>
-</dl>
+<dt id="spynnaker.pyNN.models.projection.Projection.getSynapseDynamics">
+<code class="sig-name descname">getSynapseDynamics</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parameter_name</span></em>, <em class="sig-param"><span class="n">format</span><span class="o">=</span><span class="default_value">'list'</span></em>, <em class="sig-param"><span class="n">gather</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/projection.html#Projection.getSynapseDynamics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.projection.Projection.getSynapseDynamics" title="Permalink to this definition">¶</a></dt>
+<dd><div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 5.0: </span>Use <code class="docutils literal notranslate"><span class="pre">get(parameter_name)</span></code> instead.</p>
+</div>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.id_to_index">
-<code class="sig-name descname">id_to_index</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/pynn_population_common.html#PyNNPopulationCommon.id_to_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.id_to_index" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given the ID(s) of cell(s) in the Population, return its (their)            index (order in the Population).</p>
-<p>Defined by
-<a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/populations.html">http://neuralensemble.org/docs/PyNN/reference/populations.html</a></p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>id</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em>) – </p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or iterable(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>)</p>
-</dd>
-</dl>
+<dt id="spynnaker.pyNN.models.projection.Projection.getWeights">
+<code class="sig-name descname">getWeights</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">format</span><span class="o">=</span><span class="default_value">'list'</span></em>, <em class="sig-param"><span class="n">gather</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/projection.html#Projection.getWeights"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.projection.Projection.getWeights" title="Permalink to this definition">¶</a></dt>
+<dd><div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 5.0: </span>Use <code class="docutils literal notranslate"><span class="pre">get('weight')</span></code> instead.</p>
+</div>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.id_to_local_index">
-<code class="sig-name descname">id_to_local_index</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cell_id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/pynn_population_common.html#PyNNPopulationCommon.id_to_local_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.id_to_local_index" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given the ID(s) of cell(s) in the Population, return its (their)            index (order in the Population), counting only cells on the local            MPI node.</p>
-<p>Defined by
-<a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/populations.html">http://neuralensemble.org/docs/PyNN/reference/populations.html</a></p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>cell_id</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em>) – </p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or iterable(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>)</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.index_to_id">
-<code class="sig-name descname">index_to_id</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">index</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/pynn_population_common.html#PyNNPopulationCommon.index_to_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.index_to_id" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given the index (order in the Population) of cell(s) in the            Population, return their ID(s)</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em>) – </p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or iterable(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>)</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.inject">
-<code class="sig-name descname">inject</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">current_source</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/pynn_population_common.html#PyNNPopulationCommon.inject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.inject" title="Permalink to this definition">¶</a></dt>
-<dd><p>Connect a current source to all cells in the Population.</p>
-<p>Defined by
-<a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/populations.html">http://neuralensemble.org/docs/PyNN/reference/populations.html</a></p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.label">
-<em class="property">property </em><code class="sig-name descname">label</code><a class="headerlink" href="#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.label" title="Permalink to this definition">¶</a></dt>
-<dd><p>The label of the population</p>
-<dl class="field-list simple">
+<dt id="spynnaker.pyNN.models.projection.Projection.label">
+<em class="property">property </em><code class="sig-name descname">label</code><a class="headerlink" href="#spynnaker.pyNN.models.projection.Projection.label" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
 </dd>
@@ -407,184 +404,54 @@ is a list.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.last_id">
-<em class="property">property </em><code class="sig-name descname">last_id</code><a class="headerlink" href="#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.last_id" title="Permalink to this definition">¶</a></dt>
-<dd><p>The ID of the last member of the population.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.local_size">
-<em class="property">property </em><code class="sig-name descname">local_size</code><a class="headerlink" href="#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.local_size" title="Permalink to this definition">¶</a></dt>
-<dd><p>The number of local cells</p>
-<p>Defined by
-<a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/populations.html">http://neuralensemble.org/docs/PyNN/reference/populations.html</a></p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.mark_no_changes">
-<code class="sig-name descname">mark_no_changes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/pynn_population_common.html#PyNNPopulationCommon.mark_no_changes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.mark_no_changes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Mark this population as not having changes to be mapped.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.positions">
-<em class="property">property </em><code class="sig-name descname">positions</code><a class="headerlink" href="#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.positions" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the position array for structured populations.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.requires_mapping">
-<em class="property">property </em><code class="sig-name descname">requires_mapping</code><a class="headerlink" href="#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.requires_mapping" title="Permalink to this definition">¶</a></dt>
-<dd><p>Whether this population requires mapping.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.set">
-<code class="sig-name descname">set</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parameter</span></em>, <em class="sig-param"><span class="n">value</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/pynn_population_common.html#PyNNPopulationCommon.set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.set" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set one or more parameters for every cell in the population.</p>
-<p>param can be a dict, in which case value should not be supplied, or a
-string giving the parameter name, in which case value is the parameter
-value. value can be a numeric value, or list of such
-(e.g. for setting spike times):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">p</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;tau_m&quot;</span><span class="p">,</span> <span class="mf">20.0</span><span class="p">)</span><span class="o">.</span>
-<span class="n">p</span><span class="o">.</span><span class="n">set</span><span class="p">({</span><span class="s1">&#39;tau_m&#39;</span><span class="p">:</span><span class="mi">20</span><span class="p">,</span> <span class="s1">&#39;v_rest&#39;</span><span class="p">:</span><span class="o">-</span><span class="mi">65</span><span class="p">})</span>
-</pre></div>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>parameter</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>Any</em><em>)</em>) – the parameter to set</p></li>
-<li><p><strong>value</strong> (<em>Any</em>) – the value of the parameter to set.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.set_by_selector">
-<code class="sig-name descname">set_by_selector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">selector</span></em>, <em class="sig-param"><span class="n">parameter</span></em>, <em class="sig-param"><span class="n">value</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/pynn_population_common.html#PyNNPopulationCommon.set_by_selector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.set_by_selector" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set one or more parameters for selected cell in the population.</p>
-<p>param can be a dict, in which case value should not be supplied, or a
-string giving the parameter name, in which case value is the parameter
-value. value can be a numeric value, or list of such
-(e.g. for setting spike times):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">p</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;tau_m&quot;</span><span class="p">,</span> <span class="mf">20.0</span><span class="p">)</span><span class="o">.</span>
-<span class="n">p</span><span class="o">.</span><span class="n">set</span><span class="p">({</span><span class="s1">&#39;tau_m&#39;</span><span class="p">:</span><span class="mi">20</span><span class="p">,</span> <span class="s1">&#39;v_rest&#39;</span><span class="p">:</span><span class="o">-</span><span class="mi">65</span><span class="p">})</span>
-</pre></div>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>selector</strong> – See <code class="xref py py-meth docutils literal notranslate"><span class="pre">RangedList.set_value_by_selector()</span></code> as this is just a
-pass through method</p></li>
-<li><p><strong>parameter</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em>) – the parameter to set</p></li>
-<li><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – the value of the parameter to set.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.set_constraint">
-<code class="sig-name descname">set_constraint</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">constraint</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/pynn_population_common.html#PyNNPopulationCommon.set_constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.set_constraint" title="Permalink to this definition">¶</a></dt>
-<dd><p>Apply a constraint to a population that restricts the processor            onto which its atoms will be placed.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>constraint</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN)"><em>AbstractConstraint</em></a>) – </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.set_mapping_constraint">
-<code class="sig-name descname">set_mapping_constraint</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">constraint_dict</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/pynn_population_common.html#PyNNPopulationCommon.set_mapping_constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.set_mapping_constraint" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add a placement constraint - for backwards compatibility</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>constraint_dict</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em>) – A dictionary containing “x”, “y” and optionally “p” as keys, and
-ints as values</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.set_max_atoms_per_core">
-<code class="sig-name descname">set_max_atoms_per_core</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">max_atoms_per_core</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/pynn_population_common.html#PyNNPopulationCommon.set_max_atoms_per_core"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.set_max_atoms_per_core" title="Permalink to this definition">¶</a></dt>
-<dd><p>Supports the setting of this population’s max atoms per core</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>max_atoms_per_core</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – the new value for the max atoms per core.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.size">
-<em class="property">property </em><code class="sig-name descname">size</code><a class="headerlink" href="#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.size" title="Permalink to this definition">¶</a></dt>
-<dd><p>The number of neurons in the population</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.structure">
-<em class="property">property </em><code class="sig-name descname">structure</code><a class="headerlink" href="#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.structure" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the structure for the population.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/space.html#pyNN.space.BaseStructure" title="(in PyNN v0.9)">BaseStructure</a> or <a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="module-spynnaker.pyNN.models.pynn_projection_common">
-<span id="spynnaker-pynn-models-pynn-projection-common-module"></span><h2>spynnaker.pyNN.models.pynn_projection_common module<a class="headerlink" href="#module-spynnaker.pyNN.models.pynn_projection_common" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt id="spynnaker.pyNN.models.pynn_projection_common.PyNNProjectionCommon">
-<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.pynn_projection_common.</code><code class="sig-name descname">PyNNProjectionCommon</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">spinnaker_control</span></em>, <em class="sig-param"><span class="n">connector</span></em>, <em class="sig-param"><span class="n">synapse_dynamics_stdp</span></em>, <em class="sig-param"><span class="n">target</span></em>, <em class="sig-param"><span class="n">pre_synaptic_population</span></em>, <em class="sig-param"><span class="n">post_synaptic_population</span></em>, <em class="sig-param"><span class="n">prepop_is_view</span></em>, <em class="sig-param"><span class="n">postpop_is_view</span></em>, <em class="sig-param"><span class="n">rng</span></em>, <em class="sig-param"><span class="n">machine_time_step</span></em>, <em class="sig-param"><span class="n">label</span></em>, <em class="sig-param"><span class="n">time_scale_factor</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/pynn_projection_common.html#PyNNProjectionCommon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.pynn_projection_common.PyNNProjectionCommon" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<p>A container for all the connections of a given type (same synapse type        and plasticity mechanisms) between two populations, together with        methods to set parameters of those connections, including of        plasticity mechanisms.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>spinnaker_control</strong> (<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.interface.html#spinn_front_end_common.interface.abstract_spinnaker_base.AbstractSpinnakerBase" title="(in SpiNNFrontEndCommon)"><em>AbstractSpinnakerBase</em></a>) – The simulator engine core.</p></li>
-<li><p><strong>connector</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector" title="spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector"><em>AbstractConnector</em></a>) – What is the connector for this projection.</p></li>
-<li><p><strong>synapse_dynamics_stdp</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics" title="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics"><em>AbstractSynapseDynamics</em></a>) – How synapses behave</p></li>
-<li><p><strong>target</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – What is the target on the post-synaptic population?</p></li>
-<li><p><strong>pre_synaptic_population</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex" title="spynnaker.pyNN.models.neuron.AbstractPopulationVertex"><em>AbstractPopulationVertex</em></a>) – Where do we connect from?</p></li>
-<li><p><strong>post_synaptic_population</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex" title="spynnaker.pyNN.models.neuron.AbstractPopulationVertex"><em>AbstractPopulationVertex</em></a>) – Where do we connect to?</p></li>
-<li><p><strong>rng</strong> (<a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.NumpyRNG" title="(in PyNN v0.9)"><em>NumpyRNG</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – </p></li>
-<li><p><strong>machine_time_step</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – </p></li>
-<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – Label for the projection, or None to generate one</p></li>
-<li><p><strong>time_scale_factor</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – </p></li>
-</ul>
-</dd>
-</dl>
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.pynn_projection_common.PyNNProjectionCommon.mark_no_changes">
-<code class="sig-name descname">mark_no_changes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/pynn_projection_common.html#PyNNProjectionCommon.mark_no_changes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.pynn_projection_common.PyNNProjectionCommon.mark_no_changes" title="Permalink to this definition">¶</a></dt>
+<dt id="spynnaker.pyNN.models.projection.Projection.mark_no_changes">
+<code class="sig-name descname">mark_no_changes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/projection.html#Projection.mark_no_changes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.projection.Projection.mark_no_changes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Mark this projection as not having changes to be mapped.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.pynn_projection_common.PyNNProjectionCommon.requires_mapping">
-<em class="property">property </em><code class="sig-name descname">requires_mapping</code><a class="headerlink" href="#spynnaker.pyNN.models.pynn_projection_common.PyNNProjectionCommon.requires_mapping" title="Permalink to this definition">¶</a></dt>
+<dt id="spynnaker.pyNN.models.projection.Projection.post">
+<em class="property">property </em><code class="sig-name descname">post</code><a class="headerlink" href="#spynnaker.pyNN.models.projection.Projection.post" title="Permalink to this definition">¶</a></dt>
+<dd><p>The post-population or population view.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.PopulationBase" title="spynnaker.pyNN.models.populations.PopulationBase">PopulationBase</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.projection.Projection.pre">
+<em class="property">property </em><code class="sig-name descname">pre</code><a class="headerlink" href="#spynnaker.pyNN.models.projection.Projection.pre" title="Permalink to this definition">¶</a></dt>
+<dd><p>The pre-population or population view.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.PopulationBase" title="spynnaker.pyNN.models.populations.PopulationBase">PopulationBase</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.projection.Projection.printDelays">
+<code class="sig-name descname">printDelays</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span></em>, <em class="sig-param"><span class="n">format</span><span class="o">=</span><span class="default_value">'list'</span></em>, <em class="sig-param"><span class="n">gather</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/projection.html#Projection.printDelays"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.projection.Projection.printDelays" title="Permalink to this definition">¶</a></dt>
+<dd><div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 5.0: </span>Use <code class="docutils literal notranslate"><span class="pre">save('delay')</span></code> instead.</p>
+</div>
+<p>Print synaptic weights to file. In the array format, zeros are
+printed for non-existent connections.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.projection.Projection.printWeights">
+<code class="sig-name descname">printWeights</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span></em>, <em class="sig-param"><span class="n">format</span><span class="o">=</span><span class="default_value">'list'</span></em>, <em class="sig-param"><span class="n">gather</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/projection.html#Projection.printWeights"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.projection.Projection.printWeights" title="Permalink to this definition">¶</a></dt>
+<dd><div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 5.0: </span>Use <code class="docutils literal notranslate"><span class="pre">save('weight')</span></code> instead.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.projection.Projection.requires_mapping">
+<em class="property">property </em><code class="sig-name descname">requires_mapping</code><a class="headerlink" href="#spynnaker.pyNN.models.projection.Projection.requires_mapping" title="Permalink to this definition">¶</a></dt>
 <dd><p>Whether this projection requires mapping.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -594,32 +461,227 @@ ints as values</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.pynn_projection_common.PyNNProjectionCommon.size">
-<code class="sig-name descname">size</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gather</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/pynn_projection_common.html#PyNNProjectionCommon.size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.pynn_projection_common.PyNNProjectionCommon.size" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the total number of connections.</p>
+<dt id="spynnaker.pyNN.models.projection.Projection.save">
+<code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">attribute_names</span></em>, <em class="sig-param"><span class="n">file</span></em>, <em class="sig-param"><span class="n">format</span><span class="o">=</span><span class="default_value">'list'</span></em>, <em class="sig-param"><span class="n">gather</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">with_address</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/projection.html#Projection.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.projection.Projection.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print synaptic attributes (weights, delays, etc.) to file. In the            array format, zeros are printed for non-existent connections.            Values will be expressed in the standard PyNN units (i.e.,             millivolts, nanoamps, milliseconds, microsiemens, nanofarads,             event per second).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>SpiNNaker always gathers.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>gather</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – If False, only get the number of connections locally.
-Which means nothing on SpiNNaker…</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>attribute_names</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>)</em>) – </p></li>
+<li><p><strong>file</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><em>pyNN.recording.files.BaseFile</em>) – filename or open handle (which will be closed)</p></li>
+<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – </p></li>
+<li><p><strong>gather</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Ignored</p></li>
+<li><p><strong>with_address</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – </p></li>
+</ul>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.projection.Projection.saveConnections">
+<code class="sig-name descname">saveConnections</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span></em>, <em class="sig-param"><span class="n">gather</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">compatible_output</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/projection.html#Projection.saveConnections"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.projection.Projection.saveConnections" title="Permalink to this definition">¶</a></dt>
+<dd><div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 5.0: </span>Use <code class="docutils literal notranslate"><span class="pre">save('all')</span></code> instead.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.projection.Projection.set">
+<code class="sig-name descname">set</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">attributes</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/projection.html#Projection.set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.projection.Projection.set" title="Permalink to this definition">¶</a></dt>
+<dd><div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Not implemented.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.projection.Projection.size">
+<code class="sig-name descname">size</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gather</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/projection.html#Projection.size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.projection.Projection.size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the total number of connections.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>SpiNNaker always gathers.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Not implemented.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>gather</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – If False, only get the number of connections locally.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.projection.Projection.weightHistogram">
+<code class="sig-name descname">weightHistogram</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">min</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">max</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbins</span><span class="o">=</span><span class="default_value">10</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/projection.html#Projection.weightHistogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.projection.Projection.weightHistogram" title="Permalink to this definition">¶</a></dt>
+<dd><div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 5.0: </span>Use <code class="docutils literal notranslate"><span class="pre">numpy.histogram</span></code> on the weights instead.</p>
+</div>
+<p>Return a histogram of synaptic weights.
+If <code class="docutils literal notranslate"><span class="pre">min</span></code> and <code class="docutils literal notranslate"><span class="pre">max</span></code> are not given, the minimum and maximum weights
+are calculated automatically.</p>
 </dd></dl>
 
 </dd></dl>
 
 </div>
-<div class="section" id="module-spynnaker.pyNN.models.recording_common">
-<span id="spynnaker-pynn-models-recording-common-module"></span><h2>spynnaker.pyNN.models.recording_common module<a class="headerlink" href="#module-spynnaker.pyNN.models.recording_common" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-spynnaker.pyNN.models.recorder">
+<span id="spynnaker-pynn-models-recorder-module"></span><h2>spynnaker.pyNN.models.recorder module<a class="headerlink" href="#module-spynnaker.pyNN.models.recorder" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="spynnaker.pyNN.models.recording_common.RecordingCommon">
-<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.recording_common.</code><code class="sig-name descname">RecordingCommon</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">population</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/recording_common.html#RecordingCommon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.recording_common.RecordingCommon" title="Permalink to this definition">¶</a></dt>
+<dt id="spynnaker.pyNN.models.recorder.Recorder">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.recorder.</code><code class="sig-name descname">Recorder</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">population</span></em>, <em class="sig-param"><span class="n">vertex</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/recorder.html#Recorder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.recorder.Recorder" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<p>Object to hold recording behaviour.</p>
+<p>Object to hold recording behaviour, used by populations.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>population</strong> (<a class="reference internal" href="#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon" title="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon"><em>PyNNPopulationCommon</em></a>) – the population to record for</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>population</strong> (<a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.Population" title="spynnaker.pyNN.models.populations.Population"><em>Population</em></a>) – the population to record for</p></li>
+<li><p><strong>vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN)"><em>ApplicationVertex</em></a>) – the SpiNNaker graph vertex used by the population</p></li>
+</ul>
 </dd>
 </dl>
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.recorder.Recorder.cache_data">
+<code class="sig-name descname">cache_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/recorder.html#Recorder.cache_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.recorder.Recorder.cache_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store data for later extraction</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.recorder.Recorder.extract_neo_block">
+<code class="sig-name descname">extract_neo_block</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">variables</span></em>, <em class="sig-param"><span class="n">view_indexes</span></em>, <em class="sig-param"><span class="n">clear</span></em>, <em class="sig-param"><span class="n">annotations</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/recorder.html#Recorder.extract_neo_block"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.recorder.Recorder.extract_neo_block" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts block from the vertices and puts them into a Neo block</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>variables</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>)</em>) – the variables to extract</p></li>
+<li><p><strong>view_indexes</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#slice" title="(in Python v3.6)"><em>slice</em></a>) – the indexes to be included in the view</p></li>
+<li><p><strong>clear</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – if the variables should be cleared after reading</p></li>
+<li><p><strong>annotations</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><em>object</em></a><em>)</em>) – annotations to put on the Neo block</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The Neo block</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.9)">Block</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.recorder.Recorder.get_all_possible_recordable_variables">
+<code class="sig-name descname">get_all_possible_recordable_variables</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/recorder.html#Recorder.get_all_possible_recordable_variables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.recorder.Recorder.get_all_possible_recordable_variables" title="Permalink to this definition">¶</a></dt>
+<dd><p>All variables that could be recorded.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#set" title="(in Python v3.6)">set</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.recorder.Recorder.get_all_recording_variables">
+<code class="sig-name descname">get_all_recording_variables</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/recorder.html#Recorder.get_all_recording_variables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.recorder.Recorder.get_all_recording_variables" title="Permalink to this definition">¶</a></dt>
+<dd><p>All variables that have been set to record.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#set" title="(in Python v3.6)">set</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.recorder.Recorder.get_recorded_matrix">
+<code class="sig-name descname">get_recorded_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">variable</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/recorder.html#Recorder.get_recorded_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.recorder.Recorder.get_recorded_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform safety checks and get the recorded data from the vertex            in matrix format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The variable name to read. Supported variable names are:
+<code class="docutils literal notranslate"><span class="pre">gsyn_exc</span></code>, <code class="docutils literal notranslate"><span class="pre">gsyn_inh</span></code>, <code class="docutils literal notranslate"><span class="pre">v</span></code></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>data, indexes, sampling_interval</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a>(<a class="reference external" href="https://numpy.org/doc/1.19/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>), <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.recorder.Recorder.get_recorded_pynn7">
+<code class="sig-name descname">get_recorded_pynn7</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">variable</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/recorder.html#Recorder.get_recorded_pynn7"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.recorder.Recorder.get_recorded_pynn7" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get recorded data in PyNN 0.7 format. Must not be spikes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name of the variable to get. Supported variable names are:
+<code class="docutils literal notranslate"><span class="pre">gsyn_exc</span></code>, <code class="docutils literal notranslate"><span class="pre">gsyn_inh</span></code>, <code class="docutils literal notranslate"><span class="pre">v</span></code></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/1.19/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.recorder.Recorder.get_spikes">
+<code class="sig-name descname">get_spikes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/recorder.html#Recorder.get_spikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.recorder.Recorder.get_spikes" title="Permalink to this definition">¶</a></dt>
+<dd><p>How to get spikes (of a population’s neurons) from the recorder.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the spikes (event times) from the underlying vertex</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/1.19/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.recorder.Recorder.record">
+<code class="sig-name descname">record</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">variable</span></em>, <em class="sig-param"><span class="n">sampling_interval</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">to_file</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">indexes</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/recorder.html#Recorder.record"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.recorder.Recorder.record" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tell the vertex to record data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The variable to record, supported variables to
+record are: <code class="docutils literal notranslate"><span class="pre">gsyn_exc</span></code>, <code class="docutils literal notranslate"><span class="pre">gsyn_inh</span></code>, <code class="docutils literal notranslate"><span class="pre">v</span></code>, <code class="docutils literal notranslate"><span class="pre">spikes</span></code>.</p></li>
+<li><p><strong>sampling_interval</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – the interval to record them</p></li>
+<li><p><strong>to_file</strong> (<em>neo.io.baseio.BaseIO</em><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – If set, a file to write to (by handle or name)</p></li>
+<li><p><strong>indexes</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – List of indexes to record or None for all</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.recorder.Recorder.turn_off_all_recording">
+<code class="sig-name descname">turn_off_all_recording</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">indexes</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/recorder.html#Recorder.turn_off_all_recording"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.recorder.Recorder.turn_off_all_recording" title="Permalink to this definition">¶</a></dt>
+<dd><p>Turns off recording, is used by a pop saying <code class="docutils literal notranslate"><span class="pre">.record()</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>indexes</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.recorder.Recorder.write_to_files_indicators">
+<em class="property">property </em><code class="sig-name descname">write_to_files_indicators</code><a class="headerlink" href="#spynnaker.pyNN.models.recorder.Recorder.write_to_files_indicators" title="Permalink to this definition">¶</a></dt>
+<dd><p>What variables should be written to files, and where should they            be written.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>, neo.io.baseio.BaseIO or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a> or <a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </div>
@@ -640,10 +702,10 @@ Which means nothing on SpiNNaker…</p>
 <li><a class="reference internal" href="#">spynnaker.pyNN.models package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.models.abstract_pynn_model">spynnaker.pyNN.models.abstract_pynn_model module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.models.defaults">spynnaker.pyNN.models.defaults module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.pynn_population_common">spynnaker.pyNN.models.pynn_population_common module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.pynn_projection_common">spynnaker.pyNN.models.pynn_projection_common module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.recording_common">spynnaker.pyNN.models.recording_common module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.models.projection">spynnaker.pyNN.models.projection module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.models.recorder">spynnaker.pyNN.models.recorder module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.models">Module contents</a></li>
 </ul>
 </li>
@@ -699,7 +761,7 @@ Which means nothing on SpiNNaker…</p>
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2017.
+        &#169; Copyright 2014-2021.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
     </div>
   </body>

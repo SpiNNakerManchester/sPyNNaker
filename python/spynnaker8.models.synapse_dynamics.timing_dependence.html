@@ -1,0 +1,243 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>spynnaker8.models.synapse_dynamics.timing_dependence package &#8212; sPyNNaker  documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="spynnaker8.models.synapse_dynamics.weight_dependence package" href="spynnaker8.models.synapse_dynamics.weight_dependence.html" />
+    <link rel="prev" title="spynnaker8.models.synapse_dynamics package" href="spynnaker8.models.synapse_dynamics.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="spynnaker8.models.synapse_dynamics.weight_dependence.html" title="spynnaker8.models.synapse_dynamics.weight_dependence package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="spynnaker8.models.synapse_dynamics.html" title="spynnaker8.models.synapse_dynamics package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >spynnaker</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="spynnaker8.html" >spynnaker8 package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="spynnaker8.models.html" >spynnaker8.models package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="spynnaker8.models.synapse_dynamics.html" accesskey="U">spynnaker8.models.synapse_dynamics package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker8.models.synapse_dynamics.timing_dependence package</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="spynnaker8-models-synapse-dynamics-timing-dependence-package">
+<h1>spynnaker8.models.synapse_dynamics.timing_dependence package<a class="headerlink" href="#spynnaker8-models-synapse-dynamics-timing-dependence-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-spynnaker8.models.synapse_dynamics.timing_dependence">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker8.models.synapse_dynamics.timing_dependence" title="Permalink to this headline">¶</a></h2>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Using classes via this module is deprecated. Please use
+<a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.html#module-spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence" title="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence"><code class="xref py py-mod docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence</span></code></a>
+instead.</p>
+</div>
+<dl class="py class">
+<dt id="spynnaker8.models.synapse_dynamics.timing_dependence.TimingDependencePfisterSpikeTriplet">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker8.models.synapse_dynamics.timing_dependence.</code><code class="sig-name descname">TimingDependencePfisterSpikeTriplet</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tau_plus</span></em>, <em class="sig-param"><span class="n">tau_minus</span></em>, <em class="sig-param"><span class="n">tau_x</span></em>, <em class="sig-param"><span class="n">tau_y</span></em>, <em class="sig-param"><span class="n">A_plus</span><span class="o">=</span><span class="default_value">0.01</span></em>, <em class="sig-param"><span class="n">A_minus</span><span class="o">=</span><span class="default_value">0.01</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/models/synapse_dynamics/timing_dependence/pfister_spike_triplet.html#TimingDependencePfisterSpikeTriplet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker8.models.synapse_dynamics.timing_dependence.TimingDependencePfisterSpikeTriplet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.timing_dependence_pfister_spike_triplet.TimingDependencePfisterSpikeTriplet</span></code></p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 6.0: </span>Use
+<a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependencePfisterSpikeTriplet" title="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependencePfisterSpikeTriplet"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependencePfisterSpikeTriplet</span></code></a>
+instead.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tau_plus</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau_+\)</span></p></li>
+<li><p><strong>tau_minus</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau_-\)</span></p></li>
+<li><p><strong>tau_x</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau_x\)</span></p></li>
+<li><p><strong>tau_y</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau_y\)</span></p></li>
+<li><p><strong>A_plus</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(A^+\)</span></p></li>
+<li><p><strong>A_minus</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(A^-\)</span></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker8.models.synapse_dynamics.timing_dependence.TimingDependenceRecurrent">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker8.models.synapse_dynamics.timing_dependence.</code><code class="sig-name descname">TimingDependenceRecurrent</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">accumulator_depression</span><span class="o">=</span><span class="default_value">- 6</span></em>, <em class="sig-param"><span class="n">accumulator_potentiation</span><span class="o">=</span><span class="default_value">6</span></em>, <em class="sig-param"><span class="n">mean_pre_window</span><span class="o">=</span><span class="default_value">35.0</span></em>, <em class="sig-param"><span class="n">mean_post_window</span><span class="o">=</span><span class="default_value">35.0</span></em>, <em class="sig-param"><span class="n">dual_fsm</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">A_plus</span><span class="o">=</span><span class="default_value">0.01</span></em>, <em class="sig-param"><span class="n">A_minus</span><span class="o">=</span><span class="default_value">0.01</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/models/synapse_dynamics/timing_dependence/recurrent.html#TimingDependenceRecurrent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker8.models.synapse_dynamics.timing_dependence.TimingDependenceRecurrent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.timing_dependence_recurrent.TimingDependenceRecurrent</span></code></p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 6.0: </span>Use
+<a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceRecurrent" title="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceRecurrent"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceRecurrent</span></code></a>
+instead.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>accumulator_depression</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – </p></li>
+<li><p><strong>accumulator_potentiation</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – </p></li>
+<li><p><strong>mean_pre_window</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – </p></li>
+<li><p><strong>mean_post_window</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – </p></li>
+<li><p><strong>dual_fsm</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – </p></li>
+<li><p><strong>A_plus</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(A^+\)</span></p></li>
+<li><p><strong>A_minus</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(A^-\)</span></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker8.models.synapse_dynamics.timing_dependence.TimingDependenceSpikeNearestPair">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker8.models.synapse_dynamics.timing_dependence.</code><code class="sig-name descname">TimingDependenceSpikeNearestPair</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tau_plus</span><span class="o">=</span><span class="default_value">20.0</span></em>, <em class="sig-param"><span class="n">tau_minus</span><span class="o">=</span><span class="default_value">20.0</span></em>, <em class="sig-param"><span class="n">A_plus</span><span class="o">=</span><span class="default_value">0.01</span></em>, <em class="sig-param"><span class="n">A_minus</span><span class="o">=</span><span class="default_value">0.01</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/models/synapse_dynamics/timing_dependence/spike_nearest_pair.html#TimingDependenceSpikeNearestPair"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker8.models.synapse_dynamics.timing_dependence.TimingDependenceSpikeNearestPair" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.timing_dependence_spike_nearest_pair.TimingDependenceSpikeNearestPair</span></code></p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 6.0: </span>Use
+<a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikeNearestPair" title="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikeNearestPair"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikeNearestPair</span></code></a>
+instead.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tau_plus</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau_+\)</span></p></li>
+<li><p><strong>tau_minus</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau_-\)</span></p></li>
+<li><p><strong>A_plus</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(A^+\)</span></p></li>
+<li><p><strong>A_minus</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(A^-\)</span></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker8.models.synapse_dynamics.timing_dependence.TimingDependenceSpikePair">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker8.models.synapse_dynamics.timing_dependence.</code><code class="sig-name descname">TimingDependenceSpikePair</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tau_plus</span><span class="o">=</span><span class="default_value">20.0</span></em>, <em class="sig-param"><span class="n">tau_minus</span><span class="o">=</span><span class="default_value">20.0</span></em>, <em class="sig-param"><span class="n">A_plus</span><span class="o">=</span><span class="default_value">0.01</span></em>, <em class="sig-param"><span class="n">A_minus</span><span class="o">=</span><span class="default_value">0.01</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/models/synapse_dynamics/timing_dependence/spike_pair.html#TimingDependenceSpikePair"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker8.models.synapse_dynamics.timing_dependence.TimingDependenceSpikePair" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.timing_dependence_spike_pair.TimingDependenceSpikePair</span></code></p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 6.0: </span>Use
+<a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikePair" title="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikePair"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikePair</span></code></a>
+instead.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tau_plus</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau_+\)</span></p></li>
+<li><p><strong>tau_minus</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau_-\)</span></p></li>
+<li><p><strong>A_plus</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(A^+\)</span></p></li>
+<li><p><strong>A_minus</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(A^-\)</span></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker8.models.synapse_dynamics.timing_dependence.TimingDependenceVogels2011">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker8.models.synapse_dynamics.timing_dependence.</code><code class="sig-name descname">TimingDependenceVogels2011</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">alpha</span></em>, <em class="sig-param"><span class="n">tau</span><span class="o">=</span><span class="default_value">20.0</span></em>, <em class="sig-param"><span class="n">A_plus</span><span class="o">=</span><span class="default_value">0.01</span></em>, <em class="sig-param"><span class="n">A_minus</span><span class="o">=</span><span class="default_value">0.01</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/models/synapse_dynamics/timing_dependence/vogels_2011.html#TimingDependenceVogels2011"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker8.models.synapse_dynamics.timing_dependence.TimingDependenceVogels2011" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.timing_dependence_vogels_2011.TimingDependenceVogels2011</span></code></p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 6.0: </span>Use
+<a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceVogels2011" title="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceVogels2011"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceVogels2011</span></code></a>
+instead.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\alpha\)</span></p></li>
+<li><p><strong>tau</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau\)</span></p></li>
+<li><p><strong>A_plus</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(A^+\)</span></p></li>
+<li><p><strong>A_minus</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(A^-\)</span></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">spynnaker8.models.synapse_dynamics.timing_dependence package</a><ul>
+<li><a class="reference internal" href="#module-spynnaker8.models.synapse_dynamics.timing_dependence">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="spynnaker8.models.synapse_dynamics.html"
+                        title="previous chapter">spynnaker8.models.synapse_dynamics package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="spynnaker8.models.synapse_dynamics.weight_dependence.html"
+                        title="next chapter">spynnaker8.models.synapse_dynamics.weight_dependence package</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/spynnaker8.models.synapse_dynamics.timing_dependence.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="spynnaker8.models.synapse_dynamics.weight_dependence.html" title="spynnaker8.models.synapse_dynamics.weight_dependence package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="spynnaker8.models.synapse_dynamics.html" title="spynnaker8.models.synapse_dynamics package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >spynnaker</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="spynnaker8.html" >spynnaker8 package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="spynnaker8.models.html" >spynnaker8.models package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="spynnaker8.models.synapse_dynamics.html" >spynnaker8.models.synapse_dynamics package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker8.models.synapse_dynamics.timing_dependence package</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2021.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
+    </div>
+  </body>
+</html>

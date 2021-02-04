@@ -52,9 +52,9 @@
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
+<span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">data_specification.enums</span> <span class="kn">import</span> <span class="n">DataType</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.threshold_types</span> <span class="kn">import</span> <span class="n">AbstractThresholdType</span>
-<span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 
 <span class="n">DEVICE</span> <span class="o">=</span> <span class="s2">&quot;device&quot;</span>
 <span class="n">TIME_UNTIL_SEND</span> <span class="o">=</span> <span class="s2">&quot;time_until_send&quot;</span>
@@ -107,7 +107,6 @@
 
 <div class="viewcode-block" id="ThresholdTypeMulticastDeviceControl.get_values"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.ThresholdTypeMulticastDeviceControl.get_values">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractThresholdType</span><span class="o">.</span><span class="n">get_values</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
-
         <span class="c1"># Add the rest of the data</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">parameters</span><span class="p">[</span><span class="n">DEVICE</span><span class="p">]</span><span class="o">.</span><span class="n">apply_operation</span><span class="p">(</span>
                     <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">device_control_key</span><span class="p">),</span>
@@ -130,7 +129,6 @@
 
 <div class="viewcode-block" id="ThresholdTypeMulticastDeviceControl.update_values"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.ThresholdTypeMulticastDeviceControl.update_values">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractThresholdType</span><span class="o">.</span><span class="n">update_values</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">update_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">):</span>
-
         <span class="c1"># Read the data</span>
         <span class="p">(</span><span class="n">_key</span><span class="p">,</span> <span class="n">_uses_payload</span><span class="p">,</span> <span class="n">_min</span><span class="p">,</span> <span class="n">_max</span><span class="p">,</span> <span class="n">_between</span><span class="p">,</span> <span class="n">time_until_send</span><span class="p">,</span>
          <span class="n">_send_type</span><span class="p">)</span> <span class="o">=</span> <span class="n">values</span>
@@ -172,7 +170,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2017.
+        &#169; Copyright 2014-2021.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
     </div>
   </body>

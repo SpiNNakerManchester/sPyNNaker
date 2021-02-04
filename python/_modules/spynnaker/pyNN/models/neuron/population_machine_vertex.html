@@ -133,14 +133,14 @@
         <span class="n">TDMA_MISSES</span> <span class="o">=</span> <span class="mi">14</span></div>
 
     <span class="n">SATURATION_COUNT_NAME</span> <span class="o">=</span> <span class="s2">&quot;Times_synaptic_weights_have_saturated&quot;</span>
-    <span class="n">SATURATION_COUNT_MESSAGE</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">_SATURATION_COUNT_MESSAGE</span> <span class="o">=</span> <span class="p">(</span>
         <span class="s2">&quot;The weights from the synapses for </span><span class="si">{}</span><span class="s2"> on </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2"> saturated &quot;</span>
         <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> times. If this causes issues you can increase the &quot;</span>
         <span class="s2">&quot;spikes_per_second and / or ring_buffer_sigma &quot;</span>
         <span class="s2">&quot;values located within the .spynnaker.cfg file.&quot;</span><span class="p">)</span>
 
     <span class="n">INPUT_BUFFER_FULL_NAME</span> <span class="o">=</span> <span class="s2">&quot;Times_the_input_buffer_lost_packets&quot;</span>
-    <span class="n">INPUT_BUFFER_FULL_MESSAGE</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">_INPUT_BUFFER_FULL_MESSAGE</span> <span class="o">=</span> <span class="p">(</span>
         <span class="s2">&quot;The input buffer for </span><span class="si">{}</span><span class="s2"> on </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2"> lost packets on </span><span class="si">{}</span><span class="s2"> &quot;</span>
         <span class="s2">&quot;occasions. This is often a sign that the system is running &quot;</span>
         <span class="s2">&quot;too quickly for the number of neurons per core.  Please &quot;</span>
@@ -153,7 +153,7 @@
 
     <span class="n">SATURATED_PLASTIC_WEIGHTS_NAME</span> <span class="o">=</span> <span class="p">(</span>
         <span class="s2">&quot;Times_plastic_synaptic_weights_have_saturated&quot;</span><span class="p">)</span>
-    <span class="n">SATURATED_PLASTIC_WEIGHTS_MESSAGE</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">_SATURATED_PLASTIC_WEIGHTS_MESSAGE</span> <span class="o">=</span> <span class="p">(</span>
         <span class="s2">&quot;The weights from the plastic synapses for </span><span class="si">{}</span><span class="s2"> on </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2"> &quot;</span>
         <span class="s2">&quot;saturated </span><span class="si">{}</span><span class="s2"> times. If this causes issue increase the &quot;</span>
         <span class="s2">&quot;spikes_per_second and / or ring_buffer_sigma values located &quot;</span>
@@ -181,7 +181,7 @@
         <span class="mi">4</span><span class="p">:</span> <span class="s2">&quot;PROCESS_PLASTIC_SYNAPSES&quot;</span><span class="p">}</span>
 
     <span class="c1"># x words needed for a bitfield covering 256 atoms</span>
-    <span class="n">WORDS_TO_COVER_256_ATOMS</span> <span class="o">=</span> <span class="mi">8</span>
+    <span class="n">_WORDS_TO_COVER_256_ATOMS</span> <span class="o">=</span> <span class="mi">8</span>
 
     <span class="c1"># provenance data items</span>
     <span class="n">BIT_FIELD_FILTERED_PACKETS</span> <span class="o">=</span> \
@@ -328,12 +328,12 @@
         <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SATURATION_COUNT_NAME</span><span class="p">),</span>
             <span class="n">n_saturations</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">n_saturations</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="n">message</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">SATURATION_COUNT_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">message</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_SATURATION_COUNT_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                 <span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">n_saturations</span><span class="p">)))</span>
         <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">INPUT_BUFFER_FULL_NAME</span><span class="p">),</span>
             <span class="n">n_buffer_overflows</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">n_buffer_overflows</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="n">message</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">INPUT_BUFFER_FULL_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">message</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_INPUT_BUFFER_FULL_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                 <span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">n_buffer_overflows</span><span class="p">)))</span>
         <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">TOTAL_PRE_SYNAPTIC_EVENT_NAME</span><span class="p">),</span>
@@ -344,7 +344,7 @@
         <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SATURATED_PLASTIC_WEIGHTS_NAME</span><span class="p">),</span>
             <span class="n">n_plastic_saturations</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">n_plastic_saturations</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="n">message</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">SATURATED_PLASTIC_WEIGHTS_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">message</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_SATURATED_PLASTIC_WEIGHTS_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                 <span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">n_plastic_saturations</span><span class="p">)))</span>
         <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N_RE_WIRES_NAME</span><span class="p">),</span> <span class="n">n_rewires</span><span class="p">))</span>
@@ -368,7 +368,7 @@
                 <span class="s2">&quot;size of buffers, or neuron params per neuron etc.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="n">failed_to_read_bit_fields</span><span class="p">,</span>
                     <span class="n">failed_to_read_bit_fields</span> <span class="o">*</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">WORDS_TO_COVER_256_ATOMS</span><span class="p">))))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_WORDS_TO_COVER_256_ATOMS</span><span class="p">))))</span>
         <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">DMA_COMPLETE</span><span class="p">),</span> <span class="n">dma_completes</span><span class="p">))</span>
         <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
@@ -386,9 +386,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">BIT_FIELD_FILTERED_PACKETS</span><span class="p">),</span>
             <span class="n">n_packets_filtered_by_bit_field_filter</span><span class="p">,</span>
             <span class="n">report</span><span class="o">=</span><span class="p">(</span>
-                    <span class="n">n_packets_filtered_by_bit_field_filter</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="p">(</span>
-                        <span class="n">n_buffer_overflows</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">or</span>
-                        <span class="n">times_timer_tic_overran</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)),</span>
+                <span class="n">n_packets_filtered_by_bit_field_filter</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="p">(</span>
+                    <span class="n">n_buffer_overflows</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">times_timer_tic_overran</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)),</span>
             <span class="n">message</span><span class="o">=</span><span class="p">(</span>
                 <span class="s2">&quot;There were </span><span class="si">{}</span><span class="s2"> packets received by </span><span class="si">{}</span><span class="s2">:</span><span class="si">{}</span><span class="s2">:</span><span class="si">{}</span><span class="s2"> that were &quot;</span>
                 <span class="s2">&quot;filtered by the Bitfield filterer on the core. These packets &quot;</span>
@@ -411,7 +410,7 @@
             <span class="n">input_buffer_max_filled_size</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
 
         <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">get_tdma_provenance_item</span><span class="p">(</span>
-                <span class="n">names</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">tdma_misses</span><span class="p">))</span>
+            <span class="n">names</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">tdma_misses</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">provenance_items</span></div>
 
 <div class="viewcode-block" id="PopulationMachineVertex.get_recorded_region_ids"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.get_recorded_region_ids">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractReceiveBuffersToHost</span><span class="o">.</span><span class="n">get_recorded_region_ids</span><span class="p">)</span>
@@ -736,7 +735,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2017.
+        &#169; Copyright 2014-2021.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
     </div>
   </body>

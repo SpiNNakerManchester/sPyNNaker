@@ -1932,7 +1932,7 @@ If None the assumption is all neurons are recording</p></li>
 <dl class="py class">
 <dt id="spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModel">
 <em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neuron.</code><code class="sig-name descname">AbstractPyNNNeuronModel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_pynn_neuron_model.html#AbstractPyNNNeuronModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel" title="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel</span></code></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>model</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl" title="spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl"><em>AbstractNeuronImpl</em></a>) – The model implementation</p>
@@ -2219,11 +2219,6 @@ calculation</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="spynnaker.pyNN.models.neuron.PopulationMachineVertex.INPUT_BUFFER_FULL_MESSAGE">
-<code class="sig-name descname">INPUT_BUFFER_FULL_MESSAGE</code><em class="property"> = 'The input buffer for {} on {}, {}, {} lost packets on {} occasions. This is often a sign that the system is running too quickly for the number of neurons per core.  Please increase the timer_tic or time_scale_factor or decrease the number of neurons per core.'</em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.INPUT_BUFFER_FULL_MESSAGE" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt id="spynnaker.pyNN.models.neuron.PopulationMachineVertex.INPUT_BUFFER_FULL_NAME">
 <code class="sig-name descname">INPUT_BUFFER_FULL_NAME</code><em class="property"> = 'Times_the_input_buffer_lost_packets'</em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.INPUT_BUFFER_FULL_NAME" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -2264,18 +2259,8 @@ calculation</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="spynnaker.pyNN.models.neuron.PopulationMachineVertex.SATURATED_PLASTIC_WEIGHTS_MESSAGE">
-<code class="sig-name descname">SATURATED_PLASTIC_WEIGHTS_MESSAGE</code><em class="property"> = 'The weights from the plastic synapses for {} on {}, {}, {} saturated {} times. If this causes issue increase the spikes_per_second and / or ring_buffer_sigma values located within the .spynnaker.cfg file.'</em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.SATURATED_PLASTIC_WEIGHTS_MESSAGE" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt id="spynnaker.pyNN.models.neuron.PopulationMachineVertex.SATURATED_PLASTIC_WEIGHTS_NAME">
 <code class="sig-name descname">SATURATED_PLASTIC_WEIGHTS_NAME</code><em class="property"> = 'Times_plastic_synaptic_weights_have_saturated'</em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.SATURATED_PLASTIC_WEIGHTS_NAME" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="spynnaker.pyNN.models.neuron.PopulationMachineVertex.SATURATION_COUNT_MESSAGE">
-<code class="sig-name descname">SATURATION_COUNT_MESSAGE</code><em class="property"> = 'The weights from the synapses for {} on {}, {}, {} saturated {} times. If this causes issues you can increase the spikes_per_second and / or ring_buffer_sigma values located within the .spynnaker.cfg file.'</em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.SATURATION_COUNT_MESSAGE" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -2296,11 +2281,6 @@ calculation</p>
 <dl class="py attribute">
 <dt id="spynnaker.pyNN.models.neuron.PopulationMachineVertex.TOTAL_PRE_SYNAPTIC_EVENT_NAME">
 <code class="sig-name descname">TOTAL_PRE_SYNAPTIC_EVENT_NAME</code><em class="property"> = 'Total_pre_synaptic_events'</em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.TOTAL_PRE_SYNAPTIC_EVENT_NAME" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="spynnaker.pyNN.models.neuron.PopulationMachineVertex.WORDS_TO_COVER_256_ATOMS">
-<code class="sig-name descname">WORDS_TO_COVER_256_ATOMS</code><em class="property"> = 8</em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.WORDS_TO_COVER_256_ATOMS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -2974,7 +2954,7 @@ between runs</p>
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2017.
+        &#169; Copyright 2014-2021.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
     </div>
   </body>

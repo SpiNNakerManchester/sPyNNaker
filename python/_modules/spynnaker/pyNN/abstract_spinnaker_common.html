@@ -57,16 +57,16 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">with_metaclass</span>
 
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> \
-    <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.abstract_base</span> <span class="kn">import</span> <span class="n">AbstractBase</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.abstract_spinnaker_base</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractSpinnakerBase</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.exceptions</span> <span class="kn">import</span> <span class="n">ConfigurationException</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utility_models</span> <span class="kn">import</span> <span class="n">CommandSender</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.utility_objs</span> <span class="kn">import</span> <span class="n">ExecutableFinder</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities</span> <span class="kn">import</span> <span class="n">globals_variables</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="n">unset_simulator</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN</span> <span class="kn">import</span> <span class="n">extra_algorithms</span><span class="p">,</span> <span class="n">model_binaries</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities</span> <span class="kn">import</span> <span class="n">constants</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.spynnaker_simulator_interface</span> <span class="kn">import</span> <span class="p">(</span>
@@ -123,7 +123,7 @@
 <span class="sd">        :param user_extra_algorithms_pre_run:</span>
 <span class="sd">        :type user_extra_algorithms_pre_run: list(str) or None</span>
 <span class="sd">        :param time_scale_factor:</span>
-<span class="sd">        :type time_scale_factor:</span>
+<span class="sd">        :type time_scale_factor: float or None</span>
 <span class="sd">        :param extra_post_run_algorithms:</span>
 <span class="sd">        :type extra_post_run_algorithms: list(str) or None</span>
 <span class="sd">        :param extra_mapping_algorithms:</span>
@@ -131,7 +131,7 @@
 <span class="sd">        :param extra_load_algorithms:</span>
 <span class="sd">        :type extra_load_algorithms: list(str) or None</span>
 <span class="sd">        :param front_end_versions:</span>
-<span class="sd">        :type front_end_versions:</span>
+<span class="sd">        :type front_end_versions: list(tuple(str,str)) or None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=too-many-arguments, too-many-locals</span>
 
@@ -245,7 +245,12 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">machine_time_step</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_set_up_timings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timestep</span><span class="p">,</span> <span class="n">min_delay</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="p">):</span>
-        <span class="c1"># pylint: disable=too-many-arguments</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param float timestep:</span>
+<span class="sd">        :param int min_delay:</span>
+<span class="sd">        :param configparser.ConfigParser config:</span>
+<span class="sd">        :param float time_scale_factor:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># Get the standard values</span>
         <span class="k">if</span> <span class="n">timestep</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -311,6 +316,8 @@
 
     <span class="k">def</span> <span class="nf">_detect_if_graph_has_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reset_flags</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Iterate though the graph and look for changes.</span>
+
+<span class="sd">        :param bool reset_flags:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">changed</span><span class="p">,</span> <span class="n">data_changed</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">AbstractSpiNNakerCommon</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span>\
             <span class="n">_detect_if_graph_has_changed</span><span class="p">(</span><span class="n">reset_flags</span><span class="p">)</span>
@@ -380,7 +387,7 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">AbstractSpiNNakerCommon</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">stop</span><span class="p">(</span>
             <span class="n">turn_off_machine</span><span class="p">,</span> <span class="n">clear_routing_tables</span><span class="p">,</span> <span class="n">clear_tags</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reset_number_of_neurons_per_core</span><span class="p">()</span>
-        <span class="n">globals_variables</span><span class="o">.</span><span class="n">unset_simulator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+        <span class="n">unset_simulator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractSpiNNakerCommon.run"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_time</span><span class="p">,</span> <span class="n">sync_time</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Run the model created.</span>
@@ -446,7 +453,8 @@
 <span class="sd">        :param projection_to_attribute_map:</span>
 <span class="sd">            the projection to attributes mapping</span>
 <span class="sd">        :type projection_to_attribute_map:</span>
-<span class="sd">            dict(PyNNProjectionCommon, list(int) or tuple(int) or None)</span>
+<span class="sd">            dict(~spynnaker.pyNN.models.projection.Projection,</span>
+<span class="sd">            list(int) or tuple(int) or None)</span>
 <span class="sd">        :return: a extracted data object with get method for getting the data</span>
 <span class="sd">        :rtype: ExtractedData</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -503,10 +511,11 @@
         <span class="sd">&quot;&quot;&quot; Locate receivers and their corresponding monitor cores for\</span>
 <span class="sd">            setting router time-outs.</span>
 
-<span class="sd">        :param projections: the projections going to be read</span>
+<span class="sd">        :param list projections: the projections going to be read</span>
 <span class="sd">        :param gatherers: the gatherers per Ethernet chip</span>
 <span class="sd">        :param extra_monitors_per_chip: the extra monitor cores per chip</span>
 <span class="sd">        :return: list of tuples with gatherer and its extra monitor cores</span>
+<span class="sd">        :rtype: list</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=protected-access</span>
         <span class="n">important_gathers</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
@@ -589,7 +598,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2017.
+        &#169; Copyright 2014-2021.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
     </div>
   </body>

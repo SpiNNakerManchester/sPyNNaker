@@ -143,12 +143,13 @@
             <span class="n">max_rate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">splitter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param int n_neurons:</span>
-<span class="sd">        :param iterable(~pacman.model.constraints.AbstractConstraint) \</span>
-<span class="sd">                constraints:</span>
+<span class="sd">        :param constraints:</span>
+<span class="sd">        :type constraints:</span>
+<span class="sd">            iterable(~pacman.model.constraints.AbstractConstraint)</span>
 <span class="sd">        :param str label:</span>
 <span class="sd">        :param float seed:</span>
 <span class="sd">        :param int max_atoms_per_core:</span>
-<span class="sd">        :param SpikeSourcePoisson model:</span>
+<span class="sd">        :param ~spynnaker.pyNN.models.spike_source.SpikeSourcePoisson model:</span>
 <span class="sd">        :param iterable(float) rate:</span>
 <span class="sd">        :param iterable(int) start:</span>
 <span class="sd">        :param iterable(int) duration:</span>
@@ -656,7 +657,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2017.
+        &#169; Copyright 2014-2021.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
     </div>
   </body>

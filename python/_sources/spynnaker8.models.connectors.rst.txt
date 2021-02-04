@@ -1,0 +1,10 @@
+spynnaker8.models.connectors package
+====================================
+
+Module contents
+---------------
+
+.. automodule:: spynnaker8.models.connectors
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -327,6 +327,127 @@ bit_field_key, structural region)</p>
 </dd></dl>
 
 </div>
+<div class="section" id="module-spynnaker.pyNN.utilities.data_cache">
+<span id="spynnaker-pynn-utilities-data-cache-module"></span><h2>spynnaker.pyNN.utilities.data_cache module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.data_cache" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="spynnaker.pyNN.utilities.data_cache.DataCache">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.utilities.data_cache.</code><code class="sig-name descname">DataCache</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">label</span></em>, <em class="sig-param"><span class="n">description</span></em>, <em class="sig-param"><span class="n">segment_number</span></em>, <em class="sig-param"><span class="n">recording_start_time</span></em>, <em class="sig-param"><span class="n">t</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/data_cache.html#DataCache"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.data_cache.DataCache" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Storage object to hold all the data to (re)create a Neo Segment</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Required because deep-copy does not work on neo Objects</p>
+</div>
+<p>Stores the Data shared by all variable types at the top level
+and holds a cache for the variable specific data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – cache label</p></li>
+<li><p><strong>description</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – cache description</p></li>
+<li><p><strong>segment_number</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – cache segment number</p></li>
+<li><p><strong>recording_start_time</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – when this cache was started in recording space.</p></li>
+<li><p><strong>t</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – time</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="spynnaker.pyNN.utilities.data_cache.DataCache.description">
+<em class="property">property </em><code class="sig-name descname">description</code><a class="headerlink" href="#spynnaker.pyNN.utilities.data_cache.DataCache.description" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.utilities.data_cache.DataCache.get_data">
+<code class="sig-name descname">get_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">variable</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/data_cache.html#DataCache.get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.data_cache.DataCache.get_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the variable cache for the named variable</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – name of variable to get cache for</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The cache data, IDs, indexes and units</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#spynnaker.pyNN.utilities.variable_cache.VariableCache" title="spynnaker.pyNN.utilities.variable_cache.VariableCache">VariableCache</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.utilities.data_cache.DataCache.has_data">
+<code class="sig-name descname">has_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">variable</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/data_cache.html#DataCache.has_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.data_cache.DataCache.has_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if data for a variable has been cached</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of variable</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True if there is cached data</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.utilities.data_cache.DataCache.label">
+<em class="property">property </em><code class="sig-name descname">label</code><a class="headerlink" href="#spynnaker.pyNN.utilities.data_cache.DataCache.label" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.utilities.data_cache.DataCache.rec_datetime">
+<em class="property">property </em><code class="sig-name descname">rec_datetime</code><a class="headerlink" href="#spynnaker.pyNN.utilities.data_cache.DataCache.rec_datetime" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.utilities.data_cache.DataCache.recording_start_time">
+<em class="property">property </em><code class="sig-name descname">recording_start_time</code><a class="headerlink" href="#spynnaker.pyNN.utilities.data_cache.DataCache.recording_start_time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.utilities.data_cache.DataCache.save_data">
+<code class="sig-name descname">save_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">variable</span></em>, <em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">indexes</span></em>, <em class="sig-param"><span class="n">n_neurons</span></em>, <em class="sig-param"><span class="n">units</span></em>, <em class="sig-param"><span class="n">sampling_interval</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/data_cache.html#DataCache.save_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.data_cache.DataCache.save_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves the data for one variable in this segment</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – name of variable data applies to</p></li>
+<li><p><strong>data</strong> (<a class="reference external" href="https://numpy.org/doc/1.19/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a>) – raw data in sPyNNaker format</p></li>
+<li><p><strong>indexes</strong> (<a class="reference external" href="https://numpy.org/doc/1.19/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a>) – population indexes for which data should be returned</p></li>
+<li><p><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Number of neurons in the population,
+regardless of if they where recording or not.</p></li>
+<li><p><strong>units</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – the units in which the data is</p></li>
+<li><p><strong>sampling_interval</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – The number of milliseconds between samples.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.utilities.data_cache.DataCache.segment_number">
+<em class="property">property </em><code class="sig-name descname">segment_number</code><a class="headerlink" href="#spynnaker.pyNN.utilities.data_cache.DataCache.segment_number" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.utilities.data_cache.DataCache.t">
+<em class="property">property </em><code class="sig-name descname">t</code><a class="headerlink" href="#spynnaker.pyNN.utilities.data_cache.DataCache.t" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.utilities.data_cache.DataCache.variables">
+<em class="property">property </em><code class="sig-name descname">variables</code><a class="headerlink" href="#spynnaker.pyNN.utilities.data_cache.DataCache.variables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provides a list of which variables data has been cached for</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Iterator (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 <div class="section" id="module-spynnaker.pyNN.utilities.extracted_data">
 <span id="spynnaker-pynn-utilities-extracted-data-module"></span><h2>spynnaker.pyNN.utilities.extracted_data module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.extracted_data" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
@@ -341,7 +462,7 @@ bit_field_key, structural region)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>projection</strong> (<a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.pynn_projection_common.PyNNProjectionCommon" title="spynnaker.pyNN.models.pynn_projection_common.PyNNProjectionCommon"><em>PyNNProjectionCommon</em></a>) – the projection data was extracted from</p></li>
+<li><p><strong>projection</strong> (<a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.projection.Projection" title="spynnaker.pyNN.models.projection.Projection"><em>Projection</em></a>) – the projection data was extracted from</p></li>
 <li><p><strong>attribute</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#tuple" title="(in Python v3.6)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – the attribute to retrieve</p></li>
 </ul>
 </dd>
@@ -361,7 +482,7 @@ bit_field_key, structural region)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>projection</strong> (<a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.pynn_projection_common.PyNNProjectionCommon" title="spynnaker.pyNN.models.pynn_projection_common.PyNNProjectionCommon"><em>PyNNProjectionCommon</em></a>) – the projection data was extracted from</p></li>
+<li><p><strong>projection</strong> (<a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.projection.Projection" title="spynnaker.pyNN.models.projection.Projection"><em>Projection</em></a>) – the projection data was extracted from</p></li>
 <li><p><strong>attribute</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#tuple" title="(in Python v3.6)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – the attribute to store</p></li>
 <li><p><strong>data</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.ConnectionHolder" title="spynnaker.pyNN.models.neuron.ConnectionHolder"><em>ConnectionHolder</em></a>) – attribute data in a connection holder</p></li>
 </ul>
@@ -494,9 +615,15 @@ From: <a class="reference external" href="http://www.johndcook.com/blog/skewness
 <span id="spynnaker-pynn-utilities-spynnaker-failed-state-module"></span><h2>spynnaker.pyNN.utilities.spynnaker_failed_state module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.spynnaker_failed_state" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState">
-<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.utilities.spynnaker_failed_state.</code><code class="sig-name descname">SpynnakerFailedState</code><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/spynnaker_failed_state.html#SpynnakerFailedState"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.html#spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface" title="spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">spinn_front_end_common.utilities.failed_state.FailedState</span></code>, <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.utilities.spynnaker_failed_state.</code><code class="sig-name descname">SpynnakerFailedState</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/spynnaker_failed_state.html#SpynnakerFailedState"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.html#spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface" title="spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">spinn_front_end_common.utilities.failed_state.FailedState</span></code></p>
 <p>Marks the simulation as failed.</p>
+<dl class="py method">
+<dt id="spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.dt">
+<em class="property">property </em><code class="sig-name descname">dt</code><a class="headerlink" href="#spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.dt" title="Permalink to this definition">¶</a></dt>
+<dd><p>The timestep, in milliseconds.</p>
+</dd></dl>
+
 <dl class="py method">
 <dt id="spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.get_current_time">
 <code class="sig-name descname">get_current_time</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/spynnaker_failed_state.html#SpynnakerFailedState.get_current_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.get_current_time" title="Permalink to this definition">¶</a></dt>
@@ -518,13 +645,54 @@ From: <a class="reference external" href="http://www.johndcook.com/blog/skewness
 <dd></dd></dl>
 
 <dl class="py method">
+<dt id="spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.mpi_rank">
+<em class="property">property </em><code class="sig-name descname">mpi_rank</code><a class="headerlink" href="#spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.mpi_rank" title="Permalink to this definition">¶</a></dt>
+<dd><p>The MPI rank of the controller node.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.name">
+<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>The name of the simulator. Used to ensure PyNN recording neo            blocks are correctly labelled.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.num_processes">
+<em class="property">property </em><code class="sig-name descname">num_processes</code><a class="headerlink" href="#spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.num_processes" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of MPI worker processes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.recorders">
+<em class="property">property </em><code class="sig-name descname">recorders</code><a class="headerlink" href="#spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.recorders" title="Permalink to this definition">¶</a></dt>
+<dd><p>The recorders, used by the PyNN state object.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt id="spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.reset">
 <em class="property">static </em><code class="sig-name descname">reset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">annotations</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/spynnaker_failed_state.html#SpynnakerFailedState.reset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.reset" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
+<dt id="spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.segment_counter">
+<em class="property">property </em><code class="sig-name descname">segment_counter</code><a class="headerlink" href="#spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.segment_counter" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of the current recording segment being generated.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt id="spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.set_number_of_neurons_per_core">
 <code class="sig-name descname">set_number_of_neurons_per_core</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">neuron_type</span></em>, <em class="sig-param"><span class="n">max_permitted</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/spynnaker_failed_state.html#SpynnakerFailedState.set_number_of_neurons_per_core"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.set_number_of_neurons_per_core" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.t">
+<em class="property">property </em><code class="sig-name descname">t</code><a class="headerlink" href="#spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.t" title="Permalink to this definition">¶</a></dt>
+<dd><p>The current simulation time, in milliseconds.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.write_on_end">
+<code class="sig-name descname">write_on_end</code><a class="headerlink" href="#spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.write_on_end" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -680,18 +848,20 @@ returned by field_types</p></li>
 <dl class="py function">
 <dt id="spynnaker.pyNN.utilities.utility_calls.create_mars_kiss_seeds">
 <code class="sig-prename descclassname">spynnaker.pyNN.utilities.utility_calls.</code><code class="sig-name descname">create_mars_kiss_seeds</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rng</span></em>, <em class="sig-param"><span class="n">seed</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#create_mars_kiss_seeds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.create_mars_kiss_seeds" title="Permalink to this definition">¶</a></dt>
-<dd><p>generates and checks that the seed values generated by the given
-random number generator or seed to a random number generator are
-suitable for use as a mars 64 kiss seed.</p>
+<dd><p>generates and checks that the seed values generated by the given        random number generator or seed to a random number generator are        suitable for use as a mars 64 kiss seed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>or numpy.random.RandomState rng</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – the random number generator.</p></li>
-<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – the seed to create a random number generator if not        handed.</p></li>
+<li><p><strong>rng</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a><em> or </em><a class="reference external" href="https://numpy.org/doc/1.19/reference/random/legacy.html#numpy.random.RandomState" title="(in NumPy v1.19)"><em>RandomState</em></a>) – the random number generator.</p></li>
+<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – the seed to create a random number generator if not handed.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>a list of 4 ints which are used by the mars64 kiss random number         generator for seeds.</p>
+<dd class="field-even"><p>a list of 4 ints which are used by the mars64 kiss random number
+generator for seeds.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -830,6 +1000,80 @@ suitable for use as a mars 64 kiss seed.</p>
 </dd></dl>
 
 </div>
+<div class="section" id="module-spynnaker.pyNN.utilities.variable_cache">
+<span id="spynnaker-pynn-utilities-variable-cache-module"></span><h2>spynnaker.pyNN.utilities.variable_cache module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.variable_cache" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="spynnaker.pyNN.utilities.variable_cache.VariableCache">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.utilities.variable_cache.</code><code class="sig-name descname">VariableCache</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">indexes</span></em>, <em class="sig-param"><span class="n">n_neurons</span></em>, <em class="sig-param"><span class="n">units</span></em>, <em class="sig-param"><span class="n">sampling_interval</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/variable_cache.html#VariableCache"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.variable_cache.VariableCache" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Simple holder method to keep data, IDs, indexes and units together</p>
+<p>Typically used to recreate the Neo object for one type of variable for
+one segment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<a class="reference external" href="https://numpy.org/doc/1.19/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a>) – raw data in sPyNNaker format</p></li>
+<li><p><strong>indexes</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em>) – Population indexes for which data was collected</p></li>
+<li><p><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Number of neurons in the population,
+regardless of whether they were recording or not.</p></li>
+<li><p><strong>units</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – the units in which the data is</p></li>
+<li><p><strong>sampling_interval</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – The number of milliseconds between samples.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="spynnaker.pyNN.utilities.variable_cache.VariableCache.data">
+<em class="property">property </em><code class="sig-name descname">data</code><a class="headerlink" href="#spynnaker.pyNN.utilities.variable_cache.VariableCache.data" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.19/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.utilities.variable_cache.VariableCache.indexes">
+<em class="property">property </em><code class="sig-name descname">indexes</code><a class="headerlink" href="#spynnaker.pyNN.utilities.variable_cache.VariableCache.indexes" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.utilities.variable_cache.VariableCache.n_neurons">
+<em class="property">property </em><code class="sig-name descname">n_neurons</code><a class="headerlink" href="#spynnaker.pyNN.utilities.variable_cache.VariableCache.n_neurons" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.utilities.variable_cache.VariableCache.sampling_interval">
+<em class="property">property </em><code class="sig-name descname">sampling_interval</code><a class="headerlink" href="#spynnaker.pyNN.utilities.variable_cache.VariableCache.sampling_interval" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a> or <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.utilities.variable_cache.VariableCache.units">
+<em class="property">property </em><code class="sig-name descname">units</code><a class="headerlink" href="#spynnaker.pyNN.utilities.variable_cache.VariableCache.units" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 <div class="section" id="module-spynnaker.pyNN.utilities">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.utilities" title="Permalink to this headline">¶</a></h2>
 </div>
@@ -849,12 +1093,14 @@ suitable for use as a mars 64 kiss seed.</p>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.bit_field_utilities">spynnaker.pyNN.utilities.bit_field_utilities module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.constants">spynnaker.pyNN.utilities.constants module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.data_cache">spynnaker.pyNN.utilities.data_cache module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.extracted_data">spynnaker.pyNN.utilities.extracted_data module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider">spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.running_stats">spynnaker.pyNN.utilities.running_stats module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.spynnaker_failed_state">spynnaker.pyNN.utilities.spynnaker_failed_state module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.struct">spynnaker.pyNN.utilities.struct module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.utility_calls">spynnaker.pyNN.utilities.utility_calls module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.variable_cache">spynnaker.pyNN.utilities.variable_cache module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.utilities">Module contents</a></li>
 </ul>
 </li>
@@ -910,7 +1156,7 @@ suitable for use as a mars 64 kiss seed.</p>
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2017.
+        &#169; Copyright 2014-2021.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
     </div>
   </body>

@@ -54,18 +54,20 @@
 
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">from</span> <span class="nn">pyNN.standardmodels.synapses</span> <span class="kn">import</span> <span class="n">StaticSynapse</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="n">AbstractChangableAfterRun</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">BYTES_PER_WORD</span><span class="p">,</span> <span class="n">BYTES_PER_SHORT</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="n">get_simulator</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="n">AbstractSettable</span>
 <span class="kn">from</span> <span class="nn">.abstract_plastic_synapse_dynamics</span> <span class="kn">import</span> <span class="n">AbstractPlasticSynapseDynamics</span>
-<span class="kn">from</span> <span class="nn">.abstract_synapse_dynamics_structural</span> \
-    <span class="kn">import</span> <span class="nn">AbstractSynapseDynamicsStructural</span>
+<span class="kn">from</span> <span class="nn">.abstract_synapse_dynamics_structural</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AbstractSynapseDynamicsStructural</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.abstract_generate_on_machine</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractGenerateOnMachine</span><span class="p">,</span> <span class="n">MatrixGeneratorID</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">InvalidParameterType</span><span class="p">,</span>\
-    <span class="n">SynapticConfigurationException</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">InvalidParameterType</span><span class="p">,</span> <span class="n">SynapticConfigurationException</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.utility_calls</span> <span class="kn">import</span> <span class="n">get_n_bits</span>
 
 <span class="c1"># How large are the time-stamps stored with each event</span>
@@ -99,42 +101,47 @@
         <span class="s2">&quot;__backprop_delay&quot;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">timing_dependence</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">weight_dependence</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">timing_dependence</span><span class="p">,</span> <span class="n">weight_dependence</span><span class="p">,</span>
             <span class="n">voltage_dependence</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dendritic_delay_fraction</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-            <span class="n">weight</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">delay</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">pad_to_length</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">backprop_delay</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="n">weight</span><span class="o">=</span><span class="n">StaticSynapse</span><span class="o">.</span><span class="n">default_parameters</span><span class="p">[</span><span class="s1">&#39;weight&#39;</span><span class="p">],</span>
+            <span class="n">delay</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pad_to_length</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">backprop_delay</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param AbstractTimingDependence timing_dependence:</span>
 <span class="sd">        :param AbstractWeightDependence weight_dependence:</span>
 <span class="sd">        :param None voltage_dependence: not supported</span>
 <span class="sd">        :param float dendritic_delay_fraction: [0.5, 1.0]</span>
 <span class="sd">        :param float weight:</span>
-<span class="sd">        :param float delay:</span>
+<span class="sd">        :param delay: Use ``None`` to get the simulator default minimum delay.</span>
+<span class="sd">        :type delay: float or None</span>
 <span class="sd">        :param pad_to_length:</span>
 <span class="sd">        :type pad_to_length: int or None</span>
 <span class="sd">        :param bool backprop_delay:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">timing_dependence</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">weight_dependence</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="s2">&quot;Both timing_dependence and weight_dependence must be&quot;</span>
+                <span class="s2">&quot;specified&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">voltage_dependence</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="s2">&quot;Voltage dependence has not been implemented&quot;</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">__timing_dependence</span> <span class="o">=</span> <span class="n">timing_dependence</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__weight_dependence</span> <span class="o">=</span> <span class="n">weight_dependence</span>
+        <span class="c1"># move data from timing to weight dependence; that&#39;s where we need it</span>
+        <span class="n">weight_dependence</span><span class="o">.</span><span class="n">set_a_plus_a_minus</span><span class="p">(</span>
+            <span class="n">timing_dependence</span><span class="o">.</span><span class="n">A_plus</span><span class="p">,</span> <span class="n">timing_dependence</span><span class="o">.</span><span class="n">A_minus</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__dendritic_delay_fraction</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">dendritic_delay_fraction</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_mapping</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__pad_to_length</span> <span class="o">=</span> <span class="n">pad_to_length</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__weight</span> <span class="o">=</span> <span class="n">weight</span>
+        <span class="k">if</span> <span class="n">delay</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">delay</span> <span class="o">=</span> <span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">min_delay</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__delay</span> <span class="o">=</span> <span class="n">delay</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__backprop_delay</span> <span class="o">=</span> <span class="n">backprop_delay</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dendritic_delay_fraction</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
                 <span class="s2">&quot;dendritic_delay_fraction must be in the interval [0.5, 1.0]&quot;</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">timing_dependence</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">weight_dependence</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-                <span class="s2">&quot;Both timing_dependence and weight_dependence must be&quot;</span>
-                <span class="s2">&quot;specified&quot;</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">voltage_dependence</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-                <span class="s2">&quot;Voltage dependence has not been implemented&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="SynapseDynamicsSTDP.merge"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.merge">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractPlasticSynapseDynamics</span><span class="o">.</span><span class="n">merge</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">merge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_dynamics</span><span class="p">):</span>
@@ -646,7 +653,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2017.
+        &#169; Copyright 2014-2021.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
     </div>
   </body>

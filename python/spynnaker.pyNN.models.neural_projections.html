@@ -382,10 +382,12 @@ This edge may not be fully initialised</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>connector</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector" title="spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector"><em>AbstractConnector</em></a>) – The connector connected to the synapse</p></li>
-<li><p><strong>pre_population</strong> (<a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon" title="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon"><em>PyNNPopulationCommon</em></a>) – The population sending spikes to the synapse</p></li>
-<li><p><strong>post_population</strong> (<a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon" title="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon"><em>PyNNPopulationCommon</em></a>) – The population hosting the synapse</p></li>
-<li><p><strong>prepop_is_view</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Whether the prepopulation is a view</p></li>
-<li><p><strong>postpop_is_view</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Whether the postpopulation is a view</p></li>
+<li><p><strong>pre_population</strong> (<a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.Population" title="spynnaker.pyNN.models.populations.Population"><em>Population</em></a><em> or
+</em><a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.PopulationView" title="spynnaker.pyNN.models.populations.PopulationView"><em>PopulationView</em></a>) – The population sending spikes to the synapse</p></li>
+<li><p><strong>post_population</strong> (<a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.Population" title="spynnaker.pyNN.models.populations.Population"><em>Population</em></a><em>
+or </em><a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.PopulationView" title="spynnaker.pyNN.models.populations.PopulationView"><em>PopulationView</em></a>) – The population hosting the synapse</p></li>
+<li><p><strong>prepop_is_view</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Whether the <code class="docutils literal notranslate"><span class="pre">pre_population</span></code> is a view</p></li>
+<li><p><strong>postpop_is_view</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Whether the <code class="docutils literal notranslate"><span class="pre">post_population</span></code> is a view</p></li>
 <li><p><strong>rng</strong> (<a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.NumpyRNG" title="(in PyNN v0.9)"><em>NumpyRNG</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – Seeded random number generator</p></li>
 <li><p><strong>synapse_dynamics</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics" title="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics"><em>AbstractSynapseDynamics</em></a>) – The dynamic behaviour of the synapse</p></li>
 <li><p><strong>synapse_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType" title="spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType"><em>AbstractSynapseType</em></a>) – The type of the synapse</p></li>
@@ -478,7 +480,8 @@ may have already been so done)</p>
 <dd><p>The population hosting the synapse</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon" title="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon">PyNNPopulationCommon</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.Population" title="spynnaker.pyNN.models.populations.Population">Population</a> or
+<a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.PopulationView" title="spynnaker.pyNN.models.populations.PopulationView">PopulationView</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -486,7 +489,7 @@ may have already been so done)</p>
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neural_projections.SynapseInformation.postpop_is_view">
 <em class="property">property </em><code class="sig-name descname">postpop_is_view</code><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.SynapseInformation.postpop_is_view" title="Permalink to this definition">¶</a></dt>
-<dd><p>Whether the postpopulation is a view</p>
+<dd><p>Whether the <a class="reference internal" href="#spynnaker.pyNN.models.neural_projections.SynapseInformation.post_population" title="spynnaker.pyNN.models.neural_projections.SynapseInformation.post_population"><code class="xref py py-meth docutils literal notranslate"><span class="pre">post_population()</span></code></a> is a view</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></p>
@@ -500,7 +503,8 @@ may have already been so done)</p>
 <dd><p>The population sending spikes to the synapse</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon" title="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon">PyNNPopulationCommon</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.Population" title="spynnaker.pyNN.models.populations.Population">Population</a> or
+<a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.PopulationView" title="spynnaker.pyNN.models.populations.PopulationView">PopulationView</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -519,7 +523,7 @@ may have already been so done)</p>
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neural_projections.SynapseInformation.prepop_is_view">
 <em class="property">property </em><code class="sig-name descname">prepop_is_view</code><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.SynapseInformation.prepop_is_view" title="Permalink to this definition">¶</a></dt>
-<dd><p>Whether the prepopulation is a view</p>
+<dd><p>Whether the <a class="reference internal" href="#spynnaker.pyNN.models.neural_projections.SynapseInformation.pre_population" title="spynnaker.pyNN.models.neural_projections.SynapseInformation.pre_population"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pre_population()</span></code></a> is a view</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></p>
@@ -643,7 +647,7 @@ may have already been so done)</p>
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2017.
+        &#169; Copyright 2014-2021.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
     </div>
   </body>

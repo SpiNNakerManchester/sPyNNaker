@@ -1,0 +1,10 @@
+spynnaker8.models.populations package
+=====================================
+
+Module contents
+---------------
+
+.. automodule:: spynnaker8.models.populations
+   :members:
+   :undoc-members:
+   :show-inheritance:

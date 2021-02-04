@@ -1,0 +1,10 @@
+spynnaker8.models.synapse\_dynamics.timing\_dependence package
+==============================================================
+
+Module contents
+---------------
+
+.. automodule:: spynnaker8.models.synapse_dynamics.timing_dependence
+   :members:
+   :undoc-members:
+   :show-inheritance:

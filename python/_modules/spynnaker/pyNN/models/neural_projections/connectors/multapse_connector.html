@@ -52,12 +52,9 @@
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
-<span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">numpy.random</span>
 <span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">raise_from</span>
-<span class="kn">from</span> <span class="nn">spinn_utilities.abstract_base</span> <span class="kn">import</span> <span class="n">abstractmethod</span>
-<span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">pacman.model.graphs.common</span> <span class="kn">import</span> <span class="n">Slice</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
@@ -70,8 +67,6 @@
     <span class="n">AbstractConnectorSupportsViewsOnMachine</span><span class="p">)</span>
 
 <span class="n">N_GEN_PARAMS</span> <span class="o">=</span> <span class="mi">8</span>
-
-<span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
 
 
 <div class="viewcode-block" id="MultapseConnector"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.MultapseConnector">[docs]</a><span class="k">class</span> <span class="nc">MultapseConnector</span><span class="p">(</span><span class="n">AbstractGenerateConnectorOnMachine</span><span class="p">,</span>
@@ -90,25 +85,35 @@
         <span class="s2">&quot;__synapses_per_edge&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__with_replacement&quot;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_synapses</span><span class="p">,</span> <span class="n">allow_self_connections</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                 <span class="n">with_replacement</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">allow_self_connections</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">with_replacement</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param int num_synapses:</span>
+<span class="sd">        :param int n:</span>
 <span class="sd">            This is the total number of synapses in the connection.</span>
 <span class="sd">        :param bool allow_self_connections:</span>
 <span class="sd">            Allow a neuron to connect to itself or not.</span>
 <span class="sd">        :param bool with_replacement:</span>
 <span class="sd">            When selecting, allow a neuron to be re-selected or not.</span>
 <span class="sd">        :param bool safe:</span>
-<span class="sd">        :param callable callback: Ignored</span>
+<span class="sd">            Whether to check that weights and delays have valid values.</span>
+<span class="sd">            If ``False``, this check is skipped.</span>
 <span class="sd">        :param bool verbose:</span>
+<span class="sd">            Whether to output extra information about the connectivity to a</span>
+<span class="sd">            CSV file</span>
 <span class="sd">        :param rng:</span>
-<span class="sd">            Seeded random number generator, or None to make one when needed</span>
+<span class="sd">            Seeded random number generator, or ``None`` to make one when</span>
+<span class="sd">            needed.</span>
 <span class="sd">        :type rng: ~pyNN.random.NumpyRNG or None</span>
+<span class="sd">        :param callable callback:</span>
+<span class="sd">            if given, a callable that display a progress bar on the terminal.</span>
+
+<span class="sd">            .. note::</span>
+<span class="sd">                Not supported by sPyNNaker.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">MultapseConnector</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">safe</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__num_synapses</span> <span class="o">=</span> <span class="n">num_synapses</span>
+        <span class="c1"># We absolutely require an integer at this point!</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__num_synapses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_roundsize</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="s2">&quot;MultapseConnector&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__allow_self_connections</span> <span class="o">=</span> <span class="n">allow_self_connections</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__with_replacement</span> <span class="o">=</span> <span class="n">with_replacement</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__pre_slices</span> <span class="o">=</span> <span class="kc">None</span>
@@ -116,15 +121,31 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__synapses_per_edge</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rng</span> <span class="o">=</span> <span class="n">rng</span>
 
-<div class="viewcode-block" id="MultapseConnector.get_rng_next"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.MultapseConnector.get_rng_next">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">get_rng_next</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_synapses</span><span class="p">,</span> <span class="n">prob_connect</span><span class="p">):</span>
+<div class="viewcode-block" id="MultapseConnector.get_rng_next"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.MultapseConnector.get_rng_next">[docs]</a>    <span class="k">def</span> <span class="nf">get_rng_next</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_synapses</span><span class="p">,</span> <span class="n">prob_connect</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the required RNGs</span>
 
 <span class="sd">        :param int num_synapses:</span>
 <span class="sd">            The number of synapses to make random numbers for in this call</span>
 <span class="sd">        :param list(float) prob_connect: The probability of connection</span>
 <span class="sd">        :rtype: ~numpy.ndarray</span>
-<span class="sd">        &quot;&quot;&quot;</span></div>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Below is how numpy does multinomial internally...</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">prob_connect</span><span class="p">)</span>
+        <span class="n">multinomial</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">dn</span> <span class="o">=</span> <span class="n">num_synapses</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">multinomial</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rng</span><span class="o">.</span><span class="n">next</span><span class="p">(</span>
+                <span class="mi">1</span><span class="p">,</span> <span class="n">distribution</span><span class="o">=</span><span class="s2">&quot;binomial&quot;</span><span class="p">,</span>
+                <span class="n">parameters</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;n&#39;</span><span class="p">:</span> <span class="n">dn</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">:</span> <span class="n">prob_connect</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">/</span> <span class="n">total</span><span class="p">})</span>
+            <span class="n">dn</span> <span class="o">=</span> <span class="n">dn</span> <span class="o">-</span> <span class="n">multinomial</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">dn</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">total</span> <span class="o">=</span> <span class="n">total</span> <span class="o">-</span> <span class="n">prob_connect</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">dn</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">multinomial</span><span class="p">[</span><span class="n">size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">dn</span>
+
+        <span class="k">return</span> <span class="n">multinomial</span></div>
 
 <div class="viewcode-block" id="MultapseConnector.get_delay_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.MultapseConnector.get_delay_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_delay_maximum</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_delay_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
@@ -159,7 +180,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">__synapses_per_edge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_rng_next</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__num_synapses</span><span class="p">,</span> <span class="n">prob_connect</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__synapses_per_edge</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__num_synapses</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> of </span><span class="si">{}</span><span class="s2"> synapses generated&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="k">raise</span> <span class="n">SpynnakerException</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> of </span><span class="si">{}</span><span class="s2"> synapses generated&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__synapses_per_edge</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">__num_synapses</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__pre_slices</span> <span class="o">=</span> <span class="n">pre_slices</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__post_slices</span> <span class="o">=</span> <span class="n">post_slices</span>
@@ -415,7 +436,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2017.
+        &#169; Copyright 2014-2021.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
     </div>
   </body>

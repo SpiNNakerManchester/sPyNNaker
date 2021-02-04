@@ -52,8 +52,6 @@
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">data_specification.enums</span> <span class="kn">import</span> <span class="n">DataType</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
@@ -66,8 +64,6 @@
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.plasticity.stdp.common</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">float_to_fixed</span><span class="p">,</span> <span class="n">get_exp_lut_array</span><span class="p">)</span>
 
-<span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
-
 
 <div class="viewcode-block" id="TimingDependenceVogels2011"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceVogels2011">[docs]</a><span class="k">class</span> <span class="nc">TimingDependenceVogels2011</span><span class="p">(</span><span class="n">AbstractTimingDependence</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; A timing dependence STDP rule due to Vogels (2011).</span>
@@ -76,17 +72,24 @@
         <span class="s2">&quot;__alpha&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__synapse_structure&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__tau&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__tau_data&quot;</span><span class="p">]</span>
+        <span class="s2">&quot;__tau_data&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__a_plus&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__a_minus&quot;</span><span class="p">]</span>
 
     <span class="n">default_parameters</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;tau&#39;</span><span class="p">:</span> <span class="mf">20.0</span><span class="p">}</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="n">default_parameters</span><span class="p">[</span><span class="s1">&#39;tau&#39;</span><span class="p">]):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="n">default_parameters</span><span class="p">[</span><span class="s1">&#39;tau&#39;</span><span class="p">],</span>
+                 <span class="n">A_plus</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">A_minus</span><span class="o">=</span><span class="mf">0.01</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param float alpha: :math:`\alpha`</span>
 <span class="sd">        :param float tau: :math:`\tau`</span>
+<span class="sd">        :param float A_plus: :math:`A^+`</span>
+<span class="sd">        :param float A_minus: :math:`A^-`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__alpha</span> <span class="o">=</span> <span class="n">alpha</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__tau</span> <span class="o">=</span> <span class="n">tau</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__a_plus</span> <span class="o">=</span> <span class="n">A_plus</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__a_minus</span> <span class="o">=</span> <span class="n">A_minus</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_structure</span> <span class="o">=</span> <span class="n">SynapseStructureWeightOnly</span><span class="p">()</span>
 
@@ -109,6 +112,30 @@
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tau</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">A_plus</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; :math:`A^+`</span>
+
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__a_plus</span>
+
+    <span class="nd">@A_plus</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">A_plus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__a_plus</span> <span class="o">=</span> <span class="n">new_value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">A_minus</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; :math:`A^-`</span>
+
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__a_minus</span>
+
+    <span class="nd">@A_minus</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">A_minus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__a_minus</span> <span class="o">=</span> <span class="n">new_value</span>
 
 <div class="viewcode-block" id="TimingDependenceVogels2011.is_same_as"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceVogels2011.is_same_as">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractTimingDependence</span><span class="o">.</span><span class="n">is_same_as</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">is_same_as</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timing_dependence</span><span class="p">):</span>
@@ -206,7 +233,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2017.
+        &#169; Copyright 2014-2021.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
     </div>
   </body>

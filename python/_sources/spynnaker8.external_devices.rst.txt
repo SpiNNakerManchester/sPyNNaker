@@ -1,0 +1,10 @@
+spynnaker8.external\_devices package
+====================================
+
+Module contents
+---------------
+
+.. automodule:: spynnaker8.external_devices
+   :members:
+   :undoc-members:
+   :show-inheritance:

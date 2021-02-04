@@ -63,7 +63,7 @@
     <span class="n">LivePacketGatherParameters</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">LIVE_POISSON_CONTROL_PARTITION_ID</span><span class="p">,</span> <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.pynn_population_common</span> <span class="kn">import</span> <span class="n">PyNNPopulationCommon</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.populations</span> <span class="kn">import</span> <span class="n">Population</span>
 
 
 <div class="viewcode-block" id="SpynnakerExternalDevicePluginManager"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.spynnaker_external_device_plugin_manager.SpynnakerExternalDevicePluginManager">[docs]</a><span class="k">class</span> <span class="nc">SpynnakerExternalDevicePluginManager</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -124,7 +124,7 @@
         <span class="sd">&quot;&quot;&quot; Output the spikes from a given population from SpiNNaker as they\</span>
 <span class="sd">            occur in the simulation.</span>
 
-<span class="sd">        :param PyNNPopulationCommon population:</span>
+<span class="sd">        :param ~spynnaker.pyNN.models.populations.Population population:</span>
 <span class="sd">            The population to activate the live output for</span>
 <span class="sd">        :param str database_notify_host:</span>
 <span class="sd">            The hostname for the device which is listening to the database</span>
@@ -205,23 +205,23 @@
         <span class="sd">&quot;&quot;&quot; Activate the output of spikes from a population to an external\</span>
 <span class="sd">            device. Note that all spikes will be sent to the device.</span>
 
-<span class="sd">        :param PyNNPopulationCommon population:</span>
+<span class="sd">        :param ~spynnaker.pyNN.models.populations.Population population:</span>
 <span class="sd">            The pyNN population object from which spikes will be sent.</span>
 <span class="sd">        :param device:</span>
 <span class="sd">            The pyNN population or external device to which the spikes will be</span>
 <span class="sd">            sent.</span>
 <span class="sd">        :type device:</span>
-<span class="sd">            PyNNPopulationCommon or</span>
+<span class="sd">            ~spynnaker.pyNN.models.populations.Population or</span>
 <span class="sd">            ~pacman.model.graphs.application.ApplicationVertex</span>
 <span class="sd">        :param str partition_id:</span>
 <span class="sd">            The partition ID to activate live output to.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">device_vertex</span> <span class="o">=</span> <span class="n">device</span>
         <span class="c1"># pylint: disable=protected-access</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="n">PyNNPopulationCommon</span><span class="p">):</span>
-            <span class="n">device_vertex</span> <span class="o">=</span> <span class="n">device</span><span class="o">.</span><span class="n">_get_vertex</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="n">Population</span><span class="p">):</span>
+            <span class="n">device_vertex</span> <span class="o">=</span> <span class="n">device</span><span class="o">.</span><span class="n">_vertex</span>
         <span class="n">SpynnakerExternalDevicePluginManager</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span>
-            <span class="n">population</span><span class="o">.</span><span class="n">_get_vertex</span><span class="p">,</span> <span class="n">device_vertex</span><span class="p">,</span> <span class="n">partition_id</span><span class="p">)</span></div>
+            <span class="n">population</span><span class="o">.</span><span class="n">_vertex</span><span class="p">,</span> <span class="n">device_vertex</span><span class="p">,</span> <span class="n">partition_id</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SpynnakerExternalDevicePluginManager.add_socket_address"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.spynnaker_external_device_plugin_manager.SpynnakerExternalDevicePluginManager.add_socket_address">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">add_socket_address</span><span class="p">(</span><span class="n">socket_address</span><span class="p">):</span>
@@ -295,8 +295,9 @@
             <span class="n">reserve_reverse_ip_tag</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Add a live rate controller to a Poisson population.</span>
 
-<span class="sd">        :param PyNNPopulationCommon poisson_population:</span>
-<span class="sd">            The population to control</span>
+<span class="sd">        :param poisson_population: The population to control</span>
+<span class="sd">        :type poisson_population:</span>
+<span class="sd">            ~spynnaker.pyNN.models.populations.Population</span>
 <span class="sd">        :param str control_label_extension:</span>
 <span class="sd">            An extension to add to the label of the Poisson source. Must match</span>
 <span class="sd">            up with the equivalent in the SpynnakerPoissonControlConnection</span>
@@ -314,7 +315,7 @@
 <span class="sd">            used, False if SDP is to be used (default)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=too-many-arguments, protected-access</span>
-        <span class="n">vertex</span> <span class="o">=</span> <span class="n">poisson_population</span><span class="o">.</span><span class="n">_get_vertex</span>
+        <span class="n">vertex</span> <span class="o">=</span> <span class="n">poisson_population</span><span class="o">.</span><span class="n">_vertex</span>
         <span class="n">control_label</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">vertex</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">control_label_extension</span><span class="p">)</span>
         <span class="n">controller</span> <span class="o">=</span> <span class="n">ReverseIpTagMultiCastSource</span><span class="p">(</span>
             <span class="n">n_keys</span><span class="o">=</span><span class="n">vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">control_label</span><span class="p">,</span>
@@ -392,7 +393,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2017.
+        &#169; Copyright 2014-2021.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
     </div>
   </body>

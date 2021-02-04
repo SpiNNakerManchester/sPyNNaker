@@ -75,14 +75,35 @@ checks.)</p></li>
 <dd></dd></dl>
 
 <dl class="py method">
+<dt id="spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.connect">
+<code class="sig-name descname">connect</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">projection</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/abstract_connector.html#AbstractConnector.connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply this connector to a projection.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Do <em>not</em> call this! SpyNNaker does not work that way.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>projection</strong> (<a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.projection.Projection" title="spynnaker.pyNN.models.projection.Projection"><em>Projection</em></a>) – </p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference internal" href="spynnaker.pyNN.html#spynnaker.pyNN.exceptions.SpynnakerException" title="spynnaker.pyNN.exceptions.SpynnakerException"><strong>SpynnakerException</strong></a> – Always. Method not supported; profiled out.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt id="spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.could_connect">
 <code class="sig-name descname">could_connect</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">_synapse_info</span></em>, <em class="sig-param"><span class="n">_pre_slice</span></em>, <em class="sig-param"><span class="n">_post_slice</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/abstract_connector.html#AbstractConnector.could_connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.could_connect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks if a pre slice and a post slice could connect.</p>
 <p>Typically used to determine if a Machine Edge should be created by
 checking that at least one of the indexes in the pre slice could
 over time connect to at least one of the indexes in the post slice.</p>
-<p>note: This method should never return a false negative,
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This method should never return a false negative,
 but may return a false positives</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -90,6 +111,9 @@ but may return a false positives</p>
 <li><p><strong>_post_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN)"><em>Slice</em></a>) – </p></li>
 <li><p><strong>_synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) – </p></li>
 </ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -312,6 +336,9 @@ or </em><a class="reference external" href="https://docs.python.org/3.6/library/
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) – </p>
 </dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></p>
+</dd>
 </dl>
 </dd></dl>
 
@@ -527,8 +554,8 @@ or </em><a class="reference external" href="https://docs.python.org/3.6/library/
 
 <dl class="py class">
 <dt id="spynnaker.pyNN.models.neural_projections.connectors.AllToAllConnector">
-<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neural_projections.connectors.</code><code class="sig-name descname">AllToAllConnector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">allow_self_connections</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">safe</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">callback</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/all_to_all_connector.html#AllToAllConnector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.AllToAllConnector" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neural_projections.connectors.abstract_generate_connector_on_machine.AbstractGenerateConnectorOnMachine</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neural_projections.connectors.abstract_connector_supports_views_on_machine.AbstractConnectorSupportsViewsOnMachine</span></code></p>
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neural_projections.connectors.</code><code class="sig-name descname">AllToAllConnector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">allow_self_connections</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">safe</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">callback</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/all_to_all_connector.html#AllToAllConnector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.AllToAllConnector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neural_projections.connectors.abstract_generate_connector_on_machine.AbstractGenerateConnectorOnMachine</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neural_projections.connectors.abstract_connector_supports_views_on_machine.AbstractConnectorSupportsViewsOnMachine</span></code>, <a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/connectors.html#pyNN.connectors.AllToAllConnector" title="(in PyNN v0.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyNN.connectors.AllToAllConnector</span></code></a></p>
 <p>Connects all cells in the presynaptic population to all cells in         the postsynaptic population.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -536,9 +563,16 @@ or </em><a class="reference external" href="https://docs.python.org/3.6/library/
 <li><p><strong>allow_self_connections</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – if the connector is used to connect a Population to itself, this
 flag determines whether a neuron is allowed to connect to itself,
 or only to other neurons in the Population.</p></li>
-<li><p><strong>safe</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – </p></li>
-<li><p><strong>callback</strong> (<em>callable</em>) – Ignored</p></li>
-<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – </p></li>
+<li><p><strong>safe</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, check that weights and delays have valid values.
+If <code class="docutils literal notranslate"><span class="pre">False</span></code>, this check is skipped.</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Whether to output extra information about the connectivity to a
+CSV file</p></li>
+<li><p><strong>callback</strong> (<em>callable</em>) – <p>if given, a callable that display a progress bar on the terminal.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Not supported by sPyNNaker.</p>
+</div>
+</p></li>
 </ul>
 </dd>
 </dl>
@@ -718,10 +752,19 @@ or </em><a class="reference external" href="https://docs.python.org/3.6/library/
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>array</strong> (<a class="reference external" href="https://numpy.org/doc/1.19/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a><em>(</em><em>2</em><em>, </em><em>uint8</em><em>)</em>) – An explicit boolean matrix that specifies the connections            between the pre- and post-populations            (see PyNN documentation). Must be 2D in practice.</p></li>
-<li><p><strong>safe</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – </p></li>
-<li><p><strong>callback</strong> (<em>callable</em>) – Ignored</p></li>
-<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – </p></li>
+<li><p><strong>array</strong> (<a class="reference external" href="https://numpy.org/doc/1.19/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a><em>(</em><em>2</em><em>, </em><em>uint8</em><em>)</em>) – An explicit boolean matrix that specifies the connections
+between the pre- and post-populations
+(see PyNN documentation). Must be 2D in practice.</p></li>
+<li><p><strong>safe</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Whether to check that weights and delays have valid values.
+If False, this check is skipped.</p></li>
+<li><p><strong>callback</strong> (<em>callable</em>) – <p>if given, a callable that display a progress bar on the terminal.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Not supported by sPyNNaker.</p>
+</div>
+</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Whether to output extra information about the connectivity to a
+CSV file</p></li>
 </ul>
 </dd>
 </dl>
@@ -845,15 +888,22 @@ or </em><a class="reference external" href="https://docs.python.org/3.6/library/
 <em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neural_projections.connectors.</code><code class="sig-name descname">CSAConnector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cset</span></em>, <em class="sig-param"><span class="n">safe</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">callback</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/csa_connector.html#CSAConnector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.CSAConnector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neural_projections.connectors.abstract_connector.AbstractConnector</span></code></p>
 <p>Make connections using a Connection Set Algebra (Djurfeldt 2012)        description between the neurons in the pre- and post-populations.
-If you get TypeError in Python 3 see:
+If you get <code class="docutils literal notranslate"><span class="pre">TypeError</span></code> in Python 3 see:
 <a class="reference external" href="https://github.com/INCF/csa/issues/10">https://github.com/INCF/csa/issues/10</a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>cset</strong> (<em>csa.connset.CSet</em>) – A description of the connection set between populations</p></li>
-<li><p><strong>safe</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – </p></li>
-<li><p><strong>callback</strong> (<em>callable</em>) – Ignored</p></li>
-<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – </p></li>
+<li><p><strong>safe</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, check that weights and delays have valid values.
+If <code class="docutils literal notranslate"><span class="pre">False</span></code>, this check is skipped.</p></li>
+<li><p><strong>callback</strong> (<em>callable</em>) – <p>if given, a callable that display a progress bar on the terminal.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Not supported by sPyNNaker.</p>
+</div>
+</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Whether to output extra information about the connectivity to a
+CSV file</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises</dt>
@@ -992,26 +1042,28 @@ or </em><a class="reference external" href="https://docs.python.org/3.6/library/
 
 <dl class="py class">
 <dt id="spynnaker.pyNN.models.neural_projections.connectors.DistanceDependentProbabilityConnector">
-<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neural_projections.connectors.</code><code class="sig-name descname">DistanceDependentProbabilityConnector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d_expression</span></em>, <em class="sig-param"><span class="n">allow_self_connections</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">safe</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">callback</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">n_connections</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">rng</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/distance_dependent_probability_connector.html#DistanceDependentProbabilityConnector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.DistanceDependentProbabilityConnector" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neural_projections.connectors.abstract_connector.AbstractConnector</span></code></p>
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neural_projections.connectors.</code><code class="sig-name descname">DistanceDependentProbabilityConnector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d_expression</span></em>, <em class="sig-param"><span class="n">allow_self_connections</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">safe</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">n_connections</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">rng</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">callback</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/distance_dependent_probability_connector.html#DistanceDependentProbabilityConnector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.DistanceDependentProbabilityConnector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neural_projections.connectors.abstract_connector.AbstractConnector</span></code>, <a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/connectors.html#pyNN.connectors.DistanceDependentProbabilityConnector" title="(in PyNN v0.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyNN.connectors.DistanceDependentProbabilityConnector</span></code></a></p>
 <p>Make connections using a distribution which varies with distance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>d_expression</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – the right-hand side of a valid python expression for
-probability, involving ‘d’, e.g. “exp(-abs(d))”, or “d&lt;3”,
-that can be parsed by eval(), that computes the distance
+probability, involving <code class="docutils literal notranslate"><span class="pre">d</span></code>,
+(e.g. <code class="docutils literal notranslate"><span class="pre">&quot;exp(-abs(d))&quot;</span></code>, or <code class="docutils literal notranslate"><span class="pre">&quot;d</span> <span class="pre">&lt;</span> <span class="pre">3&quot;</span></code>),
+that can be parsed by <code class="docutils literal notranslate"><span class="pre">eval()</span></code>, that computes the distance
 dependent distribution.</p></li>
 <li><p><strong>allow_self_connections</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – if the connector is used to connect a Population to itself, this
 flag determines whether a neuron is allowed to connect to itself,
 or only to other neurons in the Population.</p></li>
-<li><p><strong>space</strong> (<a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/space.html#pyNN.space.Space" title="(in PyNN v0.9)"><em>Space</em></a>) – a Space object, needed if you wish to specify distance-dependent
-weights or delays.</p></li>
-<li><p><strong>safe</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – </p></li>
-<li><p><strong>callback</strong> (<em>callable</em>) – Ignored</p></li>
-<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – </p></li>
+<li><p><strong>safe</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – if <code class="docutils literal notranslate"><span class="pre">True</span></code>, check that weights and delays have valid values.
+If <code class="docutils literal notranslate"><span class="pre">False</span></code>, this check is skipped.</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Whether to output extra information about the connectivity to a
+CSV file</p></li>
 <li><p><strong>n_connections</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – The number of efferent synaptic connections per neuron.</p></li>
-<li><p><strong>rng</strong> (<a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.NumpyRNG" title="(in PyNN v0.9)"><em>NumpyRNG</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – Seeded random number generator, or None to make one when needed</p></li>
+<li><p><strong>rng</strong> (<a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.NumpyRNG" title="(in PyNN v0.9)"><em>NumpyRNG</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – Seeded random number generator, or <code class="docutils literal notranslate"><span class="pre">None</span></code> to make one when
+needed.</p></li>
+<li><p><strong>callback</strong> (<em>callable</em>) – </p></li>
 </ul>
 </dd>
 </dl>
@@ -1161,8 +1213,8 @@ or </em><a class="reference external" href="https://docs.python.org/3.6/library/
 
 <dl class="py class">
 <dt id="spynnaker.pyNN.models.neural_projections.connectors.FixedNumberPostConnector">
-<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neural_projections.connectors.</code><code class="sig-name descname">FixedNumberPostConnector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em>, <em class="sig-param"><span class="n">allow_self_connections</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">with_replacement</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">safe</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">callback</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">rng</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/fixed_number_post_connector.html#FixedNumberPostConnector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.FixedNumberPostConnector" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neural_projections.connectors.abstract_generate_connector_on_machine.AbstractGenerateConnectorOnMachine</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neural_projections.connectors.abstract_connector_supports_views_on_machine.AbstractConnectorSupportsViewsOnMachine</span></code></p>
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neural_projections.connectors.</code><code class="sig-name descname">FixedNumberPostConnector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em>, <em class="sig-param"><span class="n">allow_self_connections</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">safe</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">with_replacement</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">rng</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">callback</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/fixed_number_post_connector.html#FixedNumberPostConnector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.FixedNumberPostConnector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neural_projections.connectors.abstract_generate_connector_on_machine.AbstractGenerateConnectorOnMachine</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neural_projections.connectors.abstract_connector_supports_views_on_machine.AbstractConnectorSupportsViewsOnMachine</span></code>, <a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/connectors.html#pyNN.connectors.FixedNumberPostConnector" title="(in PyNN v0.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyNN.connectors.FixedNumberPostConnector</span></code></a></p>
 <p>Connects a fixed number of post-synaptic neurons selected at random,        to all pre-synaptic neurons.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1171,16 +1223,24 @@ or </em><a class="reference external" href="https://docs.python.org/3.6/library/
 <li><p><strong>allow_self_connections</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – if the connector is used to connect a Population to itself, this
 flag determines whether a neuron is allowed to connect to itself,
 or only to other neurons in the Population.</p></li>
+<li><p><strong>safe</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Whether to check that weights and delays have valid values;
+if <code class="docutils literal notranslate"><span class="pre">False</span></code>, this check is skipped.</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Whether to output extra information about the connectivity to a
+CSV file</p></li>
 <li><p><strong>with_replacement</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – this flag determines how the random selection of post-synaptic
-neurons is performed; if true, then every post-synaptic neuron
+neurons is performed; if <code class="docutils literal notranslate"><span class="pre">True</span></code>, then every post-synaptic neuron
 can be chosen on each occasion, and so multiple connections
-between neuron pairs are possible; if false, then once a
+between neuron pairs are possible; if <code class="docutils literal notranslate"><span class="pre">False</span></code>, then once a
 post-synaptic neuron has been connected to a pre-neuron, it can’t
 be connected again.</p></li>
-<li><p><strong>safe</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – </p></li>
-<li><p><strong>callback</strong> (<em>callable</em>) – Ignored</p></li>
-<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – </p></li>
-<li><p><strong>rng</strong> (<a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.NumpyRNG" title="(in PyNN v0.9)"><em>NumpyRNG</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – Seeded random number generator, or None to make one when needed</p></li>
+<li><p><strong>rng</strong> (<a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.NumpyRNG" title="(in PyNN v0.9)"><em>NumpyRNG</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – Seeded random number generator, or <code class="docutils literal notranslate"><span class="pre">None</span></code> to make one when
+needed.</p></li>
+<li><p><strong>callback</strong> (<em>callable</em>) – <p>if given, a callable that display a progress bar on the terminal.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Not supported by sPyNNaker.</p>
+</div>
+</p></li>
 </ul>
 </dd>
 </dl>
@@ -1357,8 +1417,8 @@ or </em><a class="reference external" href="https://docs.python.org/3.6/library/
 
 <dl class="py class">
 <dt id="spynnaker.pyNN.models.neural_projections.connectors.FixedNumberPreConnector">
-<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neural_projections.connectors.</code><code class="sig-name descname">FixedNumberPreConnector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em>, <em class="sig-param"><span class="n">allow_self_connections</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">with_replacement</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">safe</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">callback</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">rng</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/fixed_number_pre_connector.html#FixedNumberPreConnector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.FixedNumberPreConnector" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neural_projections.connectors.abstract_generate_connector_on_machine.AbstractGenerateConnectorOnMachine</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neural_projections.connectors.abstract_connector_supports_views_on_machine.AbstractConnectorSupportsViewsOnMachine</span></code></p>
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neural_projections.connectors.</code><code class="sig-name descname">FixedNumberPreConnector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em>, <em class="sig-param"><span class="n">allow_self_connections</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">safe</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">with_replacement</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">rng</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">callback</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/fixed_number_pre_connector.html#FixedNumberPreConnector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.FixedNumberPreConnector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neural_projections.connectors.abstract_generate_connector_on_machine.AbstractGenerateConnectorOnMachine</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neural_projections.connectors.abstract_connector_supports_views_on_machine.AbstractConnectorSupportsViewsOnMachine</span></code>, <a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/connectors.html#pyNN.connectors.FixedNumberPreConnector" title="(in PyNN v0.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyNN.connectors.FixedNumberPreConnector</span></code></a></p>
 <p>Connects a fixed number of pre-synaptic neurons selected at random,        to all post-synaptic neurons.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1367,16 +1427,23 @@ or </em><a class="reference external" href="https://docs.python.org/3.6/library/
 <li><p><strong>allow_self_connections</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – if the connector is used to connect a Population to itself,
 this flag determines whether a neuron is allowed to connect to
 itself, or only to other neurons in the Population.</p></li>
+<li><p><strong>safe</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Whether to check that weights and delays have valid values.
+If <code class="docutils literal notranslate"><span class="pre">False</span></code>, this check is skipped.</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Whether to output extra information about the connectivity to a
+CSV file</p></li>
 <li><p><strong>with_replacement</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – this flag determines how the random selection of pre-synaptic
 neurons is performed; if true, then every pre-synaptic neuron
 can be chosen on each occasion, and so multiple connections
 between neuron pairs are possible; if false, then once a
 pre-synaptic neuron has been connected to a post-neuron, it
 can’t be connected again.</p></li>
-<li><p><strong>safe</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – </p></li>
-<li><p><strong>callback</strong> (<em>callable</em>) – Ignored</p></li>
-<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – </p></li>
 <li><p><strong>rng</strong> (<a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.NumpyRNG" title="(in PyNN v0.9)"><em>NumpyRNG</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – Seeded random number generator, or None to make one when needed</p></li>
+<li><p><strong>callback</strong> (<em>callable</em>) – <p>if given, a callable that display a progress bar on the terminal.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Not supported by sPyNNaker.</p>
+</div>
+</p></li>
 </ul>
 </dd>
 </dl>
@@ -1553,18 +1620,28 @@ or </em><a class="reference external" href="https://docs.python.org/3.6/library/
 
 <dl class="py class">
 <dt id="spynnaker.pyNN.models.neural_projections.connectors.FixedProbabilityConnector">
-<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neural_projections.connectors.</code><code class="sig-name descname">FixedProbabilityConnector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">p_connect</span></em>, <em class="sig-param"><span class="n">allow_self_connections</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">safe</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">callback</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">rng</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/fixed_probability_connector.html#FixedProbabilityConnector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.FixedProbabilityConnector" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neural_projections.connectors.abstract_generate_connector_on_machine.AbstractGenerateConnectorOnMachine</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neural_projections.connectors.abstract_connector_supports_views_on_machine.AbstractConnectorSupportsViewsOnMachine</span></code></p>
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neural_projections.connectors.</code><code class="sig-name descname">FixedProbabilityConnector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">p_connect</span></em>, <em class="sig-param"><span class="n">allow_self_connections</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">safe</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">rng</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">callback</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/fixed_probability_connector.html#FixedProbabilityConnector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.FixedProbabilityConnector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neural_projections.connectors.abstract_generate_connector_on_machine.AbstractGenerateConnectorOnMachine</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neural_projections.connectors.abstract_connector_supports_views_on_machine.AbstractConnectorSupportsViewsOnMachine</span></code>, <a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/connectors.html#pyNN.connectors.FixedProbabilityConnector" title="(in PyNN v0.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyNN.connectors.FixedProbabilityConnector</span></code></a></p>
 <p>For each pair of pre-post cells, the connection probability is constant.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>p_connect</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – a float between zero and one. Each potential connection is created            with this probability.</p></li>
-<li><p><strong>allow_self_connections</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – if the connector is used to connect a Population to itself, this            flag determines whether a neuron is allowed to connect to itself,            or only to other neurons in the Population.</p></li>
-<li><p><strong>safe</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – </p></li>
-<li><p><strong>callback</strong> (<em>callable</em>) – Ignored</p></li>
-<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – </p></li>
+<li><p><strong>p_connect</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – a value between zero and one. Each potential connection is created
+with this probability.</p></li>
+<li><p><strong>allow_self_connections</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – if the connector is used to connect a Population to itself, this
+flag determines whether a neuron is allowed to connect to itself,
+or only to other neurons in the Population.</p></li>
+<li><p><strong>safe</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, check that weights and delays have valid values.
+If <code class="docutils literal notranslate"><span class="pre">False</span></code>, this check is skipped.</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Whether to output extra information about the connectivity to a
+CSV file</p></li>
 <li><p><strong>rng</strong> (<a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.NumpyRNG" title="(in PyNN v0.9)"><em>NumpyRNG</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – Seeded random number generator, or None to make one when needed</p></li>
+<li><p><strong>callback</strong> (<em>callable</em>) – <p>if given, a callable that display a progress bar on the terminal.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Not supported by sPyNNaker.</p>
+</div>
+</p></li>
 </ul>
 </dd>
 </dl>
@@ -1724,32 +1801,105 @@ or </em><a class="reference external" href="https://docs.python.org/3.6/library/
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.neural_projections.connectors.FixedProbabilityConnector.p_connect">
+<em class="property">property </em><code class="sig-name descname">p_connect</code><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.FixedProbabilityConnector.p_connect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker.pyNN.models.neural_projections.connectors.FromFileConnector">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neural_projections.connectors.</code><code class="sig-name descname">FromFileConnector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span></em>, <em class="sig-param"><span class="n">distributed</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">safe</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">callback</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/from_file_connector.html#FromFileConnector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.FromFileConnector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neural_projections.connectors.from_list_connector.FromListConnector</span></code>, <a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/connectors.html#pyNN.connectors.FromFileConnector" title="(in PyNN v0.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyNN.connectors.FromFileConnector</span></code></a></p>
+<p>Make connections according to a list read from a file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/io.html#io.FileIO" title="(in Python v3.6)"><em>FileIO</em></a>) – <p>Either an open file object or the filename of a file containing a
+list of connections, in the format required by
+<a class="reference internal" href="#spynnaker.pyNN.models.neural_projections.connectors.FromListConnector" title="spynnaker.pyNN.models.neural_projections.connectors.FromListConnector"><code class="xref py py-class docutils literal notranslate"><span class="pre">FromListConnector</span></code></a>.
+Column headers, if included in the file, must be specified using
+a list or tuple, e.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># columns = [&quot;i&quot;, &quot;j&quot;, &quot;weight&quot;, &quot;delay&quot;, &quot;U&quot;, &quot;tau_rec&quot;]</span>
+</pre></div>
+</div>
+<p>Note that the header requires <cite>#</cite> at the beginning of the line.</p>
+</p></li>
+<li><p><strong>distributed</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – <p>Basic pyNN says:</p>
+<blockquote>
+<div><p>if this is <code class="docutils literal notranslate"><span class="pre">True</span></code>, then each node will read connections from
+a file called <code class="docutils literal notranslate"><span class="pre">filename.x</span></code>, where <code class="docutils literal notranslate"><span class="pre">x</span></code> is the MPI rank. This
+speeds up loading connections for distributed simulations.</p>
+</div></blockquote>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Always leave this as <code class="docutils literal notranslate"><span class="pre">False</span></code> with sPyNNaker, which is not
+MPI-based.</p>
+</div>
+</p></li>
+<li><p><strong>safe</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Whether to check that weights and delays have valid values.
+If <code class="docutils literal notranslate"><span class="pre">False</span></code>, this check is skipped.</p></li>
+<li><p><strong>callback</strong> (<em>callable</em>) – <p>if given, a callable that display a progress bar on the terminal.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Not supported by sPyNNaker.</p>
+</div>
+</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Whether to output extra information about the connectivity to a
+CSV file</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.neural_projections.connectors.FromFileConnector.get_reader">
+<code class="sig-name descname">get_reader</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/from_file_connector.html#FromFileConnector.get_reader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.FromFileConnector.get_reader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a file reader object using the PyNN methods.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A pynn StandardTextFile or similar</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>StandardTextFile</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
 <dt id="spynnaker.pyNN.models.neural_projections.connectors.FromListConnector">
-<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neural_projections.connectors.</code><code class="sig-name descname">FromListConnector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">conn_list</span></em>, <em class="sig-param"><span class="n">safe</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">callback</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">column_names</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/from_list_connector.html#FromListConnector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.FromListConnector" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neural_projections.connectors.</code><code class="sig-name descname">FromListConnector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">conn_list</span></em>, <em class="sig-param"><span class="n">safe</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">column_names</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">callback</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/from_list_connector.html#FromListConnector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.FromListConnector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neural_projections.connectors.abstract_connector.AbstractConnector</span></code></p>
 <p>Make connections according to a list.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>conn_list</strong> (<a class="reference external" href="https://numpy.org/doc/1.19/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#tuple" title="(in Python v3.6)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>,</em><em>..</em><em>)</em><em>)</em>) – <p>a list of tuples, one tuple for each connection. Each
-tuple should contain at least:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">pre_idx</span><span class="p">,</span> <span class="n">post_idx</span><span class="p">)</span>
+<li><p><strong>conn_list</strong> (<a class="reference external" href="https://numpy.org/doc/1.19/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#tuple" title="(in Python v3.6)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>,</em><em>..</em><em>)</em><em>)</em>) – <p>A numpy array or a list of tuples, one tuple for each connection.
+Each tuple should contain:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">pre_idx</span><span class="p">,</span> <span class="n">post_idx</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="n">pn</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>where <code class="docutils literal notranslate"><span class="pre">pre_idx</span></code> is the index (i.e. order in the Population,
-not the ID) of the presynaptic neuron, and <code class="docutils literal notranslate"><span class="pre">post_idx</span></code> is
-the index of the postsynaptic neuron.</p>
-<p>Additional items per synapse are acceptable but all synapses
-should have the same number of items.</p>
+not the ID) of the presynaptic neuron, <code class="docutils literal notranslate"><span class="pre">post_idx</span></code> is
+the index of the postsynaptic neuron, and
+<code class="docutils literal notranslate"><span class="pre">p1</span></code>, <code class="docutils literal notranslate"><span class="pre">p2</span></code>, etc. are the synaptic parameters (e.g.,
+weight, delay, plasticity parameters).
+All tuples/rows must have the same number of items.</p>
 </p></li>
-<li><p><strong>safe</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – </p></li>
-<li><p><strong>callback</strong> (<em>callable</em>) – Ignored</p></li>
-<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – </p></li>
-<li><p><strong>column_names</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>)</em>) – If not None, must have same length as number of
-extra columns in <code class="docutils literal notranslate"><span class="pre">conn_list</span></code> (i.e., after the first two).</p></li>
+<li><p><strong>safe</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – if <code class="docutils literal notranslate"><span class="pre">True</span></code>, check that weights and delays have valid values.
+If <code class="docutils literal notranslate"><span class="pre">False</span></code>, this check is skipped.</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Whether to output extra information about the connectivity to a
+CSV file</p></li>
+<li><p><strong>column_names</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#tuple" title="(in Python v3.6)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>)</em>) – the names of the parameters <code class="docutils literal notranslate"><span class="pre">p1</span></code>, <code class="docutils literal notranslate"><span class="pre">p2</span></code>, etc.
+If not provided, it is assumed the parameters are <code class="docutils literal notranslate"><span class="pre">weight,</span> <span class="pre">delay</span></code>
+(for backwards compatibility).</p></li>
+<li><p><strong>callback</strong> (<em>callable</em>) – <p>if given, a callable that display a progress bar on the terminal.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Not supported by sPyNNaker.</p>
+</div>
+</p></li>
 </ul>
 </dd>
 </dl>
@@ -1782,8 +1932,11 @@ extra columns in <code class="docutils literal notranslate"><span class="pre">co
 <p>Typically used to determine if a Machine Edge should be created by
 checking that at least one of the indexes in the pre slice could
 over time connect to at least one of the indexes in the post slice.</p>
-<p>note: This method should never return a false negative,
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This method should never return a false negative,
 but may return a false positives</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1791,6 +1944,9 @@ but may return a false positives</p>
 <li><p><strong>_post_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN)"><em>Slice</em></a>) – </p></li>
 <li><p><strong>_synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) – </p></li>
 </ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2008,14 +2164,24 @@ or </em><a class="reference external" href="https://docs.python.org/3.6/library/
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>index_expression</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – the right-hand side of a valid python expression for
 probability, involving the indices of the pre and post populations,
-that can be parsed by eval(), that computes a probability dist.</p></li>
+that can be parsed by eval(), that computes a probability dist;
+the indices will be given as variables <code class="docutils literal notranslate"><span class="pre">i</span></code> and <code class="docutils literal notranslate"><span class="pre">j</span></code> when the
+expression is evaluated.</p></li>
 <li><p><strong>allow_self_connections</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – if the connector is used to connect a Population to itself, this
 flag determines whether a neuron is allowed to connect to itself,
 or only to other neurons in the Population.</p></li>
-<li><p><strong>rng</strong> (<a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.NumpyRNG" title="(in PyNN v0.9)"><em>NumpyRNG</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – Seeded random number generator, or None to make one when needed</p></li>
-<li><p><strong>safe</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – </p></li>
-<li><p><strong>callback</strong> (<em>callable</em>) – Ignored</p></li>
-<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – </p></li>
+<li><p><strong>rng</strong> (<a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.NumpyRNG" title="(in PyNN v0.9)"><em>NumpyRNG</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – Seeded random number generator, or <code class="docutils literal notranslate"><span class="pre">None</span></code> to make one when
+needed.</p></li>
+<li><p><strong>safe</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Whether to check that weights and delays have valid values.
+If <code class="docutils literal notranslate"><span class="pre">False</span></code>, this check is skipped.</p></li>
+<li><p><strong>callback</strong> (<em>callable</em>) – <p>if given, a callable that display a progress bar on the terminal.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Not supported by sPyNNaker.</p>
+</div>
+</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Whether to output extra information about the connectivity to a
+CSV file</p></li>
 </ul>
 </dd>
 </dl>
@@ -2158,7 +2324,7 @@ or </em><a class="reference external" href="https://docs.python.org/3.6/library/
 
 <dl class="py class">
 <dt id="spynnaker.pyNN.models.neural_projections.connectors.KernelConnector">
-<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neural_projections.connectors.</code><code class="sig-name descname">KernelConnector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">shape_pre</span></em>, <em class="sig-param"><span class="n">shape_post</span></em>, <em class="sig-param"><span class="n">shape_kernel</span></em>, <em class="sig-param"><span class="n">weight_kernel</span></em>, <em class="sig-param"><span class="n">delay_kernel</span></em>, <em class="sig-param"><span class="n">shape_common</span></em>, <em class="sig-param"><span class="n">pre_sample_steps_in_post</span></em>, <em class="sig-param"><span class="n">pre_start_coords_in_post</span></em>, <em class="sig-param"><span class="n">post_sample_steps_in_pre</span></em>, <em class="sig-param"><span class="n">post_start_coords_in_pre</span></em>, <em class="sig-param"><span class="n">safe</span></em>, <em class="sig-param"><span class="n">verbose</span></em>, <em class="sig-param"><span class="n">callback</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/kernel_connector.html#KernelConnector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.KernelConnector" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neural_projections.connectors.</code><code class="sig-name descname">KernelConnector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">shape_pre</span></em>, <em class="sig-param"><span class="n">shape_post</span></em>, <em class="sig-param"><span class="n">shape_kernel</span></em>, <em class="sig-param"><span class="n">weight_kernel</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">delay_kernel</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">shape_common</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">pre_sample_steps_in_post</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">pre_start_coords_in_post</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">post_sample_steps_in_pre</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">post_start_coords_in_pre</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">safe</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">space</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">callback</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/kernel_connector.html#KernelConnector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.KernelConnector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neural_projections.connectors.abstract_generate_connector_on_machine.AbstractGenerateConnectorOnMachine</span></code></p>
 <p>Where the pre- and post-synaptic populations are considered as a 2D    array. Connect every post(row, col) neuron to many pre(row, col, kernel)    through a (kernel) set of weights and/or delays.</p>
 <div class="admonition-todo admonition">
@@ -2187,8 +2353,11 @@ Starting row/col for pre sampling &lt;=&gt; (offX, offY)</p></li>
 Sampling steps/jumps for post pop &lt;=&gt; (stepX, stepY)</p></li>
 <li><p><strong>post_start_coords_in_pre</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#tuple" title="(in Python v3.6)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em>) – (optional)
 Starting row/col for post sampling &lt;=&gt; (offX, offY)</p></li>
-<li><p><strong>safe</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – </p></li>
-<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – </p></li>
+<li><p><strong>safe</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Whether to check that weights and delays have valid values.
+If <code class="docutils literal notranslate"><span class="pre">False</span></code>, this check is skipped.</p></li>
+<li><p><strong>space</strong> (<a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/space.html#pyNN.space.Space" title="(in PyNN v0.9)"><em>Space</em></a>) – Currently ignored; for future compatibility.</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Whether to output extra information about the connectivity to a
+CSV file</p></li>
 <li><p><strong>callback</strong> (<em>callable</em>) – (ignored)</p></li>
 </ul>
 </dd>
@@ -2445,19 +2614,27 @@ or </em><a class="reference external" href="https://docs.python.org/3.6/library/
 
 <dl class="py class">
 <dt id="spynnaker.pyNN.models.neural_projections.connectors.MultapseConnector">
-<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neural_projections.connectors.</code><code class="sig-name descname">MultapseConnector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">num_synapses</span></em>, <em class="sig-param"><span class="n">allow_self_connections</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">with_replacement</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">safe</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">callback</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">rng</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/multapse_connector.html#MultapseConnector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.MultapseConnector" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neural_projections.connectors.</code><code class="sig-name descname">MultapseConnector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em>, <em class="sig-param"><span class="n">allow_self_connections</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">with_replacement</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">safe</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">rng</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">callback</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/multapse_connector.html#MultapseConnector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.MultapseConnector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neural_projections.connectors.abstract_generate_connector_on_machine.AbstractGenerateConnectorOnMachine</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neural_projections.connectors.abstract_connector_supports_views_on_machine.AbstractConnectorSupportsViewsOnMachine</span></code></p>
 <p>Create a multapse connector. The size of the source and destination        populations are obtained when the projection is connected. The number        of synapses is specified. when instantiated, the required number of        synapses is created by selecting at random from the source and target        populations with replacement. Uniform selection probability is assumed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>num_synapses</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – This is the total number of synapses in the connection.</p></li>
+<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – This is the total number of synapses in the connection.</p></li>
 <li><p><strong>allow_self_connections</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Allow a neuron to connect to itself or not.</p></li>
 <li><p><strong>with_replacement</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – When selecting, allow a neuron to be re-selected or not.</p></li>
-<li><p><strong>safe</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – </p></li>
-<li><p><strong>callback</strong> (<em>callable</em>) – Ignored</p></li>
-<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – </p></li>
-<li><p><strong>rng</strong> (<a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.NumpyRNG" title="(in PyNN v0.9)"><em>NumpyRNG</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – Seeded random number generator, or None to make one when needed</p></li>
+<li><p><strong>safe</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Whether to check that weights and delays have valid values.
+If <code class="docutils literal notranslate"><span class="pre">False</span></code>, this check is skipped.</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Whether to output extra information about the connectivity to a
+CSV file</p></li>
+<li><p><strong>rng</strong> (<a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.NumpyRNG" title="(in PyNN v0.9)"><em>NumpyRNG</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – Seeded random number generator, or <code class="docutils literal notranslate"><span class="pre">None</span></code> to make one when
+needed.</p></li>
+<li><p><strong>callback</strong> (<em>callable</em>) – <p>if given, a callable that display a progress bar on the terminal.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Not supported by sPyNNaker.</p>
+</div>
+</p></li>
 </ul>
 </dd>
 </dl>
@@ -2605,7 +2782,7 @@ or </em><a class="reference external" href="https://docs.python.org/3.6/library/
 
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neural_projections.connectors.MultapseConnector.get_rng_next">
-<em class="property">abstract </em><code class="sig-name descname">get_rng_next</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">num_synapses</span></em>, <em class="sig-param"><span class="n">prob_connect</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/multapse_connector.html#MultapseConnector.get_rng_next"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.MultapseConnector.get_rng_next" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_rng_next</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">num_synapses</span></em>, <em class="sig-param"><span class="n">prob_connect</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/multapse_connector.html#MultapseConnector.get_rng_next"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.MultapseConnector.get_rng_next" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the required RNGs</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -2638,16 +2815,22 @@ or </em><a class="reference external" href="https://docs.python.org/3.6/library/
 
 <dl class="py class">
 <dt id="spynnaker.pyNN.models.neural_projections.connectors.OneToOneConnector">
-<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neural_projections.connectors.</code><code class="sig-name descname">OneToOneConnector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">random_number_class</span></em>, <em class="sig-param"><span class="n">safe</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">callback</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/one_to_one_connector.html#OneToOneConnector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.OneToOneConnector" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neural_projections.connectors.abstract_generate_connector_on_machine.AbstractGenerateConnectorOnMachine</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neural_projections.connectors.abstract_connector_supports_views_on_machine.AbstractConnectorSupportsViewsOnMachine</span></code></p>
-<p>Where the pre- and postsynaptic populations have the same size,        connect cell i in the presynaptic pynn_population.py to cell i in the        postsynaptic pynn_population.py for all i.</p>
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neural_projections.connectors.</code><code class="sig-name descname">OneToOneConnector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">safe</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">callback</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/one_to_one_connector.html#OneToOneConnector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.OneToOneConnector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neural_projections.connectors.abstract_generate_connector_on_machine.AbstractGenerateConnectorOnMachine</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neural_projections.connectors.abstract_connector_supports_views_on_machine.AbstractConnectorSupportsViewsOnMachine</span></code>, <a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/connectors.html#pyNN.connectors.OneToOneConnector" title="(in PyNN v0.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyNN.connectors.OneToOneConnector</span></code></a></p>
+<p>Where the pre- and postsynaptic populations have the same size,        connect cell <em>i</em> in the presynaptic population to cell <em>i</em> in        the postsynaptic population, for all <em>i</em>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>random_number_class</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#type" title="(in Python v3.6)"><em>type</em></a>) – </p></li>
-<li><p><strong>safe</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – </p></li>
-<li><p><strong>callback</strong> (<em>callable</em>) – Ignored</p></li>
-<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – </p></li>
+<li><p><strong>safe</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, check that weights and delays have valid values.
+If <code class="docutils literal notranslate"><span class="pre">False</span></code>, this check is skipped.</p></li>
+<li><p><strong>callback</strong> (<em>callable</em>) – <p>if given, a callable that display a progress bar on the terminal.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Not supported by sPyNNaker.</p>
+</div>
+</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Whether to output extra information about the connectivity to a
+CSV file</p></li>
 </ul>
 </dd>
 </dl>
@@ -2658,8 +2841,11 @@ or </em><a class="reference external" href="https://docs.python.org/3.6/library/
 <p>Typically used to determine if a Machine Edge should be created by
 checking that at least one of the indexes in the pre slice could
 over time connect to at least one of the indexes in the post slice.</p>
-<p>note: This method should never return a false negative,
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This method should never return a false negative,
 but may return a false positives</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -2667,6 +2853,9 @@ but may return a false positives</p>
 <li><p><strong>_post_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN)"><em>Slice</em></a>) – </p></li>
 <li><p><strong>_synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) – </p></li>
 </ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2834,6 +3023,9 @@ or </em><a class="reference external" href="https://docs.python.org/3.6/library/
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) – </p>
 </dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></p>
+</dd>
 </dl>
 </dd></dl>
 
@@ -2843,17 +3035,33 @@ or </em><a class="reference external" href="https://docs.python.org/3.6/library/
 <dt id="spynnaker.pyNN.models.neural_projections.connectors.SmallWorldConnector">
 <em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neural_projections.connectors.</code><code class="sig-name descname">SmallWorldConnector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">degree</span></em>, <em class="sig-param"><span class="n">rewiring</span></em>, <em class="sig-param"><span class="n">allow_self_connections</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">n_connections</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">rng</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">safe</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">callback</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/small_world_connector.html#SmallWorldConnector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.SmallWorldConnector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neural_projections.connectors.abstract_connector.AbstractConnector</span></code></p>
+<p>A connector that uses connection statistics based on the Small World        network connectivity model.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is typically used from a population to itself.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>degree</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – </p></li>
-<li><p><strong>rewiring</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – </p></li>
-<li><p><strong>allow_self_connections</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – </p></li>
-<li><p><strong>n_connections</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – </p></li>
-<li><p><strong>rng</strong> (<a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.NumpyRNG" title="(in PyNN v0.9)"><em>NumpyRNG</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – Seeded random number generator, or None to make one when needed</p></li>
-<li><p><strong>safe</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – </p></li>
-<li><p><strong>callback</strong> (<em>callable</em>) – Ignored</p></li>
-<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – </p></li>
+<li><p><strong>degree</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – the region length where nodes will be connected locally</p></li>
+<li><p><strong>rewiring</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – the probability of rewiring each edge</p></li>
+<li><p><strong>allow_self_connections</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – if the connector is used to connect a Population to itself, this
+flag determines whether a neuron is allowed to connect to itself,
+or only to other neurons in the Population.</p></li>
+<li><p><strong>n_connections</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – if specified, the number of efferent synaptic connections per
+neuron</p></li>
+<li><p><strong>rng</strong> (<a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.NumpyRNG" title="(in PyNN v0.9)"><em>NumpyRNG</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – Seeded random number generator, or <code class="docutils literal notranslate"><span class="pre">None</span></code> to make one when
+needed.</p></li>
+<li><p><strong>safe</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, check that weights and delays have valid values.
+If <code class="docutils literal notranslate"><span class="pre">False</span></code>, this check is skipped.</p></li>
+<li><p><strong>callback</strong> (<em>callable</em>) – <p>if given, a callable that display a progress bar on the terminal.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Not supported by sPyNNaker.</p>
+</div>
+</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Whether to output extra information about the connectivity to a
+CSV file</p></li>
 </ul>
 </dd>
 </dl>
@@ -3050,7 +3258,7 @@ or </em><a class="reference external" href="https://docs.python.org/3.6/library/
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2017.
+        &#169; Copyright 2014-2021.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
     </div>
   </body>

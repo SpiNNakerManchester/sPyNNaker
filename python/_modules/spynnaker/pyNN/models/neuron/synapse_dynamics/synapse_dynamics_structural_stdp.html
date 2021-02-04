@@ -53,16 +53,16 @@
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">from</span> <span class="nn">pyNN.standardmodels.synapses</span> <span class="kn">import</span> <span class="n">StaticSynapse</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SynapticConfigurationException</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.utility_calls</span> <span class="kn">import</span> <span class="n">create_mars_kiss_seeds</span>
 <span class="kn">from</span> <span class="nn">.abstract_synapse_dynamics_structural</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractSynapseDynamicsStructural</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.synapse_dynamics_stdp</span> <span class="kn">import</span> <span class="n">SynapseDynamicsSTDP</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.synapse_dynamics.</span>\
-    <span class="n">synapse_dynamics_structural_common</span> <span class="kn">import</span> <span class="p">(</span>
-        <span class="n">DEFAULT_F_REW</span><span class="p">,</span> <span class="n">DEFAULT_INITIAL_WEIGHT</span><span class="p">,</span> <span class="n">DEFAULT_INITIAL_DELAY</span><span class="p">,</span>
-        <span class="n">DEFAULT_S_MAX</span><span class="p">,</span> <span class="n">SynapseDynamicsStructuralCommon</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SynapticConfigurationException</span>
+<span class="kn">from</span> <span class="nn">.synapse_dynamics_structural_common</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DEFAULT_F_REW</span><span class="p">,</span> <span class="n">DEFAULT_INITIAL_WEIGHT</span><span class="p">,</span> <span class="n">DEFAULT_INITIAL_DELAY</span><span class="p">,</span>
+    <span class="n">DEFAULT_S_MAX</span><span class="p">,</span> <span class="n">SynapseDynamicsStructuralCommon</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="SynapseDynamicsStructuralSTDP"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralSTDP">[docs]</a><span class="k">class</span> <span class="nc">SynapseDynamicsStructuralSTDP</span><span class="p">(</span>
@@ -115,14 +115,17 @@
             <span class="n">voltage_dependence</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dendritic_delay_fraction</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
             <span class="n">f_rew</span><span class="o">=</span><span class="n">DEFAULT_F_REW</span><span class="p">,</span> <span class="n">initial_weight</span><span class="o">=</span><span class="n">DEFAULT_INITIAL_WEIGHT</span><span class="p">,</span>
             <span class="n">initial_delay</span><span class="o">=</span><span class="n">DEFAULT_INITIAL_DELAY</span><span class="p">,</span> <span class="n">s_max</span><span class="o">=</span><span class="n">DEFAULT_S_MAX</span><span class="p">,</span>
-            <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">delay</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">backprop_delay</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="n">StaticSynapse</span><span class="o">.</span><span class="n">default_parameters</span><span class="p">[</span><span class="s1">&#39;weight&#39;</span><span class="p">],</span>
+            <span class="n">delay</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">backprop_delay</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param AbstractPartnerSelection partner_selection:</span>
 <span class="sd">            The partner selection rule</span>
 <span class="sd">        :param AbstractFormation formation: The formation rule</span>
 <span class="sd">        :param AbstractElimination elimination: The elimination rule</span>
 <span class="sd">        :param AbstractTimingDependence timing_dependence:</span>
+<span class="sd">            The STDP timing dependence rule</span>
 <span class="sd">        :param AbstractWeightDependence weight_dependence:</span>
+<span class="sd">            The STDP weight dependence rule</span>
 <span class="sd">        :param None voltage_dependence:</span>
 <span class="sd">            The STDP voltage dependence (unsupported)</span>
 <span class="sd">        :param float dendritic_delay_fraction:</span>
@@ -138,9 +141,12 @@
 <span class="sd">            values</span>
 <span class="sd">        :type initial_delay: float or tuple(float, float)</span>
 <span class="sd">        :param int s_max: Maximum fan-in per target layer neuron</span>
-<span class="sd">        :param int seed: seed the random number generators</span>
+<span class="sd">        :param seed: seed for the random number generators</span>
+<span class="sd">        :type seed: int or None</span>
 <span class="sd">        :param float weight: The weight of connections formed by the connector</span>
-<span class="sd">        :param float delay: The delay of connections formed by the connector</span>
+<span class="sd">        :param delay: The delay of connections formed by the connector</span>
+<span class="sd">            Use ``None`` to get the simulator default minimum delay.</span>
+<span class="sd">        :type delay: float or None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">SynapseDynamicsSTDP</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">timing_dependence</span><span class="p">,</span> <span class="n">weight_dependence</span><span class="p">,</span> <span class="n">voltage_dependence</span><span class="p">,</span>
@@ -149,7 +155,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__partner_selection</span> <span class="o">=</span> <span class="n">partner_selection</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__formation</span> <span class="o">=</span> <span class="n">formation</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__elimination</span> <span class="o">=</span> <span class="n">elimination</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__f_rew</span> <span class="o">=</span> <span class="n">f_rew</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__f_rew</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">f_rew</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__p_rew</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">__f_rew</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__initial_weight</span> <span class="o">=</span> <span class="n">initial_weight</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__initial_delay</span> <span class="o">=</span> <span class="n">initial_delay</span>
@@ -342,7 +348,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2017.
+        &#169; Copyright 2014-2021.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
     </div>
   </body>

@@ -52,8 +52,6 @@
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">pacman.model.constraints.key_allocator_constraints</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">FixedKeyAndMaskConstraint</span><span class="p">)</span>
@@ -67,8 +65,6 @@
     <span class="n">ProvidesKeyToAtomMappingImpl</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utility_models</span> <span class="kn">import</span> <span class="n">MultiCastCommand</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SpynnakerException</span>
-
-<span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
 
 
 <span class="k">def</span> <span class="nf">get_y_from_fpga_retina</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
@@ -107,7 +103,7 @@
     <span class="k">return</span> <span class="kc">None</span>
 
 
-<div class="viewcode-block" id="ExternalFPGARetinaDevice"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.ExternalFPGARetinaDevice">[docs]</a><span class="k">class</span> <span class="nc">ExternalFPGARetinaDevice</span><span class="p">(</span>
+<div class="viewcode-block" id="ExternalFPGARetinaDevice"><a class="viewcode-back" href="../../../../spynnaker8.external_devices.html#spynnaker.pyNN.external_devices_models.ExternalFPGARetinaDevice">[docs]</a><span class="k">class</span> <span class="nc">ExternalFPGARetinaDevice</span><span class="p">(</span>
         <span class="n">ApplicationSpiNNakerLinkVertex</span><span class="p">,</span> <span class="n">AbstractSendMeMulticastCommandsVertex</span><span class="p">,</span>
         <span class="n">AbstractProvidesOutgoingPartitionConstraints</span><span class="p">,</span>
         <span class="n">ProvidesKeyToAtomMappingImpl</span><span class="p">):</span>
@@ -163,7 +159,7 @@
         <span class="k">raise</span> <span class="n">SpynnakerException</span><span class="p">(</span>
             <span class="s2">&quot;the FPGA retina does not recognise this mode&quot;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="ExternalFPGARetinaDevice.get_n_neurons"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.ExternalFPGARetinaDevice.get_n_neurons">[docs]</a>    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="ExternalFPGARetinaDevice.get_n_neurons"><a class="viewcode-back" href="../../../../spynnaker8.external_devices.html#spynnaker.pyNN.external_devices_models.ExternalFPGARetinaDevice.get_n_neurons">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">get_n_neurons</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">polarity</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="n">ExternalFPGARetinaDevice</span><span class="o">.</span><span class="n">MODE_128</span><span class="p">:</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">polarity</span> <span class="o">==</span> <span class="n">ExternalFPGARetinaDevice</span><span class="o">.</span><span class="n">UP_POLARITY</span> <span class="ow">or</span>
@@ -205,7 +201,7 @@
     <span class="k">def</span> <span class="nf">timed_commands</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">[]</span>
 
-<div class="viewcode-block" id="ExternalFPGARetinaDevice.get_outgoing_partition_constraints"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.ExternalFPGARetinaDevice.get_outgoing_partition_constraints">[docs]</a>    <span class="k">def</span> <span class="nf">get_outgoing_partition_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">partition</span><span class="p">):</span>
+<div class="viewcode-block" id="ExternalFPGARetinaDevice.get_outgoing_partition_constraints"><a class="viewcode-back" href="../../../../spynnaker8.external_devices.html#spynnaker.pyNN.external_devices_models.ExternalFPGARetinaDevice.get_outgoing_partition_constraints">[docs]</a>    <span class="k">def</span> <span class="nf">get_outgoing_partition_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">partition</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">FixedKeyAndMaskConstraint</span><span class="p">([</span>
             <span class="n">BaseKeyAndMask</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__fixed_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__fixed_mask</span><span class="p">)])]</span></div></div>
 </pre></div>
@@ -245,7 +241,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2017.
+        &#169; Copyright 2014-2021.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
     </div>
   </body>

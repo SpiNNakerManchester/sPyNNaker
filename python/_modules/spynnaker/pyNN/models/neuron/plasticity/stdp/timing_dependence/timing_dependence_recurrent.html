@@ -53,12 +53,10 @@
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> \
-    <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">data_specification.enums</span> <span class="kn">import</span> <span class="n">DataType</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">BYTES_PER_WORD</span><span class="p">,</span> <span class="n">BYTES_PER_SHORT</span><span class="p">)</span>
+    <span class="n">BYTES_PER_WORD</span><span class="p">,</span> <span class="n">BYTES_PER_SHORT</span><span class="p">,</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.abstract_timing_dependence</span> <span class="kn">import</span> <span class="n">AbstractTimingDependence</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">SynapseStructureWeightAccumulator</span><span class="p">)</span>
@@ -75,7 +73,9 @@
         <span class="s2">&quot;__dual_fsm&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__mean_post_window&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__mean_pre_window&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__synapse_structure&quot;</span><span class="p">]</span>
+        <span class="s2">&quot;__synapse_structure&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__a_plus&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__a_minus&quot;</span><span class="p">]</span>
 
     <span class="n">default_parameters</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s1">&#39;accumulator_depression&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">6</span><span class="p">,</span> <span class="s1">&#39;accumulator_potentiation&#39;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>
@@ -88,7 +88,17 @@
                 <span class="s1">&#39;accumulator_potentiation&#39;</span><span class="p">],</span>
             <span class="n">mean_pre_window</span><span class="o">=</span><span class="n">default_parameters</span><span class="p">[</span><span class="s1">&#39;mean_pre_window&#39;</span><span class="p">],</span>
             <span class="n">mean_post_window</span><span class="o">=</span><span class="n">default_parameters</span><span class="p">[</span><span class="s1">&#39;mean_post_window&#39;</span><span class="p">],</span>
-            <span class="n">dual_fsm</span><span class="o">=</span><span class="n">default_parameters</span><span class="p">[</span><span class="s1">&#39;dual_fsm&#39;</span><span class="p">]):</span>
+            <span class="n">dual_fsm</span><span class="o">=</span><span class="n">default_parameters</span><span class="p">[</span><span class="s1">&#39;dual_fsm&#39;</span><span class="p">],</span>
+            <span class="n">A_plus</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">A_minus</span><span class="o">=</span><span class="mf">0.01</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param int accumulator_depression:</span>
+<span class="sd">        :param int accumulator_potentiation:</span>
+<span class="sd">        :param float mean_pre_window:</span>
+<span class="sd">        :param float mean_post_window:</span>
+<span class="sd">        :param bool dual_fsm:</span>
+<span class="sd">        :param float A_plus: :math:`A^+`</span>
+<span class="sd">        :param float A_minus: :math:`A^-`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__accumulator_depression_plus_one</span> <span class="o">=</span> <span class="n">accumulator_depression</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__accumulator_potentiation_minus_one</span> <span class="o">=</span> \
@@ -96,8 +106,34 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__mean_pre_window</span> <span class="o">=</span> <span class="n">mean_pre_window</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__mean_post_window</span> <span class="o">=</span> <span class="n">mean_post_window</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__dual_fsm</span> <span class="o">=</span> <span class="n">dual_fsm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__a_plus</span> <span class="o">=</span> <span class="n">A_plus</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__a_minus</span> <span class="o">=</span> <span class="n">A_minus</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_structure</span> <span class="o">=</span> <span class="n">SynapseStructureWeightAccumulator</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">A_plus</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; :math:`A^+`</span>
+
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__a_plus</span>
+
+    <span class="nd">@A_plus</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">A_plus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__a_plus</span> <span class="o">=</span> <span class="n">new_value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">A_minus</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; :math:`A^-`</span>
+
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__a_minus</span>
+
+    <span class="nd">@A_minus</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">A_minus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__a_minus</span> <span class="o">=</span> <span class="n">new_value</span>
 
 <div class="viewcode-block" id="TimingDependenceRecurrent.is_same_as"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceRecurrent.is_same_as">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractTimingDependence</span><span class="o">.</span><span class="n">is_same_as</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">is_same_as</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timing_dependence</span><span class="p">):</span>
@@ -229,7 +265,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2017.
+        &#169; Copyright 2014-2021.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
     </div>
   </body>

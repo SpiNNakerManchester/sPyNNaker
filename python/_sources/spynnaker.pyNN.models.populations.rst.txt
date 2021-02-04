@@ -1,0 +1,10 @@
+spynnaker.pyNN.models.populations package
+=========================================
+
+Module contents
+---------------
+
+.. automodule:: spynnaker.pyNN.models.populations
+   :members:
+   :undoc-members:
+   :show-inheritance:

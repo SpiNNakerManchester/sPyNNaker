@@ -67,6 +67,7 @@
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.utility_objs</span> <span class="kn">import</span> <span class="n">ProvenanceDataItem</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.abstract_base</span> <span class="kn">import</span> <span class="n">AbstractBase</span><span class="p">,</span> <span class="n">abstractmethod</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities</span> <span class="kn">import</span> <span class="n">utility_calls</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SpynnakerException</span>
 
 <span class="c1"># global objects</span>
 <span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
@@ -82,6 +83,7 @@
 <div class="viewcode-block" id="AbstractConnector"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector">[docs]</a><span class="k">class</span> <span class="nc">AbstractConnector</span><span class="p">(</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">AbstractBase</span><span class="p">,</span> <span class="nb">object</span><span class="p">)):</span>
     <span class="sd">&quot;&quot;&quot; Abstract class that all PyNN Connectors extend.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># pylint: disable=unused-argument,too-many-arguments</span>
 
     <span class="n">NUMPY_SYNAPSES_DTYPE</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;source&quot;</span><span class="p">,</span> <span class="s2">&quot;uint32&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;target&quot;</span><span class="p">,</span> <span class="s2">&quot;uint16&quot;</span><span class="p">),</span>
                             <span class="p">(</span><span class="s2">&quot;weight&quot;</span><span class="p">,</span> <span class="s2">&quot;float64&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;delay&quot;</span><span class="p">,</span> <span class="s2">&quot;float64&quot;</span><span class="p">),</span>
@@ -133,7 +135,6 @@
 <span class="sd">        :param int machine_time_step: machine time step</span>
 <span class="sd">        :param SynapseInformation synapse_info: the synapse info</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># pylint: disable=unused-argument</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rng</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rng</span> <span class="ow">or</span> <span class="n">NumpyRNG</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__min_delay</span> <span class="o">=</span> <span class="n">machine_time_step</span> <span class="o">/</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span></div>
 
@@ -149,7 +150,8 @@
         <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="ow">and</span>
                 <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">RandomDistribution</span><span class="p">))</span> <span class="ow">and</span>
                 <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="s2">&quot;__getitem__&quot;</span><span class="p">)):</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Parameter </span><span class="si">{}</span><span class="s2"> format unsupported&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="n">SpynnakerException</span><span class="p">(</span><span class="s2">&quot;Parameter </span><span class="si">{}</span><span class="s2"> format unsupported&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">name</span><span class="p">))</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">allow_lists</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="s2">&quot;__getitem__&quot;</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
                 <span class="s2">&quot;Lists of </span><span class="si">{}</span><span class="s2"> are not supported by the implementation of </span><span class="si">{}</span><span class="s2"> on &quot;</span>
@@ -192,7 +194,7 @@
             <span class="k">return</span> <span class="n">delays</span>
         <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">delays</span><span class="p">,</span> <span class="s2">&quot;__getitem__&quot;</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">delays</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Unrecognised delay format: </span><span class="si">{:s}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="k">raise</span> <span class="n">SpynnakerException</span><span class="p">(</span><span class="s2">&quot;Unrecognised delay format: </span><span class="si">{:s}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
             <span class="nb">type</span><span class="p">(</span><span class="n">delays</span><span class="p">)))</span>
 
     <span class="k">def</span> <span class="nf">_get_delay_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delays</span><span class="p">,</span> <span class="n">n_connections</span><span class="p">):</span>
@@ -217,7 +219,7 @@
             <span class="k">return</span> <span class="n">delays</span>
         <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">delays</span><span class="p">,</span> <span class="s2">&quot;__getitem__&quot;</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">delays</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Unrecognised delay format: </span><span class="si">{:s}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="k">raise</span> <span class="n">SpynnakerException</span><span class="p">(</span><span class="s2">&quot;Unrecognised delay format: </span><span class="si">{:s}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
             <span class="nb">type</span><span class="p">(</span><span class="n">delays</span><span class="p">)))</span>
 
 <div class="viewcode-block" id="AbstractConnector.get_delay_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.get_delay_maximum">[docs]</a>    <span class="nd">@abstractmethod</span>
@@ -252,7 +254,7 @@
             <span class="k">return</span> <span class="mf">0.0</span>
         <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">delays</span><span class="p">,</span> <span class="s2">&quot;__getitem__&quot;</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">delays</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Unrecognised delay format&quot;</span><span class="p">)</span></div>
+        <span class="k">raise</span> <span class="n">SpynnakerException</span><span class="p">(</span><span class="s2">&quot;Unrecognised delay format&quot;</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_get_n_connections_from_pre_vertex_with_delay_maximum</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">delays</span><span class="p">,</span> <span class="n">n_total_connections</span><span class="p">,</span> <span class="n">n_connections</span><span class="p">,</span>
@@ -270,7 +272,6 @@
 <span class="sd">        :param float max_delay:</span>
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">delays</span><span class="p">,</span> <span class="n">RandomDistribution</span><span class="p">):</span>
             <span class="n">prob_in_range</span> <span class="o">=</span> <span class="n">utility_calls</span><span class="o">.</span><span class="n">get_probability_within_range</span><span class="p">(</span>
                 <span class="n">delays</span><span class="p">,</span> <span class="n">min_delay</span><span class="p">,</span> <span class="n">max_delay</span><span class="p">)</span>
@@ -290,7 +291,7 @@
             <span class="n">prob_delayed</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">n_delayed</span><span class="p">)</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">n_total</span><span class="p">)</span>
             <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">utility_calls</span><span class="o">.</span><span class="n">get_probable_maximum_selected</span><span class="p">(</span>
                 <span class="n">n_total_connections</span><span class="p">,</span> <span class="n">n_connections</span><span class="p">,</span> <span class="n">prob_delayed</span><span class="p">)))</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Unrecognised delay format&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">SpynnakerException</span><span class="p">(</span><span class="s2">&quot;Unrecognised delay format&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="AbstractConnector.get_n_connections_from_pre_vertex_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.get_n_connections_from_pre_vertex_maximum">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_n_connections_from_pre_vertex_maximum</span><span class="p">(</span>
@@ -312,7 +313,6 @@
 <span class="sd">        :type max_delay: int or None</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
-        <span class="c1"># pylint: disable=too-many-arguments</span>
 
 <div class="viewcode-block" id="AbstractConnector.get_n_connections_to_post_vertex_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.get_n_connections_to_post_vertex_maximum">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_n_connections_to_post_vertex_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
@@ -337,7 +337,7 @@
             <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="s2">&quot;__getitem__&quot;</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Unrecognised weight format&quot;</span><span class="p">)</span></div>
+        <span class="k">raise</span> <span class="n">SpynnakerException</span><span class="p">(</span><span class="s2">&quot;Unrecognised weight format&quot;</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_get_weight_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">n_connections</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the maximum of the weights.</span>
@@ -369,7 +369,7 @@
             <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="s2">&quot;__getitem__&quot;</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">weights</span><span class="p">))</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Unrecognised weight format&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">SpynnakerException</span><span class="p">(</span><span class="s2">&quot;Unrecognised weight format&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="AbstractConnector.get_weight_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.get_weight_maximum">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_weight_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
@@ -378,7 +378,6 @@
 <span class="sd">        :param SynapseInformation synapse_info:</span>
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
-        <span class="c1"># pylint: disable=too-many-arguments</span>
 
 <div class="viewcode-block" id="AbstractConnector.get_weight_variance"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.get_weight_variance">[docs]</a>    <span class="k">def</span> <span class="nf">get_weight_variance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the variance of the weights.</span>
@@ -394,7 +393,7 @@
             <span class="k">return</span> <span class="mf">0.0</span>
         <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="s2">&quot;__getitem__&quot;</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Unrecognised weight format&quot;</span><span class="p">)</span></div>
+        <span class="k">raise</span> <span class="n">SpynnakerException</span><span class="p">(</span><span class="s2">&quot;Unrecognised weight format&quot;</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_expand_distances</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d_expression</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Check if a distance expression contains at least one term `d[x]`.</span>
@@ -455,7 +454,7 @@
                 <span class="k">for</span> <span class="n">connection_slice</span> <span class="ow">in</span> <span class="n">connection_slices</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;float64&quot;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">string_types</span><span class="p">)</span> <span class="ow">or</span> <span class="n">callable</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__space</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="k">raise</span> <span class="n">SpynnakerException</span><span class="p">(</span>
                     <span class="s2">&quot;No space object specified in projection </span><span class="si">{}</span><span class="s2">-</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                         <span class="n">synapse_info</span><span class="o">.</span><span class="n">pre_population</span><span class="p">,</span>
                         <span class="n">synapse_info</span><span class="o">.</span><span class="n">post_population</span><span class="p">))</span>
@@ -472,7 +471,7 @@
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
                 <span class="k">return</span> <span class="n">_expr_context</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">values</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;what on earth are you giving me?&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">SpynnakerException</span><span class="p">(</span><span class="s2">&quot;what on earth are you giving me?&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_generate_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_connections</span><span class="p">,</span> <span class="n">connection_slices</span><span class="p">,</span>
                           <span class="n">pre_slice</span><span class="p">,</span> <span class="n">post_slice</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
@@ -492,7 +491,7 @@
             <span class="k">if</span> <span class="ow">not</span> <span class="n">weights</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
                 <span class="n">warn_once</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="s2">&quot;No connection in &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
             <span class="k">elif</span> <span class="n">numpy</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">weights</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="k">raise</span> <span class="n">SpynnakerException</span><span class="p">(</span>
                     <span class="s2">&quot;Weights must be either all positive or all negative&quot;</span>
                     <span class="s2">&quot; in projection </span><span class="si">{}</span><span class="s2">-&gt;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                         <span class="n">synapse_info</span><span class="o">.</span><span class="n">pre_population</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
@@ -556,7 +555,11 @@
 <span class="sd">            The synaptic matrix data to go to the machine, as a Numpy array</span>
 <span class="sd">        :rtype: ~numpy.ndarray</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
-        <span class="c1"># pylint: disable=too-many-arguments</span>
+
+    <span class="n">_CLIPPED_MSG</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;The delays in the connector </span><span class="si">{}</span><span class="s2"> from </span><span class="si">{}</span><span class="s2"> to </span><span class="si">{}</span><span class="s2"> was clipped to </span><span class="si">{}</span><span class="s2"> a &quot;</span>
+        <span class="s2">&quot;total of </span><span class="si">{}</span><span class="s2"> times.  This can be avoided by reducing the timestep &quot;</span>
+        <span class="s2">&quot;or increasing the minimum delay to one timestep&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="AbstractConnector.get_provenance_data"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.get_provenance_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_provenance_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -570,15 +573,10 @@
         <span class="c1"># Convert to native Python integer; provenance system assumption</span>
         <span class="n">ncd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_clipped_delays</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
-            <span class="p">[</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;Times_synaptic_delays_got_clipped&quot;</span><span class="p">],</span> <span class="n">ncd</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">ncd</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="n">message</span><span class="o">=</span><span class="p">(</span>
-                <span class="s2">&quot;The delays in the connector </span><span class="si">{}</span><span class="s2"> from </span><span class="si">{}</span><span class="s2"> to </span><span class="si">{}</span><span class="s2"> was clipped &quot;</span>
-                <span class="s2">&quot;to </span><span class="si">{}</span><span class="s2"> a total of </span><span class="si">{}</span><span class="s2"> times.  This can be avoided by reducing &quot;</span>
-                <span class="s2">&quot;the timestep or increasing the minimum delay to one &quot;</span>
-                <span class="s2">&quot;timestep&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">pre_population</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
-                    <span class="n">synapse_info</span><span class="o">.</span><span class="n">post_population</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__min_delay</span><span class="p">,</span>
-                    <span class="n">ncd</span><span class="p">)))]</span></div>
+            <span class="p">[</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;Times_synaptic_delays_got_clipped&quot;</span><span class="p">],</span> <span class="n">ncd</span><span class="p">,</span>
+            <span class="n">report</span><span class="o">=</span><span class="p">(</span><span class="n">ncd</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">),</span> <span class="n">message</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_CLIPPED_MSG</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">pre_population</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
+                <span class="n">synapse_info</span><span class="o">.</span><span class="n">post_population</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__min_delay</span><span class="p">,</span> <span class="n">ncd</span><span class="p">))]</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">safe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -621,8 +619,8 @@
 <div class="viewcode-block" id="AbstractConnector.use_direct_matrix"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.use_direct_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">use_direct_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param SynapseInformation synapse_info:</span>
+<span class="sd">        :rtype: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># pylint: disable=unused-argument</span>
         <span class="k">return</span> <span class="kc">False</span></div>
 
 <div class="viewcode-block" id="AbstractConnector.could_connect"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.could_connect">[docs]</a>    <span class="k">def</span> <span class="nf">could_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_synapse_info</span><span class="p">,</span> <span class="n">_pre_slice</span><span class="p">,</span> <span class="n">_post_slice</span><span class="p">):</span>
@@ -633,15 +631,51 @@
 <span class="sd">        checking that at least one of the indexes in the pre slice could</span>
 <span class="sd">        over time connect to at least one of the indexes in the post slice.</span>
 
-<span class="sd">        note: This method should never return a false negative,</span>
-<span class="sd">        but may return a false positives</span>
+<span class="sd">        .. note::</span>
+<span class="sd">            This method should never return a false negative,</span>
+<span class="sd">            but may return a false positives</span>
 
 <span class="sd">        :param ~pacman.model.graphs.common.Slice _pre_slice:</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice _post_slice:</span>
 <span class="sd">        :param SynapseInformation _synapse_info:</span>
+<span class="sd">        :rtype: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Unless we know for sure we must say they could connect</span>
-        <span class="k">return</span> <span class="kc">True</span></div></div>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="AbstractConnector.connect"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.connect">[docs]</a>    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">projection</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Apply this connector to a projection.</span>
+
+<span class="sd">        .. warning::</span>
+<span class="sd">            Do *not* call this! SpyNNaker does not work that way.</span>
+
+<span class="sd">        :param ~spynnaker.pyNN.models.projection.Projection projection:</span>
+<span class="sd">        :raises SpynnakerException: Always. Method not supported; profiled out.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="n">SpynnakerException</span><span class="p">(</span><span class="s2">&quot;Standard pyNN connect method not supported&quot;</span><span class="p">)</span></div>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_roundsize</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Ensures that the ``size`` is an integer. Approximate integers are\</span>
+<span class="sd">            rounded; other values cause exceptions.</span>
+
+<span class="sd">        :param size: The value to be rounded</span>
+<span class="sd">        :type size: int or float</span>
+<span class="sd">        :param str label: The type-name of the connection, for messages</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        :raises SpynnakerException: If the size is non-integer and not close</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">size</span>
+        <span class="c1"># Allow a float which has a near int value</span>
+        <span class="n">temp</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">size</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">temp</span> <span class="o">-</span> <span class="n">size</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.001</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Size of </span><span class="si">{}</span><span class="s2"> rounded from </span><span class="si">{}</span><span class="s2"> to </span><span class="si">{}</span><span class="s2">. &quot;</span>
+                           <span class="s2">&quot;Please use int values for size&quot;</span><span class="p">,</span>
+                           <span class="n">label</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">temp</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">temp</span>
+        <span class="k">raise</span> <span class="n">SpynnakerException</span><span class="p">(</span>
+            <span class="s2">&quot;Size of </span><span class="si">{}</span><span class="s2"> must be an int, received </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">size</span><span class="p">))</span></div>
 </pre></div>
 
             <div class="clearer"></div>
@@ -679,7 +713,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2017.
+        &#169; Copyright 2014-2021.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
     </div>
   </body>

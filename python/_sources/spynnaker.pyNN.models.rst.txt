@@ -12,11 +12,20 @@ Subpackages
    spynnaker.pyNN.models.neural_projections
    spynnaker.pyNN.models.neural_properties
    spynnaker.pyNN.models.neuron
+   spynnaker.pyNN.models.populations
    spynnaker.pyNN.models.spike_source
    spynnaker.pyNN.models.utility_models
 
 Submodules
 ----------
+
+spynnaker.pyNN.models.abstract\_pynn\_model module
+--------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.abstract_pynn_model
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 spynnaker.pyNN.models.defaults module
 -------------------------------------
@@ -26,26 +35,18 @@ spynnaker.pyNN.models.defaults module
    :undoc-members:
    :show-inheritance:
 
-spynnaker.pyNN.models.pynn\_population\_common module
------------------------------------------------------
+spynnaker.pyNN.models.projection module
+---------------------------------------
 
-.. automodule:: spynnaker.pyNN.models.pynn_population_common
+.. automodule:: spynnaker.pyNN.models.projection
    :members:
    :undoc-members:
    :show-inheritance:
 
-spynnaker.pyNN.models.pynn\_projection\_common module
------------------------------------------------------
+spynnaker.pyNN.models.recorder module
+-------------------------------------
 
-.. automodule:: spynnaker.pyNN.models.pynn_projection_common
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-spynnaker.pyNN.models.recording\_common module
-----------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.recording_common
+.. automodule:: spynnaker.pyNN.models.recorder
    :members:
    :undoc-members:
    :show-inheritance:

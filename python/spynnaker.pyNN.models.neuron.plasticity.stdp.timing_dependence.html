@@ -174,7 +174,7 @@
 
 <dl class="py class">
 <dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependencePfisterSpikeTriplet">
-<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.</code><code class="sig-name descname">TimingDependencePfisterSpikeTriplet</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tau_plus</span></em>, <em class="sig-param"><span class="n">tau_minus</span></em>, <em class="sig-param"><span class="n">tau_x</span></em>, <em class="sig-param"><span class="n">tau_y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/plasticity/stdp/timing_dependence/timing_dependence_pfister_spike_triplet.html#TimingDependencePfisterSpikeTriplet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependencePfisterSpikeTriplet" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.</code><code class="sig-name descname">TimingDependencePfisterSpikeTriplet</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tau_plus</span></em>, <em class="sig-param"><span class="n">tau_minus</span></em>, <em class="sig-param"><span class="n">tau_x</span></em>, <em class="sig-param"><span class="n">tau_y</span></em>, <em class="sig-param"><span class="n">A_plus</span></em>, <em class="sig-param"><span class="n">A_minus</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/plasticity/stdp/timing_dependence/timing_dependence_pfister_spike_triplet.html#TimingDependencePfisterSpikeTriplet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependencePfisterSpikeTriplet" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.abstract_timing_dependence.AbstractTimingDependence</span></code></p>
 <p>A timing dependence STDP rule based on spike triplets.</p>
 <p>Jean-Pascal Pfister, Wulfram Gerstner. Triplets of Spikes in a Model of
@@ -187,9 +187,33 @@ Spike Timing-Dependent Plasticity. <em>Journal of Neuroscience</em>,
 <li><p><strong>tau_minus</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau_-\)</span></p></li>
 <li><p><strong>tau_x</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau_x\)</span></p></li>
 <li><p><strong>tau_y</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau_y\)</span></p></li>
+<li><p><strong>A_plus</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(A^+\)</span></p></li>
+<li><p><strong>A_minus</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(A^-\)</span></p></li>
 </ul>
 </dd>
 </dl>
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependencePfisterSpikeTriplet.A_minus">
+<em class="property">property </em><code class="sig-name descname">A_minus</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependencePfisterSpikeTriplet.A_minus" title="Permalink to this definition">¶</a></dt>
+<dd><p><span class="math notranslate nohighlight">\(A^-\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependencePfisterSpikeTriplet.A_plus">
+<em class="property">property </em><code class="sig-name descname">A_plus</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependencePfisterSpikeTriplet.A_plus" title="Permalink to this definition">¶</a></dt>
+<dd><p><span class="math notranslate nohighlight">\(A^+\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependencePfisterSpikeTriplet.get_parameter_names">
 <code class="sig-name descname">get_parameter_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/plasticity/stdp/timing_dependence/timing_dependence_pfister_spike_triplet.html#TimingDependencePfisterSpikeTriplet.get_parameter_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependencePfisterSpikeTriplet.get_parameter_names" title="Permalink to this definition">¶</a></dt>
@@ -333,9 +357,44 @@ Spike Timing-Dependent Plasticity. <em>Journal of Neuroscience</em>,
 
 <dl class="py class">
 <dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceRecurrent">
-<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.</code><code class="sig-name descname">TimingDependenceRecurrent</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">accumulator_depression</span><span class="o">=</span><span class="default_value">- 6</span></em>, <em class="sig-param"><span class="n">accumulator_potentiation</span><span class="o">=</span><span class="default_value">6</span></em>, <em class="sig-param"><span class="n">mean_pre_window</span><span class="o">=</span><span class="default_value">35.0</span></em>, <em class="sig-param"><span class="n">mean_post_window</span><span class="o">=</span><span class="default_value">35.0</span></em>, <em class="sig-param"><span class="n">dual_fsm</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/plasticity/stdp/timing_dependence/timing_dependence_recurrent.html#TimingDependenceRecurrent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceRecurrent" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.</code><code class="sig-name descname">TimingDependenceRecurrent</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">accumulator_depression</span><span class="o">=</span><span class="default_value">- 6</span></em>, <em class="sig-param"><span class="n">accumulator_potentiation</span><span class="o">=</span><span class="default_value">6</span></em>, <em class="sig-param"><span class="n">mean_pre_window</span><span class="o">=</span><span class="default_value">35.0</span></em>, <em class="sig-param"><span class="n">mean_post_window</span><span class="o">=</span><span class="default_value">35.0</span></em>, <em class="sig-param"><span class="n">dual_fsm</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">A_plus</span><span class="o">=</span><span class="default_value">0.01</span></em>, <em class="sig-param"><span class="n">A_minus</span><span class="o">=</span><span class="default_value">0.01</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/plasticity/stdp/timing_dependence/timing_dependence_recurrent.html#TimingDependenceRecurrent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceRecurrent" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.abstract_timing_dependence.AbstractTimingDependence</span></code></p>
 <p>A timing dependence STDP rule based on recurrences.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>accumulator_depression</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – </p></li>
+<li><p><strong>accumulator_potentiation</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – </p></li>
+<li><p><strong>mean_pre_window</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – </p></li>
+<li><p><strong>mean_post_window</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – </p></li>
+<li><p><strong>dual_fsm</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – </p></li>
+<li><p><strong>A_plus</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(A^+\)</span></p></li>
+<li><p><strong>A_minus</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(A^-\)</span></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceRecurrent.A_minus">
+<em class="property">property </em><code class="sig-name descname">A_minus</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceRecurrent.A_minus" title="Permalink to this definition">¶</a></dt>
+<dd><p><span class="math notranslate nohighlight">\(A^-\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceRecurrent.A_plus">
+<em class="property">property </em><code class="sig-name descname">A_plus</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceRecurrent.A_plus" title="Permalink to this definition">¶</a></dt>
+<dd><p><span class="math notranslate nohighlight">\(A^+\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py attribute">
 <dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceRecurrent.default_parameters">
 <code class="sig-name descname">default_parameters</code><em class="property"> = {'accumulator_depression': -6, 'accumulator_potentiation': 6, 'dual_fsm': True, 'mean_post_window': 35.0, 'mean_pre_window': 35.0}</em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceRecurrent.default_parameters" title="Permalink to this definition">¶</a></dt>
@@ -440,7 +499,7 @@ Spike Timing-Dependent Plasticity. <em>Journal of Neuroscience</em>,
 
 <dl class="py class">
 <dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikeNearestPair">
-<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.</code><code class="sig-name descname">TimingDependenceSpikeNearestPair</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tau_plus</span><span class="o">=</span><span class="default_value">20.0</span></em>, <em class="sig-param"><span class="n">tau_minus</span><span class="o">=</span><span class="default_value">20.0</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/plasticity/stdp/timing_dependence/timing_dependence_spike_nearest_pair.html#TimingDependenceSpikeNearestPair"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikeNearestPair" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.</code><code class="sig-name descname">TimingDependenceSpikeNearestPair</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tau_plus</span><span class="o">=</span><span class="default_value">20.0</span></em>, <em class="sig-param"><span class="n">tau_minus</span><span class="o">=</span><span class="default_value">20.0</span></em>, <em class="sig-param"><span class="n">A_plus</span><span class="o">=</span><span class="default_value">0.01</span></em>, <em class="sig-param"><span class="n">A_minus</span><span class="o">=</span><span class="default_value">0.01</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/plasticity/stdp/timing_dependence/timing_dependence_spike_nearest_pair.html#TimingDependenceSpikeNearestPair"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikeNearestPair" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.abstract_timing_dependence.AbstractTimingDependence</span></code></p>
 <p>A timing dependence STDP rule based on nearest pairs.</p>
 <dl class="field-list simple">
@@ -448,9 +507,33 @@ Spike Timing-Dependent Plasticity. <em>Journal of Neuroscience</em>,
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>tau_plus</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau_+\)</span></p></li>
 <li><p><strong>tau_minus</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau_-\)</span></p></li>
+<li><p><strong>A_plus</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(A^+\)</span></p></li>
+<li><p><strong>A_minus</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(A^-\)</span></p></li>
 </ul>
 </dd>
 </dl>
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikeNearestPair.A_minus">
+<em class="property">property </em><code class="sig-name descname">A_minus</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikeNearestPair.A_minus" title="Permalink to this definition">¶</a></dt>
+<dd><p><span class="math notranslate nohighlight">\(A^-\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikeNearestPair.A_plus">
+<em class="property">property </em><code class="sig-name descname">A_plus</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikeNearestPair.A_plus" title="Permalink to this definition">¶</a></dt>
+<dd><p><span class="math notranslate nohighlight">\(A^+\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py attribute">
 <dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikeNearestPair.default_parameters">
 <code class="sig-name descname">default_parameters</code><em class="property"> = {'tau_minus': 20.0, 'tau_plus': 20.0}</em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikeNearestPair.default_parameters" title="Permalink to this definition">¶</a></dt>
@@ -577,7 +660,7 @@ Spike Timing-Dependent Plasticity. <em>Journal of Neuroscience</em>,
 
 <dl class="py class">
 <dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikePair">
-<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.</code><code class="sig-name descname">TimingDependenceSpikePair</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tau_plus</span><span class="o">=</span><span class="default_value">20.0</span></em>, <em class="sig-param"><span class="n">tau_minus</span><span class="o">=</span><span class="default_value">20.0</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/plasticity/stdp/timing_dependence/timing_dependence_spike_pair.html#TimingDependenceSpikePair"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikePair" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.</code><code class="sig-name descname">TimingDependenceSpikePair</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tau_plus</span><span class="o">=</span><span class="default_value">20.0</span></em>, <em class="sig-param"><span class="n">tau_minus</span><span class="o">=</span><span class="default_value">20.0</span></em>, <em class="sig-param"><span class="n">A_plus</span><span class="o">=</span><span class="default_value">0.01</span></em>, <em class="sig-param"><span class="n">A_minus</span><span class="o">=</span><span class="default_value">0.01</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/plasticity/stdp/timing_dependence/timing_dependence_spike_pair.html#TimingDependenceSpikePair"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikePair" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.abstract_timing_dependence.AbstractTimingDependence</span></code></p>
 <p>A basic timing dependence STDP rule.</p>
 <dl class="field-list simple">
@@ -585,9 +668,33 @@ Spike Timing-Dependent Plasticity. <em>Journal of Neuroscience</em>,
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>tau_plus</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau_+\)</span></p></li>
 <li><p><strong>tau_minus</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau_-\)</span></p></li>
+<li><p><strong>A_plus</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(A^+\)</span></p></li>
+<li><p><strong>A_minus</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(A^-\)</span></p></li>
 </ul>
 </dd>
 </dl>
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikePair.A_minus">
+<em class="property">property </em><code class="sig-name descname">A_minus</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikePair.A_minus" title="Permalink to this definition">¶</a></dt>
+<dd><p><span class="math notranslate nohighlight">\(A^-\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikePair.A_plus">
+<em class="property">property </em><code class="sig-name descname">A_plus</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikePair.A_plus" title="Permalink to this definition">¶</a></dt>
+<dd><p><span class="math notranslate nohighlight">\(A^+\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikePair.get_parameter_names">
 <code class="sig-name descname">get_parameter_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/plasticity/stdp/timing_dependence/timing_dependence_spike_pair.html#TimingDependenceSpikePair.get_parameter_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikePair.get_parameter_names" title="Permalink to this definition">¶</a></dt>
@@ -709,7 +816,7 @@ Spike Timing-Dependent Plasticity. <em>Journal of Neuroscience</em>,
 
 <dl class="py class">
 <dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceVogels2011">
-<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.</code><code class="sig-name descname">TimingDependenceVogels2011</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">alpha</span></em>, <em class="sig-param"><span class="n">tau</span><span class="o">=</span><span class="default_value">20.0</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/plasticity/stdp/timing_dependence/timing_dependence_vogels_2011.html#TimingDependenceVogels2011"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceVogels2011" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.</code><code class="sig-name descname">TimingDependenceVogels2011</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">alpha</span></em>, <em class="sig-param"><span class="n">tau</span><span class="o">=</span><span class="default_value">20.0</span></em>, <em class="sig-param"><span class="n">A_plus</span><span class="o">=</span><span class="default_value">0.01</span></em>, <em class="sig-param"><span class="n">A_minus</span><span class="o">=</span><span class="default_value">0.01</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/plasticity/stdp/timing_dependence/timing_dependence_vogels_2011.html#TimingDependenceVogels2011"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceVogels2011" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.abstract_timing_dependence.AbstractTimingDependence</span></code></p>
 <p>A timing dependence STDP rule due to Vogels (2011).</p>
 <dl class="field-list simple">
@@ -717,9 +824,33 @@ Spike Timing-Dependent Plasticity. <em>Journal of Neuroscience</em>,
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\alpha\)</span></p></li>
 <li><p><strong>tau</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(\tau\)</span></p></li>
+<li><p><strong>A_plus</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(A^+\)</span></p></li>
+<li><p><strong>A_minus</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(A^-\)</span></p></li>
 </ul>
 </dd>
 </dl>
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceVogels2011.A_minus">
+<em class="property">property </em><code class="sig-name descname">A_minus</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceVogels2011.A_minus" title="Permalink to this definition">¶</a></dt>
+<dd><p><span class="math notranslate nohighlight">\(A^-\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceVogels2011.A_plus">
+<em class="property">property </em><code class="sig-name descname">A_plus</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceVogels2011.A_plus" title="Permalink to this definition">¶</a></dt>
+<dd><p><span class="math notranslate nohighlight">\(A^+\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceVogels2011.alpha">
 <em class="property">property </em><code class="sig-name descname">alpha</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceVogels2011.alpha" title="Permalink to this definition">¶</a></dt>
@@ -916,7 +1047,7 @@ Spike Timing-Dependent Plasticity. <em>Journal of Neuroscience</em>,
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2017.
+        &#169; Copyright 2014-2021.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
     </div>
   </body>

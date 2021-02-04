@@ -52,18 +52,13 @@
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
-<span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
-
-<span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> \
-    <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities</span> <span class="kn">import</span> <span class="n">globals_variables</span>
-<span class="kn">from</span> <span class="nn">.abstract_connector</span> <span class="kn">import</span> <span class="n">AbstractConnector</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="n">get_simulator</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">InvalidParameterType</span>
-
-<span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
+<span class="kn">from</span> <span class="nn">.abstract_connector</span> <span class="kn">import</span> <span class="n">AbstractConnector</span>
 
 <span class="c1"># Indices of the source and target in the connection list array</span>
 <span class="n">_SOURCE</span> <span class="o">=</span> <span class="mi">0</span>
@@ -71,7 +66,7 @@
 <span class="n">_FIRST_PARAM</span> <span class="o">=</span> <span class="mi">2</span>
 
 
-<div class="viewcode-block" id="FromListConnector"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.FromListConnector">[docs]</a><span class="k">class</span> <span class="nc">FromListConnector</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="p">):</span>
+<div class="viewcode-block" id="FromListConnector"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.FromListConnector">[docs]</a><span class="k">class</span> <span class="nc">FromListConnector</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Make connections according to a list.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
@@ -87,28 +82,37 @@
         <span class="s2">&quot;__split_pre_slices&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__split_post_slices&quot;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn_list</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                 <span class="n">column_names</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn_list</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">column_names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param conn_list:</span>
-<span class="sd">            a list of tuples, one tuple for each connection. Each</span>
-<span class="sd">            tuple should contain at least::</span>
+<span class="sd">            A numpy array or a list of tuples, one tuple for each connection.</span>
+<span class="sd">            Each tuple should contain::</span>
 
-<span class="sd">                (pre_idx, post_idx)</span>
+<span class="sd">                (pre_idx, post_idx, p1, p2, ..., pn)</span>
 
 <span class="sd">            where ``pre_idx`` is the index (i.e. order in the Population,</span>
-<span class="sd">            not the ID) of the presynaptic neuron, and ``post_idx`` is</span>
-<span class="sd">            the index of the postsynaptic neuron.</span>
-
-<span class="sd">            Additional items per synapse are acceptable but all synapses</span>
-<span class="sd">            should have the same number of items.</span>
+<span class="sd">            not the ID) of the presynaptic neuron, ``post_idx`` is</span>
+<span class="sd">            the index of the postsynaptic neuron, and</span>
+<span class="sd">            ``p1``, ``p2``, etc. are the synaptic parameters (e.g.,</span>
+<span class="sd">            weight, delay, plasticity parameters).</span>
+<span class="sd">            All tuples/rows must have the same number of items.</span>
 <span class="sd">        :type conn_list: ~numpy.ndarray or list(tuple(int,int,...))</span>
 <span class="sd">        :param bool safe:</span>
-<span class="sd">        :param callable callback: Ignored</span>
+<span class="sd">            if ``True``, check that weights and delays have valid values.</span>
+<span class="sd">            If ``False``, this check is skipped.</span>
 <span class="sd">        :param bool verbose:</span>
-<span class="sd">        :param column_names: If not None, must have same length as number of</span>
-<span class="sd">            extra columns in ``conn_list`` (i.e., after the first two).</span>
-<span class="sd">        :type column_names: None or list(str)</span>
+<span class="sd">            Whether to output extra information about the connectivity to a</span>
+<span class="sd">            CSV file</span>
+<span class="sd">        :param column_names: the names of the parameters ``p1``, ``p2``, etc.</span>
+<span class="sd">            If not provided, it is assumed the parameters are ``weight, delay``</span>
+<span class="sd">            (for backwards compatibility).</span>
+<span class="sd">        :type column_names: None or tuple(str) or list(str)</span>
+<span class="sd">        :param callable callback:</span>
+<span class="sd">            if given, a callable that display a progress bar on the terminal.</span>
+
+<span class="sd">            .. note::</span>
+<span class="sd">                Not supported by sPyNNaker.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">FromListConnector</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">safe</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
 
@@ -120,21 +124,21 @@
         <span class="c1"># Call the conn_list setter, as this sets the internal values</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">conn_list</span> <span class="o">=</span> <span class="n">conn_list</span>
 
-<div class="viewcode-block" id="FromListConnector.get_delay_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.get_delay_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_delay_maximum</span><span class="p">)</span>
+<div class="viewcode-block" id="FromListConnector.get_delay_maximum"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.get_delay_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_delay_maximum</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_delay_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delays</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">synapse_info</span><span class="o">.</span><span class="n">delays</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__delays</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="FromListConnector.get_delay_minimum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.get_delay_minimum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_delay_minimum</span><span class="p">)</span>
+<div class="viewcode-block" id="FromListConnector.get_delay_minimum"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.get_delay_minimum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_delay_minimum</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_delay_minimum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delays</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">synapse_info</span><span class="o">.</span><span class="n">delays</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__delays</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="FromListConnector.get_delay_variance"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.get_delay_variance">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_delay_variance</span><span class="p">)</span>
+<div class="viewcode-block" id="FromListConnector.get_delay_variance"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.get_delay_variance">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_delay_variance</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_delay_variance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delays</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delays</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">delays</span><span class="p">)</span>
@@ -201,7 +205,7 @@
 
         <span class="k">return</span> <span class="kc">True</span>
 
-<div class="viewcode-block" id="FromListConnector.get_n_connections_from_pre_vertex_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.get_n_connections_from_pre_vertex_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_n_connections_from_pre_vertex_maximum</span><span class="p">)</span>
+<div class="viewcode-block" id="FromListConnector.get_n_connections_from_pre_vertex_maximum"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.get_n_connections_from_pre_vertex_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_n_connections_from_pre_vertex_maximum</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_n_connections_from_pre_vertex_maximum</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">min_delay</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">max_delay</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -236,7 +240,7 @@
             <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_pre_neurons</span> <span class="o">*</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_post_neurons</span><span class="p">,</span>
             <span class="n">max_targets</span><span class="p">,</span> <span class="n">min_delay</span><span class="p">,</span> <span class="n">max_delay</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="FromListConnector.get_n_connections_to_post_vertex_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.get_n_connections_to_post_vertex_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_n_connections_to_post_vertex_maximum</span><span class="p">)</span>
+<div class="viewcode-block" id="FromListConnector.get_n_connections_to_post_vertex_maximum"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.get_n_connections_to_post_vertex_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_n_connections_to_post_vertex_maximum</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_n_connections_to_post_vertex_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__targets</span><span class="p">):</span>
             <span class="k">return</span> <span class="mi">0</span>
@@ -244,14 +248,14 @@
         <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__targets</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int64&#39;</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)))</span></div>
 
-<div class="viewcode-block" id="FromListConnector.get_weight_mean"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.get_weight_mean">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_weight_mean</span><span class="p">)</span>
+<div class="viewcode-block" id="FromListConnector.get_weight_mean"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.get_weight_mean">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_weight_mean</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_weight_mean</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__weights</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__weights</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="FromListConnector.get_weight_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.get_weight_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_weight_maximum</span><span class="p">)</span>
+<div class="viewcode-block" id="FromListConnector.get_weight_maximum"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.get_weight_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_weight_maximum</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_weight_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__weights</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -259,7 +263,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__weights</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="FromListConnector.get_weight_variance"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.get_weight_variance">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_weight_variance</span><span class="p">)</span>
+<div class="viewcode-block" id="FromListConnector.get_weight_variance"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.get_weight_variance">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_weight_variance</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_weight_variance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">):</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__weights</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -267,7 +271,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__weights</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="FromListConnector.create_synaptic_block"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.create_synaptic_block">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">create_synaptic_block</span><span class="p">)</span>
+<div class="viewcode-block" id="FromListConnector.create_synaptic_block"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.create_synaptic_block">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">create_synaptic_block</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">create_synaptic_block</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">pre_slices</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
             <span class="n">synapse_type</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
@@ -315,7 +319,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__conn_list</span>
 
-<div class="viewcode-block" id="FromListConnector.get_n_connections"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.get_n_connections">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_slices</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">,</span> <span class="n">pre_hi</span><span class="p">,</span> <span class="n">post_hi</span><span class="p">):</span>
+<div class="viewcode-block" id="FromListConnector.get_n_connections"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.get_n_connections">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_slices</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">,</span> <span class="n">pre_hi</span><span class="p">,</span> <span class="n">post_hi</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param list(~pacman.model.graphs.common.Slice) pre_slices:</span>
 <span class="sd">        :param list(~pacman.model.graphs.common.Slice) post_slices:</span>
@@ -384,8 +388,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__delays</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">delay_column</span> <span class="o">=</span> <span class="n">column_names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;delay&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">_FIRST_PARAM</span>
-            <span class="n">machine_time_step</span> <span class="o">=</span> <span class="n">globals_variables</span><span class="o">.</span><span class="n">get_simulator</span><span class="p">(</span>
-                <span class="p">)</span><span class="o">.</span><span class="n">machine_time_step</span>
+            <span class="n">machine_time_step</span> <span class="o">=</span> <span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">machine_time_step</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__delays</span> <span class="o">=</span> <span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">rint</span><span class="p">(</span>
                 <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__conn_list</span><span class="p">[:,</span> <span class="n">delay_column</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span>
                     <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span> <span class="o">/</span> <span class="n">machine_time_step</span><span class="p">))</span> <span class="o">*</span>
@@ -432,7 +435,7 @@
     <span class="k">def</span> <span class="nf">column_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column_names</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__column_names</span> <span class="o">=</span> <span class="n">column_names</span>
 
-<div class="viewcode-block" id="FromListConnector.get_extra_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.get_extra_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">get_extra_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="FromListConnector.get_extra_parameters"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.get_extra_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">get_extra_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Getter for the extra parameters. Excludes ``weight`` and\</span>
 <span class="sd">        ``delay`` columns.</span>
 
@@ -441,19 +444,27 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__extra_parameters</span></div>
 
-<div class="viewcode-block" id="FromListConnector.get_extra_parameter_names"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.get_extra_parameter_names">[docs]</a>    <span class="k">def</span> <span class="nf">get_extra_parameter_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="FromListConnector.get_extra_parameter_names"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.get_extra_parameter_names">[docs]</a>    <span class="k">def</span> <span class="nf">get_extra_parameter_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Getter for the names of the extra parameters.</span>
 
 <span class="sd">        :rtype: list(str)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__extra_parameter_names</span></div>
 
-<div class="viewcode-block" id="FromListConnector.could_connect"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.could_connect">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">could_connect</span><span class="p">)</span>
+<div class="viewcode-block" id="FromListConnector.could_connect"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.could_connect">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">could_connect</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">could_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_synapse_info</span><span class="p">,</span> <span class="n">_pre_slice</span><span class="p">,</span> <span class="n">_post_slice</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">any</span><span class="p">((</span><span class="n">_pre_slice</span><span class="o">.</span><span class="n">lo_atom</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sources</span><span class="p">)</span> <span class="o">&amp;</span>
                    <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__sources</span> <span class="o">&lt;=</span> <span class="n">_pre_slice</span><span class="o">.</span><span class="n">hi_atom</span><span class="p">)</span> <span class="o">&amp;</span>
                    <span class="p">(</span><span class="n">_post_slice</span><span class="o">.</span><span class="n">lo_atom</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__targets</span><span class="p">)</span> <span class="o">&amp;</span>
-                   <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__targets</span> <span class="o">&lt;=</span> <span class="n">_post_slice</span><span class="o">.</span><span class="n">hi_atom</span><span class="p">))</span></div></div>
+                   <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__targets</span> <span class="o">&lt;=</span> <span class="n">_post_slice</span><span class="o">.</span><span class="n">hi_atom</span><span class="p">))</span></div>
+
+    <span class="k">def</span> <span class="nf">_apply_parameters_to_synapse_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_type</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param AbstractStaticSynapseDynamics synapse_type:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__extra_parameter_names</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__extra_parameter_names</span><span class="p">):</span>
+                <span class="n">synapse_type</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__extra_parameters</span><span class="p">[:,</span> <span class="n">i</span><span class="p">])</span></div>
 </pre></div>
 
             <div class="clearer"></div>
@@ -491,7 +502,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2017.
+        &#169; Copyright 2014-2021.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
     </div>
   </body>

@@ -1,0 +1,426 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>spynnaker8.utilities package &#8212; sPyNNaker  documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="spynnaker8.models.synapse_dynamics.weight_dependence package" href="spynnaker8.models.synapse_dynamics.weight_dependence.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="spynnaker8.models.synapse_dynamics.weight_dependence.html" title="spynnaker8.models.synapse_dynamics.weight_dependence package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >spynnaker</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="spynnaker8.html" accesskey="U">spynnaker8 package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker8.utilities package</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="spynnaker8-utilities-package">
+<h1>spynnaker8.utilities package<a class="headerlink" href="#spynnaker8-utilities-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-spynnaker8.utilities.neo_compare">
+<span id="spynnaker8-utilities-neo-compare-module"></span><h2>spynnaker8.utilities.neo_compare module<a class="headerlink" href="#module-spynnaker8.utilities.neo_compare" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="spynnaker8.utilities.neo_compare.compare_analogsignal">
+<code class="sig-prename descclassname">spynnaker8.utilities.neo_compare.</code><code class="sig-name descname">compare_analogsignal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">as1</span></em>, <em class="sig-param"><span class="n">as2</span></em>, <em class="sig-param"><span class="n">same_length</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/utilities/neo_compare.html#compare_analogsignal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker8.utilities.neo_compare.compare_analogsignal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compares two analogsignal Objects to see if they are the same</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>as1</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.AnalogSignal" title="(in Neo v0.9)"><em>AnalogSignal</em></a>) – first analogsignal holding list of individual analogsignal Objects</p></li>
+<li><p><strong>as2</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.AnalogSignal" title="(in Neo v0.9)"><em>AnalogSignal</em></a>) – second analogsignal holding list of individual analogsignal Objects</p></li>
+<li><p><strong>same_length</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Flag to indicate if the same length of data is
+held, i.e., all spikes up to the same time. If False allows one trains
+to have additional data after the first ends. This is used to compare
+data extracted part way with data extracted at the end.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#AssertionError" title="(in Python v3.6)"><strong>AssertionError</strong></a> – If the analogsignals are not equal</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spynnaker8.utilities.neo_compare.compare_blocks">
+<code class="sig-prename descclassname">spynnaker8.utilities.neo_compare.</code><code class="sig-name descname">compare_blocks</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">neo1</span></em>, <em class="sig-param"><span class="n">neo2</span></em>, <em class="sig-param"><span class="n">same_runs</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">same_data</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">same_length</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/utilities/neo_compare.html#compare_blocks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker8.utilities.neo_compare.compare_blocks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compares two neo Blocks to see if they hold the same data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>neo1</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.9)"><em>Block</em></a>) – First block to check</p></li>
+<li><p><strong>neo2</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.9)"><em>Block</em></a>) – Second block to check</p></li>
+<li><p><strong>same_runs</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Flag to signal if blocks are the same length.
+If False extra segments in the larger block are ignored</p></li>
+<li><p><strong>same_data</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Flag to indicate if the same type of data is held,
+i.e., same spikes, v, gsyn_exc and gsyn_inh.
+If False only data in both blocks is compared</p></li>
+<li><p><strong>same_length</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Flag to indicate if the same length of data is
+held, i.e., all spikes up to the same time. If False allows one trains
+to have additional data after the first ends. This is used to compare
+data extracted part way with data extracted at the end.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#AssertionError" title="(in Python v3.6)"><strong>AssertionError</strong></a> – If the blocks are not equal</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spynnaker8.utilities.neo_compare.compare_segments">
+<code class="sig-prename descclassname">spynnaker8.utilities.neo_compare.</code><code class="sig-name descname">compare_segments</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">seg1</span></em>, <em class="sig-param"><span class="n">seg2</span></em>, <em class="sig-param"><span class="n">same_data</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">same_length</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/utilities/neo_compare.html#compare_segments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker8.utilities.neo_compare.compare_segments" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>seg1</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Segment" title="(in Neo v0.9)"><em>Segment</em></a>) – First Segment to check</p></li>
+<li><p><strong>seg2</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Segment" title="(in Neo v0.9)"><em>Segment</em></a>) – Second Segment to check</p></li>
+<li><p><strong>same_data</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Flag to indicate if the same type of data is held,
+i.e., same spikes, v, gsyn_exc and gsyn_inh.
+If False only data in both blocks is compared</p></li>
+<li><p><strong>same_length</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Flag to indicate if the same length of data is
+held, i.e., all spikes up to the same time. If False allows one trains
+to have additional data after the first ends. This is used to compare
+data extracted part way with data extracted at the end.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#AssertionError" title="(in Python v3.6)"><strong>AssertionError</strong></a> – If the segments are not equal</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spynnaker8.utilities.neo_compare.compare_spiketrain">
+<code class="sig-prename descclassname">spynnaker8.utilities.neo_compare.</code><code class="sig-name descname">compare_spiketrain</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">spiketrain1</span></em>, <em class="sig-param"><span class="n">spiketrain2</span></em>, <em class="sig-param"><span class="n">same_length</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/utilities/neo_compare.html#compare_spiketrain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker8.utilities.neo_compare.compare_spiketrain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks two Spiketrains have the exact same data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spiketrain1</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.SpikeTrain" title="(in Neo v0.9)"><em>SpikeTrain</em></a>) – first spiketrain</p></li>
+<li><p><strong>spiketrain2</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.SpikeTrain" title="(in Neo v0.9)"><em>SpikeTrain</em></a>) – second spiketrain</p></li>
+<li><p><strong>same_length</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Flag to indicate if the same length of data is
+held, i.e., all spikes up to the same time. If False allows one trains
+to have additional spikes after the first ends. This is used to
+compare data extracted part way with data extracted at the end.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#AssertionError" title="(in Python v3.6)"><strong>AssertionError</strong></a> – If the spiketrains are not equal</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spynnaker8.utilities.neo_compare.compare_spiketrains">
+<code class="sig-prename descclassname">spynnaker8.utilities.neo_compare.</code><code class="sig-name descname">compare_spiketrains</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">spiketrains1</span></em>, <em class="sig-param"><span class="n">spiketrains2</span></em>, <em class="sig-param"><span class="n">same_data</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">same_length</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/utilities/neo_compare.html#compare_spiketrains"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker8.utilities.neo_compare.compare_spiketrains" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check two Lists of SpikeTrains have the exact same data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spiketrains1</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.SpikeTrain" title="(in Neo v0.9)"><em>SpikeTrain</em></a><em>)</em>) – First list SpikeTrains to compare</p></li>
+<li><p><strong>spiketrains2</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.SpikeTrain" title="(in Neo v0.9)"><em>SpikeTrain</em></a><em>)</em>) – Second list of SpikeTrains to compare</p></li>
+<li><p><strong>same_data</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Flag to indicate if the same type of data is held,
+i.e., same spikes, v, gsyn_exc and gsyn_inh.
+If False allows one or both lists to be Empty.
+Even if False none empty lists must be the same length</p></li>
+<li><p><strong>same_length</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Flag to indicate if the same length of data is
+held, i.e., all spikes up to the same time. If False allows one trains
+to have additional spikes after the first ends. This is used to compare
+data extracted part way with data extracted at the end.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#AssertionError" title="(in Python v3.6)"><strong>AssertionError</strong></a> – If the spiketrains are not equal</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-spynnaker8.utilities.neo_convertor">
+<span id="spynnaker8-utilities-neo-convertor-module"></span><h2>spynnaker8.utilities.neo_convertor module<a class="headerlink" href="#module-spynnaker8.utilities.neo_convertor" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="spynnaker8.utilities.neo_convertor.convert_analog_signal">
+<code class="sig-prename descclassname">spynnaker8.utilities.neo_convertor.</code><code class="sig-name descname">convert_analog_signal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">signal_array</span></em>, <em class="sig-param"><span class="n">time_unit</span><span class="o">=</span><span class="default_value">UnitTime('millisecond', 0.001 * s, 'ms')</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/utilities/neo_convertor.html#convert_analog_signal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker8.utilities.neo_convertor.convert_analog_signal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts part of a NEO object into told spynnaker7 format</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>signal_array</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.AnalogSignal" title="(in Neo v0.9)"><em>AnalogSignal</em></a>) – Extended Quantities object</p></li>
+<li><p><strong>time_unit</strong> (<em>quantities.unitquantity.UnitTime</em>) – Data time unit for time index</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/1.19/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spynnaker8.utilities.neo_convertor.convert_data">
+<code class="sig-prename descclassname">spynnaker8.utilities.neo_convertor.</code><code class="sig-name descname">convert_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">run</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/utilities/neo_convertor.html#convert_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker8.utilities.neo_convertor.convert_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts the data into a numpy array in the format ID, time, value</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.9)"><em>Block</em></a>) – Data as returned by a getData() call</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of the data to be extracted.
+Same values as used in getData()</p></li>
+<li><p><strong>run</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Zero based index of the run to extract data for</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/1.19/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spynnaker8.utilities.neo_convertor.convert_data_list">
+<code class="sig-prename descclassname">spynnaker8.utilities.neo_convertor.</code><code class="sig-name descname">convert_data_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">runs</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/utilities/neo_convertor.html#convert_data_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker8.utilities.neo_convertor.convert_data_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts the data into a list of numpy arrays in the format ID, time,        value</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.9)"><em>Block</em></a>) – Data as returned by a getData() call</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of the data to be extracted.
+Same values as used in getData()</p></li>
+<li><p><strong>runs</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – List of Zero based index of the run to extract data for.
+Or None to extract all runs</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://numpy.org/doc/1.19/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spynnaker8.utilities.neo_convertor.convert_gsyn">
+<code class="sig-prename descclassname">spynnaker8.utilities.neo_convertor.</code><code class="sig-name descname">convert_gsyn</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gsyn_exc</span></em>, <em class="sig-param"><span class="n">gsyn_inh</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/utilities/neo_convertor.html#convert_gsyn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker8.utilities.neo_convertor.convert_gsyn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts two neo objects into the spynnaker7 format</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It is acceptable for both neo parameters to be the same object</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gsyn_exc</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.9)"><em>Block</em></a>) – neo with gsyn_exc data</p></li>
+<li><p><strong>gsyn_inh</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.9)"><em>Block</em></a>) – neo with gsyn_exc data</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/1.19/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spynnaker8.utilities.neo_convertor.convert_gsyn_exc_list">
+<code class="sig-prename descclassname">spynnaker8.utilities.neo_convertor.</code><code class="sig-name descname">convert_gsyn_exc_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/utilities/neo_convertor.html#convert_gsyn_exc_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker8.utilities.neo_convertor.convert_gsyn_exc_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts the gsyn_exc into a list numpy array one per segment (all        runs) in the format ID, time, value</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>data</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.9)"><em>Block</em></a>) – The data to convert; it must have Gsyn_exc data in it</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://numpy.org/doc/1.19/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spynnaker8.utilities.neo_convertor.convert_gsyn_inh_list">
+<code class="sig-prename descclassname">spynnaker8.utilities.neo_convertor.</code><code class="sig-name descname">convert_gsyn_inh_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/utilities/neo_convertor.html#convert_gsyn_inh_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker8.utilities.neo_convertor.convert_gsyn_inh_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts the gsyn_inh into a list numpy array one per segment (all        runs) in the format ID, time, value</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>data</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.9)"><em>Block</em></a>) – The data to convert; it must have Gsyn_inh data in it</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://numpy.org/doc/1.19/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spynnaker8.utilities.neo_convertor.convert_spikes">
+<code class="sig-prename descclassname">spynnaker8.utilities.neo_convertor.</code><code class="sig-name descname">convert_spikes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">neo</span></em>, <em class="sig-param"><span class="n">run</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/utilities/neo_convertor.html#convert_spikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker8.utilities.neo_convertor.convert_spikes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts the spikes for run one from a Neo Object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>neo</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.9)"><em>Block</em></a>) – neo Object including Spike Data</p></li>
+<li><p><strong>run</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Zero based index of the run to extract data for</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/1.19/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spynnaker8.utilities.neo_convertor.convert_spiketrains">
+<code class="sig-prename descclassname">spynnaker8.utilities.neo_convertor.</code><code class="sig-name descname">convert_spiketrains</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">spiketrains</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/utilities/neo_convertor.html#convert_spiketrains"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker8.utilities.neo_convertor.convert_spiketrains" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts a list of spiketrains into spynnaker7 format</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>spiketrains</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.SpikeTrain" title="(in Neo v0.9)"><em>SpikeTrain</em></a><em>)</em>) – List of SpikeTrains</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/1.19/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spynnaker8.utilities.neo_convertor.convert_v_list">
+<code class="sig-prename descclassname">spynnaker8.utilities.neo_convertor.</code><code class="sig-name descname">convert_v_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/utilities/neo_convertor.html#convert_v_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker8.utilities.neo_convertor.convert_v_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts the voltage into a list numpy array one per segment (all        runs) in the format ID, time, value</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>data</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.9)"><em>Block</em></a>) – The data to convert; it must have V data in it</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://numpy.org/doc/1.19/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spynnaker8.utilities.neo_convertor.count_spikes">
+<code class="sig-prename descclassname">spynnaker8.utilities.neo_convertor.</code><code class="sig-name descname">count_spikes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">neo</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/utilities/neo_convertor.html#count_spikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker8.utilities.neo_convertor.count_spikes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Help function to count the number of spikes in a list of spiketrains</p>
+<p>Only counts run 0</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>neo</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.9)"><em>Block</em></a>) – Neo Object which has spikes in it</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The number of spikes in the first segment</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spynnaker8.utilities.neo_convertor.count_spiketrains">
+<code class="sig-prename descclassname">spynnaker8.utilities.neo_convertor.</code><code class="sig-name descname">count_spiketrains</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">spiketrains</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/utilities/neo_convertor.html#count_spiketrains"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker8.utilities.neo_convertor.count_spiketrains" title="Permalink to this definition">¶</a></dt>
+<dd><p>Help function to count the number of spikes in a list of spiketrains</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>spiketrains</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.SpikeTrain" title="(in Neo v0.9)"><em>SpikeTrain</em></a><em>)</em>) – List of SpikeTrains</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Total number of spikes in all the spiketrains</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-spynnaker8.utilities">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker8.utilities" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">spynnaker8.utilities package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-spynnaker8.utilities.neo_compare">spynnaker8.utilities.neo_compare module</a></li>
+<li><a class="reference internal" href="#module-spynnaker8.utilities.neo_convertor">spynnaker8.utilities.neo_convertor module</a></li>
+<li><a class="reference internal" href="#module-spynnaker8.utilities">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="spynnaker8.models.synapse_dynamics.weight_dependence.html"
+                        title="previous chapter">spynnaker8.models.synapse_dynamics.weight_dependence package</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/spynnaker8.utilities.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="spynnaker8.models.synapse_dynamics.weight_dependence.html" title="spynnaker8.models.synapse_dynamics.weight_dependence package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >spynnaker</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="spynnaker8.html" >spynnaker8 package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker8.utilities package</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2021.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
+    </div>
+  </body>
+</html>

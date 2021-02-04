@@ -80,7 +80,7 @@
     <span class="k">return</span> <span class="p">(</span><span class="n">key</span> <span class="o">&gt;&gt;</span> <span class="mi">14</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x1</span>
 
 
-<div class="viewcode-block" id="MunichRetinaDevice"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.MunichRetinaDevice">[docs]</a><span class="k">class</span> <span class="nc">MunichRetinaDevice</span><span class="p">(</span>
+<div class="viewcode-block" id="MunichRetinaDevice"><a class="viewcode-back" href="../../../../spynnaker8.external_devices.html#spynnaker.pyNN.external_devices_models.MunichRetinaDevice">[docs]</a><span class="k">class</span> <span class="nc">MunichRetinaDevice</span><span class="p">(</span>
         <span class="n">ApplicationSpiNNakerLinkVertex</span><span class="p">,</span> <span class="n">AbstractSendMeMulticastCommandsVertex</span><span class="p">,</span>
         <span class="n">AbstractProvidesOutgoingPartitionConstraints</span><span class="p">,</span>
         <span class="n">ProvidesKeyToAtomMappingImpl</span><span class="p">):</span>
@@ -90,23 +90,25 @@
         <span class="s2">&quot;__fixed_key&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__fixed_mask&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__polarity&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__position&quot;</span><span class="p">]</span>
+        <span class="s2">&quot;__is_right&quot;</span><span class="p">]</span>
 
     <span class="c1"># key codes for the robot retina</span>
-    <span class="n">MANAGEMENT_BIT</span> <span class="o">=</span> <span class="mh">0x400</span>
-    <span class="n">MANAGEMENT_MASK</span> <span class="o">=</span> <span class="mh">0xFFFFF800</span>
-    <span class="n">LEFT_RETINA_ENABLE</span> <span class="o">=</span> <span class="mh">0x45</span>
-    <span class="n">RIGHT_RETINA_ENABLE</span> <span class="o">=</span> <span class="mh">0x46</span>
-    <span class="n">LEFT_RETINA_DISABLE</span> <span class="o">=</span> <span class="mh">0x45</span>
-    <span class="n">RIGHT_RETINA_DISABLE</span> <span class="o">=</span> <span class="mh">0x46</span>
-    <span class="n">LEFT_RETINA_KEY_SET</span> <span class="o">=</span> <span class="mh">0x43</span>
-    <span class="n">RIGHT_RETINA_KEY_SET</span> <span class="o">=</span> <span class="mh">0x44</span>
+    <span class="n">_MANAGEMENT_BIT</span> <span class="o">=</span> <span class="mh">0x400</span>
+    <span class="n">_MANAGEMENT_MASK</span> <span class="o">=</span> <span class="mh">0xFFFFF800</span>
+    <span class="n">_LEFT_RETINA_ENABLE</span> <span class="o">=</span> <span class="mh">0x45</span>
+    <span class="n">_RIGHT_RETINA_ENABLE</span> <span class="o">=</span> <span class="mh">0x46</span>
+    <span class="n">_LEFT_RETINA_DISABLE</span> <span class="o">=</span> <span class="mh">0x45</span>
+    <span class="n">_RIGHT_RETINA_DISABLE</span> <span class="o">=</span> <span class="mh">0x46</span>
+    <span class="n">_LEFT_RETINA_KEY_SET</span> <span class="o">=</span> <span class="mh">0x43</span>
+    <span class="n">_RIGHT_RETINA_KEY_SET</span> <span class="o">=</span> <span class="mh">0x44</span>
 
     <span class="n">UP_POLARITY</span> <span class="o">=</span> <span class="s2">&quot;UP&quot;</span>
     <span class="n">DOWN_POLARITY</span> <span class="o">=</span> <span class="s2">&quot;DOWN&quot;</span>
     <span class="n">MERGED_POLARITY</span> <span class="o">=</span> <span class="s2">&quot;MERGED&quot;</span>
 
+    <span class="c1">#: Select the left retina</span>
     <span class="n">LEFT_RETINA</span> <span class="o">=</span> <span class="s2">&quot;LEFT&quot;</span>
+    <span class="c1">#: Select the right retina</span>
     <span class="n">RIGHT_RETINA</span> <span class="o">=</span> <span class="s2">&quot;RIGHT&quot;</span>
     <span class="n">_RETINAS</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">((</span><span class="n">LEFT_RETINA</span><span class="p">,</span> <span class="n">RIGHT_RETINA</span><span class="p">))</span>
 
@@ -127,7 +129,8 @@
 <span class="sd">        :param str position: ``LEFT`` or ``RIGHT``</span>
 <span class="sd">        :param str label:</span>
 <span class="sd">        :param str polarity: ``UP``, ``DOWN`` or ``MERGED``</span>
-<span class="sd">        :param str board_address:</span>
+<span class="sd">        :param board_address:</span>
+<span class="sd">        :type board_address: str or None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="k">if</span> <span class="n">polarity</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -147,18 +150,17 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">__fixed_mask</span> <span class="o">=</span> <span class="mh">0xFFFFC000</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__polarity</span> <span class="o">=</span> <span class="n">polarity</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__position</span> <span class="o">=</span> <span class="n">position</span>
+        <span class="k">if</span> <span class="n">position</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_RETINAS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SpynnakerException</span><span class="p">(</span>
+                <span class="s2">&quot;The external Retina does not recognise this position&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__is_right</span> <span class="o">=</span> <span class="n">position</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">RIGHT_RETINA</span>
 
         <span class="nb">super</span><span class="p">(</span><span class="n">MunichRetinaDevice</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">n_atoms</span><span class="o">=</span><span class="n">fixed_n_neurons</span><span class="p">,</span> <span class="n">spinnaker_link_id</span><span class="o">=</span><span class="n">spinnaker_link_id</span><span class="p">,</span>
             <span class="n">max_atoms_per_core</span><span class="o">=</span><span class="n">fixed_n_neurons</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span>
             <span class="n">board_address</span><span class="o">=</span><span class="n">board_address</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__position</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_RETINAS</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">SpynnakerException</span><span class="p">(</span>
-                <span class="s2">&quot;The external Retina does not recognise this _position&quot;</span><span class="p">)</span>
-
-<div class="viewcode-block" id="MunichRetinaDevice.get_outgoing_partition_constraints"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.MunichRetinaDevice.get_outgoing_partition_constraints">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractProvidesOutgoingPartitionConstraints</span><span class="o">.</span>
+<div class="viewcode-block" id="MunichRetinaDevice.get_outgoing_partition_constraints"><a class="viewcode-back" href="../../../../spynnaker8.external_devices.html#spynnaker.pyNN.external_devices_models.MunichRetinaDevice.get_outgoing_partition_constraints">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractProvidesOutgoingPartitionConstraints</span><span class="o">.</span>
                <span class="n">get_outgoing_partition_constraints</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_outgoing_partition_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">partition</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">FixedKeyAndMaskConstraint</span><span class="p">([</span>
@@ -170,10 +172,9 @@
         <span class="n">commands</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
         <span class="c1"># change the retina key it transmits with</span>
         <span class="c1"># (based off if its right or left)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__position</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">RIGHT_RETINA</span><span class="p">:</span>
-            <span class="n">key_set_command</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MANAGEMENT_BIT</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">RIGHT_RETINA_KEY_SET</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">key_set_command</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MANAGEMENT_BIT</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">LEFT_RETINA_KEY_SET</span>
+        <span class="n">key_set_command</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_MANAGEMENT_BIT</span> <span class="o">|</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_RIGHT_RETINA_KEY_SET</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__is_right</span>
+            <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_LEFT_RETINA_KEY_SET</span><span class="p">)</span>
 
         <span class="c1"># to ensure populations receive the correct packets, this needs to be</span>
         <span class="c1"># different based on which retina</span>
@@ -185,10 +186,9 @@
             <span class="n">delay_between_repeats</span><span class="o">=</span><span class="mi">1000</span><span class="p">))</span>
 
         <span class="c1"># make retina enabled (dependent on if its a left or right retina</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__position</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">RIGHT_RETINA</span><span class="p">:</span>
-            <span class="n">enable_command</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MANAGEMENT_BIT</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">RIGHT_RETINA_ENABLE</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">enable_command</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MANAGEMENT_BIT</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">LEFT_RETINA_ENABLE</span>
+        <span class="n">enable_command</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_MANAGEMENT_BIT</span> <span class="o">|</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_RIGHT_RETINA_ENABLE</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__is_right</span>
+            <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_LEFT_RETINA_ENABLE</span><span class="p">)</span>
         <span class="n">commands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">MultiCastCommand</span><span class="p">(</span>
             <span class="n">key</span><span class="o">=</span><span class="n">enable_command</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">repeat</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
             <span class="n">delay_between_repeats</span><span class="o">=</span><span class="mi">1000</span><span class="p">))</span>
@@ -199,10 +199,9 @@
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSendMeMulticastCommandsVertex</span><span class="o">.</span><span class="n">pause_stop_commands</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">pause_stop_commands</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># disable retina</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__position</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">RIGHT_RETINA</span><span class="p">:</span>
-            <span class="n">disable_command</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MANAGEMENT_BIT</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">RIGHT_RETINA_DISABLE</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">disable_command</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MANAGEMENT_BIT</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">LEFT_RETINA_DISABLE</span>
+        <span class="n">disable_command</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_MANAGEMENT_BIT</span> <span class="o">|</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_RIGHT_RETINA_DISABLE</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__is_right</span>
+            <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_LEFT_RETINA_DISABLE</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="p">[</span><span class="n">MultiCastCommand</span><span class="p">(</span>
             <span class="n">disable_command</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">repeat</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">delay_between_repeats</span><span class="o">=</span><span class="mi">1000</span><span class="p">)]</span>
@@ -248,7 +247,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2017.
+        &#169; Copyright 2014-2021.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
     </div>
   </body>
