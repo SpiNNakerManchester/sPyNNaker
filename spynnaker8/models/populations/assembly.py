@@ -13,8 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import logging
+from spinn_utilities.log import FormatAdapter
 from spynnaker.pyNN.models.populations import Assembly as _BaseClass
-logger = logging.getLogger(__file__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class Assembly(_BaseClass):
