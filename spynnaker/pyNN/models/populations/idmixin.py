@@ -12,6 +12,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+from six import iteritems
 import sys
 from six import reraise
 
@@ -71,14 +73,16 @@ class IDMixin(object):
 
     def __getattr__(self, name):
         # pylint: disable=broad-except
+        if name == "initial_values":
+            return self.__population._get_initial_values(self.__id)
         try:
-            return self.__population.get_by_selector(
+            return self.__population._get_by_selector(
                 selector=self.__id, parameter_names=name)[0]
         except Exception:
             ei = sys.exc_info()
             try:
                 # try initialisable variable
-                return self.__population.get_initial_value(
+                return self.__population._get_initial_value(
                     selector=self.__id, variable=name)[0]
             except Exception:
                 # that failed too so raise the better original exception
@@ -95,7 +99,7 @@ class IDMixin(object):
                 ei = sys.exc_info()
                 try:
                     # try initialisable variable
-                    return self.__population.set_initial_value(
+                    return self.__population._initialize(
                         selector=self.__id, variable=name, value=value)
                 except Exception:
                     # that failed too so raise the better original exception
@@ -115,7 +119,7 @@ class IDMixin(object):
         """
         results = dict()
         for name in self.celltype.get_parameter_names():
-            results[name] = self.__population.get_by_selector(self.__id, name)
+            results[name] = self.__population._get_by_selector(self.__id, name)
         return results
 
     @property
@@ -172,15 +176,21 @@ class IDMixin(object):
         :param str variable: The name of the variable
         :rtype: float
         """
-        return self.__population.get_initial_value(variable, self.__id)
+        return self.__population._get_initial_value(variable, self.__id)
 
     def set_initial_value(self, variable, value):
-        """ Set the initial value of a state variable of the cell.
-
+        """ Set the initial value of a state variable of the cell.	        
         :param str variable: The name of the variable
         :param float value: The value of the variable
         """
-        self.__population.set_initial_value(variable, value, self.__id)
+        self.__population._initialize(variable, value, self.__id)
+
+    def initialize(self, **initial_values):
+        """ Set the initial value of a state variable of the cell.
+
+        """
+        for variable, value in iteritems(initial_values):
+            self.__population._initialize(variable, value, self.__id)
 
     def as_view(self):
         """ Return a PopulationView containing just this cell.

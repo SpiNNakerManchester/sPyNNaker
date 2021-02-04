@@ -125,14 +125,14 @@ class Test_IDMixin(BaseTestCase):
     def test_initial_value(self):
         sim.setup(timestep=1.0)
         pop = sim.Population(5, sim.IF_curr_exp(), label="pop_1")
-        self.assertEqual([-65, -65, -65, -65, -65], pop.get_initial_value("v"))
+        self.assertEqual([-65, -65, -65, -65, -65], pop.initial_values["v"])
         view = PopulationView(pop, [1, 3], label="Odds")
         view2 = PopulationView(pop, [1, 2], label="OneTwo")
         view_iv = view.initial_values
         self.assertEqual(3, len(view_iv))
         self.assertEqual([-65, -65], view_iv["v"])
         view.initialize(v=-60)
-        self.assertEqual([-65, -60, -65, -60, -65], pop.get_initial_value("v"))
+        self.assertEqual([-65, -60, -65, -60, -65], pop.initial_values["v"])
         self.assertEqual([-60, -60], view.initial_values["v"])
         self.assertEqual([-60, -65], view2.initial_values["v"])
         rand_distr = RandomDistribution("uniform",
