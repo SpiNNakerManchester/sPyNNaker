@@ -139,6 +139,9 @@ static inline void do_dma_read(
     next_buffer_to_fill = (next_buffer_to_fill + 1) % N_DMA_BUFFERS;
 }
 
+uint32_t spikes_pushed = 0;
+uint32_t spikes_popped = 0;
+
 //! \brief Check if there is anything to do. If not, DMA is not busy
 //! \param[out] row:
 //!     The address of the synaptic row that has been processed
@@ -183,6 +186,11 @@ static inline bool is_something_to_do(
     while (in_spikes_get_next_spike(spike)) {
         // Enable interrupts while looking up in the master pop table,
         // as this can be slow
+        spikes_popped += 1;
+        if (spikes_pushed - spikes_popped != in_spikes_size()) {
+            log_error("Mismatch between spikes pushed %d and popped %d and size %d",
+                    spikes_pushed, spikes_popped, in_spikes_size());
+        }
         spin1_mode_restore(cpsr);
         if (population_table_get_first_address(
                 *spike, row, n_bytes_to_transfer)) {
@@ -315,6 +323,12 @@ static void multicast_packet_received_callback(uint key, uint payload) {
     // cycle through the packet insertion
     for (uint count = payload; count > 0; count--) {
         in_spikes_add_spike(key);
+        spikes_pushed += 1;
+    }
+
+    if (spikes_pushed - spikes_popped != in_spikes_size()) {
+        log_error("Mismatch between spikes pushed %d and popped %d and size %d",
+                spikes_pushed, spikes_popped, in_spikes_size());
     }
 
     // If we're not already processing synaptic DMAs,
@@ -446,6 +460,12 @@ void spike_processing_clear_input_buffer(timer_t time) {
         log_error("%d spikes still in buffer but DMA not busy", n_spikes);
         rt_error(RTE_SWERR);
     }
+    if (spikes_pushed - spikes_popped != n_spikes) {
+        log_error("Mismatch between spikes pushed %d and popped %d and size %d",
+                spikes_pushed, spikes_popped, n_spikes);
+    }
+    spikes_pushed = 0;
+    spikes_popped = 0;
 
     // Record the count whether clearing or not for provenance
     count_input_buffer_packets_late += n_spikes;
