@@ -50,7 +50,7 @@ class MachineMunichMotorDevice(
         "__speed",
         "__update_time"]
 
-    _MOTOR_PARTITION_ID = "MOTOR"
+    MOTOR_PARTITION_ID = "MOTOR"
 
     # By asking for this number of keys, we will get a mask of 0xFFFFF800,
     # which works with the motor control protocol correctly
@@ -181,7 +181,7 @@ class MachineMunichMotorDevice(
 
         # Get the key
         edge_key = routing_info.get_first_key_from_pre_vertex(
-            placement.vertex, self._MOTOR_PARTITION_ID)
+            placement.vertex, self.MOTOR_PARTITION_ID)
         if edge_key is None:
             raise SpynnakerException(
                 "This motor should have one outgoing edge to the robot")
@@ -222,7 +222,7 @@ class MachineMunichMotorDevice(
 
     @overrides(MachineVertex.get_n_keys_for_partition)
     def get_n_keys_for_partition(self, _partition):
-        if _partition == self._MOTOR_PARTITION_ID:
+        if _partition == self.MOTOR_PARTITION_ID:
             return self._MOTOR_N_KEYS
         return super(MachineMunichMotorDevice, self).get_n_keys_for_partition(
             _partition)
