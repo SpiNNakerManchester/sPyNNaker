@@ -26,8 +26,7 @@ from spinn_front_end_common.interface.buffer_management.buffer_models import (
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
 from spinn_front_end_common.abstract_models import (
-    AbstractHasAssociatedBinary, AbstractRecordable,
-    AbstractSupportsBitFieldGeneration,
+    AbstractHasAssociatedBinary, AbstractSupportsBitFieldGeneration,
     AbstractSupportsBitFieldRoutingCompression,
     AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification)
 from spinn_front_end_common.interface.profiling import (
@@ -48,8 +47,7 @@ from spinn_front_end_common.utilities import (
 class PopulationMachineVertex(
         MachineVertex, AbstractReceiveBuffersToHost,
         AbstractHasAssociatedBinary, ProvidesProvenanceDataFromMachineImpl,
-        AbstractRecordable, AbstractHasProfileData,
-        AbstractSupportsBitFieldGeneration,
+        AbstractHasProfileData, AbstractSupportsBitFieldGeneration,
         AbstractSupportsBitFieldRoutingCompression,
         AbstractGeneratesDataSpecification, AbstractSynapseExpandable,
         AbstractRewritesDataSpecification, AbstractReadParametersBeforeSet):
@@ -177,7 +175,6 @@ class PopulationMachineVertex(
         MachineVertex.__init__(
             self, label, constraints, app_vertex, vertex_slice)
         self.__binary_file_name = binary_file_name
-        AbstractRecordable.__init__(self)
         self.__recorded_region_ids = recorded_region_ids
         self.__resources = resources_required
         self.__drop_late_spikes = drop_late_spikes
@@ -232,10 +229,6 @@ class PopulationMachineVertex(
     @overrides(ProvidesProvenanceDataFromMachineImpl._n_additional_data_items)
     def _n_additional_data_items(self):
         return len(PopulationMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES)
-
-    @overrides(AbstractRecordable.is_recording)
-    def is_recording(self):
-        return len(self.__recorded_region_ids) > 0
 
     @overrides(ProvidesProvenanceDataFromMachineImpl.
                get_provenance_data_from_machine)
