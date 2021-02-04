@@ -65,8 +65,7 @@
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.helpful_functions</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">locate_memory_region_for_placement</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">AbstractHasAssociatedBinary</span><span class="p">,</span> <span class="n">AbstractRecordable</span><span class="p">,</span>
-    <span class="n">AbstractSupportsBitFieldGeneration</span><span class="p">,</span>
+    <span class="n">AbstractHasAssociatedBinary</span><span class="p">,</span> <span class="n">AbstractSupportsBitFieldGeneration</span><span class="p">,</span>
     <span class="n">AbstractSupportsBitFieldRoutingCompression</span><span class="p">,</span>
     <span class="n">AbstractGeneratesDataSpecification</span><span class="p">,</span> <span class="n">AbstractRewritesDataSpecification</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.profiling</span> <span class="kn">import</span> <span class="p">(</span>
@@ -87,8 +86,7 @@
 <div class="viewcode-block" id="PopulationMachineVertex"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex">[docs]</a><span class="k">class</span> <span class="nc">PopulationMachineVertex</span><span class="p">(</span>
         <span class="n">MachineVertex</span><span class="p">,</span> <span class="n">AbstractReceiveBuffersToHost</span><span class="p">,</span>
         <span class="n">AbstractHasAssociatedBinary</span><span class="p">,</span> <span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="p">,</span>
-        <span class="n">AbstractRecordable</span><span class="p">,</span> <span class="n">AbstractHasProfileData</span><span class="p">,</span>
-        <span class="n">AbstractSupportsBitFieldGeneration</span><span class="p">,</span>
+        <span class="n">AbstractHasProfileData</span><span class="p">,</span> <span class="n">AbstractSupportsBitFieldGeneration</span><span class="p">,</span>
         <span class="n">AbstractSupportsBitFieldRoutingCompression</span><span class="p">,</span>
         <span class="n">AbstractGeneratesDataSpecification</span><span class="p">,</span> <span class="n">AbstractSynapseExpandable</span><span class="p">,</span>
         <span class="n">AbstractRewritesDataSpecification</span><span class="p">,</span> <span class="n">AbstractReadParametersBeforeSet</span><span class="p">):</span>
@@ -216,7 +214,6 @@
         <span class="n">MachineVertex</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__binary_file_name</span> <span class="o">=</span> <span class="n">binary_file_name</span>
-        <span class="n">AbstractRecordable</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__recorded_region_ids</span> <span class="o">=</span> <span class="n">recorded_region_ids</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__resources</span> <span class="o">=</span> <span class="n">resources_required</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__drop_late_spikes</span> <span class="o">=</span> <span class="n">drop_late_spikes</span>
@@ -271,10 +268,6 @@
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="o">.</span><span class="n">_n_additional_data_items</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">_n_additional_data_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="p">)</span>
-
-<div class="viewcode-block" id="PopulationMachineVertex.is_recording"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.is_recording">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractRecordable</span><span class="o">.</span><span class="n">is_recording</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">is_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__recorded_region_ids</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span></div>
 
 <div class="viewcode-block" id="PopulationMachineVertex.get_provenance_data_from_machine"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.get_provenance_data_from_machine">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="o">.</span>
                <span class="n">get_provenance_data_from_machine</span><span class="p">)</span>

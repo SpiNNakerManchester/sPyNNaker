@@ -70,8 +70,7 @@
 <span class="kn">from</span> <span class="nn">pacman.model.graphs.machine</span> <span class="kn">import</span> <span class="n">MachineVertex</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractHasAssociatedBinary</span><span class="p">,</span> <span class="n">AbstractSupportsDatabaseInjection</span><span class="p">,</span>
-    <span class="n">AbstractRecordable</span><span class="p">,</span> <span class="n">AbstractRewritesDataSpecification</span><span class="p">,</span>
-    <span class="n">AbstractGeneratesDataSpecification</span><span class="p">)</span>
+    <span class="n">AbstractRewritesDataSpecification</span><span class="p">,</span> <span class="n">AbstractGeneratesDataSpecification</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.provenance</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.buffer_management.buffer_models</span> <span class="kn">import</span> <span class="p">(</span>
@@ -123,7 +122,7 @@
 
 <div class="viewcode-block" id="SpikeSourcePoissonMachineVertex"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex.SpikeSourcePoissonMachineVertex">[docs]</a><span class="k">class</span> <span class="nc">SpikeSourcePoissonMachineVertex</span><span class="p">(</span>
         <span class="n">MachineVertex</span><span class="p">,</span> <span class="n">AbstractReceiveBuffersToHost</span><span class="p">,</span>
-        <span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="p">,</span> <span class="n">AbstractRecordable</span><span class="p">,</span>
+        <span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="p">,</span>
         <span class="n">AbstractSupportsDatabaseInjection</span><span class="p">,</span> <span class="n">AbstractHasProfileData</span><span class="p">,</span>
         <span class="n">AbstractHasAssociatedBinary</span><span class="p">,</span> <span class="n">AbstractRewritesDataSpecification</span><span class="p">,</span>
         <span class="n">AbstractGeneratesDataSpecification</span><span class="p">,</span> <span class="n">AbstractReadParametersBeforeSet</span><span class="p">):</span>
@@ -212,10 +211,6 @@
         <span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="o">.</span><span class="n">_n_additional_data_items</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">_n_additional_data_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="mi">1</span>
-
-<div class="viewcode-block" id="SpikeSourcePoissonMachineVertex.is_recording"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex.SpikeSourcePoissonMachineVertex.is_recording">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractRecordable</span><span class="o">.</span><span class="n">is_recording</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">is_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__is_recording</span></div>
 
 <div class="viewcode-block" id="SpikeSourcePoissonMachineVertex.get_recorded_region_ids"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex.SpikeSourcePoissonMachineVertex.get_recorded_region_ids">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractReceiveBuffersToHost</span><span class="o">.</span><span class="n">get_recorded_region_ids</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_recorded_region_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
