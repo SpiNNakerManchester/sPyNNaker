@@ -33,7 +33,7 @@ class AbstractReadParametersBeforeSet(object, metaclass=AbstractBase):
         if not issubclass(cls, MachineVertex):
             raise ConfigurationException(
                 cls._WRONG_VERTEX_TYPE_ERROR.format(cls))
-        return super(AbstractReadParametersBeforeSet, cls).__new__(cls)
+        return super().__new__(cls, *args, **kwargs)
 
     @abstractmethod
     def read_parameters_from_machine(

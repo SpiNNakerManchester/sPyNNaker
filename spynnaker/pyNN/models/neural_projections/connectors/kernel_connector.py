@@ -396,7 +396,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
     def gen_delays_id(self, delays):
         if self._krn_delays is not None:
             return PARAM_TYPE_KERNEL
-        return super(KernelConnector, self).gen_delays_id(delays)
+        return super().gen_delays_id(delays)
 
     @overrides(
         AbstractGenerateConnectorOnMachine.gen_delay_params_size_in_bytes)
@@ -404,8 +404,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         if self._krn_delays is not None:
             return (N_KERNEL_PARAMS + 1 + self._krn_delays.size) * \
                 BYTES_PER_WORD
-        return super(KernelConnector, self).gen_delay_params_size_in_bytes(
-            delays)
+        return super().gen_delay_params_size_in_bytes(delays)
 
     @overrides(AbstractGenerateConnectorOnMachine.gen_delay_params)
     def gen_delay_params(self, delays, pre_vertex_slice, post_vertex_slice):
@@ -415,14 +414,14 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             data = numpy.array(properties, dtype="uint32")
             values = DataType.S1615.encode_as_numpy_int_array(self._krn_delays)
             return numpy.concatenate((data, values.flatten()))
-        return super(KernelConnector, self).gen_delay_params(
+        return super().gen_delay_params(
             delays, pre_vertex_slice, post_vertex_slice)
 
     @overrides(AbstractGenerateConnectorOnMachine.gen_weights_id)
     def gen_weights_id(self, weights):
         if self._krn_weights is not None:
             return PARAM_TYPE_KERNEL
-        return super(KernelConnector, self).gen_weights_id(weights)
+        return super().gen_weights_id(weights)
 
     @overrides(
         AbstractGenerateConnectorOnMachine.gen_weight_params_size_in_bytes)
@@ -430,8 +429,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         if self._krn_weights is not None:
             return (N_KERNEL_PARAMS + 1 + self._krn_weights.size) * \
                 BYTES_PER_WORD
-        return super(KernelConnector, self).gen_weight_params_size_in_bytes(
-            weights)
+        return super().gen_weight_params_size_in_bytes(weights)
 
     @overrides(AbstractGenerateConnectorOnMachine.gen_weights_params)
     def gen_weights_params(self, weights, pre_vertex_slice, post_vertex_slice):
@@ -442,7 +440,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             values = DataType.S1615.encode_as_numpy_int_array(
                 self._krn_weights)
             return numpy.concatenate((data, values.flatten()))
-        return super(KernelConnector, self).gen_weights_params(
+        return super().gen_weights_params(
             weights, pre_vertex_slice, post_vertex_slice)
 
     @property

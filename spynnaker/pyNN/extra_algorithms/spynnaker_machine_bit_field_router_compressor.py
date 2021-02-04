@@ -209,9 +209,7 @@ class SpynnakerMachineBitFieldUnorderedRouterCompressor(
             "algorithm name is deprecated. "
             "Please use MachineBitFieldOrderedCoveringCompressor instead. "
             "Remove algorithms from your cfg to use defaults")
-        return super(
-            SpynnakerMachineBitFieldUnorderedRouterCompressor, cls).__new__(
-            cls, *args, **kwargs)
+        return super().__new__(cls, *args, **kwargs)
 
     @overrides(AbstractMachineBitFieldRouterCompressor._compressor_factory)
     def _compressor_factory(self):

@@ -272,8 +272,8 @@ class AbstractSpiNNakerCommon(
     def _detect_if_graph_has_changed(self, reset_flags=True):
         """ Iterate though the graph and look for changes.
         """
-        changed, data_changed = super(AbstractSpiNNakerCommon, self).\
-            _detect_if_graph_has_changed(reset_flags)
+        changed, data_changed = super()._detect_if_graph_has_changed(
+            reset_flags)
 
         # Additionally check populations for changes
         for population in self._populations:
@@ -300,8 +300,7 @@ class AbstractSpiNNakerCommon(
     def add_application_vertex(self, vertex):
         if isinstance(vertex, CommandSender):
             self._command_sender = vertex
-
-        AbstractSpinnakerBase.add_application_vertex(self, vertex)
+        super().add_application_vertex(vertex)
 
     @staticmethod
     def _count_unique_keys(commands):
@@ -337,8 +336,7 @@ class AbstractSpiNNakerCommon(
         for population in self._populations:
             population._end()
 
-        super(AbstractSpiNNakerCommon, self).stop(
-            turn_off_machine, clear_routing_tables, clear_tags)
+        super().stop(turn_off_machine, clear_routing_tables, clear_tags)
         self.reset_number_of_neurons_per_core()
         globals_variables.unset_simulator(self)
 
@@ -369,7 +367,7 @@ class AbstractSpiNNakerCommon(
             self.extend_extra_post_run_algorithms(
                 ["RedundantPacketCountReport"])
 
-        super(AbstractSpiNNakerCommon, self).run(run_time, sync_time)
+        super().run(run_time, sync_time)
 
     @staticmethod
     def register_binary_search_path(search_path):

@@ -42,9 +42,8 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
         """
 
         # do partitioning in same way
-        machine_graph, chips_used = SplitterPartitioner.__call__(
-            self, app_graph, machine, plan_n_time_steps,
-            pre_allocated_resources)
+        machine_graph, chips_used = super().__call__(
+            app_graph, machine, plan_n_time_steps, pre_allocated_resources)
 
         # return the accepted things
         return machine_graph, chips_used
@@ -54,7 +53,6 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
             self, src_machine_vertex, dest_machine_vertex,
             common_edge_type, app_edge, machine_graph,
             app_outgoing_edge_partition, resource_tracker):
-
         # filter off connectivity
         if (isinstance(app_edge, AbstractSlicesConnect) and not
                 app_edge.could_connect(

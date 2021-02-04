@@ -90,10 +90,10 @@ class MockFromListConnector(FromListConnector):
         self._split_count = 0
 
     def _split_connections(self, pre_slices, post_slices):
-        split = FromListConnector._split_connections(
-            self, pre_slices, post_slices)
+        split = super()._split_connections(pre_slices, post_slices)
         if split:
             self._split_count += 1
+        return split
 
 
 def test_connector_split():
