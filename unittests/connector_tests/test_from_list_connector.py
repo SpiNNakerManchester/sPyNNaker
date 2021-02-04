@@ -85,9 +85,8 @@ class MockFromListConnector(FromListConnector):
     # Use to check that the split is done only once
 
     def __init__(self, conn_list, safe=True, verbose=False, column_names=None):
-        FromListConnector.__init__(
-            self, conn_list, safe=safe, verbose=verbose,
-            column_names=column_names)
+        super().__init__(
+            conn_list, safe=safe, verbose=verbose, column_names=column_names)
         self._split_count = 0
 
     def _split_connections(self, pre_slices, post_slices):

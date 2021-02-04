@@ -110,7 +110,7 @@ class MunichRetinaDevice(
         self.__polarity = polarity
         self.__position = position
 
-        super(MunichRetinaDevice, self).__init__(
+        super().__init__(
             n_atoms=fixed_n_neurons, spinnaker_link_id=spinnaker_link_id,
             max_atoms_per_core=fixed_n_neurons, label=label,
             board_address=board_address)

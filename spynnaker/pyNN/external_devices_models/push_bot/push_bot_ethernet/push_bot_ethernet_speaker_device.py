@@ -53,8 +53,7 @@ class PushBotEthernetSpeakerDevice(
             raise ConfigurationException(
                 "speaker parameter must be a PushBotSpeaker value")
 
-        super(PushBotEthernetSpeakerDevice, self).__init__(
-            protocol, speaker, True, timesteps_between_send)
+        super().__init__(protocol, speaker, True, timesteps_between_send)
 
         # protocol specific data items
         self.__command_protocol = protocol

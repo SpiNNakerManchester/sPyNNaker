@@ -67,8 +67,7 @@ class AbstractGenerateConnectorOnMachine(
         :param callable callback: Ignored
         :param bool verbose:
         """
-        AbstractConnector.__init__(  # pylint: disable=non-parent-init-called
-            self, safe=safe, callback=callback, verbose=verbose)
+        super().__init__(safe=safe, callback=callback, verbose=verbose)
         self.__delay_seed = dict()
         self.__weight_seed = dict()
         self.__connector_seed = dict()

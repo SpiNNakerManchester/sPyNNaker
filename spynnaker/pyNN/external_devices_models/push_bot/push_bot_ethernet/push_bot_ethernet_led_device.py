@@ -48,7 +48,7 @@ class PushBotEthernetLEDDevice(
         :param start_total_period: The "total period" to set at the start
         :param start_frequency: The "frequency" to set at the start
         :param timesteps_between_send:
-            The number of timesteps between sending commands to the device,\
+            The number of timesteps between sending commands to the device,
             or None to use the default
         """
         # pylint: disable=too-many-arguments
@@ -56,8 +56,7 @@ class PushBotEthernetLEDDevice(
             raise ConfigurationException(
                 "led parameter must be a PushBotLED value")
 
-        super(PushBotEthernetLEDDevice, self).__init__(
-            protocol, led, True, timesteps_between_send)
+        super().__init__(protocol, led, True, timesteps_between_send)
 
         # protocol specific data items
         self.__command_protocol = protocol

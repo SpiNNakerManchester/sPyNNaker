@@ -45,7 +45,7 @@ class SmallWorldConnector(AbstractConnector):
         :param bool verbose:
         """
         # pylint: disable=too-many-arguments
-        super(SmallWorldConnector, self).__init__(safe, callback, verbose, rng)
+        super().__init__(safe, callback, verbose, rng)
         self.__rewiring = rewiring
         self.__degree = degree
         self.__allow_self_connections = allow_self_connections
@@ -57,8 +57,7 @@ class SmallWorldConnector(AbstractConnector):
 
     @overrides(AbstractConnector.set_projection_information)
     def set_projection_information(self, machine_time_step, synapse_info):
-        AbstractConnector.set_projection_information(
-            self, machine_time_step, synapse_info)
+        super().set_projection_information(machine_time_step, synapse_info)
         self._set_n_connections(synapse_info)
 
     def _set_n_connections(self, synapse_info):

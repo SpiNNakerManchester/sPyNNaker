@@ -41,7 +41,7 @@ class PushBotEthernetRetinaDevice(
         :param retina_injector_label:
         """
         # pylint: disable=too-many-arguments
-        super(PushBotEthernetRetinaDevice, self).__init__(protocol, resolution)
+        super().__init__(protocol, resolution)
         pushbot_wifi_connection = get_pushbot_wifi_connection(
             pushbot_ip_address, pushbot_port)
         self.__translator = PushBotTranslator(

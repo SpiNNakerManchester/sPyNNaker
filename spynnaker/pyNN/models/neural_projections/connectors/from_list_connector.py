@@ -71,7 +71,7 @@ class FromListConnector(AbstractConnector):
             extra columns in ``conn_list`` (i.e., after the first two).
         :type column_names: None or list(str)
         """
-        super(FromListConnector, self).__init__(safe, callback, verbose)
+        super().__init__(safe, callback, verbose)
 
         self.__column_names = column_names
         self.__split_conn_list = None

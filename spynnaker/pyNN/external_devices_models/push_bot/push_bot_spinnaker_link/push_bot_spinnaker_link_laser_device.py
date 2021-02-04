@@ -53,9 +53,9 @@ class PushBotSpiNNakerLinkLaserDevice(
         :param start_frequency: The "frequency" to send at the start
         """
         # pylint: disable=too-many-arguments
-        PushBotEthernetLaserDevice.__init__(
-            self, laser, protocol, start_active_time,
-            start_total_period, start_frequency)
+        super().__init__(
+            laser, protocol, start_active_time, start_total_period,
+            start_frequency)
         ApplicationSpiNNakerLinkVertex.__init__(
             self, spinnaker_link_id=spinnaker_link_id, n_atoms=n_neurons,
             board_address=board_address, label=label)

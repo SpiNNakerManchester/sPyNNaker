@@ -91,8 +91,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         :param bool verbose:
         :param callable callback: (ignored)
         """
-        super(KernelConnector, self).__init__(
-            safe=safe, callback=callback, verbose=verbose)
+        super().__init__(safe=safe, callback=callback, verbose=verbose)
 
         # Get the kernel size
         self._kernel_w = shape_kernel[WIDTH]

@@ -36,7 +36,7 @@ class ThresholdTypeMulticastDeviceControl(AbstractThresholdType):
         """
         :param list(AbstractMulticastControllableDevice) device:
         """
-        super(ThresholdTypeMulticastDeviceControl, self).__init__([
+        super().__init__([
             DataType.UINT32,   # control_key
             DataType.UINT32,   # control_uses_payload
             DataType.S1615,    # min_value

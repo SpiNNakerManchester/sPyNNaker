@@ -76,13 +76,11 @@ from unittests.mocks import MockSimulator, MockPopulation
 
 
 class MockSynapseIO(object):
-
     def get_block_n_bytes(self, max_row_length, n_rows):
         return 4
 
 
 class MockMasterPopulationTable(object):
-
     def __init__(self, key_to_entry_map):
         self._key_to_entry_map = key_to_entry_map
 
@@ -92,14 +90,12 @@ class MockMasterPopulationTable(object):
 
 
 class MockCPUInfo(object):
-
     @property
     def user(self):
         return [0, 0, 0, 0]
 
 
 class MockTransceiverRawData(object):
-
     def __init__(self, data_to_read):
         self._data_to_read = data_to_read
 
@@ -111,16 +107,13 @@ class MockTransceiverRawData(object):
 
 
 class MockSplitter(SplitterSliceLegacy, AbstractSpynnakerSplitterDelay):
-
     def __init__(self):
-        SplitterSliceLegacy.__init__(self, "mock splitter")
-        AbstractSpynnakerSplitterDelay.__init__(self)
+        super().__init__("mock splitter")
 
 
 class SimpleApplicationVertex(ApplicationVertex, LegacyPartitionerAPI):
-
     def __init__(self, n_atoms, label=None):
-        super(SimpleApplicationVertex, self).__init__(label=label)
+        super().__init__(label=label)
         self._n_atoms = n_atoms
 
     @property

@@ -107,7 +107,7 @@ class ExternalFPGARetinaDevice(
         fixed_n_neurons = self.get_n_neurons(mode, polarity)
         self.__fixed_mask = self._get_mask(mode)
 
-        super(ExternalFPGARetinaDevice, self).__init__(
+        super().__init__(
             n_atoms=fixed_n_neurons, spinnaker_link_id=spinnaker_link_id,
             label=label, max_atoms_per_core=fixed_n_neurons,
             board_address=board_address)

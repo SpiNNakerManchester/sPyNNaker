@@ -56,8 +56,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
             Seeded random number generator, or None to make one when needed
         :type rng: ~pyNN.random.NumpyRNG or None
         """
-        super(FixedProbabilityConnector, self).__init__(
-            safe, callback, verbose)
+        super().__init__(safe, callback, verbose)
         self._p_connect = p_connect
         self.__allow_self_connections = allow_self_connections
         self._rng = rng

@@ -37,7 +37,7 @@ class WeightDependenceAdditive(
         :param float w_min: :math:`w^{min}`
         :param float w_max: :math:`w^{max}`
         """
-        super(WeightDependenceAdditive, self).__init__()
+        super().__init__()
         self.__w_min = w_min
         self.__w_max = w_max
 

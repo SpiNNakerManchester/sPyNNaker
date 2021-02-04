@@ -60,43 +60,43 @@ class SynapseTypeSEMD(AbstractSynapseType):
             isyn_inh, multiplicator, exc2_old, scaling_factor):
         r"""
         :param tau_syn_E: :math:`\tau^{syn}_{e_1}`
-        :type tau_syn_E: \
-            float, iterable(float), ~pyNN.random.RandomDistribution \
+        :type tau_syn_E:
+            float, iterable(float), ~pyNN.random.RandomDistribution
             or (mapping) function
         :param tau_syn_E2: :math:`\tau^{syn}_{e_2}`
-        :type tau_syn_E2: \
-            float, iterable(float), ~pyNN.random.RandomDistribution \
+        :type tau_syn_E2:
+            float, iterable(float), ~pyNN.random.RandomDistribution
             or (mapping) function
         :param tau_syn_I: :math:`\tau^{syn}_i`
-        :type tau_syn_I: \
-            float, iterable(float), ~pyNN.random.RandomDistribution \
+        :type tau_syn_I:
+            float, iterable(float), ~pyNN.random.RandomDistribution
             or (mapping) function
         :param isyn_exc: :math:`I^{syn}_{e_1}`
-        :type isyn_exc: \
-            float, iterable(float), ~pyNN.random.RandomDistribution \
+        :type isyn_exc:
+            float, iterable(float), ~pyNN.random.RandomDistribution
             or (mapping) function
         :param isyn_exc2: :math:`I^{syn}_{e_2}`
-        :type isyn_exc2: \
-            float, iterable(float), ~pyNN.random.RandomDistribution \
+        :type isyn_exc2:
+            float, iterable(float), ~pyNN.random.RandomDistribution
             or (mapping) function
         :param isyn_inh: :math:`I^{syn}_i`
-        :type isyn_inh: \
-            float, iterable(float), ~pyNN.random.RandomDistribution \
+        :type isyn_inh:
+            float, iterable(float), ~pyNN.random.RandomDistribution
             or (mapping) function
-        :param float multiplicator:
-        :type multiplicator: \
-            float, iterable(float), ~pyNN.random.RandomDistribution \
+        :param multiplicator:
+        :type multiplicator:
+            float, iterable(float), ~pyNN.random.RandomDistribution
             or (mapping) function
         :param exc2_old:
-        :type exc2_old: \
-            float, iterable(float), ~pyNN.random.RandomDistribution \
+        :type exc2_old:
+            float, iterable(float), ~pyNN.random.RandomDistribution
             or (mapping) function
         :param scaling_factor:
-        :type scaling_factor: \
-            float, iterable(float), ~pyNN.random.RandomDistribution \
+        :type scaling_factor:
+            float, iterable(float), ~pyNN.random.RandomDistribution
             or (mapping) function
         """
-        super(SynapseTypeSEMD, self).__init__(
+        super().__init__(
             [DataType.U032,    # decay_E
              DataType.U032,    # init_E
              DataType.S1615,   # isyn_exc

@@ -59,6 +59,6 @@ class PushBotLifSpinnakerLink(ExternalDeviceLifControl):
             device.set_command_protocol(command_protocol)
 
         # Initialise the abstract LIF class
-        super(PushBotLifSpinnakerLink, self).__init__(
+        super().__init__(
             devices, True, None, tau_m, cm, v_rest, v_reset,
             tau_syn_E, tau_syn_I, tau_refrac, i_offset, v, isyn_exc, isyn_inh)

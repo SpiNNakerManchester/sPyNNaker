@@ -151,7 +151,7 @@ class SpikeSourcePoissonMachineVertex(
             self, resources_required, is_recording, constraints=None,
             label=None, app_vertex=None, vertex_slice=None):
         # pylint: disable=too-many-arguments
-        super(SpikeSourcePoissonMachineVertex, self).__init__(
+        super().__init__(
             label, constraints=constraints, app_vertex=app_vertex,
             vertex_slice=vertex_slice)
         self.__is_recording = is_recording
@@ -169,8 +169,7 @@ class SpikeSourcePoissonMachineVertex(
         return self.POISSON_SPIKE_SOURCE_REGIONS.PROVENANCE_REGION.value
 
     @property
-    @overrides(
-        ProvidesProvenanceDataFromMachineImpl._n_additional_data_items)
+    @overrides(ProvidesProvenanceDataFromMachineImpl._n_additional_data_items)
     def _n_additional_data_items(self):
         return 1
 

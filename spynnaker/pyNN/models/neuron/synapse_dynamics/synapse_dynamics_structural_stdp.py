@@ -103,8 +103,8 @@ class SynapseDynamicsStructuralSTDP(
         :param float weight: The weight of connections formed by the connector
         :param float delay: The delay of connections formed by the connector
         """
-        SynapseDynamicsSTDP.__init__(
-            self, timing_dependence, weight_dependence, voltage_dependence,
+        super().__init__(
+            timing_dependence, weight_dependence, voltage_dependence,
             dendritic_delay_fraction, weight, delay, pad_to_length=s_max,
             backprop_delay=backprop_delay)
         self.__partner_selection = partner_selection
@@ -168,14 +168,13 @@ class SynapseDynamicsStructuralSTDP(
 
     @overrides(SynapseDynamicsSTDP.get_vertex_executable_suffix)
     def get_vertex_executable_suffix(self):
-        return (SynapseDynamicsSTDP.get_vertex_executable_suffix(self) +
+        return (super().get_vertex_executable_suffix() +
                 SynapseDynamicsStructuralCommon.get_vertex_executable_suffix(
                     self))
 
     @overrides(SynapseDynamicsSTDP.get_n_words_for_plastic_connections)
     def get_n_words_for_plastic_connections(self, n_connections):
-        value = super(SynapseDynamicsStructuralSTDP,
-                      self).get_n_words_for_plastic_connections(n_connections)
+        value = super().get_n_words_for_plastic_connections(n_connections)
         self.__actual_row_max_length = value
         return value
 
@@ -193,7 +192,7 @@ class SynapseDynamicsStructuralSTDP(
 
     @overrides(SynapseDynamicsSTDP.get_parameter_names)
     def get_parameter_names(self):
-        names = SynapseDynamicsSTDP.get_parameter_names(self)
+        names = super().get_parameter_names()
         names.extend(SynapseDynamicsStructuralCommon.get_parameter_names(self))
         return names
 
@@ -248,8 +247,7 @@ class SynapseDynamicsStructuralSTDP(
 
     @overrides(SynapseDynamicsSTDP.get_weight_maximum)
     def get_weight_maximum(self, connector, synapse_info):
-        w_max = super(SynapseDynamicsStructuralSTDP, self).get_weight_maximum(
-            connector, synapse_info)
+        w_max = super().get_weight_maximum(connector, synapse_info)
         return max(w_max, self.__initial_weight)
 
     @overrides(SynapseDynamicsStructuralCommon.get_seeds)

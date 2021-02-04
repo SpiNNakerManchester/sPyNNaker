@@ -46,8 +46,7 @@ class PushBotEthernetMotorDevice(
             raise ConfigurationException(
                 "motor parameter must be a PushBotMotor value")
 
-        super(PushBotEthernetMotorDevice, self).__init__(
-            protocol, motor, True, timesteps_between_send)
+        super().__init__(protocol, motor, True, timesteps_between_send)
         self.__command_protocol = protocol
 
     @overrides(PushBotEthernetDevice.set_command_protocol)

@@ -33,5 +33,5 @@ class ArbitraryFPGADevice(
         :param label:
         """
         # pylint: disable=too-many-arguments
-        super(ArbitraryFPGADevice, self).__init__(
+        super().__init__(
             n_neurons, fpga_id, fpga_link_id, board_address, label)

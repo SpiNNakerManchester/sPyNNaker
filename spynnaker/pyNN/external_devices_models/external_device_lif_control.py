@@ -91,7 +91,7 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
         self._translator = translator
         self._create_edges = create_edges
 
-        super(ExternalDeviceLifControl, self).__init__(
+        super().__init__(
             model_name="ExternalDeviceLifControl",
             binary="external_device_lif_control.aplx",
             neuron_model=neuron_model, input_type=input_type,

@@ -56,8 +56,7 @@ class SplitterAbstractPopulationVertexSlice(
         "your vertex and try again.")
 
     def __init__(self):
-        AbstractSplitterSlice.__init__(self, self.SPLITTER_NAME)
-        AbstractSpynnakerSplitterDelay.__init__(self)
+        super().__init__(self.SPLITTER_NAME)
 
     @overrides(AbstractSplitterSlice.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):

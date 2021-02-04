@@ -60,7 +60,7 @@ class PushBotRetinaConnection(SpynnakerLiveSpikesConnection):
         :type local_port: int or None
         """
         # pylint: disable=too-many-arguments
-        super(PushBotRetinaConnection, self).__init__(
+        super().__init__(
             send_labels=[retina_injector_label], local_host=local_host,
             local_port=local_port)
         self.__retina_injector_label = retina_injector_label

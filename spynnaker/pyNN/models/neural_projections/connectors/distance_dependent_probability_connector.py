@@ -70,8 +70,7 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
         :type rng: ~pyNN.random.NumpyRNG or None
         """
         # pylint: disable=too-many-arguments
-        super(DistanceDependentProbabilityConnector, self).__init__(
-            safe, callback, verbose)
+        super().__init__(safe, callback, verbose)
         self.__d_expression = d_expression
         self.__allow_self_connections = allow_self_connections
         self._rng = rng
@@ -82,8 +81,7 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
 
     @overrides(AbstractConnector.set_projection_information)
     def set_projection_information(self, machine_time_step, synapse_info):
-        AbstractConnector.set_projection_information(
-            self, machine_time_step, synapse_info)
+        super().set_projection_information(machine_time_step, synapse_info)
         self._set_probabilities(synapse_info)
 
     def _set_probabilities(self, synapse_info):

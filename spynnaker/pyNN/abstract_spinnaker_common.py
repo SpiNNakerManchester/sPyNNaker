@@ -129,7 +129,7 @@ class AbstractSpiNNakerCommon(
         if front_end_versions is not None:
             versions.extend(front_end_versions)
 
-        super(AbstractSpiNNakerCommon, self).__init__(
+        super().__init__(
             configfile=self.CONFIG_FILE_NAME,
             executable_finder=self.__EXECUTABLE_FINDER,
             graph_label=graph_label,

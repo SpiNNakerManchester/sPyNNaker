@@ -43,7 +43,7 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
         :param bool verbose:
         """
         self.__random_number_class = random_number_class
-        super(OneToOneConnector, self).__init__(safe, callback, verbose)
+        super().__init__(safe, callback, verbose)
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):

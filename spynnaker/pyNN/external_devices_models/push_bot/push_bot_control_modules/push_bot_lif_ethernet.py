@@ -62,6 +62,6 @@ class PushBotLifEthernet(ExternalDeviceLifControl):
             protocol,
             get_pushbot_wifi_connection(pushbot_ip_address, pushbot_port))
 
-        super(PushBotLifEthernet, self).__init__(
+        super().__init__(
             devices, False, translator, tau_m, cm, v_rest, v_reset,
             tau_syn_E, tau_syn_I, tau_refrac, i_offset, v, isyn_exc, isyn_inh)

@@ -45,7 +45,7 @@ class PushBotEthernetLaserDevice(
             The "total period" value to send at the start
         :param start_frequency: The "frequency" to send at the start
         :param timesteps_between_send:
-            The number of timesteps between sending commands to the device,\
+            The number of timesteps between sending commands to the device,
             or None to use the default
         """
         # pylint: disable=too-many-arguments
@@ -53,8 +53,7 @@ class PushBotEthernetLaserDevice(
             raise ConfigurationException(
                 "laser parameter must be a PushBotLaser value")
 
-        super(PushBotEthernetLaserDevice, self).__init__(
-            protocol, laser, True, timesteps_between_send)
+        super().__init__(protocol, laser, True, timesteps_between_send)
 
         # protocol specific data items
         self.__command_protocol = protocol

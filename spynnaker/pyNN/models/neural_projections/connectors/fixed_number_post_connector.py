@@ -67,7 +67,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
             Seeded random number generator, or None to make one when needed
         :type rng: ~pyNN.random.NumpyRNG or None
         """
-        super(FixedNumberPostConnector, self).__init__(safe, callback, verbose)
+        super().__init__(safe, callback, verbose)
         self.__n_post = n
         self.__allow_self_connections = allow_self_connections
         self.__with_replacement = with_replacement
@@ -77,8 +77,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         self._rng = rng
 
     def set_projection_information(self, machine_time_step, synapse_info):
-        AbstractConnector.set_projection_information(
-            self, machine_time_step, synapse_info)
+        super().set_projection_information(machine_time_step, synapse_info)
         if (not self.__with_replacement and
                 self.__n_post > synapse_info.n_post_neurons):
             raise SpynnakerException(

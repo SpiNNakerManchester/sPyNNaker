@@ -85,7 +85,7 @@ class MachineMunichMotorDevice(
         :param constraints:
         :param app_vertex:
         """
-        super(MachineMunichMotorDevice, self).__init__(
+        super().__init__(
             label=label, constraints=constraints, app_vertex=app_vertex,
             vertex_slice=Slice(0, self.N_ATOMS-1))
         self.__speed = speed

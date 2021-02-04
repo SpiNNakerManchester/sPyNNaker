@@ -119,8 +119,7 @@ class AbstractPopulationVertex(
         """
 
         # pylint: disable=too-many-arguments, too-many-locals
-        TDMAAwareApplicationVertex.__init__(
-            self, label, constraints, max_atoms_per_core, splitter)
+        super().__init__(label, constraints, max_atoms_per_core, splitter)
 
         self.__n_atoms = self.round_n_atoms(n_neurons, "n_neurons")
         self.__n_data_specs = 0
@@ -486,8 +485,7 @@ class AbstractPopulationVertex(
         """
         return [ContiguousKeyRangeContraint()]
 
-    @overrides(
-        AbstractNeuronRecordable.clear_recording)
+    @overrides(AbstractNeuronRecordable.clear_recording)
     def clear_recording(self, variable, buffer_manager, placements):
         if variable == NeuronRecorder.SPIKES:
             index = len(self.__neuron_impl.get_recordable_variables())

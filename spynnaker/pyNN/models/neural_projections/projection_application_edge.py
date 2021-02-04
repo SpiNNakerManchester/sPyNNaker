@@ -64,8 +64,7 @@ class ProjectionApplicationEdge(
             SynapseInformation or iterable(SynapseInformation)
         :param str label:
         """
-        super(ProjectionApplicationEdge, self).__init__(
-            pre_vertex, post_vertex, label=label)
+        super().__init__(pre_vertex, post_vertex, label=label)
 
         # A list of all synapse information for all the projections that are
         # represented by this edge
@@ -144,8 +143,7 @@ class ProjectionApplicationEdge(
 
     @overrides(ApplicationEdge.remember_associated_machine_edge)
     def remember_associated_machine_edge(self, machine_edge):
-        super(ProjectionApplicationEdge, self).\
-            remember_associated_machine_edge(machine_edge)
+        super().remember_associated_machine_edge(machine_edge)
         if self.__slices_list_mode:
             # Unexpected but if extra remember after a get convert back to sets
             self.__pre_slices = set(self.__pre_slices)
@@ -159,7 +157,7 @@ class ProjectionApplicationEdge(
 
     @overrides(ApplicationEdge.forget_machine_edges)
     def forget_machine_edges(self):
-        super(ProjectionApplicationEdge, self).forget_machine_edges()
+        super().forget_machine_edges()
         self.__pre_slices = set()
         self.__post_slices = set()
         self.__slices_list_mode = False

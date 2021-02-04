@@ -35,7 +35,7 @@ class _MunichMotorDevice(ApplicationSpiNNakerLinkVertex):
     __slots__ = []
 
     def __init__(self, spinnaker_link_id, board_address=None):
-        super(_MunichMotorDevice, self).__init__(
+        super().__init__(
             n_atoms=6, spinnaker_link_id=spinnaker_link_id,
             label="External Munich Motor", max_atoms_per_core=6,
             board_address=board_address)
@@ -73,8 +73,7 @@ class MunichMotorDevice(
         m_vertex = MachineMunichMotorDevice(
             speed, sample_time, update_time, delay_time, delta_threshold,
             continue_if_not_different, label, app_vertex=self)
-        super(MunichMotorDevice, self).__init__(
-            m_vertex, label, None, m_vertex.N_ATOMS)
+        super().__init__(m_vertex, label, None, m_vertex.N_ATOMS)
         self.__dependent_vertices = [
             _MunichMotorDevice(spinnaker_link_id, board_address)]
 

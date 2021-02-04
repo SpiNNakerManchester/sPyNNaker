@@ -12,10 +12,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from spinn_front_end_common.utilities.constants import \
-    MICRO_TO_MILLISECOND_CONVERSION
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
+from spinn_front_end_common.utilities.constants import (
+    MICRO_TO_MILLISECOND_CONVERSION)
 from .abstract_neuron_model import AbstractNeuronModel
 from spynnaker.pyNN.models.neuron.implementations import (
     AbstractStandardNeuronComponent)
@@ -49,31 +49,31 @@ class NeuronModelIzh(AbstractNeuronModel):
     def __init__(self, a, b, c, d, v_init, u_init, i_offset):
         """
         :param a: :math:`a`
-        :type a: float, iterable(float), ~pyNN.random.RandomDistribution or \
-                 (mapping) function
+        :type a: float, iterable(float), ~pyNN.random.RandomDistribution or
+            (mapping) function
         :param b: :math:`b`
-        :type b: float, iterable(float), ~pyNN.random.RandomDistribution or \
-                 (mapping) function
+        :type b: float, iterable(float), ~pyNN.random.RandomDistribution or
+            (mapping) function
         :param c: :math:`c`
-        :type c: float, iterable(float), ~pyNN.random.RandomDistribution or \
-                 (mapping) function
+        :type c: float, iterable(float), ~pyNN.random.RandomDistribution or
+            (mapping) function
         :param d: :math:`d`
-        :type d: float, iterable(float), ~pyNN.random.RandomDistribution or \
-                 (mapping) function
+        :type d: float, iterable(float), ~pyNN.random.RandomDistribution or
+            (mapping) function
         :param v_init: :math:`v_{init}`
-        :type v_init: \
-            float, iterable(float), ~pyNN.random.RandomDistribution or \
+        :type v_init:
+            float, iterable(float), ~pyNN.random.RandomDistribution or
             (mapping) function
         :param u_init: :math:`u_{init}`
-        :type u_init: \
-            float, iterable(float), ~pyNN.random.RandomDistribution or \
+        :type u_init:
+            float, iterable(float), ~pyNN.random.RandomDistribution or
             (mapping) function
         :param i_offset: :math:`I_{offset}`
-        :type i_offset: \
-            float, iterable(float), ~pyNN.random.RandomDistribution or \
+        :type i_offset:
+            float, iterable(float), ~pyNN.random.RandomDistribution or
             (mapping) function
         """
-        super(NeuronModelIzh, self).__init__(
+        super().__init__(
             [DataType.S1615,   # a
              DataType.S1615,   # b
              DataType.S1615,   # c

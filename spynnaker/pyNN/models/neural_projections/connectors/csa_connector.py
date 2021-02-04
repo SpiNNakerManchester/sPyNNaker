@@ -52,7 +52,7 @@ class CSAConnector(AbstractConnector):
             some environments so we don't force it to be present unless you
             want to actually use this class.
         """
-        super(CSAConnector, self).__init__(safe, callback, verbose)
+        super().__init__(safe, callback, verbose)
         found, ex = _csa_found
         if not found:
             raise ex

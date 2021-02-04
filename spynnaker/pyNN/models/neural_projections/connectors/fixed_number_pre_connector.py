@@ -72,7 +72,7 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
         # :param ~pyNN.space.Space space:
         # a Space object, needed if you wish to specify distance-dependent\
         # weights or delays - not implemented
-        super(FixedNumberPreConnector, self).__init__(safe, callback, verbose)
+        super().__init__(safe, callback, verbose)
         self.__n_pre = n
         self.__allow_self_connections = allow_self_connections
         self.__with_replacement = with_replacement
@@ -82,8 +82,7 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
         self._rng = rng
 
     def set_projection_information(self, machine_time_step, synapse_info):
-        AbstractConnector.set_projection_information(
-            self, machine_time_step, synapse_info)
+        super().set_projection_information(machine_time_step, synapse_info)
         if (not self.__with_replacement and
                 self.__n_pre > synapse_info.n_pre_neurons):
             raise SpynnakerException(
