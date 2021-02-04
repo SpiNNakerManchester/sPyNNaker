@@ -1,18 +1,3 @@
-# Copyright (c) 2017-2019 The University of Manchester
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 import logging
 import math
 import numpy
@@ -34,14 +19,11 @@ from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.interface.profiling import profile_utils
-from spynnaker.pyNN.models.common import SimplePopulationSettable
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models import (
     AbstractReadParametersBeforeSet)
 from .rate_source_live_machine_vertex import (
     RateSourceLiveMachineVertex)
-
-logger = logging.getLogger(__name__)
 
 # bool has_key; uint32_t key; uint32_t generators; uint32_t timer_offset; uint32_t refresh;
 PARAMS_BASE_WORDS = 5
@@ -56,35 +38,13 @@ _MAX_OFFSET_DENOMINATOR = 10
 
 _REGIONS = RateSourceLiveMachineVertex.RATE_SOURCE_REGIONS
 
-
-class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification,
+class RateLiveInjectorVertex(ApplicationVertex, AbstractGeneratesDataSpecification,
         AbstractHasAssociatedBinary, AbstractChangableAfterRun, AbstractRewritesDataSpecification,
-        SimplePopulationSettable, ProvidesKeyToAtomMappingImpl):
+        ProvidesKeyToAtomMappingImpl):
 
-    __slots__ = [
-        "__model_name",
-        "__model",
-        "__n_atoms",
-        "__machine_vertices",
-        "__change_requires_neuron_parameters_reload",
-        "__self_machine_time_step",
-        "__n_subvertices",
-        "__n_data_specs",
-        "__n_profile_samples",
-        "__requires_mapping",
-        "__refresh_rate"
-    ]
-
-    RATE_RECORDING_REGION_ID = 0
-
-    def __init__(self, sources, constraints, max_atoms_per_core, 
-            label, model, machine_vertices, refresh_rate):
+    def __init__(self, label, constraints):
         # pylint: disable=too-many-arguments
-        self.__model_name = "RateSourceLive"
-        self.__model = model
-        self.__n_atoms = sources
-        self.__machine_vertices = machine_vertices
-        self.__refresh_rate = refresh_rate
+        self.__model_name = "RateLiveInjector"
 
         self.__change_requires_neuron_parameters_reload = False
         self.__machine_time_step = None
@@ -92,9 +52,9 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
         self.__n_subvertices = 0
         self.__n_data_specs = 0
 
-        super(RateSourceLiveVertex, self).__init__(
+        super(RateLiveInjectorVertex, self).__init__(
             label=label, constraints=constraints,
-            max_atoms_per_core=max_atoms_per_core)
+            max_atoms_per_core=1)
 
         # get config from simulator
         config = globals_variables.get_simulator().config
@@ -112,11 +72,6 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
     @overrides(AbstractChangableAfterRun.mark_no_changes)
     def mark_no_changes(self):
         self.__requires_mapping = False
-
-    @overrides(SimplePopulationSettable.set_value)
-    def set_value(self, key, value):
-        SimplePopulationSettable.set_value(self, key, value)
-        self.__change_requires_neuron_parameters_reload = True
 
     @inject_items({
         "machine_time_step": "MachineTimeStep"
@@ -153,7 +108,7 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
 
     @property
     def n_atoms(self):
-        return self.__n_atoms
+        return 1
 
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
@@ -203,16 +158,6 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
                 placement.vertex)), label='RateParams')
 
     @staticmethod
-    def _convert_ms_to_n_timesteps(value, machine_time_step):
-        return numpy.round(
-            value * (MICROSECONDS_PER_MILLISECOND / float(machine_time_step)))
-
-    @staticmethod
-    def _convert_n_timesteps_to_ms(value, machine_time_step):
-        return (
-                value / (MICROSECONDS_PER_MILLISECOND / float(machine_time_step)))
-
-    @staticmethod
     def get_dtcm_usage_for_atoms():
         return 0
 
@@ -222,7 +167,7 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
     def get_binary_file_name(self):
-        return "rate_source_live.aplx"
+        return "rate_live_injector.aplx"
 
     @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
     def get_binary_start_type(self):

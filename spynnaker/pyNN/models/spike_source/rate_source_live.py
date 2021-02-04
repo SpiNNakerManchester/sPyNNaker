@@ -21,16 +21,21 @@ class RateSourceLive(AbstractPyNNModel):
 
     default_population_parameters = {}
 
-    def __init__(self, sources, partitions=1):
+    def __init__(self, sources, refresh_rate, partitions=1):
 
         self.__sources = sources
         self.__partitions = partitions
+        # Number of sources for MNIST. To Be Changed!
+        self._max_atoms_per_core = 784
+        # Numer of timesteps we want to keep each rate fixed
+        self.__refresh_rate = refresh_rate
 
     @overrides(AbstractPyNNModel.create_vertex)
     def create_vertex(
             self, n_neurons, label, constraints):
         return RateSourceLivePartition(
-            self.__sources, constraints, label, self, self.__partitions)
+            self.__sources, constraints, label,
+            self, self.__partitions, self.__refresh_rate)
 
     @property
     def _sources(self):

@@ -104,6 +104,11 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
 
                     mem_offset += 1
 
+                # Ensures correct memory alignment for the synaptic contributions in case
+                # some synapse types are not used in the simulation
+                if self._n_incoming_partitions[index] == 0:
+                    mem_offset += 1
+
             self._neuron_vertices[i].incoming_partitions = self._n_incoming_partitions
 
             self._neuron_vertices[i].connected_app_vertices = syn_vertices

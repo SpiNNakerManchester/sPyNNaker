@@ -1,30 +1,44 @@
 import math
 
 from .rate_source_live_vertex import RateSourceLiveVertex
+from .rate_live_injector_vertex import RateLiveInjectorVertex
 from spynnaker.pyNN.models.common import SimplePopulationSettable
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spinn_utilities.overrides import overrides
+
+# The number of usable application cores in a chip
+APP_CORES_PER_CHIP = 15
 
 class RateSourceLivePartition(SimplePopulationSettable, AbstractChangableAfterRun):
 
     __slots__ = [
         "__vertices",
         "__n_atoms",
-        "__partitions"]
+        "__partitions",
+        "__refresh_rate",
+        "__injector_vertex"]
 
-    def __init__(self, sources,
-        constraints, label, max_atoms, rate_source_live, partitions):
+    def __init__(self, sources, constraints, label, rate_source_live, partitions, refresh_rate):
 
         self.__n_atoms = sources
         self.__vertices = list()
         self.__partitions = partitions
+        self.__refresh_rate = refresh_rate
 
-        self.__atoms_per_partition = self._compute_partition_and_offset_size()
+        self.__injector_vertex = RateLiveInjectorVertex()
+        
+        self.__atoms_per_partition = self._compute_partition_and_offset_size(self.__n_atoms)
+    
+        # Keep one core in the chip as service core to inject the values in memory
+        self.__machine_vertices = self._compute_partition_and_offset_size(APP_CORES_PER_CHIP - 1)
+
+        # Set this in order to force the partitioning to have the number of machine cores we want
+        self.__max_atoms_per_core = int(math.ceil(self.__atoms_per_partition / self.__machine_vertices))
 
         for i in range(self.__partitions):
             self.__vertices.append(RateSourceLiveVertex(
-                self.__atoms_per_partition[i], constraints,
-                label+str(i), max_atoms, rate_source_live))
+                self.__atoms_per_partition[i], constraints, self.__max_atoms_per_core,
+                label+str(i), rate_source_live, self.__machine_vertices[i], self.__refresh_rate))
 
     @property
     def n_atoms(self):
@@ -34,15 +48,18 @@ class RateSourceLivePartition(SimplePopulationSettable, AbstractChangableAfterRu
     def out_vertices(self):
         return self.__vertices
 
-    def _compute_partition_and_offset_size(self):
+    @property
+    def injector_vertex(self):
+        return self.__injector_vertex
 
-        min_neurons_per_partition = int(math.floor(self._n_atoms / self.__partitions))
+    def _compute_partition_and_offset_size(self, elements):
 
-        remaining_neurons = self._n_atoms - (min_neurons_per_partition * self.__partitions)
+        min_elements_per_partition = int(math.floor(elements / self.__partitions))
 
-        contents = [min_neurons_per_partition if i < self.__partitions 
-            else min_neurons_per_partition + remaining_neurons 
-            for i in range(self.__partitions)]
+        remainder = elements % self.__partitions
+
+        contents = [min_elements_per_partition + 1 if i < remainder 
+            else min_elements_per_partition for i in range(self.__partitions)]
 
         return contents
 
