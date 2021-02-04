@@ -473,9 +473,12 @@ void spike_processing_clear_input_buffer(timer_t time) {
 
     if (clear_input_buffers_of_late_packets) {
         in_spikes_clear();
+        spin1_dma_flush();
         spikes_pushed = 0;
         spikes_popped = 0;
+        dma_busy = false;
     }
+
 }
 
 bool spike_processing_initialise( // EXPORTED
