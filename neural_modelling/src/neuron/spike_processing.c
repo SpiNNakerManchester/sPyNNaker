@@ -295,6 +295,11 @@ static inline void setup_synaptic_dma_write(
 static void multicast_packet_received_callback(uint key, uint payload) {
     p_per_ts_struct.packets_this_time_step += 1;
 
+    if (in_spikes_size() && !dma_busy) {
+        log_error("At receive, %d packets in buffer but DMA not busy", in_spikes_size());
+        rt_error(RTE_SWERR);
+    }
+
     // handle the 2 cases separately
     if (payload == 0) {
         log_debug(
@@ -417,6 +422,7 @@ void user_event_callback(UNUSED uint unused0, UNUSED uint unused1) {
 /* INTERFACE FUNCTIONS - cannot be static */
 uint32_t latest_clear = 0xFFFFFFFF;
 uint32_t earliest_clear = 0;
+uint32_t max_dropped = 0;
 //! \brief clears the input buffer of packets and records them
 void spike_processing_clear_input_buffer(timer_t time) {
 
@@ -432,9 +438,17 @@ void spike_processing_clear_input_buffer(timer_t time) {
     if (timer_time < latest_clear) {
         latest_clear = timer_time;
     }
+    uint32_t n_spikes = in_spikes_size();
+    if (n_spikes > max_dropped) {
+        max_dropped = n_spikes;
+    }
+    if (n_spikes > 0 && !dma_busy) {
+        log_error("%d spikes still in buffer but DMA not busy", n_spikes);
+        rt_error(RTE_SWERR);
+    }
 
     // Record the count whether clearing or not for provenance
-    count_input_buffer_packets_late += in_spikes_size();
+    count_input_buffer_packets_late += n_spikes;
 
     if (clear_input_buffers_of_late_packets) {
         in_spikes_clear();
