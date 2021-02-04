@@ -323,8 +323,9 @@ static void multicast_packet_received_callback(uint key, uint payload) {
 
     // cycle through the packet insertion
     for (uint count = payload; count > 0; count--) {
-        in_spikes_add_spike(key);
-        spikes_pushed += 1;
+        if (in_spikes_add_spike(key)) {
+            spikes_pushed += 1;
+        }
     }
 
     if (spikes_pushed - spikes_popped != in_spikes_size()) {
