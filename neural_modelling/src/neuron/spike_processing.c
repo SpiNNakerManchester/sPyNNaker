@@ -442,11 +442,14 @@ uint32_t earliest_clear = 0;
 uint32_t max_dropped = 0;
 //! \brief clears the input buffer of packets and records them
 void spike_processing_clear_input_buffer(timer_t time) {
-
-    // Record the number of packets received last timer tick
-    p_per_ts_struct.time = time;
-    recording_record(p_per_ts_region, &p_per_ts_struct, sizeof(p_per_ts_struct));
-    p_per_ts_struct.packets_this_time_step = 0;
+    uint32_t n_spikes = in_spikes_size();
+    if (clear_input_buffers_of_late_packets) {
+        spin1_dma_flush();
+        in_spikes_clear();
+        spikes_pushed = 0;
+        spikes_popped = 0;
+        dma_busy = false;
+    }
 
     uint32_t timer_time = tc[T1_COUNT];
     if (timer_time > earliest_clear) {
@@ -455,7 +458,12 @@ void spike_processing_clear_input_buffer(timer_t time) {
     if (timer_time < latest_clear) {
         latest_clear = timer_time;
     }
-    uint32_t n_spikes = in_spikes_size();
+
+    // Record the number of packets received last timer tick
+    p_per_ts_struct.time = time;
+    recording_record(p_per_ts_region, &p_per_ts_struct, sizeof(p_per_ts_struct));
+    p_per_ts_struct.packets_this_time_step = 0;
+
     if (n_spikes > max_dropped) {
         max_dropped = n_spikes;
     }
@@ -471,14 +479,6 @@ void spike_processing_clear_input_buffer(timer_t time) {
 
     // Record the count whether clearing or not for provenance
     count_input_buffer_packets_late += n_spikes;
-
-    if (clear_input_buffers_of_late_packets) {
-        in_spikes_clear();
-        spin1_dma_flush();
-        spikes_pushed = 0;
-        spikes_popped = 0;
-        dma_busy = false;
-    }
 
 }
 
