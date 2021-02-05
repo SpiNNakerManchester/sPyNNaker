@@ -18,11 +18,18 @@ from six import string_types
 from pyNN.random import RandomDistribution
 from pyNN.connectors import OneToOneConnector as PyNNOneToOneConnector
 from spinn_utilities.overrides import overrides
+from spinn_utilities.safe_eval import SafeEval
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
 from .abstract_connector_supports_views_on_machine import (
     AbstractConnectorSupportsViewsOnMachine)
+_expr_context = SafeEval(
+    math, numpy, numpy.arccos, numpy.arcsin, numpy.arctan, numpy.arctan2,
+    numpy.ceil, numpy.cos, numpy.cosh, numpy.exp, numpy.fabs, numpy.floor,
+    numpy.fmod, numpy.hypot, numpy.ldexp, numpy.log, numpy.log10, numpy.modf,
+    numpy.power, numpy.sin, numpy.sinh, numpy.sqrt, numpy.tan, numpy.tanh,
+    numpy.maximum, numpy.minimum, e=numpy.e, pi=numpy.pi)
 
 
 class OneToOneConnector(AbstractGenerateConnectorOnMachine,
