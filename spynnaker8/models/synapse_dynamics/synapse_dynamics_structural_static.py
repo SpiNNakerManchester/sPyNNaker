@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import logging
+from spinn_utilities.log import FormatAdapter
 from pyNN.standardmodels.synapses import StaticSynapse
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStructuralStatic as
@@ -21,7 +22,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics.\
     synapse_dynamics_structural_common import (
         DEFAULT_F_REW, DEFAULT_INITIAL_WEIGHT, DEFAULT_INITIAL_DELAY,
         DEFAULT_S_MAX)
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class SynapseDynamicsStructuralStatic(_BaseClass):

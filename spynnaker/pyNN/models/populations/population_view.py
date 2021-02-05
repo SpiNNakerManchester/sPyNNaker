@@ -17,6 +17,7 @@ import logging
 import neo
 import numpy
 from six import integer_types, string_types
+from spinn_utilities.log import FormatAdapter
 from pyNN import descriptions
 from pyNN.random import NumpyRNG
 from spinn_utilities.logger_utils import warn_once
@@ -24,7 +25,7 @@ from spinn_utilities.ranged.abstract_sized import AbstractSized
 from .idmixin import IDMixin
 from .population_base import PopulationBase
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class PopulationView(PopulationBase):
