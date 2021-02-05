@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy
+import math
 from six import string_types
 from pyNN.random import RandomDistribution
 from pyNN.connectors import OneToOneConnector as PyNNOneToOneConnector
