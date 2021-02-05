@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2021 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,32 +13,29 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import logging
+from spinn_utilities.log import FormatAdapter
 from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
-    WeightDependenceAdditiveTriplet as
+    WeightDependenceMultiplicative as
     _BaseClass)
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
-class WeightDependenceAdditiveTriplet(_BaseClass):
+class WeightDependenceMultiplicative(_BaseClass):
     """
     .. deprecated:: 6.0
         Use
-        :py:class:`spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditiveTriplet`
+        :py:class:`spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceMultiplicative`
         instead.
     """
     __slots__ = []
 
-    # noinspection PyPep8Naming
-    def __init__(
-            self, w_min=0.0, w_max=1.0, A3_plus=0.01, A3_minus=0.01):
+    def __init__(self, w_min=0.0, w_max=1.0):
         r"""
         :param float w_min: :math:`w_\mathrm{min}`
         :param float w_max: :math:`w_\mathrm{max}`
-        :param float A3_plus: :math:`A_3^+`
-        :param float A3_minus: :math:`A_3^-`
         """
-        super(WeightDependenceAdditiveTriplet, self).__init__(
-            w_max=w_max, w_min=w_min, A3_plus=A3_plus, A3_minus=A3_minus)
+        super(WeightDependenceMultiplicative, self).__init__(
+            w_max=w_max, w_min=w_min)
         logger.warning(
             "please use spynnaker.pyNN.models.neuron.plasticity.stdp."
-            "weight_dependence.WeightDependenceAdditiveTriplet instead")
+            "weight_dependence.WeightDependenceMultiplicative instead")

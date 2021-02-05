@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2021 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -12,39 +12,35 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 import logging
+from spinn_utilities.log import FormatAdapter
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
-    TimingDependencePfisterSpikeTriplet as
+    TimingDependenceVogels2011 as
     _BaseClass)
-logger = logging.getLogger(__name__)
+
+_defaults = _BaseClass.default_parameters
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
-class TimingDependencePfisterSpikeTriplet(_BaseClass):
+class TimingDependenceVogels2011(_BaseClass):
     """
     .. deprecated:: 6.0
         Use
-        :py:class:`spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependencePfisterSpikeTriplet`
+        :py:class:`spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceVogels2011`
         instead.
     """
     __slots__ = []
 
-    # noinspection PyPep8Naming
     def __init__(
-            self, tau_plus, tau_minus, tau_x, tau_y, A_plus=0.01,
-            A_minus=0.01):
+            self, alpha, tau=_defaults['tau'], A_plus=0.01, A_minus=0.01):
         r"""
-        :param float tau_plus: :math:`\tau_+`
-        :param float tau_minus: :math:`\tau_-`
-        :param float tau_x: :math:`\tau_x`
-        :param float tau_y: :math:`\tau_y`
+        :param float alpha: :math:`\alpha`
+        :param float tau: :math:`\tau`
         :param float A_plus: :math:`A^+`
         :param float A_minus: :math:`A^-`
         """
-        # pylint: disable=too-many-arguments
-        super(TimingDependencePfisterSpikeTriplet, self).__init__(
-            tau_plus=tau_plus, tau_minus=tau_minus, tau_x=tau_x,
-            tau_y=tau_y, A_plus=A_plus, A_minus=A_minus)
+        super(TimingDependenceVogels2011, self).__init__(
+            tau=tau, alpha=alpha, A_plus=A_plus, A_minus=A_minus)
         logger.warning(
             "please use spynnaker.pyNN.models.neuron.plasticity.stdp."
-            "timing_dependence.TimingDependencePfisterSpikeTriplet instead")
+            "timing_dependence.TimingDependenceVogels2011 instead")
