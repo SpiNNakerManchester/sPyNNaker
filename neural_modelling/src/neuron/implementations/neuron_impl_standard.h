@@ -183,9 +183,10 @@ static void neuron_impl_load_neuron_parameters(
     // Read the number of steps per timestep
     n_steps_per_timestep = address[next++];
     if (n_steps_per_timestep > 1) {
-        log_info("Looping over %u steps each timestep", n_steps_per_timestep);
+        log_debug("Looping over %u steps each timestep", n_steps_per_timestep);
     } else if (n_steps_per_timestep == 0) {
         log_error("bad number of steps per timestep: 0");
+        rt_error(RTE_SWERR);
     }
 
     if (sizeof(global_neuron_params_t)) {
@@ -266,7 +267,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
     // Loop however many times requested; do this in reverse for efficiency,
     // and because the index doesn't actually matter
-    for (uint32_t i = n_steps_per_timestep; i > 0; i--) {
+    for (uint32_t i_step = n_steps_per_timestep; i_step > 0; i_step--) {
         // Get the voltage
         state_t soma_voltage = neuron_model_get_membrane_voltage(this_neuron);
 
@@ -294,7 +295,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
         }
 
         // Do recording if on the first step
-        if (i == n_steps_per_timestep) {
+        if (i_step == n_steps_per_timestep) {
             neuron_recording_record_accum(
                     V_RECORDING_INDEX, neuron_index, soma_voltage);
             neuron_recording_record_accum(

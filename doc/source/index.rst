@@ -18,8 +18,6 @@ This code depends on SpiNNUtils_, SpiNNMachine_, SpiNNStorageHandlers_, SpiNNMan
 sPyNNaker
 =========
 
-.. automodule:: spynnaker
-
 Contents:
 
 .. toctree::
@@ -34,4 +32,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-

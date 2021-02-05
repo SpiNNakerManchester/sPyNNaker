@@ -24,6 +24,8 @@ class InputTypeDelta(AbstractInputType):
     __slots__ = []
 
     def __init__(self):
+        """
+        """
         super(InputTypeDelta, self).__init__([
             DataType.S1615])  # scale_factor, calculated from timestep
 

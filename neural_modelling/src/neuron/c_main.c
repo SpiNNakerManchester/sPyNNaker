@@ -43,7 +43,6 @@
 #include "structural_plasticity/synaptogenesis_dynamics.h"
 #include "profile_tags.h"
 #include "direct_synapses.h"
-#include "bit_field_filter.h"
 
 #include <data_specification.h>
 #include <simulation.h>
@@ -51,6 +50,7 @@
 #include <debug.h>
 #include <bit_field.h>
 #include <filter_info.h>
+#include <tdma_processing.h>
 
 /* validates that the model being compiled does indeed contain a application
  * magic number*/
@@ -79,6 +79,10 @@ struct neuron_provenance {
     uint32_t n_filtered_by_bitfield;
     //! The number of rewirings performed.
     uint32_t n_rewires;
+    uint32_t n_packets_dropped_from_lateness;
+    uint32_t spike_processing_get_max_filled_input_buffer_size;
+    //! the number of times the TDMA fully missed its slots
+    uint32_t n_tdma_mises;
 };
 
 //! values for the priority for each callback
@@ -98,9 +102,6 @@ uint32_t time;
 //! timer tick period (in microseconds)
 static uint32_t timer_period;
 
-//! timer phase offset (in microseconds)
-static uint32_t timer_offset;
-
 //! The number of timer ticks to run for before being expected to exit
 static uint32_t simulation_ticks = 0;
 
@@ -108,19 +109,22 @@ static uint32_t simulation_ticks = 0;
 static uint32_t infinite_run;
 
 //! Timer callbacks since last rewiring
-int32_t last_rewiring_time = 0;
+static int32_t last_rewiring_time = 0;
 
 //! Rewiring period represented as an integer
-int32_t rewiring_period = 0;
+static int32_t rewiring_period = 0;
 
 //! Flag representing whether rewiring is enabled
-bool rewiring = false;
+static bool rewiring = false;
 
 //! Count the number of rewiring attempts
-uint32_t count_rewire_attempts = 0;
+static uint32_t count_rewire_attempts = 0;
 
 //! The number of neurons on the core
 static uint32_t n_neurons;
+
+//! timer count for tdma of certain models
+static uint global_timer_count;
 
 //! \brief Callback to store provenance data (format: neuron_provenance).
 //! \param[out] provenance_region: Where to write the provenance data
@@ -130,20 +134,23 @@ static void c_main_store_provenance_data(address_t provenance_region) {
 
     // store the data into the provenance data region
     prov->n_pre_synaptic_events = synapses_get_pre_synaptic_events();
-    prov->n_synaptic_weight_saturations = synapses_get_saturation_count();
+    prov->n_synaptic_weight_saturations = synapses_saturation_count;
     prov->n_input_buffer_overflows = spike_processing_get_buffer_overflows();
     prov->current_timer_tick = time;
     prov->n_plastic_synaptic_weight_saturations =
         synapse_dynamics_get_plastic_saturation_count();
-    prov->n_ghost_pop_table_searches =
-        spike_processing_get_ghost_pop_table_searches();
+    prov->n_ghost_pop_table_searches = ghost_pop_table_searches;
     prov->n_failed_bitfield_reads = failed_bit_field_reads;
     prov->n_dmas_complete = spike_processing_get_dma_complete_count();
     prov->n_spikes_processed = spike_processing_get_spike_processing_count();
-    prov->n_invalid_master_pop_table_hits =
-        spike_processing_get_invalid_master_pop_table_hits();
-    prov->n_filtered_by_bitfield = population_table_get_filtered_packet_count();
+    prov->n_invalid_master_pop_table_hits = invalid_master_pop_hits;
+    prov->n_filtered_by_bitfield = bit_field_filtered_packets;
     prov->n_rewires = spike_processing_get_successful_rewires();
+    prov->n_packets_dropped_from_lateness =
+        spike_processing_get_n_packets_dropped_from_lateness();
+    prov->spike_processing_get_max_filled_input_buffer_size =
+        spike_processing_get_max_filled_input_buffer_size();
+    prov->n_tdma_mises = tdma_processing_times_behind();
 
     log_debug("finished other provenance data");
 }
@@ -177,20 +184,23 @@ static bool initialise(void) {
     // Set up the neurons
     uint32_t n_synapse_types;
     uint32_t incoming_spike_buffer_size;
+    uint32_t n_regions_used;
     if (!neuron_initialise(
             data_specification_get_region(NEURON_PARAMS_REGION, ds_regions),
             data_specification_get_region(NEURON_RECORDING_REGION, ds_regions),
             &n_neurons, &n_synapse_types, &incoming_spike_buffer_size,
-            &timer_offset)) {
+            &n_regions_used)) {
         return false;
     }
 
     // Set up the synapses
     uint32_t *ring_buffer_to_input_buffer_left_shifts;
+    bool clear_input_buffers_of_late_packets_init;
     if (!synapses_initialise(
             data_specification_get_region(SYNAPSE_PARAMS_REGION, ds_regions),
             n_neurons, n_synapse_types,
-            &ring_buffer_to_input_buffer_left_shifts)) {
+            &ring_buffer_to_input_buffer_left_shifts,
+            &clear_input_buffers_of_late_packets_init)) {
         return false;
     }
 
@@ -228,19 +238,21 @@ static bool initialise(void) {
     rewiring = rewiring_period != -1;
 
     if (!spike_processing_initialise(
-            row_max_n_words, MC, USER, incoming_spike_buffer_size)) {
+            row_max_n_words, MC, USER, incoming_spike_buffer_size,
+            clear_input_buffers_of_late_packets_init, n_regions_used)) {
         return false;
     }
 
     // Setup profiler
     profiler_init(data_specification_get_region(PROFILER_REGION, ds_regions));
 
-    log_info("initialising the bit field region");
-    print_post_to_pre_entry();
-    if (!bit_field_filter_initialise(data_specification_get_region(
-            BIT_FIELD_FILTER_REGION, ds_regions))) {
+    // Do bitfield configuration last to only use any unused memory
+    if (!population_table_load_bitfields(
+            data_specification_get_region(BIT_FIELD_FILTER_REGION, ds_regions))) {
         return false;
     }
+
+    print_post_to_pre_entry();
 
     log_debug("Initialise: finished");
     return true;
@@ -262,7 +274,7 @@ void resume_callback(void) {
     // flushed in case there is a delayed spike left over from a previous run
     // NOTE: at reset, time is set to UINT_MAX ahead of timer_callback(...)
     if ((time+1) == 0) {
-    	synapses_flush_ring_buffers();
+        synapses_flush_ring_buffers();
     }
 
 }
@@ -272,6 +284,8 @@ void resume_callback(void) {
 //!            executed since start of simulation
 //! \param[in] unused: unused parameter kept for API consistency
 void timer_callback(uint timer_count, UNUSED uint unused) {
+
+    global_timer_count = timer_count;
     profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
 
     time++;
@@ -285,7 +299,7 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
 
     /* if a fixed number of simulation ticks that were specified at startup
      * then do reporting for finishing */
-    if (infinite_run != TRUE && time >= simulation_ticks) {
+    if (simulation_is_finished()) {
 
         // Enter pause and resume state to avoid another tick
         simulation_handle_pause_resume(resume_callback);
@@ -310,7 +324,10 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
         return;
     }
 
-    // Do rewiring
+    // First do synapses timestep update, as this is time-critical
+    synapses_do_timestep_update(time);
+
+    // Then do rewiring
     if (rewiring &&
             ((last_rewiring_time >= rewiring_period && !synaptogenesis_is_fast())
                 || synaptogenesis_is_fast())) {
@@ -324,9 +341,8 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
         count_rewire_attempts++;
     }
 
-    // Now do synapse and neuron time step updates
-    synapses_do_timestep_update(time);
-    neuron_do_timestep_update(time, timer_count, timer_period);
+    // Now do neuron time step update
+    neuron_do_timestep_update(time, timer_count);
 
     profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 }
@@ -343,9 +359,8 @@ void c_main(void) {
     time = UINT32_MAX;
 
     // Set timer tick (in microseconds)
-    log_debug("setting timer tick callback for %d microseconds",
-              timer_period);
-    spin1_set_timer_tick_and_phase(timer_period, timer_offset);
+    log_debug("setting timer tick callback for %d microseconds", timer_period);
+    spin1_set_timer_tick(timer_period);
 
     // Set up the timer tick callback (others are handled elsewhere)
     spin1_callback_on(TIMER_TICK, timer_callback, TIMER);

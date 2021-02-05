@@ -117,6 +117,17 @@ static inline uint32_t in_spikes_real_size(void) {
     return circular_buffer_real_size(buffer);
 }
 
+//! \brief get the size of the input spike buffer
+//! \return The size of the buffer.
+static inline uint32_t in_spikes_size(void) {
+    return circular_buffer_size(buffer);
+}
+
+//! \brief clears the input spike buffer.
+static inline void in_spikes_clear(void) {
+    circular_buffer_clear(buffer);
+}
+
 //! \brief Get the spike at a specific index of the input spike buffer.
 //! \param[in] index: The index to retrieve from. Will be _wrapped_ within the
 //!     buffer.

@@ -31,7 +31,8 @@ class AbstractPopulationSettable(AbstractSettable):
     @abstractproperty
     def n_atoms(self):
         """" See \
-            :py:meth:`~pacman.model.graphs.application.ApplicationVertex.n_atoms`
+            :py:meth:`~pacman.model.partitioner_interfaces.\
+            legacy_partitioner_api.LegacyPartitionerAPI.n_atoms`
         """
 
     def get_value_by_selector(self, selector, key):
@@ -75,5 +76,7 @@ class AbstractPopulationSettable(AbstractSettable):
             # Keep all the setting stuff in one place by creating a RangedList
             ranged_list = SpynnakerRangedList(
                 size=self.n_atoms, value=old_values)
-            self.set_value(key, ranged_list)
-        ranged_list.set_value_by_selector(selector, value)
+
+        ranged_list.set_value_by_selector(
+            selector, value, ranged_list.is_list(value, self.n_atoms))
+        self.set_value(key, ranged_list)

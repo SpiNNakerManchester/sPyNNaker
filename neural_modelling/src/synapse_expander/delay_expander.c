@@ -35,9 +35,10 @@ struct delay_builder_config {
     // the parameters
     uint32_t max_row_n_synapses;
     uint32_t max_delayed_row_n_synapses;
-    uint32_t pre_slice_start;
-    uint32_t pre_slice_count;
+    uint32_t post_slice_start;
+    uint32_t post_slice_count;
     uint32_t max_stage;
+    uint32_t max_delay_per_stage;
     accum timestep_per_delay;
     // the connector and delay parameter generators
     uint32_t connector_type;
@@ -59,8 +60,8 @@ struct delay_builder_config {
  *         error
  */
 static bool read_delay_builder_region(address_t *in_region,
-        bit_field_t *neuron_delay_stage_config, uint32_t post_slice_start,
-        uint32_t post_slice_count) {
+        bit_field_t *neuron_delay_stage_config, uint32_t pre_slice_start,
+        uint32_t pre_slice_count) {
     // Get the parameters
     address_t region = *in_region;
     struct delay_builder_config config;
@@ -79,8 +80,6 @@ static bool read_delay_builder_region(address_t *in_region,
     }
 
     // For each pre-neuron, generate the connections
-    uint32_t pre_slice_start = config.pre_slice_start;
-    uint32_t pre_slice_count = config.pre_slice_count;
     uint32_t pre_slice_end = pre_slice_start + pre_slice_count;
     for (uint32_t pre_neuron_index = pre_slice_start;
             pre_neuron_index < pre_slice_end; pre_neuron_index++) {
@@ -90,7 +89,7 @@ static bool read_delay_builder_region(address_t *in_region,
         uint16_t indices[max_n_synapses];
         uint32_t n_indices = connection_generator_generate(
                 connection_generator, pre_slice_start, pre_slice_count,
-                pre_neuron_index, post_slice_start, post_slice_count,
+                pre_neuron_index, config.post_slice_start, config.post_slice_count,
                 max_n_synapses, indices);
         log_debug("Generated %u synapses", n_indices);
 
@@ -115,8 +114,8 @@ static bool read_delay_builder_region(address_t *in_region,
             }
 
             // Get the delay stage and update the data
-            struct delay_value delay_value =
-                    get_delay(rounded_delay, config.max_stage);
+            struct delay_value delay_value = get_delay(
+                rounded_delay, config.max_stage, config.max_delay_per_stage);
             if (delay_value.stage > 0) {
                 bit_field_set(neuron_delay_stage_config[delay_value.stage - 1],
                         pre_neuron_index - pre_slice_start);
@@ -158,17 +157,17 @@ static bool run_delay_expander(
 
     // Read the global parameters from the expander region
     uint32_t n_out_edges = *params_address++;
-    uint32_t post_slice_start = *params_address++;
-    uint32_t post_slice_count = *params_address++;
+    uint32_t pre_slice_start = *params_address++;
+    uint32_t pre_slice_count = *params_address++;
 
     log_info("Generating %u delay edges for %u atoms starting at %u",
-            n_out_edges, post_slice_count, post_slice_start);
+            n_out_edges, pre_slice_count, pre_slice_start);
 
     // Go through each connector and make the delay data
     for (uint32_t edge = 0; edge < n_out_edges; edge++) {
         if (!read_delay_builder_region(
                 &params_address, neuron_delay_stage_config,
-                post_slice_start, post_slice_count)) {
+                pre_slice_start, pre_slice_count)) {
             return false;
         }
     }

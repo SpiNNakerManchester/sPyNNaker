@@ -13,26 +13,24 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
 from spinn_utilities.progress_bar import ProgressBar
 from spynnaker.pyNN.models.neuron import ConnectionHolder
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 
-logger = logging.getLogger(__name__)
-
 
 class SpYNNakerConnectionHolderGenerator(object):
     """ Sets up connection holders for reports to use.
-
-    :param ~pacman.model.graphs.application.ApplicationGraph \
-            application_graph:
-        app graph
-    :return: the set of connection holders for after DSG generation
-    :rtype: dict(tuple(ProjectionApplicationEdge, SynapseInformation), \
-        ConnectionHolder)
     """
 
     def __call__(self, application_graph):
+        """
+        :param ~pacman.model.graphs.application.ApplicationGraph \
+                application_graph:
+            app graph
+        :return: the set of connection holders for after DSG generation
+        :rtype: dict(tuple(ProjectionApplicationEdge, SynapseInformation), \
+            ConnectionHolder)
+        """
         progress = ProgressBar(
             application_graph.n_outgoing_edge_partitions,
             "Generating connection holders for reporting connection data.")
@@ -57,7 +55,7 @@ class SpYNNakerConnectionHolderGenerator(object):
             None, True, edge.pre_vertex.n_atoms, edge.post_vertex.n_atoms)
 
         for synapse_information in edge.synapse_information:
-            edge.post_vertex.add_pre_run_connection_holder(
-                connection_holder, edge, synapse_information)
+            synapse_information.add_pre_run_connection_holder(
+                connection_holder)
             # store for the report generations
             data_holders[edge, synapse_information] = connection_holder

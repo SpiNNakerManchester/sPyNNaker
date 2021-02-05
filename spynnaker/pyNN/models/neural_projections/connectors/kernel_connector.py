@@ -48,10 +48,11 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
     """
 
     def __init__(
-            self, shape_pre, shape_post, shape_kernel, weight_kernel,
-            delay_kernel, shape_common, pre_sample_steps_in_post,
-            pre_start_coords_in_post, post_sample_steps_in_pre,
-            post_start_coords_in_pre, safe, verbose, callback=None):
+            self, shape_pre, shape_post, shape_kernel, weight_kernel=None,
+            delay_kernel=None, shape_common=None,
+            pre_sample_steps_in_post=None, pre_start_coords_in_post=None,
+            post_sample_steps_in_pre=None, post_start_coords_in_pre=None,
+            safe=True, space=None, verbose=False, callback=None):
         """
         :param shape_pre:
             2D shape of the pre population (rows/height, cols/width, usually
@@ -88,11 +89,18 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             Starting row/col for post sampling <=> (offX, offY)
         :type post_start_coords_in_pre: None or list(int) or tuple(int,int)
         :param bool safe:
+            Whether to check that weights and delays have valid values.
+            If ``False``, this check is skipped.
+        :param ~pyNN.space.Space space:
+            Currently ignored; for future compatibility.
         :param bool verbose:
+            Whether to output extra information about the connectivity to a
+            CSV file
         :param callable callback: (ignored)
         """
         super(KernelConnector, self).__init__(
             safe=safe, callback=callback, verbose=verbose)
+        assert space is None, "non-None space unsupported"
 
         # Get the kernel size
         self._kernel_w = shape_kernel[WIDTH]
@@ -315,6 +323,18 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         # if not then use the values that came in
         return self._get_delay_maximum(synapse_info.delays, n_conns)
 
+    @overrides(AbstractConnector.get_delay_minimum)
+    def get_delay_minimum(self, synapse_info):
+        # I think this is overestimated, but not by much
+        n_conns = (
+            self._pre_w * self._pre_h * self._kernel_w * self._kernel_h)
+        # Use the kernel delays if user has supplied them
+        if self._krn_delays is not None:
+            return self._get_delay_minimum(self._krn_delays, n_conns)
+
+        # if not then use the values that came in
+        return self._get_delay_minimum(synapse_info.delays, n_conns)
+
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, post_vertex_slice, synapse_info, min_delay=None,
@@ -344,8 +364,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices, post_slice_index,
-            pre_vertex_slice, post_vertex_slice, synapse_type, synapse_info):
+            self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
+            synapse_type, synapse_info):
         (n_connections, all_post, all_pre_in_range, all_pre_in_range_delays,
          all_pre_in_range_weights) = self.__compute_statistics(
             synapse_info.weights, synapse_info.delays, pre_vertex_slice,
@@ -441,8 +461,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
 
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_params)
     def gen_connector_params(
-            self, pre_slices, pre_slice_index, post_slices, post_slice_index,
-            pre_vertex_slice, post_vertex_slice, synapse_type, synapse_info):
+            self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
+            synapse_type, synapse_info):
         return numpy.array(self._kernel_properties, dtype="uint32")
 
     @property

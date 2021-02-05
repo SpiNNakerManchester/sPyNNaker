@@ -77,6 +77,7 @@ typedef struct {
     uint32_t machine_no_atoms;
     uint32_t low_atom;
     uint32_t high_atom;
+    uint32_t with_replacement;
     // the 2 seeds that are used: shared for sync, local for everything else
     mars_kiss64_seed_t shared_seed;
     mars_kiss64_seed_t local_seed;
@@ -89,6 +90,8 @@ typedef struct {
     mars_kiss64_seed_t *local_seed;
     //! Low atom copied from rewiring data
     uint32_t post_low_atom;
+    // with_replacement copied from rewiring data
+    uint32_t with_replacement;
     // what are the currently selecting pre- and post-synaptic neurons
     uint32_t pre_syn_id;
     uint32_t post_syn_id;
@@ -186,7 +189,7 @@ static inline bool sp_structs_get_sub_pop_info(
 //! \param[in,out] row: The row of the synaptic matrix to be updated
 //! \return True if the synapse was removed
 static inline bool sp_structs_remove_synapse(
-        current_state_t *restrict current_state, address_t restrict row) {
+        current_state_t *restrict current_state, synaptic_row_t restrict row) {
     if (!synapse_dynamics_remove_neuron(current_state->offset, row)) {
         return false;
     }
@@ -199,7 +202,7 @@ static inline bool sp_structs_remove_synapse(
 //! \param[in,out] row: The row of the synaptic matrix to be updated
 //! \return True if the synapse was added
 static inline bool sp_structs_add_synapse(
-        current_state_t *restrict current_state, address_t restrict row) {
+        current_state_t *restrict current_state, synaptic_row_t restrict row) {
     uint32_t appr_scaled_weight = current_state->pre_population_info->weight;
 
     uint32_t actual_delay;

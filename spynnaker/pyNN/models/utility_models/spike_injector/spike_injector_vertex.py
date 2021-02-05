@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
@@ -24,7 +25,7 @@ from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, EIEIOSpikeRecorder, SimplePopulationSettable)
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class SpikeInjectorVertex(
@@ -45,7 +46,7 @@ class SpikeInjectorVertex(
 
     def __init__(
             self, n_neurons, label, constraints, port, virtual_key,
-            reserve_reverse_ip_tag):
+            reserve_reverse_ip_tag, splitter):
         # pylint: disable=too-many-arguments
         self.__receive_port = None
         self.__virtual_key = None
@@ -55,7 +56,8 @@ class SpikeInjectorVertex(
             virtual_key=virtual_key,
             reserve_reverse_ip_tag=reserve_reverse_ip_tag,
             constraints=constraints,
-            enable_injection=True)
+            enable_injection=True,
+            splitter=splitter)
 
         # Set up for recording
         self.__spike_recorder = EIEIOSpikeRecorder()

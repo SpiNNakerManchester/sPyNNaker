@@ -30,7 +30,6 @@
 import mock
 import os
 import sys
-from sphinx import apidoc
 
 autodoc_mock_imports = ['_tkinter']
 
@@ -57,12 +56,13 @@ extensions = [
 
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3.6', None),
-    'numpy': ("https://numpy.org/doc/stable/", None),
+    'numpy': ("https://numpy.org/doc/1.19/", None),
+    'matplotlib': ('https://matplotlib.org', None),
     'pynn': ("http://neuralensemble.org/docs/PyNN/", None),
+    'neo': ('https://neo.readthedocs.io/en/stable/', None),
+    # We don't link to quantities; their docs are too awful
     'spinn_utilities': ('https://spinnutils.readthedocs.io/en/latest/', None),
     'spinn_machine': ('https://spinnmachine.readthedocs.io/en/latest/', None),
-    'spinn_storage_handlers': (
-        'https://spinnstoragehandlers.readthedocs.io/en/latest/', None),
     'spinnman': ('https://spinnman.readthedocs.io/en/latest/', None),
     'pacman': ('https://pacman.readthedocs.io/en/latest/', None),
     'data_specification': (
@@ -85,7 +85,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'sPyNNaker'
-copyright = u'2014-2017'
+copyright = u'2014-2021'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -384,36 +384,78 @@ for f in os.listdir("."):
     if (os.path.isfile(f) and f.endswith(
             ".rst") and f != "index.rst" and f != "modules.rst"):
         os.remove(f)
-apidoc.main([None, '-o', ".", "../../spynnaker",
-             "../../spynnaker/pyNN/connections/[a-z]*.py",
-             "../../spynnaker/pyNN/external_devices_models/push_bot/*/[a-z]*.py",
-             "../../spynnaker/pyNN/external_devices_models/push_bot/a*.py",
-             "../../spynnaker/pyNN/external_devices_models/[a-oq-z]*.py",
-             "../../spynnaker/pyNN/models/abstract_models/[a-z]*.py",
-             "../../spynnaker/pyNN/models/common/[a-qs-z]*.py",
-             "../../spynnaker/pyNN/models/neural_projections/[abd-z]*.py",
-             "../../spynnaker/pyNN/models/neural_projections/connectors/[a-z]*.py",
-             "../../spynnaker/pyNN/models/neural_properties/[a-z]*.py",
-             "../../spynnaker/pyNN/models/neuron/additional_inputs/[a-z]*.py",
-             "../../spynnaker/pyNN/models/neuron/builds/[a-z]*.py",
-             "../../spynnaker/pyNN/models/neuron/implementations/[a-z]*.py",
-             "../../spynnaker/pyNN/models/neuron/input_types/[a-z]*.py",
-             "../../spynnaker/pyNN/models/neuron/master_pop_table_generators/[a-z]*.py",
-             "../../spynnaker/pyNN/models/neuron/neuron_models/[a-z]*.py",
-             "../../spynnaker/pyNN/models/neuron/plasticity/stdp/*/[a-z]*.py",
-             "../../spynnaker/pyNN/models/neuron/structural_plasticity/synaptogenesis/*/[a-z]*.py",
-             "../../spynnaker/pyNN/models/neuron/synapse_dynamics/[a-z]*.py",
-             "../../spynnaker/pyNN/models/neuron/synapse_io/[a-z]*.py",
-             "../../spynnaker/pyNN/models/neuron/synapse_types/[a-z]*.py",
-             "../../spynnaker/pyNN/models/neuron/threshold_types/[a-z]*.py",
-             "../../spynnaker/pyNN/models/neuron/abstract*.py",
-             "../../spynnaker/pyNN/models/neuron/population_machine*.py",
-             "../../spynnaker/pyNN/models/neuron/synaptic_manager.py",
-             "../../spynnaker/pyNN/models/neuron/[cg]*.py",
-             "../../spynnaker/pyNN/models/spike_source/*[eny].py",
-             "../../spynnaker/pyNN/models/utility_models/*/[a-z]*.py",
-             "../../spynnaker/pyNN/models/abstract_p*.py",
-             "../../spynnaker/pyNN/overridden_*/[a-z]*.py",
-             "../../spynnaker/pyNN/protocols/m*.py",
-             "../../spynnaker/pyNN/utilities/ra*/[a-z]*.py",
-             ])
+
+# We want to document __call__ when encountered
+autodoc_default_options = {
+    "members": True,
+    "special-members": "__call__"
+}
+
+
+def filtered_files(base, excludes=None, exclude_dir=None):
+    if not excludes:
+        excludes = []
+    excludes = set(base + "/" + e for e in excludes)
+    for root, _dirs, files in os.walk(base):
+        for filename in files:
+            full = root + "/" + filename
+            if exclude_dir and exclude_dir in root:
+                yield full
+            elif filename.endswith(".py") and not filename.startswith("_"):
+                if full not in excludes:
+                    yield full
+
+
+# UGH!
+output_dir = os.path.abspath(".")
+os.chdir("../..")
+
+# We only document __init__.py files... except for these special cases.
+# Use the unix full pathname from the root of the checked out repo
+explicit_wanted_files = [
+    "spynnaker/gsyn_tools.py",
+    "spynnaker/spike_checker.py",
+    "spynnaker/plot_utils.py",
+    "spynnaker/pyNN/abstract_spinnaker_common.py",
+    "spynnaker/pyNN/exceptions.py",
+    "spynnaker/pyNN/spynnaker_simulator_interface.py",
+    "spynnaker/pyNN/spynnaker_external_device_plugin_manager.py",
+    "spynnaker/pyNN/models/abstract_pynn_model.py",
+    "spynnaker/pyNN/models/projection.py",
+    "spynnaker/pyNN/models/defaults.py",
+    "spynnaker/pyNN/models/recorder.py",
+    "spynnaker/pyNN/models/neuron/key_space_tracker.py",
+    "spynnaker/pyNN/models/neuron/synaptic_matrices.py",
+    "spynnaker/pyNN/models/neuron/master_pop_table.py",
+    "spynnaker/pyNN/models/neuron/synaptic_matrix.py",
+    "spynnaker/pyNN/models/neuron/synapse_io.py",
+    "spynnaker/pyNN/models/neuron/synaptic_matrix_app.py",
+    "spynnaker/pyNN/models/neuron/plasticity/stdp/common.py",
+    "spynnaker/pyNN/models/spike_source/spike_source_array_vertex.py",
+    "spynnaker/pyNN/models/spike_source/spike_source_poisson_vertex.py",
+    "spynnaker/pyNN/models/spike_source/spike_source_poisson_machine_vertex.py",
+    "spynnaker/pyNN/models/common/recording_utils.py",
+    "spynnaker/pyNN/utilities/bit_field_utilities.py",
+    "spynnaker/pyNN/utilities/spynnaker_failed_state.py",
+    "spynnaker/pyNN/utilities/constants.py",
+    "spynnaker/pyNN/utilities/data_cache.py",
+    "spynnaker/pyNN/utilities/extracted_data.py",
+    "spynnaker/pyNN/utilities/fake_HBP_Portal_machine_provider.py",
+    "spynnaker/pyNN/utilities/running_stats.py",
+    "spynnaker/pyNN/utilities/utility_calls.py",
+    "spynnaker/pyNN/utilities/struct.py",
+    "spynnaker/pyNN/utilities/variable_cache.py",
+    "spynnaker8/spynnaker8_simulator_interface.py",
+    "spynnaker8/spynnaker_plotting.py",
+    "spynnaker8/utilities/neo_convertor.py",
+    "spynnaker8/utilities/neo_compare.py"]
+options = ['-o', output_dir, "."]
+options.extend(filtered_files(".", explicit_wanted_files, "tests"))
+try:
+    # Old style API; Python 2.7
+    from sphinx import apidoc
+    options = [None] + options
+except ImportError:
+    # New style API; Python 3.6 onwards
+    from sphinx.ext import apidoc
+apidoc.main(options)

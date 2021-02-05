@@ -15,11 +15,14 @@
 
 from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from pacman.exceptions import PacmanConfigurationException
 
 
 @add_metaclass(AbstractBase)
 class AbstractAcceptsIncomingSynapses(object):
     """ Indicates an object that can be a post-vertex in a PyNN projection.
+
+    Note: See verify_splitter
     """
     __slots__ = ()
 
@@ -39,52 +42,44 @@ class AbstractAcceptsIncomingSynapses(object):
         """
 
     @abstractmethod
-    def get_maximum_delay_supported_in_ms(self, machine_time_step):
-        """ Get the maximum delay supported by this vertex.
-
-        :param int machine_time_step: microseconds
-        :rtype: int
-        """
-
-    @abstractmethod
-    def add_pre_run_connection_holder(
-            self, connection_holder, projection_edge, synapse_information):
-        """ Add a connection holder to the vertex to be filled in when the\
-            connections are actually generated.
-
-        :param ConnectionHolder connection_holder:
-        :param ProjectionApplicationEdge projection_edge:
-        :param SynapseInformation synapse_information:
-        """
-
-    @abstractmethod
     def get_connections_from_machine(
-            self, transceiver, placement, edge, routing_infos,
-            synapse_information, machine_time_step, using_extra_monitor_cores,
-            placements=None, monitor_api=None, fixed_routes=None,
-            extra_monitor=None):
+            self, transceiver, placements, app_edge, synapse_info):
         # pylint: disable=too-many-arguments
         """ Get the connections from the machine post-run.
 
-        :param ~spinnman.Transceiver transceiver:
-        :param ~pacman.model.placements.Placement placement:
-        :param ProjectionMachineEdge edge:
-        :param ~pacman.model.routing_info.RoutingInfo routing_infos:
-        :param SynapseInformation synapse_information:
-        :param int machine_time_step: microseconds
-        :param bool using_extra_monitor_cores:
-        :param placements:
-        :type placements: None or ~pacman.model.placements.Placements
-        :param monitor_api:
-        :type monitor_api: None or \
-            ~spinn_front_end_common.utility_models.DataSpeedUpPacketGatherMachineVertex
-        :param fixed_routes:
-        :param extra_monitor: the extra monitor for this
-        :type fixed_routes: None or \
-            dict(tuple(int,int),~spinn_machine.FixedRouteEntry)
+        :param ~spinnman.transceiver.Transceiver transceiver:\
+            How to read the connection data
+        :param ~pacman.model.placements.Placements placements:\
+            Where the connection data is on the machine
+        :param ProjectionApplicationEdge app_edge:\
+            The edge for which the data is being read
+        :param SynapseInformation synapse_info:\
+            The specific projection within the edge
         """
 
     @abstractmethod
     def clear_connection_cache(self):
         """ Clear the connection data stored in the vertex so far.
         """
+
+    def verify_splitter(self, splitter):
+        """
+        Check that the splitter implements the API(s) expected by the\
+        SynapticMatrices
+
+        Any Vertex that implements this api should override
+        ApplicationVertex.splitter method to also call this function
+
+        :param splitter: the splitter
+        :type splitter:
+            ~spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay
+        :raises PacmanConfigurationException: is the splitter is not an \
+            instance of AbstractSpynnakerSplitterDelay
+        """
+        # Delayed import to avoid cicular dependency
+        from spynnaker.pyNN.extra_algorithms.splitter_components import (
+            AbstractSpynnakerSplitterDelay)
+        if not isinstance(splitter, AbstractSpynnakerSplitterDelay):
+            raise PacmanConfigurationException(
+                "The splitter needs to be an instance of "
+                "----------------AbstractSpynnakerSplitterDelay")

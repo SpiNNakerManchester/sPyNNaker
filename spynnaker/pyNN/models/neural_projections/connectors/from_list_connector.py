@@ -13,17 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
 import numpy
-
-from spinn_front_end_common.utilities.constants import \
-    MICRO_TO_MILLISECOND_CONVERSION
 from spinn_utilities.overrides import overrides
-from spinn_front_end_common.utilities import globals_variables
-from .abstract_connector import AbstractConnector
+from spinn_front_end_common.utilities.constants import (
+    MICRO_TO_MILLISECOND_CONVERSION)
+from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.exceptions import InvalidParameterType
-
-logger = logging.getLogger(__name__)
+from .abstract_connector import AbstractConnector
 
 # Indices of the source and target in the connection list array
 _SOURCE = 0
@@ -47,28 +43,37 @@ class FromListConnector(AbstractConnector):
         "__split_pre_slices",
         "__split_post_slices"]
 
-    def __init__(self, conn_list, safe=True, callback=None, verbose=False,
-                 column_names=None):
+    def __init__(self, conn_list, safe=True, verbose=False, column_names=None,
+                 callback=None):
         """
         :param conn_list:
-            a list of tuples, one tuple for each connection. Each
-            tuple should contain at least::
+            A numpy array or a list of tuples, one tuple for each connection.
+            Each tuple should contain::
 
-                (pre_idx, post_idx)
+                (pre_idx, post_idx, p1, p2, ..., pn)
 
             where ``pre_idx`` is the index (i.e. order in the Population,
-            not the ID) of the presynaptic neuron, and ``post_idx`` is
-            the index of the postsynaptic neuron.
-
-            Additional items per synapse are acceptable but all synapses
-            should have the same number of items.
+            not the ID) of the presynaptic neuron, ``post_idx`` is
+            the index of the postsynaptic neuron, and
+            ``p1``, ``p2``, etc. are the synaptic parameters (e.g.,
+            weight, delay, plasticity parameters).
+            All tuples/rows must have the same number of items.
         :type conn_list: ~numpy.ndarray or list(tuple(int,int,...))
         :param bool safe:
-        :param callable callback: Ignored
+            if ``True``, check that weights and delays have valid values.
+            If ``False``, this check is skipped.
         :param bool verbose:
-        :param column_names: If not None, must have same length as number of
-            extra columns in ``conn_list`` (i.e., after the first two).
-        :type column_names: None or list(str)
+            Whether to output extra information about the connectivity to a
+            CSV file
+        :param column_names: the names of the parameters ``p1``, ``p2``, etc.
+            If not provided, it is assumed the parameters are ``weight, delay``
+            (for backwards compatibility).
+        :type column_names: None or tuple(str) or list(str)
+        :param callable callback:
+            if given, a callable that display a progress bar on the terminal.
+
+            .. note::
+                Not supported by sPyNNaker.
         """
         super(FromListConnector, self).__init__(safe, callback, verbose)
 
@@ -86,6 +91,13 @@ class FromListConnector(AbstractConnector):
             return numpy.max(synapse_info.delays)
         else:
             return numpy.max(self.__delays)
+
+    @overrides(AbstractConnector.get_delay_minimum)
+    def get_delay_minimum(self, synapse_info):
+        if self.__delays is None:
+            return numpy.min(synapse_info.delays)
+        else:
+            return numpy.min(self.__delays)
 
     @overrides(AbstractConnector.get_delay_variance)
     def get_delay_variance(self, delays):
@@ -222,8 +234,8 @@ class FromListConnector(AbstractConnector):
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices, post_slice_index,
-            pre_vertex_slice, post_vertex_slice, synapse_type, synapse_info):
+            self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
+            synapse_type, synapse_info):
         # pylint: disable=too-many-arguments
         if not len(self.__sources):
             return numpy.zeros(0, dtype=self.NUMPY_SYNAPSES_DTYPE)
@@ -337,8 +349,7 @@ class FromListConnector(AbstractConnector):
         self.__delays = None
         try:
             delay_column = column_names.index('delay') + _FIRST_PARAM
-            machine_time_step = globals_variables.get_simulator(
-                ).machine_time_step
+            machine_time_step = get_simulator().machine_time_step
             self.__delays = (numpy.rint(
                 numpy.array(self.__conn_list[:, delay_column]) * (
                     MICRO_TO_MILLISECOND_CONVERSION / machine_time_step)) *
@@ -407,3 +418,11 @@ class FromListConnector(AbstractConnector):
                    (self.__sources <= _pre_slice.hi_atom) &
                    (_post_slice.lo_atom <= self.__targets) &
                    (self.__targets <= _post_slice.hi_atom))
+
+    def _apply_parameters_to_synapse_type(self, synapse_type):
+        """
+        :param AbstractStaticSynapseDynamics synapse_type:
+        """
+        if self.__extra_parameter_names:
+            for i, name in enumerate(self.__extra_parameter_names):
+                synapse_type.set_value(name, self.__extra_parameters[:, i])

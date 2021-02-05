@@ -17,8 +17,8 @@ BUILDS = synapse_expander \
          bit_field_expander \
          spike_source/poisson \
          delay_extension \
-         neuron \
-         robot_motor_control
+         robot_motor_control \
+         neuron
 
 DIRS = $(BUILDS:%=makefiles/%)
 

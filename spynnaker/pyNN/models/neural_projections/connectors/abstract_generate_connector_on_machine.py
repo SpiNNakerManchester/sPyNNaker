@@ -20,6 +20,7 @@ from six import with_metaclass
 from spinn_utilities.abstract_base import abstractproperty, AbstractBase
 from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
 
@@ -103,8 +104,8 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         """
         key = (id(pre_vertex_slice), id(post_vertex_slice))
         if key not in self.__connector_seed:
-            self.__connector_seed[key] = [
-                int(i * 0xFFFFFFFF) for i in rng.next(n=4)]
+            self.__connector_seed[key] = utility_calls.create_mars_kiss_seeds(
+                rng)
         return self.__connector_seed[key]
 
     @staticmethod
@@ -123,7 +124,7 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
             return None
         key = (id(pre_vertex_slice), id(post_vertex_slice), id(values))
         if key not in seeds:
-            seeds[key] = [int(i * 0xFFFFFFFF) for i in values.rng.next(n=4)]
+            seeds[key] = utility_calls.create_mars_kiss_seeds(values.rng)
         return seeds[key]
 
     @staticmethod
@@ -283,15 +284,12 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         """
 
     def gen_connector_params(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
+            self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
             synapse_type, synapse_info):
         """ Get the parameters of the on machine generation.
 
         :param list(~pacman.model.graphs.common.Slice) pre_slices:
-        :param int pre_slice_index:
         :param list(~pacman.model.graphs.common.Slice) post_slices:
-        :param int post_slice_index:
         :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         :param AbstractSynapseType synapse_type:
@@ -313,7 +311,7 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
     def _get_view_lo_hi(view):
         """ Get the range of neuron IDs covered by a view.
 
-        :param spynnaker8.models.populations.PopulationView view:
+        :param ~spynnaker.pyNN.models.populations.PopulationView view:
         :rtype: tuple(int,int)
         """
         # Evil forward reference to subpackage implementation of type!
