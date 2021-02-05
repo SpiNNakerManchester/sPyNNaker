@@ -16,6 +16,7 @@
 import logging
 import neo
 import numpy
+from spinn_utilities.log import FormatAdapter
 from pyNN import descriptions
 from pyNN.random import NumpyRNG
 from spinn_utilities.logger_utils import warn_once
@@ -23,7 +24,7 @@ from spinn_utilities.ranged.abstract_sized import AbstractSized
 from .idmixin import IDMixin
 from .population_base import PopulationBase
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class PopulationView(PopulationBase):
@@ -114,7 +115,7 @@ class PopulationView(PopulationBase):
 
         :rtype: dict(str, ...)
         """
-        return self.__population.get_initial_values(selector=self.__indexes)
+        return self.__population._get_initial_values(selector=self.__indexes)
 
     @property
     def parent(self):
@@ -263,7 +264,7 @@ class PopulationView(PopulationBase):
         if simplify is not True:
             logger.warning("The simplify value is ignored if not set to true")
 
-        return self.__population.get_by_selector(
+        return self.__population._get_by_selector(
             self.__indexes, parameter_names)
 
     def get_data(
@@ -389,7 +390,7 @@ class PopulationView(PopulationBase):
             p.initialize(v=lambda i: -65 + i / 10.0)
         """
         for variable, value in initial_values.items():
-            self.__population.set_initial_value(
+            self.__population._initialize(
                 variable, value, self.__indexes)
 
     def record(self, variables,  # pylint: disable=arguments-differ

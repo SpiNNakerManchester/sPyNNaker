@@ -80,7 +80,7 @@ class TestPopulation(BaseTestCase):
         pop_1.set(tau_m=2)
         values = pop_1.get("tau_m")
         self.assertEqual([2, 2, 2, 2, 2], values)
-        values = pop_1.get_by_selector(slice(1, 3), "tau_m")
+        values = pop_1._get_by_selector(slice(1, 3), "tau_m")
         self.assertEqual([2, 2], values)
         pop_1.set_by_selector(slice(1, 3), "tau_m", 3)
         values = pop_1.get("tau_m")
@@ -89,7 +89,7 @@ class TestPopulation(BaseTestCase):
         self.assertEqual([1.0, 1.0, 1.0, 1.0, 1.0], values['cm'])
         self.assertEqual(
             [-50.0, -50.0, -50.0, -50.0, -50.0], values["v_thresh"])
-        values = pop_1.get_by_selector([1, 3, 4], ["cm", "v_thresh"])
+        values = pop_1._get_by_selector([1, 3, 4], ["cm", "v_thresh"])
         self.assertEqual([1.0, 1.0, 1.0], values['cm'])
         self.assertEqual(
             [-50.0, -50.0, -50.0], values["v_thresh"])
@@ -98,11 +98,11 @@ class TestPopulation(BaseTestCase):
     def test_init_by_in(self):
         sim.setup(timestep=1.0)
         pop = sim.Population(4, sim.IF_curr_exp())
-        assert [-65.0, -65.0, -65.0, -65.0] == pop.get_initial_value("v")
-        pop.set_initial_value(variable="v", value=-60, selector=1)
-        assert [-65, -60, -65, -65] == pop.get_initial_value("v")
-        pop.set_initial_value(variable="v", value=12, selector=2)
-        assert [-60] == pop.get_initial_value("v", selector=1)
+        assert [-65.0, -65.0, -65.0, -65.0] == pop.initial_values["v"]
+        pop._initialize(variable="v", value=-60, selector=1)
+        assert [-65, -60, -65, -65] == pop.initial_values["v"]
+        pop._initialize(variable="v", value=12, selector=2)
+        assert [-60] == pop._get_initial_value("v", selector=1)
         sim.end()
 
     def test_init_bad(self):
@@ -118,9 +118,7 @@ class TestPopulation(BaseTestCase):
         sim.setup(timestep=1.0)
         pop = sim.Population(4, sim.SpikeSourceArray())
         with pytest.raises(KeyError):
-            pop.set_initial_value(variable="v", value="Anything")
-        with pytest.raises(KeyError):
-            pop.get_initial_value(variable="v")
+            pop.initialize(v="Anything")
         with pytest.raises(KeyError):
             pop.initial_values
         sim.end()
@@ -131,7 +129,7 @@ class TestPopulation(BaseTestCase):
             cellclass=sim.IF_curr_exp, cellparams=None, n=4)
         initial_values = pop.initial_values
         assert "v" in initial_values
-        initial_values = pop.get_initial_values(selector=3)
+        initial_values = pop._get_initial_values(selector=3)
         assert {"v": [-65], "isyn_exc": [0], "isyn_inh": [0]} == initial_values
         sim.end()
 

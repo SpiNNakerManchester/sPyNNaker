@@ -44,6 +44,10 @@ from .population_view import PopulationView
 
 logger = FormatAdapter(logging.getLogger(__file__))
 
+REMOVED_V6 = "The method {} is not standard PyNN so has been permently " \
+      "removed. Use {} instead. " \
+      "(Even this warning will be removed in version 7)"
+
 
 # Not in the class so pylint doesn't get confused about abstractness of methods
 def _we_dont_do_this_now(*args):  # pylint: disable=unused-argument
@@ -568,8 +572,11 @@ class Population(PopulationBase):
                 "Population does not support the initialisation")
         return self._vertex.initial_values
 
-    # NON-PYNN API CALL
     def get_initial_value(self, variable, selector=None):
+        raise NotImplementedError(REMOVED_V6.format(
+            "get_initial_value", "initial_values"))
+
+    def _get_initial_value(self, variable, selector):
         """ See :py:meth:`~.AbstractPopulationInitializable.get_initial_value`
 
         :param str variable: variable name with or without ``_init`` suffix
@@ -586,30 +593,11 @@ class Population(PopulationBase):
                     variable))
         return self._vertex.get_initial_value(variable, selector)
 
-    # NON-PYNN API CALL
     def set_initial_value(self, variable, value, selector=None):
-        """ See :py:meth:`~.AbstractPopulationInitializable.set_initial_value`
+        raise NotImplementedError(REMOVED_V6.format(
+            "set_initial_value", "initialize"))
 
-        :param str variable: variable name with or without ``_init`` suffix
-        :param value: New value for the variable
-        :type value: int or float or list(int) or list(float)
-        :param selector: a description of the subrange to accept, or None for
-            all. See:
-            :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
-        :type selector: None or slice or int or list(bool) or list(int)
-        """
-        if not self.__vertex_population_initializable:
-            raise KeyError(
-                "Population does not support the initialisation of {}".format(
-                    variable))
-        if get_not_running_simulator().has_ran \
-                and not self.__vertex_changeable_after_run:
-            raise Exception("Population does not support changes after run")
-        self._read_parameters_before_set()
-        self._vertex.set_initial_value(variable, value, selector)
-
-    # NON-PYNN API CALL
-    def get_initial_values(self, selector=None):
+    def _get_initial_values(self, selector=None):
         """ See :py:meth:`~.AbstractPopulationInitializable.get_initial_values`
 
         :param selector: a description of the subrange to accept, or ``None``
@@ -756,7 +744,7 @@ class Population(PopulationBase):
         return results
 
     # NON-PYNN API CALL
-    def get_by_selector(self, selector, parameter_names):
+    def _get_by_selector(self, selector, parameter_names):
         """ Get the values of a parameter for the selected cell in the\
             population.
 
@@ -835,13 +823,17 @@ class Population(PopulationBase):
         # TODO: Need __getitem__
         _we_dont_do_this_now(cell_id)
 
-    def _initialize(self, variable, value):
+    def _initialize(self, variable, value, selector=None):
         """ Set the initial value of one of the state variables of the neurons\
             in this population.
 
         :param str variable:
         :param value:
         :type value: float or int or list(float) or list(int)
+        :param selector: a description of the subrange to accept.
+            Or None for all. See:
+            :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
+        :type selector: slice or int or iterable(bool) or iterable(int)
         """
         if not self.__vertex_population_initializable:
             raise KeyError(
@@ -851,7 +843,7 @@ class Population(PopulationBase):
                 and not self.__vertex_changeable_after_run:
             raise Exception("Population does not support changes after run")
         self._read_parameters_before_set()
-        self.__vertex.initialize(variable, value)
+        self.__vertex.initialize(variable, value, selector)
 
     def inject(self, current_source):
         """ Connect a current source to all cells in the Population.

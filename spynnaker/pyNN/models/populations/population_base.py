@@ -16,9 +16,10 @@
 import logging
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 def _we_dont_do_this_now(*args):  # pylint: disable=unused-argument
