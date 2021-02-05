@@ -214,7 +214,7 @@
     </algorithm>
     <algorithm name="SpynnakerMachineBitFieldUnorderedRouterCompressor">
         <python_module>spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor</python_module>
-        <!-- DEPRECATED Use SpynnakerOrderedCoveringOnChipRouterCompression !-->
+        <!-- DEPRECATED Use SpynnakerMachineBitFieldOrderedCoveringCompressor !-->
         <python_class>SpynnakerMachineBitFieldUnorderedRouterCompressor</python_class>
         <input_definitions>
             <parameter>

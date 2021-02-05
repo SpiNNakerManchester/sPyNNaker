@@ -14,11 +14,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from p8_integration_tests.base_test_case import BaseTestCase
-from p8_integration_tests.quick_test.test_onchip_compressor.many_routes \
-    import do_run
+from p8_integration_tests.quick_test.test_onchip_compressor.many_bitfields \
+    import do_bitfield_run
 
 
-class TestUnorderedCompressor(BaseTestCase):
+class TestOrderedCoveringBitFieldCompressor(BaseTestCase):
 
     def test_do_run(self):
-        self.runsafe(do_run)
+        self.runsafe(do_bitfield_run)
