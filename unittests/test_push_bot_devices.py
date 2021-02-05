@@ -14,9 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters \
-    import (
-        PushBotLaser, PushBotMotor, PushBotSpeaker, PushBotLED)
+from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
+    PushBotLaser, PushBotMotor, PushBotSpeaker, PushBotLED)
 
 
 class Test(unittest.TestCase):

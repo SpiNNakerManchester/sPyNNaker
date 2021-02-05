@@ -14,11 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from enum import Enum
-import logging
 from spinn_front_end_common.utility_models import MultiCastCommand
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-
-logger = logging.getLogger(__name__)
 
 # structure of command is KKKKKKKKKKKKKKKKKKKKK-IIIIIII-F-DDD
 # K = ignored key at the top of the command
@@ -298,8 +295,9 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     def __init__(self, mode, instance_key=None, uart_id=0):
         """
-        :param MODES mode:
-            The mode of operation of the protocol
+        :param mode: The mode of operation of the protocol
+        :type modes:
+            ~spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES
         :param instance_key: The optional instance key to use
         :type instance_key: int or None
         :param int uart_id: The ID of the UART when needed
@@ -322,7 +320,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
     @property
     def mode(self):
         """
-        :rtype: MODES
+        :rtype: ~spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES
         """
         return self.__mode
 

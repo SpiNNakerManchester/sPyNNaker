@@ -45,12 +45,14 @@ class SynapseInformation(object):
         """
         :param AbstractConnector connector:
             The connector connected to the synapse
-        :param PyNNPopulationCommon pre_population:
-            The population sending spikes to the synapse
-        :param PyNNPopulationCommon post_population:
-            The population hosting the synapse
-        :param bool prepop_is_view: Whether the prepopulation is a view
-        :param bool postpop_is_view: Whether the postpopulation is a view
+        :param pre_population: The population sending spikes to the synapse
+        :type pre_population: ~spynnaker.pyNN.models.populations.Population or
+            ~spynnaker.pyNN.models.populations.PopulationView
+        :param post_population: The population hosting the synapse
+        :type post_population: ~spynnaker.pyNN.models.populations.Population
+            or ~spynnaker.pyNN.models.populations.PopulationView
+        :param bool prepop_is_view: Whether the ``pre_population`` is a view
+        :param bool postpop_is_view: Whether the ``post_population`` is a view
         :param rng: Seeded random number generator
         :type rng: ~pyNN.random.NumpyRNG or None
         :param AbstractSynapseDynamics synapse_dynamics:
@@ -89,7 +91,8 @@ class SynapseInformation(object):
     def pre_population(self):
         """ The population sending spikes to the synapse
 
-        :rtype: PyNNPopulationCommon
+        :rtype: ~spynnaker.pyNN.models.populations.Population or
+            ~spynnaker.pyNN.models.populations.PopulationView
         """
         return self.__pre_population
 
@@ -97,7 +100,8 @@ class SynapseInformation(object):
     def post_population(self):
         """ The population hosting the synapse
 
-        :rtype: PyNNPopulationCommon
+        :rtype: ~spynnaker.pyNN.models.populations.Population or
+            ~spynnaker.pyNN.models.populations.PopulationView
         """
         return self.__post_population
 
@@ -119,7 +123,7 @@ class SynapseInformation(object):
 
     @property
     def prepop_is_view(self):
-        """ Whether the prepopulation is a view
+        """ Whether the :py:meth:`pre_population` is a view
 
         :rtype: bool
         """
@@ -127,7 +131,7 @@ class SynapseInformation(object):
 
     @property
     def postpop_is_view(self):
-        """ Whether the postpopulation is a view
+        """ Whether the :py:meth:`post_population` is a view
 
         :rtype: bool
         """

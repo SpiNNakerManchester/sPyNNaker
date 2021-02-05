@@ -13,8 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
 import numpy
+from pyNN.random import RandomDistribution
+from pyNN.connectors import OneToOneConnector as PyNNOneToOneConnector
 from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
@@ -22,27 +23,32 @@ from .abstract_generate_connector_on_machine import (
 from .abstract_connector_supports_views_on_machine import (
     AbstractConnectorSupportsViewsOnMachine)
 
-logger = logging.getLogger(__name__)
-
 
 class OneToOneConnector(AbstractGenerateConnectorOnMachine,
-                        AbstractConnectorSupportsViewsOnMachine):
+                        AbstractConnectorSupportsViewsOnMachine,
+                        PyNNOneToOneConnector):
     """ Where the pre- and postsynaptic populations have the same size,\
-        connect cell i in the presynaptic pynn_population.py to cell i in the\
-        postsynaptic pynn_population.py for all i.
+        connect cell *i* in the presynaptic population to cell *i* in\
+        the postsynaptic population, for all *i*.
     """
-    __slots__ = ["__random_number_class"]
+    __slots__ = []
 
-    def __init__(self, random_number_class,
-                 safe=True, callback=None, verbose=False):
+    def __init__(self, safe=True, callback=None, verbose=False):
         """
-        :param type random_number_class:
         :param bool safe:
-        :param callable callback: Ignored
+            If ``True``, check that weights and delays have valid values.
+            If ``False``, this check is skipped.
+        :param callable callback:
+            if given, a callable that display a progress bar on the terminal.
+
+            .. note::
+                Not supported by sPyNNaker.
         :param bool verbose:
+            Whether to output extra information about the connectivity to a
+            CSV file
         """
-        self.__random_number_class = random_number_class
         super(OneToOneConnector, self).__init__(safe, callback, verbose)
+        PyNNOneToOneConnector.__init__(self, safe=safe, callback=callback)
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
@@ -68,7 +74,7 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
 
         if numpy.isscalar(delays):
             return int(min_delay <= delays <= max_delay)
-        if isinstance(delays, self.__random_number_class):
+        if isinstance(delays, RandomDistribution):
             return 1
 
         slice_min_delay = min(delays)

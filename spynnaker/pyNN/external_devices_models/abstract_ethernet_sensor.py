@@ -54,5 +54,5 @@ class AbstractEthernetSensor(object):
         """ Get a Database Connection instance that this device uses\
             to inject packets
 
-        :rtype: SpynnakerLiveSpikesConnection
+        :rtype: ~spynnaker.pyNN.connections.SpynnakerLiveSpikesConnection
         """

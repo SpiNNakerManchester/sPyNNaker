@@ -44,9 +44,6 @@
 #include <debug.h>
 #include "synapse_types.h"
 
-//! Used to scale the secondary response
-static const REAL SCALING_FACTOR = REAL_CONST(100.0);
-
 //---------------------------------------
 // Synapse parameters
 //---------------------------------------
@@ -69,6 +66,8 @@ struct synapse_param_t {
     input_t multiplicator;
     //! History storage used to reset synaptic state
     input_t exc2_old;
+    //! Scaling factor for the secondary response
+    input_t scaling_factor;
 };
 
 //! The supported synapse type indices
@@ -151,10 +150,10 @@ static inline input_t *synapse_types_get_excitatory_input(
 
 	parameters->exc2_old = parameters->exc2.synaptic_input_value;
 
-    excitatory_response[0] = 0; // I think?
+    excitatory_response[0] = 0;
     excitatory_response[1] =
     		parameters->exc2.synaptic_input_value * parameters->multiplicator
-    		* SCALING_FACTOR;
+    		* parameters->scaling_factor;
     return &excitatory_response[0];
 }
 
@@ -216,6 +215,7 @@ static inline void synapse_types_print_parameters(synapse_param_t *parameters) {
             parameters->inh.synaptic_input_value);
     log_info("multiplicator = %11.4k\n", parameters->multiplicator);
     log_info("exc2_old      = %11.4k\n", parameters->exc2_old);
+    log_info("scaling_factor = %11.4k\n", parameters->scaling_factor);
 }
 
 #endif  // _SYNAPSE_TYPES_SEMD_IMPL_H_

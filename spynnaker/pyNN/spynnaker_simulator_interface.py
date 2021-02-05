@@ -21,6 +21,8 @@ from spinn_front_end_common.utilities import SimulatorInterface
 
 @add_metaclass(AbstractBase)
 class SpynnakerSimulatorInterface(SimulatorInterface):
+    """ The API exposed by the simulator itself.
+    """
 
     __slots__ = ()
 
@@ -48,3 +50,32 @@ class SpynnakerSimulatorInterface(SimulatorInterface):
     @abstractmethod
     def set_number_of_neurons_per_core(self, neuron_type, max_permitted):
         pass
+
+    @abstractproperty
+    def dt(self):
+        """ The timestep, in milliseconds. """
+
+    @abstractproperty
+    def mpi_rank(self):
+        """ The MPI rank of the controller node. """
+
+    @abstractproperty
+    def name(self):
+        """ The name of the simulator. Used to ensure PyNN recording neo\
+            blocks are correctly labelled. """
+
+    @abstractproperty
+    def num_processes(self):
+        """ The number of MPI worker processes. """
+
+    @abstractproperty
+    def recorders(self):
+        """ The recorders, used by the PyNN state object. """
+
+    @abstractproperty
+    def segment_counter(self):
+        """ The number of the current recording segment being generated. """
+
+    @abstractproperty
+    def t(self):
+        """ The current simulation time, in milliseconds. """

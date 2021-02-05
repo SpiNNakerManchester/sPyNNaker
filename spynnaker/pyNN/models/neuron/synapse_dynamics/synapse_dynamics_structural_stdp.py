@@ -14,16 +14,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy
+from pyNN.standardmodels.synapses import StaticSynapse
 from spinn_utilities.overrides import overrides
+from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
 from .synapse_dynamics_stdp import SynapseDynamicsSTDP
-from spynnaker.pyNN.models.neuron.synapse_dynamics.\
-    synapse_dynamics_structural_common import (
-        DEFAULT_F_REW, DEFAULT_INITIAL_WEIGHT, DEFAULT_INITIAL_DELAY,
-        DEFAULT_S_MAX, SynapseDynamicsStructuralCommon)
-from spynnaker.pyNN.exceptions import SynapticConfigurationException
+from .synapse_dynamics_structural_common import (
+    DEFAULT_F_REW, DEFAULT_INITIAL_WEIGHT, DEFAULT_INITIAL_DELAY,
+    DEFAULT_S_MAX, SynapseDynamicsStructuralCommon)
 
 
 class SynapseDynamicsStructuralSTDP(
@@ -76,14 +76,17 @@ class SynapseDynamicsStructuralSTDP(
             voltage_dependence=None, dendritic_delay_fraction=1.0,
             f_rew=DEFAULT_F_REW, initial_weight=DEFAULT_INITIAL_WEIGHT,
             initial_delay=DEFAULT_INITIAL_DELAY, s_max=DEFAULT_S_MAX,
-            seed=None, weight=0.0, delay=1.0, backprop_delay=True):
+            seed=None, weight=StaticSynapse.default_parameters['weight'],
+            delay=None, backprop_delay=True):
         """
         :param AbstractPartnerSelection partner_selection:
             The partner selection rule
         :param AbstractFormation formation: The formation rule
         :param AbstractElimination elimination: The elimination rule
         :param AbstractTimingDependence timing_dependence:
+            The STDP timing dependence rule
         :param AbstractWeightDependence weight_dependence:
+            The STDP weight dependence rule
         :param None voltage_dependence:
             The STDP voltage dependence (unsupported)
         :param float dendritic_delay_fraction:
@@ -99,9 +102,12 @@ class SynapseDynamicsStructuralSTDP(
             values
         :type initial_delay: float or tuple(float, float)
         :param int s_max: Maximum fan-in per target layer neuron
-        :param int seed: seed the random number generators
+        :param seed: seed for the random number generators
+        :type seed: int or None
         :param float weight: The weight of connections formed by the connector
-        :param float delay: The delay of connections formed by the connector
+        :param delay: The delay of connections formed by the connector
+            Use ``None`` to get the simulator default minimum delay.
+        :type delay: float or None
         """
         SynapseDynamicsSTDP.__init__(
             self, timing_dependence, weight_dependence, voltage_dependence,
@@ -110,7 +116,7 @@ class SynapseDynamicsStructuralSTDP(
         self.__partner_selection = partner_selection
         self.__formation = formation
         self.__elimination = elimination
-        self.__f_rew = f_rew
+        self.__f_rew = float(f_rew)
         self.__p_rew = 1. / self.__f_rew
         self.__initial_weight = initial_weight
         self.__initial_delay = initial_delay
