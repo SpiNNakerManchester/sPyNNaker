@@ -49,6 +49,7 @@ REMOVED_V6 = "The method {} is not standard PyNN so has been permently " \
       "removed. Use {} instead. " \
       "(Even this warning will be removed in version 7)"
 
+
 # Not in the class so pylint doesn't get confused about abstractness of methods
 def _we_dont_do_this_now(*args):  # pylint: disable=unused-argument
     # pragma: no cover
