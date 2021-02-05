@@ -179,7 +179,7 @@ class IDMixin(object):
         return self.__population._get_initial_value(variable, self.__id)
 
     def set_initial_value(self, variable, value):
-        """ Set the initial value of a state variable of the cell.	        
+        """ Set the initial value of a state variable of the cell.
         :param str variable: The name of the variable
         :param float value: The value of the variable
         """
