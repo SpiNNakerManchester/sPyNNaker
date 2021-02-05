@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2021 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,11 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import logging
+from spinn_utilities.log import FormatAdapter
 from pyNN.standardmodels.synapses import StaticSynapse as PyNNStaticSynapse
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic as
     _BaseClass)
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class SynapseDynamicsStatic(_BaseClass):

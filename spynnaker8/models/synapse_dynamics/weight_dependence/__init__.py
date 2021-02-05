@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2021 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,9 +20,9 @@
     instead.
 """
 
-from .additive import WeightDependenceAdditive
-from .multiplicative import WeightDependenceMultiplicative
-from .additive_triplet import WeightDependenceAdditiveTriplet
+from .weight_dependence_additive import WeightDependenceAdditive
+from .weight_dependence_multiplicative import WeightDependenceMultiplicative
+from .weight_dependence_additive_triplet import WeightDependenceAdditiveTriplet
 
 __all__ = ["WeightDependenceAdditive", "WeightDependenceMultiplicative",
            "WeightDependenceAdditiveTriplet"]

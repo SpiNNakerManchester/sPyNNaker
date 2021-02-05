@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2021 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -12,35 +12,31 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 import logging
-from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
-    TimingDependenceSpikePair as
+from spinn_utilities.log import FormatAdapter
+from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
+    WeightDependenceAdditive as
     _BaseClass)
+logger = FormatAdapter(logging.getLogger(__name__))
 
-logger = logging.getLogger(__name__)
 
-
-class TimingDependenceSpikePair(_BaseClass):
+class WeightDependenceAdditive(_BaseClass):
     """
     .. deprecated:: 6.0
         Use
-        :py:class:`spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikePair`
+        :py:class:`spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditive`
         instead.
     """
     __slots__ = []
 
-    def __init__(
-            self, tau_plus=20.0, tau_minus=20.0, A_plus=0.01, A_minus=0.01):
+    # noinspection PyPep8Naming
+    def __init__(self, w_min=0.0, w_max=1.0):
         r"""
-        :param float tau_plus: :math:`\tau_+`
-        :param float tau_minus: :math:`\tau_-`
-        :param float A_plus: :math:`A^+`
-        :param float A_minus: :math:`A^-`
+        :param float w_min: :math:`w_\mathrm{min}`
+        :param float w_max: :math:`w_\mathrm{max}`
         """
-        super(TimingDependenceSpikePair, self).__init__(
-            tau_plus=tau_plus, tau_minus=tau_minus, A_plus=A_plus,
-            A_minus=A_minus)
+        super(WeightDependenceAdditive, self).__init__(
+            w_min=w_min, w_max=w_max)
         logger.warning(
             "please use spynnaker.pyNN.models.neuron.plasticity.stdp."
-            "timing_dependence.TimingDependenceSpikePair instead")
+            "weight_dependence.WeightDependenceAdditive instead")

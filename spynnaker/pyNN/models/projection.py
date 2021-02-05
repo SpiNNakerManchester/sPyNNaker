@@ -17,6 +17,7 @@ import functools
 import logging
 import numpy
 from six import string_types
+from spinn_utilities.log import FormatAdapter
 from pyNN import common as pynn_common
 from pyNN.random import RandomDistribution
 from pyNN.recording.files import StandardTextFile
@@ -39,7 +40,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 from spynnaker._version import __version__
 from spynnaker.pyNN.models.populations import Population, PopulationView
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 def _we_dont_do_this_now(*args):  # pylint: disable=unused-argument

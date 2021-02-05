@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2021 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -12,34 +12,36 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import logging
+from spinn_utilities.log import FormatAdapter
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
-    TimingDependenceVogels2011 as
+    TimingDependenceSpikePair as
     _BaseClass)
 
-_defaults = _BaseClass.default_parameters
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
-class TimingDependenceVogels2011(_BaseClass):
+class TimingDependenceSpikePair(_BaseClass):
     """
     .. deprecated:: 6.0
         Use
-        :py:class:`spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceVogels2011`
+        :py:class:`spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikePair`
         instead.
     """
     __slots__ = []
 
     def __init__(
-            self, alpha, tau=_defaults['tau'], A_plus=0.01, A_minus=0.01):
+            self, tau_plus=20.0, tau_minus=20.0, A_plus=0.01, A_minus=0.01):
         r"""
-        :param float alpha: :math:`\alpha`
-        :param float tau: :math:`\tau`
+        :param float tau_plus: :math:`\tau_+`
+        :param float tau_minus: :math:`\tau_-`
         :param float A_plus: :math:`A^+`
         :param float A_minus: :math:`A^-`
         """
-        super(TimingDependenceVogels2011, self).__init__(
-            tau=tau, alpha=alpha, A_plus=A_plus, A_minus=A_minus)
+        super(TimingDependenceSpikePair, self).__init__(
+            tau_plus=tau_plus, tau_minus=tau_minus, A_plus=A_plus,
+            A_minus=A_minus)
         logger.warning(
             "please use spynnaker.pyNN.models.neuron.plasticity.stdp."
-            "timing_dependence.TimingDependenceVogels2011 instead")
+            "timing_dependence.TimingDependenceSpikePair instead")

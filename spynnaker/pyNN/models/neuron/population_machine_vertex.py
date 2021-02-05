@@ -571,7 +571,7 @@ class PopulationMachineVertex(
 
     def _write_neuron_parameters(self, spec, key, region_id):
 
-        self._app_vertex.update_state_variables()
+        self._app_vertex.set_has_run()
 
         # pylint: disable=too-many-arguments
         n_atoms = self.vertex_slice.n_atoms

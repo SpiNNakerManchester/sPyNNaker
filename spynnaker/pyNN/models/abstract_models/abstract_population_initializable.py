@@ -27,7 +27,7 @@ class AbstractPopulationInitializable(object):
     __slots__ = ()
 
     @abstractmethod
-    def initialize(self, variable, value):
+    def initialize(self, variable, value, selector=None):
         """ Set the initial value of one of the state variables of the neurons\
             in this population.
 
@@ -72,25 +72,6 @@ class AbstractPopulationInitializable(object):
         ideally also with ``_init`` removed or added.
 
         :param str variable: variable name with or without ``_init``
-        :param selector: a description of the subrange to accept, or None for
-            all. See:
-            :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
-        :type selector: None or slice or int or list(bool) or list(int)
-        :return: A list or an Object which act like a list
-        :rtype: iterable
-        """
-
-    @abstractmethod
-    def set_initial_value(self, variable, value, selector=None):
-        """ Sets the value for any variable whose in \
-            initialize_parameters.keys
-
-        Must support the variable as listed in initialize_parameters.keys,\
-        ideally also with ``_init`` removed or added
-
-        :param str variable: variable name with or without ``_init``
-        :param value: New value for the variable
-        :type value: int or float or list(int) or list(float)
         :param selector: a description of the subrange to accept, or None for
             all. See:
             :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
