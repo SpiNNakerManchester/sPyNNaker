@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017-2021 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,54 +15,48 @@
 
 import logging
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    FixedNumberPreConnector as _BaseClass)
+    MultapseConnector as
+    _BaseClass)
 logger = logging.getLogger(__file__)
 
 
-class FixedNumberPreConnector(_BaseClass):
-    """ Connects a fixed number of pre-synaptic neurons selected at random,\
-        to all post-synaptic neurons.
+class MultapseConnector(_BaseClass):
+    """
+    Create a multapse connector. The size of the source and destination\
+    populations are obtained when the projection is connected. The number of\
+    synapses is specified. when instantiated, the required number of synapses\
+    is created by selecting at random from the source and target populations\
+    *with replacement* (by default). Uniform selection probability is assumed.
 
     .. deprecated:: 6.0
         Use
-        :py:class:`spynnaker.pyNN.models.neural_projections.connectors.FixedNumberPreConnector`
+        :py:class:`spynnaker.pyNN.models.neural_projections.connectors.MultapseConnector`
         instead.
     """
     __slots__ = []
 
-    def __init__(
-            self, n, allow_self_connections=True, safe=True, verbose=False,
-            with_replacement=False, rng=None, callback=None):
+    def __init__(self, n, allow_self_connections=True,
+                 with_replacement=True, safe=True, verbose=False,
+                 rng=None):
         """
-        :param int n:
-            number of random pre-synaptic neurons connected to post-neurons
+        :param int n: This is the total number of synapses in the connection.
         :param bool allow_self_connections:
-            if the connector is used to connect a Population to itself, this
-            flag determines whether a neuron is allowed to connect to itself,
-            or only to other neurons in the Population.
+            Allow a neuron to connect to itself or not.
+        :param bool with_replacement:
+            When selecting, allow a neuron to be re-selected or not.
         :param bool safe:
             Whether to check that weights and delays have valid values.
             If False, this check is skipped.
         :param bool verbose:
             Whether to output extra information about the connectivity to a
             CSV file
-        :param bool with_replacement:
-            if False, once a connection is made, it can't be made again; if
-            True, multiple connections between the same pair of neurons are
-            allowed
         :param rng: random number generator
         :type rng: ~pyNN.random.NumpyRNG or None
-        :param callable callback:
-            if given, a callable that display a progress bar on the terminal.
-
-            .. note::
-                Not supported by sPyNNaker.
         """
-        # pylint: disable=too-many-arguments
-        super(FixedNumberPreConnector, self).__init__(
-            n=n, allow_self_connections=allow_self_connections,
+        super(MultapseConnector, self).__init__(
+            num_synapses=n, allow_self_connections=allow_self_connections,
             with_replacement=with_replacement, safe=safe, verbose=verbose,
             rng=rng)
         logger.warning(
             "please use spynnaker.pyNN.models.neural_projections.connectors."
-            "FixedNumberPreConnector instead")
+            "MultapseConnector instead")

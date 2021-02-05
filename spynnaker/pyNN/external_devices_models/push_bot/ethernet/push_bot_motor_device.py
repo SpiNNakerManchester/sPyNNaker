@@ -19,7 +19,7 @@ from spinn_front_end_common.abstract_models import (
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from .device import PushBotEthernetDevice
+from .push_bot_device import PushBotEthernetDevice
 from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
     PushBotMotor)
 
