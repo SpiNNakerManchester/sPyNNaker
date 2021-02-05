@@ -273,10 +273,6 @@ static inline bool row_restructure(
                 current_state->post_syn_id, row,
                 &current_state->weight, &current_state->delay,
                 &current_state->offset, &current_state->synapse_type)) {
-            return synaptogenesis_elimination_rule(current_state,
-                    elimination_params[current_state->post_to_pre.pop_index],
-                    time, row);
-        } else {
             log_debug("Post neuron %u not in row", current_state->post_syn_id);
             return false;
         }
