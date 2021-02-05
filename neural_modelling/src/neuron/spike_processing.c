@@ -295,7 +295,7 @@ static inline void setup_synaptic_dma_write(
 static void multicast_packet_received_callback(uint key, uint payload) {
     p_per_ts_struct.packets_this_time_step += 1;
 
-    if (in_spikes_size() && !dma_busy) {
+    if (in_spikes_size() > 1 && !dma_busy) {
         log_error("At receive, %d packets in buffer but DMA not busy", in_spikes_size());
         rt_error(RTE_SWERR);
     }
@@ -448,7 +448,7 @@ void spike_processing_clear_input_buffer(timer_t time) {
     if (n_spikes > max_dropped) {
         max_dropped = n_spikes;
     }
-    if (n_spikes > 0 && !dma_busy) {
+    if (n_spikes > 1 && !dma_busy) {
         log_error("%d spikes still in buffer but DMA not busy", n_spikes);
         rt_error(RTE_SWERR);
     }
