@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017-2021 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,43 +15,54 @@
 
 import logging
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    AllToAllConnector as _BaseClass)
+    FixedNumberPostConnector as _BaseClass)
 logger = logging.getLogger(__file__)
 
 
-class AllToAllConnector(_BaseClass):
-    """ Connects all cells in the presynaptic population to all cells in \
-        the postsynaptic population
+class FixedNumberPostConnector(_BaseClass):
+    """ PyNN connector that puts a fixed number of connections on each of the\
+        post neurons.
 
     .. deprecated:: 6.0
         Use
-        :py:class:`spynnaker.pyNN.models.neural_projections.connectors.AllToAllConnector`
+        :py:class:`spynnaker.pyNN.models.neural_projections.connectors.FixedNumberPostConnector`
         instead.
     """
     __slots__ = []
 
     def __init__(
-            self, allow_self_connections=True, safe=True,
-            verbose=None, callback=None):
+            self, n, allow_self_connections=True, safe=True, verbose=False,
+            with_replacement=False, rng=None, callback=None):
         """
+        :param int n:
+            number of random post-synaptic neurons connected to pre-neurons
         :param bool allow_self_connections:
             if the connector is used to connect a Population to itself, this
             flag determines whether a neuron is allowed to connect to itself,
             or only to other neurons in the Population.
-        :param bool safe: if True, check that weights and delays have valid
-            values. If False, this check is skipped.
+        :param bool safe:
+            Whether to check that weights and delays have valid values;
+            if False, this check is skipped.
         :param bool verbose:
             Whether to output extra information about the connectivity to a
             CSV file
+        :param bool with_replacement:
+            if False, once a connection is made, it can't be made again;
+            if True, multiple connections between the same pair of neurons
+            are allowed
+        :param rng: random number generator
+        :type rng: ~pyNN.random.NumpyRNG or None
         :param callable callback:
             if given, a callable that display a progress bar on the terminal.
 
             .. note::
                 Not supported by sPyNNaker.
         """
-        _BaseClass.__init__(
-            self, allow_self_connections=allow_self_connections,
-            safe=safe, verbose=verbose, callback=callback)
+        # pylint: disable=too-many-arguments
+        super(FixedNumberPostConnector, self).__init__(
+            n=n, allow_self_connections=allow_self_connections,
+            with_replacement=with_replacement, safe=safe, verbose=verbose,
+            rng=rng)
         logger.warning(
             "please use spynnaker.pyNN.models.neural_projections.connectors."
-            "AllToAllConnector instead")
+            "FixedNumberPostConnector instead")
