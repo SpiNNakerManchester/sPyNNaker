@@ -281,6 +281,7 @@ void resume_callback(void) {
 
 extern uint32_t earliest_clear;
 extern uint32_t latest_clear;
+extern uint32_t max_dropped;
 
 //! \brief Timer interrupt callback
 //! \param[in] timer_count: the number of times this call back has been
@@ -322,8 +323,8 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
         // run
         time--;
 
-        log_info("Earliest send = %d, latest send = %d, earliest clear = %d, latest clear = %d",
-                earliest_send_time, latest_send_time, earliest_clear, latest_clear);
+        log_info("Earliest send = %d, latest send = %d, earliest clear = %d, latest clear = %d, max_dropped = %d",
+                earliest_send_time, latest_send_time, earliest_clear, latest_clear, max_dropped);
 
         log_debug("Rewire tries = %d", count_rewire_attempts);
         simulation_ready_to_read();
