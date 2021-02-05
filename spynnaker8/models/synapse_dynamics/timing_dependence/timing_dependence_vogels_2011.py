@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2021 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,29 +13,33 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import logging
-from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
-    WeightDependenceAdditive as
+from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
+    TimingDependenceVogels2011 as
     _BaseClass)
+
+_defaults = _BaseClass.default_parameters
 logger = logging.getLogger(__name__)
 
 
-class WeightDependenceAdditive(_BaseClass):
+class TimingDependenceVogels2011(_BaseClass):
     """
     .. deprecated:: 6.0
         Use
-        :py:class:`spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditive`
+        :py:class:`spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceVogels2011`
         instead.
     """
     __slots__ = []
 
-    # noinspection PyPep8Naming
-    def __init__(self, w_min=0.0, w_max=1.0):
+    def __init__(
+            self, alpha, tau=_defaults['tau'], A_plus=0.01, A_minus=0.01):
         r"""
-        :param float w_min: :math:`w_\mathrm{min}`
-        :param float w_max: :math:`w_\mathrm{max}`
+        :param float alpha: :math:`\alpha`
+        :param float tau: :math:`\tau`
+        :param float A_plus: :math:`A^+`
+        :param float A_minus: :math:`A^-`
         """
-        super(WeightDependenceAdditive, self).__init__(
-            w_min=w_min, w_max=w_max)
+        super(TimingDependenceVogels2011, self).__init__(
+            tau=tau, alpha=alpha, A_plus=A_plus, A_minus=A_minus)
         logger.warning(
             "please use spynnaker.pyNN.models.neuron.plasticity.stdp."
-            "weight_dependence.WeightDependenceAdditive instead")
+            "timing_dependence.TimingDependenceVogels2011 instead")
