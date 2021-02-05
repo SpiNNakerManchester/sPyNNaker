@@ -220,7 +220,8 @@ class SpikeSourceArrayVertex(
             if isinstance(old_values, RangedListOfList):
                 ranged_list = old_values
             else:
-                # Keep all the setting stuff in one place by creating a RangedList
+                # Keep all the setting stuff in one place by creating a
+                # RangedListofLists
                 ranged_list = RangedListOfList(
                     size=self.n_atoms, value=old_values)
             ranged_list.set_value_by_selector(
