@@ -13,9 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
 import numpy
-from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
 try:
@@ -24,8 +22,6 @@ try:
 except ImportError as _ex:  # noqa: F821
     # Importing csa causes problems with readthedocs so allowing it to fail
     _csa_found = (False, _ex)
-
-logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class CSAConnector(AbstractConnector):
@@ -45,8 +41,17 @@ class CSAConnector(AbstractConnector):
         :param csa.connset.CSet cset:
             A description of the connection set between populations
         :param bool safe:
-        :param callable callback: Ignored
+            If ``True``, check that weights and delays have valid values.
+            If ``False``, this check is skipped.
+        :param callable callback:
+            if given, a callable that display a progress bar on the terminal.
+
+            .. note::
+                Not supported by sPyNNaker.
+
         :param bool verbose:
+            Whether to output extra information about the connectivity to a
+            CSV file
         :raises ImportError:
             if the `csa` library isn't present; it's tricky to install in
             some environments so we don't force it to be present unless you

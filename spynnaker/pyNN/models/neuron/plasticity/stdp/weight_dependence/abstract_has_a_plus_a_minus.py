@@ -17,7 +17,7 @@ from spinn_utilities.abstract_base import AbstractBase
 
 
 class AbstractHasAPlusAMinus(object, metaclass=AbstractBase):
-    r""" An object that has A\ :sup:`+` and A\ :sup:`-` properties.
+    r""" An object that has :math:`A^+` and :math:`A^-` properties.
     """
     __slots__ = [
         '__a_plus',

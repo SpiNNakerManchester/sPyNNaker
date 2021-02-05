@@ -12,7 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 import numpy
 from spinn_utilities.overrides import overrides
 from data_specification.enums.data_type import DataType
@@ -48,10 +47,11 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
     """
 
     def __init__(
-            self, shape_pre, shape_post, shape_kernel, weight_kernel,
-            delay_kernel, shape_common, pre_sample_steps_in_post,
-            pre_start_coords_in_post, post_sample_steps_in_pre,
-            post_start_coords_in_pre, safe, verbose, callback=None):
+            self, shape_pre, shape_post, shape_kernel, weight_kernel=None,
+            delay_kernel=None, shape_common=None,
+            pre_sample_steps_in_post=None, pre_start_coords_in_post=None,
+            post_sample_steps_in_pre=None, post_start_coords_in_pre=None,
+            safe=True, space=None, verbose=False, callback=None):
         """
         :param shape_pre:
             2D shape of the pre population (rows/height, cols/width, usually
@@ -88,10 +88,17 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             Starting row/col for post sampling <=> (offX, offY)
         :type post_start_coords_in_pre: None or list(int) or tuple(int,int)
         :param bool safe:
+            Whether to check that weights and delays have valid values.
+            If ``False``, this check is skipped.
+        :param ~pyNN.space.Space space:
+            Currently ignored; for future compatibility.
         :param bool verbose:
+            Whether to output extra information about the connectivity to a
+            CSV file
         :param callable callback: (ignored)
         """
         super().__init__(safe=safe, callback=callback, verbose=verbose)
+        assert space is None, "non-None space unsupported"
 
         # Get the kernel size
         self._kernel_w = shape_kernel[WIDTH]

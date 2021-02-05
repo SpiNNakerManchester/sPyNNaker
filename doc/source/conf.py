@@ -58,7 +58,10 @@ extensions = [
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3.6', None),
     'numpy': ("https://numpy.org/doc/1.19/", None),
+    'matplotlib': ('https://matplotlib.org', None),
     'pynn': ("http://neuralensemble.org/docs/PyNN/", None),
+    'neo': ('https://neo.readthedocs.io/en/stable/', None),
+    # We don't link to quantities; their docs are too awful
     'spinn_utilities': ('https://spinnutils.readthedocs.io/en/latest/', None),
     'spinn_machine': ('https://spinnmachine.readthedocs.io/en/latest/', None),
     'spinnman': ('https://spinnman.readthedocs.io/en/latest/', None),
@@ -83,7 +86,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'sPyNNaker'
-copyright = u'2014-2017'
+copyright = u'2014-2021'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -390,13 +393,16 @@ autodoc_default_options = {
 }
 
 
-def filtered_files(base, excludes=None):
+def filtered_files(base, excludes=None, exclude_dir=None):
     if not excludes:
         excludes = []
+    excludes = set(base + "/" + e for e in excludes)
     for root, _dirs, files in os.walk(base):
         for filename in files:
-            if filename.endswith(".py") and not filename.startswith("_"):
-                full = root + "/" + filename
+            full = root + "/" + filename
+            if exclude_dir and exclude_dir in root:
+                yield full
+            elif filename.endswith(".py") and not filename.startswith("_"):
                 if full not in excludes:
                     yield full
 
@@ -415,10 +421,10 @@ explicit_wanted_files = [
     "spynnaker/pyNN/exceptions.py",
     "spynnaker/pyNN/spynnaker_simulator_interface.py",
     "spynnaker/pyNN/spynnaker_external_device_plugin_manager.py",
-    "spynnaker/pyNN/models/pynn_population_common.py",
-    "spynnaker/pyNN/models/pynn_projection_common.py",
+    "spynnaker/pyNN/models/abstract_pynn_model.py",
+    "spynnaker/pyNN/models/projection.py",
     "spynnaker/pyNN/models/defaults.py",
-    "spynnaker/pyNN/models/recording_common.py",
+    "spynnaker/pyNN/models/recorder.py",
     "spynnaker/pyNN/models/neuron/key_space_tracker.py",
     "spynnaker/pyNN/models/neuron/synaptic_matrices.py",
     "spynnaker/pyNN/models/neuron/master_pop_table.py",
@@ -433,13 +439,17 @@ explicit_wanted_files = [
     "spynnaker/pyNN/utilities/bit_field_utilities.py",
     "spynnaker/pyNN/utilities/spynnaker_failed_state.py",
     "spynnaker/pyNN/utilities/constants.py",
+    "spynnaker/pyNN/utilities/data_cache.py",
     "spynnaker/pyNN/utilities/extracted_data.py",
     "spynnaker/pyNN/utilities/fake_HBP_Portal_machine_provider.py",
     "spynnaker/pyNN/utilities/running_stats.py",
     "spynnaker/pyNN/utilities/utility_calls.py",
     "spynnaker/pyNN/utilities/struct.py",
-    ]
-options = ['-o', output_dir, "spynnaker"]
-options.extend(filtered_files("spynnaker", explicit_wanted_files))
-
+    "spynnaker/pyNN/utilities/variable_cache.py",
+    "spynnaker8/spynnaker8_simulator_interface.py",
+    "spynnaker8/spynnaker_plotting.py",
+    "spynnaker8/utilities/neo_convertor.py",
+    "spynnaker8/utilities/neo_compare.py"]
+options = ['-o', output_dir, "."]
+options.extend(filtered_files(".", explicit_wanted_files, "tests"))
 apidoc.main(options)

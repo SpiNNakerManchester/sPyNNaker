@@ -104,12 +104,13 @@ class SpikeSourcePoissonVertex(
             max_rate=None, splitter=None):
         """
         :param int n_neurons:
-        :param iterable(~pacman.model.constraints.AbstractConstraint) \
-                constraints:
+        :param constraints:
+        :type constraints:
+            iterable(~pacman.model.constraints.AbstractConstraint)
         :param str label:
         :param float seed:
         :param int max_atoms_per_core:
-        :param SpikeSourcePoisson model:
+        :param ~spynnaker.pyNN.models.spike_source.SpikeSourcePoisson model:
         :param iterable(float) rate:
         :param iterable(int) start:
         :param iterable(int) duration:

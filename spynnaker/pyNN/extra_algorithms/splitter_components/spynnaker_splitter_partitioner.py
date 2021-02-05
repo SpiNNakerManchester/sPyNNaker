@@ -12,13 +12,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import logging
+from spinn_utilities.overrides import overrides
 from pacman.model.partitioner_interfaces import AbstractSlicesConnect
 from pacman.operations.partition_algorithms import SplitterPartitioner
-from spinn_utilities.log import FormatAdapter
-from spinn_utilities.overrides import overrides
-
-logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class SpynnakerSplitterPartitioner(SplitterPartitioner):

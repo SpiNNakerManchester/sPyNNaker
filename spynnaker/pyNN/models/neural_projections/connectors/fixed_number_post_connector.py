@@ -12,9 +12,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import logging
 import math
 import numpy
+from pyNN.connectors import (
+    FixedNumberPostConnector as
+    PyNNFixedNumberPostConnector)
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .abstract_connector import AbstractConnector
@@ -26,11 +28,11 @@ from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
 
 N_GEN_PARAMS = 8
-logger = logging.getLogger(__file__)
 
 
 class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
-                               AbstractConnectorSupportsViewsOnMachine):
+                               AbstractConnectorSupportsViewsOnMachine,
+                               PyNNFixedNumberPostConnector):
     """ Connects a fixed number of post-synaptic neurons selected at random,\
         to all pre-synaptic neurons.
     """
@@ -44,8 +46,8 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         "__post_connector_seed"]
 
     def __init__(
-            self, n, allow_self_connections=True, with_replacement=False,
-            safe=True, callback=None, verbose=False, rng=None):
+            self, n, allow_self_connections=True, safe=True, verbose=False,
+            with_replacement=False, rng=None, callback=None):
         """
         :param int n:
             number of random post-synaptic neurons connected to pre-neurons.
@@ -53,22 +55,34 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
             if the connector is used to connect a Population to itself, this
             flag determines whether a neuron is allowed to connect to itself,
             or only to other neurons in the Population.
+        :param bool safe:
+            Whether to check that weights and delays have valid values;
+            if ``False``, this check is skipped.
+        :param bool verbose:
+            Whether to output extra information about the connectivity to a
+            CSV file
         :param bool with_replacement:
             this flag determines how the random selection of post-synaptic
-            neurons is performed; if true, then every post-synaptic neuron
+            neurons is performed; if ``True``, then every post-synaptic neuron
             can be chosen on each occasion, and so multiple connections
-            between neuron pairs are possible; if false, then once a
+            between neuron pairs are possible; if ``False``, then once a
             post-synaptic neuron has been connected to a pre-neuron, it can't
             be connected again.
-        :param bool safe:
-        :param callable callback: Ignored
-        :param bool verbose:
         :param rng:
-            Seeded random number generator, or None to make one when needed
+            Seeded random number generator, or ``None`` to make one when
+            needed.
         :type rng: ~pyNN.random.NumpyRNG or None
+        :param callable callback:
+            if given, a callable that display a progress bar on the terminal.
+
+            .. note::
+                Not supported by sPyNNaker.
         """
         super().__init__(safe, callback, verbose)
-        self.__n_post = n
+        self.__n_post = self._roundsize(n, "FixedNumberPostConnector")
+        PyNNFixedNumberPostConnector.__init__(
+            self, self.__n_post, allow_self_connections, with_replacement, rng,
+            safe, callback)
         self.__allow_self_connections = allow_self_connections
         self.__with_replacement = with_replacement
         self.__post_neurons = None

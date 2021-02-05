@@ -14,17 +14,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spynnaker.pyNN.models.neuron.builds import IFCurrExpBase
-from spynnaker.pyNN.models.pynn_population_common import PyNNPopulationCommon
+from spynnaker.pyNN.models.populations.population import Population
 from unittests.mocks import MockSimulator
 
 
 def test_selector():
-    simulator = MockSimulator.setup()
+    MockSimulator.setup()
     model = IFCurrExpBase()
-    pop_1 = PyNNPopulationCommon(spinnaker_control=simulator, size=5,
-                                 label="Test", constraints=None, model=model,
-                                 structure=None, initial_values=None)
-    pop_1.set("tau_m", 2)
+    pop_1 = Population(
+        size=5, label="Test", constraints=None, cellclass=model,
+        structure=None, initial_values={})
+    pop_1.set(tau_m=2)
     values = pop_1.get("tau_m")
     assert [2, 2, 2, 2, 2] == values
     values = pop_1.get_by_selector(slice(1, 3), "tau_m")
@@ -41,9 +41,9 @@ def test_selector():
 
 
 def test_round():
-    simulator = MockSimulator.setup()
+    MockSimulator.setup()
     model = IFCurrExpBase()
-    pop_1 = PyNNPopulationCommon(
-        spinnaker_control=simulator, size=4.999999, label="Test",
-        constraints=None, model=model, structure=None, initial_values=None)
+    pop_1 = Population(
+        size=4.999999, label="Test", cellclass=model,
+        constraints=None, structure=None, initial_values={})
     assert pop_1.size == 5
