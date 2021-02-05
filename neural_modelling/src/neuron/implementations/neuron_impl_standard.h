@@ -183,7 +183,7 @@ static void neuron_impl_load_neuron_parameters(
     // Read the number of steps per timestep
     n_steps_per_timestep = address[next++];
     if (n_steps_per_timestep > 1) {
-        log_info("Looping over %u steps each timestep", n_steps_per_timestep);
+        log_debug("Looping over %u steps each timestep", n_steps_per_timestep);
     } else if (n_steps_per_timestep == 0) {
         log_error("bad number of steps per timestep: 0");
         rt_error(RTE_SWERR);
