@@ -83,10 +83,13 @@ class TestIDMixin(BaseTestCase):
     def test_init_by_in(self):
         sim.setup(timestep=1.0)
         pop = sim.Population(N_NEURONS, sim.IF_curr_exp(), label=LABEL)
-        assert [-65.0, -65.0, -65.0, -65.0] == pop.get_initial_value("v")
+        assert [-65.0, -65.0, -65.0, -65.0] == pop.initial_values["v"]
         cells = pop.all_cells
         cells[1].set_initial_value(variable="v", value=-60)
         assert [-60] == cells[1].get_initial_value("v")
+        cells[2].initialize(v=-59)
+        assert [-59] == cells[2].initial_values["v"]
+        assert [-65.0, -60.0, -59.0, -65.0] == pop.initial_values["v"]
         sim.end()
 
     def test_initial_values(self):
@@ -96,7 +99,7 @@ class TestIDMixin(BaseTestCase):
         assert -65 == cells[1].v
         assert -65 == cells[1].v_init
         cells[1].v = -60
-        assert [-65.0, -60.0, -65.0, -65.0] == pop.get_initial_value("v")
+        assert [-65.0, -60.0, -65.0, -65.0] == pop.initial_values["v"]
         sim.end()
 
     def test_asview(self):
