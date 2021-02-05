@@ -241,14 +241,15 @@
 
 
 <div class="viewcode-block" id="SpynnakerMachineBitFieldUnorderedRouterCompressor"><a class="viewcode-back" href="../../../../spynnaker.pyNN.extra_algorithms.html#spynnaker.pyNN.extra_algorithms.SpynnakerMachineBitFieldUnorderedRouterCompressor">[docs]</a><span class="k">class</span> <span class="nc">SpynnakerMachineBitFieldUnorderedRouterCompressor</span><span class="p">(</span>
-        <span class="n">AbstractMachineBitFieldRouterCompressor</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; DEPRACATED use MachineBitFieldRouterCompressor &quot;&quot;&quot;</span>
+        <span class="n">SpynnakerMachineBitFieldOrderedCoveringCompressor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; DEPRACATED use SpynnakerMachineBitFieldOrderedCoveringCompressor &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
             <span class="s2">&quot;SpynnakerMachineBitFieldUnorderedRouterCompressor &quot;</span>
             <span class="s2">&quot;algorithm name is deprecated. &quot;</span>
-            <span class="s2">&quot;Please use MachineBitFieldOrderedCoveringCompressor instead. &quot;</span>
+            <span class="s2">&quot;Please use SpynnakerMachineBitFieldOrderedCoveringCompressor &quot;</span>
+            <span class="s2">&quot;instead. &quot;</span>
             <span class="s2">&quot;Remove algorithms from your cfg to use defaults&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span>
             <span class="n">SpynnakerMachineBitFieldUnorderedRouterCompressor</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span>
