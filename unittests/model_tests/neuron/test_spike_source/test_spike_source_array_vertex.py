@@ -56,5 +56,5 @@ class TestSpikeSourceArrayVertex(unittest.TestCase):
 
     def test_double_list(self):
         SpikeSourceArrayVertex(
-            n_neurons=5, spike_times=[1, 11, 22], constraints=None,
+            n_neurons=3, spike_times=[[1], [11], [22]], constraints=None,
             label="test", max_atoms_per_core=None, model=None, splitter=None)

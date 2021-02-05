@@ -28,7 +28,7 @@ from spynnaker.pyNN.utilities.spynnaker_failed_state import (
 
 class Close_Once(object):
 
-    __slots__ = ("closed")
+    __slots__ = ["closed"]
 
     def __init__(self):
         self.closed = False
