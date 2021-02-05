@@ -142,6 +142,7 @@ typedef struct bi_exp_params{
          input_t input){
 
  	if (synapse_type_index == EXCITATORY) {
+                //log_info("ip: %5.6k", input);
 
  		parameter->exc_a_response =  parameter->exc_a_response + input;
  				/*

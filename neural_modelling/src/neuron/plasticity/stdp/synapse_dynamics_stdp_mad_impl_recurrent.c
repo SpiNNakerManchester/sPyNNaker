@@ -376,7 +376,8 @@ bool synapse_dynamics_process_plastic_synapses(
 
         // Convert into ring buffer offset
         uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
-                delay_axonal + delay_dendritic + time, type_index,
+                //delay_axonal + delay_dendritic + time, type_index,
+                delay_axonal + full_delay + time, type_index,
                 synapse_type_index_bits);
 
         uint32_t accumulation = ring_buffers[ring_buffer_index] +

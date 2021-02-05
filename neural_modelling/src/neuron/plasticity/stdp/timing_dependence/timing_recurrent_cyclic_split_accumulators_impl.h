@@ -24,10 +24,9 @@ typedef uint16_t pre_trace_t;
 #include <neuron/plasticity/stdp/stdp_typedefs.h>
 #include "random.h"
 
-#define inc_FF_pot +1
-#define inc_teacher_dep -1
-#define inc_vdiff_pot +2
-#define inc_vdiff_dep -2
+#define inc_tune_pot +1
+#define inc_tune_dep -1
+#define inc_LL_dep -1
 
 typedef struct {
     int32_t accum_decay_per_ts;
@@ -266,49 +265,54 @@ static inline update_state_t timing_apply_pre_spike(
 
         } else {
             // We are hitting the depression threshold, so take action.
-            if (syn_type == 0) {
                 // io_printf(IO_BUF, "DEP: t: %d, Vdiff: %k, histPot: %k    ", time, voltage_difference, post_synaptic_mem_V);
         	if (print_plasticity){ io_printf(IO_BUF, "        Accumulator limit reached: Depressing diff %k\n", voltage_difference); }
                 if (previous_state.lock == 0){
-                    //if ((voltage_difference > 900.0k) || ((mars_kiss64_seed(recurrentSeed) & ((STDP_FIXED_POINT_ONE>>2) - 1)) > 128)) {
-		    //io_printf(IO_BUF, " Dep vdiff: %k) ", voltage_difference);
-                    if (voltage_difference > 900.0k) {
+                    //io_printf(IO_BUF, "Thresh: %k, v: %k\n", post_synaptic_threshold->threshold_value, post_synaptic_mem_V);
+                    if ((voltage_difference < v_diff_pot_threshold) || (voltage_difference > 900.0k)) {
+                        // Either voltage near thresh when teacher arrived, or neuron fired based on FF alone.
+                        // Near perfect balance. Don't depress this synapse significantly:
+                        //io_printf(IO_BUF, "%d : LL dep - near balance\n", time);
+	            	previous_state.lock = 1;
+		     	previous_state.dep_accumulator = 0;
+                       if (!locked_weights_unchanged) {
+                           previous_state.weight_state.weight = previous_state.weight_state.weight + inc_LL_dep;
+                       }
+                    } else {
                         // Neuron fires by feedforward input alone. Probably firing too early. 
                         // Enable full depression, which should push the firing a bit later.
-                        //io_printf(IO_BUF, "FF dep\n");
+                        //io_printf(IO_BUF, "%d : Full dep\n", time);
 			previous_state.lock = 1;
 			previous_state.dep_accumulator = 0;
 			previous_state.weight_state = weight_one_term_apply_depression_sd( previous_state.weight_state, syn_type, STDP_FIXED_POINT_ONE);
 			if (print_plasticity) { io_printf(IO_BUF, "            Applying full depression (gap to threshold: %k)\n", voltage_difference); }
-                    } else if (voltage_difference > v_diff_pot_threshold) {
-                        // Still relying on teacher and a long way from threshold. Assume that we are in early learning stages. Synapse is
-                        // probably an early firer in the pattern, so can safely depress (risky):
-			previous_state.lock = 1;
-			previous_state.dep_accumulator = 0;
-			previous_state.weight_state = weight_one_term_apply_depression_sd( previous_state.weight_state, syn_type, STDP_FIXED_POINT_ONE);
-			previous_state.weight_state.weight += 1;
-                        //io_printf(IO_BUF, "Early dep\n");
-			if (print_plasticity) { io_printf(IO_BUF, "            Early firer. Applying full depression (gap to threshold: %k)\n", voltage_difference); }
-
-                    } else {
-                        // Neuron firing was due to teacher. So natural firing would still be late.
-                        // So lock low, to avoid making the output spike even later.
-			previous_state.lock = 1;
-			previous_state.dep_accumulator = 0;
-                        previous_state.weight_state.weight = previous_state.weight_state.weight + inc_teacher_dep;
-                        //io_printf(IO_BUF, "LL dep\n");
-			if (print_plasticity) { io_printf(IO_BUF, "            Applying teacher dep (LL)\n"); }
                     }
-                } else {
-                    //io_printf(IO_BUF, "Dep LOCKED\n");
+                    //} else if (voltage_difference > v_diff_pot_threshold) {
+                    //    // Still relying on teacher and a long way from threshold. Assume that we are in early learning stages. Synapse is
+                    //    // probably an early firer in the pattern, so can safely depress (risky):
+	            //		previous_state.lock = 1;
+	            //		previous_state.dep_accumulator = 0;
+	            //		previous_state.weight_state = weight_one_term_apply_depression_sd( previous_state.weight_state, syn_type, STDP_FIXED_POINT_ONE);
+		    //	previous_state.weight_state.weight += 1;
+                    //    io_printf(IO_BUF, "Early dep\n");
+	            //		if (print_plasticity) { io_printf(IO_BUF, "            Early firer. Applying full depression (gap to threshold: %k)\n", voltage_difference); }
+                    //} else {
+                    //    // Neuron firing was due to teacher. So natural firing would still be late.
+                    //    // So lock low, to avoid making the output spike even later.
+	            //		previous_state.lock = 1;
+		    // 	previous_state.dep_accumulator = 0;
+                    //    previous_state.weight_state.weight = previous_state.weight_state.weight + inc_teacher_dep;
+                    //    io_printf(IO_BUF, "LL dep\n");
+	            //		if (print_plasticity) { io_printf(IO_BUF, "            Applying teacher dep (LL)\n"); }
+                } // previous_state.lock == 0
+                else {
+                    //io_printf(IO_BUF, "%d : Dep LOCKED\n", time);
                     if (print_plasticity){ io_printf(IO_BUF, "Synapse already locked, so cannot depress\n"); }
-                }
+                } // previous_state==lock, else
 
-            }
-        }
-    } else {
-        if (print_plasticity){ io_printf (IO_BUF, "        PRE SPIKE WAS NOT IN POST WINDOW!!\n"); }
-    }
+        } // previous_state.dep_accumulator >..., else clause
+    }  // ((time > last_post_time) && ....
+    else { if (print_plasticity){ io_printf (IO_BUF, "        PRE SPIKE WAS NOT IN POST WINDOW!!\n"); } }
 
     // Set the post window to be just before this pre-spike. This is the only way I've found to
     // reset it. It means that the first window length will be garbage.
@@ -390,30 +394,41 @@ static inline update_state_t timing_apply_post_spike(
                if (print_plasticity){ io_printf(IO_BUF, "Updating Type: 0 Synapse\n"); }
                // Check synapse is unlocked
                if (previous_state.lock == 0) {
+                   //io_printf(IO_BUF, "Thresh: %k, v: %k\n", post_synaptic_threshold->threshold_value, post_synaptic_mem_V);
                    if (voltage_difference > 900.0k) {
-                       // Neuron fired through feed-forward input, ahead of desired time. Therefore, don't potentiate further.
-                       if (print_plasticity){ io_printf(IO_BUF, "FF pot\n"); }
+                       // Neuron fired through feed-forward input, ahead of desired time. Therefore, depress!! (New functionality!)
+                       if (print_plasticity){ io_printf(IO_BUF, "was FF pot\n"); }
+                       //io_printf(IO_BUF, "%d : pot syn - dep tuning\n", time);
+                       previous_state.lock = 1;
+                       previous_state.pot_accumulator = 0;
+			previous_state.weight_state = weight_one_term_apply_depression_sd( previous_state.weight_state, syn_type, STDP_FIXED_POINT_ONE);
+                       if (!locked_weights_unchanged) {
+                        previous_state.weight_state.weight = previous_state.weight_state.weight + inc_tune_dep;
+                       }
+                   } else if (voltage_difference > v_diff_pot_threshold) {
+                       // Neuron fired throught teacher but far from threshold already
+                       //io_printf(IO_BUF, "%d : pot syn - big potentiation\n", time);
+                       previous_state.weight_state = weight_one_term_apply_potentiation_sd( previous_state.weight_state, syn_type, STDP_FIXED_POINT_ONE);
                        previous_state.lock = 1;
                        previous_state.pot_accumulator = 0;
                        if (!locked_weights_unchanged) {
-                           previous_state.weight_state.weight = previous_state.weight_state.weight + inc_FF_pot;
+                           previous_state.weight_state.weight = previous_state.weight_state.weight + inc_tune_pot;
                        }
-                       if (print_plasticity){
-                           io_printf(IO_BUF, "Neuron fired by pattern input (not teacher): locking at current weight");
-                           io_printf(IO_BUF, "t: %k, FF full pot - Vdiff: %k, somaPot: %k\n", time, v_diff_pot_threshold, post_synaptic_mem_V);
-                       }
-                   } else {
+                   } // if voltage_difference < v_diff_pot_threshold
+                   else {
                        // Teacher triggers neuron to fire. Therefore we need full potentiation to make spike happen by FF input:
                        previous_state.lock = 1;
                        previous_state.pot_accumulator = 0;
                        previous_state.weight_state = weight_one_term_apply_potentiation_sd( previous_state.weight_state, syn_type, STDP_FIXED_POINT_ONE);
+                       //io_printf(IO_BUF, "%d : pot syn - pot tuning\n", time);
                        if (print_plasticity){
                	           io_printf(IO_BUF, "Voltage  diff: %k, so potentiate\n", voltage_difference);
                            io_printf(IO_BUF, "Old weight: %u, ", previous_state.weight_state);
                            io_printf(IO_BUF, "New Weight: %u \n", previous_state.weight_state);
                        }
-                   } // if voltage_diff > ... else
+                   } // if voltage_diff > 900.0k ... else
                } else { // previous_state.locked == 0, else
+                   //io_printf(IO_BUF, "%d : Pot LOCKED\n", time);
                    if (print_plasticity){ io_printf(IO_BUF, "Synapse is already locked\n"); }
                } // if prev_state.lock == 0, else clause
            } // if prev_state.pot_acc  thresh, else clause

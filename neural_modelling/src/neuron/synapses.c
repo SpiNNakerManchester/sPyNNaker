@@ -303,6 +303,8 @@ void synapses_do_timestep_update(timer_t time) {
 
             // Convert ring-buffer entry to input and add on to correct
             // input for this synapse type and neuron
+            // SD 02/02/21:
+            //log_info("T: %u  ", time);
             neuron_add_inputs(
                 synapse_type_index, neuron_index,
                 synapses_convert_weight_to_input(
