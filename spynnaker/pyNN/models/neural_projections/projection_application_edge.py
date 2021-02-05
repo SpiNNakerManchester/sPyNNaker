@@ -13,15 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
-
-from spinn_front_end_common.interface.provenance import \
-    AbstractProvidesLocalProvenanceData
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationEdge
 from pacman.model.partitioner_interfaces import AbstractSlicesConnect
+from spinn_front_end_common.interface.provenance import (
+    AbstractProvidesLocalProvenanceData)
 
-logger = logging.getLogger(__name__)
 _DynamicsStructural = None
 
 

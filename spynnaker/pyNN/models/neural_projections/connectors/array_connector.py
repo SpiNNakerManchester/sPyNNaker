@@ -13,12 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
 import numpy
 from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
-
-logger = logging.getLogger(__name__)
 
 
 class ArrayConnector(AbstractConnector):
@@ -32,13 +29,21 @@ class ArrayConnector(AbstractConnector):
     def __init__(self, array, safe=True, callback=None, verbose=False):
         """
         :param array:
-            An explicit boolean matrix that specifies the connections\
-            between the pre- and post-populations\
+            An explicit boolean matrix that specifies the connections
+            between the pre- and post-populations
             (see PyNN documentation). Must be 2D in practice.
         :type array: ~numpy.ndarray(2, ~numpy.uint8)
         :param bool safe:
-        :param callable callback: Ignored
+            Whether to check that weights and delays have valid values.
+            If False, this check is skipped.
+        :param callable callback:
+            if given, a callable that display a progress bar on the terminal.
+
+            .. note::
+                Not supported by sPyNNaker.
         :param bool verbose:
+            Whether to output extra information about the connectivity to a
+            CSV file
         """
         super(ArrayConnector, self).__init__(safe, callback, verbose)
         self.__array = array

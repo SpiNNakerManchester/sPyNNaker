@@ -267,7 +267,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
     // Loop however many times requested; do this in reverse for efficiency,
     // and because the index doesn't actually matter
-    for (uint32_t i = n_steps_per_timestep; i > 0; i--) {
+    for (uint32_t i_step = n_steps_per_timestep; i_step > 0; i_step--) {
         // Get the voltage
         state_t soma_voltage = neuron_model_get_membrane_voltage(this_neuron);
 
@@ -295,7 +295,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
         }
 
         // Do recording if on the first step
-        if (i == n_steps_per_timestep) {
+        if (i_step == n_steps_per_timestep) {
             neuron_recording_record_accum(
                     V_RECORDING_INDEX, neuron_index, soma_voltage);
             neuron_recording_record_accum(

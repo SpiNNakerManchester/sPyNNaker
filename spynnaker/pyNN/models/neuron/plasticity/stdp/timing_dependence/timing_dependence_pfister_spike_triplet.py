@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, MICRO_TO_MILLISECOND_CONVERSION)
@@ -24,8 +23,6 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence\
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure\
     import SynapseStructureWeightOnly
 from spinn_front_end_common.utilities.globals_variables import get_simulator
-
-logger = logging.getLogger(__name__)
 
 
 class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
@@ -44,20 +41,26 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
         "__tau_x",
         "__tau_x_data",
         "__tau_y",
-        "__tau_y_data"]
+        "__tau_y_data",
+        "__a_plus",
+        "__a_minus"]
 
     # noinspection PyPep8Naming
-    def __init__(self, tau_plus, tau_minus, tau_x, tau_y):
+    def __init__(self, tau_plus, tau_minus, tau_x, tau_y, A_plus, A_minus):
         r"""
         :param float tau_plus: :math:`\tau_+`
         :param float tau_minus: :math:`\tau_-`
         :param float tau_x: :math:`\tau_x`
         :param float tau_y: :math:`\tau_y`
+        :param float A_plus: :math:`A^+`
+        :param float A_minus: :math:`A^-`
         """
         self.__tau_plus = tau_plus
         self.__tau_minus = tau_minus
         self.__tau_x = tau_x
         self.__tau_y = tau_y
+        self.__a_plus = A_plus
+        self.__a_minus = A_minus
 
         self.__synapse_structure = SynapseStructureWeightOnly()
 
@@ -99,6 +102,30 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
         :rtype: float
         """
         return self.__tau_y
+
+    @property
+    def A_plus(self):
+        r""" :math:`A^+`
+
+        :rtype: float
+        """
+        return self.__a_plus
+
+    @A_plus.setter
+    def A_plus(self, new_value):
+        self.__a_plus = new_value
+
+    @property
+    def A_minus(self):
+        r""" :math:`A^-`
+
+        :rtype: float
+        """
+        return self.__a_minus
+
+    @A_minus.setter
+    def A_minus(self, new_value):
+        self.__a_minus = new_value
 
     @overrides(AbstractTimingDependence.is_same_as)
     def is_same_as(self, timing_dependence):

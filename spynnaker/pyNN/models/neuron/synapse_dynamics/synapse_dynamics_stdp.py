@@ -15,18 +15,20 @@
 
 import math
 import numpy
+from pyNN.standardmodels.synapses import StaticSynapse
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BYTES_PER_SHORT)
+from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.models.abstract_models import AbstractSettable
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
-from .abstract_synapse_dynamics_structural \
-    import AbstractSynapseDynamicsStructural
+from .abstract_synapse_dynamics_structural import (
+    AbstractSynapseDynamicsStructural)
 from .abstract_generate_on_machine import (
     AbstractGenerateOnMachine, MatrixGeneratorID)
-from spynnaker.pyNN.exceptions import InvalidParameterType,\
-    SynapticConfigurationException
+from spynnaker.pyNN.exceptions import (
+    InvalidParameterType, SynapticConfigurationException)
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 
 # How large are the time-stamps stored with each event
@@ -62,28 +64,43 @@ class SynapseDynamicsSTDP(
         "__backprop_delay"]
 
     def __init__(
-            self, timing_dependence=None, weight_dependence=None,
+            self, timing_dependence, weight_dependence,
             voltage_dependence=None, dendritic_delay_fraction=1.0,
-            weight=0.0, delay=1.0, pad_to_length=None,
-            backprop_delay=True, neuromodulation=False):
+            weight=StaticSynapse.default_parameters['weight'],
+            delay=None, pad_to_length=None, backprop_delay=True,
+            neuromodulation=False):
         """
         :param AbstractTimingDependence timing_dependence:
         :param AbstractWeightDependence weight_dependence:
         :param None voltage_dependence: not supported
         :param float dendritic_delay_fraction: [0.5, 1.0]
         :param float weight:
-        :param float delay:
+        :param delay: Use ``None`` to get the simulator default minimum delay.
+        :type delay: float or None
         :param pad_to_length:
         :type pad_to_length: int or None
         :param bool backprop_delay:
         :param bool neuromodulation:
         """
+        if timing_dependence is None or weight_dependence is None:
+            raise NotImplementedError(
+                "Both timing_dependence and weight_dependence must be"
+                "specified")
+        if voltage_dependence is not None:
+            raise NotImplementedError(
+                "Voltage dependence has not been implemented")
+
         self.__timing_dependence = timing_dependence
         self.__weight_dependence = weight_dependence
+        # move data from timing to weight dependence; that's where we need it
+        weight_dependence.set_a_plus_a_minus(
+            timing_dependence.A_plus, timing_dependence.A_minus)
         self.__dendritic_delay_fraction = float(dendritic_delay_fraction)
         self.__change_requires_mapping = True
         self.__pad_to_length = pad_to_length
         self.__weight = weight
+        if delay is None:
+            delay = get_simulator().min_delay
         self.__delay = delay
         self.__backprop_delay = backprop_delay
         self.__neuromodulation = neuromodulation
@@ -91,15 +108,6 @@ class SynapseDynamicsSTDP(
         if not (0.5 <= self.__dendritic_delay_fraction <= 1.0):
             raise NotImplementedError(
                 "dendritic_delay_fraction must be in the interval [0.5, 1.0]")
-
-        if timing_dependence is None or weight_dependence is None:
-            raise NotImplementedError(
-                "Both timing_dependence and weight_dependence must be"
-                "specified")
-
-        if voltage_dependence is not None:
-            raise NotImplementedError(
-                "Voltage dependence has not been implemented")
 
     @overrides(AbstractPlasticSynapseDynamics.merge)
     def merge(self, synapse_dynamics):

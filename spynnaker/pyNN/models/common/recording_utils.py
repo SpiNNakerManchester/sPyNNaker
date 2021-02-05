@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-import logging
 import struct
 import numpy
 from spinn_front_end_common.utilities.helpful_functions import (
@@ -22,7 +21,6 @@ from spinn_front_end_common.utilities.helpful_functions import (
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.exceptions import MemReadException
 
-logger = logging.getLogger(__name__)
 _RECORDING_COUNT = struct.Struct("<I")
 _SEEK_END = 2  # Define here for Py2.7 compatibility
 
