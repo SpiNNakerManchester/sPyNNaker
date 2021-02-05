@@ -13,13 +13,18 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import math
-
 import numpy
 from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
 
 
 class SmallWorldConnector(AbstractConnector):
+    """ A connector that uses connection statistics based on the Small World\
+        network connectivity model.
+
+    .. note::
+        This is typically used from a population to itself.
+    """
     __slots__ = [
         "__allow_self_connections",  # TODO: currently ignored
         "__degree",
@@ -33,16 +38,31 @@ class SmallWorldConnector(AbstractConnector):
             verbose=False):
         """
         :param float degree:
-        :param float rewiring:
+            the region length where nodes will be connected locally
+        :param float rewiring: the probability of rewiring each edge
         :param bool allow_self_connections:
+            if the connector is used to connect a Population to itself, this
+            flag determines whether a neuron is allowed to connect to itself,
+            or only to other neurons in the Population.
         :param n_connections:
+            if specified, the number of efferent synaptic connections per
+            neuron
         :type n_connections: int or None
         :param rng:
-            Seeded random number generator, or None to make one when needed
+            Seeded random number generator, or ``None`` to make one when
+            needed.
         :type rng: ~pyNN.random.NumpyRNG or None
         :param bool safe:
-        :param callable callback: Ignored
+            If ``True``, check that weights and delays have valid values.
+            If ``False``, this check is skipped.
+        :param callable callback:
+            if given, a callable that display a progress bar on the terminal.
+
+            .. note::
+                Not supported by sPyNNaker.
         :param bool verbose:
+            Whether to output extra information about the connectivity to a
+            CSV file
         """
         # pylint: disable=too-many-arguments
         super(SmallWorldConnector, self).__init__(safe, callback, verbose, rng)
