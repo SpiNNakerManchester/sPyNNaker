@@ -75,6 +75,7 @@ void matrix_generator_free(matrix_generator_t generator);
  * \param[in] delay_generator: The generator of delay values
  * \param[in] weight_generator: The generator of weight values
  * \param[in] max_stage: The maximum delay stage to support
+ * \param[in] max_delay_per_stage: The delay per delay stage
  * \param[in] timestep_per_delay: The delay value multiplier to get to timesteps
  * \return The number of connections generated
  */
@@ -84,9 +85,10 @@ bool matrix_generator_generate(
         uint32_t max_row_n_words, uint32_t max_delayed_row_n_words,
         uint32_t max_row_n_synapses, uint32_t max_delayed_row_n_synapses,
         uint32_t n_synapse_type_bits, uint32_t n_synapse_index_bits,
-        uint32_t synapse_type, accum *weight_scales,
+        uint32_t synapse_type, unsigned long accum *weight_scales,
         uint32_t post_slice_start, uint32_t post_slice_count,
         uint32_t pre_slice_start, uint32_t pre_slice_count,
         connection_generator_t connection_generator,
         param_generator_t delay_generator, param_generator_t weight_generator,
-        uint32_t max_stage, accum timestep_per_delay);
+        uint32_t max_stage, uint32_t max_delay_per_stage,
+        accum timestep_per_delay);

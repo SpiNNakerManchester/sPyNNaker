@@ -14,8 +14,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .delay_block import DelayBlock
-from .delay_extension_machine_vertex import DelayExtensionMachineVertex
+from .delay_extension_machine_vertex import (
+    DelayExtensionMachineVertex, DELAY_EXPANDER_APLX)
 from .delay_extension_vertex import DelayExtensionVertex
 
 __all__ = ["DelayBlock", "DelayExtensionMachineVertex",
-           "DelayExtensionVertex"]
+           "DelayExtensionVertex", "DELAY_EXPANDER_APLX"]

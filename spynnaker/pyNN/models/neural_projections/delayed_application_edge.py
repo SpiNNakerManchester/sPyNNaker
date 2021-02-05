@@ -16,24 +16,42 @@
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationEdge
 from pacman.model.partitioner_interfaces import AbstractSlicesConnect
-from .delayed_machine_edge import DelayedMachineEdge
 
 
 class DelayedApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
+
     __slots__ = [
-        "__synapse_information"]
+        "__synapse_information",
+        "__machine_edges_by_slices",
+        "__undelayed_edge"]
 
     def __init__(
-            self, pre_vertex, post_vertex, synapse_information, label=None):
+            self, pre_vertex, post_vertex, synapse_information, undelayed_edge,
+            label=None):
         """
         :param DelayExtensionVertex pre_vertex:
+            The delay extension at the start of the edge
         :param AbstractPopulationVertex post_vertex:
-        :param SynapseInformation synapse_information:
+            The target of the synapses
+        :param synapse_information:
+            The synapse information on this edge
+        :type synapse_information:
+            SynapseInformation or iterable(SynapseInformation)
+        :param ProjectionApplicationEdge undelayed_edge:
+            The edge that is used for projections without extended delays
         :param str label:
+            The edge label
         """
         super(DelayedApplicationEdge, self).__init__(
             pre_vertex, post_vertex, label=label)
-        self.__synapse_information = [synapse_information]
+        if hasattr(synapse_information, '__iter__'):
+            self.__synapse_information = synapse_information
+        else:
+            self.__synapse_information = [synapse_information]
+        self.__undelayed_edge = undelayed_edge
+
+        # Keep the machine edges by pre- and post-slice
+        self.__machine_edges_by_slices = dict()
 
     @property
     def synapse_information(self):
@@ -48,10 +66,33 @@ class DelayedApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
         """
         self.__synapse_information.append(synapse_information)
 
-    @overrides(ApplicationEdge._create_machine_edge)
-    def _create_machine_edge(self, pre_vertex, post_vertex, label):
-        return DelayedMachineEdge(
-            self.__synapse_information, pre_vertex, post_vertex, self, label)
+    @property
+    def undelayed_edge(self):
+        """ Get the edge that for projections without extended delays
+
+        :rtype: ProjectionApplicationEdge
+        """
+        return self.__undelayed_edge
+
+    @overrides(ApplicationEdge.remember_associated_machine_edge)
+    def remember_associated_machine_edge(self, machine_edge):
+        super(DelayedApplicationEdge, self).\
+            remember_associated_machine_edge(machine_edge)
+        self.__machine_edges_by_slices[
+            machine_edge.pre_vertex.vertex_slice,
+            machine_edge.post_vertex.vertex_slice] = machine_edge
+
+    def get_machine_edge(self, pre_vertex, post_vertex):
+        """ Get a specific machine edge from this edge
+
+        :param DelayExtensionMachineVertex pre_vertex:
+            The vertex at the start of the machine edge
+        :param PopulationMachineVertex post_vertex:
+            The vertex at the end of the machine edge
+        :rtype: ~pacman.model.graphs.machine.MachineEdge or None
+        """
+        return self.__machine_edges_by_slices.get(
+            (pre_vertex.vertex_slice, post_vertex.vertex_slice), None)
 
     @overrides(AbstractSlicesConnect.could_connect)
     def could_connect(self, pre_slice, post_slice):

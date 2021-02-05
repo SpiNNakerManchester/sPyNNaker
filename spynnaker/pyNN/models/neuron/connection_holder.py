@@ -47,7 +47,7 @@ class ConnectionHolder(object):
         "__fixed_values",
 
         # A callback to call with the data when finished
-        "__notify",
+        "__notify"
     )
 
     def __init__(

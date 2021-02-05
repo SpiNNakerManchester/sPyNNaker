@@ -18,6 +18,9 @@ from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION, BYTES_PER_WORD)
 
+# Address to indicate that the synaptic region is unused
+SYN_REGION_UNUSED = 0xFFFFFFFF
+
 
 class GeneratorData(object):
     """ Data for each connection of the synapse generator.
@@ -30,10 +33,9 @@ class GeneratorData(object):
         "__max_row_n_synapses",
         "__max_row_n_words",
         "__max_stage",
-        "__post_slice_index",
+        "__max_delay_per_stage",
         "__post_slices",
         "__post_vertex_slice",
-        "__pre_slice_index",
         "__pre_slices",
         "__pre_vertex_slice",
         "__synapse_information",
@@ -44,9 +46,9 @@ class GeneratorData(object):
     def __init__(
             self, synaptic_matrix_offset, delayed_synaptic_matrix_offset,
             max_row_n_words, max_delayed_row_n_words, max_row_n_synapses,
-            max_delayed_row_n_synapses, pre_slices, pre_slice_index,
-            post_slices, post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_information, max_stage, machine_time_step):
+            max_delayed_row_n_synapses, pre_slices, post_slices,
+            pre_vertex_slice, post_vertex_slice, synapse_information,
+            max_stage,  max_delay_per_stage, machine_time_step):
         self.__synaptic_matrix_offset = synaptic_matrix_offset
         self.__delayed_synaptic_matrix_offset = delayed_synaptic_matrix_offset
         self.__max_row_n_words = max_row_n_words
@@ -54,14 +56,20 @@ class GeneratorData(object):
         self.__max_row_n_synapses = max_row_n_synapses
         self.__max_delayed_row_n_synapses = max_delayed_row_n_synapses
         self.__pre_slices = pre_slices
-        self.__pre_slice_index = pre_slice_index
         self.__post_slices = post_slices
-        self.__post_slice_index = post_slice_index
         self.__pre_vertex_slice = pre_vertex_slice
         self.__post_vertex_slice = post_vertex_slice
         self.__synapse_information = synapse_information
         self.__max_stage = max_stage
+        self.__max_delay_per_stage = max_delay_per_stage
         self.__machine_time_step = machine_time_step
+
+        # Offsets are used in words in the generator, but only
+        # if the values are valid
+        if self.__synaptic_matrix_offset != SYN_REGION_UNUSED:
+            self.__synaptic_matrix_offset //= BYTES_PER_WORD
+        if self.__delayed_synaptic_matrix_offset != SYN_REGION_UNUSED:
+            self.__delayed_synaptic_matrix_offset //= BYTES_PER_WORD
 
     @property
     def size(self):
@@ -99,6 +107,7 @@ class GeneratorData(object):
             self.__pre_vertex_slice.lo_atom,
             self.__pre_vertex_slice.n_atoms,
             self.__max_stage,
+            self.__max_delay_per_stage,
             DataType.S1615.encode_as_int(
                 MICRO_TO_MILLISECOND_CONVERSION / self.__machine_time_step),
             self.__synapse_information.synapse_type,
@@ -109,8 +118,7 @@ class GeneratorData(object):
             dtype="uint32"))
         items.append(synapse_dynamics.gen_matrix_params)
         items.append(connector.gen_connector_params(
-            self.__pre_slices, self.__pre_slice_index, self.__post_slices,
-            self.__post_slice_index, self.__pre_vertex_slice,
+            self.__pre_slices, self.__post_slices, self.__pre_vertex_slice,
             self.__post_vertex_slice, self.__synapse_information.synapse_type,
             self.__synapse_information))
         items.append(connector.gen_weights_params(

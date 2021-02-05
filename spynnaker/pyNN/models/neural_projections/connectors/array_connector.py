@@ -13,12 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
 import numpy
 from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
-
-logger = logging.getLogger(__name__)
 
 
 class ArrayConnector(AbstractConnector):
@@ -32,13 +29,21 @@ class ArrayConnector(AbstractConnector):
     def __init__(self, array, safe=True, callback=None, verbose=False):
         """
         :param array:
-            An explicit boolean matrix that specifies the connections\
-            between the pre- and post-populations\
+            An explicit boolean matrix that specifies the connections
+            between the pre- and post-populations
             (see PyNN documentation). Must be 2D in practice.
         :type array: ~numpy.ndarray(2, ~numpy.uint8)
         :param bool safe:
-        :param callable callback: Ignored
+            Whether to check that weights and delays have valid values.
+            If False, this check is skipped.
+        :param callable callback:
+            if given, a callable that display a progress bar on the terminal.
+
+            .. note::
+                Not supported by sPyNNaker.
         :param bool verbose:
+            Whether to output extra information about the connectivity to a
+            CSV file
         """
         super(ArrayConnector, self).__init__(safe, callback, verbose)
         self.__array = array
@@ -58,6 +63,10 @@ class ArrayConnector(AbstractConnector):
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
         return self._get_delay_maximum(synapse_info.delays, len(self.__array))
+
+    @overrides(AbstractConnector.get_delay_minimum)
+    def get_delay_minimum(self, synapse_info):
+        return self._get_delay_minimum(synapse_info.delays, len(self.__array))
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
@@ -89,8 +98,8 @@ class ArrayConnector(AbstractConnector):
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices, post_slice_index,
-            pre_vertex_slice, post_vertex_slice, synapse_type, synapse_info):
+            self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
+            synapse_type, synapse_info):
         pre_neurons = []
         post_neurons = []
         n_connections = 0

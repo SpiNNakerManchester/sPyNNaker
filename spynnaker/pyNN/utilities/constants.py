@@ -55,11 +55,6 @@ NA_TO_PA_SCALE = 1000.0
 WEIGHT_FLOAT_TO_FIXED_SCALE = 16.0
 SCALE = WEIGHT_FLOAT_TO_FIXED_SCALE * NA_TO_PA_SCALE
 
-# natively supported delays for all abstract_models
-MAX_SUPPORTED_DELAY_TICS = 16
-MAX_DELAY_BLOCKS = 8
-MAX_TIMER_TICS_SUPPORTED_PER_BLOCK = 16
-
 #: the minimum supported delay slot between two neurons
 MIN_SUPPORTED_DELAY = 1
 
@@ -94,3 +89,6 @@ GSYN_INHIB = "gsyn_inh"
 
 #: The partition ID used for Poisson live control data
 LIVE_POISSON_CONTROL_PARTITION_ID = "CONTROL"
+
+#: The maximum row length of the master population table
+POP_TABLE_MAX_ROW_LENGTH = 256

@@ -23,9 +23,23 @@
 #define _POPULATION_TABLE_H_
 
 #include <common/neuron-typedefs.h>
-#include <bit_field.h>
+#include <filter_info.h>
 
-//! \brief Sets up the table
+//! \brief the number of times a DMA resulted in 0 entries
+extern uint32_t ghost_pop_table_searches;
+
+//! \brief the number of times packet isn't in the master pop table at all!
+extern uint32_t invalid_master_pop_hits;
+
+//! \brief The number of bit fields which were not able to be read in due to
+//!     DTCM limits.
+extern uint32_t failed_bit_field_reads;
+
+//! \brief The number of packets dropped because the bitfield filter says
+//!     they don't hit anything
+extern uint32_t bit_field_filtered_packets;
+
+//! \brief Set up the table
 //! \param[in] table_address: The address of the start of the table data
 //! \param[in] synapse_rows_address: The address of the start of the synapse
 //!                                  data
@@ -38,18 +52,19 @@ bool population_table_initialise(
         address_t table_address, address_t synapse_rows_address,
         address_t direct_rows_address, uint32_t *row_max_n_words);
 
+//! \brief Initialise the bitfield filtering system.
+//! \param[in] filter_region: Where the bitfield configuration is
+//! \return True on success
+bool population_table_load_bitfields(filter_region_t *filter_region);
+
 //! \brief Get the first row data for the given input spike
 //! \param[in] spike: The spike received
 //! \param[out] row_address: Updated with the address of the row
 //! \param[out] n_bytes_to_transfer: Updated with the number of bytes to read
 //! \return True if there is a row to read, False if not
 bool population_table_get_first_address(
-        spike_t spike, address_t* row_address, size_t* n_bytes_to_transfer);
-
-//! \brief Get the position in the master population table.
-//! \param[in] spike: The spike received
-//! \return The position in the master pop table
-int population_table_position_in_the_master_pop_array(spike_t spike);
+        spike_t spike, synaptic_row_t* row_address,
+        size_t* n_bytes_to_transfer);
 
 //! \brief Get the next row data for a previously given spike.  If no spike has
 //!        been given, return False.
@@ -58,42 +73,7 @@ int population_table_position_in_the_master_pop_array(spike_t spike);
 //! \param[out] n_bytes_to_transfer: Updated with the number of bytes to read
 //! \return True if there is a row to read, False if not
 bool population_table_get_next_address(
-        spike_t *spike, address_t* row_address, size_t* n_bytes_to_transfer);
-
-//! \brief Reports how many DMAs were pointless
-//! \return How many were done that were not required
-uint32_t population_table_get_ghost_pop_table_searches(void);
-
-//! \brief Sets the connectivity lookup map.
-//! \param[in] connectivity_bit_fields: the connectivity lookup bitfield
-void population_table_set_connectivity_bit_field(
-        bit_field_t* connectivity_bit_fields);
-
-//! \brief Get the number of master pop table key misses
-//! \return the number of master pop table key misses
-uint32_t population_table_get_invalid_master_pop_hits(void);
-
-//! \brief Clears the DTCM allocated by the population table.
-//! \return If the clearing was successful or not.
-bool population_table_shut_down(void);
-
-//! \brief Get the length of master population table.
-//! \return Length of the master pop table
-uint32_t population_table_length(void);
-
-//! \brief Get the spike associated at a specific index.
-//! \param[in] index: the index in the master pop table
-//! \return the spike
-spike_t population_table_get_spike_for_index(uint32_t index);
-
-//! \brief Get the mask for the entry at a specific index
-//! \param[in] index: the index in the master pop table
-//! \return the mask associated with this entry
-uint32_t population_table_get_mask_for_entry(uint32_t index);
-
-//! \brief Get the number of packets that were filtered from the bitfield
-//!     filter
-//! \return the number of packets filtered by the bitfield filter
-uint32_t population_table_get_filtered_packet_count(void);
+        spike_t *spike, synaptic_row_t* row_address,
+        size_t* n_bytes_to_transfer);
 
 #endif // _POPULATION_TABLE_H_
