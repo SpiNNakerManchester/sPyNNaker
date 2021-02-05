@@ -98,11 +98,11 @@ static inline final_state_t plasticity_update_synapse(
         uint32_t time,
         const REAL last_pre_time,
         update_state_t current_state,
-        const post_event_history_t *post_event_history) {
+        const post_event_history_t *post_event_value) {
 
     //Apply Urbanczik-Senn Formula
     current_state = timing_apply_rate(
-                        current_state, *post_event_history, last_pre_time);
+                        current_state, *post_event_value, last_pre_time);
 
 
     // Return final synaptic word and weight

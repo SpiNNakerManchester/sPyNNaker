@@ -56,6 +56,8 @@ static uint32_t single_fixed_synapse[4];
 static uint32_t number_of_rewires = 0;
 static bool any_spike = false;
 
+static uint32_t read_cb_calls;
+
 /* PRIVATE FUNCTIONS - static for inlining */
 
 static inline void do_dma_read(
@@ -222,6 +224,8 @@ static void post_buffer_complete_callback(uint unused1, uint unused2) {
     use(unused1);
     use(unused2);
 
+    read_cb_calls++;
+
     if(!spin1_trigger_user_event(0, 0)) {
         log_debug("Could not trigger user event \n");
     }
@@ -278,6 +282,8 @@ bool spike_processing_initialise( // EXPORTED
         dma_busy = false;
     }
 
+    read_cb_calls = 0;
+
     return true;
 }
 
@@ -328,4 +334,9 @@ bool received_any_spike(void) { // EXPORTED
 uint32_t spike_processing_flush_in_buffer() {
 
     return in_rates_flush_buffer();
+}
+
+uint32_t spike_processing_read_cb_calls() {
+
+    return read_cb_calls;
 }

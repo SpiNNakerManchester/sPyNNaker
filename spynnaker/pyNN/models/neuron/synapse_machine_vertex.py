@@ -50,7 +50,8 @@ class SynapseMachineVertex(
                ("FLUSHED_SPIKES", 5),
                ("MAX_FLUSHED_SPIKES", 6),
                ("MAX_TIME", 7),
-               ("CB_CALLS", 8)])
+               ("CB_CALLS", 8),
+               ("READ_CB_CALLS", 9)])
 
     PROFILE_TAG_LABELS = {
         0: "TIMER",
@@ -139,6 +140,9 @@ class SynapseMachineVertex(
         cb_calls = provenance_data[
             self.EXTRA_PROVENANCE_DATA_ENTRIES.
             CB_CALLS.value]
+        rd_cb_calls = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.
+            READ_CB_CALLS.value]
 
         label, x, y, p, names = self._get_placement_details(placement)
 
@@ -212,6 +216,10 @@ class SynapseMachineVertex(
         provenance_items.append(ProvenanceDataItem(
             self._add_name(names, "Number of calls for the write contribution callback"),
             cb_calls))
+
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names, "Number of calls for the read post buffer callback"),
+            rd_cb_calls))
 
         return provenance_items
 

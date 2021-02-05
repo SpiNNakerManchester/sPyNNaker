@@ -75,4 +75,6 @@ bool received_any_spike(void);
 
 uint32_t spike_processing_flush_in_buffer();
 
+uint32_t spike_processing_read_cb_calls();
+
 #endif // _SPIKE_PROCESSING_H_

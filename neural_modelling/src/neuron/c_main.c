@@ -290,7 +290,7 @@ void c_main(void) {
     // Set timer tick (in microseconds)
     log_debug("setting timer tick callback for %d microseconds",
             timer_period);
-    spin1_set_timer_tick_and_phase(timer_period, timer_offset);
+    spin1_set_timer_tick(timer_period);
 
     // Set up the timer tick callback (others are handled elsewhere)
     spin1_callback_on(TIMER_TICK, timer_callback, TIMER);

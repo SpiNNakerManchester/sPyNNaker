@@ -65,6 +65,7 @@ struct synapse_provenance {
     uint32_t max_flushed_spikes;
     uint32_t max_time;
     uint32_t cb_calls;
+    uint32_t read_cb_calls;
 };
 
 //! values for the priority for each callback
@@ -129,6 +130,7 @@ void c_main_store_provenance_data(address_t provenance_region){
     prov->max_flushed_spikes = max_spikes_remaining;
     prov->max_time = max_time;
     prov->cb_calls = cb_calls;
+    prov->read_cb_calls = spike_processing_read_cb_calls();
     log_debug("finished other provenance data");
 }
 
@@ -308,13 +310,14 @@ void timer_callback(uint timer_count, uint unused) {
     
     // 40 for test purposes, to add prints. It was 10 before
     uint32_t wc_reg = tc[T1_COUNT] * 0.005 - 40;
+    // Overallocate 60 microseconds from the beginning of the timestep
+    // Max time required with 8 neurons and 14 partitions was 52 microseconds
+    uint32_t rc_reg = 60;
 
-    //io_printf(IO_BUF, "Che bella burdella bella che abbiamo qui\n");
-
-    //Schedule event 10 microseconds from now
+    //Schedule event for post buffer read
     if(has_plastic_synapses) {
         
-        if(!timer_schedule_proc(read_contributions, 0, 0, 200)) {
+        if(!timer_schedule_proc(read_contributions, 0, 0, rc_reg)) {
 
             rt_error(RTE_API);
         }

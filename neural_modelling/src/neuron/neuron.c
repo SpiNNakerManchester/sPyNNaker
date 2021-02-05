@@ -117,9 +117,8 @@ static volatile bool dma_finished;
 
 static REAL *synaptic_region;
 
-//! Offset for the second exc synaptic contribution
-static uint32_t contribution_offset;
-static uint32_t poisson_offset;
+//! Array containing the offsets for each syn type for the contributions
+static uint32_t *contribution_offset;
 
 static uint32_t *incoming_partitions;
 
@@ -286,9 +285,13 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
         return false;
     }
 
+    contribution_offset = (uint32_t *) spin1_malloc(n_synapse_types * sizeof(uint32_t));
+
     uint8_t total_partitions = 0;
     
     for (index_t i = 0; i < n_synapse_types; i++) {
+
+        contribution_offset[i] = total_partitions * n_neurons_power_2;
 
         incoming_partitions[i] =
             *(address + INCOMING_PARTITIONS_PTR + i);
@@ -464,7 +467,7 @@ void neuron_do_timestep_update( // EXPORTED
         
         for (index_t synapse_type_index = 0; synapse_type_index < n_synapse_types; synapse_type_index++) {
 
-            register uint32_t buff_index = ((synapse_type_index << synapse_index_bits) | neuron_index);
+            register uint32_t buff_index = contribution_offset[synapse_type_index];
 
             //Add the values from synaptic_contributions
             sum = 0;

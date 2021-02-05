@@ -46,8 +46,6 @@ uint32_t plastic_saturation_count = 0;
 
 static uint32_t post_events_size;
 
-static REAL v_rest;
-
 //---------------------------------------
 // Macros
 //---------------------------------------
@@ -100,13 +98,13 @@ static inline final_state_t plasticity_update_basal_synapse(
         uint32_t time,
         const REAL last_pre_time,
         update_state_t current_state,
-        const post_event_history_t *post_event_history) {
+        const post_event_history_t *post_event_value) {
 
     //io_printf(IO_BUF, "basal update\n");
 
     //Apply Urbanczik-Senn Formula
     current_state = timing_apply_rate(
-                        current_state, post_event_history->vb_diff, last_pre_time);
+                        current_state, post_event_value->vb_diff, last_pre_time);
 
 
     // Return final synaptic word and weight
@@ -117,13 +115,13 @@ static inline final_state_t plasticity_update_apical_synapse(
         uint32_t time,
         const REAL last_pre_time,
         update_state_t current_state,
-        const post_event_history_t *post_event_history) {
+        const post_event_history_t *post_event_value) {
 
     //io_printf(IO_BUF, "apical update\n");
 
     //Apply Urbanczik-Senn Formula
     current_state = timing_apply_rate(
-                        current_state, post_event_history->va_diff, last_pre_time);
+                        current_state, post_event_value->va_diff, last_pre_time);
 
     // Return final synaptic word and weight
     return synapse_structure_get_final_state(current_state);
@@ -246,10 +244,6 @@ address_t synapse_dynamics_initialise(
     synapse_delay_index_type_bits =
             SYNAPSE_DELAY_BITS + synapse_type_index_bits;
     synapse_type_mask = (1 << log_n_synapse_types) - 1;
-
-    // Resting potential used for apical weight update. Assumed to be 0 in the Bengio paper
-    // NEEDS CHANGING IF WE WANT THE CHANCE TO USE DIFFERENT RESTING POTENTIALS!!!!!!!!!!!!!!!!
-    v_rest = 0.0k;
 
     *has_plastic_synapses = true;
 
