@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
@@ -32,15 +33,15 @@ from spynnaker.pyNN.models.abstract_models import (
     AbstractPopulationSettable, AbstractContainsUnits)
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.utilities.ranged import (
-    SpynnakerRangeDictionary, SpynnakerRangedList)
+    SpynnakerRangeDictionary)
 from .synaptic_manager import SynapticManager
-
-logger = logging.getLogger(__name__)
 
 # TODO: Make sure these values are correct (particularly CPU cycles)
 _NEURON_BASE_DTCM_USAGE_IN_BYTES = 9 * BYTES_PER_WORD
 _NEURON_BASE_N_CPU_CYCLES_PER_NEURON = 22
 _NEURON_BASE_N_CPU_CYCLES = 10
+
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class AbstractPopulationVertex(
@@ -70,8 +71,7 @@ class AbstractPopulationVertex(
         "__units",
         "__n_data_specs",
         "__initial_state_variables",
-        "__has_reset_last",
-        "__updated_state_variables"]
+        "__has_run"]
 
     #: recording region IDs
     _SPIKE_RECORDING_REGION = 0
@@ -137,11 +137,10 @@ class AbstractPopulationVertex(
         self.__neuron_impl = neuron_impl
         self.__pynn_model = pynn_model
         self._parameters = SpynnakerRangeDictionary(n_neurons)
-        self._state_variables = SpynnakerRangeDictionary(n_neurons)
         self.__neuron_impl.add_parameters(self._parameters)
-        self.__neuron_impl.add_state_variables(self._state_variables)
-        self.__initial_state_variables = None
-        self.__updated_state_variables = set()
+        self.__initial_state_variables = SpynnakerRangeDictionary(n_neurons)
+        self.__neuron_impl.add_state_variables(self.__initial_state_variables)
+        self._state_variables = self.__initial_state_variables.copy()
 
         # Set up for recording
         recordable_variables = list(
@@ -161,7 +160,7 @@ class AbstractPopulationVertex(
         # bool for if state has changed.
         self.__change_requires_mapping = True
         self.__change_requires_data_generation = False
-        self.__has_reset_last = True
+        self.__has_run = False
 
         # Set up for profiling
         self.__n_profile_samples = helpful_functions.read_config_int(
@@ -206,28 +205,12 @@ class AbstractPopulationVertex(
     def synapse_manager(self):
         return self.__synapse_manager
 
-    def update_state_variables(self):
-        """ processes any changes since init
+    def set_has_run(self):
+        """ Set the flag has run so initialize only affects state variables
 
         :rtype: None
         """
-
-        # If resetting
-        if self.__has_reset_last:
-            # reset any state variables that need to be reset
-            if self.__initial_state_variables is not None:
-                self._state_variables = self.__copy_ranged_dict(
-                    self.__initial_state_variables, self._state_variables,
-                    self.__updated_state_variables)
-                self.__initial_state_variables = None
-            else:
-                # If no initial state variables, copy them now
-                self.__initial_state_variables = self.__copy_ranged_dict(
-                    self._state_variables)
-
-        # Reset things that need resetting
-        self.__has_reset_last = False
-        self.__updated_state_variables.clear()
+        self.__has_run = True
 
     @property
     @overrides(AbstractChangableAfterRun.requires_mapping)
@@ -258,22 +241,6 @@ class AbstractPopulationVertex(
             self.BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
             self.tdma_sdram_size_in_bytes +
             self.__neuron_impl.get_sdram_usage_in_bytes(vertex_slice.n_atoms))
-
-    @staticmethod
-    def __copy_ranged_dict(source, merge=None, merge_keys=None):
-        target = SpynnakerRangeDictionary(len(source))
-        for key in source.keys():
-            copy_list = SpynnakerRangedList(len(source))
-            if merge_keys is None or key not in merge_keys:
-                init_list = source.get_list(key)
-            else:
-                init_list = merge.get_list(key)
-            for start, stop, value in init_list.iter_ranges():
-                is_list = (hasattr(value, '__iter__') and
-                           not isinstance(value, str))
-                copy_list.set_value_by_slice(start, stop, value, is_list)
-            target[key] = copy_list
-        return target
 
     @overrides(AbstractSpikeRecordable.is_recording_spikes)
     def is_recording_spikes(self):
@@ -324,17 +291,23 @@ class AbstractPopulationVertex(
         return self.__neuron_recorder.get_neuron_sampling_interval("spikes")
 
     @overrides(AbstractPopulationInitializable.initialize)
-    def initialize(self, variable, value):
-        if not self.__has_reset_last:
-            raise Exception(
-                "initialize can only be called before the first call to run, "
-                "or before the first call to run after a reset")
+    def initialize(self, variable, value, selector=None):
         if variable not in self._state_variables:
             raise KeyError(
                 "Vertex does not support initialisation of"
                 " parameter {}".format(variable))
-        self._state_variables.set_value(variable, value)
-        self.__updated_state_variables.add(variable)
+        if self.__has_run:
+            self._state_variables[variable].set_value_by_selector(
+                selector, value)
+            logger.warning(
+                "initializing {} after run and before reset only changes the "
+                "current state and will be lost after reset".format(variable))
+        else:
+            # set the inital values
+            self.__initial_state_variables[variable].set_value_by_selector(
+                selector, value)
+            # Update the sate variables in case asked for
+            self._state_variables.copy_into(self.__initial_state_variables)
         for vertex in self.machine_vertices:
             if isinstance(vertex, AbstractRewritesDataSpecification):
                 vertex.set_reload_required(True)
@@ -378,20 +351,6 @@ class AbstractPopulationVertex(
         if selector is None:
             return ranged_list
         return ranged_list.get_values(selector)
-
-    @overrides(AbstractPopulationInitializable.set_initial_value)
-    def set_initial_value(self, variable, value, selector=None):
-        if variable not in self._state_variables:
-            raise KeyError(
-                "Vertex does not support initialisation of"
-                " parameter {}".format(variable))
-
-        parameter = self._get_parameter(variable)
-        ranged_list = self._state_variables[parameter]
-        ranged_list.set_value_by_selector(selector, value)
-        for vertex in self.machine_vertices:
-            if isinstance(vertex, AbstractRewritesDataSpecification):
-                vertex.set_reload_required(True)
 
     @property
     def conductance_based(self):
@@ -564,7 +523,8 @@ class AbstractPopulationVertex(
     @overrides(AbstractCanReset.reset_to_first_timestep)
     def reset_to_first_timestep(self):
         # Mark that reset has been done, and reload state variables
-        self.__has_reset_last = True
+        self.__has_run = False
+        self._state_variables.copy_into(self.__initial_state_variables)
         for vertex in self.machine_vertices:
             if isinstance(vertex, AbstractRewritesDataSpecification):
                 vertex.set_reload_required(True)

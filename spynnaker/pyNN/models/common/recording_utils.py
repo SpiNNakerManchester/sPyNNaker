@@ -14,14 +14,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-import logging
+import struct
 import numpy
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.exceptions import MemReadException
 
-logger = logging.getLogger(__name__)
+_RECORDING_COUNT = struct.Struct("<I")
 _SEEK_END = 2  # Define here for Py2.7 compatibility
 
 
@@ -131,10 +131,6 @@ def make_missing_string(missing):
     :param iterable(~pacman.model.placements.Placement) missing:
     :rtype: str
     """
-    missing_str = ""
-    separator = ""
-    for placement in missing:
-        missing_str += "{}({}, {}, {})".format(
-            separator, placement.x, placement.y, placement.p)
-        separator = "; "
-    return missing_str
+    return "; ".join(
+        "({}, {}, {})".format(placement.x, placement.y, placement.p)
+        for placement in missing)

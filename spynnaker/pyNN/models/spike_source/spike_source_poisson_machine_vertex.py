@@ -30,8 +30,7 @@ from pacman.executor.injection_decorator import inject_items
 from pacman.model.graphs.machine import MachineVertex
 from spinn_front_end_common.abstract_models import (
     AbstractHasAssociatedBinary, AbstractSupportsDatabaseInjection,
-    AbstractRecordable, AbstractRewritesDataSpecification,
-    AbstractGeneratesDataSpecification)
+    AbstractRewritesDataSpecification, AbstractGeneratesDataSpecification)
 from spinn_front_end_common.interface.provenance import (
     ProvidesProvenanceDataFromMachineImpl)
 from spinn_front_end_common.interface.buffer_management.buffer_models import (
@@ -86,7 +85,7 @@ _FOUR_WORDS = struct.Struct("<4I")
 
 class SpikeSourcePoissonMachineVertex(
         MachineVertex, AbstractReceiveBuffersToHost,
-        ProvidesProvenanceDataFromMachineImpl, AbstractRecordable,
+        ProvidesProvenanceDataFromMachineImpl,
         AbstractSupportsDatabaseInjection, AbstractHasProfileData,
         AbstractHasAssociatedBinary, AbstractRewritesDataSpecification,
         AbstractGeneratesDataSpecification, AbstractReadParametersBeforeSet):
@@ -175,10 +174,6 @@ class SpikeSourcePoissonMachineVertex(
         ProvidesProvenanceDataFromMachineImpl._n_additional_data_items)
     def _n_additional_data_items(self):
         return 1
-
-    @overrides(AbstractRecordable.is_recording)
-    def is_recording(self):
-        return self.__is_recording
 
     @overrides(AbstractReceiveBuffersToHost.get_recorded_region_ids)
     def get_recorded_region_ids(self):
