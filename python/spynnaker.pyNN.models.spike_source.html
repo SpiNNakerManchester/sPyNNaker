@@ -211,6 +211,21 @@ If None the assumption is all neurons are recording</p></li>
 </dd></dl>
 
 <dl class="py method">
+<dt id="spynnaker.pyNN.models.spike_source.spike_source_array_vertex.SpikeSourceArrayVertex.set_value_by_selector">
+<code class="sig-name descname">set_value_by_selector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">selector</span></em>, <em class="sig-param"><span class="n">key</span></em>, <em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_array_vertex.html#SpikeSourceArrayVertex.set_value_by_selector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_array_vertex.SpikeSourceArrayVertex.set_value_by_selector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the value for a particular key but only for the selected             subset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>selector</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#slice" title="(in Python v3.6)"><em>slice</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em>) – See             <a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangedList" title="(in SpiNNUtils)"><code class="xref py py-class docutils literal notranslate"><span class="pre">RangedList</span></code></a>.set_value_by_selector            as this is just a pass through method</p></li>
+<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – the name of the parameter to change</p></li>
+<li><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em>) – the new value of the parameter to assign</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt id="spynnaker.pyNN.models.spike_source.spike_source_array_vertex.SpikeSourceArrayVertex.spike_times">
 <em class="property">property </em><code class="sig-name descname">spike_times</code><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_array_vertex.SpikeSourceArrayVertex.spike_times" title="Permalink to this definition">¶</a></dt>
 <dd><p>The spike times of the spike source array</p>
@@ -966,6 +981,185 @@ If None the assumption is all neurons are recording</p></li>
 <dt id="spynnaker.pyNN.models.spike_source.SpikeSourceArray.default_population_parameters">
 <code class="sig-name descname">default_population_parameters</code><em class="property"> = {'splitter': None}</em><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.SpikeSourceArray.default_population_parameters" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.spike_source.</code><code class="sig-name descname">SpikeSourceArrayVertex</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n_neurons</span></em>, <em class="sig-param"><span class="n">spike_times</span></em>, <em class="sig-param"><span class="n">constraints</span></em>, <em class="sig-param"><span class="n">label</span></em>, <em class="sig-param"><span class="n">max_atoms_per_core</span></em>, <em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">splitter</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_array_vertex.html#SpikeSourceArrayVertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spinn_front_end_common.utility_models.reverse_ip_tag_multi_cast_source.ReverseIpTagMultiCastSource</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.common.abstract_spike_recordable.AbstractSpikeRecordable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.common.simple_population_settable.SimplePopulationSettable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">spinn_front_end_common.abstract_models.abstract_changable_after_run.AbstractChangableAfterRun</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">spinn_front_end_common.abstract_models.impl.provides_key_to_atom_mapping_impl.ProvidesKeyToAtomMappingImpl</span></code></p>
+<p>Model for play back of spikes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_keys</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – The number of keys to be sent via this multicast source</p></li>
+<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The label of this vertex</p></li>
+<li><p><strong>constraints</strong> (<em>iterable</em><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN)"><em>AbstractConstraint</em></a><em>)</em>) – Any initial constraints to this vertex</p></li>
+<li><p><strong>max_atoms_per_core</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – </p></li>
+<li><p><strong>board_address</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – The IP address of the board on which to place
+this vertex if receiving data, either buffered or live (by
+default, any board is chosen)</p></li>
+<li><p><strong>receive_port</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – The port on the board that will listen for
+incoming event packets (default is to disable this feature; set a
+value to enable it)</p></li>
+<li><p><strong>receive_sdp_port</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – The SDP port to listen on for incoming event packets
+(defaults to 1)</p></li>
+<li><p><strong>receive_tag</strong> (<a class="reference external" href="https://spinnmachine.readthedocs.io/en/latest/spinn_machine.tags/#spinn_machine.tags.IPTag" title="(in SpiNNMachine)"><em>IPTag</em></a>) – The IP tag to use for receiving live events
+(uses any by default)</p></li>
+<li><p><strong>receive_rate</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – The estimated rate of packets that will be sent by this source</p></li>
+<li><p><strong>virtual_key</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – The base multicast key to send received events with
+(assigned automatically by default)</p></li>
+<li><p><strong>prefix</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – The prefix to “or” with generated multicast keys
+(default is no prefix)</p></li>
+<li><p><strong>prefix_type</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman.messages.eieio/#spinnman.messages.eieio.EIEIOPrefix" title="(in SpiNNMan)"><em>EIEIOPrefix</em></a>) – Whether the prefix should apply to the upper or lower half of the
+multicast keys (default is upper half)</p></li>
+<li><p><strong>check_keys</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – True if the keys of received events should be verified before
+sending (default False)</p></li>
+<li><p><strong>send_buffer_times</strong> (<a class="reference external" href="https://numpy.org/doc/1.19/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a><em>(</em><a class="reference external" href="https://numpy.org/doc/1.19/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a><em>(</em><em>numpy.int32</em><em>)</em><em>) or
+</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://numpy.org/doc/1.19/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a><em>(</em><em>int32</em><em>)</em><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – An array of arrays of times at which keys
+should be sent (one array for each key, default disabled)</p></li>
+<li><p><strong>send_buffer_partition_id</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – The ID of the partition containing
+the edges down which the events are to be sent</p></li>
+<li><p><strong>reserve_reverse_ip_tag</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Extra flag for input without a reserved port</p></li>
+<li><p><strong>enable_injection</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Flag to indicate that data will be received to inject</p></li>
+<li><p><strong>splitter</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a><em> or </em><em>AbstractSplitterCommon</em>) – the splitter object needed for this vertex</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.SPIKE_RECORDING_REGION_ID">
+<code class="sig-name descname">SPIKE_RECORDING_REGION_ID</code><em class="property"> = 0</em><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.SPIKE_RECORDING_REGION_ID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.clear_spike_recording">
+<code class="sig-name descname">clear_spike_recording</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">buffer_manager</span></em>, <em class="sig-param"><span class="n">placements</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_array_vertex.html#SpikeSourceArrayVertex.clear_spike_recording"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.clear_spike_recording" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clear the recorded data from the object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>buffer_manager</strong> (<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.interface.buffer_management.html#spinn_front_end_common.interface.buffer_management.BufferManager" title="(in SpiNNFrontEndCommon)"><em>BufferManager</em></a>) – the buffer manager object</p></li>
+<li><p><strong>placements</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placements" title="(in PACMAN)"><em>Placements</em></a>) – the placements object</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.describe">
+<code class="sig-name descname">describe</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_array_vertex.html#SpikeSourceArrayVertex.describe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.describe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a human-readable description of the cell or synapse type.</p>
+<p>The output may be customised by specifying a different template        together with an associated template engine        (see <code class="xref py py-mod docutils literal notranslate"><span class="pre">pyNN.descriptions</span></code>).</p>
+<p>If template is None, then a dictionary containing the template        context will be returned.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.get_spikes">
+<code class="sig-name descname">get_spikes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">placements</span></em>, <em class="sig-param"><span class="n">buffer_manager</span></em>, <em class="sig-param"><span class="n">machine_time_step</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_array_vertex.html#SpikeSourceArrayVertex.get_spikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.get_spikes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the recorded spikes from the object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>placements</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placements" title="(in PACMAN)"><em>Placements</em></a>) – the placements object</p></li>
+<li><p><strong>buffer_manager</strong> (<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.interface.buffer_management.html#spinn_front_end_common.interface.buffer_management.BufferManager" title="(in SpiNNFrontEndCommon)"><em>BufferManager</em></a>) – the buffer manager object</p></li>
+<li><p><strong>machine_time_step</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – the time step of the simulation, in microseconds</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A numpy array of 2-element arrays of (neuron_id, time)            ordered by time, one element per event</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.19/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>,<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>))</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.get_spikes_sampling_interval">
+<code class="sig-name descname">get_spikes_sampling_interval</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_array_vertex.html#SpikeSourceArrayVertex.get_spikes_sampling_interval"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.get_spikes_sampling_interval" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the current sampling interval for spikes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Sampling interval in microseconds</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.is_recording_spikes">
+<code class="sig-name descname">is_recording_spikes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_array_vertex.html#SpikeSourceArrayVertex.is_recording_spikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.is_recording_spikes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if spikes are being recorded</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>True if spikes are being recorded, False otherwise</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.mark_no_changes">
+<code class="sig-name descname">mark_no_changes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_array_vertex.html#SpikeSourceArrayVertex.mark_no_changes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.mark_no_changes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Marks the point after which changes are reported, so that new            changes can be detected before the next check.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.requires_mapping">
+<em class="property">property </em><code class="sig-name descname">requires_mapping</code><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.requires_mapping" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if changes that have been made require that mapping be            performed.  By default this returns False but can be overridden to            indicate changes that require mapping.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.set_recording_spikes">
+<code class="sig-name descname">set_recording_spikes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">new_state</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">sampling_interval</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">indexes</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_array_vertex.html#SpikeSourceArrayVertex.set_recording_spikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.set_recording_spikes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set spikes to being recorded.             If <cite>new_state</cite> is false all other parameters are ignored.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>new_state</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Set if the spikes are recording or not</p></li>
+<li><p><strong>sampling_interval</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – The interval at which spikes are recorded.
+Must be a whole multiple of the timestep.
+None will be taken as the timestep.</p></li>
+<li><p><strong>indexes</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – The indexes of the neurons that will record spikes.
+If None the assumption is all neurons are recording</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.set_value_by_selector">
+<code class="sig-name descname">set_value_by_selector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">selector</span></em>, <em class="sig-param"><span class="n">key</span></em>, <em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_array_vertex.html#SpikeSourceArrayVertex.set_value_by_selector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.set_value_by_selector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the value for a particular key but only for the selected             subset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>selector</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#slice" title="(in Python v3.6)"><em>slice</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em>) – See             <a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangedList" title="(in SpiNNUtils)"><code class="xref py py-class docutils literal notranslate"><span class="pre">RangedList</span></code></a>.set_value_by_selector            as this is just a pass through method</p></li>
+<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – the name of the parameter to change</p></li>
+<li><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em>) – the new value of the parameter to assign</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.spike_times">
+<em class="property">property </em><code class="sig-name descname">spike_times</code><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.spike_times" title="Permalink to this definition">¶</a></dt>
+<dd><p>The spike times of the spike source array</p>
+</dd></dl>
 
 </dd></dl>
 

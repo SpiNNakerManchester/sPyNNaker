@@ -56,6 +56,7 @@
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.ranged</span> <span class="kn">import</span> <span class="n">RangedListOfList</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utility_models</span> <span class="kn">import</span> <span class="n">ReverseIpTagMultiCastSource</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="n">AbstractChangableAfterRun</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models.impl</span> <span class="kn">import</span> <span class="p">(</span>
@@ -76,7 +77,13 @@
 <span class="k">def</span> <span class="nf">_send_buffer_times</span><span class="p">(</span><span class="n">spike_times</span><span class="p">,</span> <span class="n">time_step</span><span class="p">):</span>
     <span class="c1"># Convert to ticks</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">spike_times</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">spike_times</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;__len__&quot;</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">_as_numpy_ticks</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">time_step</span><span class="p">)</span> <span class="k">for</span> <span class="n">times</span> <span class="ow">in</span> <span class="n">spike_times</span><span class="p">]</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">times</span> <span class="ow">in</span> <span class="n">spike_times</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">times</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_as_numpy_ticks</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">time_step</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">([])</span>
+        <span class="k">return</span> <span class="n">data</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">_as_numpy_ticks</span><span class="p">(</span><span class="n">spike_times</span><span class="p">,</span> <span class="n">time_step</span><span class="p">)</span>
 
@@ -96,7 +103,6 @@
         <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__model_name</span> <span class="o">=</span> <span class="s2">&quot;SpikeSourceArray&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__model</span> <span class="o">=</span> <span class="n">model</span>
-
         <span class="k">if</span> <span class="n">spike_times</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">spike_times</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_spike_times</span> <span class="o">=</span> <span class="n">spike_times</span>
@@ -128,7 +134,45 @@
     <span class="k">def</span> <span class="nf">spike_times</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; The spike times of the spike source array</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spike_times</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spike_times</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_to_early_spikes_single_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spike_times</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if there is one or more spike_times before the current time</span>
+
+<span class="sd">        Logs a warning for the first oen found</span>
+
+<span class="sd">        :param iterable(int spike_times:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">current_time</span> <span class="o">=</span> <span class="n">globals_variables</span><span class="o">.</span><span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">get_current_time</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">spike_times</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">spike_times</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">current_time</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;SpikeSourceArray </span><span class="si">{}</span><span class="s2"> has spike_times that are lower than &quot;</span>
+                    <span class="s2">&quot;the current time </span><span class="si">{}</span><span class="s2"> For example </span><span class="si">{}</span><span class="s2"> - &quot;</span>
+                    <span class="s2">&quot;these will be ignored.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="p">,</span> <span class="n">current_time</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">spike_times</span><span class="p">[</span><span class="n">i</span><span class="p">])))</span>
+                <span class="k">return</span>
+
+    <span class="k">def</span> <span class="nf">_check_spikes_double_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spike_times</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if there is one or more spike_times before the current time</span>
+
+<span class="sd">        Logs a warning for the first oen found</span>
+
+<span class="sd">        :param iterable(iterable(int) spike_times:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">current_time</span> <span class="o">=</span> <span class="n">globals_variables</span><span class="o">.</span><span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">get_current_time</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">neuron_id</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">):</span>
+            <span class="n">id_times</span> <span class="o">=</span> <span class="n">spike_times</span><span class="p">[</span><span class="n">neuron_id</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">id_times</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="n">id_times</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">current_time</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                       <span class="s2">&quot;SpikeSourceArray </span><span class="si">{}</span><span class="s2"> has spike_times that are lower &quot;</span>
+                       <span class="s2">&quot;than the current time </span><span class="si">{}</span><span class="s2"> For example </span><span class="si">{}</span><span class="s2"> - &quot;</span>
+                       <span class="s2">&quot;these will be ignored.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="bp">self</span><span class="p">,</span> <span class="n">current_time</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">id_times</span><span class="p">[</span><span class="n">i</span><span class="p">])))</span>
+                    <span class="k">return</span>
 
     <span class="nd">@spike_times</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">spike_times</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spike_times</span><span class="p">):</span>
@@ -137,15 +181,12 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">time_step</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_spikes_sampling_interval</span><span class="p">()</span>
-        <span class="n">current_time</span> <span class="o">=</span> <span class="n">globals_variables</span><span class="o">.</span><span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">get_current_time</span><span class="p">()</span>
         <span class="c1"># warn the user if they are asking for a spike time out of range</span>
-        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">spike_times</span><span class="p">)):</span>
-            <span class="k">if</span> <span class="n">spike_times</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">current_time</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;A spike time of </span><span class="si">{}</span><span class="s2"> was specified for the &quot;</span>
-                               <span class="s2">&quot;SpikeSourceArray </span><span class="si">{}</span><span class="s2"> that is &quot;</span>
-                               <span class="s2">&quot;lower than the current time </span><span class="si">{}</span><span class="s2"> - this &quot;</span>
-                               <span class="s2">&quot;will be ignored.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                                   <span class="nb">float</span><span class="p">(</span><span class="n">spike_times</span><span class="p">[</span><span class="n">n</span><span class="p">]),</span> <span class="bp">self</span><span class="p">,</span> <span class="n">current_time</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">spike_times</span><span class="p">:</span>  <span class="c1"># in case of empty list do not check</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">spike_times</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;__iter__&#39;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_check_spikes_double_list</span><span class="p">(</span><span class="n">spike_times</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_to_early_spikes_single_list</span><span class="p">(</span><span class="n">spike_times</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">send_buffer_times</span> <span class="o">=</span> <span class="n">_send_buffer_times</span><span class="p">(</span><span class="n">spike_times</span><span class="p">,</span> <span class="n">time_step</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_spike_times</span> <span class="o">=</span> <span class="n">spike_times</span>
 
@@ -209,7 +250,25 @@
             <span class="s2">&quot;default_initial_values&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__model</span><span class="o">.</span><span class="n">default_parameters</span><span class="p">,</span>
             <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="n">parameters</span><span class="p">,</span>
         <span class="p">}</span>
-        <span class="k">return</span> <span class="n">context</span></div></div>
+        <span class="k">return</span> <span class="n">context</span></div>
+
+<div class="viewcode-block" id="SpikeSourceArrayVertex.set_value_by_selector"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_array_vertex.SpikeSourceArrayVertex.set_value_by_selector">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">SimplePopulationSettable</span><span class="o">.</span><span class="n">set_value_by_selector</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">set_value_by_selector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selector</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;spike_times&quot;</span><span class="p">:</span>
+            <span class="n">old_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">old_values</span><span class="p">,</span> <span class="n">RangedListOfList</span><span class="p">):</span>
+                <span class="n">ranged_list</span> <span class="o">=</span> <span class="n">old_values</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Keep all the setting stuff in one place by creating a</span>
+                <span class="c1"># RangedListofLists</span>
+                <span class="n">ranged_list</span> <span class="o">=</span> <span class="n">RangedListOfList</span><span class="p">(</span>
+                    <span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">old_values</span><span class="p">)</span>
+            <span class="n">ranged_list</span><span class="o">.</span><span class="n">set_value_by_selector</span><span class="p">(</span>
+                <span class="n">selector</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">ranged_list</span><span class="o">.</span><span class="n">is_list</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">ranged_list</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">SimplePopulationSettable</span><span class="o">.</span><span class="n">set_value_by_selector</span><span class="p">(</span>
+                <span class="bp">self</span><span class="p">,</span> <span class="n">selector</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div></div>
 </pre></div>
 
             <div class="clearer"></div>

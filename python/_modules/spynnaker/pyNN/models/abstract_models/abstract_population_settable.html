@@ -115,8 +115,10 @@
             <span class="c1"># Keep all the setting stuff in one place by creating a RangedList</span>
             <span class="n">ranged_list</span> <span class="o">=</span> <span class="n">SpynnakerRangedList</span><span class="p">(</span>
                 <span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">old_values</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">ranged_list</span><span class="p">)</span>
-        <span class="n">ranged_list</span><span class="o">.</span><span class="n">set_value_by_selector</span><span class="p">(</span><span class="n">selector</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div></div>
+
+        <span class="n">ranged_list</span><span class="o">.</span><span class="n">set_value_by_selector</span><span class="p">(</span>
+            <span class="n">selector</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">ranged_list</span><span class="o">.</span><span class="n">is_list</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">ranged_list</span><span class="p">)</span></div></div>
 </pre></div>
 
             <div class="clearer"></div>
