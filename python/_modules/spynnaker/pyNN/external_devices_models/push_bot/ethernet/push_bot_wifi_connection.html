@@ -1,0 +1,289 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>spynnaker.pyNN.external_devices_models.push_bot.ethernet.push_bot_wifi_connection &#8212; sPyNNaker  documentation</title>
+    <link rel="stylesheet" href="../../../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../../_static/sphinxdoc.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../../../../" src="../../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../../_static/jquery.js"></script>
+    <script src="../../../../../../_static/underscore.js"></script>
+    <script src="../../../../../../_static/doctools.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    <link rel="index" title="Index" href="../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.external_devices_models.push_bot.ethernet.push_bot_wifi_connection</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for spynnaker.pyNN.external_devices_models.push_bot.ethernet.push_bot_wifi_connection</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2017-2019 The University of Manchester</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">platform</span>
+<span class="kn">import</span> <span class="nn">select</span>
+<span class="kn">import</span> <span class="nn">socket</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">raise_from</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
+<span class="kn">from</span> <span class="nn">spinnman.connections.abstract_classes</span> <span class="kn">import</span> <span class="n">Listenable</span><span class="p">,</span> <span class="n">Connection</span>
+<span class="kn">from</span> <span class="nn">spinnman.exceptions</span> <span class="kn">import</span> <span class="n">SpinnmanIOException</span><span class="p">,</span> <span class="n">SpinnmanTimeoutException</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_KB</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
+<span class="c1"># A set of connections that have already been made</span>
+<span class="n">_existing_connections</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="get_pushbot_wifi_connection"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.external_devices_models.push_bot.ethernet.html#spynnaker.pyNN.external_devices_models.push_bot.ethernet.get_pushbot_wifi_connection">[docs]</a><span class="k">def</span> <span class="nf">get_pushbot_wifi_connection</span><span class="p">(</span><span class="n">remote_host</span><span class="p">,</span> <span class="n">remote_port</span><span class="o">=</span><span class="mi">56000</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Get an existing connection to a PushBot, or make a new one.</span>
+
+<span class="sd">    :param str remote_host: The IP address of the PushBot</span>
+<span class="sd">    :param int remote_port: The port number of the PushBot (default 56000)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">remote_host</span><span class="p">,</span> <span class="n">remote_port</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_existing_connections</span><span class="p">:</span>
+        <span class="n">_existing_connections</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="n">PushBotWIFIConnection</span><span class="p">(</span><span class="n">remote_host</span><span class="p">,</span> <span class="n">remote_port</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_existing_connections</span><span class="p">[</span><span class="n">key</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="PushBotWIFIConnection"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.external_devices_models.push_bot.ethernet.html#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotWIFIConnection">[docs]</a><span class="k">class</span> <span class="nc">PushBotWIFIConnection</span><span class="p">(</span><span class="n">Connection</span><span class="p">,</span> <span class="n">Listenable</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A connection to a PushBot via Wi-Fi.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;__local_ip_address&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__local_port&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__remote_ip_address&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__remote_port&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__socket&quot;</span><span class="p">]</span>
+
+    <span class="n">RECV_SIZE</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="n">BYTES_PER_KB</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">remote_host</span><span class="p">,</span> <span class="n">remote_port</span><span class="o">=</span><span class="mi">56000</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param str remote_host: The IP address of the PushBot</span>
+<span class="sd">        :param int remote_port: The port number of the PushBot (default 56000)</span>
+<span class="sd">        :raise SpinnmanIOException:</span>
+<span class="sd">            If there is an error setting up the communication channel</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Create a TCP Socket</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__socket</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_STREAM</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># pylint: disable=broad-except</span>
+            <span class="n">raise_from</span><span class="p">(</span><span class="n">SpinnmanIOException</span><span class="p">(</span>
+                <span class="s2">&quot;Error setting up socket: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">e</span><span class="p">)),</span> <span class="n">e</span><span class="p">)</span>
+
+        <span class="c1"># Get the port to connect to</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__remote_port</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">remote_port</span><span class="p">)</span>
+
+        <span class="c1"># Get the host to connect to</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__remote_ip_address</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">gethostbyname</span><span class="p">(</span><span class="n">remote_host</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Trying to connect to the PushBot via Wi-Fi&quot;</span><span class="p">)</span>
+            <span class="c1"># Connect the socket</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__socket</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__remote_ip_address</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__remote_port</span><span class="p">))</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Succeeded in connecting to PushBot via Wi-Fi&quot;</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># pylint: disable=broad-except</span>
+            <span class="n">raise_from</span><span class="p">(</span><span class="n">SpinnmanIOException</span><span class="p">(</span>
+                <span class="s2">&quot;Error binding socket to </span><span class="si">{}</span><span class="s2">:</span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__remote_ip_address</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__remote_port</span><span class="p">,</span> <span class="n">e</span><span class="p">)),</span> <span class="n">e</span><span class="p">)</span>
+
+        <span class="c1"># Get the details of where the socket is connected</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__local_ip_address</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__local_port</span> <span class="o">=</span>\
+                <span class="bp">self</span><span class="o">.</span><span class="n">__socket</span><span class="o">.</span><span class="n">getsockname</span><span class="p">()</span>
+
+            <span class="c1"># Ensure that a standard address is used for the INADDR_ANY</span>
+            <span class="c1"># hostname</span>
+            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__local_ip_address</span> <span class="ow">is</span> <span class="kc">None</span>
+                    <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">__local_ip_address</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__local_ip_address</span> <span class="o">=</span> <span class="s2">&quot;0.0.0.0&quot;</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># pylint: disable=broad-except</span>
+            <span class="n">raise_from</span><span class="p">(</span><span class="n">SpinnmanIOException</span><span class="p">(</span>
+                <span class="s2">&quot;Error querying socket: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">e</span><span class="p">)),</span> <span class="n">e</span><span class="p">)</span>
+
+        <span class="c1"># Set a general timeout on the socket</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__socket</span><span class="o">.</span><span class="n">settimeout</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PushBotWIFIConnection.is_connected"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.external_devices_models.push_bot.ethernet.html#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotWIFIConnection.is_connected">[docs]</a>    <span class="k">def</span> <span class="nf">is_connected</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; See\</span>
+<span class="sd">            :py:meth:`~spinnman.connections.Connection.is_connected`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">platform</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;windows&quot;</span><span class="p">):</span>
+            <span class="n">cmd_args</span> <span class="o">=</span> <span class="s2">&quot;-n 1 -w 1&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cmd_args</span> <span class="o">=</span> <span class="s2">&quot;-c 1 -W 1&quot;</span>
+
+        <span class="c1"># check if machine is active and on the network</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>  <span class="c1"># Try up to five times...</span>
+            <span class="c1"># Start a ping process</span>
+            <span class="n">process</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
+                <span class="s2">&quot;ping &quot;</span> <span class="o">+</span> <span class="n">cmd_args</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__remote_ip_address</span><span class="p">,</span>
+                <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span>
+            <span class="n">process</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">process</span><span class="o">.</span><span class="n">returncode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1"># ping worked</span>
+                <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="c1"># If the ping fails this number of times, the host cannot be contacted</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">local_ip_address</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The local IP address to which the connection is bound, \</span>
+<span class="sd">            as a dotted string, e.g. `0.0.0.0`</span>
+
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__local_ip_address</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">local_port</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The local port to which the connection is bound.</span>
+
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__local_port</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">remote_ip_address</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The remote IP address to which the connection is connected, \</span>
+<span class="sd">            as a dotted string, or None if not connected remotely</span>
+
+<span class="sd">        :rtype: str or None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__remote_ip_address</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">remote_port</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The remote port to which the connection is connected, \</span>
+<span class="sd">            or None if not connected remotely</span>
+
+<span class="sd">        :rtype: int or None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__remote_port</span>
+
+<div class="viewcode-block" id="PushBotWIFIConnection.receive"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.external_devices_models.push_bot.ethernet.html#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotWIFIConnection.receive">[docs]</a>    <span class="k">def</span> <span class="nf">receive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Receive data from the connection</span>
+
+<span class="sd">        :param timeout: The timeout, or None to wait forever</span>
+<span class="sd">        :type timeout: float or None</span>
+<span class="sd">        :return: The data received</span>
+<span class="sd">        :rtype: bytes</span>
+<span class="sd">        :raise SpinnmanTimeoutException:</span>
+<span class="sd">            If a timeout occurs before any data is received</span>
+<span class="sd">        :raise SpinnmanIOException: If an error occurs receiving the data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__socket</span><span class="o">.</span><span class="n">settimeout</span><span class="p">(</span><span class="n">timeout</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__socket</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">RECV_SIZE</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">socket</span><span class="o">.</span><span class="n">timeout</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SpinnmanTimeoutException</span><span class="p">(</span><span class="s2">&quot;receive&quot;</span><span class="p">,</span> <span class="n">timeout</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># pylint: disable=broad-except</span>
+            <span class="n">raise_from</span><span class="p">(</span><span class="n">SpinnmanIOException</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)),</span> <span class="n">e</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PushBotWIFIConnection.send"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.external_devices_models.push_bot.ethernet.html#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotWIFIConnection.send">[docs]</a>    <span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Send data down this connection</span>
+
+<span class="sd">        :param bytearray data: The data to be sent</span>
+<span class="sd">        :raise SpinnmanIOException: If there is an error sending the data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__socket</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># pylint: disable=broad-except</span>
+            <span class="n">raise_from</span><span class="p">(</span><span class="n">SpinnmanIOException</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)),</span> <span class="n">e</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PushBotWIFIConnection.close"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.external_devices_models.push_bot.ethernet.html#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotWIFIConnection.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; See\</span>
+<span class="sd">            :py:meth:`spinnman.connections.Connection.close`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__socket</span><span class="o">.</span><span class="n">shutdown</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">SHUT_WR</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># pylint: disable=broad-except</span>
+            <span class="k">pass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__socket</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="PushBotWIFIConnection.is_ready_to_receive"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.external_devices_models.push_bot.ethernet.html#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotWIFIConnection.is_ready_to_receive">[docs]</a>    <span class="k">def</span> <span class="nf">is_ready_to_receive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">select</span><span class="o">.</span><span class="n">select</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">__socket</span><span class="p">],</span> <span class="p">[],</span> <span class="p">[],</span> <span class="n">timeout</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="PushBotWIFIConnection.get_receive_method"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.external_devices_models.push_bot.ethernet.html#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotWIFIConnection.get_receive_method">[docs]</a>    <span class="k">def</span> <span class="nf">get_receive_method</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">receive</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.external_devices_models.push_bot.ethernet.push_bot_wifi_connection</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2021.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
+    </div>
+  </body>
+</html>
