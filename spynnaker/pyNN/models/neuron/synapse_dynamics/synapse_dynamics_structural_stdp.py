@@ -80,8 +80,9 @@ class SynapseDynamicsStructuralSTDP(
             voltage_dependence=None, dendritic_delay_fraction=1.0,
             f_rew=DEFAULT_F_REW, initial_weight=DEFAULT_INITIAL_WEIGHT,
             initial_delay=DEFAULT_INITIAL_DELAY, s_max=DEFAULT_S_MAX,
-            seed=None, weight=StaticSynapse.default_parameters['weight'],
-            delay=None, backprop_delay=True, neuromodulation=False):
+            with_replacement=True, seed=None,
+            weight=StaticSynapse.default_parameters['weight'], delay=None,
+            backprop_delay=True, neuromodulation=False):
         """
         :param AbstractPartnerSelection partner_selection:
             The partner selection rule
@@ -106,6 +107,10 @@ class SynapseDynamicsStructuralSTDP(
             values
         :type initial_delay: float or tuple(float, float)
         :param int s_max: Maximum fan-in per target layer neuron
+        :param bool with_replacement:
+            If set to True (default), a new synapse can be formed in a
+            location where a connection already exists; if False, then it must
+            form where no connection already exists
         :param seed: seed for the random number generators
         :type seed: int or None
         :param float weight: The weight of connections formed by the connector
@@ -127,6 +132,7 @@ class SynapseDynamicsStructuralSTDP(
         self.__initial_weight = initial_weight
         self.__initial_delay = initial_delay
         self.__s_max = s_max
+        self.__with_replacement = with_replacement
         self.__seed = seed
         self.__connections = dict()
 
@@ -218,6 +224,11 @@ class SynapseDynamicsStructuralSTDP(
     @overrides(AbstractSynapseDynamicsStructural.s_max)
     def s_max(self):
         return self.__s_max
+
+    @property
+    @overrides(AbstractSynapseDynamicsStructural.with_replacement)
+    def with_replacement(self):
+        return self.__with_replacement
 
     @property
     @overrides(AbstractSynapseDynamicsStructural.seed)

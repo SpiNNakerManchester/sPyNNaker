@@ -18,7 +18,7 @@ from p8_integration_tests.quick_test.test_onchip_compressor.many_routes \
     import do_run
 
 
-class TestUnorderedBitFieldCompressor(BaseTestCase):
+class TestOrderedCoveringCompressor(BaseTestCase):
 
     def test_do_run(self):
         self.runsafe(do_run)

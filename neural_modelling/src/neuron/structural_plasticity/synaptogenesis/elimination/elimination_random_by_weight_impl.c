@@ -26,8 +26,7 @@ elimination_params_t *synaptogenesis_elimination_init(uint8_t **data) {
         log_error("Out of memory when allocating parameters");
         rt_error(RTE_SWERR);
     }
-
-    spin1_memcpy(elim_params, *data, sizeof(struct elimination_params));
+    spin1_memcpy(elim_params, *data, sizeof(elimination_params_t));
     log_debug("Elimination random by weight prob_dep=%u prob_pot=%u thresh=%u",
             elim_params->prob_elim_depression,
             elim_params->prob_elim_potentiation,

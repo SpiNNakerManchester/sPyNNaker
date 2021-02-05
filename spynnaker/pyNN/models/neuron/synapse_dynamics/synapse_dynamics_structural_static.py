@@ -76,8 +76,8 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
             self, partner_selection, formation, elimination,
             f_rew=DEFAULT_F_REW, initial_weight=DEFAULT_INITIAL_WEIGHT,
             initial_delay=DEFAULT_INITIAL_DELAY, s_max=DEFAULT_S_MAX,
-            seed=None, weight=StaticSynapse.default_parameters['weight'],
-            delay=None):
+            with_replacement=True, seed=None,
+            weight=StaticSynapse.default_parameters['weight'], delay=None):
         """
         :param AbstractPartnerSelection partner_selection:
             The partner selection rule
@@ -93,6 +93,10 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
             values
         :type initial_delay: float or (float, float)
         :param int s_max: Maximum fan-in per target layer neuron
+        :param bool with_replacement:
+            If set to True (default), a new synapse can be formed in a
+            location where a connection already exists; if False, then it must
+            form where no connection already exists
         :param int seed: seed the random number generators
         :param float weight: The weight of connections formed by the connector
         :param delay: The delay of connections formed by the connector
@@ -110,6 +114,7 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
         self.__initial_weight = initial_weight
         self.__initial_delay = initial_delay
         self.__s_max = s_max
+        self.__with_replacement = with_replacement
         self.__seed = seed
         self.__connections = dict()
 
@@ -215,6 +220,11 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
     @overrides(AbstractSynapseDynamicsStructural.s_max)
     def s_max(self):
         return self.__s_max
+
+    @property
+    @overrides(AbstractSynapseDynamicsStructural.with_replacement)
+    def with_replacement(self):
+        return self.__with_replacement
 
     @property
     @overrides(AbstractSynapseDynamicsStructural.initial_weight)
