@@ -25,7 +25,7 @@ class RateSourceLivePartition(SimplePopulationSettable, AbstractChangableAfterRu
         self.__partitions = partitions
         self.__refresh_rate = refresh_rate
 
-        self.__injector_vertex = RateLiveInjectorVertex()
+        self.__injector_vertex = RateLiveInjectorVertex("Rate_live_injector", constraints, rate_source_live)
         
         self.__atoms_per_partition = self._compute_partition_and_offset_size(self.__n_atoms)
     
@@ -38,7 +38,10 @@ class RateSourceLivePartition(SimplePopulationSettable, AbstractChangableAfterRu
         for i in range(self.__partitions):
             self.__vertices.append(RateSourceLiveVertex(
                 self.__atoms_per_partition[i], constraints, self.__max_atoms_per_core,
-                label+str(i), rate_source_live, self.__machine_vertices[i], self.__refresh_rate))
+                label+str(i), rate_source_live, self.__machine_vertices[i], self.__refresh_rate,
+                self.__injector_vertex))
+
+        self.__injector_vertex.connected_app_vertices = self.__vertices
 
     @property
     def n_atoms(self):

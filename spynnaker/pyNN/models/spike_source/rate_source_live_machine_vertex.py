@@ -37,7 +37,8 @@ class RateSourceLiveMachineVertex(
         "__buffered_sdram_per_timestep",
         "__is_recording",
         "__minimum_buffer_sdram",
-        "__resources"]
+        "__resources",
+        "__vertex_index"]
 
     EXTRA_PROVENANCE_DATA_ENTRIES = Enum(
         value="EXTRA_PROVENANCE_DATA_ENTRIES",
@@ -64,6 +65,7 @@ class RateSourceLiveMachineVertex(
             label, constraints=constraints)
         self.__is_recording = is_recording
         self.__resources = resources_required
+        self.__vertex_index = None
 
     @property
     @overrides(MachineVertex.resources_required)
@@ -84,6 +86,14 @@ class RateSourceLiveMachineVertex(
     @overrides(AbstractRecordable.is_recording)
     def is_recording(self):
         return self.__is_recording
+
+    @property
+    def vertex_index(self):
+        return self.__vertex_index
+
+    @vertex_index.setter
+    def vertex_index(self, vertex_index):
+        self.__vertex_index = vertex_index
 
     @overrides(ProvidesProvenanceDataFromMachineImpl.
                get_provenance_data_from_machine)

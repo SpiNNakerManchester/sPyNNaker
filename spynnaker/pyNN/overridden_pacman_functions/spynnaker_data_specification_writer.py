@@ -18,6 +18,10 @@ from spinn_front_end_common.interface.interface_functions import (
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 from spynnaker.pyNN.models.neuron import SynapticManager
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+from spynnaker.pyNN.models.spike_source.rate_live_injector_vertex import \
+    RateLiveInjectorVertex
+from spynnaker.pyNN.models.spike_source.rate_source_live_vertex import \
+    RateSourceLiveVertex
 
 
 class SpynnakerDataSpecificationWriter(
@@ -36,6 +40,8 @@ class SpynnakerDataSpecificationWriter(
         delay_extensions = list()
         syn_vertices = list()
         neuron_vertices = list()
+        rate_injectors = list()
+        rate_sources = list()
         placement_order = list()
         for placement in placements.placements:
             associated_vertex = graph_mapper.get_application_vertex(
@@ -47,11 +53,18 @@ class SpynnakerDataSpecificationWriter(
                 syn_vertices.append(placement)
             elif isinstance(associated_vertex, AbstractPopulationVertex):
                 neuron_vertices.append(placement)
+            elif isinstance(associated_vertex, RateLiveInjectorVertex):
+                rate_injectors.append(placement)
+            elif isinstance(associated_vertex, RateSourceLiveVertex):
+                rate_sources.append(placement)
             else:
                 placement_order.append(placement)
+
         placement_order.extend(neuron_vertices)
         placement_order.extend(syn_vertices)
         placement_order.extend(delay_extensions)
+        placement_order.extend(rate_injectors)
+        placement_order.extend(rate_sources)
 
         return super(SpynnakerDataSpecificationWriter, self).__call__(
             placements, hostname, report_default_directory, write_text_specs,

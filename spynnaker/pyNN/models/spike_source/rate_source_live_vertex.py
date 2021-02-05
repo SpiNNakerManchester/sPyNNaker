@@ -22,6 +22,7 @@ from pacman.executor.injection_decorator import inject_items
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
+from pacman.model.constraints.placer_constraints import SameChipAsConstraint
 from spinn_front_end_common.abstract_models import (
     AbstractChangableAfterRun, AbstractGeneratesDataSpecification, AbstractHasAssociatedBinary,
     AbstractRewritesDataSpecification)
@@ -40,6 +41,8 @@ from spynnaker.pyNN.models.abstract_models import (
     AbstractReadParametersBeforeSet)
 from .rate_source_live_machine_vertex import (
     RateSourceLiveMachineVertex)
+
+from .rate_live_injector_vertex import RateLiveInjectorVertex
 
 logger = logging.getLogger(__name__)
 
@@ -65,6 +68,7 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
         "__model_name",
         "__model",
         "__n_atoms",
+        "__n_machine_vertices",
         "__machine_vertices",
         "__change_requires_neuron_parameters_reload",
         "__self_machine_time_step",
@@ -72,18 +76,21 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
         "__n_data_specs",
         "__n_profile_samples",
         "__requires_mapping",
-        "__refresh_rate"
+        "__refresh_rate",
+        "__injector_vertex"
     ]
 
     RATE_RECORDING_REGION_ID = 0
 
+    _n_vertices = 0
+
     def __init__(self, sources, constraints, max_atoms_per_core, 
-            label, model, machine_vertices, refresh_rate):
+            label, model, machine_vertices, refresh_rate, injector_vertex):
         # pylint: disable=too-many-arguments
         self.__model_name = "RateSourceLive"
         self.__model = model
         self.__n_atoms = sources
-        self.__machine_vertices = machine_vertices
+        self.__n_machine_vertices = machine_vertices
         self.__refresh_rate = refresh_rate
 
         self.__change_requires_neuron_parameters_reload = False
@@ -91,6 +98,9 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
 
         self.__n_subvertices = 0
         self.__n_data_specs = 0
+        self.__injector_vertex = inject_items
+
+        self.__machine_vertices = dict()
 
         super(RateSourceLiveVertex, self).__init__(
             label=label, constraints=constraints,
@@ -104,6 +114,10 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
         # used for reset and rerun
         self.__requires_mapping = True
 
+    @property
+    def machine_vertices(self):
+        return self.__machine_vertices
+    
     @property
     @overrides(AbstractChangableAfterRun.requires_mapping)
     def requires_mapping(self):
@@ -155,13 +169,25 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
     def n_atoms(self):
         return self.__n_atoms
 
+    @overrides(ApplicationVertex.create_machine_vertex)
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
         # pylint: disable=too-many-arguments, arguments-differ
-        self.__n_subvertices += 1
-        return RateSourceLiveMachineVertex(
+        machine_vertex = RateSourceLiveMachineVertex(
             resources_required, False, constraints, label)
+
+        RateSourceLiveVertex._n_vertices += 1
+        self.__machine_vertices[self.__n_subvertices] = machine_vertex
+
+        connected_machine_vertex = self.__injector_vertex.machine_vertex
+
+        if connected_machine_vertex is not None:
+            machine_vertex.add_constraint(SameChipAsConstraint(connected_machine_vertex))
+            
+        self.__n_subvertices += 1
+
+        return machine_vertex
 
     def reserve_memory_regions(self, spec, placement, graph_mapper):
         """ Reserve memory regions for rate source parameters and output\
@@ -230,7 +256,8 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
 
     def _write_rate_parameters(
             self, spec, graph, placement, routing_info,
-            vertex_slice, machine_time_step, time_scale_factor):
+            vertex_slice, machine_time_step, time_scale_factor,
+            vertex_index):
         """ Generate Neuron Parameter data for rate sources
 
         :param spec: the data specification writer
@@ -335,10 +362,16 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
             self.get_binary_file_name(), machine_time_step,
             time_scale_factor))
 
+        if vertex.vertex_index is None:
+            for c in vertex.constraints:
+                if isinstance(c, SameChipAsConstraint) and \
+                isinstance(graph_mapper.get_application_vertex(c.vertex), RateLiveInjectorVertex):
+                    vertex.vertex_index = c.vertex.vertex_index
+
         # write parameters
         self._write_rate_parameters(
             spec, graph, placement, routing_info, vertex_slice,
-            machine_time_step, time_scale_factor)
+            machine_time_step, time_scale_factor, vertex.vertex_index)
 
         # write profile data
         profile_utils.write_profile_region_data(
