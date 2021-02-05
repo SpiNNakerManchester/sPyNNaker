@@ -506,10 +506,8 @@ bool population_table_get_first_address(
     last_spike = spike;
     next_item = entry.start;
     items_to_go = entry.count;
-    uint32_t bits_offset = 0;
     if (entry.extra_info_flag) {
         extra_info extra = address_list[next_item++].extra;
-        bits_offset = get_core_index(extra, spike) * extra.n_words;
         last_neuron_id = get_extended_neuron_id(entry, extra, spike);
     } else {
         last_neuron_id = get_neuron_id(entry, spike);
@@ -523,10 +521,12 @@ bool population_table_get_first_address(
         log_debug("Can be checked, bitfield is allocated");
         // check that the bit flagged for this neuron id does hit a
         // neuron here. If not return false and avoid the DMA check.
+        uint32_t bit_field_id = get_neuron_id(entry, spike);
         if (!bit_field_test(
-                &connectivity_bit_field[position][bits_offset], last_neuron_id)) {
+                connectivity_bit_field[position], bit_field_id)) {
             log_debug("Tested and was not set");
             bit_field_filtered_packets += 1;
+            items_to_go = 0;
             return false;
         }
         log_debug("Was set, carrying on");

@@ -14,12 +14,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy
-from spinn_front_end_common.utilities.constants import \
-    MICRO_TO_MILLISECOND_CONVERSION
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, BYTES_PER_SHORT)
+    BYTES_PER_WORD, BYTES_PER_SHORT, MICRO_TO_MILLISECOND_CONVERSION)
 from .abstract_timing_dependence import AbstractTimingDependence
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
     SynapseStructureWeightAccumulator)
@@ -36,7 +34,9 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
         "__dual_fsm",
         "__mean_post_window",
         "__mean_pre_window",
-        "__synapse_structure"]
+        "__synapse_structure",
+        "__a_plus",
+        "__a_minus"]
 
     default_parameters = {
         'accumulator_depression': -6, 'accumulator_potentiation': 6,
@@ -49,7 +49,17 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
                 'accumulator_potentiation'],
             mean_pre_window=default_parameters['mean_pre_window'],
             mean_post_window=default_parameters['mean_post_window'],
-            dual_fsm=default_parameters['dual_fsm']):
+            dual_fsm=default_parameters['dual_fsm'],
+            A_plus=0.01, A_minus=0.01):
+        """
+        :param int accumulator_depression:
+        :param int accumulator_potentiation:
+        :param float mean_pre_window:
+        :param float mean_post_window:
+        :param bool dual_fsm:
+        :param float A_plus: :math:`A^+`
+        :param float A_minus: :math:`A^-`
+        """
         # pylint: disable=too-many-arguments
         self.__accumulator_depression_plus_one = accumulator_depression + 1
         self.__accumulator_potentiation_minus_one = \
@@ -57,8 +67,34 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
         self.__mean_pre_window = mean_pre_window
         self.__mean_post_window = mean_post_window
         self.__dual_fsm = dual_fsm
+        self.__a_plus = A_plus
+        self.__a_minus = A_minus
 
         self.__synapse_structure = SynapseStructureWeightAccumulator()
+
+    @property
+    def A_plus(self):
+        r""" :math:`A^+`
+
+        :rtype: float
+        """
+        return self.__a_plus
+
+    @A_plus.setter
+    def A_plus(self, new_value):
+        self.__a_plus = new_value
+
+    @property
+    def A_minus(self):
+        r""" :math:`A^-`
+
+        :rtype: float
+        """
+        return self.__a_minus
+
+    @A_minus.setter
+    def A_minus(self, new_value):
+        self.__a_minus = new_value
 
     @overrides(AbstractTimingDependence.is_same_as)
     def is_same_as(self, timing_dependence):

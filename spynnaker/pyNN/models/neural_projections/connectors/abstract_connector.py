@@ -28,6 +28,7 @@ from spinn_utilities.safe_eval import SafeEval
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spynnaker.pyNN.utilities import utility_calls
+from spynnaker.pyNN.exceptions import SpynnakerException
 
 # global objects
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -43,6 +44,7 @@ _expr_context = SafeEval(
 class AbstractConnector(with_metaclass(AbstractBase, object)):
     """ Abstract class that all PyNN Connectors extend.
     """
+    # pylint: disable=unused-argument,too-many-arguments
 
     NUMPY_SYNAPSES_DTYPE = [("source", "uint32"), ("target", "uint16"),
                             ("weight", "float64"), ("delay", "float64"),
@@ -94,7 +96,6 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         :param int machine_time_step: machine time step
         :param SynapseInformation synapse_info: the synapse info
         """
-        # pylint: disable=unused-argument
         self._rng = (self._rng or NumpyRNG())
         self.__min_delay = machine_time_step / MICRO_TO_MILLISECOND_CONVERSION
 
@@ -110,7 +111,8 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         if (not numpy.isscalar(values) and
                 not (isinstance(values, RandomDistribution)) and
                 not hasattr(values, "__getitem__")):
-            raise Exception("Parameter {} format unsupported".format(name))
+            raise SpynnakerException("Parameter {} format unsupported".format(
+                name))
         if not allow_lists and hasattr(values, "__getitem__"):
             raise NotImplementedError(
                 "Lists of {} are not supported by the implementation of {} on "
@@ -153,7 +155,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
             return delays
         elif hasattr(delays, "__getitem__"):
             return numpy.min(delays)
-        raise Exception("Unrecognised delay format: {:s}".format(
+        raise SpynnakerException("Unrecognised delay format: {:s}".format(
             type(delays)))
 
     def _get_delay_maximum(self, delays, n_connections):
@@ -178,7 +180,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
             return delays
         elif hasattr(delays, "__getitem__"):
             return numpy.max(delays)
-        raise Exception("Unrecognised delay format: {:s}".format(
+        raise SpynnakerException("Unrecognised delay format: {:s}".format(
             type(delays)))
 
     @abstractmethod
@@ -213,7 +215,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
             return 0.0
         elif hasattr(delays, "__getitem__"):
             return numpy.var(delays)
-        raise Exception("Unrecognised delay format")
+        raise SpynnakerException("Unrecognised delay format")
 
     def _get_n_connections_from_pre_vertex_with_delay_maximum(
             self, delays, n_total_connections, n_connections,
@@ -231,7 +233,6 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         :param float max_delay:
         :rtype: float
         """
-        # pylint: disable=too-many-arguments
         if isinstance(delays, RandomDistribution):
             prob_in_range = utility_calls.get_probability_within_range(
                 delays, min_delay, max_delay)
@@ -251,7 +252,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
             prob_delayed = float(n_delayed) / float(n_total)
             return int(math.ceil(utility_calls.get_probable_maximum_selected(
                 n_total_connections, n_connections, prob_delayed)))
-        raise Exception("Unrecognised delay format")
+        raise SpynnakerException("Unrecognised delay format")
 
     @abstractmethod
     def get_n_connections_from_pre_vertex_maximum(
@@ -273,7 +274,6 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         :type max_delay: int or None
         :rtype: int
         """
-        # pylint: disable=too-many-arguments
 
     @abstractmethod
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):
@@ -298,7 +298,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
             return abs(weights)
         elif hasattr(weights, "__getitem__"):
             return numpy.mean(weights)
-        raise Exception("Unrecognised weight format")
+        raise SpynnakerException("Unrecognised weight format")
 
     def get_weight_minimum(self, weights, weight_random_sigma):
         """ Get the minimum of the weights.
@@ -368,7 +368,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
             return abs(weights)
         elif hasattr(weights, "__getitem__"):
             return numpy.amax(numpy.abs(weights))
-        raise Exception("Unrecognised weight format")
+        raise SpynnakerException("Unrecognised weight format")
 
     @abstractmethod
     def get_weight_maximum(self, synapse_info):
@@ -377,7 +377,6 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         :param SynapseInformation synapse_info:
         :rtype: float
         """
-        # pylint: disable=too-many-arguments
 
     def get_weight_variance(self, weights):
         """ Get the variance of the weights.
@@ -393,7 +392,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
             return 0.0
         elif hasattr(weights, "__getitem__"):
             return numpy.var(weights)
-        raise Exception("Unrecognised weight format")
+        raise SpynnakerException("Unrecognised weight format")
 
     def _expand_distances(self, d_expression):
         """ Check if a distance expression contains at least one term `d[x]`.
@@ -454,7 +453,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
                 for connection_slice in connection_slices]).astype("float64")
         elif isinstance(values, string_types) or callable(values):
             if self.__space is None:
-                raise Exception(
+                raise SpynnakerException(
                     "No space object specified in projection {}-{}".format(
                         synapse_info.pre_population,
                         synapse_info.post_population))
@@ -471,7 +470,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
             if isinstance(values, string_types):
                 return _expr_context.eval(values)
             return values(d)
-        raise Exception("what on earth are you giving me?")
+        raise SpynnakerException("what on earth are you giving me?")
 
     def _generate_weights(self, n_connections, connection_slices,
                           pre_slice, post_slice, synapse_info):
@@ -491,7 +490,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
             if not weights.size:
                 warn_once(logger, "No connection in " + str(self))
             elif numpy.amin(weights) < 0 < numpy.amax(weights):
-                raise Exception(
+                raise SpynnakerException(
                     "Weights must be either all positive or all negative"
                     " in projection {}->{}".format(
                         synapse_info.pre_population.label,
@@ -555,7 +554,11 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
             The synaptic matrix data to go to the machine, as a Numpy array
         :rtype: ~numpy.ndarray
         """
-        # pylint: disable=too-many-arguments
+
+    _CLIPPED_MSG = (
+        "The delays in the connector {} from {} to {} was clipped to {} a "
+        "total of {} times.  This can be avoided by reducing the timestep "
+        "or increasing the minimum delay to one timestep")
 
     def get_provenance_data(self, synapse_info):
         """
@@ -569,15 +572,10 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         # Convert to native Python integer; provenance system assumption
         ncd = self.__n_clipped_delays.item()
         return [ProvenanceDataItem(
-            [name, "Times_synaptic_delays_got_clipped"], ncd, report=ncd > 0,
-            message=(
-                "The delays in the connector {} from {} to {} was clipped "
-                "to {} a total of {} times.  This can be avoided by reducing "
-                "the timestep or increasing the minimum delay to one "
-                "timestep".format(
-                    self.__class__.__name__, synapse_info.pre_population.label,
-                    synapse_info.post_population.label, self.__min_delay,
-                    ncd)))]
+            [name, "Times_synaptic_delays_got_clipped"], ncd,
+            report=(ncd > 0), message=self._CLIPPED_MSG.format(
+                self.__class__.__name__, synapse_info.pre_population.label,
+                synapse_info.post_population.label, self.__min_delay, ncd))]
 
     @property
     def safe(self):
@@ -620,8 +618,8 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
     def use_direct_matrix(self, synapse_info):
         """
         :param SynapseInformation synapse_info:
+        :rtype: bool
         """
-        # pylint: disable=unused-argument
         return False
 
     def could_connect(self, _synapse_info, _pre_slice, _post_slice):
@@ -632,12 +630,48 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         checking that at least one of the indexes in the pre slice could
         over time connect to at least one of the indexes in the post slice.
 
-        note: This method should never return a false negative,
-        but may return a false positives
+        .. note::
+            This method should never return a false negative,
+            but may return a false positives
 
         :param ~pacman.model.graphs.common.Slice _pre_slice:
         :param ~pacman.model.graphs.common.Slice _post_slice:
         :param SynapseInformation _synapse_info:
+        :rtype: bool
         """
         # Unless we know for sure we must say they could connect
         return True
+
+    def connect(self, projection):
+        """ Apply this connector to a projection.
+
+        .. warning::
+            Do *not* call this! SpyNNaker does not work that way.
+
+        :param ~spynnaker.pyNN.models.projection.Projection projection:
+        :raises SpynnakerException: Always. Method not supported; profiled out.
+        """
+        raise SpynnakerException("Standard pyNN connect method not supported")
+
+    @staticmethod
+    def _roundsize(size, label):
+        """ Ensures that the ``size`` is an integer. Approximate integers are\
+            rounded; other values cause exceptions.
+
+        :param size: The value to be rounded
+        :type size: int or float
+        :param str label: The type-name of the connection, for messages
+        :rtype: int
+        :raises SpynnakerException: If the size is non-integer and not close
+        """
+        if isinstance(size, int):
+            return size
+        # Allow a float which has a near int value
+        temp = int(round(size))
+        if abs(temp - size) < 0.001:
+            logger.warning("Size of {} rounded from {} to {}. "
+                           "Please use int values for size",
+                           label, size, temp)
+            return temp
+        raise SpynnakerException(
+            "Size of {} must be an int, received {}".format(label, size))

@@ -16,9 +16,7 @@
 import configparser
 import numpy
 from spinn_front_end_common.utilities import globals_variables
-from spynnaker.pyNN.utilities.spynnaker_failed_state import (
-    SpynnakerFailedState)
-from builtins import property
+from spynnaker8.spinnaker import Spynnaker8FailedState
 
 
 class MockPopulation(object):
@@ -139,12 +137,21 @@ class MockSimulator(object):
         pass
 
     @classmethod
-    def setup(cls):
+    def setup(cls, init_failed_state=False):
         simulator = MockSimulator()
-        globals_variables.set_failed_state(SpynnakerFailedState())
+        if init_failed_state:
+            globals_variables.set_failed_state(Spynnaker8FailedState())
         globals_variables.set_simulator(simulator)
         return simulator
 
     @property
     def use_virtual_board(self):
         return True
+
+    @property
+    def min_delay(self):
+        return 1
+
+    @property
+    def t(self):
+        return 0
