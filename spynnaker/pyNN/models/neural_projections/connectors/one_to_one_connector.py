@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy
+from six import string_types
 from pyNN.random import RandomDistribution
 from pyNN.connectors import OneToOneConnector as PyNNOneToOneConnector
 from spinn_utilities.overrides import overrides
