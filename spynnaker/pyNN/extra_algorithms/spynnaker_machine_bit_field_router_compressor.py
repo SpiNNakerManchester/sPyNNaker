@@ -202,14 +202,15 @@ class SpynnakerMachineBitFieldOrderedCoveringCompressor(
 
 
 class SpynnakerMachineBitFieldUnorderedRouterCompressor(
-        AbstractMachineBitFieldRouterCompressor):
-    """ DEPRACATED use MachineBitFieldRouterCompressor """
+        SpynnakerMachineBitFieldOrderedCoveringCompressor):
+    """ DEPRACATED use SpynnakerMachineBitFieldOrderedCoveringCompressor """
 
     def __new__(cls, *args, **kwargs):
         logger.warning(
             "SpynnakerMachineBitFieldUnorderedRouterCompressor "
             "algorithm name is deprecated. "
-            "Please use MachineBitFieldOrderedCoveringCompressor instead. "
+            "Please use SpynnakerMachineBitFieldOrderedCoveringCompressor "
+            "instead. "
             "Remove algorithms from your cfg to use defaults")
         return super(
             SpynnakerMachineBitFieldUnorderedRouterCompressor, cls).__new__(
