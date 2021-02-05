@@ -19,7 +19,7 @@ from p8_integration_tests.base_test_case import BaseTestCase
 
 class TestInitialize(BaseTestCase):
 
-    # pop.set_inital_value is not a standard PyNN call, but
+    # pop.set_initial_value is not a standard PyNN call, but
     # we allow it on SpiNNaker, so we should test it (between runs)
 
     def set_initialize_between_runs(self):
@@ -45,7 +45,7 @@ class TestInitialize(BaseTestCase):
         self.assertEquals([-62, -62, -62], pop.initial_values["v"])
         id_mixin = pop[1]
         id_mixin.initialize(v=-60)
-        # v on not changed is now the current state not initital value
+        # v on not changed is now the current state not initial value
         self.assertNotEqual(-60, pop.initial_values["v"][0])
         self.assertNotEqual(-62, pop.initial_values["v"][0])
         self.assertEquals(-60, pop.initial_values["v"][1])
@@ -64,7 +64,8 @@ class TestInitialize(BaseTestCase):
         view.initialize(v=-63)
         self.assertEquals(-63, pop.initial_values["v"][0])
         self.assertEquals(-63, pop.initial_values["v"][1])
-        # v on not changed is now the current state not initital value
+
+        # v on not changed is now the current state not initial value
         self.assertNotEqual(-63, pop.initial_values["v"][2])
         self.assertNotEqual(-64, pop.initial_values["v"][2])
         p.run(runtime2)
@@ -86,7 +87,6 @@ class TestInitialize(BaseTestCase):
         assert v1[runtime1][1] == -63.0
         assert v1[runtime1][2] != -63.0
         assert v1[runtime1][2] != -64.0
-
 
     def test_set_initial_value_between_runs(self):
         self.runsafe(self.set_initialize_between_runs)
