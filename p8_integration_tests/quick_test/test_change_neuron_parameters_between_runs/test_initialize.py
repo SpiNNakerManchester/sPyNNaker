@@ -54,7 +54,6 @@ class TestInitialize(BaseTestCase):
         p.run(runtime3)
 
         p.reset()
-        neo = pop.get_data('v')
         self.assertEquals([-64, -64, -64], pop.initial_values["v"])
         pop.initialize(isyn_exc=-0.1)
         self.assertEquals([-64, -64, -64], pop.initial_values["v"])
