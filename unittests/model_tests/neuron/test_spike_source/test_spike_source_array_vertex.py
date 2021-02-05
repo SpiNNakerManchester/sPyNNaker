@@ -32,7 +32,7 @@ class TestSpikeSourceArrayVertex(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        globals_variables.set_failed_state(SpynnakerFailedState())
+        globals_variables._failed_state = SpynnakerFailedState("test")
         globals_variables.set_simulator(MockSimulator())
 
     @classmethod
