@@ -753,6 +753,17 @@
 </dd></dl>
 
 <dl class="py method">
+<dt id="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamicsStructural.with_replacement">
+<em class="property">abstract property </em><code class="sig-name descname">with_replacement</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamicsStructural.with_replacement" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether to allow replacement when creating synapses</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt id="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamicsStructural.write_structural_parameters">
 <em class="property">abstract </em><code class="sig-name descname">write_structural_parameters</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">spec</span></em>, <em class="sig-param"><span class="n">region</span></em>, <em class="sig-param"><span class="n">machine_time_step</span></em>, <em class="sig-param"><span class="n">weight_scales</span></em>, <em class="sig-param"><span class="n">machine_graph</span></em>, <em class="sig-param"><span class="n">machine_vertex</span></em>, <em class="sig-param"><span class="n">routing_info</span></em>, <em class="sig-param"><span class="n">synaptic_matrices</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/abstract_synapse_dynamics_structural.html#AbstractSynapseDynamicsStructural.write_structural_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamicsStructural.write_structural_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write structural plasticity parameters</p>
@@ -1663,7 +1674,7 @@ It should be different every time called with None.</p>
 
 <dl class="py class">
 <dt id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralSTDP">
-<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neuron.synapse_dynamics.</code><code class="sig-name descname">SynapseDynamicsStructuralSTDP</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">partner_selection</span></em>, <em class="sig-param"><span class="n">formation</span></em>, <em class="sig-param"><span class="n">elimination</span></em>, <em class="sig-param"><span class="n">timing_dependence</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">weight_dependence</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">voltage_dependence</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dendritic_delay_fraction</span><span class="o">=</span><span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">f_rew</span><span class="o">=</span><span class="default_value">10000</span></em>, <em class="sig-param"><span class="n">initial_weight</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">initial_delay</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">s_max</span><span class="o">=</span><span class="default_value">32</span></em>, <em class="sig-param"><span class="n">seed</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">weight</span><span class="o">=</span><span class="default_value">0.0</span></em>, <em class="sig-param"><span class="n">delay</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">backprop_delay</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_structural_stdp.html#SynapseDynamicsStructuralSTDP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralSTDP" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neuron.synapse_dynamics.</code><code class="sig-name descname">SynapseDynamicsStructuralSTDP</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">partner_selection</span></em>, <em class="sig-param"><span class="n">formation</span></em>, <em class="sig-param"><span class="n">elimination</span></em>, <em class="sig-param"><span class="n">timing_dependence</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">weight_dependence</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">voltage_dependence</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dendritic_delay_fraction</span><span class="o">=</span><span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">f_rew</span><span class="o">=</span><span class="default_value">10000</span></em>, <em class="sig-param"><span class="n">initial_weight</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">initial_delay</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">s_max</span><span class="o">=</span><span class="default_value">32</span></em>, <em class="sig-param"><span class="n">with_replacement</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">seed</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">weight</span><span class="o">=</span><span class="default_value">0.0</span></em>, <em class="sig-param"><span class="n">delay</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">backprop_delay</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_structural_stdp.html#SynapseDynamicsStructuralSTDP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralSTDP" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_stdp.SynapseDynamicsSTDP</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_structural_common.SynapseDynamicsStructuralCommon</span></code></p>
 <p>Class that enables synaptic rewiring in the presence of STDP.</p>
 <p>It acts as a wrapper around SynapseDynamicsSTDP, meaning rewiring can        operate in parallel with STDP synapses.</p>
@@ -1685,6 +1696,9 @@ a fixed delay value, or a tuple of two values means the delay will
 be chosen at random from a uniform distribution between the given
 values</p></li>
 <li><p><strong>s_max</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Maximum fan-in per target layer neuron</p></li>
+<li><p><strong>with_replacement</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – If set to True (default), a new synapse can be formed in a
+location where a connection already exists; if False, then it must
+form where no connection already exists</p></li>
 <li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – seed for the random number generators</p></li>
 <li><p><strong>weight</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – The weight of connections formed by the connector</p></li>
 <li><p><strong>delay</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – The delay of connections formed by the connector
@@ -1937,11 +1951,22 @@ It should be different every time called with None.</p>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralSTDP.with_replacement">
+<em class="property">property </em><code class="sig-name descname">with_replacement</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralSTDP.with_replacement" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether to allow replacement when creating synapses</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
 <dt id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralStatic">
-<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neuron.synapse_dynamics.</code><code class="sig-name descname">SynapseDynamicsStructuralStatic</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">partner_selection</span></em>, <em class="sig-param"><span class="n">formation</span></em>, <em class="sig-param"><span class="n">elimination</span></em>, <em class="sig-param"><span class="n">f_rew</span><span class="o">=</span><span class="default_value">10000</span></em>, <em class="sig-param"><span class="n">initial_weight</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">initial_delay</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">s_max</span><span class="o">=</span><span class="default_value">32</span></em>, <em class="sig-param"><span class="n">seed</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">weight</span><span class="o">=</span><span class="default_value">0.0</span></em>, <em class="sig-param"><span class="n">delay</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_structural_static.html#SynapseDynamicsStructuralStatic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralStatic" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neuron.synapse_dynamics.</code><code class="sig-name descname">SynapseDynamicsStructuralStatic</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">partner_selection</span></em>, <em class="sig-param"><span class="n">formation</span></em>, <em class="sig-param"><span class="n">elimination</span></em>, <em class="sig-param"><span class="n">f_rew</span><span class="o">=</span><span class="default_value">10000</span></em>, <em class="sig-param"><span class="n">initial_weight</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">initial_delay</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">s_max</span><span class="o">=</span><span class="default_value">32</span></em>, <em class="sig-param"><span class="n">with_replacement</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">seed</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">weight</span><span class="o">=</span><span class="default_value">0.0</span></em>, <em class="sig-param"><span class="n">delay</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_structural_static.html#SynapseDynamicsStructuralStatic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralStatic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_static.SynapseDynamicsStatic</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_structural_common.SynapseDynamicsStructuralCommon</span></code></p>
 <p>Class that enables synaptic rewiring in the absence of STDP.</p>
 <p>It acts as a wrapper around SynapseDynamicsStatic, meaning that rewiring
@@ -1960,6 +1985,9 @@ a fixed delay value, or a tuple of two values means the delay will
 be chosen at random from a uniform distribution between the given
 values</p></li>
 <li><p><strong>s_max</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Maximum fan-in per target layer neuron</p></li>
+<li><p><strong>with_replacement</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – If set to True (default), a new synapse can be formed in a
+location where a connection already exists; if False, then it must
+form where no connection already exists</p></li>
 <li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – seed the random number generators</p></li>
 <li><p><strong>weight</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – The weight of connections formed by the connector</p></li>
 <li><p><strong>delay</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – The delay of connections formed by the connector
@@ -2236,6 +2264,17 @@ It should be different every time called with None.</p>
 <li><p><strong>param</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – </p></li>
 <li><p><strong>value</strong> – </p></li>
 </ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralStatic.with_replacement">
+<em class="property">property </em><code class="sig-name descname">with_replacement</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralStatic.with_replacement" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether to allow replacement when creating synapses</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>

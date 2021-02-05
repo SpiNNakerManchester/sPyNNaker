@@ -115,8 +115,9 @@
             <span class="n">voltage_dependence</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dendritic_delay_fraction</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
             <span class="n">f_rew</span><span class="o">=</span><span class="n">DEFAULT_F_REW</span><span class="p">,</span> <span class="n">initial_weight</span><span class="o">=</span><span class="n">DEFAULT_INITIAL_WEIGHT</span><span class="p">,</span>
             <span class="n">initial_delay</span><span class="o">=</span><span class="n">DEFAULT_INITIAL_DELAY</span><span class="p">,</span> <span class="n">s_max</span><span class="o">=</span><span class="n">DEFAULT_S_MAX</span><span class="p">,</span>
-            <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="n">StaticSynapse</span><span class="o">.</span><span class="n">default_parameters</span><span class="p">[</span><span class="s1">&#39;weight&#39;</span><span class="p">],</span>
-            <span class="n">delay</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">backprop_delay</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="n">with_replacement</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">weight</span><span class="o">=</span><span class="n">StaticSynapse</span><span class="o">.</span><span class="n">default_parameters</span><span class="p">[</span><span class="s1">&#39;weight&#39;</span><span class="p">],</span> <span class="n">delay</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">backprop_delay</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param AbstractPartnerSelection partner_selection:</span>
 <span class="sd">            The partner selection rule</span>
@@ -141,6 +142,10 @@
 <span class="sd">            values</span>
 <span class="sd">        :type initial_delay: float or tuple(float, float)</span>
 <span class="sd">        :param int s_max: Maximum fan-in per target layer neuron</span>
+<span class="sd">        :param bool with_replacement:</span>
+<span class="sd">            If set to True (default), a new synapse can be formed in a</span>
+<span class="sd">            location where a connection already exists; if False, then it must</span>
+<span class="sd">            form where no connection already exists</span>
 <span class="sd">        :param seed: seed for the random number generators</span>
 <span class="sd">        :type seed: int or None</span>
 <span class="sd">        :param float weight: The weight of connections formed by the connector</span>
@@ -160,6 +165,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__initial_weight</span> <span class="o">=</span> <span class="n">initial_weight</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__initial_delay</span> <span class="o">=</span> <span class="n">initial_delay</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__s_max</span> <span class="o">=</span> <span class="n">s_max</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__with_replacement</span> <span class="o">=</span> <span class="n">with_replacement</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__seed</span> <span class="o">=</span> <span class="n">seed</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__connections</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
@@ -251,6 +257,11 @@
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseDynamicsStructural</span><span class="o">.</span><span class="n">s_max</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">s_max</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__s_max</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseDynamicsStructural</span><span class="o">.</span><span class="n">with_replacement</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">with_replacement</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__with_replacement</span>
 
     <span class="nd">@property</span>
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseDynamicsStructural</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
