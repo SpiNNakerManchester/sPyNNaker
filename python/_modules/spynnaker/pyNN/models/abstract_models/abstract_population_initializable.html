@@ -66,7 +66,7 @@
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
 
 <div class="viewcode-block" id="AbstractPopulationInitializable.initialize"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.initialize">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">selector</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Set the initial value of one of the state variables of the neurons\</span>
 <span class="sd">            in this population.</span>
 
@@ -111,25 +111,6 @@
 <span class="sd">        ideally also with ``_init`` removed or added.</span>
 
 <span class="sd">        :param str variable: variable name with or without ``_init``</span>
-<span class="sd">        :param selector: a description of the subrange to accept, or None for</span>
-<span class="sd">            all. See:</span>
-<span class="sd">            :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`</span>
-<span class="sd">        :type selector: None or slice or int or list(bool) or list(int)</span>
-<span class="sd">        :return: A list or an Object which act like a list</span>
-<span class="sd">        :rtype: iterable</span>
-<span class="sd">        &quot;&quot;&quot;</span></div>
-
-<div class="viewcode-block" id="AbstractPopulationInitializable.set_initial_value"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.set_initial_value">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">set_initial_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">selector</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Sets the value for any variable whose in \</span>
-<span class="sd">            initialize_parameters.keys</span>
-
-<span class="sd">        Must support the variable as listed in initialize_parameters.keys,\</span>
-<span class="sd">        ideally also with ``_init`` removed or added</span>
-
-<span class="sd">        :param str variable: variable name with or without ``_init``</span>
-<span class="sd">        :param value: New value for the variable</span>
-<span class="sd">        :type value: int or float or list(int) or list(float)</span>
 <span class="sd">        :param selector: a description of the subrange to accept, or None for</span>
 <span class="sd">            all. See:</span>
 <span class="sd">            :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`</span>

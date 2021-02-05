@@ -52,6 +52,8 @@
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">pacman.model.constraints.key_allocator_constraints</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ContiguousKeyRangeContraint</span><span class="p">)</span>
@@ -70,13 +72,15 @@
     <span class="n">AbstractPopulationSettable</span><span class="p">,</span> <span class="n">AbstractContainsUnits</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">InvalidParameterType</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.ranged</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">SpynnakerRangeDictionary</span><span class="p">,</span> <span class="n">SpynnakerRangedList</span><span class="p">)</span>
+    <span class="n">SpynnakerRangeDictionary</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.synaptic_manager</span> <span class="kn">import</span> <span class="n">SynapticManager</span>
 
 <span class="c1"># TODO: Make sure these values are correct (particularly CPU cycles)</span>
 <span class="n">_NEURON_BASE_DTCM_USAGE_IN_BYTES</span> <span class="o">=</span> <span class="mi">9</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
 <span class="n">_NEURON_BASE_N_CPU_CYCLES_PER_NEURON</span> <span class="o">=</span> <span class="mi">22</span>
 <span class="n">_NEURON_BASE_N_CPU_CYCLES</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
 
 
 <div class="viewcode-block" id="AbstractPopulationVertex"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex">[docs]</a><span class="k">class</span> <span class="nc">AbstractPopulationVertex</span><span class="p">(</span>
@@ -106,8 +110,7 @@
         <span class="s2">&quot;__units&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__n_data_specs&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__initial_state_variables&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__has_reset_last&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__updated_state_variables&quot;</span><span class="p">]</span>
+        <span class="s2">&quot;__has_run&quot;</span><span class="p">]</span>
 
     <span class="c1">#: recording region IDs</span>
     <span class="n">_SPIKE_RECORDING_REGION</span> <span class="o">=</span> <span class="mi">0</span>
@@ -173,11 +176,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_impl</span> <span class="o">=</span> <span class="n">neuron_impl</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__pynn_model</span> <span class="o">=</span> <span class="n">pynn_model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span> <span class="o">=</span> <span class="n">SpynnakerRangeDictionary</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_state_variables</span> <span class="o">=</span> <span class="n">SpynnakerRangeDictionary</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_impl</span><span class="o">.</span><span class="n">add_parameters</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_impl</span><span class="o">.</span><span class="n">add_state_variables</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_state_variables</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__initial_state_variables</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__updated_state_variables</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__initial_state_variables</span> <span class="o">=</span> <span class="n">SpynnakerRangeDictionary</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_impl</span><span class="o">.</span><span class="n">add_state_variables</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__initial_state_variables</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_state_variables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__initial_state_variables</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
         <span class="c1"># Set up for recording</span>
         <span class="n">recordable_variables</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
@@ -197,7 +199,7 @@
         <span class="c1"># bool for if state has changed.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_mapping</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_data_generation</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__has_reset_last</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__has_run</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="c1"># Set up for profiling</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__n_profile_samples</span> <span class="o">=</span> <span class="n">helpful_functions</span><span class="o">.</span><span class="n">read_config_int</span><span class="p">(</span>
@@ -242,28 +244,12 @@
     <span class="k">def</span> <span class="nf">synapse_manager</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_manager</span>
 
-<div class="viewcode-block" id="AbstractPopulationVertex.update_state_variables"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.update_state_variables">[docs]</a>    <span class="k">def</span> <span class="nf">update_state_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; processes any changes since init</span>
+<div class="viewcode-block" id="AbstractPopulationVertex.set_has_run"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.set_has_run">[docs]</a>    <span class="k">def</span> <span class="nf">set_has_run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Set the flag has run so initialize only affects state variables</span>
 
 <span class="sd">        :rtype: None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="c1"># If resetting</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__has_reset_last</span><span class="p">:</span>
-            <span class="c1"># reset any state variables that need to be reset</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__initial_state_variables</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_state_variables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__copy_ranged_dict</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">__initial_state_variables</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state_variables</span><span class="p">,</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">__updated_state_variables</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__initial_state_variables</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="c1"># If no initial state variables, copy them now</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__initial_state_variables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__copy_ranged_dict</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_state_variables</span><span class="p">)</span>
-
-        <span class="c1"># Reset things that need resetting</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__has_reset_last</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__updated_state_variables</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__has_run</span> <span class="o">=</span> <span class="kc">True</span></div>
 
     <span class="nd">@property</span>
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractChangableAfterRun</span><span class="o">.</span><span class="n">requires_mapping</span><span class="p">)</span>
@@ -294,22 +280,6 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">BYTES_TILL_START_OF_GLOBAL_PARAMETERS</span> <span class="o">+</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">tdma_sdram_size_in_bytes</span> <span class="o">+</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_impl</span><span class="o">.</span><span class="n">get_sdram_usage_in_bytes</span><span class="p">(</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">))</span></div>
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">__copy_ranged_dict</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">merge</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">merge_keys</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">target</span> <span class="o">=</span> <span class="n">SpynnakerRangeDictionary</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">source</span><span class="p">))</span>
-        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">source</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="n">copy_list</span> <span class="o">=</span> <span class="n">SpynnakerRangedList</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">source</span><span class="p">))</span>
-            <span class="k">if</span> <span class="n">merge_keys</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">merge_keys</span><span class="p">:</span>
-                <span class="n">init_list</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">get_list</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">init_list</span> <span class="o">=</span> <span class="n">merge</span><span class="o">.</span><span class="n">get_list</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">init_list</span><span class="o">.</span><span class="n">iter_ranges</span><span class="p">():</span>
-                <span class="n">is_list</span> <span class="o">=</span> <span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s1">&#39;__iter__&#39;</span><span class="p">)</span> <span class="ow">and</span>
-                           <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">))</span>
-                <span class="n">copy_list</span><span class="o">.</span><span class="n">set_value_by_slice</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">is_list</span><span class="p">)</span>
-            <span class="n">target</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy_list</span>
-        <span class="k">return</span> <span class="n">target</span>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.is_recording_spikes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.is_recording_spikes">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpikeRecordable</span><span class="o">.</span><span class="n">is_recording_spikes</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">is_recording_spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -360,17 +330,23 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_recorder</span><span class="o">.</span><span class="n">get_neuron_sampling_interval</span><span class="p">(</span><span class="s2">&quot;spikes&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.initialize"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.initialize">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractPopulationInitializable</span><span class="o">.</span><span class="n">initialize</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__has_reset_last</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
-                <span class="s2">&quot;initialize can only be called before the first call to run, &quot;</span>
-                <span class="s2">&quot;or before the first call to run after a reset&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">selector</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">variable</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state_variables</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
                 <span class="s2">&quot;Vertex does not support initialisation of&quot;</span>
                 <span class="s2">&quot; parameter </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">variable</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_state_variables</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__updated_state_variables</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__has_run</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_state_variables</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span><span class="o">.</span><span class="n">set_value_by_selector</span><span class="p">(</span>
+                <span class="n">selector</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;initializing </span><span class="si">{}</span><span class="s2"> after run and before reset only changes the &quot;</span>
+                <span class="s2">&quot;current state and will be lost after reset&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">variable</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># set the inital values</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__initial_state_variables</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span><span class="o">.</span><span class="n">set_value_by_selector</span><span class="p">(</span>
+                <span class="n">selector</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+            <span class="c1"># Update the sate variables in case asked for</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_state_variables</span><span class="o">.</span><span class="n">copy_into</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__initial_state_variables</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">vertex</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">machine_vertices</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vertex</span><span class="p">,</span> <span class="n">AbstractRewritesDataSpecification</span><span class="p">):</span>
                 <span class="n">vertex</span><span class="o">.</span><span class="n">set_reload_required</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span></div>
@@ -414,20 +390,6 @@
         <span class="k">if</span> <span class="n">selector</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">ranged_list</span>
         <span class="k">return</span> <span class="n">ranged_list</span><span class="o">.</span><span class="n">get_values</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="AbstractPopulationVertex.set_initial_value"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.set_initial_value">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractPopulationInitializable</span><span class="o">.</span><span class="n">set_initial_value</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">set_initial_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">selector</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">variable</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state_variables</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
-                <span class="s2">&quot;Vertex does not support initialisation of&quot;</span>
-                <span class="s2">&quot; parameter </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">variable</span><span class="p">))</span>
-
-        <span class="n">parameter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_parameter</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
-        <span class="n">ranged_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state_variables</span><span class="p">[</span><span class="n">parameter</span><span class="p">]</span>
-        <span class="n">ranged_list</span><span class="o">.</span><span class="n">set_value_by_selector</span><span class="p">(</span><span class="n">selector</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">vertex</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">machine_vertices</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vertex</span><span class="p">,</span> <span class="n">AbstractRewritesDataSpecification</span><span class="p">):</span>
-                <span class="n">vertex</span><span class="o">.</span><span class="n">set_reload_required</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">conductance_based</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -600,7 +562,8 @@
 <div class="viewcode-block" id="AbstractPopulationVertex.reset_to_first_timestep"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.reset_to_first_timestep">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractCanReset</span><span class="o">.</span><span class="n">reset_to_first_timestep</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">reset_to_first_timestep</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Mark that reset has been done, and reload state variables</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__has_reset_last</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__has_run</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_state_variables</span><span class="o">.</span><span class="n">copy_into</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__initial_state_variables</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">vertex</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">machine_vertices</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vertex</span><span class="p">,</span> <span class="n">AbstractRewritesDataSpecification</span><span class="p">):</span>
                 <span class="n">vertex</span><span class="o">.</span><span class="n">set_reload_required</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>

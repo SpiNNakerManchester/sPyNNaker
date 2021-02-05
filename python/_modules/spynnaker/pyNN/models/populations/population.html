@@ -84,6 +84,10 @@
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
 
+<span class="n">REMOVED_V6</span> <span class="o">=</span> <span class="s2">&quot;The method </span><span class="si">{}</span><span class="s2"> is not standard PyNN so has been permently &quot;</span> \
+      <span class="s2">&quot;removed. Use </span><span class="si">{}</span><span class="s2"> instead. &quot;</span> \
+      <span class="s2">&quot;(Even this warning will be removed in version 7)&quot;</span>
+
 
 <span class="c1"># Not in the class so pylint doesn&#39;t get confused about abstractness of methods</span>
 <span class="k">def</span> <span class="nf">_we_dont_do_this_now</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>  <span class="c1"># pylint: disable=unused-argument</span>
@@ -608,8 +612,11 @@
                 <span class="s2">&quot;Population does not support the initialisation&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vertex</span><span class="o">.</span><span class="n">initial_values</span>
 
-    <span class="c1"># NON-PYNN API CALL</span>
 <div class="viewcode-block" id="Population.get_initial_value"><a class="viewcode-back" href="../../../../../spynnaker8.html#spynnaker.pyNN.models.populations.Population.get_initial_value">[docs]</a>    <span class="k">def</span> <span class="nf">get_initial_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">selector</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">REMOVED_V6</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="s2">&quot;get_initial_value&quot;</span><span class="p">,</span> <span class="s2">&quot;initial_values&quot;</span><span class="p">))</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_initial_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">selector</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; See :py:meth:`~.AbstractPopulationInitializable.get_initial_value`</span>
 
 <span class="sd">        :param str variable: variable name with or without ``_init`` suffix</span>
@@ -624,32 +631,13 @@
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
                 <span class="s2">&quot;Population does not support the initialisation of </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="n">variable</span><span class="p">))</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vertex</span><span class="o">.</span><span class="n">get_initial_value</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">selector</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vertex</span><span class="o">.</span><span class="n">get_initial_value</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">selector</span><span class="p">)</span>
 
-    <span class="c1"># NON-PYNN API CALL</span>
 <div class="viewcode-block" id="Population.set_initial_value"><a class="viewcode-back" href="../../../../../spynnaker8.html#spynnaker.pyNN.models.populations.Population.set_initial_value">[docs]</a>    <span class="k">def</span> <span class="nf">set_initial_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">selector</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; See :py:meth:`~.AbstractPopulationInitializable.set_initial_value`</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">REMOVED_V6</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="s2">&quot;set_initial_value&quot;</span><span class="p">,</span> <span class="s2">&quot;initialize&quot;</span><span class="p">))</span></div>
 
-<span class="sd">        :param str variable: variable name with or without ``_init`` suffix</span>
-<span class="sd">        :param value: New value for the variable</span>
-<span class="sd">        :type value: int or float or list(int) or list(float)</span>
-<span class="sd">        :param selector: a description of the subrange to accept, or None for</span>
-<span class="sd">            all. See:</span>
-<span class="sd">            :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`</span>
-<span class="sd">        :type selector: None or slice or int or list(bool) or list(int)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex_population_initializable</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
-                <span class="s2">&quot;Population does not support the initialisation of </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">variable</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">get_not_running_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">has_ran</span> \
-                <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex_changeable_after_run</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Population does not support changes after run&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_read_parameters_before_set</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_vertex</span><span class="o">.</span><span class="n">set_initial_value</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">selector</span><span class="p">)</span></div>
-
-    <span class="c1"># NON-PYNN API CALL</span>
-<div class="viewcode-block" id="Population.get_initial_values"><a class="viewcode-back" href="../../../../../spynnaker8.html#spynnaker.pyNN.models.populations.Population.get_initial_values">[docs]</a>    <span class="k">def</span> <span class="nf">get_initial_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selector</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_get_initial_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selector</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; See :py:meth:`~.AbstractPopulationInitializable.get_initial_values`</span>
 
 <span class="sd">        :param selector: a description of the subrange to accept, or ``None``</span>
@@ -661,7 +649,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex_population_initializable</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;Population does not support the initialisation&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vertex</span><span class="o">.</span><span class="n">get_initial_values</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vertex</span><span class="o">.</span><span class="n">get_initial_values</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">positions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -796,7 +784,7 @@
         <span class="k">return</span> <span class="n">results</span></div>
 
     <span class="c1"># NON-PYNN API CALL</span>
-<div class="viewcode-block" id="Population.get_by_selector"><a class="viewcode-back" href="../../../../../spynnaker8.html#spynnaker.pyNN.models.populations.Population.get_by_selector">[docs]</a>    <span class="k">def</span> <span class="nf">get_by_selector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selector</span><span class="p">,</span> <span class="n">parameter_names</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_get_by_selector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selector</span><span class="p">,</span> <span class="n">parameter_names</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the values of a parameter for the selected cell in the\</span>
 <span class="sd">            population.</span>
 
@@ -821,7 +809,7 @@
         <span class="k">for</span> <span class="n">parameter_name</span> <span class="ow">in</span> <span class="n">parameter_names</span><span class="p">:</span>
             <span class="n">results</span><span class="p">[</span><span class="n">parameter_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_value_by_selector</span><span class="p">(</span>
                 <span class="n">selector</span><span class="p">,</span> <span class="n">parameter_name</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">results</span></div>
+        <span class="k">return</span> <span class="n">results</span>
 
 <div class="viewcode-block" id="Population.id_to_index"><a class="viewcode-back" href="../../../../../spynnaker8.html#spynnaker.pyNN.models.populations.Population.id_to_index">[docs]</a>    <span class="k">def</span> <span class="nf">id_to_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>  <span class="c1"># @ReservedAssignment</span>
         <span class="sd">&quot;&quot;&quot; Given the ID(s) of cell(s) in the Population, return its (their)\</span>
@@ -875,13 +863,17 @@
         <span class="c1"># TODO: Need __getitem__</span>
         <span class="n">_we_dont_do_this_now</span><span class="p">(</span><span class="n">cell_id</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">_initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">selector</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Set the initial value of one of the state variables of the neurons\</span>
 <span class="sd">            in this population.</span>
 
 <span class="sd">        :param str variable:</span>
 <span class="sd">        :param value:</span>
 <span class="sd">        :type value: float or int or list(float) or list(int)</span>
+<span class="sd">        :param selector: a description of the subrange to accept.</span>
+<span class="sd">            Or None for all. See:</span>
+<span class="sd">            :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`</span>
+<span class="sd">        :type selector: slice or int or iterable(bool) or iterable(int)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex_population_initializable</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
@@ -891,7 +883,7 @@
                 <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex_changeable_after_run</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Population does not support changes after run&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_read_parameters_before_set</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">initialize</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">initialize</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">selector</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Population.inject"><a class="viewcode-back" href="../../../../../spynnaker8.html#spynnaker.pyNN.models.populations.Population.inject">[docs]</a>    <span class="k">def</span> <span class="nf">inject</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_source</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Connect a current source to all cells in the Population.</span>

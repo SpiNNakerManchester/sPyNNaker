@@ -1669,7 +1669,7 @@ Get a property of the overall model.</p>
 
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.initialize">
-<code class="sig-name descname">initialize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">variable</span></em>, <em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.initialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.initialize" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">initialize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">variable</span></em>, <em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">selector</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.initialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.initialize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the initial value of one of the state variables of the neurons            in this population.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1799,25 +1799,12 @@ Get a property of the overall model.</p>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.set_initial_value">
-<code class="sig-name descname">set_initial_value</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">variable</span></em>, <em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">selector</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.set_initial_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.set_initial_value" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets the value for any variable whose in             initialize_parameters.keys</p>
-<p>Must support the variable as listed in initialize_parameters.keys,        ideally also with <code class="docutils literal notranslate"><span class="pre">_init</span></code> removed or added</p>
+<dt id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.set_has_run">
+<code class="sig-name descname">set_has_run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.set_has_run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.set_has_run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the flag has run so initialize only affects state variables</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – variable name with or without <code class="docutils literal notranslate"><span class="pre">_init</span></code></p></li>
-<li><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em>) – New value for the variable</p></li>
-<li><p><strong>selector</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#slice" title="(in Python v3.6)"><em>slice</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em>) – a description of the subrange to accept, or None for
-all. See:
-<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.AbstractSized.selector_to_ids" title="(in SpiNNUtils)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">selector_to_ids()</span></code></a></p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A list or an Object which act like a list</p>
-</dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>iterable</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1905,17 +1892,6 @@ If None the assumption is all neurons are recording</p></li>
 <dt id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.synapse_manager">
 <em class="property">property </em><code class="sig-name descname">synapse_manager</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.synapse_manager" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.update_state_variables">
-<code class="sig-name descname">update_state_variables</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.update_state_variables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.update_state_variables" title="Permalink to this definition">¶</a></dt>
-<dd><p>processes any changes since init</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></p>
-</dd>
-</dl>
-</dd></dl>
 
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.weight_scale">
