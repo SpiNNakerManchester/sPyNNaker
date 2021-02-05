@@ -53,10 +53,11 @@
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">WeightDependenceAdditiveTriplet</span> <span class="k">as</span>
     <span class="n">_BaseClass</span><span class="p">)</span>
-<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
 
 
 <div class="viewcode-block" id="WeightDependenceAdditiveTriplet"><a class="viewcode-back" href="../../../../../spynnaker8.models.synapse_dynamics.weight_dependence.html#spynnaker8.models.synapse_dynamics.weight_dependence.WeightDependenceAdditiveTriplet">[docs]</a><span class="k">class</span> <span class="nc">WeightDependenceAdditiveTriplet</span><span class="p">(</span><span class="n">_BaseClass</span><span class="p">):</span>
