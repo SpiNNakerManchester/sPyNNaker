@@ -45,6 +45,9 @@ from .population_view import PopulationView
 
 logger = FormatAdapter(logging.getLogger(__file__))
 
+REMOVED_V6 = "The method {} is not standard PyNN so has been permently " \
+      "removed. Use {} instead. " \
+      "(Even this warning will be removed in version 7)"
 
 # Not in the class so pylint doesn't get confused about abstractness of methods
 def _we_dont_do_this_now(*args):  # pylint: disable=unused-argument
@@ -570,7 +573,8 @@ class Population(PopulationBase):
         return self._vertex.initial_values
 
     def get_initial_value(self, variable, selector=None):
-        raise NotImplementedError("use initial_values property")
+        raise NotImplementedError(REMOVED_V6.format(
+            "get_initial_value", "initial_values"))
 
     def _get_initial_value(self, variable, selector):
         """ See :py:meth:`~.AbstractPopulationInitializable.get_initial_value`
@@ -590,7 +594,8 @@ class Population(PopulationBase):
         return self._vertex.get_initial_value(variable, selector)
 
     def set_initial_value(self, variable, value, selector=None):
-        raise NotImplementedError("use initialize method")
+        raise NotImplementedError(REMOVED_V6.format(
+            "set_initial_value", "initialize"))
 
     def _get_initial_values(self, selector=None):
         """ See :py:meth:`~.AbstractPopulationInitializable.get_initial_values`
