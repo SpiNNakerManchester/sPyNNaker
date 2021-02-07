@@ -105,7 +105,7 @@ class MwhPopulationSynfire(BaseTestCase):
             (v, gsyn, spikes) = do_run(nNeurons, neurons_per_core)
             self.assertEqual(600, len(spikes))
         except SpinnmanTimeoutException as ex:
-            raise SkipTest(ex)
+            raise SkipTest() from ex
         self.assertEqual(600, len(spikes))
 
     def test_run_light(self):

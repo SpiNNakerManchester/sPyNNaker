@@ -282,12 +282,12 @@ class Recorder(object):
         """
         try:
             return self.__population.find_units(variable)
-        except Exception:
+        except Exception as e:
             logger.warning("Population: {} Does not support units for {}",
                            self.__population.label, variable)
             if variable in _DEFAULT_UNITS:
                 return _DEFAULT_UNITS[variable]
-            raise
+            raise e
 
     @property
     def __spike_sampling_interval(self):

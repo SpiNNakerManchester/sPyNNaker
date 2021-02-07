@@ -36,7 +36,8 @@ class TestMultiBoardSpikeOutput(BaseTestCase):
             machine = p.get_machine()
         except ConfigurationException as oops:
             if "Failure to detect machine of " in str(oops):
-                raise SkipTest("You Need at least 3 boards to run this test")
+                raise SkipTest(
+                    "You Need at least 3 boards to run this test") from oops
 
         labels = list()
         for chip in machine.ethernet_connected_chips:

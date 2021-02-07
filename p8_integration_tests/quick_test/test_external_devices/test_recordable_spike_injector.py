@@ -17,7 +17,6 @@ from collections import defaultdict
 from random import randint
 import time
 import unittest
-from six import iteritems
 import spynnaker8 as p
 from p8_integration_tests.base_test_case import BaseTestCase
 
@@ -67,7 +66,7 @@ class TestRecordableSpikeInjector(BaseTestCase):
 
         # We expect to see at least one spike per neuron even with dropped
         # packets
-        for (index, count) in iteritems(self._n_spikes):
+        for (index, count) in self._n_spikes.items():
             if __name__ == "__main__":
                 if index not in spike_trains:
                     print("Neuron {} should have spiked {} times but didn't"

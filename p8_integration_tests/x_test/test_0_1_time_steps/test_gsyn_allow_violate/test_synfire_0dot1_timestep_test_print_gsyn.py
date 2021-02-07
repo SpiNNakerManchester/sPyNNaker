@@ -62,7 +62,7 @@ class TestPrintGsyn(BaseTestCase):
             os.remove(gsyn_path)
         except SpinnmanTimeoutException as ex:
             # System intentional overload so may error
-            raise SkipTest(ex)
+            raise SkipTest() from ex
 
 
 if __name__ == '__main__':

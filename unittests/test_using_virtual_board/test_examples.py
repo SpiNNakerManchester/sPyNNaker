@@ -75,7 +75,7 @@ class TestScripts(BaseTestCase):
                             script, "scripts_skipped_with_unknown_issues")
                     else:
                         print("Error on {}".format(script))
-                        raise
+                        raise ex
 
     def examples(self):
         self.check_directory(

@@ -18,7 +18,6 @@
 """
 Synfirechain-like example with 6 chains
 """
-from __future__ import print_function
 import spynnaker8 as p
 from p8_integration_tests.base_test_case import BaseTestCase
 

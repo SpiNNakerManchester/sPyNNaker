@@ -41,12 +41,12 @@ class TestPopulation(BaseTestCase):
         vs = initial_values["v"]
         assert [-60, -59, -58, -57, -56] == vs
 
-        pop_1.all_cells
-        pop_1.local_cells
+        _ = pop_1.all_cells
+        _ = pop_1.local_cells
 
         self.assertEqual(n_neurons, pop_1.local_size)
 
-        pop_1.structure
+        _ = pop_1.structure
         sim.end()
 
     def test_position_generator(self):
@@ -58,10 +58,10 @@ class TestPopulation(BaseTestCase):
         try:
             gen = pop_1.position_generator
             print(gen(0))
-        except NotImplementedError:
+        except NotImplementedError as e:
             msg = "Depends on https://github.com/SpiNNakerManchester" \
                   "/sPyNNaker8/pull/73"
-            raise SkipTest(msg)
+            raise SkipTest(msg) from e
         sim.end()
 
     def test_set(self):
@@ -120,7 +120,7 @@ class TestPopulation(BaseTestCase):
         with pytest.raises(KeyError):
             pop.initialize(v="Anything")
         with pytest.raises(KeyError):
-            pop.initial_values
+            _ = pop.initial_values
         sim.end()
 
     def test_initial_values(self):

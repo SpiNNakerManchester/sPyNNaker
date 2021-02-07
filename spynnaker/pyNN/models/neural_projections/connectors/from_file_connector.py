@@ -15,7 +15,6 @@
 
 import os
 import numpy
-from six import string_types
 from pyNN.connectors import FromFileConnector as PyNNFromFileConnector
 from pyNN.recording.files import StandardTextFile
 from .from_list_connector import FromListConnector
@@ -65,7 +64,7 @@ class FromFileConnector(FromListConnector, PyNNFromFileConnector):
             CSV file
         """
         self._file = file
-        if isinstance(file, string_types):
+        if isinstance(file, str):
             real_file = self.get_reader(file)
             try:
                 conn_list = self._read_conn_list(real_file, distributed)

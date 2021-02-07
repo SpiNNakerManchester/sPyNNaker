@@ -183,7 +183,7 @@ class TestVABenchmarkSpikes(BaseTestCase):
             exc_spikes = do_run()
         # System intentional overload so may error
         except SpinnmanTimeoutException as ex:
-            raise SkipTest(ex)
+            raise SkipTest() from ex
         spike_count = neo_convertor.count_spikes(exc_spikes)
         print(spike_count)
         # CB Jan 14 2019 Result varie between runs

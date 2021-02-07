@@ -23,7 +23,6 @@ This package contains the profile of that code for PyNN 0.9
 # common imports
 import logging
 import numpy as __numpy
-from six import iteritems
 from pyNN import common as pynn_common
 from pyNN.common import control as _pynn_control
 from pyNN.recording import get_io
@@ -499,7 +498,7 @@ def list_standard_models():
     :rtype: list(str)
     """
     results = list()
-    for (key, obj) in iteritems(globals()):
+    for (key, obj) in globals().items():
         if isinstance(obj, type) and issubclass(obj, AbstractPyNNModel):
             results.append(key)
     return results

@@ -44,10 +44,8 @@ class TestResetInitialize(BaseTestCase):
         pop.set(i_offset=2.0)
         sim.run(runtime)
 
-        try:
+        with self.assertRaises(Exception):
             pop.initialize(v=initial4)  # this should throw an exception
-        except Exception:
-            pass
 
         pop.set(i_offset=2.5)
         sim.run(runtime)
