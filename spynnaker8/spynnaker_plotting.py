@@ -13,13 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
-from spinn_utilities.log import FormatAdapter
 import spynnaker.spynnaker_plotting as new_plotting
 from spynnaker.spynnaker_plotting import SpynnakerPanel as _BaseClass
 from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
-
-logger = FormatAdapter(logging.getLogger(__name__))
 
 
 def plot_spiketrains(ax, spiketrains, label='', **options):
