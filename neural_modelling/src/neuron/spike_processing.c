@@ -454,10 +454,6 @@ void spike_processing_clear_input_buffer(timer_t time) {
     if (n_spikes > max_dropped) {
         max_dropped = n_spikes;
     }
-    if (n_spikes > 1 && !dma_busy) {
-        log_error("%d spikes still in buffer but DMA not busy", n_spikes);
-        rt_error(RTE_SWERR);
-    }
 
     // Record the count whether clearing or not for provenance
     count_input_buffer_packets_late += n_spikes;
