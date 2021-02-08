@@ -35,8 +35,10 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class AbstractMachineBitFieldRouterCompressor(object, metaclass=AbstractBase):
-    """ Adds in regeneration of synaptic matrices to bitfield compression to\
-    :py:class:`spinn_front_end_common.interface.interface_functions.MachineBitFieldRouterCompressor`
+    """ Algorithm that adds in regeneration of synaptic matrices to bitfield\
+    compression to\
+    :py:class:`spinn_front_end_common.interface.interface_functions.\
+    MachineBitFieldRouterCompressor`
     """
 
     _RERUN_IOBUF_NAME_PATTERN = "rerun_of_synaptic_expander_on_{}_{}_{}.txt"

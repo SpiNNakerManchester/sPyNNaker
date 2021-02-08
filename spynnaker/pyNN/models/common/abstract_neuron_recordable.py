@@ -14,8 +14,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_utilities.require_subclass import require_subclass
+from pacman.model.graphs.application import ApplicationVertex
 
 
+@require_subclass(ApplicationVertex)
 class AbstractNeuronRecordable(object, metaclass=AbstractBase):
     """ Indicates that a variable (e.g., membrane voltage) can be recorded\
         from this object.
