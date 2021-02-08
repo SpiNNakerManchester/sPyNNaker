@@ -14,9 +14,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
+from spinn_utilities.require_subclass import require_subclass
 from spinn_utilities.ranged.abstract_list import AbstractList
 from pacman.model.graphs.application import ApplicationVertex
-from spinn_front_end_common.utilities.class_utils import require_subclass
 from spynnaker.pyNN.utilities.ranged import SpynnakerRangedList
 from .abstract_settable import AbstractSettable
 

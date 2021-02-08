@@ -14,9 +14,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_utilities.require_subclass import require_subclass
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.application import ApplicationVertex
-from spinn_front_end_common.utilities.class_utils import require_subclass
 
 
 @require_subclass(ApplicationVertex)
