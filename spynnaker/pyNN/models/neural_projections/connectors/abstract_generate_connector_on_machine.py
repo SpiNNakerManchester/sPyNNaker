@@ -194,10 +194,10 @@ class AbstractGenerateConnectorOnMachine(
         be generated on the machine
 
         :param weights:
-        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or
             float or list(int) or list(float)
         :param delays:
-        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or
             float or list(int) or list(float)
         :rtype: bool
         """
@@ -208,7 +208,7 @@ class AbstractGenerateConnectorOnMachine(
         """ Get the id of the weight generator on the machine
 
         :param weights:
-        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or
             float or list(int) or list(float)
         :rtype: int
         """
@@ -218,7 +218,7 @@ class AbstractGenerateConnectorOnMachine(
         """ Get the parameters of the weight generator on the machine
 
         :param weights:
-        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or
             float or list(int) or list(float)
         :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
@@ -233,7 +233,7 @@ class AbstractGenerateConnectorOnMachine(
         """ The size of the weight parameters in bytes
 
         :param weights:
-        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or
             float or list(int) or list(float)
         :rtype: int
         """
@@ -243,7 +243,7 @@ class AbstractGenerateConnectorOnMachine(
         """ Get the id of the delay generator on the machine
 
         :param delays:
-        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or
             float or list(int) or list(float)
         :rtype: int
         """
@@ -253,7 +253,7 @@ class AbstractGenerateConnectorOnMachine(
         """ Get the parameters of the delay generator on the machine
 
         :param delays:
-        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or
             float or list(int) or list(float)
         :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
@@ -268,7 +268,7 @@ class AbstractGenerateConnectorOnMachine(
         """ The size of the delay parameters in bytes
 
         :param delays:
-        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or
             float or list(int) or list(float)
         :rtype: int
         """

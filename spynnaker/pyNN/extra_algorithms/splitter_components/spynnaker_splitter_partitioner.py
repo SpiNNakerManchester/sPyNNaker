@@ -30,7 +30,7 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
         :param ApplicationGraph app_graph: app graph
         :param ~spinn_machine.Machine machine: machine
         :param int plan_n_time_steps: the number of time steps to run for
-        :param pre_allocated_resources: any pre allocated res to account for\
+        :param pre_allocated_resources: any pre-allocated res to account for
             before doing any splitting.
         :type pre_allocated_resources: PreAllocatedResourceContainer or None
         :rtype: tuple(~pacman.model.graphs.machine.MachineGraph, int)

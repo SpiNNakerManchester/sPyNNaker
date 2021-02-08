@@ -87,7 +87,7 @@ class AbstractTimingDependence(object, metaclass=AbstractBase):
 
         :param str pre_population_label: label of pre.
         :param str post_population_label: label of post.
-        :rtype: \
+        :rtype:
             list(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)
         """
         # pylint: disable=unused-argument

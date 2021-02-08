@@ -65,11 +65,11 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         :type shape_kernel: list(int) or tuple(int,int)
         :param weight_kernel: (optional)
             2D matrix of size shape_kernel describing the weights
-        :type weight_kernel: ~numpy.ndarray or ~pyNN.random.NumpyRNG \
+        :type weight_kernel: ~numpy.ndarray or ~pyNN.random.NumpyRNG
             or int or float or list(int) or list(float) or None
         :param delay_kernel: (optional)
             2D matrix of size shape_kernel describing the delays
-        :type delay_kernel: ~numpy.ndarray or ~pyNN.random.NumpyRNG \
+        :type delay_kernel: ~numpy.ndarray or ~pyNN.random.NumpyRNG
             or int or float or list(int) or list(float) or None
         :param shape_common: (optional)
             2D shape of common coordinate system (for both pre and post,
@@ -206,7 +206,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         """ Convert kernel values given into the correct format.
 
         :param vals:
-        :type vals: int or float or ~pyNN.random.NumpyRNG or ~numpy.ndarray\
+        :type vals: int or float or ~pyNN.random.NumpyRNG or ~numpy.ndarray
             or ConvolutionKernel
         :rtype: ~numpy.ndarray
         """
@@ -234,10 +234,10 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         """ Compute the relevant information required for the connections.
 
         :param weights:
-        :type weights: int or float or ~pyNN.random.NumpyRNG or \
+        :type weights: int or float or ~pyNN.random.NumpyRNG or
             ~numpy.ndarray or ConvolutionKernel
         :param delays:
-        :type delays: int or float or ~pyNN.random.NumpyRNG or ~numpy.ndarray\
+        :type delays: int or float or ~pyNN.random.NumpyRNG or ~numpy.ndarray
             or ConvolutionKernel
         :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:

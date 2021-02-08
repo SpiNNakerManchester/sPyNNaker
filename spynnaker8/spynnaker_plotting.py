@@ -173,7 +173,7 @@ def plot_segment(axes, segment, label='', **options):
         include the name of the data to plot
 
     .. note::
-        method signature defined by pynn plotting.\
+        method signature defined by pynn plotting.
         This allows mixing of this plotting tool and pynn's
 
     :param ~matplotlib.axes.Axes axes: An Axes in a matplotlib figure
@@ -207,38 +207,38 @@ def plot_segment(axes, segment, label='', **options):
 class SpynnakerPanel(object):
     """ Represents a single panel in a multi-panel figure.
 
-    Compatible with :py:class:`pyNN.utility.plotting.Frame` and\
-        can be mixed with :py:class:`pyNN.utility.plotting.Panel`
+    Compatible with :py:class:`pyNN.utility.plotting.Frame` and
+    can be mixed with :py:class:`pyNN.utility.plotting.Panel`
 
-    Unlike :py:class:`pyNN.utility.plotting.Panel`,\
-        Spikes are plotted faster,\
-        other data is plotted as a heatmap
+    Unlike :py:class:`pyNN.utility.plotting.Panel`,
+    spikes are plotted faster,
+    other data is plotted as a heatmap
 
-    A panel is a Matplotlib Axes or Subplot instance. A data item may be an\
-    :py:class:`~neo.core.AnalogSignal`, or a list of \
-    :py:class:`~neo.core.SpikeTrain`\\ s. The Panel will\
-    automatically choose an appropriate representation. Multiple data items\
+    A panel is a Matplotlib Axes or Subplot instance. A data item may be an
+    :py:class:`~neo.core.AnalogSignal`, or a list of
+    :py:class:`~neo.core.SpikeTrain`\\ s. The Panel will
+    automatically choose an appropriate representation. Multiple data items
     may be plotted in the same panel.
 
-    Valid options are any valid Matplotlib formatting options that should be\
+    Valid options are any valid Matplotlib formatting options that should be
     applied to the Axes/Subplot, plus in addition:
 
         `data_labels`:
             a list of strings of the same length as the number of data items.
         `line_properties`:
-            a list of dicts containing Matplotlib formatting options, of the\
+            a list of dicts containing Matplotlib formatting options, of the
             same length as the number of data items.
 
-    Whole Neo Objects can be passed in as long as they\
-        contain a single Segment/run\
-        and only contain one type of data
+    Whole Neo Objects can be passed in as long as they
+    contain a single Segment/run
+    and only contain one type of data.
     Whole Segments can be passed in only if they only contain one type of data
     """
 
     def __init__(self, *data, **options):
         """
         :param data: One or more data series to be plotted.
-        :type data: list(~neo.core.SpikeTrain) or ~neo.core.AnalogSignal \
+        :type data: list(~neo.core.SpikeTrain) or ~neo.core.AnalogSignal
             or ~numpy.ndarray or ~neo.core.Block or ~neo.core.Segment
         :param options: Any additional information.
         """

@@ -180,7 +180,7 @@ class DelayExtensionVertex(
                 synapse_information:
             The synapse information of the connection
         :param synapse_information:
-        :type synapse_information: \
+        :type synapse_information:
             ~spynnaker.pyNN.models.neural_projections.SynapseInformation
         :param int max_stage:
             The maximum delay stage

@@ -50,13 +50,13 @@ class AbstractAcceptsIncomingSynapses(object, metaclass=AbstractBase):
         # pylint: disable=too-many-arguments
         """ Get the connections from the machine post-run.
 
-        :param ~spinnman.transceiver.Transceiver transceiver:\
+        :param ~spinnman.transceiver.Transceiver transceiver:
             How to read the connection data
-        :param ~pacman.model.placements.Placements placements:\
+        :param ~pacman.model.placements.Placements placements:
             Where the connection data is on the machine
-        :param ProjectionApplicationEdge app_edge:\
+        :param ProjectionApplicationEdge app_edge:
             The edge for which the data is being read
-        :param SynapseInformation synapse_info:\
+        :param SynapseInformation synapse_info:
             The specific projection within the edge
         """
 

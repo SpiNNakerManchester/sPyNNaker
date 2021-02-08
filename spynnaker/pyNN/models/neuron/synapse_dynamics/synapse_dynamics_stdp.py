@@ -483,7 +483,7 @@ class SynapseDynamicsSTDP(
         """
         :param str pre_population_label:
         :param str post_population_label:
-        :rtype: \
+        :rtype:
             list(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)
         """
         prov_data = list()

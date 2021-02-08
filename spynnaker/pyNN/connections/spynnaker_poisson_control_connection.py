@@ -33,7 +33,7 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
         """
         :param iterable(str) poisson_labels:
             Labels of Poisson populations to be controlled
-        :param str local_host: Optional specification of the local hostname or\
+        :param str local_host: Optional specification of the local hostname or
             IP address of the interface to listen on
         :param int local_port:
             Optional specification of the local port to listen on. Must match

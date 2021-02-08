@@ -307,7 +307,7 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
     :param extra_load_algorithms:
         extra algorithms to use within the loading phase
     :type extra_load_algorithms: list(str) or None
-    :param time_scale_factor: multiplicative factor to the machine time step\
+    :param time_scale_factor: multiplicative factor to the machine time step
         (does not affect the neuron models accuracy)
     :type time_scale_factor: int or None
     :param n_chips_required:

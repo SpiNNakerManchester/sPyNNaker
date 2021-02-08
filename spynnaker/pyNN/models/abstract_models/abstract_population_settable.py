@@ -40,8 +40,8 @@ class AbstractPopulationSettable(AbstractSettable, metaclass=AbstractBase):
         """ Gets the value for a particular key but only for the selected\
             subset.
 
-        :param selector: See \
-            :py:meth:`~spinn_utilities.ranged.RangedList.get_value_by_selector`\
+        :param selector: See
+            :py:meth:`~spinn_utilities.ranged.RangedList.get_value_by_selector`
             as this is just a pass through method
         :type selector: None or slice or int or list(bool) or list(int)
         :param str key: the name of the parameter to change
