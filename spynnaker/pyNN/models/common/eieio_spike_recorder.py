@@ -24,7 +24,6 @@ from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, MICRO_TO_MILLISECOND_CONVERSION)
 
 logger = FormatAdapter(logging.getLogger(__name__))
-_ONE_WORD = struct.Struct("<I")
 _TWO_WORDS = struct.Struct("<II")
 
 

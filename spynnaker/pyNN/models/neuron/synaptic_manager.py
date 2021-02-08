@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import math
-import struct
 import numpy
 from scipy import special  # @UnresolvedImport
 
@@ -43,9 +42,6 @@ _SYNAPSES_BASE_DTCM_USAGE_IN_BYTES = 7 * BYTES_PER_WORD
 _SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES = 1 * BYTES_PER_WORD
 _SYNAPSES_BASE_N_CPU_CYCLES_PER_NEURON = 10
 _SYNAPSES_BASE_N_CPU_CYCLES = 8
-
-# Struct to read or write a word
-_ONE_WORD = struct.Struct("<I")
 
 
 class SynapticManager(object):

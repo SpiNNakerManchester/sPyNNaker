@@ -51,10 +51,8 @@ def get_data(transceiver, placement, region, region_size):
 
     region_base_address = locate_memory_region_for_placement(
         placement, region, transceiver)
-    number_of_bytes_written = _RECORDING_COUNT.unpack_from(
-        transceiver.read_memory(
-            placement.x, placement.y, region_base_address,
-            BYTES_PER_WORD))[0]
+    number_of_bytes_written = transceiver.read_word(
+        placement.x, placement.y, region_base_address)
 
     # Subtract 4 for the word representing the size itself
     expected_size = region_size - BYTES_PER_WORD
@@ -132,10 +130,6 @@ def make_missing_string(missing):
     :param iterable(~pacman.model.placements.Placement) missing:
     :rtype: str
     """
-    missing_str = ""
-    separator = ""
-    for placement in missing:
-        missing_str += "{}({}, {}, {})".format(
-            separator, placement.x, placement.y, placement.p)
-        separator = "; "
-    return missing_str
+    return "; ".join(
+        "({}, {}, {})".format(placement.x, placement.y, placement.p)
+        for placement in missing)

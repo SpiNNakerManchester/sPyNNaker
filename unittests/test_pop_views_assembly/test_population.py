@@ -69,7 +69,25 @@ class TestPopulation(BaseTestCase):
         label = "pop_1"
         sim.setup(timestep=1.0)
         pop_1 = sim.Population(n_neurons, sim.IF_curr_exp(), label=label)
-        pop_1.set(v=2)
+        pop_1.set(i_offset=2)
+        sim.end()
+
+    def test_set_multiple(self):
+        n_neurons = 5
+        label = "pop_1"
+        sim.setup(timestep=1.0)
+        pop_1 = sim.Population(n_neurons, sim.IF_curr_exp(), label=label)
+        pop_1.set(i_offset=[2, 3, 4, 5, 6])
+        sim.end()
+
+    def test_set_multiple_via_indirect(self):
+        n_neurons = 5
+        label = "pop_1"
+        sim.setup(timestep=1.0)
+        pop_1 = sim.Population(
+            n_neurons, sim.IF_curr_exp(i_offset=0), label=label)
+        view = pop_1[0:3]
+        view.set(i_offset=[2, 3, 4])
         sim.end()
 
     def test_selector(self):
