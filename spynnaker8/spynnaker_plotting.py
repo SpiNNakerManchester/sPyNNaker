@@ -31,7 +31,7 @@ def plot_spiketrains(ax, spiketrains, label='', **options):
     :param options: plotting options
     """
     moved_in_v6(
-        "spynnaker.spynnaker_plotting", "spynnaker8.spynnaker_plotting")
+        "spynnaker8.spynnaker_plotting", "spynnaker.spynnaker_plotting")
     new_plotting.plot_spiketrains(ax, spiketrains, label='', **options)
 
 
@@ -48,7 +48,7 @@ def plot_spikes_numpy(ax, spikes, label='', **options):
     :param options: plotting options
     """
     moved_in_v6(
-        "spynnaker.spynnaker_plotting", "spynnaker8.spynnaker_plotting")
+        "spynnaker8.spynnaker_plotting", "spynnaker.spynnaker_plotting")
     new_plotting.plot_spikes_numpy(ax, spikes, label='', **options)
 
 
@@ -65,7 +65,7 @@ def heat_plot_numpy(ax, data, label='', **options):
     :param options: plotting options
     """
     moved_in_v6(
-        "spynnaker.spynnaker_plotting", "spynnaker8.spynnaker_plotting")
+        "spynnaker8.spynnaker_plotting", "spynnaker.spynnaker_plotting")
     new_plotting.heat_plot_numpy(ax, data, label='', **options)
 
 
@@ -82,7 +82,7 @@ def heat_plot_neo(ax, signal_array, label='', **options):
     :param options: plotting options
     """
     moved_in_v6(
-        "spynnaker.spynnaker_plotting", "spynnaker8.spynnaker_plotting")
+        "spynnaker8.spynnaker_plotting", "spynnaker.spynnaker_plotting")
     new_plotting.heat_plot_neo(ax, signal_array, label='', **options)
 
 
@@ -99,7 +99,7 @@ def plot_segment(axes, segment, label='', **options):
     :param options: plotting options
     """
     moved_in_v6(
-        "spynnaker.spynnaker_plotting", "spynnaker8.spynnaker_plotting")
+        "spynnaker8.spynnaker_plotting", "spynnaker.spynnaker_plotting")
     new_plotting.plot_segment(axes, segment, label='', **options)
 
 
@@ -112,6 +112,5 @@ class SpynnakerPanel(_BaseClass):
     """
     def __init__(self, *data, **options):
         moved_in_v6(
-            "spynnaker.spynnaker_plotting", "spynnaker8.spynnaker_plotting")
+            "spynnaker8.spynnaker_plotting", "spynnaker.spynnaker_plotting")
         super(SpynnakerPanel, self).__init__(*data, **options)
-
