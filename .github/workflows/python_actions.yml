@@ -122,6 +122,41 @@ jobs:
       uses: ./support/actions/validate-xml
       with:
         base-path: spynnaker
+
+  doc-check:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [2.7, 3.6, 3.7, 3.8]
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Checkout SupportScripts
+      uses: actions/checkout@v2
+      with:
+        repository: SpiNNakerManchester/SupportScripts
+        path: support
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install pip, etc
+      uses: ./support/actions/python-tools
+    - name: Install Spinnaker Dependencies
+      uses: ./support/actions/checkout-spinn-deps
+      with:
+        repositories: >
+          SpiNNUtils SpiNNMachine SpiNNMan PACMAN DataSpecification spalloc
+          SpiNNFrontEndCommon
+        install: true
+        preinstall: ${{ matrix.python-version == 2.7 }}
+    - name: Setup
+      uses: ./support/actions/run-setup
+      with:
+        preinstall: ${{ matrix.python-version == 2.7 }}
+
     - name: Build documentation with sphinx
       uses: ./support/actions/sphinx
       with:
