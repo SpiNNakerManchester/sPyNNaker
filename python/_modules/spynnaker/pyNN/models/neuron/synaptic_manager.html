@@ -53,7 +53,6 @@
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">import</span> <span class="nn">struct</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">special</span>  <span class="c1"># @UnresolvedImport</span>
 <span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">itervalues</span>
@@ -87,9 +86,6 @@
 <span class="n">_SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
 <span class="n">_SYNAPSES_BASE_N_CPU_CYCLES_PER_NEURON</span> <span class="o">=</span> <span class="mi">10</span>
 <span class="n">_SYNAPSES_BASE_N_CPU_CYCLES</span> <span class="o">=</span> <span class="mi">8</span>
-
-<span class="c1"># Struct to read or write a word</span>
-<span class="n">_ONE_WORD</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">Struct</span><span class="p">(</span><span class="s2">&quot;&lt;I&quot;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="SynapticManager"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.SynapticManager">[docs]</a><span class="k">class</span> <span class="nc">SynapticManager</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>

@@ -53,7 +53,6 @@
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 <span class="kn">import</span> <span class="nn">struct</span>
 <span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
-
 <span class="kn">import</span> <span class="nn">numpy</span>
 
 <span class="kn">from</span> <span class="nn">data_specification.enums</span> <span class="kn">import</span> <span class="n">DataType</span>
@@ -118,6 +117,9 @@
 <span class="c1"># start_scaled, end_scaled, next_scaled, is_fast_source, exp_minus_lambda,</span>
 <span class="c1"># sqrt_lambda, isi_val, time_to_spike</span>
 <span class="n">PARAMS_WORDS_PER_RATE</span> <span class="o">=</span> <span class="mi">8</span>
+
+<span class="n">_ONE_WORD</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">Struct</span><span class="p">(</span><span class="s2">&quot;&lt;I&quot;</span><span class="p">)</span>
+<span class="n">_FOUR_WORDS</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">Struct</span><span class="p">(</span><span class="s2">&quot;&lt;4I&quot;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="SpikeSourcePoissonMachineVertex"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex.SpikeSourcePoissonMachineVertex">[docs]</a><span class="k">class</span> <span class="nc">SpikeSourcePoissonMachineVertex</span><span class="p">(</span>
@@ -674,11 +676,10 @@
         <span class="c1"># locate SDRAM address where parameters are stored</span>
         <span class="n">poisson_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">poisson_param_region_address</span><span class="p">(</span>
             <span class="n">placement</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">)</span>
-        <span class="n">seed_array</span> <span class="o">=</span> <span class="n">transceiver</span><span class="o">.</span><span class="n">read_memory</span><span class="p">(</span>
+        <span class="n">seed_array</span> <span class="o">=</span> <span class="n">_FOUR_WORDS</span><span class="o">.</span><span class="n">unpack_from</span><span class="p">(</span><span class="n">transceiver</span><span class="o">.</span><span class="n">read_memory</span><span class="p">(</span>
             <span class="n">placement</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">poisson_params</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">SEED_OFFSET_BYTES</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">SEED_SIZE_BYTES</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">update_kiss_seed</span><span class="p">(</span>
-            <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack_from</span><span class="p">(</span><span class="s2">&quot;&lt;4I&quot;</span><span class="p">,</span> <span class="n">seed_array</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">SEED_SIZE_BYTES</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">update_kiss_seed</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">,</span> <span class="n">seed_array</span><span class="p">)</span>
 
         <span class="c1"># locate SDRAM address where the rates are stored</span>
         <span class="n">poisson_rate_region_sdram_address</span> <span class="o">=</span> <span class="p">(</span>
@@ -695,7 +696,7 @@
         <span class="c1"># For each atom, read the number of rates and the rate parameters</span>
         <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
-            <span class="n">n_values</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack_from</span><span class="p">(</span><span class="s2">&quot;&lt;I&quot;</span><span class="p">,</span> <span class="n">byte_array</span><span class="p">,</span> <span class="n">offset</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">n_values</span><span class="p">,</span> <span class="o">=</span> <span class="n">_ONE_WORD</span><span class="o">.</span><span class="n">unpack_from</span><span class="p">(</span><span class="n">byte_array</span><span class="p">,</span> <span class="n">offset</span><span class="p">)</span>
             <span class="n">offset</span> <span class="o">+=</span> <span class="mi">4</span>
 
             <span class="c1"># Skip reading the index, as it will be recalculated on data write</span>

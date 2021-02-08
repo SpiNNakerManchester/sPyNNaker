@@ -91,10 +91,8 @@
 
     <span class="n">region_base_address</span> <span class="o">=</span> <span class="n">locate_memory_region_for_placement</span><span class="p">(</span>
         <span class="n">placement</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">)</span>
-    <span class="n">number_of_bytes_written</span> <span class="o">=</span> <span class="n">_RECORDING_COUNT</span><span class="o">.</span><span class="n">unpack_from</span><span class="p">(</span>
-        <span class="n">transceiver</span><span class="o">.</span><span class="n">read_memory</span><span class="p">(</span>
-            <span class="n">placement</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">region_base_address</span><span class="p">,</span>
-            <span class="n">BYTES_PER_WORD</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">number_of_bytes_written</span> <span class="o">=</span> <span class="n">transceiver</span><span class="o">.</span><span class="n">read_word</span><span class="p">(</span>
+        <span class="n">placement</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">region_base_address</span><span class="p">)</span>
 
     <span class="c1"># Subtract 4 for the word representing the size itself</span>
     <span class="n">expected_size</span> <span class="o">=</span> <span class="n">region_size</span> <span class="o">-</span> <span class="n">BYTES_PER_WORD</span>
@@ -172,13 +170,9 @@
 <span class="sd">    :param iterable(~pacman.model.placements.Placement) missing:</span>
 <span class="sd">    :rtype: str</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">missing_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-    <span class="n">separator</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-    <span class="k">for</span> <span class="n">placement</span> <span class="ow">in</span> <span class="n">missing</span><span class="p">:</span>
-        <span class="n">missing_str</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">(</span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-            <span class="n">separator</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
-        <span class="n">separator</span> <span class="o">=</span> <span class="s2">&quot;; &quot;</span>
-    <span class="k">return</span> <span class="n">missing_str</span></div>
+    <span class="k">return</span> <span class="s2">&quot;; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="s2">&quot;(</span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">placement</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">placement</span> <span class="ow">in</span> <span class="n">missing</span><span class="p">)</span></div>
 </pre></div>
 
             <div class="clearer"></div>

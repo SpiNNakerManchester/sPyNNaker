@@ -63,8 +63,8 @@
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities</span> <span class="kn">import</span> <span class="n">system_control_logic</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.utility_objs</span> <span class="kn">import</span> <span class="n">ExecutableType</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.helpful_functions</span> <span class="kn">import</span> <span class="n">n_word_struct</span>
 
-<span class="n">_ONE_WORD</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">Struct</span><span class="p">(</span><span class="s2">&quot;&lt;I&quot;</span><span class="p">)</span>
 <span class="n">_THREE_WORDS</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">Struct</span><span class="p">(</span><span class="s2">&quot;&lt;III&quot;</span><span class="p">)</span>
 <span class="c1"># bits in a word</span>
 <span class="n">_BITS_IN_A_WORD</span> <span class="o">=</span> <span class="mi">32</span>
@@ -309,8 +309,8 @@
 
             <span class="c1"># get bitfield words</span>
             <span class="k">if</span> <span class="n">n_words</span><span class="p">:</span>
-                <span class="n">bitfield</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span>
-                    <span class="s2">&quot;&lt;</span><span class="si">{}</span><span class="s2">I&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n_words</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">__txrx</span><span class="o">.</span><span class="n">read_memory</span><span class="p">(</span>
+                <span class="n">bitfield</span> <span class="o">=</span> <span class="n">n_word_struct</span><span class="p">(</span><span class="n">n_words</span><span class="p">)</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__txrx</span><span class="o">.</span><span class="n">read_memory</span><span class="p">(</span>
                         <span class="n">placement</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">read_pointer</span><span class="p">,</span>
                         <span class="n">n_words</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
@@ -353,7 +353,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">__txrx</span><span class="o">.</span><span class="n">get_user_1_register_address_from_core</span><span class="p">(</span><span class="n">placement</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__txrx</span><span class="o">.</span><span class="n">write_memory</span><span class="p">(</span>
             <span class="n">placement</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">user_1_base_address</span><span class="p">,</span>
-            <span class="n">_ONE_WORD</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">bit_field_builder_region</span><span class="p">),</span> <span class="n">_ONE_WORD</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+            <span class="n">bit_field_builder_region</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__check_for_success</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">executable_targets</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Goes through the cores checking for cores that have failed to\</span>
@@ -369,10 +369,8 @@
             <span class="n">y</span> <span class="o">=</span> <span class="n">core_subset</span><span class="o">.</span><span class="n">y</span>
             <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">core_subset</span><span class="o">.</span><span class="n">processor_ids</span><span class="p">:</span>
                 <span class="c1"># Read the result from USER0 register</span>
-                <span class="n">user_2_base_address</span> <span class="o">=</span> \
-                    <span class="n">transceiver</span><span class="o">.</span><span class="n">get_user_2_register_address_from_core</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
-                <span class="n">result</span><span class="p">,</span> <span class="o">=</span> <span class="n">_ONE_WORD</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">transceiver</span><span class="o">.</span><span class="n">read_memory</span><span class="p">(</span>
-                    <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">user_2_base_address</span><span class="p">,</span> <span class="n">_ONE_WORD</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">transceiver</span><span class="o">.</span><span class="n">read_word</span><span class="p">(</span>
+                    <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">transceiver</span><span class="o">.</span><span class="n">get_user_2_register_address_from_core</span><span class="p">(</span><span class="n">p</span><span class="p">))</span>
 
                 <span class="c1"># The result is 0 if success, otherwise failure</span>
                 <span class="k">if</span> <span class="n">result</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SUCCESS</span><span class="p">:</span>
