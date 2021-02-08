@@ -97,6 +97,7 @@ class SplitterAbstractPopulationVertexSlice(
         :param ~pacman.model.graphs.machine.MachineGraph graph: app graph
         :rtype: ~pacman.model.resources.ResourceContainer
         """
+        # pylint: disable=arguments-differ
         variable_sdram = self.get_variable_sdram(vertex_slice)
         constant_sdram = self.constant_sdram(vertex_slice, graph)
 

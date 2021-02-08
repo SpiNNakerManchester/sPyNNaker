@@ -56,7 +56,7 @@ class PopulationMachineVertex(
         "__binary_file_name",
         "__recorded_region_ids",
         "__resources",
-        "__on_chip_generatable_area",
+        "__on_chip_generatable_offset",
         "__on_chip_generatable_size",
         "__drop_late_spikes",
         "__change_requires_neuron_parameters_reload"]

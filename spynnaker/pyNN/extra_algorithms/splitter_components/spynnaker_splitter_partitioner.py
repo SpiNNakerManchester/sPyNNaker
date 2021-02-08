@@ -58,16 +58,15 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
 
         # TODO: this only works when the synaptic manager is reengineered to
         #       not assume the un-delayed edge still exists.
-        """
-        filter off delay values
-        post_splitter = dest_machine_vertex.app_vertex.splitter
-        if ((not isinstance(
-                src_machine_vertex, DelayExtensionMachineVertex)) and
-                isinstance(post_splitter, AbstractSpynnakerSplitterDelay)):
-            min_delay = self._app_edge_min_delay[app_edge]
-            if post_splitter.max_support_delay() < min_delay:
-                return
-        """
+
+        # filter off delay values
+        # post_splitter = dest_machine_vertex.app_vertex.splitter
+        # if ((not isinstance(
+        #         src_machine_vertex, DelayExtensionMachineVertex)) and
+        #         isinstance(post_splitter, AbstractSpynnakerSplitterDelay)):
+        #     min_delay = self._app_edge_min_delay[app_edge]
+        #     if post_splitter.max_support_delay() < min_delay:
+        #         return
 
         # build edge and add to machine graph
         machine_edge = common_edge_type(
