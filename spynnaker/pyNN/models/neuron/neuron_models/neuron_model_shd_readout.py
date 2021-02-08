@@ -38,6 +38,7 @@ Z_BAR_OLD = "z_bar_old"
 Z_BAR = "z_bar"
 # EP_A = "ep_a"
 # E_BAR = "e_bar"
+WINDOW_SIZE = "window_size"
 UPDATE_READY = "update_ready"
 
 UNITS = {
@@ -67,6 +68,7 @@ class NeuronModelLeakyIntegrateAndFireSHDReadout(AbstractNeuronModel):
         "_l",
         # "_w_fb",
         "_eta",
+        "_window_size",
         "_update_ready"
         ]
 
@@ -77,6 +79,7 @@ class NeuronModelLeakyIntegrateAndFireSHDReadout(AbstractNeuronModel):
             l,
             # w_fb,
             eta,
+            window_size,
             update_ready):
 
         data_types = [
@@ -88,6 +91,7 @@ class NeuronModelLeakyIntegrateAndFireSHDReadout(AbstractNeuronModel):
             DataType.INT32,  # count_refrac
             DataType.S1615,  # v_reset
             DataType.INT32,  # tau_refrac
+            DataType.UINT32, # window_size (batch update)
             # Learning signal
             DataType.S1615,  # L
             # DataType.S1615  # w_fb
@@ -134,7 +138,8 @@ class NeuronModelLeakyIntegrateAndFireSHDReadout(AbstractNeuronModel):
 
         self._eta = eta
 
-        self._update_ready = update_ready
+        self._window_size = window_size
+        self._update_ready = window_size
 
     @overrides(AbstractNeuronModel.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
@@ -150,6 +155,7 @@ class NeuronModelLeakyIntegrateAndFireSHDReadout(AbstractNeuronModel):
         parameters[I_OFFSET] = self._i_offset
         parameters[V_RESET] = self._v_reset
         parameters[TAU_REFRAC] = self._tau_refrac
+        parameters[WINDOW_SIZE] = self._window_size
 #         parameters[L] = self._l
 
         #learning params
@@ -196,7 +202,7 @@ class NeuronModelLeakyIntegrateAndFireSHDReadout(AbstractNeuronModel):
                 parameters[V_RESET],
                 parameters[TAU_REFRAC].apply_operation(
                     operation=lambda x: int(numpy.ceil(x / (ts / 1000.0)))),
-
+                # parameters[WINDOW_SIZE],
                 state_variables[L]
                 # parameters[W_FB]
                 ]

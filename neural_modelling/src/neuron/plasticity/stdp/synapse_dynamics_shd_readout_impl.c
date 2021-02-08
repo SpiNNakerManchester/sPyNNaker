@@ -37,7 +37,7 @@
 #include <neuron/models/neuron_model_shd_readout_impl.h>
 
 extern neuron_pointer_t neuron_array;
-//extern global_neuron_params_pointer_t global_parameters;
+extern global_neuron_params_pointer_t global_parameters;
 
 static uint32_t synapse_type_index_bits;
 static uint32_t synapse_index_bits;
@@ -415,7 +415,7 @@ bool synapse_dynamics_process_plastic_synapses(
             neuron->syn_state[syn_ind_from_delay].delta_w = 0.0k;
 
     		// reset update_ready counter based on pattern cycle time
-            neuron->syn_state[syn_ind_from_delay].update_ready += 1000;
+            neuron->syn_state[syn_ind_from_delay].update_ready += neuron->window_size;
 
         } else {
             if (PRINT_PLASTICITY){

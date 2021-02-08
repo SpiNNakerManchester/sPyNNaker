@@ -75,17 +75,32 @@ state_t neuron_model_state_update(
     else{
         v_mem_error = 0.k;
     }
-
-    neuron->L = v_mem_error * 0.1k;
+    if(v_mem_error > 1.k){
+        v_mem_error = 1.k;
+    }
+    if(v_mem_error < -1.k){
+        v_mem_error = -1.k;
+    }
+    neuron->L = v_mem_error;
     for (uint32_t n_ind=0; n_ind < 10; n_ind++){
-        neuron->L += learning_signal[n_ind];// * neuron->w_fb[n_ind];
+        if (n_ind == (uint32_t)dummy){
+            neuron->L += learning_signal[n_ind];// * neuron->w_fb[n_ind];
+        }
+        if (time % 1000 == 0){
+            io_printf(IO_BUF, "%u - %u - L:%k\n", (uint32_t)dummy, n_ind, learning_signal[n_ind]);
+        }
     }
     if (time % 1000 == 0 || time % 1000 == 1){
         neuron->V_membrane = neuron->V_reset;
+        io_printf(IO_BUF, "%u total - L:%k - v_mem_error:%k\n", time, neuron->L, v_mem_error);
     }
 
     // All operations now need doing once per eprop synapse
     for (uint32_t syn_ind=0; syn_ind < total_synapses_per_neuron; syn_ind++){
+        if (time % 1000 == 0 || time % 1000 == 1){
+            neuron->syn_state[syn_ind].z_bar = 0.k;
+            neuron->syn_state[syn_ind].z_bar_inp = 0.k;
+        }
 		// ******************************************************************
 		// Low-pass filter incoming spike train
 		// ******************************************************************
@@ -123,7 +138,7 @@ state_t neuron_model_state_update(
     			local_eta * neuron->L * neuron->syn_state[syn_ind].z_bar;
 
     	neuron->syn_state[syn_ind].delta_w -= this_dt_weight_change;
-//    	if ((time % 51 == 0 && !syn_ind && !printed_variables) || this_dt_weight_change > 1.k){// || neuron->syn_state[syn_ind].z_bar){// || neuron->syn_state[syn_ind].z_bar_inp){
+//    	if ((time % 51 == 0 && !syn_ind && !printed_variables) || neuron->syn_state[syn_ind].delta_w > 1000.k){// || neuron->syn_state[syn_ind].z_bar){// || neuron->syn_state[syn_ind].z_bar_inp){
 //            io_printf(IO_BUF, "total synapses = %u \t syn_ind = %u \t "
 //                              "z_bar_inp = %k \t z_bar = %k \t time:%u\n"
 //                              "L = %k & %k = v_merr\n"
@@ -197,6 +212,6 @@ void neuron_model_print_parameters(restrict neuron_pointer_t neuron) {
 //    io_printf(IO_BUF, "Seed 2: %u\n", neuron->spike_source_seed[1]);
 //    io_printf(IO_BUF, "Seed 3: %u\n", neuron->spike_source_seed[2]);
 //    io_printf(IO_BUF, "Seed 4: %u\n", neuron->spike_source_seed[3]);
-////    io_printf(IO_BUF, "seconds per tick: %u\n", neuron->seconds_per_tick);
+//    io_printf(IO_BUF, "seconds per tick: %u\n", neuron->seconds_per_tick);
 //    io_printf(IO_BUF, "ticks per second: %k\n", neuron->ticks_per_second);
 }

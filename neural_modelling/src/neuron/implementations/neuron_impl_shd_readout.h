@@ -273,9 +273,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     state_t result = neuron_model_state_update(
                 NUM_EXCITATORY_RECEPTORS, exc_input_values,
                 NUM_INHIBITORY_RECEPTORS, inh_input_values,
-                external_bias, neuron, 0.0k);
-
-    recorded_variable_values[V_RECORDING_INDEX] = result;
+                external_bias, neuron, neuron_index);
 
     if (result > 8.75k){
         output_errors[neuron_index] = expk(8.75k);
@@ -325,6 +323,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 //        }
         if (time % 1000 == 0){ // after every test is finished
             target_ind += 1;
+//            io_printf(IO_BUF, "tar idx %u\n", target_ind);
 //            for (uint32_t n_ind=0; n_ind < 10; n_ind++){
 //                neuron_pointer_t neuron_resetting = &neuron_array[n_ind];
 //                neuron_resetting->V_membrane = neuron_resetting->V_rest;
@@ -342,6 +341,8 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 //    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[neuron_index*20].z_bar;
     recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
                                     learning_signal[global_parameters->target_V[target_ind]];
+//                                    neuron->syn_state[neuron_index*5].z_bar;
+//                                    neuron->L;
 //                                    *exc_input_values;
 //                                    neuron->syn_state[neuron_index*5].delta_w;
 
@@ -353,7 +354,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 //        			neuron->syn_state[neuron_index*20].delta_w;
 //        			exc_input_values[0];
 
-
+    recorded_variable_values[V_RECORDING_INDEX] = result;
 
     // If spike occurs, communicate to relevant parts of model
     if (spike) {

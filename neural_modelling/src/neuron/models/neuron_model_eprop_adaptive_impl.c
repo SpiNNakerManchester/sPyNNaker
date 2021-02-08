@@ -134,6 +134,12 @@ state_t neuron_model_state_update(
     else{
         v_mem_error = 0.k;
     }
+    if(v_mem_error > 1.k){
+        v_mem_error = 1.k;
+    }
+    if(v_mem_error < -1.k){
+        v_mem_error = -1.k;
+    }
 //    learning_signal += v_mem_error;
 
 //	REAL reg_error = (global_parameters->core_target_rate - global_parameters->core_pop_rate) / syn_dynamics_neurons_in_partition;
@@ -142,7 +148,7 @@ state_t neuron_model_state_update(
 ////                                    / (1.225k // 00000!!!!!
 //                                    / (accum)syn_dynamics_neurons_in_partition)
 //                                    - global_parameters->core_target_rate;
-    REAL reg_learning_signal = neuron->neuron_rate - global_parameters->core_target_rate;
+//    REAL reg_learning_signal = neuron->neuron_rate - global_parameters->core_target_rate;
 //    io_printf(IO_BUF, "rls: %k\n", reg_learning_signal);
 //    if (time % neuron->window_size == neuron->window_size - 1 & !printed_value){ //hardcoded time of reset
 //        io_printf(IO_BUF, "1 %u, rate err:%k, rate:%k, target:%k\tL:%k, v_mem:%k\n",
@@ -180,14 +186,35 @@ state_t neuron_model_state_update(
         test_length = neuron->window_size;
     }
 
-    if (time % neuron->window_size > test_length * 2){ //todo make this relative to number of cues
-        neuron->L = new_learning_signal + (reg_learning_signal);// * 0.1k);
+
+    REAL firing_reg = 0.k;
+    if (neuron->neuron_rate >
+                global_parameters->core_target_rate+(global_parameters->core_target_rate - 1.k)){
+        firing_reg = neuron->neuron_rate - global_parameters->core_target_rate;
+//        io_printf(IO_BUF, "> %k = %k - %k\n", v_mem_error, neuron->V_membrane, neuron->B);
+    }
+    else if (neuron->neuron_rate < 1.k){
+        firing_reg = -1.k + neuron->neuron_rate;
+//        io_printf(IO_BUF, "< %k = %k - %k\n", v_mem_error, -neuron->V_membrane, neuron->B);
+    }
+    else{
+        firing_reg = 0.k;
+    }
+    if(firing_reg > 1.k){
+        firing_reg = 1.k;
+    }
+    if(firing_reg < -1.k){
+        firing_reg = -1.k;
+    }
+
+    if (time % test_length < 600 && time % test_length > 100 && global_parameters->core_target_rate){ //todo make this relative to number of cues
+        neuron->L = new_learning_signal + firing_reg;// * 0.1k);
     }
     else{
         neuron->L = new_learning_signal;
     }
 //    neuron->L = learning_signal * neuron->w_fb; // turns of all reg
-    neuron->L = new_learning_signal;
+//    neuron->L = new_learning_signal;
 //    if (time % 99 == 0){
 //        io_printf(IO_BUF, "during B = %k, b = %k, time = %u\n", neuron->B, neuron->b, time);
 //    }
