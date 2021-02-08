@@ -354,5 +354,5 @@ def moved_in_v6(old_location, new_location):
     if os.environ.get('CONTINUOUS_INTEGRATION', 'false').lower() == 'true':
         raise NotImplementedError("Old import: {}".format(old_location))
     logger.warning("File {} moved to {}. Please fix your imports. "
-                   "In version 7 this will fail completely.".format(
-        old_location, new_location))
+                   "In version 7 this will fail completely."
+                   "".format(old_location, new_location))
