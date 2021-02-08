@@ -358,7 +358,6 @@ void background_callback(uint timer_count, UNUSED uint unused) {
 void timer_callback(uint timer_count, UNUSED uint unused) {
     // Disable interrupts to stop DMAs and MC getting in the way of this bit
     uint32_t state = spin1_int_disable();
-    spin1_dma_flush();
 
     // Clear any outstanding spikes
     spike_processing_clear_input_buffer(time);
