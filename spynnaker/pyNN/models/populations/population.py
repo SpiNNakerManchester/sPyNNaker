@@ -194,8 +194,7 @@ class Population(PopulationBase):
         return variable in \
             self._recorder.get_all_possible_recordable_variables()
 
-    def record(self, variables, to_file=None, sampling_interval=None,
-               indexes=None):
+    def record(self, variables, to_file=None, sampling_interval=None):
         """ Record the specified variable or variables for all cells in the\
             Population or view.
 
@@ -209,26 +208,15 @@ class Population(PopulationBase):
         :type to_file: ~neo.io or ~neo.rawio or str
         :param int sampling_interval: a value in milliseconds, and an integer
             multiple of the simulation timestep.
-        :param indexes: The indexes of neurons to record from.
-            This is non-standard PyNN and equivalent to creating a view with
-            these indexes and asking the View to record.
-        :type indexes: None or list(int)
         """
         # pylint: disable=arguments-differ
-        if indexes is not None:
-            warn_once(
-                logger, "record indexes parameter is non-standard PyNN, "
-                "so may not be portable to other simulators. "
-                "It is now deprecated and replaced with views")
-        self._record_with_indexes(
-            variables, to_file, sampling_interval, indexes)
+        self._recorder.record(
+            variables, to_file, sampling_interval, indexes=None)
 
-    def _record_with_indexes(
+    def _record(
             self, variables, to_file, sampling_interval, indexes):
-        """ Same as record but without non-standard PyNN warning
-
-        This method is non-standard PyNN and is intended only to be called by
-        record in a Population, View or Assembly
+        """ Record the specified variable or variables for all cells in the\
+            Population or view.
 
         :param variables: either a single variable name or a list of variable
             names. For a given celltype class, ``celltype.recordable`` contains
@@ -246,44 +234,8 @@ class Population(PopulationBase):
             these indexes and asking the View to record.
         :type indexes: None or list(int)
         """
-        if variables is None:  # reset the list of things to record
-            if sampling_interval is not None:
-                raise ConfigurationException(
-                    "Clash between parameters in record."
-                    "variables=None turns off recording,"
-                    "while sampling_interval!=None implies turn on recording")
-            if indexes is not None:
-                warn_once(
-                    logger,
-                    "View.record with variable None is non-standard PyNN. "
-                    "Only the neurons in the view have their record turned "
-                    "off. Other neurons already set to record will remain "
-                    "set to record")
-
-            # note that if record(None) is called, its a reset
-            self._recorder.turn_off_all_recording(indexes)
-            # handle one element vs many elements
-        elif isinstance(variables, string_types):
-            # handle special case of 'all'
-            if variables == "all":
-                warn_once(
-                    logger, 'record("all") is non-standard PyNN, and '
-                    'therefore may not be portable to other simulators.')
-
-                # iterate though all possible recordings for this vertex
-                for variable in self._recorder.\
-                        get_all_possible_recordable_variables():
-                    self._recorder.record(
-                        variable, sampling_interval, to_file, indexes)
-            else:
-                # record variable
-                self._recorder.record(
-                    variables, sampling_interval, to_file, indexes)
-
-        else:  # list of variables, so just iterate though them
-            for variable in variables:
-                self._recorder.record(
-                    variable, sampling_interval, to_file, indexes)
+        self._recorder.record(
+            variables, to_file, sampling_interval, indexes=indexes)
 
     def sample(self, n, rng=None):
         """ Randomly sample `n` cells from the Population, and return a\
