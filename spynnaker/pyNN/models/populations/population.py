@@ -71,9 +71,6 @@ class Population(PopulationBase):
         "__last_id",
         "_positions",
         "_recorder",
-        "__record_gsyn_file",
-        "__record_spike_file",
-        "__record_v_file",
         "_size",
         "__structure",
         "__vertex",
@@ -131,9 +128,6 @@ class Population(PopulationBase):
             size = self.__vertex.n_atoms
         self._size = size
         self._annotations = dict()
-        self.__record_spike_file = None
-        self.__record_v_file = None
-        self.__record_gsyn_file = None
 
         # parameter
         self.__change_requires_mapping = True
