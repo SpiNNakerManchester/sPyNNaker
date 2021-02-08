@@ -16,11 +16,13 @@
 """
 utility class containing simple helper methods
 """
+import logging
 import os
 import math
 import numpy
 from pyNN.random import RandomDistribution
 from scipy.stats import binom
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.safe_eval import SafeEval
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.utilities.random_stats import (
@@ -28,6 +30,8 @@ from spynnaker.pyNN.utilities.random_stats import (
     RandomStatsNormalClippedImpl, RandomStatsNormalImpl,
     RandomStatsPoissonImpl, RandomStatsRandIntImpl, RandomStatsUniformImpl,
     RandomStatsVonmisesImpl, RandomStatsBinomialImpl)
+
+logger = FormatAdapter(logging.getLogger(__name__))
 
 MAX_RATE = 2 ** 32 - 1  # To allow a unit32_t to be used to store the rate
 
@@ -335,3 +339,20 @@ def get_n_bits(n_values):
     if n_values == 1:
         return 1
     return int(math.ceil(math.log(n_values, 2)))
+
+
+def moved_in_v6(old_location, new_location):
+    """
+    Warns the users that they are using an old import.
+
+    In version 7 this will ne upgraded to a exception and then later removed
+
+    :param str old_location: old import
+    :param str new_location: new import
+    :raise: an exception if in CONTINUOUS_INTEGRATION
+    """
+    if os.environ.get('CONTINUOUS_INTEGRATION', 'false').lower() == 'true':
+        raise NotImplementedError("Old import: {}".format(old_location))
+    logger.warning("File {} moved to {}. Please fix your imports. "
+                   "In version 7 this will fail completely.".format(
+        old_location, new_location))
