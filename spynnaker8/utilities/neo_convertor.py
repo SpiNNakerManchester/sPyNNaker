@@ -54,6 +54,9 @@ def convert_data(data, name, run=0):
     :param int run: Zero based index of the run to extract data for
     :rtype: ~numpy.ndarray
     """
+    moved_in_v6(
+        "spynnaker8.utilities.neo_convertor",
+        "spynnaker.pyNN.utilities.neo_convertor")
     return _convert_data(data, name, run=0)
 
 
