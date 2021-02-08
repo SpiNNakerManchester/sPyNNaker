@@ -60,7 +60,7 @@ class RateSourceLiveMachineVertex(
 
     def __init__(
             self, resources_required, is_recording, constraints=None,
-            label=None, vertex_offset=0):
+            label=None, vertex_offset=0, starting_slice=None):
         # pylint: disable=too-many-arguments
         super(RateSourceLiveMachineVertex, self).__init__(
             label, constraints=constraints)
@@ -68,6 +68,7 @@ class RateSourceLiveMachineVertex(
         self.__resources = resources_required
         self.__vertex_index = None
         self.__vertex_offset = vertex_offset
+        self.__starting_slice = starting_slice
 
     @property
     @overrides(MachineVertex.resources_required)
@@ -100,6 +101,10 @@ class RateSourceLiveMachineVertex(
     @property
     def vertex_offset(self):
         return self.__vertex_offset
+
+    @property
+    def starting_slice(self):
+        return self.__starting_slice
 
     @overrides(ProvidesProvenanceDataFromMachineImpl.
                get_provenance_data_from_machine)

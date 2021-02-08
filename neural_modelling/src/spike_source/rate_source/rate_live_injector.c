@@ -75,7 +75,7 @@ struct config {
 
     global_parameters globals;
     
-    REAL *rates;
+    uint8_t *rates;
 };
 
 struct source_provenance {
@@ -105,9 +105,9 @@ static uint32_t refresh_timer;
 
 static uint32_t generators;
 
-static REAL *rate_values;
-static REAL *memory_values;
-static REAL *shared_region;
+static uint8_t *rate_values;
+static uint8_t *memory_values;
+static uint8_t *shared_region;
 
 static uint32_t mem_index;
 static uint32_t vertex_offset;
@@ -155,9 +155,9 @@ static bool read_rate_parameters(struct config *config) {
     memory_values = config->rates;
     
     // The size of 1 image
-    img_size = generators * sizeof(REAL);
+    img_size = generators * sizeof(uint8_t);
 
-    shared_region = (REAL *) sark_xalloc(sv->sdram_heap, img_size, mem_index, 1);
+    shared_region = (uint8_t *) sark_xalloc(sv->sdram_heap, img_size, mem_index, 1);
 
     rate_values = spin1_malloc(img_size);
     if (rate_values == NULL) {

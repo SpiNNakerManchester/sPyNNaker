@@ -80,7 +80,7 @@ struct config {
 
     global_parameters globals;
     
-    REAL *rates;
+    uint8_t *rates;
 };
 
 struct source_provenance {
@@ -112,8 +112,8 @@ static uint32_t refresh_timer;
 
 static uint32_t generators;
 
-static REAL *rate_values;
-static REAL *memory_values;
+static uint8_t *rate_values;
+static uint8_t *memory_values;
 
 static uint32_t mem_index;
 static uint32_t vertex_offset;
@@ -153,7 +153,7 @@ static bool read_rate_parameters(struct config *config) {
 
     memory_values = config->rates;
 
-    pool_size = generators * sizeof(REAL);
+    pool_size = generators * sizeof(uint8_t);
 
     rate_values = spin1_malloc(pool_size);
     if (rate_values == NULL) {

@@ -16,32 +16,46 @@ class RateSourceLivePartition(SimplePopulationSettable, AbstractChangableAfterRu
         "__n_atoms",
         "__partitions",
         "__refresh_rate",
-        "__injector_vertex"]
+        "__injector_vertex",
+        "__dataset"]
 
-    def __init__(self, sources, constraints, label, rate_source_live, partitions, refresh_rate):
+    def __init__(self, sources, constraints, label, rate_source_live, partitions, refresh_rate, dataset):
 
         self.__n_atoms = sources
         self.__vertices = list()
         self.__partitions = partitions
         self.__refresh_rate = refresh_rate
+        self.__dataset = dataset
 
-        self.__injector_vertex = RateLiveInjectorVertex(self.__n_atoms, "Rate_live_injector", constraints, rate_source_live)
+        self.__injector_vertex = RateLiveInjectorVertex(
+            self.__n_atoms, "Rate_live_injector", constraints, rate_source_live, self.__dataset[1:])
         
         self.__atoms_per_partition = self._compute_partition_and_offset_size(self.__n_atoms)
     
         # Keep one core in the chip as service core to inject the values in memory
         self.__machine_vertices = self._compute_partition_and_offset_size(APP_CORES_PER_CHIP - 1)
 
-        # Set this in order to force the partitioning to have the number of machine cores we want
-        self.__max_atoms_per_core = int(math.ceil(self.__atoms_per_partition / self.__machine_vertices))
-
         vertex_offset = 0
         
         for i in range(self.__partitions):
+
+            starting_slices = []
+            start = vertex_offset
+            # Set this in order to force the partitioning to have the number of machine cores we want
+            max_atoms_per_core = int(math.ceil(self.__atoms_per_partition[i] / self.__machine_vertices[i]))
+            
+            for v in range(self.__machine_vertices[i]):
+
+                if v < self.__machine_vertices[i] - 1:
+                    starting_slices.append(self.__dataset[0][start : (start + max_atoms_per_core)])
+                    start += max_atoms_per_core 
+                else:
+                    starting_slices.append(self.__dataset[0][start : (self.__atoms_per_partition[i] - start)])
+
             self.__vertices.append(RateSourceLiveVertex(
-                self.__atoms_per_partition[i], constraints, self.__max_atoms_per_core,
+                self.__atoms_per_partition[i], constraints, max_atoms_per_core,
                 label+str(i), rate_source_live, self.__machine_vertices[i], self.__refresh_rate,
-                self.__injector_vertex, vertex_offset))
+                self.__injector_vertex, vertex_offset, starting_slices))
 
             vertex_offset += self.__atoms_per_partition[i]
 

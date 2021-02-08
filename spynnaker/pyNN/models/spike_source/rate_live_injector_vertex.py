@@ -26,8 +26,9 @@ from spynnaker.pyNN.models.abstract_models import (
 from .rate_source_live_machine_vertex import (
     RateSourceLiveMachineVertex)
 
-# bool has_key; uint32_t key; uint32_t generators; uint32_t timer_offset; uint32_t refresh;
-PARAMS_BASE_WORDS = 5
+# uint32_t generators; uint32_t timer_offset; uint32_t refresh;
+# uint32_t mem_index
+PARAMS_BASE_WORDS = 4
 
 START_OF_RATE_GENERATOR_PARAMETERS = PARAMS_BASE_WORDS * 4
 
@@ -54,12 +55,13 @@ class RateLiveInjectorVertex(ApplicationVertex, AbstractGeneratesDataSpecificati
         "__n_data_specs",
         "__n_profile_samples",
         "__requires_mapping",
-        "__n_generators"
+        "__n_generators",
+        "__dataset"
     ]
 
     _n_vertices = 0
 
-    def __init__(self, generators, label, constraints, model):
+    def __init__(self, generators, label, constraints, model, dataset):
         # pylint: disable=too-many-arguments
         self.__model_name = "RateLiveInjector"
         self.__model = model
@@ -74,6 +76,8 @@ class RateLiveInjectorVertex(ApplicationVertex, AbstractGeneratesDataSpecificati
 
         self.__connected_app_vertices = None
         self.__machine_vertex = None
+
+        self.__dataset = dataset
 
         super(RateLiveInjectorVertex, self).__init__(
             label=label, constraints=constraints,
@@ -135,11 +139,13 @@ class RateLiveInjectorVertex(ApplicationVertex, AbstractGeneratesDataSpecificati
         return container
 
     def get_params_bytes(self, vertex_slice):
-        """ Gets the size of the poisson parameters in bytes
+        """ Gets the size of the rate parameters in bytes
 
         :param vertex_slice:
         """
-        return PARAMS_BASE_WORDS * 4
+        dataset_sz = len(self.__dataset) * self.__n_generators
+
+        return dataset_sz + (PARAMS_BASE_WORDS * 4)
 
     @property
     def n_atoms(self):
@@ -256,6 +262,8 @@ class RateLiveInjectorVertex(ApplicationVertex, AbstractGeneratesDataSpecificati
 
         # Write the vertex index for the shared memory region
         spec.write_value(data=vertex_index)
+
+        spec.write_array(self.__dataset, data_type=DataType.UINT8)
 
 
     @inject_items({

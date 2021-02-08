@@ -48,7 +48,8 @@ logger = logging.getLogger(__name__)
 
 # bool has_key; uint32_t key; uint32_t generators;
 # uint32_t timer_offset; uint32_t refresh; uint32_t mem_index;
-PARAMS_BASE_WORDS = 6
+# uint32_t vertex_offset
+PARAMS_BASE_WORDS = 7
 
 START_OF_RATE_GENERATOR_PARAMETERS = PARAMS_BASE_WORDS * 4
 
@@ -80,7 +81,8 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
         "__refresh_rate",
         "__injector_vertex",
         "__vertex_offset",
-        "__partitioned_atoms"
+        "__partitioned_atoms",
+        "__starting_slices"
     ]
 
     RATE_RECORDING_REGION_ID = 0
@@ -89,7 +91,7 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
 
     def __init__(self, sources, constraints, max_atoms_per_core, 
             label, model, machine_vertices, refresh_rate,
-            injector_vertex, vertex_offset):
+            injector_vertex, vertex_offset, starting_slices):
         # pylint: disable=too-many-arguments
         self.__model_name = "RateSourceLive"
         self.__model = model
@@ -107,6 +109,9 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
         self.__partitioned_atoms = 0
 
         self.__machine_vertices = dict()
+
+        # The values each mahcine vertex will send at timestep 0
+        self.__starting_slices = starting_slices
 
         super(RateSourceLiveVertex, self).__init__(
             label=label, constraints=constraints,
@@ -165,11 +170,14 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
         return container
 
     def get_params_bytes(self, vertex_slice):
-        """ Gets the size of the poisson parameters in bytes
+        """ Gets the size of the rate parameters in bytes
 
         :param vertex_slice:
         """
-        return PARAMS_BASE_WORDS * 4
+
+        starting_slice_sz = vertex_slice.n_atoms
+
+        return starting_slice_sz + (PARAMS_BASE_WORDS * 4)
 
     @property
     def n_atoms(self):
@@ -182,7 +190,8 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
         # pylint: disable=too-many-arguments, arguments-differ
         machine_vertex = RateSourceLiveMachineVertex(
             resources_required, False, constraints, label,
-            self.__vertex_offset + self.__partitioned_atoms)
+            self.__vertex_offset + self.__partitioned_atoms,
+            self.__starting_slices[self.__n_subvertices])
 
         RateSourceLiveVertex._n_vertices += 1
         self.__machine_vertices[self.__n_subvertices] = machine_vertex
@@ -282,6 +291,8 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
         spec.comment("\nWriting Rate Parameters for {} rate sources:\n"
                      .format(vertex_slice.n_atoms))
 
+        vertex = placement.vertex
+
         # Set the focus to the memory region 2 (neuron parameters):
         spec.switch_write_focus(_REGIONS.RATE_PARAMS_REGION.value)
 
@@ -313,7 +324,7 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
 
         # Write the portion of image for the first timestep
         #ADJUST FOR MULTIPLE MACHINE VERTICES!!
-        spec.write_array(sel.__image_portion)
+        spec.write_array(vertex.starting_slice, data_type=DataType.UINT8)
 
 
     @inject_items({
