@@ -57,7 +57,7 @@ def convert_data(data, name, run=0):
     moved_in_v6(
         "spynnaker8.utilities.neo_convertor",
         "spynnaker.pyNN.utilities.neo_convertor")
-    return _convert_data(data, name, run=0)
+    return _convert_data(data, name, run)
 
 
 def convert_data_list(data, name, runs=None):
@@ -79,7 +79,7 @@ def convert_data_list(data, name, runs=None):
     moved_in_v6(
         "spynnaker8.utilities.neo_convertor",
         "spynnaker.pyNN.utilities.neo_convertor")
-    return _convert_data_list(data, name, runs=None)
+    return _convert_data_list(data, name, runs)
 
 
 def convert_v_list(data):
@@ -182,7 +182,7 @@ def convert_spikes(neo, run=0):
     moved_in_v6(
         "spynnaker8.utilities.neo_convertor",
         "spynnaker.pyNN.utilities.neo_convertor")
-    return _convert_spikes(neo, run=0)
+    return _convert_spikes(neo, run)
 
 
 def count_spiketrains(spiketrains):

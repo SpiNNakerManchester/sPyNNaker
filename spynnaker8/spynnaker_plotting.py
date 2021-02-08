@@ -32,7 +32,7 @@ def plot_spiketrains(ax, spiketrains, label='', **options):
     """
     moved_in_v6(
         "spynnaker8.spynnaker_plotting", "spynnaker.spynnaker_plotting")
-    new_plotting.plot_spiketrains(ax, spiketrains, label='', **options)
+    new_plotting.plot_spiketrains(ax, spiketrains, label, **options)
 
 
 def plot_spikes_numpy(ax, spikes, label='', **options):
@@ -49,7 +49,7 @@ def plot_spikes_numpy(ax, spikes, label='', **options):
     """
     moved_in_v6(
         "spynnaker8.spynnaker_plotting", "spynnaker.spynnaker_plotting")
-    new_plotting.plot_spikes_numpy(ax, spikes, label='', **options)
+    new_plotting.plot_spikes_numpy(ax, spikes, label, **options)
 
 
 def heat_plot_numpy(ax, data, label='', **options):
@@ -66,7 +66,7 @@ def heat_plot_numpy(ax, data, label='', **options):
     """
     moved_in_v6(
         "spynnaker8.spynnaker_plotting", "spynnaker.spynnaker_plotting")
-    new_plotting.heat_plot_numpy(ax, data, label='', **options)
+    new_plotting.heat_plot_numpy(ax, data, label, **options)
 
 
 def heat_plot_neo(ax, signal_array, label='', **options):
@@ -83,7 +83,7 @@ def heat_plot_neo(ax, signal_array, label='', **options):
     """
     moved_in_v6(
         "spynnaker8.spynnaker_plotting", "spynnaker.spynnaker_plotting")
-    new_plotting.heat_plot_neo(ax, signal_array, label='', **options)
+    new_plotting.heat_plot_neo(ax, signal_array, label, **options)
 
 
 def plot_segment(axes, segment, label='', **options):
@@ -100,7 +100,7 @@ def plot_segment(axes, segment, label='', **options):
     """
     moved_in_v6(
         "spynnaker8.spynnaker_plotting", "spynnaker.spynnaker_plotting")
-    new_plotting.plot_segment(axes, segment, label='', **options)
+    new_plotting.plot_segment(axes, segment, label, **options)
 
 
 class SpynnakerPanel(_BaseClass):
