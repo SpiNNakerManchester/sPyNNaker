@@ -15,13 +15,16 @@
 
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 from spinn_utilities.ranged.abstract_list import AbstractList
+from pacman.model.graphs.application import ApplicationVertex
+from spinn_front_end_common.utilities.class_utils import require_subclass
 from spynnaker.pyNN.utilities.ranged import SpynnakerRangedList
 from .abstract_settable import AbstractSettable
 
 
+@require_subclass(ApplicationVertex)
 class AbstractPopulationSettable(AbstractSettable, metaclass=AbstractBase):
-    """ Indicates that some properties of this object can be accessed from\
-        the PyNN population set and get methods.
+    """ Indicates that some properties of this application vertex can be\
+        accessed from the PyNN population set and get methods.
     """
 
     __slots__ = ()

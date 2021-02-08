@@ -14,12 +14,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from pacman.model.graphs.machine.machine_vertex import MachineVertex
+from spinn_front_end_common.utilities.class_utils import require_subclass
 
 SYNAPSE_EXPANDER_APLX = "synapse_expander.aplx"
 
 
+@require_subclass(MachineVertex)
 class AbstractSynapseExpandable(object, metaclass=AbstractBase):
-    """ Indicates a class (most likely a \
+    """ Indicates a class (a \
         :py:class:`~pacman.model.graphs.machine.MachineVertex`) \
         that has may need to run the SYNAPSE_EXPANDER aplx
 

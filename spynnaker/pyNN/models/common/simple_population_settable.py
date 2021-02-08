@@ -13,11 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.abstract_models import AbstractPopulationSettable
 
 
-class SimplePopulationSettable(AbstractPopulationSettable):
+class SimplePopulationSettable(
+        AbstractPopulationSettable, metaclass=AbstractBase):
     """ An object all of whose properties can be accessed from a PyNN\
         Population i.e. no properties are hidden
     """

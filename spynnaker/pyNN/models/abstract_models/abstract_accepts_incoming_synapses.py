@@ -15,12 +15,17 @@
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from pacman.exceptions import PacmanConfigurationException
+from pacman.model.graphs.application import ApplicationVertex
+from spinn_front_end_common.utilities.class_utils import require_subclass
 
 
+@require_subclass(ApplicationVertex)
 class AbstractAcceptsIncomingSynapses(object, metaclass=AbstractBase):
-    """ Indicates an object that can be a post-vertex in a PyNN projection.
+    """ Indicates an application vertex that can be a post-vertex in a PyNN\
+        projection.
 
-    Note: See verify_splitter
+    .. note::
+        See :py:meth:`verify_splitter`
     """
     __slots__ = ()
 
@@ -71,7 +76,7 @@ class AbstractAcceptsIncomingSynapses(object, metaclass=AbstractBase):
         :param splitter: the splitter
         :type splitter:
             ~spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay
-        :raises PacmanConfigurationException: is the splitter is not an \
+        :raises PacmanConfigurationException: if the splitter is not an
             instance of AbstractSpynnakerSplitterDelay
         """
         # Delayed import to avoid cicular dependency

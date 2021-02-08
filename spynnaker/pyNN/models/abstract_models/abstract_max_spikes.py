@@ -14,10 +14,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from pacman.model.graphs.machine import MachineVertex
+from spinn_front_end_common.utilities.class_utils import require_subclass
 
 
+@require_subclass(MachineVertex)
 class AbstractMaxSpikes(object, metaclass=AbstractBase):
-    """ Indicates a class (most likely a \
+    """ Indicates a class (a \
         :py:class:`~pacman.model.graphs.machine.MachineVertex`) \
         that can describe the maximum rate that it sends spikes.
 

@@ -15,25 +15,15 @@
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from pacman.model.graphs.machine import MachineVertex
-from spinn_front_end_common.utilities.exceptions import ConfigurationException
+from spinn_front_end_common.utilities.class_utils import require_subclass
 
 
+@require_subclass(MachineVertex)
 class AbstractReadParametersBeforeSet(object, metaclass=AbstractBase):
     """ A vertex whose parameters must be read before any can be set.
     """
 
     __slots__ = ()
-
-    _WRONG_VERTEX_TYPE_ERROR = (
-        "The vertex {} is not of type MachineVertex. By not being a "
-        "machine vertex, the sPyNNaker population set function may not "
-        "work correctly.")
-
-    def __new__(cls, *args, **kwargs):
-        if not issubclass(cls, MachineVertex):
-            raise ConfigurationException(
-                cls._WRONG_VERTEX_TYPE_ERROR.format(cls))
-        return super().__new__(cls, *args, **kwargs)
 
     @abstractmethod
     def read_parameters_from_machine(
