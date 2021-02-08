@@ -717,7 +717,7 @@ static void timer_callback(uint timer_count, UNUSED uint unused) {
         simulation_ready_to_read();
         return;
     }
-    spin1_delay_us(5);
+    spin1_delay_us(100);
 
     // Loop through spike sources
     tdma_processing_reset_phase();
