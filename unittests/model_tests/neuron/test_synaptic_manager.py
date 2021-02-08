@@ -17,6 +17,7 @@ import io
 import math
 import os
 import shutil
+import struct
 import tempfile
 from tempfile import mkdtemp
 import numpy
@@ -101,6 +102,10 @@ class MockTransceiverRawData(object):
 
     def read_memory(self, x, y, base_address, length):
         return self._data_to_read[base_address:base_address + length]
+
+    def read_word(self, x, y, base_address):
+        datum, = struct.unpack("<I", self.read_memory(x, y, base_address, 4))
+        return datum
 
 
 class MockSplitter(SplitterSliceLegacy, AbstractSpynnakerSplitterDelay):
