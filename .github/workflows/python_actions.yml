@@ -125,10 +125,7 @@ jobs:
 
   doc-check:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [2.7, 3.6, 3.7, 3.8]
-
+    # Only runs with 3.6
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -137,11 +134,10 @@ jobs:
       with:
         repository: SpiNNakerManchester/SupportScripts
         path: support
-
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: 3.6
     - name: Install pip, etc
       uses: ./support/actions/python-tools
     - name: Install Spinnaker Dependencies
@@ -151,12 +147,8 @@ jobs:
           SpiNNUtils SpiNNMachine SpiNNMan PACMAN DataSpecification spalloc
           SpiNNFrontEndCommon
         install: true
-        preinstall: ${{ matrix.python-version == 2.7 }}
     - name: Setup
       uses: ./support/actions/run-setup
-      with:
-        preinstall: ${{ matrix.python-version == 2.7 }}
-
     - name: Build documentation with sphinx
       uses: ./support/actions/sphinx
       with:
