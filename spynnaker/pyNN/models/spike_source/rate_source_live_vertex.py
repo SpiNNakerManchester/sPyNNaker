@@ -46,8 +46,9 @@ from .rate_live_injector_vertex import RateLiveInjectorVertex
 
 logger = logging.getLogger(__name__)
 
-# bool has_key; uint32_t key; uint32_t generators; uint32_t timer_offset; uint32_t refresh;
-PARAMS_BASE_WORDS = 5
+# bool has_key; uint32_t key; uint32_t generators;
+# uint32_t timer_offset; uint32_t refresh; uint32_t mem_index;
+PARAMS_BASE_WORDS = 6
 
 START_OF_RATE_GENERATOR_PARAMETERS = PARAMS_BASE_WORDS * 4
 
@@ -77,7 +78,9 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
         "__n_profile_samples",
         "__requires_mapping",
         "__refresh_rate",
-        "__injector_vertex"
+        "__injector_vertex",
+        "__vertex_offset",
+        "__partitioned_atoms"
     ]
 
     RATE_RECORDING_REGION_ID = 0
@@ -85,7 +88,8 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
     _n_vertices = 0
 
     def __init__(self, sources, constraints, max_atoms_per_core, 
-            label, model, machine_vertices, refresh_rate, injector_vertex):
+            label, model, machine_vertices, refresh_rate,
+            injector_vertex, vertex_offset):
         # pylint: disable=too-many-arguments
         self.__model_name = "RateSourceLive"
         self.__model = model
@@ -98,7 +102,9 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
 
         self.__n_subvertices = 0
         self.__n_data_specs = 0
-        self.__injector_vertex = inject_items
+        self.__injector_vertex = injector_vertex
+        self.__vertex_offset = vertex_offset
+        self.__partitioned_atoms = 0
 
         self.__machine_vertices = dict()
 
@@ -175,7 +181,8 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
             constraints=None):
         # pylint: disable=too-many-arguments, arguments-differ
         machine_vertex = RateSourceLiveMachineVertex(
-            resources_required, False, constraints, label)
+            resources_required, False, constraints, label,
+            self.__vertex_offset + self.__partitioned_atoms)
 
         RateSourceLiveVertex._n_vertices += 1
         self.__machine_vertices[self.__n_subvertices] = machine_vertex
@@ -186,6 +193,7 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
             machine_vertex.add_constraint(SameChipAsConstraint(connected_machine_vertex))
             
         self.__n_subvertices += 1
+        self.__partitioned_atoms += vertex_slice.n_atoms
 
         return machine_vertex
 
@@ -296,6 +304,16 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
 
         # Write the refesh rate
         spec.write_value(data=self.__refresh_rate)
+
+        # Write the vertex index for the shared memory region
+        spec.write_value(data=vertex_index)
+
+        # Write the offset for the first generator in memory
+        spec.write_value(data=vertex.vertex_offset)
+
+        # Write the portion of image for the first timestep
+        #ADJUST FOR MULTIPLE MACHINE VERTICES!!
+        spec.write_array(sel.__image_portion)
 
 
     @inject_items({

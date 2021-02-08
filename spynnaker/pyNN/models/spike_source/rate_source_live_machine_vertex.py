@@ -42,7 +42,8 @@ class RateSourceLiveMachineVertex(
 
     EXTRA_PROVENANCE_DATA_ENTRIES = Enum(
         value="EXTRA_PROVENANCE_DATA_ENTRIES",
-        names=[("CURRENT_TIMER_TICK", 0)])
+        names=[("CURRENT_TIMER_TICK", 0),
+               ("REFRESH_CALLS", 1)])
 
     RATE_SOURCE_REGIONS = Enum(
         value="RATE_SOURCE_REGIONS",
@@ -59,13 +60,14 @@ class RateSourceLiveMachineVertex(
 
     def __init__(
             self, resources_required, is_recording, constraints=None,
-            label=None):
+            label=None, vertex_offset=0):
         # pylint: disable=too-many-arguments
         super(RateSourceLiveMachineVertex, self).__init__(
             label, constraints=constraints)
         self.__is_recording = is_recording
         self.__resources = resources_required
         self.__vertex_index = None
+        self.__vertex_offset = vertex_offset
 
     @property
     @overrides(MachineVertex.resources_required)
@@ -95,6 +97,10 @@ class RateSourceLiveMachineVertex(
     def vertex_index(self, vertex_index):
         self.__vertex_index = vertex_index
 
+    @property
+    def vertex_offset(self):
+        return self.__vertex_offset
+
     @overrides(ProvidesProvenanceDataFromMachineImpl.
                get_provenance_data_from_machine)
     def get_provenance_data_from_machine(self, transceiver, placement):
@@ -107,12 +113,19 @@ class RateSourceLiveMachineVertex(
         last_timer_tick = provenance_data[
             self.EXTRA_PROVENANCE_DATA_ENTRIES.CURRENT_TIMER_TICK.value]
 
+        refresh_counts = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.REFRESH_CALLS.value]
+
         label, x, y, p, names = self._get_placement_details(placement)
 
         # translate into provenance data items
         provenance_items.append(ProvenanceDataItem(
             self._add_name(names, "Last_timer_tick_the_core_ran_to"),
             last_timer_tick))
+
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names, "Number of times the input has been refreshed"),
+            refresh_counts))
 
         return provenance_items
 

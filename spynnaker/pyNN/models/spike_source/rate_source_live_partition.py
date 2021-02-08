@@ -25,7 +25,7 @@ class RateSourceLivePartition(SimplePopulationSettable, AbstractChangableAfterRu
         self.__partitions = partitions
         self.__refresh_rate = refresh_rate
 
-        self.__injector_vertex = RateLiveInjectorVertex("Rate_live_injector", constraints, rate_source_live)
+        self.__injector_vertex = RateLiveInjectorVertex(self.__n_atoms, "Rate_live_injector", constraints, rate_source_live)
         
         self.__atoms_per_partition = self._compute_partition_and_offset_size(self.__n_atoms)
     
@@ -35,11 +35,15 @@ class RateSourceLivePartition(SimplePopulationSettable, AbstractChangableAfterRu
         # Set this in order to force the partitioning to have the number of machine cores we want
         self.__max_atoms_per_core = int(math.ceil(self.__atoms_per_partition / self.__machine_vertices))
 
+        vertex_offset = 0
+        
         for i in range(self.__partitions):
             self.__vertices.append(RateSourceLiveVertex(
                 self.__atoms_per_partition[i], constraints, self.__max_atoms_per_core,
                 label+str(i), rate_source_live, self.__machine_vertices[i], self.__refresh_rate,
-                self.__injector_vertex))
+                self.__injector_vertex, vertex_offset))
+
+            vertex_offset += self.__atoms_per_partition[i]
 
         self.__injector_vertex.connected_app_vertices = self.__vertices
 

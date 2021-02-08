@@ -54,11 +54,12 @@ class RateLiveInjectorVertex(ApplicationVertex, AbstractGeneratesDataSpecificati
         "__n_data_specs",
         "__n_profile_samples",
         "__requires_mapping",
+        "__n_generators"
     ]
 
     _n_vertices = 0
 
-    def __init__(self, label, constraints, model):
+    def __init__(self, generators, label, constraints, model):
         # pylint: disable=too-many-arguments
         self.__model_name = "RateLiveInjector"
         self.__model = model
@@ -68,6 +69,8 @@ class RateLiveInjectorVertex(ApplicationVertex, AbstractGeneratesDataSpecificati
 
         self.__n_subvertices = 0
         self.__n_data_specs = 0
+
+        self.__n_generators = generators
 
         self.__connected_app_vertices = None
         self.__machine_vertex = None
@@ -216,9 +219,8 @@ class RateLiveInjectorVertex(ApplicationVertex, AbstractGeneratesDataSpecificati
         return ExecutableType.USES_SIMULATION_INTERFACE
 
     def _write_rate_parameters(
-            self, spec, graph, placement, routing_info,
-            vertex_slice, machine_time_step, time_scale_factor,
-            vertex_index):
+            self, spec, vertex_slice, machine_time_step,
+            time_scale_factor, vertex_index):
         """ Generate Neuron Parameter data for rate sources
 
         :param spec: the data specification writer
@@ -238,14 +240,8 @@ class RateLiveInjectorVertex(ApplicationVertex, AbstractGeneratesDataSpecificati
         # Set the focus to the memory region 2 (neuron parameters):
         spec.switch_write_focus(_REGIONS.RATE_PARAMS_REGION.value)
 
-        # Write Key info for this core:
-        key = routing_info.get_first_key_from_pre_vertex(
-            placement.vertex, constants.SPIKE_PARTITION_ID)
-        spec.write_value(data=1 if key is not None else 0)
-        spec.write_value(data=key if key is not None else 0)
-
         # Write the number of generators
-        spec.write_value(data=vertex_slice.n_atoms)
+        spec.write_value(data=self.__n_generators)
 
         # Write the offset value
         max_offset = (
@@ -257,6 +253,9 @@ class RateLiveInjectorVertex(ApplicationVertex, AbstractGeneratesDataSpecificati
 
         # Write the refesh rate
         spec.write_value(data=self.__refresh_rate)
+
+        # Write the vertex index for the shared memory region
+        spec.write_value(data=vertex_index)
 
 
     @inject_items({
@@ -280,8 +279,7 @@ class RateLiveInjectorVertex(ApplicationVertex, AbstractGeneratesDataSpecificati
 
         # allocate parameters
         self._write_rate_parameters(
-            spec=spec, graph=graph, placement=placement,
-            routing_info=routing_info,
+            spec=spec,
             vertex_slice=graph_mapper.get_slice(placement.vertex),
             machine_time_step=machine_time_step,
             time_scale_factor=time_scale_factor)
@@ -331,8 +329,8 @@ class RateLiveInjectorVertex(ApplicationVertex, AbstractGeneratesDataSpecificati
 
         # write parameters
         self._write_rate_parameters(
-            spec, graph, placement, routing_info, vertex_slice,
-            machine_time_step, time_scale_factor, vertex.vertex_index)
+            spec, vertex_slice, machine_time_step,
+            time_scale_factor, vertex.vertex_index)
 
         # write profile data
         profile_utils.write_profile_region_data(

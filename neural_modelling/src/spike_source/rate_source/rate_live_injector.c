@@ -46,6 +46,7 @@ typedef enum region {
 #define NUMBER_OF_REGIONS_TO_RECORD 1
 #define BYTE_TO_WORD_CONVERTER 4
 #define DMA_READ_TAG 0
+#define DMA_WRITE_TAG 1
 
 typedef enum callback_priorities {
     MULTICAST = -1,
@@ -56,20 +57,14 @@ typedef enum callback_priorities {
 
 //! Parameters of the SpikeSourcePoisson
 typedef struct global_parameters {
-    //! True if there is a key to transmit, False otherwise
-    bool has_key;
-    //! The base key to send with (neuron ID to be added to it), or 0 if no key
-    uint32_t key;
     //! The number of rates
     uint32_t generators;
     //! The offset of the timer ticks to desynchronize sources
     uint32_t timer_offset;
     //! The refresh rate for the input sequence in timesteps
     uint32_t refresh;
-    //! The index used to retrieve the memory region
+    //! The tag used to allocate the memory region
     uint32_t mem_index;
-    //! The index of the first generator of this vertex in the image
-    uint32_t vertex_offset;
 
 } global_parameters;
 
@@ -102,34 +97,42 @@ static uint32_t infinite_run;
 //! The timer period
 static uint32_t timer_period;
 
-static uint32_t key;
-
 //! Refresh frequency for the inputs
 static uint32_t refresh;
-
 static uint32_t refresh_counter;
+
 static uint32_t refresh_timer;
 
 static uint32_t generators;
 
 static REAL *rate_values;
 static REAL *memory_values;
+static REAL *shared_region;
 
 static uint32_t mem_index;
 static uint32_t vertex_offset;
 
-//! The size of the pool of rates to be sent
-static uint32_t pool_size;
+static uint32_t img_size;
 
-static inline void read_rate_values() {
+static inline void update_mem_values() {
 
     refresh_timer = 0;
 
     spin1_dma_transfer(
-        DMA_READ_TAG, memory_values + (refresh_counter * generators),
-        rate_values, DMA_READ, pool_size);
+        DMA_READ_TAG, memory_values,
+        rate_values, DMA_READ, img_size);
 
+    memory_values += generators;
     refresh_counter++;
+}
+
+void dma_complete_callback(uint unused1, uint unused2) {
+
+    use(unused1);
+    use(unused2);
+
+    spin1_dma_transfer(DMA_WRITE_TAG, shared_region, rate_values,
+        DMA_WRITE, img_size);
 }
 
 
@@ -147,21 +150,22 @@ static bool read_rate_parameters(struct config *config) {
     refresh_timer = 0;
     refresh_counter = 1;
     refresh = params.refresh;
-    key = params.key;
     mem_index = params.mem_index;
-    vertex_offset = params.vertex_offset;
 
     memory_values = config->rates;
+    
+    // The size of 1 image
+    img_size = generators * sizeof(REAL);
 
-    pool_size = generators * sizeof(REAL);
+    shared_region = (REAL *) sark_xalloc(sv->sdram_heap, img_size, mem_index, 1);
 
-    rate_values = spin1_malloc(pool_size);
+    rate_values = spin1_malloc(img_size);
     if (rate_values == NULL) {
         log_error("Could not allocate space for the rate values");
         return false;
     }
 
-    spin1_memcpy(rate_values, memory_values, pool_size);
+    spin1_memcpy(shared_region, memory_values, img_size);
 
     log_info("read_rate_parameters: completed successfully");
     return true;
@@ -258,12 +262,6 @@ static void timer_callback(uint timer_count, uint unused) {
     time++;
     refresh_timer++;
 
-    if(time == 0) {
-
-        memory_values = sark_tag_ptr(mem_index, 0);
-        memory_values += vertex_offset;
-    }
-
     log_debug("Timer tick %u", time);
 
     // If a fixed number of simulation ticks are specified and these have passed
@@ -282,15 +280,8 @@ static void timer_callback(uint timer_count, uint unused) {
         return;
     }
 
-    for(index_t i = 0; i < generators; i++) {
-
-        while (!spin1_send_mc_packet(key | i, rate_values[i], WITH_PAYLOAD)) {
-                spin1_delay_us(1);
-            }
-    }
-
     if(refresh_timer > refresh) {
-        read_rate_values();
+        update_mem_values();
     }
 
     profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
@@ -311,8 +302,10 @@ void c_main(void) {
     // Set timer tick (in microseconds)
     spin1_set_timer_tick_and_phase(timer_period, params.timer_offset);
 
-    // Register callback
+    // Register callbacks
     spin1_callback_on(TIMER_TICK, timer_callback, TIMER);
+    simulation_dma_transfer_done_callback_on(
+        DMA_READ_TAG, dma_complete_callback);
 
     simulation_run();
 }
