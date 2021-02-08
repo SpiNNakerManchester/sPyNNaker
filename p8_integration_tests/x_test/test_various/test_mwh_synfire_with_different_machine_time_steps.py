@@ -20,7 +20,7 @@ Synfirechain-like example
 """
 import spynnaker8 as p
 import spynnaker.plot_utils as plot_utils
-from spynnaker8.utilities import neo_convertor
+from spynnaker.pyNN.utilities import neo_convertor
 from p8_integration_tests.base_test_case import BaseTestCase
 
 
