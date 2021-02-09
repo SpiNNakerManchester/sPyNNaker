@@ -890,7 +890,6 @@ class Population(PopulationBase):
             raise KeyError("Population does not have property {}".format(
                 parameter))
 
-
         sim = get_not_running_simulator()
         if sim.has_ran and not self.__vertex_changeable_after_run:
             raise Exception(
