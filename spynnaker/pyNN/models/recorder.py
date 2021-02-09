@@ -78,7 +78,6 @@ class Recorder(object):
         """
         return self.__write_to_files_indicators
 
-
     def record(
             self, variables, to_file, sampling_interval, indexes):
         """ Same as record but without non-standard PyNN warning
@@ -141,7 +140,7 @@ class Recorder(object):
                     variable, sampling_interval, to_file, indexes)
 
     def turn_on_record(self, variable, sampling_interval=None, to_file=None,
-               indexes=None):
+                       indexes=None):
         """ Tell the vertex to record data.
 
         :param str variable: The variable to record, supported variables to
