@@ -16,12 +16,11 @@
 import os
 import numpy
 from six import string_types
-from pyNN.connectors import FromFileConnector as PyNNFromFileConnector
 from pyNN.recording.files import StandardTextFile
 from .from_list_connector import FromListConnector
 
 
-class FromFileConnector(FromListConnector, PyNNFromFileConnector):
+class FromFileConnector(FromListConnector):
     """ Make connections according to a list read from a file.
     """
     # pylint: disable=redefined-builtin
@@ -84,9 +83,6 @@ class FromFileConnector(FromListConnector, PyNNFromFileConnector):
         FromListConnector.__init__(
             self, conn_list, safe=safe, verbose=verbose,
             column_names=column_names, callback=callback)
-        PyNNFromFileConnector.__init__(
-            self, file=file, distributed=distributed, safe=safe,
-            callback=callback)
 
     def _read_conn_list(self, the_file, distributed):
         if not distributed:

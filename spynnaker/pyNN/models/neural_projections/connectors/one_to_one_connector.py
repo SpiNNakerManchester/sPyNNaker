@@ -15,7 +15,6 @@
 
 import numpy
 from pyNN.random import RandomDistribution
-from pyNN.connectors import OneToOneConnector as PyNNOneToOneConnector
 from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
@@ -25,8 +24,7 @@ from .abstract_connector_supports_views_on_machine import (
 
 
 class OneToOneConnector(AbstractGenerateConnectorOnMachine,
-                        AbstractConnectorSupportsViewsOnMachine,
-                        PyNNOneToOneConnector):
+                        AbstractConnectorSupportsViewsOnMachine):
     """ Where the pre- and postsynaptic populations have the same size,\
         connect cell *i* in the presynaptic population to cell *i* in\
         the postsynaptic population, for all *i*.
@@ -48,7 +46,6 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
             CSV file
         """
         super(OneToOneConnector, self).__init__(safe, callback, verbose)
-        PyNNOneToOneConnector.__init__(self, safe=safe, callback=callback)
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
