@@ -836,10 +836,10 @@ class Population(PopulationBase):
             raise KeyError("Population does not have property {}".format(
                 parameter))
 
-        if get_not_running_simulator().has_ran \
-                and not self.__vertex_changeable_after_run:
+        sim = get_not_running_simulator()
+        if sim.has_ran and not self.__vertex_changeable_after_run:
             raise Exception(
-                " run has been called")
+                "Run has been called but vertex is not changable.")
 
         if isinstance(parameter, string_types):
             if value is None:
@@ -849,7 +849,8 @@ class Population(PopulationBase):
                 "Parameter must either be the name of a single parameter to"
                 " set, or a dict of parameter: value items to set")
 
-        self._read_parameters_before_set()
+        if not sim.has_reset_last:
+            self._read_parameters_before_set()
 
     def _set(self, parameter, value=None):
         """ Set one or more parameters for every cell in the population.
