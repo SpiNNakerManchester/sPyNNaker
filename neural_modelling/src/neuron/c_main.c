@@ -325,9 +325,6 @@ void background_callback(uint timer_count, UNUSED uint unused) {
         return;
     }
 
-    // First do synapses timestep update, as this is time-critical
-    synapses_do_timestep_update(time);
-
     // Then do rewiring
     if (rewiring &&
             ((last_rewiring_time >= rewiring_period && !synaptogenesis_is_fast())
@@ -360,6 +357,9 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
 
     // Clear any outstanding spikes
     spike_processing_clear_input_buffer(time);
+
+    // Also do synapses timestep update, as this is time-critical
+    synapses_do_timestep_update(time);
 
     // Push the rest to the background
     spin1_schedule_callback(background_callback, timer_count, 0, BACKGROUND);
