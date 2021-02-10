@@ -16,7 +16,7 @@ import spynnaker8 as sim
 from p8_integration_tests.base_test_case import BaseTestCase
 
 
-class TestRecordingSDRAMCalcsNoExtraMonitors(BaseTestCase):
+class TestRecordingSDRAMCalcs(BaseTestCase):
 
     def test_no_projections(self):
         sim.setup(timestep=1.0)
