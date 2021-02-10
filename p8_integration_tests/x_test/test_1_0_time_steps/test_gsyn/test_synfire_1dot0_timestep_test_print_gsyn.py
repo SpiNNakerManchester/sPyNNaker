@@ -25,8 +25,7 @@ from p8_integration_tests.scripts.synfire_run import SynfireRunner
 import spynnaker.plot_utils as plot_utils
 import spynnaker.spike_checker as spike_checker
 import spynnaker.gsyn_tools as gsyn_tools
-from spynnaker8.utilities import neo_compare
-
+from spynnaker.pyNN.utilities import neo_compare
 
 n_neurons = 10  # number of neurons in each population
 max_delay = 14.4

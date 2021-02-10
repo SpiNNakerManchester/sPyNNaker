@@ -16,7 +16,7 @@
 import p8_integration_tests.scripts.pynnBrunnelPlot as pblt
 from p8_integration_tests.base_test_case import BaseTestCase
 import p8_integration_tests.scripts.pynnBrunnelBrianNestSpinnaker as script
-from spynnaker8.utilities import neo_convertor
+from spynnaker.pyNN.utilities import neo_convertor
 
 Neurons = 3000  # number of neurons in each population
 sim_time = 1000

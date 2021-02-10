@@ -52,7 +52,7 @@ if __name__ == '__main__':
     # plotting stuff delay import so unittestsz do not need them
     import matplotlib.pyplot as plt
     from pyNN.utility.plotting import Figure
-    from spynnaker8.spynnaker_plotting import SpynnakerPanel
+    from spynnaker.spynnaker_plotting import SpynnakerPanel
 
     synfire_run.do_run(
         n_neurons, max_delay=14.4, time_step=0.1, neurons_per_core=5,
