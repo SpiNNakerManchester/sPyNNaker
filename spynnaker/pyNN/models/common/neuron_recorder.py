@@ -922,6 +922,20 @@ class NeuronRecorder(object):
         fixed_sdram += self._N_BYTES_PER_INDEX * vertex_slice.n_atoms
         return fixed_sdram
 
+    def get_exact_static_sdram_usage(self, vertex_slice):
+        """ gets the exact sdram needed by the dsg region.
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :rtype: int
+
+        NOTE: does not take into account the struct that's being allocated
+        by the c code
+        """
+        n_record = len(self.__sampling_rates)
+        sdram = (
+            get_recording_header_size(n_record) +
+            self.get_sdram_usage_in_bytes(vertex_slice))
+        return int(sdram)
+
     def get_static_sdram_usage(self, vertex_slice):
         """
         :param ~pacman.model.graphs.common.Slice vertex_slice:

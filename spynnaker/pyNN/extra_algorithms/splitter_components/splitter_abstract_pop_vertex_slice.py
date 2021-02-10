@@ -131,10 +131,8 @@ class SplitterAbstractPopulationVertexSlice(
             app graph
         :rtype: ConstantSDRAM
         """
-        # https://github.com/SpiNNakerManchester/sPyNNaker/issues/991
-        emergency_fudge = 50
         sdram_requirement = (
-            SYSTEM_BYTES_REQUIREMENT + emergency_fudge +
+            SYSTEM_BYTES_REQUIREMENT +
             self._governed_app_vertex.get_sdram_usage_for_neuron_params(
                 vertex_slice) +
             self._governed_app_vertex.neuron_recorder.get_static_sdram_usage(

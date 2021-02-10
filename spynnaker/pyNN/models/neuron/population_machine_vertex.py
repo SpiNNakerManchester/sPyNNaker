@@ -533,7 +533,7 @@ class PopulationMachineVertex(
 
         spec.reserve_memory_region(
             region=POPULATION_BASED_REGIONS.NEURON_RECORDING.value,
-            size=self._app_vertex.neuron_recorder.get_static_sdram_usage(
+            size=self._app_vertex.neuron_recorder.get_exact_static_sdram_usage(
                 self.vertex_slice),
             label="neuron recording")
 
