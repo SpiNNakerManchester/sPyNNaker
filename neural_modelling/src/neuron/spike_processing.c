@@ -139,6 +139,9 @@ static inline void do_dma_read(
     next_buffer_to_fill = (next_buffer_to_fill + 1) % N_DMA_BUFFERS;
 }
 
+uint32_t earliest_proc = 0;
+uint32_t latest_proc = 0xFFFFFFFF;
+
 //! \brief Check if there is anything to do. If not, DMA is not busy
 //! \param[out] row:
 //!     The address of the synaptic row that has been processed
@@ -181,6 +184,15 @@ static inline bool is_something_to_do(
 
     // Are there any more spikes to process?
     while (in_spikes_get_next_spike(spike)) {
+
+        uint32_t timer_time = tc[T1_COUNT];
+        if (timer_time > earliest_proc) {
+            earliest_proc = timer_time;
+        }
+        if (timer_time < latest_proc) {
+            latest_proc = timer_time;
+        }
+
         // Enable interrupts while looking up in the master pop table,
         // as this can be slow
         spin1_mode_restore(cpsr);
