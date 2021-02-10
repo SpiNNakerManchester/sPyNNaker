@@ -284,12 +284,9 @@ extern uint32_t latest_clear;
 extern uint32_t max_dropped;
 
 void background_callback(uint timer_count, UNUSED uint unused) {
-
-
     global_timer_count = timer_count;
     profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
 
-    time++;
     last_rewiring_time++;
 
     // This is the part where I save the input and output indices
@@ -359,13 +356,15 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
     // Disable interrupts to stop DMAs and MC getting in the way of this bit
     uint32_t state = spin1_int_disable();
 
+    time++;
+
     // Clear any outstanding spikes
     spike_processing_clear_input_buffer(time);
 
-    spin1_mode_restore(state);
-
     // Push the rest to the background
     spin1_schedule_callback(background_callback, timer_count, 0, BACKGROUND);
+
+    spin1_mode_restore(state);
 }
 
 //! \brief The entry point for this model.

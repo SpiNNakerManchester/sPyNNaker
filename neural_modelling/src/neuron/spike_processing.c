@@ -156,26 +156,22 @@ static inline bool is_something_to_do(
     // Check for synaptic rewiring
     while (rewires_to_do) {
         rewires_to_do--;
-        // spin1_mode_restore(cpsr);
+        spin1_mode_restore(cpsr);
         if (synaptogenesis_dynamics_rewire(time, spike, row,
                 n_bytes_to_transfer)) {
             *n_rewire += 1;
-
-            spin1_mode_restore(cpsr);
             return true;
         }
-        // cpsr = spin1_int_disable();
+        cpsr = spin1_int_disable();
     }
 
     // Is there another address in the population table?
-    // spin1_mode_restore(cpsr);
+    spin1_mode_restore(cpsr);
     if (population_table_get_next_address(spike, row, n_bytes_to_transfer)) {
         *n_process_spike += 1;
-
-        spin1_mode_restore(cpsr);
         return true;
     }
-    // cpsr = spin1_int_disable();
+    cpsr = spin1_int_disable();
 
     // track for provenance
     uint32_t input_buffer_filled_size = in_spikes_size();
@@ -187,18 +183,16 @@ static inline bool is_something_to_do(
     while (in_spikes_get_next_spike(spike)) {
         // Enable interrupts while looking up in the master pop table,
         // as this can be slow
-        // spin1_mode_restore(cpsr);
+        spin1_mode_restore(cpsr);
         if (population_table_get_first_address(
                 *spike, row, n_bytes_to_transfer)) {
             synaptogenesis_spike_received(time, *spike);
             *n_process_spike += 1;
-
-            spin1_mode_restore(cpsr);
             return true;
         }
 
         // Disable interrupts before checking if there is another spike
-        // cpsr = spin1_int_disable();
+        cpsr = spin1_int_disable();
     }
 
     // If nothing to do, the DMA is not busy

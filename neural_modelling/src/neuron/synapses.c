@@ -314,7 +314,7 @@ void synapses_do_timestep_update(timer_t time) {
     print_ring_buffers(time);
 
     // Disable interrupts to stop DMAs interfering with the ring buffers
-    uint32_t state = spin1_irq_disable();
+    uint32_t state = spin1_int_disable();
 
     // Transfer the input from the ring buffers into the input buffers
     for (uint32_t neuron_index = 0; neuron_index < n_neurons;
