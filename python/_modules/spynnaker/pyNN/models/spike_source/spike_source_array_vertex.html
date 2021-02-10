@@ -79,10 +79,7 @@
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">spike_times</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">spike_times</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;__len__&quot;</span><span class="p">):</span>
         <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">times</span> <span class="ow">in</span> <span class="n">spike_times</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">times</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_as_numpy_ticks</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">time_step</span><span class="p">))</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">([])</span>
+            <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_as_numpy_ticks</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">time_step</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">data</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">_as_numpy_ticks</span><span class="p">(</span><span class="n">spike_times</span><span class="p">,</span> <span class="n">time_step</span><span class="p">)</span>

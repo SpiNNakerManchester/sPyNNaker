@@ -929,10 +929,10 @@
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;Population does not have property </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                 <span class="n">parameter</span><span class="p">))</span>
 
-        <span class="k">if</span> <span class="n">get_not_running_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">has_ran</span> \
-                <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex_changeable_after_run</span><span class="p">:</span>
+        <span class="n">sim</span> <span class="o">=</span> <span class="n">get_not_running_simulator</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">sim</span><span class="o">.</span><span class="n">has_ran</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex_changeable_after_run</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
-                <span class="s2">&quot; run has been called&quot;</span><span class="p">)</span>
+                <span class="s2">&quot;Run has been called but vertex is not changable.&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parameter</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -942,7 +942,8 @@
                 <span class="s2">&quot;Parameter must either be the name of a single parameter to&quot;</span>
                 <span class="s2">&quot; set, or a dict of parameter: value items to set&quot;</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_read_parameters_before_set</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">sim</span><span class="o">.</span><span class="n">has_reset_last</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_read_parameters_before_set</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameter</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Set one or more parameters for every cell in the population.</span>
