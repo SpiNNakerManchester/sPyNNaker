@@ -141,6 +141,8 @@ static inline void do_dma_read(
 
 uint32_t earliest_proc = 0;
 uint32_t latest_proc = 0xFFFFFFFF;
+uint32_t max_from_last_recv = 0;
+uint32_t n_from_last_recv = 0;
 
 //! \brief Check if there is anything to do. If not, DMA is not busy
 //! \param[out] row:
@@ -184,13 +186,16 @@ static inline bool is_something_to_do(
 
     // Are there any more spikes to process?
     while (in_spikes_get_next_spike(spike)) {
-
         uint32_t timer_time = tc[T1_COUNT];
         if (timer_time > earliest_proc) {
             earliest_proc = timer_time;
         }
         if (timer_time < latest_proc) {
             latest_proc = timer_time;
+        }
+        n_from_last_recv++;
+        if (n_from_last_recv > max_from_last_recv) {
+            max_from_last_recv = n_from_last_recv;
         }
 
         // Enable interrupts while looking up in the master pop table,
@@ -315,6 +320,7 @@ static void multicast_packet_received_callback(uint key, uint payload) {
     if (timer_time < latest_recv) {
         latest_recv = timer_time;
     }
+    n_from_last_recv = 0;
 
     p_per_ts_struct.packets_this_time_step += 1;
 
