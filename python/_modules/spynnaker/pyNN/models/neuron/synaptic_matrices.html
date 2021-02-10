@@ -80,6 +80,8 @@
 <span class="n">SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES</span> <span class="o">=</span> <span class="p">(</span>
     <span class="mi">1</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
 
+<span class="n">DIRECT_MATRIX_HEADER_COST_BYTES</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
+
 
 <div class="viewcode-block" id="SynapticMatrices"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrices.SynapticMatrices">[docs]</a><span class="k">class</span> <span class="nc">SynapticMatrices</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Handler of synaptic matrices for a core of a population vertex</span>
@@ -218,7 +220,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">synapses_size</span><span class="p">(</span><span class="n">app_edges</span><span class="p">)</span> <span class="o">+</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__gen_info_size</span><span class="p">(</span><span class="n">app_edges</span><span class="p">)</span> <span class="o">+</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__gen_info_size</span><span class="p">(</span><span class="n">app_edges</span><span class="p">)</span> <span class="o">+</span> <span class="n">DIRECT_MATRIX_HEADER_COST_BYTES</span> <span class="o">+</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__poptable</span><span class="o">.</span><span class="n">get_master_population_table_size</span><span class="p">(</span><span class="n">app_edges</span><span class="p">))</span></div>
 
     <span class="k">def</span> <span class="nf">__gen_info_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_edges</span><span class="p">):</span>
@@ -337,7 +339,9 @@
         <span class="n">single_data_words</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">single_data</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
             <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__direct_matrix_region</span><span class="p">,</span>
-            <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">single_data_words</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span><span class="p">,</span>
+            <span class="n">size</span><span class="o">=</span><span class="p">(</span>
+                <span class="n">single_data_words</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span> <span class="o">+</span>
+                <span class="n">DIRECT_MATRIX_HEADER_COST_BYTES</span><span class="p">),</span>
             <span class="n">label</span><span class="o">=</span><span class="s1">&#39;DirectMatrix&#39;</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__direct_matrix_region</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">single_data_words</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span>

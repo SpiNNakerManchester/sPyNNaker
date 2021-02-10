@@ -666,6 +666,16 @@ ordered by time, one element per event</p>
 </dd></dl>
 
 <dl class="py method">
+<dt id="spynnaker.pyNN.models.common.NeuronRecorder.get_exact_static_sdram_usage">
+<code class="sig-name descname">get_exact_static_sdram_usage</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">vertex_slice</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.get_exact_static_sdram_usage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_exact_static_sdram_usage" title="Permalink to this definition">¶</a></dt>
+<dd><p>gets the exact sdram needed by the dsg region.
+:param ~pacman.model.graphs.common.Slice vertex_slice:
+:rtype: int</p>
+<p>NOTE: does not take into account the struct that’s being allocated
+by the c code</p>
+</dd></dl>
+
+<dl class="py method">
 <dt id="spynnaker.pyNN.models.common.NeuronRecorder.get_matrix_data">
 <code class="sig-name descname">get_matrix_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">label</span></em>, <em class="sig-param"><span class="n">buffer_manager</span></em>, <em class="sig-param"><span class="n">placements</span></em>, <em class="sig-param"><span class="n">application_vertex</span></em>, <em class="sig-param"><span class="n">variable</span></em>, <em class="sig-param"><span class="n">n_machine_time_steps</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.get_matrix_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_matrix_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read a data mapped to time and neuron IDs from the SpiNNaker            machine and converts to required data types with scaling if needed.</p>

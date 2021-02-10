@@ -90,7 +90,7 @@
 <span class="sd">    :return: the estimated number of bytes used by the bit field region</span>
 <span class="sd">    :rtype: int</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">sdram</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">sdram</span> <span class="o">=</span> <span class="n">ELEMENTS_USED_IN_BIT_FIELD_HEADER</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
     <span class="k">for</span> <span class="n">incoming_edge</span> <span class="ow">in</span> <span class="n">app_graph</span><span class="o">.</span><span class="n">get_edges_ending_at_vertex</span><span class="p">(</span><span class="n">vertex</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">incoming_edge</span><span class="p">,</span> <span class="n">ProjectionApplicationEdge</span><span class="p">):</span>
             <span class="n">slices</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="p">(</span>
