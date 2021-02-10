@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+# from __future__ import print_function
+
 
 def compare_spiketrain(spiketrain1, spiketrain2, same_length=True):
     """ Checks two Spiketrains have the exact same data

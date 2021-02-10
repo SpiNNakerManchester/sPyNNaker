@@ -40,10 +40,7 @@ def _send_buffer_times(spike_times, time_step):
     if len(spike_times) and hasattr(spike_times[0], "__len__"):
         data = []
         for times in spike_times:
-            if len(times) != 0:
-                data.append(_as_numpy_ticks(times, time_step))
-            else:
-                data.append([])
+            data.append(_as_numpy_ticks(times, time_step))
         return data
     else:
         return _as_numpy_ticks(spike_times, time_step)

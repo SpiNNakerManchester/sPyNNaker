@@ -14,9 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import math
 import numpy
-from pyNN.connectors import (
-    FixedNumberPreConnector as
-    PyNNFixedNumberPreConnector)
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .abstract_connector import AbstractConnector
@@ -31,8 +28,7 @@ N_GEN_PARAMS = 8
 
 
 class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
-                              AbstractConnectorSupportsViewsOnMachine,
-                              PyNNFixedNumberPreConnector):
+                              AbstractConnectorSupportsViewsOnMachine):
     """ Connects a fixed number of pre-synaptic neurons selected at random,\
         to all post-synaptic neurons.
     """
@@ -83,9 +79,6 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
         super().__init__(safe, callback, verbose)
         # We absolutely require an integer at this point!
         self.__n_pre = self._roundsize(n, "FixedNumberPreConnector")
-        PyNNFixedNumberPreConnector.__init__(
-            self, self.__n_pre, allow_self_connections, with_replacement, rng,
-            safe, callback)
         self.__allow_self_connections = allow_self_connections
         self.__with_replacement = with_replacement
         self.__pre_neurons_set = False

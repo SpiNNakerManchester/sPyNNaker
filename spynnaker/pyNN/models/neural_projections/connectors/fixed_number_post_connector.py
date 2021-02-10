@@ -14,9 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import math
 import numpy
-from pyNN.connectors import (
-    FixedNumberPostConnector as
-    PyNNFixedNumberPostConnector)
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .abstract_connector import AbstractConnector
@@ -31,8 +28,7 @@ N_GEN_PARAMS = 8
 
 
 class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
-                               AbstractConnectorSupportsViewsOnMachine,
-                               PyNNFixedNumberPostConnector):
+                               AbstractConnectorSupportsViewsOnMachine):
     """ Connects a fixed number of post-synaptic neurons selected at random,\
         to all pre-synaptic neurons.
     """
@@ -80,9 +76,6 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         """
         super().__init__(safe, callback, verbose)
         self.__n_post = self._roundsize(n, "FixedNumberPostConnector")
-        PyNNFixedNumberPostConnector.__init__(
-            self, self.__n_post, allow_self_connections, with_replacement, rng,
-            safe, callback)
         self.__allow_self_connections = allow_self_connections
         self.__with_replacement = with_replacement
         self.__post_neurons = None

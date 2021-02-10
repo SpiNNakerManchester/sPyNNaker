@@ -15,9 +15,6 @@
 
 import math
 import numpy
-from pyNN.connectors import (
-    FixedProbabilityConnector as
-    PyNNFixedProbabilityConnector)
 from spinn_utilities.overrides import overrides
 from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
@@ -34,8 +31,7 @@ N_GEN_PARAMS = 6
 
 
 class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
-                                AbstractConnectorSupportsViewsOnMachine,
-                                PyNNFixedProbabilityConnector):
+                                AbstractConnectorSupportsViewsOnMachine):
     """ For each pair of pre-post cells, the connection probability is constant.
     """
 
@@ -73,8 +69,6 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
             raise ConfigurationException(
                 "The probability must be between 0 and 1 (inclusive)")
         super().__init__(safe, callback, verbose)
-        PyNNFixedProbabilityConnector.__init__(
-            self, p_connect, allow_self_connections, rng, safe, callback)
         self._p_connect = p_connect
         self.__allow_self_connections = allow_self_connections
         self._rng = rng

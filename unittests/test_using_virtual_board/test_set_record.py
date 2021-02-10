@@ -115,9 +115,9 @@ class TestSetRecord(BaseTestCase):
             5, sim.SpikeSourceArray(spike_times=[0]))
         ssp = sim.Population(5, sim.SpikeSourcePoisson(rate=100.0),
                              additional_parameters={"seed": 1})
-        if_curr.record("spikes", indexes=[1, 2, 4])
-        ssa.record("spikes", indexes=[1, 2, 4])
-        ssp.record("spikes", indexes=[1, 2, 4])
+        if_curr[1, 2, 4].record("spikes")
+        ssa[1, 2, 4].record("spikes")
+        ssp[1, 2, 4].record("spikes")
         self.assertCountEqual(
             ["spikes"], if_curr._recorder.get_all_recording_variables())
         assert recorder._indexes["spikes"] == [1, 2, 4]
@@ -126,8 +126,8 @@ class TestSetRecord(BaseTestCase):
         sim.setup(timestep=1)
         if_curr = sim.Population(5, sim.IF_curr_exp())
         recorder = if_curr._vertex.neuron_recorder
-        if_curr.record("spikes", indexes=[1, 2, 4])
-        if_curr.record("spikes", indexes=[1, 3])
+        if_curr[1, 2, 4].record("spikes")
+        if_curr[1, 3].record("spikes")
         self.assertCountEqual(
             ["spikes"], if_curr._recorder.get_all_recording_variables())
         assert recorder._indexes["spikes"] == [1, 2, 3, 4]

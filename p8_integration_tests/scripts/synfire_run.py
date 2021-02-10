@@ -20,7 +20,7 @@ from pyNN.random import NumpyRNG
 import spynnaker8 as p
 from spynnaker8 import IF_curr_exp
 from spynnaker8 import SpikeSourceArray
-from spynnaker8.utilities import neo_convertor
+from spynnaker.pyNN.utilities import neo_convertor
 
 CELL_PARAMS_LIF = {'cm': 0.25, 'i_offset': 0.0, 'tau_m': 20.0,
                    'tau_refrac': 2.0, 'tau_syn_E': 5.0, 'tau_syn_I': 5.0,
