@@ -29,7 +29,7 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 class PopulationView(PopulationBase):
     """ A view of a subset of neurons within a\
-    :py:class:`~spynnaker.pyNN.models.populations.Population`.
+        :py:class:`~spynnaker.pyNN.models.populations.Population`.
 
     In most ways, Populations and PopulationViews have the same behaviour,
     i.e., they can be recorded, connected with Projections, etc.
@@ -233,7 +233,7 @@ class PopulationView(PopulationBase):
         """ Get the units of a variable
 
         .. warning::
-            NO PyNN description of this method.
+            No PyNN description of this method.
 
         :param str variable: The name of the variable
         :return: The units of the variable
@@ -300,8 +300,8 @@ class PopulationView(PopulationBase):
                            "as if gather was set to True.")
         if annotations is not None:
             warn_once(
-                logger, "Annoations Parameter is not standard PyNN so may not "
-                        "be supported by all platformd.")
+                logger, "Annotations parameter is not standard PyNN so may "
+                "not be supported by all platforms.")
 
         return self.__population.get_data_by_indexes(
             variables, self.__indexes, clear=clear)

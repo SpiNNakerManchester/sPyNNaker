@@ -44,7 +44,7 @@ from .population_view import PopulationView
 
 logger = FormatAdapter(logging.getLogger(__file__))
 
-REMOVED_V6 = "The method {} is not standard PyNN so has been permently " \
+REMOVED_V6 = "The method {} is not standard PyNN so has been permanently " \
       "removed. Use {} instead. " \
       "(Even this warning will be removed in version 7)"
 
@@ -573,6 +573,10 @@ class Population(PopulationBase):
         return self._vertex.initial_values
 
     def get_initial_value(self, variable, selector=None):
+        """
+        .. deprecated:: 6.0
+            Use :py:meth:`initial_values` instead.
+        """
         raise NotImplementedError(REMOVED_V6.format(
             "get_initial_value", "initial_values"))
 
@@ -594,6 +598,10 @@ class Population(PopulationBase):
         return self._vertex.get_initial_value(variable, selector)
 
     def set_initial_value(self, variable, value, selector=None):
+        """
+        .. deprecated:: 6.0
+            Use :py:meth:`initialize` instead.
+        """
         raise NotImplementedError(REMOVED_V6.format(
             "set_initial_value", "initialize"))
 
