@@ -289,10 +289,21 @@ static inline void setup_synaptic_dma_write(
     }
 }
 
+uint32_t earliest_recv = 0;
+uint32_t latest_recv = 0xFFFFFFFF;
+
 //! \brief Called when a multicast packet is received
 //! \param[in] key: The key of the packet. The spike.
 //! \param payload: the payload of the packet. The count.
 static void multicast_packet_received_callback(uint key, uint payload) {
+    uint32_t timer_time = tc[T1_COUNT];
+    if (timer_time > earliest_recv) {
+        earliest_recv = timer_time;
+    }
+    if (timer_time < latest_recv) {
+        latest_recv = timer_time;
+    }
+
     p_per_ts_struct.packets_this_time_step += 1;
 
     if (in_spikes_size() > 1 && !dma_busy) {

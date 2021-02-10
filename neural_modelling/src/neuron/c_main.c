@@ -289,6 +289,8 @@ void resume_callback(void) {
 extern uint32_t earliest_clear;
 extern uint32_t latest_clear;
 extern uint32_t max_dropped;
+extern uint32_t earliest_recv;
+extern uint32_t latest_recv;
 
 void background_callback(uint timer_count, uint local_time) {
     background_running = true;
@@ -362,8 +364,9 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
         // run
         time--;
 
-        log_info("Earliest send = %d, latest send = %d, earliest clear = %d, latest clear = %d, max_dropped = %d",
-                earliest_send_time, latest_send_time, earliest_clear, latest_clear, max_dropped);
+        log_info("%d > send > %d, %d > clear > %d, %d > recv > %d, max_dropped = %d",
+                earliest_send_time, latest_send_time, earliest_clear, latest_clear,
+                earliest_recv, latest_recv, max_dropped);
 
         log_debug("Rewire tries = %d", count_rewire_attempts);
         simulation_ready_to_read();
