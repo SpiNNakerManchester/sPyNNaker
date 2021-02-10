@@ -194,9 +194,6 @@ static inline bool is_something_to_do(
             latest_proc = timer_time;
         }
         n_from_last_recv++;
-        if (n_from_last_recv > max_from_last_recv) {
-            max_from_last_recv = n_from_last_recv;
-        }
 
         // Enable interrupts while looking up in the master pop table,
         // as this can be slow
@@ -461,6 +458,9 @@ void spike_processing_clear_input_buffer(timer_t time) {
         dma_busy = false;
     }
 
+    if (n_from_last_recv > max_from_last_recv) {
+        max_from_last_recv = n_from_last_recv;
+    }
     uint32_t timer_time = tc[T1_COUNT];
     if (timer_time > earliest_clear) {
         earliest_clear = timer_time;
