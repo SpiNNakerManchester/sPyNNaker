@@ -18,7 +18,7 @@ import random
 from threading import Condition
 import time
 import spynnaker8 as Frontend
-from spynnaker8.utilities import neo_convertor
+from spynnaker.pyNN.utilities import neo_convertor
 from p8_integration_tests.base_test_case import BaseTestCase
 
 # Create a condition to avoid overlapping prints
