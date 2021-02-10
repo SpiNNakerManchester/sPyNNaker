@@ -670,7 +670,7 @@ Each row is three long, for X,Y,Z</p>
 
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.populations.Population.record">
-<code class="sig-name descname">record</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">variables</span></em>, <em class="sig-param"><span class="n">to_file</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sampling_interval</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">indexes</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.record"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.record" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">record</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">variables</span></em>, <em class="sig-param"><span class="n">to_file</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sampling_interval</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.record"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.record" title="Permalink to this definition">¶</a></dt>
 <dd><p>Record the specified variable or variables for all cells in the            Population or view.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -683,9 +683,6 @@ a list of variables that can be recorded for that celltype.</p></li>
 <cite>sim.end()</cite> is called.</p></li>
 <li><p><strong>sampling_interval</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – a value in milliseconds, and an integer
 multiple of the simulation timestep.</p></li>
-<li><p><strong>indexes</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em>) – The indexes of neurons to record from.
-This is non-standard PyNN and equivalent to creating a view with
-these indexes and asking the View to record.</p></li>
 </ul>
 </dd>
 </dl>

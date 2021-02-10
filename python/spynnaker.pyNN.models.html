@@ -645,16 +645,25 @@ are calculated automatically.</p>
 
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.recorder.Recorder.record">
-<code class="sig-name descname">record</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">variable</span></em>, <em class="sig-param"><span class="n">sampling_interval</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">to_file</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">indexes</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/recorder.html#Recorder.record"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.recorder.Recorder.record" title="Permalink to this definition">¶</a></dt>
-<dd><p>Tell the vertex to record data.</p>
+<code class="sig-name descname">record</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">variables</span></em>, <em class="sig-param"><span class="n">to_file</span></em>, <em class="sig-param"><span class="n">sampling_interval</span></em>, <em class="sig-param"><span class="n">indexes</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/recorder.html#Recorder.record"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.recorder.Recorder.record" title="Permalink to this definition">¶</a></dt>
+<dd><p>Same as record but without non-standard PyNN warning</p>
+<p>This method is non-standard PyNN and is intended only to be called by
+record in a Population, View or Assembly</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The variable to record, supported variables to
-record are: <code class="docutils literal notranslate"><span class="pre">gsyn_exc</span></code>, <code class="docutils literal notranslate"><span class="pre">gsyn_inh</span></code>, <code class="docutils literal notranslate"><span class="pre">v</span></code>, <code class="docutils literal notranslate"><span class="pre">spikes</span></code>.</p></li>
-<li><p><strong>sampling_interval</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – the interval to record them</p></li>
-<li><p><strong>to_file</strong> (<em>neo.io.baseio.BaseIO</em><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – If set, a file to write to (by handle or name)</p></li>
-<li><p><strong>indexes</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – List of indexes to record or None for all</p></li>
+<li><p><strong>variables</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – either a single variable name or a list of variable
+names. For a given celltype class, <code class="docutils literal notranslate"><span class="pre">celltype.recordable</span></code> contains
+a list of variables that can be recorded for that celltype.
+Can also be <code class="docutils literal notranslate"><span class="pre">None</span></code> to reset the list of variables.</p></li>
+<li><p><strong>to_file</strong> (<em>io</em><em> or </em><em>rawio</em><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – a file to automatically record to (optional).
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">write_data()</span></code> will be automatically called when
+<cite>sim.end()</cite> is called.</p></li>
+<li><p><strong>sampling_interval</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – a value in milliseconds, and an integer
+multiple of the simulation timestep.</p></li>
+<li><p><strong>indexes</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em>) – The indexes of neurons to record from.
+This is non-standard PyNN and equivalent to creating a view with
+these indexes and asking the View to record.</p></li>
 </ul>
 </dd>
 </dl>
@@ -667,6 +676,23 @@ record are: <code class="docutils literal notranslate"><span class="pre">gsyn_ex
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>indexes</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.recorder.Recorder.turn_on_record">
+<code class="sig-name descname">turn_on_record</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">variable</span></em>, <em class="sig-param"><span class="n">sampling_interval</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">to_file</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">indexes</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/recorder.html#Recorder.turn_on_record"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.recorder.Recorder.turn_on_record" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tell the vertex to record data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The variable to record, supported variables to
+record are: <code class="docutils literal notranslate"><span class="pre">gsyn_exc</span></code>, <code class="docutils literal notranslate"><span class="pre">gsyn_inh</span></code>, <code class="docutils literal notranslate"><span class="pre">v</span></code>, <code class="docutils literal notranslate"><span class="pre">spikes</span></code>.</p></li>
+<li><p><strong>sampling_interval</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – the interval to record them</p></li>
+<li><p><strong>to_file</strong> (<em>neo.io.baseio.BaseIO</em><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – If set, a file to write to (by handle or name)</p></li>
+<li><p><strong>indexes</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – List of indexes to record or None for all</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>

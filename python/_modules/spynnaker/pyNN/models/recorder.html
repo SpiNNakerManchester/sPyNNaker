@@ -117,8 +117,69 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__write_to_files_indicators</span>
 
-<div class="viewcode-block" id="Recorder.record"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder.record">[docs]</a>    <span class="k">def</span> <span class="nf">record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">to_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-               <span class="n">indexes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Recorder.record"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder.record">[docs]</a>    <span class="k">def</span> <span class="nf">record</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">to_file</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">,</span> <span class="n">indexes</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Same as record but without non-standard PyNN warning</span>
+
+<span class="sd">        This method is non-standard PyNN and is intended only to be called by</span>
+<span class="sd">        record in a Population, View or Assembly</span>
+
+<span class="sd">        :param variables: either a single variable name or a list of variable</span>
+<span class="sd">            names. For a given celltype class, ``celltype.recordable`` contains</span>
+<span class="sd">            a list of variables that can be recorded for that celltype.</span>
+<span class="sd">            Can also be ``None`` to reset the list of variables.</span>
+<span class="sd">        :type variables: str or list(str) or None</span>
+<span class="sd">        :param to_file: a file to automatically record to (optional).</span>
+<span class="sd">            :py:meth:`write_data` will be automatically called when</span>
+<span class="sd">            `sim.end()` is called.</span>
+<span class="sd">        :type to_file: ~neo.io or ~neo.rawio or str</span>
+<span class="sd">        :param int sampling_interval: a value in milliseconds, and an integer</span>
+<span class="sd">            multiple of the simulation timestep.</span>
+<span class="sd">        :param indexes: The indexes of neurons to record from.</span>
+<span class="sd">            This is non-standard PyNN and equivalent to creating a view with</span>
+<span class="sd">            these indexes and asking the View to record.</span>
+<span class="sd">        :type indexes: None or list(int)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">variables</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># reset the list of things to record</span>
+            <span class="k">if</span> <span class="n">sampling_interval</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
+                    <span class="s2">&quot;Clash between parameters in record.&quot;</span>
+                    <span class="s2">&quot;variables=None turns off recording,&quot;</span>
+                    <span class="s2">&quot;while sampling_interval!=None implies turn on recording&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">indexes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">warn_once</span><span class="p">(</span>
+                    <span class="n">logger</span><span class="p">,</span>
+                    <span class="s2">&quot;View.record with variable None is non-standard PyNN. &quot;</span>
+                    <span class="s2">&quot;Only the neurons in the view have their record turned &quot;</span>
+                    <span class="s2">&quot;off. Other neurons already set to record will remain &quot;</span>
+                    <span class="s2">&quot;set to record&quot;</span><span class="p">)</span>
+
+            <span class="c1"># note that if record(None) is called, its a reset</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">turn_off_all_recording</span><span class="p">(</span><span class="n">indexes</span><span class="p">)</span>
+            <span class="c1"># handle one element vs many elements</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
+            <span class="c1"># handle special case of &#39;all&#39;</span>
+            <span class="k">if</span> <span class="n">variables</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
+                <span class="n">warn_once</span><span class="p">(</span>
+                    <span class="n">logger</span><span class="p">,</span> <span class="s1">&#39;record(&quot;all&quot;) is non-standard PyNN, and &#39;</span>
+                    <span class="s1">&#39;therefore may not be portable to other simulators.&#39;</span><span class="p">)</span>
+
+                <span class="c1"># iterate though all possible recordings for this vertex</span>
+                <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_all_possible_recordable_variables</span><span class="p">():</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">turn_on_record</span><span class="p">(</span>
+                        <span class="n">variable</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">,</span> <span class="n">to_file</span><span class="p">,</span> <span class="n">indexes</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># record variable</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">turn_on_record</span><span class="p">(</span>
+                    <span class="n">variables</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">,</span> <span class="n">to_file</span><span class="p">,</span> <span class="n">indexes</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># list of variables, so just iterate though them</span>
+            <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">turn_on_record</span><span class="p">(</span>
+                    <span class="n">variable</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">,</span> <span class="n">to_file</span><span class="p">,</span> <span class="n">indexes</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Recorder.turn_on_record"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder.turn_on_record">[docs]</a>    <span class="k">def</span> <span class="nf">turn_on_record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">to_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">indexes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Tell the vertex to record data.</span>
 
 <span class="sd">        :param str variable: The variable to record, supported variables to</span>
