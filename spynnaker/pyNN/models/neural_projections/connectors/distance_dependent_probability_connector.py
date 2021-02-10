@@ -19,9 +19,6 @@ from numpy import (
     arccos, arcsin, arctan, arctan2, ceil, cos, cosh, exp, fabs, floor, fmod,
     hypot, ldexp, log, log10, modf, power, sin, sinh, sqrt, tan, tanh, maximum,
     minimum, e, pi)
-from pyNN.connectors import (
-    DistanceDependentProbabilityConnector as
-    PyNNDistanceDependentProbabilityConnector)
 from spinn_utilities.overrides import overrides
 from spinn_utilities.safe_eval import SafeEval
 from spynnaker.pyNN.utilities.utility_calls import (
@@ -35,8 +32,7 @@ _d_expr_context = SafeEval(math, numpy, arccos, arcsin, arctan, arctan2, ceil,
                            maximum, minimum, e=e, pi=pi)
 
 
-class DistanceDependentProbabilityConnector(
-        AbstractConnector, PyNNDistanceDependentProbabilityConnector):
+class DistanceDependentProbabilityConnector(AbstractConnector):
     """ Make connections using a distribution which varies with distance.
     """
 
@@ -81,10 +77,6 @@ class DistanceDependentProbabilityConnector(
         # pylint: disable=too-many-arguments
         super(DistanceDependentProbabilityConnector, self).__init__(
             safe, callback, verbose)
-        PyNNDistanceDependentProbabilityConnector.__init__(
-            self, d_expression=d_expression,
-            allow_self_connections=allow_self_connections, rng=rng, safe=safe,
-            callback=callback)
         self.__d_expression = d_expression
         self.__allow_self_connections = allow_self_connections
         self._rng = rng
