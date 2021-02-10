@@ -132,7 +132,7 @@ class TestSpikeSourceArray(BaseTestCase):
     def recording_with_empty_lists(self):
         p.setup(timestep=1.0)
         p.set_number_of_neurons_per_core(p.SpikeSourceArray, 2)
-        spike_times = [[1], [], [], [], [4], [3]]
+        spike_times = [[], [1], [], [], [4], [3]]
         input1 = p.Population(
             6, p.SpikeSourceArray(spike_times=spike_times), label="input1")
         input1.record("spikes")

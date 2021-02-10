@@ -29,7 +29,7 @@ May 2006
 $Id: IF_cond_exp.py 917 2011-01-31 15:23:34Z apdavison $
 """
 import spynnaker8 as p
-from spynnaker8.utilities import neo_convertor
+from spynnaker.pyNN.utilities import neo_convertor
 from p8_integration_tests.base_test_case import BaseTestCase
 
 

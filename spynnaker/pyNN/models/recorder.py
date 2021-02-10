@@ -78,8 +78,69 @@ class Recorder(object):
         """
         return self.__write_to_files_indicators
 
-    def record(self, variable, sampling_interval=None, to_file=None,
-               indexes=None):
+    def record(
+            self, variables, to_file, sampling_interval, indexes):
+        """ Same as record but without non-standard PyNN warning
+
+        This method is non-standard PyNN and is intended only to be called by
+        record in a Population, View or Assembly
+
+        :param variables: either a single variable name or a list of variable
+            names. For a given celltype class, ``celltype.recordable`` contains
+            a list of variables that can be recorded for that celltype.
+            Can also be ``None`` to reset the list of variables.
+        :type variables: str or list(str) or None
+        :param to_file: a file to automatically record to (optional).
+            :py:meth:`write_data` will be automatically called when
+            `sim.end()` is called.
+        :type to_file: ~neo.io or ~neo.rawio or str
+        :param int sampling_interval: a value in milliseconds, and an integer
+            multiple of the simulation timestep.
+        :param indexes: The indexes of neurons to record from.
+            This is non-standard PyNN and equivalent to creating a view with
+            these indexes and asking the View to record.
+        :type indexes: None or list(int)
+        """
+        if variables is None:  # reset the list of things to record
+            if sampling_interval is not None:
+                raise ConfigurationException(
+                    "Clash between parameters in record."
+                    "variables=None turns off recording,"
+                    "while sampling_interval!=None implies turn on recording")
+            if indexes is not None:
+                warn_once(
+                    logger,
+                    "View.record with variable None is non-standard PyNN. "
+                    "Only the neurons in the view have their record turned "
+                    "off. Other neurons already set to record will remain "
+                    "set to record")
+
+            # note that if record(None) is called, its a reset
+            self.turn_off_all_recording(indexes)
+            # handle one element vs many elements
+        elif isinstance(variables, string_types):
+            # handle special case of 'all'
+            if variables == "all":
+                warn_once(
+                    logger, 'record("all") is non-standard PyNN, and '
+                    'therefore may not be portable to other simulators.')
+
+                # iterate though all possible recordings for this vertex
+                for variable in self.get_all_possible_recordable_variables():
+                    self.turn_on_record(
+                        variable, sampling_interval, to_file, indexes)
+            else:
+                # record variable
+                self.turn_on_record(
+                    variables, sampling_interval, to_file, indexes)
+
+        else:  # list of variables, so just iterate though them
+            for variable in variables:
+                self.turn_on_record(
+                    variable, sampling_interval, to_file, indexes)
+
+    def turn_on_record(self, variable, sampling_interval=None, to_file=None,
+                       indexes=None):
         """ Tell the vertex to record data.
 
         :param str variable: The variable to record, supported variables to
