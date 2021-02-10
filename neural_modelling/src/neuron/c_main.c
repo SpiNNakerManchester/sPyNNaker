@@ -123,9 +123,14 @@ static uint32_t count_rewire_attempts = 0;
 //! The number of neurons on the core
 static uint32_t n_neurons;
 
+//! True if the background process is queued to be run
+static bool background_in_queue = false;
+
+//! True if the background process is currently running
+static bool background_running = false;
+
 //! timer count for tdma of certain models; exported
 uint global_timer_count;
-
 
 
 //! \brief Callback to store provenance data (format: neuron_provenance).
@@ -285,7 +290,8 @@ extern uint32_t earliest_clear;
 extern uint32_t latest_clear;
 extern uint32_t max_dropped;
 
-void background_callback(uint timer_count, UNUSED uint unused) {
+void background_callback(uint timer_count, uint local_time) {
+    background_running = true;
     global_timer_count = timer_count;
     profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
 
@@ -295,7 +301,44 @@ void background_callback(uint timer_count, UNUSED uint unused) {
     //   from the circular buffer
     // If time == 0 as well as output == input == 0  then no rewire is
     //   supposed to happen. No spikes yet
-    log_debug("Timer tick %u \n", time);
+    log_debug("Timer tick %u \n", local_time);
+
+    // Then do rewiring
+    if (rewiring &&
+            ((last_rewiring_time >= rewiring_period && !synaptogenesis_is_fast())
+                || synaptogenesis_is_fast())) {
+        last_rewiring_time = 0;
+        // put flag in spike processing to do synaptic rewiring
+        if (synaptogenesis_is_fast()) {
+            spike_processing_do_rewiring(rewiring_period);
+        } else {
+            spike_processing_do_rewiring(1);
+        }
+        count_rewire_attempts++;
+    }
+
+    // Now do neuron time step update
+    neuron_do_timestep_update(local_time, timer_count);
+
+    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
+    background_running = false;
+}
+
+//! \brief Timer interrupt callback
+//! \param[in] timer_count: the number of times this call back has been
+//!            executed since start of simulation
+//! \param[in] unused: unused parameter kept for API consistency
+void timer_callback(uint timer_count, UNUSED uint unused) {
+    // Disable interrupts to stop DMAs and MC getting in the way of this bit
+    uint32_t state = spin1_int_disable();
+
+    time++;
+
+    // Clear any outstanding spikes
+    spike_processing_clear_input_buffer(time);
+
+    // Also do synapses timestep update, as this is time-critical
+    synapses_do_timestep_update(time);
 
     /* if a fixed number of simulation ticks that were specified at startup
      * then do reporting for finishing */
@@ -324,47 +367,14 @@ void background_callback(uint timer_count, UNUSED uint unused) {
 
         log_debug("Rewire tries = %d", count_rewire_attempts);
         simulation_ready_to_read();
+        spin1_mode_restore(state);
         return;
     }
 
-    // Then do rewiring
-    if (rewiring &&
-            ((last_rewiring_time >= rewiring_period && !synaptogenesis_is_fast())
-                || synaptogenesis_is_fast())) {
-        last_rewiring_time = 0;
-        // put flag in spike processing to do synaptic rewiring
-        if (synaptogenesis_is_fast()) {
-            spike_processing_do_rewiring(rewiring_period);
-        } else {
-            spike_processing_do_rewiring(1);
-        }
-        count_rewire_attempts++;
-    }
-
-    // Now do neuron time step update
-    neuron_do_timestep_update(time, timer_count);
-
-    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
-}
-
-//! \brief Timer interrupt callback
-//! \param[in] timer_count: the number of times this call back has been
-//!            executed since start of simulation
-//! \param[in] unused: unused parameter kept for API consistency
-void timer_callback(uint timer_count, UNUSED uint unused) {
-    // Disable interrupts to stop DMAs and MC getting in the way of this bit
-    uint32_t state = spin1_int_disable();
-
-    time++;
-
-    // Clear any outstanding spikes
-    spike_processing_clear_input_buffer(time);
-
-    // Also do synapses timestep update, as this is time-critical
-    synapses_do_timestep_update(time);
-
     // Push the rest to the background
-    spin1_schedule_callback(background_callback, timer_count, 0, BACKGROUND);
+    if (!spin1_schedule_callback(background_callback, timer_count, time, BACKGROUND)) {
+        log_error("Failed to add background task for time", time);
+    }
 
     spin1_mode_restore(state);
 }
