@@ -55,9 +55,6 @@
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
-<span class="kn">from</span> <span class="nn">pyNN.connectors</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">FixedNumberPostConnector</span> <span class="k">as</span>
-    <span class="n">PyNNFixedNumberPostConnector</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
 <span class="kn">from</span> <span class="nn">.abstract_connector</span> <span class="kn">import</span> <span class="n">AbstractConnector</span>
@@ -72,8 +69,7 @@
 
 
 <div class="viewcode-block" id="FixedNumberPostConnector"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.FixedNumberPostConnector">[docs]</a><span class="k">class</span> <span class="nc">FixedNumberPostConnector</span><span class="p">(</span><span class="n">AbstractGenerateConnectorOnMachine</span><span class="p">,</span>
-                               <span class="n">AbstractConnectorSupportsViewsOnMachine</span><span class="p">,</span>
-                               <span class="n">PyNNFixedNumberPostConnector</span><span class="p">):</span>
+                               <span class="n">AbstractConnectorSupportsViewsOnMachine</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Connects a fixed number of post-synaptic neurons selected at random,\</span>
 <span class="sd">        to all pre-synaptic neurons.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -122,9 +118,6 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">FixedNumberPostConnector</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">safe</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
         <span class="c1"># We absolutely require an integer at this point!</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__n_post</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_roundsize</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="s2">&quot;FixedNumberPostConnector&quot;</span><span class="p">)</span>
-        <span class="n">PyNNFixedNumberPostConnector</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_post</span><span class="p">,</span> <span class="n">allow_self_connections</span><span class="p">,</span> <span class="n">with_replacement</span><span class="p">,</span> <span class="n">rng</span><span class="p">,</span>
-            <span class="n">safe</span><span class="p">,</span> <span class="n">callback</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__allow_self_connections</span> <span class="o">=</span> <span class="n">allow_self_connections</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__with_replacement</span> <span class="o">=</span> <span class="n">with_replacement</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__post_neurons</span> <span class="o">=</span> <span class="kc">None</span>

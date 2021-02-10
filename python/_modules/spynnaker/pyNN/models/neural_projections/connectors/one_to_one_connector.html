@@ -54,7 +54,6 @@
 
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">from</span> <span class="nn">pyNN.random</span> <span class="kn">import</span> <span class="n">RandomDistribution</span>
-<span class="kn">from</span> <span class="nn">pyNN.connectors</span> <span class="kn">import</span> <span class="n">OneToOneConnector</span> <span class="k">as</span> <span class="n">PyNNOneToOneConnector</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">.abstract_connector</span> <span class="kn">import</span> <span class="n">AbstractConnector</span>
 <span class="kn">from</span> <span class="nn">.abstract_generate_connector_on_machine</span> <span class="kn">import</span> <span class="p">(</span>
@@ -64,8 +63,7 @@
 
 
 <div class="viewcode-block" id="OneToOneConnector"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.OneToOneConnector">[docs]</a><span class="k">class</span> <span class="nc">OneToOneConnector</span><span class="p">(</span><span class="n">AbstractGenerateConnectorOnMachine</span><span class="p">,</span>
-                        <span class="n">AbstractConnectorSupportsViewsOnMachine</span><span class="p">,</span>
-                        <span class="n">PyNNOneToOneConnector</span><span class="p">):</span>
+                        <span class="n">AbstractConnectorSupportsViewsOnMachine</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Where the pre- and postsynaptic populations have the same size,\</span>
 <span class="sd">        connect cell *i* in the presynaptic population to cell *i* in\</span>
 <span class="sd">        the postsynaptic population, for all *i*.</span>
@@ -87,7 +85,6 @@
 <span class="sd">            CSV file</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">OneToOneConnector</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">safe</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
-        <span class="n">PyNNOneToOneConnector</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="n">safe</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">callback</span><span class="p">)</span>
 
 <div class="viewcode-block" id="OneToOneConnector.get_delay_maximum"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.OneToOneConnector.get_delay_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_delay_maximum</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_delay_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
