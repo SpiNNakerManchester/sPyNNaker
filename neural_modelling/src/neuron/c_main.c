@@ -123,8 +123,10 @@ static uint32_t count_rewire_attempts = 0;
 //! The number of neurons on the core
 static uint32_t n_neurons;
 
-//! timer count for tdma of certain models
-static uint global_timer_count;
+//! timer count for tdma of certain models; exported
+uint global_timer_count;
+
+
 
 //! \brief Callback to store provenance data (format: neuron_provenance).
 //! \param[out] provenance_region: Where to write the provenance data
