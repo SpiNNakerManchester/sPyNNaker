@@ -82,7 +82,7 @@ def convert_data_list(data, name, runs=None):
     return _convert_data_list(data, name, runs)
 
 
-def convert_v_list(data):
+def convert_v_list(data, runs=None):
     """ Converts the voltage into a list numpy array one per segment (all\
         runs) in the format ID, time, value
 
@@ -91,15 +91,18 @@ def convert_v_list(data):
         :py:class:`spynnaker.pyNN.utilities.neo_convertor` instead.
 
     :param ~neo.core.Block data: The data to convert; it must have V data in it
+    :param runs: List of Zero based index of the run to extract data for.
+        Or None to extract all runs
+    :type runs: list(int) or None
     :rtype: list(~numpy.ndarray)
     """
     moved_in_v6(
         "spynnaker8.utilities.neo_convertor",
         "spynnaker.pyNN.utilities.neo_convertor")
-    return _convert_data_list(data, "v", runs=None)
+    return _convert_data_list(data, "v", runs=runs)
 
 
-def convert_gsyn_exc_list(data):
+def convert_gsyn_exc_list(data, runs=None):
     """ Converts the gsyn_exc into a list numpy array one per segment (all\
         runs) in the format ID, time, value
 
@@ -109,15 +112,18 @@ def convert_gsyn_exc_list(data):
 
     :param ~neo.core.Block data:
         The data to convert; it must have Gsyn_exc data in it
+    :param runs: List of Zero based index of the run to extract data for.
+        Or None to extract all runs
+    :type runs: list(int) or None
     :rtype: list(~numpy.ndarray)
     """
     moved_in_v6(
         "spynnaker8.utilities.neo_convertor",
         "spynnaker.pyNN.utilities.neo_convertor")
-    return _convert_data_list(data, "gsyn_exc", runs=None)
+    return _convert_data_list(data, "gsyn_exc", runs=runs)
 
 
-def convert_gsyn_inh_list(data):
+def convert_gsyn_inh_list(data, runs=None):
     """ Converts the gsyn_inh into a list numpy array one per segment (all\
         runs) in the format ID, time, value
 
@@ -127,12 +133,15 @@ def convert_gsyn_inh_list(data):
 
     :param ~neo.core.Block data:
         The data to convert; it must have Gsyn_inh data in it
+    :param runs: List of Zero based index of the run to extract data for.
+        Or None to extract all runs
+    :type runs: list(int) or None
     :rtype: list(~numpy.ndarray)
     """
     moved_in_v6(
         "spynnaker8.utilities.neo_convertor",
         "spynnaker.pyNN.utilities.neo_convertor")
-    return _convert_data_list(data, "gsyn_inh", runs=None)
+    return _convert_data_list(data, "gsyn_inh", runs=runs)
 
 
 def convert_gsyn(gsyn_exc, gsyn_inh):
