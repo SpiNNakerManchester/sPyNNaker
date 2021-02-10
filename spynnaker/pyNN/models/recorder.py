@@ -116,7 +116,7 @@ class Recorder(object):
             # note that if record(None) is called, its a reset
             self.turn_off_all_recording(indexes)
             # handle one element vs many elements
-        elif isinstance(variables, string_types):
+        elif isinstance(variables, str):
             # handle special case of 'all'
             if variables == "all":
                 warn_once(
