@@ -80,7 +80,6 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="spynnaker8.utilities.html">spynnaker8.utilities package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="spynnaker8.utilities.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker8.utilities.html#module-spynnaker8.utilities.neo_compare">spynnaker8.utilities.neo_compare module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="spynnaker8.utilities.html#module-spynnaker8.utilities.neo_convertor">spynnaker8.utilities.neo_convertor module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="spynnaker8.utilities.html#module-spynnaker8.utilities">Module contents</a></li>
 </ul>
@@ -93,27 +92,15 @@
 </div>
 <div class="section" id="module-spynnaker8.spynnaker_plotting">
 <span id="spynnaker8-spynnaker-plotting-module"></span><h2>spynnaker8.spynnaker_plotting module<a class="headerlink" href="#module-spynnaker8.spynnaker_plotting" title="Permalink to this headline">¶</a></h2>
-<p>Plotting tools to be used together with
-<a class="reference external" href="https://github.com/NeuralEnsemble/PyNN/blob/master/pyNN/utility/plotting.py">https://github.com/NeuralEnsemble/PyNN/blob/master/pyNN/utility/plotting.py</a></p>
 <dl class="py class">
 <dt id="spynnaker8.spynnaker_plotting.SpynnakerPanel">
 <em class="property">class </em><code class="sig-prename descclassname">spynnaker8.spynnaker_plotting.</code><code class="sig-name descname">SpynnakerPanel</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">data</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">options</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/spynnaker_plotting.html#SpynnakerPanel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker8.spynnaker_plotting.SpynnakerPanel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.spynnaker_plotting.SpynnakerPanel</span></code></p>
 <p>Represents a single panel in a multi-panel figure.</p>
-<p>Compatible with <code class="xref py py-class docutils literal notranslate"><span class="pre">pyNN.utility.plotting.Frame</span></code> and        can be mixed with <a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/utility.html#pyNN.utility.plotting.Panel" title="(in PyNN v0.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyNN.utility.plotting.Panel</span></code></a></p>
-<p>Unlike <a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/utility.html#pyNN.utility.plotting.Panel" title="(in PyNN v0.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyNN.utility.plotting.Panel</span></code></a>,        Spikes are plotted faster,        other data is plotted as a heatmap</p>
-<p>A panel is a Matplotlib Axes or Subplot instance. A data item may be an    <a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.AnalogSignal" title="(in Neo v0.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">AnalogSignal</span></code></a>, or a list of     <a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.SpikeTrain" title="(in Neo v0.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpikeTrain</span></code></a>s. The Panel will    automatically choose an appropriate representation. Multiple data items    may be plotted in the same panel.</p>
-<p>Valid options are any valid Matplotlib formatting options that should be    applied to the Axes/Subplot, plus in addition:</p>
-<blockquote>
-<div><dl class="simple">
-<dt><cite>data_labels</cite>:</dt><dd><p>a list of strings of the same length as the number of data items.</p>
-</dd>
-<dt><cite>line_properties</cite>:</dt><dd><p>a list of dicts containing Matplotlib formatting options, of the            same length as the number of data items.</p>
-</dd>
-</dl>
-</div></blockquote>
-<p>Whole Neo Objects can be passed in as long as they        contain a single Segment/run        and only contain one type of data
-Whole Segments can be passed in only if they only contain one type of data</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 6.0: </span>Use
+<code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.spynnaker_plotting</span></code> instead.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -122,23 +109,16 @@ Whole Segments can be passed in only if they only contain one type of data</p>
 </ul>
 </dd>
 </dl>
-<dl class="py method">
-<dt id="spynnaker8.spynnaker_plotting.SpynnakerPanel.plot">
-<code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">axes</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/spynnaker_plotting.html#SpynnakerPanel.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker8.spynnaker_plotting.SpynnakerPanel.plot" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plot the Panel’s data in the provided Axes/Subplot instance.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>axes</strong> (<a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.3.3)"><em>Axes</em></a>) – An Axes in a matplotlib figure</p>
-</dd>
-</dl>
-</dd></dl>
-
 </dd></dl>
 
 <dl class="py function">
 <dt id="spynnaker8.spynnaker_plotting.heat_plot_neo">
 <code class="sig-prename descclassname">spynnaker8.spynnaker_plotting.</code><code class="sig-name descname">heat_plot_neo</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ax</span></em>, <em class="sig-param"><span class="n">signal_array</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">options</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/spynnaker_plotting.html#heat_plot_neo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker8.spynnaker_plotting.heat_plot_neo" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots neurons, times and values into a heatmap</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 6.0: </span>Use
+<code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.spynnaker_plotting</span></code> instead.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -155,6 +135,10 @@ Whole Segments can be passed in only if they only contain one type of data</p>
 <dt id="spynnaker8.spynnaker_plotting.heat_plot_numpy">
 <code class="sig-prename descclassname">spynnaker8.spynnaker_plotting.</code><code class="sig-name descname">heat_plot_numpy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ax</span></em>, <em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">options</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/spynnaker_plotting.html#heat_plot_numpy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker8.spynnaker_plotting.heat_plot_numpy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots neurons, times and values into a heatmap</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 6.0: </span>Use
+<code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.spynnaker_plotting</span></code> instead.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -171,12 +155,9 @@ Whole Segments can be passed in only if they only contain one type of data</p>
 <dt id="spynnaker8.spynnaker_plotting.plot_segment">
 <code class="sig-prename descclassname">spynnaker8.spynnaker_plotting.</code><code class="sig-name descname">plot_segment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">axes</span></em>, <em class="sig-param"><span class="n">segment</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">options</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/spynnaker_plotting.html#plot_segment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker8.spynnaker_plotting.plot_segment" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots a segment into a plot of spikes or a heatmap</p>
-<blockquote>
-<div><p>If there is more than ode type of Data in the segment options must        include the name of the data to plot</p>
-</div></blockquote>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>method signature defined by pynn plotting.        This allows mixing of this plotting tool and pynn’s</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 6.0: </span>Use
+<code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.spynnaker_plotting</span></code> instead.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -194,6 +175,10 @@ Whole Segments can be passed in only if they only contain one type of data</p>
 <dt id="spynnaker8.spynnaker_plotting.plot_spikes_numpy">
 <code class="sig-prename descclassname">spynnaker8.spynnaker_plotting.</code><code class="sig-name descname">plot_spikes_numpy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ax</span></em>, <em class="sig-param"><span class="n">spikes</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">options</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/spynnaker_plotting.html#plot_spikes_numpy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker8.spynnaker_plotting.plot_spikes_numpy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot all spikes</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 6.0: </span>Use
+<code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.spynnaker_plotting</span></code> instead.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -210,6 +195,10 @@ Whole Segments can be passed in only if they only contain one type of data</p>
 <dt id="spynnaker8.spynnaker_plotting.plot_spiketrains">
 <code class="sig-prename descclassname">spynnaker8.spynnaker_plotting.</code><code class="sig-name descname">plot_spiketrains</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ax</span></em>, <em class="sig-param"><span class="n">spiketrains</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">options</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/spynnaker_plotting.html#plot_spiketrains"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker8.spynnaker_plotting.plot_spiketrains" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot all spike trains in a Segment in a raster plot.</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 6.0: </span>Use
+<code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.spynnaker_plotting</span></code> instead.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">

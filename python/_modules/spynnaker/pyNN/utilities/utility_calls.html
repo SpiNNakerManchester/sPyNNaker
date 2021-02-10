@@ -55,11 +55,13 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">utility class containing simple helper methods</span>
 <span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">from</span> <span class="nn">pyNN.random</span> <span class="kn">import</span> <span class="n">RandomDistribution</span>
 <span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">binom</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.safe_eval</span> <span class="kn">import</span> <span class="n">SafeEval</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.exceptions</span> <span class="kn">import</span> <span class="n">ConfigurationException</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.random_stats</span> <span class="kn">import</span> <span class="p">(</span>
@@ -67,6 +69,8 @@
     <span class="n">RandomStatsNormalClippedImpl</span><span class="p">,</span> <span class="n">RandomStatsNormalImpl</span><span class="p">,</span>
     <span class="n">RandomStatsPoissonImpl</span><span class="p">,</span> <span class="n">RandomStatsRandIntImpl</span><span class="p">,</span> <span class="n">RandomStatsUniformImpl</span><span class="p">,</span>
     <span class="n">RandomStatsVonmisesImpl</span><span class="p">,</span> <span class="n">RandomStatsBinomialImpl</span><span class="p">)</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
 
 <span class="n">MAX_RATE</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="mi">32</span> <span class="o">-</span> <span class="mi">1</span>  <span class="c1"># To allow a unit32_t to be used to store the rate</span>
 
@@ -374,6 +378,23 @@
     <span class="k">if</span> <span class="n">n_values</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">return</span> <span class="mi">1</span>
     <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">n_values</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span></div>
+
+
+<div class="viewcode-block" id="moved_in_v6"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.moved_in_v6">[docs]</a><span class="k">def</span> <span class="nf">moved_in_v6</span><span class="p">(</span><span class="n">old_location</span><span class="p">,</span> <span class="n">new_location</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Warns the users that they are using an old import.</span>
+
+<span class="sd">    In version 7 this will ne upgraded to a exception and then later removed</span>
+
+<span class="sd">    :param str old_location: old import</span>
+<span class="sd">    :param str new_location: new import</span>
+<span class="sd">    :raise: an exception if in CONTINUOUS_INTEGRATION</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;CONTINUOUS_INTEGRATION&#39;</span><span class="p">,</span> <span class="s1">&#39;false&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;true&#39;</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Old import: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">old_location</span><span class="p">))</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;File </span><span class="si">{}</span><span class="s2"> moved to </span><span class="si">{}</span><span class="s2">. Please fix your imports. &quot;</span>
+                   <span class="s2">&quot;In version 7 this will fail completely.&quot;</span>
+                   <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">old_location</span><span class="p">,</span> <span class="n">new_location</span><span class="p">))</span></div>
 </pre></div>
 
             <div class="clearer"></div>

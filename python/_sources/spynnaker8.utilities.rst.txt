@@ -4,14 +4,6 @@ spynnaker8.utilities package
 Submodules
 ----------
 
-spynnaker8.utilities.neo\_compare module
-----------------------------------------
-
-.. automodule:: spynnaker8.utilities.neo_compare
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 spynnaker8.utilities.neo\_convertor module
 ------------------------------------------
 
