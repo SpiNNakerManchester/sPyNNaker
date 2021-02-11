@@ -56,12 +56,14 @@ class RateLiveInjectorVertex(ApplicationVertex, AbstractGeneratesDataSpecificati
         "__n_profile_samples",
         "__requires_mapping",
         "__n_generators",
-        "__dataset"
+        "__dataset",
+        "__machine_time_step",
+        "__refresh_rate"
     ]
 
     _n_vertices = 0
 
-    def __init__(self, generators, label, constraints, model, dataset):
+    def __init__(self, generators, label, constraints, model, dataset, refresh_rate):
         # pylint: disable=too-many-arguments
         self.__model_name = "RateLiveInjector"
         self.__model = model
@@ -78,6 +80,7 @@ class RateLiveInjectorVertex(ApplicationVertex, AbstractGeneratesDataSpecificati
         self.__machine_vertex = None
 
         self.__dataset = dataset
+        self.__refresh_rate = refresh_rate
 
         super(RateLiveInjectorVertex, self).__init__(
             label=label, constraints=constraints,
@@ -143,9 +146,14 @@ class RateLiveInjectorVertex(ApplicationVertex, AbstractGeneratesDataSpecificati
 
         :param vertex_slice:
         """
-        dataset_sz = len(self.__dataset) * self.__n_generators
+        return PARAMS_BASE_WORDS * 4
 
-        return dataset_sz + (PARAMS_BASE_WORDS * 4)
+    def get_values_bytes(self, vertex_slice):
+        """ Gets the size of the rate values in bytes
+
+        :param vertex_slice:
+        """
+        return len(self.__dataset) * self.__n_generators
 
     @property
     def n_atoms(self):
@@ -188,11 +196,26 @@ class RateLiveInjectorVertex(ApplicationVertex, AbstractGeneratesDataSpecificati
 
         # reserve poisson params dsg region
         self._reserve_rate_params_region(placement, graph_mapper, spec)
+        self._reserve_rate_values_region(placement, graph_mapper, spec)
 
         profile_utils.reserve_profile_region(
             spec, _REGIONS.PROFILER_REGION.value, self.__n_profile_samples)
 
         placement.vertex.reserve_provenance_data_region(spec)
+
+    def _reserve_rate_values_region(self, placement, graph_mapper, spec):
+        """ does the allocation for the rate params region itself, as\
+            it can be reused for setters after an initial run
+
+        :param placement: the location on machine for this vertex
+        :param graph_mapper: the mapping between machine and application graphs
+        :param spec: the dsg writer
+        :return:  None
+        """
+        spec.reserve_memory_region(
+            region=_REGIONS.RATE_VALUES_REGION.value,
+            size=self.get_values_bytes(graph_mapper.get_slice(
+                placement.vertex)), label='RateValues')
 
     def _reserve_rate_params_region(self, placement, graph_mapper, spec):
         """ does the allocation for the rate params region itself, as\
@@ -263,6 +286,9 @@ class RateLiveInjectorVertex(ApplicationVertex, AbstractGeneratesDataSpecificati
         # Write the vertex index for the shared memory region
         spec.write_value(data=vertex_index)
 
+        # Set the focus to the memory region 3 (rate values):
+        spec.switch_write_focus(_REGIONS.RATE_VALUES_REGION.value)
+
         spec.write_array(self.__dataset, data_type=DataType.UINT8)
 
 
@@ -284,6 +310,7 @@ class RateLiveInjectorVertex(ApplicationVertex, AbstractGeneratesDataSpecificati
 
         # reserve the neuron parameters data region
         self._reserve_rate_params_region(placement, graph_mapper, spec)
+        self._reserve_rate_values_region(placement, graph_mapper, spec)
 
         # allocate parameters
         self._write_rate_parameters(

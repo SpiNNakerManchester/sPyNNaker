@@ -36,6 +36,7 @@ from spynnaker.pyNN.models.abstract_models import (
 from spynnaker.pyNN.utilities import constants
 from .abstract_pynn_model import AbstractPyNNModel
 from .neuron.pynn_partition_vertex import PyNNPartitionVertex
+from spynnaker.pyNN.models.spike_source.rate_source_live_partition import RateSourceLivePartition
 
 logger = FormatAdapter(logging.getLogger(__file__))
 
@@ -95,7 +96,7 @@ class PyNNPopulationCommon(object):
                 self.__vertex.append(vertex)
 
             for v in self.__vertex:
-                if isinstance(v, PyNNPartitionVertex):
+                if isinstance(v, PyNNPartitionVertex) or isinstance(v, RateSourceLivePartition):
                     v.add_internal_edges_and_vertices(self.__spinnaker_control)
                 else:
                     for app_vertex in v.out_vertices:

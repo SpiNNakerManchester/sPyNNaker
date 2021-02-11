@@ -39,6 +39,7 @@ extern uint ticks;
 //! spike source array region IDs in human readable form
 typedef enum region {
     SYSTEM, RATE_PARAMS,
+    RATE_VALUES,
     PROVENANCE_REGION,
     PROFILER_REGION
 } region;
@@ -49,9 +50,9 @@ typedef enum region {
 
 typedef enum callback_priorities {
     MULTICAST = -1,
-    SDP = 0,
+    SDP = 2,
     DMA = 1,
-    TIMER = 2
+    TIMER = 1
 } callback_priorities;
 
 //! Parameters of the SpikeSourcePoisson
@@ -73,16 +74,6 @@ typedef struct global_parameters {
 
 } global_parameters;
 
-//! The global_parameters for the sub-population
-static global_parameters params;
-
-struct config {
-
-    global_parameters globals;
-    
-    uint8_t *rates;
-};
-
 struct source_provenance {
 
     uint32_t current_timer_tick;
@@ -102,7 +93,7 @@ static uint32_t infinite_run;
 //! The timer period
 static uint32_t timer_period;
 
-static uint32_t key;
+static uint32_t key = 0;
 
 //! Refresh frequency for the inputs
 static uint32_t refresh;
@@ -113,7 +104,7 @@ static uint32_t refresh_timer;
 static uint32_t generators;
 
 static uint8_t *rate_values;
-static uint8_t *memory_values;
+static uint8_t **memory_values;
 
 static uint32_t mem_index;
 static uint32_t vertex_offset;
@@ -126,7 +117,7 @@ static inline void read_rate_values() {
     refresh_timer = 0;
 
     spin1_dma_transfer(
-        DMA_READ_TAG, memory_values + (refresh_counter * generators),
+        DMA_READ_TAG, memory_values[refresh_counter & 1] + (refresh_counter * generators),
         rate_values, DMA_READ, pool_size);
 
     refresh_counter++;
@@ -138,22 +129,27 @@ static inline void read_rate_values() {
 //!            rate parameter region starts.
 //! \return a boolean which is True if the parameters were read successfully or
 //!         False otherwise
-static bool read_rate_parameters(struct config *config) {
+static bool read_rate_parameters(address_t address, address_t starting_values) {
     // Allocate DTCM for array of rates and copy block of data
 
-    spin1_memcpy(&params, &config->globals, sizeof(params));
+    global_parameters *params = (void *) address;
 
-    generators = params.generators;
+    generators = params->generators;
     refresh_timer = 0;
-    refresh_counter = 1;
-    refresh = params.refresh;
-    key = params.key;
-    mem_index = params.mem_index;
-    vertex_offset = params.vertex_offset;
-
-    memory_values = config->rates;
+    refresh_counter = 0;
+    refresh = params->refresh;
+    if(params->has_key) {
+        key = params->key;
+    }
+    mem_index = params->mem_index;
+    vertex_offset = params->vertex_offset;
 
     pool_size = generators * sizeof(uint8_t);
+
+    memory_values = (uint8_t **) spin1_malloc(2 * sizeof(uint8_t *));
+
+    io_printf(IO_BUF, "generators %d, refresh %d\n", generators, refresh);
+    io_printf(IO_BUF, "mem_index %d, vertex_offset %d\n", mem_index, vertex_offset);
 
     rate_values = spin1_malloc(pool_size);
     if (rate_values == NULL) {
@@ -161,7 +157,15 @@ static bool read_rate_parameters(struct config *config) {
         return false;
     }
 
-    spin1_memcpy(rate_values, memory_values, pool_size);
+    spin1_memcpy(rate_values, starting_values, pool_size);
+
+    io_printf(IO_BUF, "values:\n");
+    
+    for(index_t i = 0; i < generators; i++) {
+        io_printf(IO_BUF, "%x ", rate_values[i]);
+    }
+
+    io_printf(IO_BUF, "\n");
 
     log_info("read_rate_parameters: completed successfully");
     return true;
@@ -210,7 +214,8 @@ static bool initialize(void) {
             data_specification_get_region(PROVENANCE_REGION, ds_regions));
 
     if (!read_rate_parameters(
-            data_specification_get_region(RATE_PARAMS, ds_regions))) {
+            data_specification_get_region(RATE_PARAMS, ds_regions),
+            data_specification_get_region(RATE_VALUES, ds_regions))) {
         return false;
     }
 
@@ -232,7 +237,8 @@ static void resume_callback(void) {
             data_specification_get_data_address();
 
     if (!read_rate_parameters(
-            data_specification_get_region(RATE_PARAMS, ds_regions))) {
+            data_specification_get_region(RATE_PARAMS, ds_regions),
+            data_specification_get_region(RATE_VALUES, ds_regions))) {
         log_error("failed to reread the Rate parameters from SDRAM");
         rt_error(RTE_SWERR);
     }
@@ -260,8 +266,10 @@ static void timer_callback(uint timer_count, uint unused) {
 
     if(time == 0) {
 
-        memory_values = sark_tag_ptr(mem_index, 0);
-        memory_values += vertex_offset;
+        memory_values[0] = sark_tag_ptr(mem_index, 0);
+        memory_values[1] = sark_tag_ptr(mem_index+1, 0);
+        memory_values[0] += vertex_offset;
+        memory_values[1] += vertex_offset;
     }
 
     log_debug("Timer tick %u", time);
@@ -284,12 +292,16 @@ static void timer_callback(uint timer_count, uint unused) {
 
     for(index_t i = 0; i < generators; i++) {
 
-        while (!spin1_send_mc_packet(key | i, rate_values[i], WITH_PAYLOAD)) {
-                spin1_delay_us(1);
-            }
+        // while (!spin1_send_mc_packet(key | i, rate_values[i], WITH_PAYLOAD)) {
+        //         spin1_delay_us(1);
+        //     }
+
+        io_printf(IO_BUF, "%x ", rate_values[i]);
     }
+    io_printf(IO_BUF, "\n");
 
     if(refresh_timer > refresh) {
+        io_printf(IO_BUF, "ts %d refresh\n", time);
         read_rate_values();
     }
 
@@ -309,7 +321,7 @@ void c_main(void) {
     time = UINT32_MAX;
 
     // Set timer tick (in microseconds)
-    spin1_set_timer_tick_and_phase(timer_period, params.timer_offset);
+    spin1_set_timer_tick_and_phase(timer_period, 0);
 
     // Register callback
     spin1_callback_on(TIMER_TICK, timer_callback, TIMER);

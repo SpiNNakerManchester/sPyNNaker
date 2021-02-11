@@ -39,6 +39,7 @@ extern uint ticks;
 //! spike source array region IDs in human readable form
 typedef enum region {
     SYSTEM, RATE_PARAMS,
+    RATE_VALUES,
     PROVENANCE_REGION,
     PROFILER_REGION
 } region;
@@ -50,9 +51,9 @@ typedef enum region {
 
 typedef enum callback_priorities {
     MULTICAST = -1,
-    SDP = 0,
+    SDP = 2,
     DMA = 1,
-    TIMER = 2
+    TIMER = 1
 } callback_priorities;
 
 //! Parameters of the SpikeSourcePoisson
@@ -67,16 +68,6 @@ typedef struct global_parameters {
     uint32_t mem_index;
 
 } global_parameters;
-
-//! The global_parameters for the sub-population
-static global_parameters params;
-
-struct config {
-
-    global_parameters globals;
-    
-    uint8_t *rates;
-};
 
 struct source_provenance {
 
@@ -107,7 +98,7 @@ static uint32_t generators;
 
 static uint8_t *rate_values;
 static uint8_t *memory_values;
-static uint8_t *shared_region;
+static uint8_t **shared_region;
 
 static uint32_t mem_index;
 static uint32_t vertex_offset;
@@ -123,7 +114,6 @@ static inline void update_mem_values() {
         rate_values, DMA_READ, img_size);
 
     memory_values += generators;
-    refresh_counter++;
 }
 
 void dma_complete_callback(uint unused1, uint unused2) {
@@ -131,8 +121,10 @@ void dma_complete_callback(uint unused1, uint unused2) {
     use(unused1);
     use(unused2);
 
-    spin1_dma_transfer(DMA_WRITE_TAG, shared_region, rate_values,
+    spin1_dma_transfer(DMA_WRITE_TAG, shared_region[refresh_counter & 1], rate_values,
         DMA_WRITE, img_size);
+
+    refresh_counter++;
 }
 
 
@@ -141,23 +133,26 @@ void dma_complete_callback(uint unused1, uint unused2) {
 //!            rate parameter region starts.
 //! \return a boolean which is True if the parameters were read successfully or
 //!         False otherwise
-static bool read_rate_parameters(struct config *config) {
+static bool read_rate_parameters(address_t address, address_t dataset) {
     // Allocate DTCM for array of rates and copy block of data
 
-    spin1_memcpy(&params, &config->globals, sizeof(params));
+    global_parameters *params = (void *) address;
 
-    generators = params.generators;
+    generators = params->generators;
     refresh_timer = 0;
     refresh_counter = 1;
-    refresh = params.refresh;
-    mem_index = params.mem_index;
+    refresh = params->refresh;
+    mem_index = params->mem_index;
 
-    memory_values = config->rates;
+    memory_values = (uint8_t *) dataset;
     
     // The size of 1 image
     img_size = generators * sizeof(uint8_t);
 
-    shared_region = (uint8_t *) sark_xalloc(sv->sdram_heap, img_size, mem_index, 1);
+    shared_region = (uint8_t **) spin1_malloc(2 * sizeof(uint8_t *));
+
+    shared_region[0] = (uint8_t *) sark_xalloc(sv->sdram_heap, img_size, mem_index, 1);
+    shared_region[1] = (uint8_t *) sark_xalloc(sv->sdram_heap, img_size, mem_index+1, 1);
 
     rate_values = spin1_malloc(img_size);
     if (rate_values == NULL) {
@@ -165,7 +160,9 @@ static bool read_rate_parameters(struct config *config) {
         return false;
     }
 
-    spin1_memcpy(shared_region, memory_values, img_size);
+    spin1_memcpy(shared_region[0], memory_values, img_size);
+
+    memory_values += generators;
 
     log_info("read_rate_parameters: completed successfully");
     return true;
@@ -178,7 +175,7 @@ void store_provenance_data(address_t provenance_region) {
 
     // store the data into the provenance data region
     prov->current_timer_tick = time;
-    prov->refresh_counts = refresh_counter;
+    prov->refresh_counts = refresh_counter-1;
     log_debug("finished other provenance data");
 }
 
@@ -214,7 +211,8 @@ static bool initialize(void) {
             data_specification_get_region(PROVENANCE_REGION, ds_regions));
 
     if (!read_rate_parameters(
-            data_specification_get_region(RATE_PARAMS, ds_regions))) {
+            data_specification_get_region(RATE_PARAMS, ds_regions),
+            data_specification_get_region(RATE_VALUES, ds_regions))) {
         return false;
     }
 
@@ -236,7 +234,8 @@ static void resume_callback(void) {
             data_specification_get_data_address();
 
     if (!read_rate_parameters(
-            data_specification_get_region(RATE_PARAMS, ds_regions))) {
+            data_specification_get_region(RATE_PARAMS, ds_regions),
+            data_specification_get_region(RATE_VALUES, ds_regions))) {
         log_error("failed to reread the Rate parameters from SDRAM");
         rt_error(RTE_SWERR);
     }
@@ -281,6 +280,7 @@ static void timer_callback(uint timer_count, uint unused) {
     }
 
     if(refresh_timer > refresh) {
+        io_printf(IO_BUF, "refreshing t %d\n", time);
         update_mem_values();
     }
 
@@ -300,7 +300,7 @@ void c_main(void) {
     time = UINT32_MAX;
 
     // Set timer tick (in microseconds)
-    spin1_set_timer_tick_and_phase(timer_period, params.timer_offset);
+    spin1_set_timer_tick_and_phase(timer_period, 0);
 
     // Register callbacks
     spin1_callback_on(TIMER_TICK, timer_callback, TIMER);

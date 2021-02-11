@@ -73,7 +73,7 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
         "__n_machine_vertices",
         "__machine_vertices",
         "__change_requires_neuron_parameters_reload",
-        "__self_machine_time_step",
+        "__machine_time_step",
         "__n_subvertices",
         "__n_data_specs",
         "__n_profile_samples",
@@ -154,9 +154,11 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
         # pylint: disable=arguments-differ
 
         rate_params_sz = self.get_params_bytes(vertex_slice)
+        rate_values_sz = self.get_values_bytes(vertex_slice)
         other = ConstantSDRAM(
             SYSTEM_BYTES_REQUIREMENT +
             rate_params_sz +
+            rate_values_sz +
             RateSourceLiveMachineVertex.get_provenance_data_size(
                 RateSourceLiveMachineVertex.N_ADDITIONAL_PROVENANCE_DATA_ITEMS) +
             profile_utils.get_profile_region_size(self.__n_profile_samples))
@@ -174,10 +176,14 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
 
         :param vertex_slice:
         """
+        return (PARAMS_BASE_WORDS * 4)
 
-        starting_slice_sz = vertex_slice.n_atoms
+    def get_values_bytes(self, vertex_slice):
+        """ Gets the size of the rate values in bytes
 
-        return starting_slice_sz + (PARAMS_BASE_WORDS * 4)
+        :param vertex_slice:
+        """
+        return vertex_slice.n_atoms
 
     @property
     def n_atoms(self):
@@ -223,14 +229,29 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
             size=SIMULATION_N_BYTES,
             label='setup')
 
-        # reserve poisson params dsg region
+        # reserve rate params dsg region
         self._reserve_rate_params_region(placement, graph_mapper, spec)
+        self._reserve_rate_values_region(placement, graph_mapper, spec)
 
         profile_utils.reserve_profile_region(
             spec, _REGIONS.PROFILER_REGION.value, self.__n_profile_samples)
 
         placement.vertex.reserve_provenance_data_region(spec)
 
+    def _reserve_rate_values_region(self, placement, graph_mapper, spec):
+        """ does the allocation for the rate params region itself, as\
+            it can be reused for setters after an initial run
+
+        :param placement: the location on machine for this vertex
+        :param graph_mapper: the mapping between machine and application graphs
+        :param spec: the dsg writer
+        :return:  None
+        """
+        spec.reserve_memory_region(
+            region=_REGIONS.RATE_VALUES_REGION.value,
+            size=self.get_values_bytes(graph_mapper.get_slice(
+                placement.vertex)), label='RateValues')
+    
     def _reserve_rate_params_region(self, placement, graph_mapper, spec):
         """ does the allocation for the rate params region itself, as\
             it can be reused for setters after an initial run
@@ -293,7 +314,7 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
 
         vertex = placement.vertex
 
-        # Set the focus to the memory region 2 (neuron parameters):
+        # Set the focus to the memory region 2 (rate parameters):
         spec.switch_write_focus(_REGIONS.RATE_PARAMS_REGION.value)
 
         # Write Key info for this core:
@@ -322,8 +343,10 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
         # Write the offset for the first generator in memory
         spec.write_value(data=vertex.vertex_offset)
 
+        # Set the focus to the memory region 3 (rate values):
+        spec.switch_write_focus(_REGIONS.RATE_VALUES_REGION.value)
+
         # Write the portion of image for the first timestep
-        #ADJUST FOR MULTIPLE MACHINE VERTICES!!
         spec.write_array(vertex.starting_slice, data_type=DataType.UINT8)
 
 
@@ -345,6 +368,7 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
 
         # reserve the neuron parameters data region
         self._reserve_rate_params_region(placement, graph_mapper, spec)
+        self._reserve_rate_values_region(placement, graph_mapper, spec)
 
         # allocate parameters
         self._write_rate_parameters(

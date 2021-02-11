@@ -13,16 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-BUILDS = spike_source \
-		delay_extension \
-		neuron \
-		robot_motor_control \
-		synapse_expander \
+APP = rate_live_injector
+SOURCES = spike_source/rate_source/rate_live_injector.c
 
-DIRS = $(BUILDS:%=makefiles/%)
+include ../../neural_support.mk
 
-all: $(DIRS)
-	for d in $(DIRS); do $(MAKE) -C $$d || exit $$?; done
-
-clean: $(DIRS)
-	for d in $(DIRS); do $(MAKE) -C $$d clean || exit $$?; done

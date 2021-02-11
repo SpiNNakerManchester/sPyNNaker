@@ -38,7 +38,9 @@ class RateSourceLiveMachineVertex(
         "__is_recording",
         "__minimum_buffer_sdram",
         "__resources",
-        "__vertex_index"]
+        "__vertex_index",
+        "__vertex_offset",
+        "__starting_slice"]
 
     EXTRA_PROVENANCE_DATA_ENTRIES = Enum(
         value="EXTRA_PROVENANCE_DATA_ENTRIES",
@@ -49,8 +51,9 @@ class RateSourceLiveMachineVertex(
         value="RATE_SOURCE_REGIONS",
         names=[('SYSTEM_REGION', 0),
                ('RATE_PARAMS_REGION', 1),
-               ('PROVENANCE_REGION', 2),
-               ('PROFILER_REGION', 3)])
+               ('RATE_VALUES_REGION', 2),
+               ('PROVENANCE_REGION', 3),
+               ('PROFILER_REGION', 4)])
 
     PROFILE_TAG_LABELS = {
         0: "TIMER",

@@ -13,16 +13,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-BUILDS = spike_source \
-		delay_extension \
-		neuron \
-		robot_motor_control \
-		synapse_expander \
+MODELS = poisson \
+		rate_live_injector \
+		rate_source \
+		rate_source_live
+		 
 
-DIRS = $(BUILDS:%=makefiles/%)
 
-all: $(DIRS)
-	for d in $(DIRS); do $(MAKE) -C $$d || exit $$?; done
+all:
+	for d in $(MODELS); do $(MAKE) -C $$d || exit $$?; done
 
-clean: $(DIRS)
-	for d in $(DIRS); do $(MAKE) -C $$d clean || exit $$?; done
+clean:
+	for d in $(MODELS); do $(MAKE) -C $$d clean || exit $$?; done

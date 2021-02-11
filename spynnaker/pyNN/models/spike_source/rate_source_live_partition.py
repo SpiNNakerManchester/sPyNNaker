@@ -6,6 +6,11 @@ from spynnaker.pyNN.models.common import SimplePopulationSettable
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spinn_utilities.overrides import overrides
 
+from pacman.model.graphs.application.application_edge \
+    import ApplicationEdge
+
+from spynnaker.pyNN.utilities import constants
+
 # The number of usable application cores in a chip
 APP_CORES_PER_CHIP = 15
 
@@ -17,6 +22,8 @@ class RateSourceLivePartition(SimplePopulationSettable, AbstractChangableAfterRu
         "__partitions",
         "__refresh_rate",
         "__injector_vertex",
+        "__atoms_per_partition",
+        "__machine_vertices",
         "__dataset"]
 
     def __init__(self, sources, constraints, label, rate_source_live, partitions, refresh_rate, dataset):
@@ -28,7 +35,7 @@ class RateSourceLivePartition(SimplePopulationSettable, AbstractChangableAfterRu
         self.__dataset = dataset
 
         self.__injector_vertex = RateLiveInjectorVertex(
-            self.__n_atoms, "Rate_live_injector", constraints, rate_source_live, self.__dataset[1:])
+            self.__n_atoms, "Rate_live_injector", constraints, rate_source_live, self.__dataset[1:], refresh_rate)
         
         self.__atoms_per_partition = self._compute_partition_and_offset_size(self.__n_atoms)
     
@@ -36,11 +43,13 @@ class RateSourceLivePartition(SimplePopulationSettable, AbstractChangableAfterRu
         self.__machine_vertices = self._compute_partition_and_offset_size(APP_CORES_PER_CHIP - 1)
 
         vertex_offset = 0
+        atoms_partition_offset = 0
         
         for i in range(self.__partitions):
 
             starting_slices = []
             start = vertex_offset
+            atoms_partition_offset += self.__atoms_per_partition[i]
             # Set this in order to force the partitioning to have the number of machine cores we want
             max_atoms_per_core = int(math.ceil(self.__atoms_per_partition[i] / self.__machine_vertices[i]))
             
@@ -50,7 +59,7 @@ class RateSourceLivePartition(SimplePopulationSettable, AbstractChangableAfterRu
                     starting_slices.append(self.__dataset[0][start : (start + max_atoms_per_core)])
                     start += max_atoms_per_core 
                 else:
-                    starting_slices.append(self.__dataset[0][start : (self.__atoms_per_partition[i] - start)])
+                    starting_slices.append(self.__dataset[0][start : atoms_partition_offset])
 
             self.__vertices.append(RateSourceLiveVertex(
                 self.__atoms_per_partition[i], constraints, max_atoms_per_core,
@@ -68,6 +77,24 @@ class RateSourceLivePartition(SimplePopulationSettable, AbstractChangableAfterRu
     @property
     def out_vertices(self):
         return self.__vertices
+
+    @property
+    def partitions(self):
+        return self.__partitions
+
+    def add_internal_edges_and_vertices(self, spinnaker_control):
+
+        spinnaker_control.add_application_vertex(self.__injector_vertex)
+
+        for v in self.__vertices:
+
+            spinnaker_control.add_application_vertex(v)
+
+            spinnaker_control.add_application_edge(ApplicationEdge(
+                self.__injector_vertex, v,
+                label="injector_edge {}".format(spinnaker_control.none_labelled_edge_count)),
+                constants.SPIKE_PARTITION_ID)
+            spinnaker_control.increment_none_labelled_edge_count()
 
     @property
     def injector_vertex(self):
