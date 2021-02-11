@@ -52,14 +52,12 @@
 <span class="c1">#</span>
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">TimingDependenceRecurrent</span> <span class="k">as</span>
     <span class="n">_BaseClass</span><span class="p">)</span>
 
 <span class="n">_defaults</span> <span class="o">=</span> <span class="n">_BaseClass</span><span class="o">.</span><span class="n">default_parameters</span>
-<span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.utility_calls</span> <span class="kn">import</span> <span class="n">moved_in_v6</span>
 
 
 <div class="viewcode-block" id="TimingDependenceRecurrent"><a class="viewcode-back" href="../../../../../spynnaker8.models.synapse_dynamics.timing_dependence.html#spynnaker8.models.synapse_dynamics.timing_dependence.TimingDependenceRecurrent">[docs]</a><span class="k">class</span> <span class="nc">TimingDependenceRecurrent</span><span class="p">(</span><span class="n">_BaseClass</span><span class="p">):</span>
@@ -87,15 +85,16 @@
 <span class="sd">        :param float A_minus: :math:`A^-`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
+        <span class="n">moved_in_v6</span><span class="p">(</span><span class="s2">&quot;spynnaker8.models.synapse_dynamics.timing_dependence.&quot;</span>
+                    <span class="s2">&quot;TimingDependenceRecurrent&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;spynnaker.pyNN.models.neuron.plasticity.stdp.&quot;</span>
+                    <span class="s2">&quot;timing_dependence.TimingDependenceRecurrent&quot;</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TimingDependenceRecurrent</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">accumulator_depression</span><span class="o">=</span><span class="n">accumulator_depression</span><span class="p">,</span>
             <span class="n">accumulator_potentiation</span><span class="o">=</span><span class="n">accumulator_potentiation</span><span class="p">,</span>
             <span class="n">mean_pre_window</span><span class="o">=</span><span class="n">mean_pre_window</span><span class="p">,</span>
             <span class="n">mean_post_window</span><span class="o">=</span><span class="n">mean_post_window</span><span class="p">,</span>
-            <span class="n">dual_fsm</span><span class="o">=</span><span class="n">dual_fsm</span><span class="p">,</span> <span class="n">A_plus</span><span class="o">=</span><span class="n">A_plus</span><span class="p">,</span> <span class="n">A_minus</span><span class="o">=</span><span class="n">A_minus</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-            <span class="s2">&quot;please use spynnaker.pyNN.models.neuron.plasticity.stdp.&quot;</span>
-            <span class="s2">&quot;timing_dependence.TimingDependenceRecurrent instead&quot;</span><span class="p">)</span></div>
+            <span class="n">dual_fsm</span><span class="o">=</span><span class="n">dual_fsm</span><span class="p">,</span> <span class="n">A_plus</span><span class="o">=</span><span class="n">A_plus</span><span class="p">,</span> <span class="n">A_minus</span><span class="o">=</span><span class="n">A_minus</span><span class="p">)</span></div>
 </pre></div>
 
             <div class="clearer"></div>

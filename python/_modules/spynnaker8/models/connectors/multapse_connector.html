@@ -53,12 +53,10 @@
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neural_projections.connectors</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">MultapseConnector</span> <span class="k">as</span>
     <span class="n">_BaseClass</span><span class="p">)</span>
-<span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.utility_calls</span> <span class="kn">import</span> <span class="n">moved_in_v6</span>
 
 
 <div class="viewcode-block" id="MultapseConnector"><a class="viewcode-back" href="../../../../spynnaker8.models.connectors.html#spynnaker8.models.connectors.MultapseConnector">[docs]</a><span class="k">class</span> <span class="nc">MultapseConnector</span><span class="p">(</span><span class="n">_BaseClass</span><span class="p">):</span>
@@ -94,13 +92,13 @@
 <span class="sd">        :param rng: random number generator</span>
 <span class="sd">        :type rng: ~pyNN.random.NumpyRNG or None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">moved_in_v6</span><span class="p">(</span><span class="s2">&quot;spynnaker8.models.connectors.MultapseConnector&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;spynnaker.pyNN.models.neural_projections.connectors.&quot;</span>
+                    <span class="s2">&quot;MultapseConnector&quot;</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">MultapseConnector</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">num_synapses</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">allow_self_connections</span><span class="o">=</span><span class="n">allow_self_connections</span><span class="p">,</span>
             <span class="n">with_replacement</span><span class="o">=</span><span class="n">with_replacement</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="n">safe</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
-            <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-            <span class="s2">&quot;please use spynnaker.pyNN.models.neural_projections.connectors.&quot;</span>
-            <span class="s2">&quot;MultapseConnector instead&quot;</span><span class="p">)</span></div>
+            <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span></div>
 </pre></div>
 
             <div class="clearer"></div>

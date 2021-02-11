@@ -52,12 +52,10 @@
 <span class="c1">#</span>
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neural_projections.connectors</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">FromFileConnector</span> <span class="k">as</span>
     <span class="n">_BaseClass</span><span class="p">)</span>
-<span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.utility_calls</span> <span class="kn">import</span> <span class="n">moved_in_v6</span>
 
 
 <div class="viewcode-block" id="FromFileConnector"><a class="viewcode-back" href="../../../../spynnaker8.models.connectors.html#spynnaker8.models.connectors.FromFileConnector">[docs]</a><span class="k">class</span> <span class="nc">FromFileConnector</span><span class="p">(</span><span class="n">_BaseClass</span><span class="p">):</span>
@@ -108,10 +106,9 @@
 <span class="sd">            Whether to output extra information about the connectivity to a</span>
 <span class="sd">            CSV file</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">_BaseClass</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">distributed</span><span class="p">,</span> <span class="n">safe</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-            <span class="s2">&quot;please use spynnaker.pyNN.models.neural_projections.connectors.&quot;</span>
-            <span class="s2">&quot;FromFileConnector instead&quot;</span><span class="p">)</span></div>
+        <span class="n">moved_in_v6</span><span class="p">(</span><span class="s2">&quot;spynnaker8.models.connectors&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;spynnaker.pyNN.models.neural_projections.connectors&quot;</span><span class="p">)</span>
+        <span class="n">_BaseClass</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">distributed</span><span class="p">,</span> <span class="n">safe</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span></div>
 </pre></div>
 
             <div class="clearer"></div>
