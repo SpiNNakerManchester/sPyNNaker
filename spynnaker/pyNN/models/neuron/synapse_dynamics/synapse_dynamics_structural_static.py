@@ -14,28 +14,28 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy
+from pyNN.standardmodels.synapses import StaticSynapse
 from spinn_utilities.overrides import overrides
+from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
-from spynnaker.pyNN.models.neuron.synapse_dynamics.\
-    synapse_dynamics_structural_common import (
-        DEFAULT_F_REW, DEFAULT_INITIAL_WEIGHT, DEFAULT_INITIAL_DELAY,
-        DEFAULT_S_MAX, SynapseDynamicsStructuralCommon)
+from .synapse_dynamics_structural_common import (
+    DEFAULT_F_REW, DEFAULT_INITIAL_WEIGHT, DEFAULT_INITIAL_DELAY,
+    DEFAULT_S_MAX, SynapseDynamicsStructuralCommon as
+    _Common)
 from .synapse_dynamics_static import SynapseDynamicsStatic
 from .synapse_dynamics_stdp import SynapseDynamicsSTDP
 from .synapse_dynamics_structural_stdp import SynapseDynamicsStructuralSTDP
-from spynnaker.pyNN.exceptions import SynapticConfigurationException
 
 
-class SynapseDynamicsStructuralStatic(
-        SynapseDynamicsStatic, SynapseDynamicsStructuralCommon):
+class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
     """ Class that enables synaptic rewiring in the absence of STDP.
 
-        It acts as a wrapper around SynapseDynamicsStatic, meaning that \
-        rewiring can operate in parallel with static synapses.
+    It acts as a wrapper around SynapseDynamicsStatic, meaning that rewiring
+    can operate in parallel with static synapses.
 
-        Written by Petrut Bogdan.
+    Written by Petrut Bogdan.
     """
     __slots__ = [
         # Frequency of rewiring (Hz)
@@ -76,7 +76,8 @@ class SynapseDynamicsStructuralStatic(
             self, partner_selection, formation, elimination,
             f_rew=DEFAULT_F_REW, initial_weight=DEFAULT_INITIAL_WEIGHT,
             initial_delay=DEFAULT_INITIAL_DELAY, s_max=DEFAULT_S_MAX,
-            seed=None, weight=0.0, delay=1.0):
+            with_replacement=True, seed=None,
+            weight=StaticSynapse.default_parameters['weight'], delay=None):
         """
         :param AbstractPartnerSelection partner_selection:
             The partner selection rule
@@ -92,9 +93,15 @@ class SynapseDynamicsStructuralStatic(
             values
         :type initial_delay: float or (float, float)
         :param int s_max: Maximum fan-in per target layer neuron
+        :param bool with_replacement:
+            If set to True (default), a new synapse can be formed in a
+            location where a connection already exists; if False, then it must
+            form where no connection already exists
         :param int seed: seed the random number generators
         :param float weight: The weight of connections formed by the connector
-        :param float delay: The delay of connections formed by the connector
+        :param delay: The delay of connections formed by the connector
+            Use ``None`` to get the simulator default minimum delay.
+        :type delay: float or None
         """
         super(SynapseDynamicsStructuralStatic, self).__init__(
             weight=weight, delay=delay, pad_to_length=s_max)
@@ -107,6 +114,7 @@ class SynapseDynamicsStructuralStatic(
         self.__initial_weight = initial_weight
         self.__initial_delay = initial_delay
         self.__s_max = s_max
+        self.__with_replacement = with_replacement
         self.__seed = seed
         self.__connections = dict()
 
@@ -161,14 +169,12 @@ class SynapseDynamicsStructuralStatic(
 
     @overrides(SynapseDynamicsStatic.is_same_as)
     def is_same_as(self, synapse_dynamics):
-        return SynapseDynamicsStructuralCommon.is_same_as(
-            self, synapse_dynamics)
+        return _Common.is_same_as(self, synapse_dynamics)
 
     @overrides(SynapseDynamicsStatic.get_vertex_executable_suffix)
     def get_vertex_executable_suffix(self):
         return (SynapseDynamicsStatic.get_vertex_executable_suffix(self) +
-                SynapseDynamicsStructuralCommon.get_vertex_executable_suffix(
-                    self))
+                _Common.get_vertex_executable_suffix(self))
 
     @overrides(SynapseDynamicsStatic.get_n_words_for_static_connections)
     def get_n_words_for_static_connections(self, n_connections):
@@ -192,7 +198,7 @@ class SynapseDynamicsStructuralStatic(
     @overrides(SynapseDynamicsStatic.get_parameter_names)
     def get_parameter_names(self):
         names = SynapseDynamicsStatic.get_parameter_names(self)
-        names.extend(SynapseDynamicsStructuralCommon.get_parameter_names(self))
+        names.extend(_Common.get_parameter_names(self))
         return names
 
     @property
@@ -214,6 +220,11 @@ class SynapseDynamicsStructuralStatic(
     @overrides(AbstractSynapseDynamicsStructural.s_max)
     def s_max(self):
         return self.__s_max
+
+    @property
+    @overrides(AbstractSynapseDynamicsStructural.with_replacement)
+    def with_replacement(self):
+        return self.__with_replacement
 
     @property
     @overrides(AbstractSynapseDynamicsStructural.initial_weight)
@@ -241,7 +252,7 @@ class SynapseDynamicsStructuralStatic(
         return self.__elimination
 
     @property
-    @overrides(SynapseDynamicsStructuralCommon.connections)
+    @overrides(_Common.connections)
     def connections(self):
         return self.__connections
 
@@ -259,7 +270,7 @@ class SynapseDynamicsStructuralStatic(
             connector, synapse_info)
         return max(w_m, self.__initial_weight)
 
-    @overrides(SynapseDynamicsStructuralCommon.get_seeds)
+    @overrides(_Common.get_seeds)
     def get_seeds(self, app_vertex=None):
         if app_vertex:
             if app_vertex not in self.__seeds.keys():

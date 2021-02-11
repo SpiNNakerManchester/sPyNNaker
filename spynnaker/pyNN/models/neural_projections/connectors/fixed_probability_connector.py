@@ -40,30 +40,38 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
 
     def __init__(
             self, p_connect, allow_self_connections=True, safe=True,
-            callback=None, verbose=False, rng=None):
+            verbose=False, rng=None, callback=None):
         """
         :param float p_connect:
-            a float between zero and one. Each potential connection is created\
+            a value between zero and one. Each potential connection is created
             with this probability.
         :param bool allow_self_connections:
-            if the connector is used to connect a Population to itself, this\
-            flag determines whether a neuron is allowed to connect to itself,\
+            if the connector is used to connect a Population to itself, this
+            flag determines whether a neuron is allowed to connect to itself,
             or only to other neurons in the Population.
         :param bool safe:
-        :param callable callback: Ignored
+            If ``True``, check that weights and delays have valid values.
+            If ``False``, this check is skipped.
         :param bool verbose:
+            Whether to output extra information about the connectivity to a
+            CSV file
         :param rng:
             Seeded random number generator, or None to make one when needed
         :type rng: ~pyNN.random.NumpyRNG or None
+        :param callable callback:
+            if given, a callable that display a progress bar on the terminal.
+
+            .. note::
+                Not supported by sPyNNaker.
         """
+        if not 0.0 <= p_connect <= 1.0:
+            raise ConfigurationException(
+                "The probability must be between 0 and 1 (inclusive)")
         super(FixedProbabilityConnector, self).__init__(
             safe, callback, verbose)
         self._p_connect = p_connect
         self.__allow_self_connections = allow_self_connections
         self._rng = rng
-        if not 0 <= self._p_connect <= 1:
-            raise ConfigurationException(
-                "The probability must be between 0 and 1 (inclusive)")
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
@@ -177,3 +185,14 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
     def gen_connector_params_size_in_bytes(self):
         # view + params + seeds
         return self._view_params_bytes + (N_GEN_PARAMS * BYTES_PER_WORD)
+
+    @property
+    def p_connect(self):
+        return self._p_connect
+
+    @p_connect.setter
+    def p_connect(self, new_value):
+        if not 0.0 <= new_value <= 1.0:
+            raise ConfigurationException(
+                "The probability must be between 0 and 1 (inclusive)")
+        self._p_connect = new_value

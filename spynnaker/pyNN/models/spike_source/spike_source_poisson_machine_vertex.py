@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import struct
 from enum import Enum
-
 import numpy
 
 from data_specification.enums import DataType
@@ -31,8 +30,7 @@ from pacman.executor.injection_decorator import inject_items
 from pacman.model.graphs.machine import MachineVertex
 from spinn_front_end_common.abstract_models import (
     AbstractHasAssociatedBinary, AbstractSupportsDatabaseInjection,
-    AbstractRecordable, AbstractRewritesDataSpecification,
-    AbstractGeneratesDataSpecification)
+    AbstractRewritesDataSpecification, AbstractGeneratesDataSpecification)
 from spinn_front_end_common.interface.provenance import (
     ProvidesProvenanceDataFromMachineImpl)
 from spinn_front_end_common.interface.buffer_management.buffer_models import (
@@ -81,10 +79,13 @@ PARAMS_WORDS_PER_NEURON = 2
 # sqrt_lambda, isi_val, time_to_spike
 PARAMS_WORDS_PER_RATE = 8
 
+_ONE_WORD = struct.Struct("<I")
+_FOUR_WORDS = struct.Struct("<4I")
+
 
 class SpikeSourcePoissonMachineVertex(
         MachineVertex, AbstractReceiveBuffersToHost,
-        ProvidesProvenanceDataFromMachineImpl, AbstractRecordable,
+        ProvidesProvenanceDataFromMachineImpl,
         AbstractSupportsDatabaseInjection, AbstractHasProfileData,
         AbstractHasAssociatedBinary, AbstractRewritesDataSpecification,
         AbstractGeneratesDataSpecification, AbstractReadParametersBeforeSet):
@@ -173,10 +174,6 @@ class SpikeSourcePoissonMachineVertex(
         ProvidesProvenanceDataFromMachineImpl._n_additional_data_items)
     def _n_additional_data_items(self):
         return 1
-
-    @overrides(AbstractRecordable.is_recording)
-    def is_recording(self):
-        return self.__is_recording
 
     @overrides(AbstractReceiveBuffersToHost.get_recorded_region_ids)
     def get_recorded_region_ids(self):
@@ -640,11 +637,10 @@ class SpikeSourcePoissonMachineVertex(
         # locate SDRAM address where parameters are stored
         poisson_params = self.poisson_param_region_address(
             placement, transceiver)
-        seed_array = transceiver.read_memory(
+        seed_array = _FOUR_WORDS.unpack_from(transceiver.read_memory(
             placement.x, placement.y, poisson_params + self.SEED_OFFSET_BYTES,
-            self.SEED_SIZE_BYTES)
-        self._app_vertex.update_kiss_seed(
-            vertex_slice, struct.unpack_from("<4I", seed_array))
+            self.SEED_SIZE_BYTES))
+        self._app_vertex.update_kiss_seed(vertex_slice, seed_array)
 
         # locate SDRAM address where the rates are stored
         poisson_rate_region_sdram_address = (
@@ -661,7 +657,7 @@ class SpikeSourcePoissonMachineVertex(
         # For each atom, read the number of rates and the rate parameters
         offset = 0
         for i in range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1):
-            n_values = struct.unpack_from("<I", byte_array, offset)[0]
+            n_values, = _ONE_WORD.unpack_from(byte_array, offset)
             offset += 4
 
             # Skip reading the index, as it will be recalculated on data write
