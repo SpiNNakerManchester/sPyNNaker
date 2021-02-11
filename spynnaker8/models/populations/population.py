@@ -13,10 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
-from spinn_utilities.log import FormatAdapter
 from spynnaker.pyNN.models.populations import Population as _BaseClass
-logger = FormatAdapter(logging.getLogger(__name__))
+from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
 
 
 class Population(_BaseClass):
@@ -50,9 +48,8 @@ class Population(_BaseClass):
         :type additional_parameters: dict(str, ...)
         """
         # pylint: disable=too-many-arguments
+        moved_in_v6("spynnaker8.models.populations.Population",
+                    "spynnaker.pyNN.models.populations.Population")
         super(Population, self).__init__(
             size, cellclass, cellparams, structure, initial_values, label,
             constraints, additional_parameters)
-
-        logger.warning(
-            "please use spynnaker.pyNN.models.populations.Population instead")

@@ -13,12 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
-from spinn_utilities.log import FormatAdapter
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
     TimingDependencePfisterSpikeTriplet as
     _BaseClass)
-logger = FormatAdapter(logging.getLogger(__name__))
+from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
 
 
 class TimingDependencePfisterSpikeTriplet(_BaseClass):
@@ -43,9 +41,10 @@ class TimingDependencePfisterSpikeTriplet(_BaseClass):
         :param float A_minus: :math:`A^-`
         """
         # pylint: disable=too-many-arguments
+        moved_in_v6("spynnaker8.models.synapse_dynamics.timing_dependence."
+                    "TimingDependencePfisterSpikeTriplet",
+                    "spynnaker.pyNN.models.neuron.plasticity.stdp."
+                    "timing_dependence.TimingDependencePfisterSpikeTriplet")
         super(TimingDependencePfisterSpikeTriplet, self).__init__(
             tau_plus=tau_plus, tau_minus=tau_minus, tau_x=tau_x,
             tau_y=tau_y, A_plus=A_plus, A_minus=A_minus)
-        logger.warning(
-            "please use spynnaker.pyNN.models.neuron.plasticity.stdp."
-            "timing_dependence.TimingDependencePfisterSpikeTriplet instead")
