@@ -123,12 +123,6 @@ static uint32_t count_rewire_attempts = 0;
 //! The number of neurons on the core
 static uint32_t n_neurons;
 
-//! True if the background process is queued to be run
-static bool background_in_queue = false;
-
-//! True if the background process is currently running
-static bool background_running = false;
-
 //! timer count for tdma of certain models; exported
 uint global_timer_count;
 
@@ -296,7 +290,6 @@ extern uint32_t latest_proc;
 extern uint32_t max_from_last_recv;
 
 void background_callback(uint timer_count, uint local_time) {
-    background_running = true;
     global_timer_count = timer_count;
     profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
 
@@ -326,7 +319,6 @@ void background_callback(uint timer_count, uint local_time) {
     neuron_do_timestep_update(local_time, timer_count);
 
     profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
-    background_running = false;
 }
 
 //! \brief Timer interrupt callback
