@@ -80,23 +80,23 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tau_syn_E</span><span class="p">,</span> <span class="n">tau_syn_I</span><span class="p">,</span> <span class="n">isyn_exc</span><span class="p">,</span> <span class="n">isyn_inh</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param tau_syn_E: :math:`\tau^{syn}_e`</span>
-<span class="sd">        :type tau_syn_E: \</span>
-<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution \</span>
+<span class="sd">        :type tau_syn_E:</span>
+<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution</span>
 <span class="sd">            or (mapping) function</span>
 <span class="sd">        :param tau_syn_I: :math:`\tau^{syn}_i`</span>
-<span class="sd">        :type tau_syn_I: \</span>
-<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution \</span>
+<span class="sd">        :type tau_syn_I:</span>
+<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution</span>
 <span class="sd">            or (mapping) function</span>
 <span class="sd">        :param isyn_exc: :math:`I^{syn}_e`</span>
-<span class="sd">        :type isyn_exc: /</span>
-<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution \</span>
+<span class="sd">        :type isyn_exc:</span>
+<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution</span>
 <span class="sd">            or (mapping) function</span>
 <span class="sd">        :param isyn_inh: :math:`I^{syn}_i`</span>
-<span class="sd">        :type isyn_inh: \</span>
-<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution \</span>
+<span class="sd">        :type isyn_inh:</span>
+<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution</span>
 <span class="sd">            or (mapping) function</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">SynapseTypeExponential</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">([</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">([</span>
             <span class="n">DataType</span><span class="o">.</span><span class="n">U032</span><span class="p">,</span>    <span class="c1"># decay_E</span>
             <span class="n">DataType</span><span class="o">.</span><span class="n">U032</span><span class="p">,</span>    <span class="c1"># init_E</span>
             <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># isyn_exc</span>

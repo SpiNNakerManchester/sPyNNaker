@@ -95,12 +95,11 @@
         <span class="s2">&quot;your vertex and try again.&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">AbstractSplitterSlice</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SPLITTER_NAME</span><span class="p">)</span>
-        <span class="n">AbstractSpynnakerSplitterDelay</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SPLITTER_NAME</span><span class="p">)</span>
 
 <div class="viewcode-block" id="SplitterAbstractPopulationVertexSlice.set_governed_app_vertex"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexSlice.set_governed_app_vertex">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSplitterSlice</span><span class="o">.</span><span class="n">set_governed_app_vertex</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">set_governed_app_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">):</span>
-        <span class="n">AbstractSplitterSlice</span><span class="o">.</span><span class="n">set_governed_app_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">set_governed_app_vertex</span><span class="p">(</span><span class="n">app_vertex</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">app_vertex</span><span class="p">,</span> <span class="n">AbstractPopulationVertex</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">PacmanConfigurationException</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">INVALID_POP_ERROR_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">app_vertex</span><span class="p">))</span></div>
@@ -137,6 +136,7 @@
 <span class="sd">        :param ~pacman.model.graphs.machine.MachineGraph graph: app graph</span>
 <span class="sd">        :rtype: ~pacman.model.resources.ResourceContainer</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># pylint: disable=arguments-differ</span>
         <span class="n">variable_sdram</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_variable_sdram</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">)</span>
         <span class="n">constant_sdram</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">constant_sdram</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">,</span> <span class="n">graph</span><span class="p">)</span>
 

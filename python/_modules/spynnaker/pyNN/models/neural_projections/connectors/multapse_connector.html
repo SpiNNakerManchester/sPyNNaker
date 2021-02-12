@@ -54,7 +54,6 @@
 
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">numpy.random</span>
-<span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">raise_from</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">pacman.model.graphs.common</span> <span class="kn">import</span> <span class="n">Slice</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
@@ -111,7 +110,7 @@
 <span class="sd">            .. note::</span>
 <span class="sd">                Not supported by sPyNNaker.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">MultapseConnector</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">safe</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">safe</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
         <span class="c1"># We absolutely require an integer at this point!</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__num_synapses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_roundsize</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="s2">&quot;MultapseConnector&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__allow_self_connections</span> <span class="o">=</span> <span class="n">allow_self_connections</span>
@@ -277,11 +276,11 @@
             <span class="n">chosen</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
                 <span class="n">pairs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="n">n_connections</span><span class="p">,</span>
                 <span class="n">replace</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__with_replacement</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># pylint: disable=broad-except</span>
-            <span class="n">raise_from</span><span class="p">(</span><span class="n">SpynnakerException</span><span class="p">(</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SpynnakerException</span><span class="p">(</span>
                 <span class="s2">&quot;MultapseConnector: The number of connections is too large &quot;</span>
                 <span class="s2">&quot;for sampling without replacement; &quot;</span>
-                <span class="s2">&quot;reduce the value specified in the connector&quot;</span><span class="p">),</span> <span class="n">e</span><span class="p">)</span>
+                <span class="s2">&quot;reduce the value specified in the connector&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
 
         <span class="c1"># Set up synaptic block</span>
         <span class="n">block</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pairs</span><span class="p">[</span><span class="n">chosen</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>

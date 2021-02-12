@@ -81,8 +81,7 @@
 <span class="sd">        :param str label:</span>
 <span class="sd">            The edge label</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">DelayedApplicationEdge</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">pre_vertex</span><span class="p">,</span> <span class="n">post_vertex</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">pre_vertex</span><span class="p">,</span> <span class="n">post_vertex</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">synapse_information</span><span class="p">,</span> <span class="s1">&#39;__iter__&#39;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span> <span class="o">=</span> <span class="n">synapse_information</span>
         <span class="k">else</span><span class="p">:</span>
@@ -115,8 +114,7 @@
 
 <div class="viewcode-block" id="DelayedApplicationEdge.remember_associated_machine_edge"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.DelayedApplicationEdge.remember_associated_machine_edge">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">ApplicationEdge</span><span class="o">.</span><span class="n">remember_associated_machine_edge</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">remember_associated_machine_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">machine_edge</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">DelayedApplicationEdge</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span>\
-            <span class="n">remember_associated_machine_edge</span><span class="p">(</span><span class="n">machine_edge</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">remember_associated_machine_edge</span><span class="p">(</span><span class="n">machine_edge</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__machine_edges_by_slices</span><span class="p">[</span>
             <span class="n">machine_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">,</span>
             <span class="n">machine_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">]</span> <span class="o">=</span> <span class="n">machine_edge</span></div>

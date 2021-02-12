@@ -54,10 +54,9 @@
 
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
-<span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">raise_from</span>
 
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> \
-    <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">,</span> <span class="n">BYTES_PER_WORD</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">,</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities</span> <span class="kn">import</span> <span class="n">globals_variables</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neural_projections.connectors</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractConnector</span><span class="p">)</span>
@@ -219,7 +218,7 @@
             <span class="c1"># Find the number of synapses available for the maximum population</span>
             <span class="c1"># table size, as extracted from the exception</span>
             <span class="n">max_synapses</span> <span class="o">=</span> <span class="n">dynamics</span><span class="o">.</span><span class="n">get_max_synapses</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">max_size</span><span class="p">)</span>
-            <span class="n">raise_from</span><span class="p">(</span><span class="n">SynapseRowTooBigException</span><span class="p">(</span>
+            <span class="k">raise</span> <span class="n">SynapseRowTooBigException</span><span class="p">(</span>
                 <span class="n">max_synapses</span><span class="p">,</span>
                 <span class="s2">&quot;The connection between </span><span class="si">{}</span><span class="s2"> and </span><span class="si">{}</span><span class="s2"> has more synapses (</span><span class="si">{}</span><span class="s2">) than&quot;</span>
                 <span class="s2">&quot; can currently be supported on this implementation of PyNN&quot;</span>
@@ -227,7 +226,7 @@
                 <span class="s2">&quot; Please reduce the size of the target population, or reduce&quot;</span>
                 <span class="s2">&quot; the number of neurons per core.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="n">in_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="p">,</span> <span class="n">in_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="p">,</span> <span class="n">n_synapses</span><span class="p">,</span>
-                    <span class="n">max_synapses</span><span class="p">)),</span> <span class="n">e</span><span class="p">)</span>
+                    <span class="n">max_synapses</span><span class="p">))</span> <span class="kn">from</span> <span class="nn">e</span>
 
 <div class="viewcode-block" id="SynapseIORowBased.get_max_row_info"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synapse_io.SynapseIORowBased.get_max_row_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_max_row_info</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_delay_stages</span><span class="p">,</span>

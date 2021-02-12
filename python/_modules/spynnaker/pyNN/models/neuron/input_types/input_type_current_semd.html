@@ -75,15 +75,15 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiplicator</span><span class="p">,</span> <span class="n">inh_input_previous</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param multiplicator:</span>
-<span class="sd">        :type multiplicator: \</span>
-<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution \</span>
+<span class="sd">        :type multiplicator:</span>
+<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution</span>
 <span class="sd">            or (mapping) function</span>
 <span class="sd">        :param inh_input_previous:</span>
-<span class="sd">        :type inh_input_previous: \</span>
-<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution \</span>
+<span class="sd">        :type inh_input_previous:</span>
+<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution</span>
 <span class="sd">            or (mapping) function</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">InputTypeCurrentSEMD</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">([</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">([</span>
             <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># multiplicator</span>
             <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">])</span>  <span class="c1"># inh_input_previous</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__multiplicator</span> <span class="o">=</span> <span class="n">multiplicator</span>

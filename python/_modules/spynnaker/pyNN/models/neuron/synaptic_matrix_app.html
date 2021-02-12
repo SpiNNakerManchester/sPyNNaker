@@ -51,18 +51,14 @@
 <span class="c1">#</span>
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
-<span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">itervalues</span>
 
 <span class="kn">from</span> <span class="nn">pacman.model.graphs.common.slice</span> <span class="kn">import</span> <span class="n">Slice</span>
-
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities</span> <span class="kn">import</span> <span class="n">globals_variables</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.helpful_functions</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">locate_memory_region_for_placement</span><span class="p">)</span>
-
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.synaptic_matrix</span> <span class="kn">import</span> <span class="n">SynapticMatrix</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.generator_data</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">GeneratorData</span><span class="p">,</span> <span class="n">SYN_REGION_UNUSED</span><span class="p">)</span>
@@ -713,7 +709,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__received_block</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__delay_received_block</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">for</span> <span class="n">matrix</span> <span class="ow">in</span> <span class="n">itervalues</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__matrices</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">matrix</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__matrices</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
             <span class="n">matrix</span><span class="o">.</span><span class="n">clear_connection_cache</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="SynapticMatrixApp.read_generated_connection_holders"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrix_app.SynapticMatrixApp.read_generated_connection_holders">[docs]</a>    <span class="k">def</span> <span class="nf">read_generated_connection_holders</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>

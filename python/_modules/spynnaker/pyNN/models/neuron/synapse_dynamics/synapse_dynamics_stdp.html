@@ -513,8 +513,7 @@
 
 <div class="viewcode-block" id="SynapseDynamicsSTDP.get_weight_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.get_weight_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractPlasticSynapseDynamics</span><span class="o">.</span><span class="n">get_weight_maximum</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_weight_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connector</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
-        <span class="n">w_max</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">SynapseDynamicsSTDP</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_weight_maximum</span><span class="p">(</span>
-            <span class="n">connector</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span>
+        <span class="n">w_max</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_weight_maximum</span><span class="p">(</span><span class="n">connector</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span>
         <span class="c1"># The maximum weight is the largest that it could be set to from</span>
         <span class="c1"># the weight dependence</span>
         <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">w_max</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__weight_dependence</span><span class="o">.</span><span class="n">weight_maximum</span><span class="p">)</span></div>
@@ -523,7 +522,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param str pre_population_label:</span>
 <span class="sd">        :param str post_population_label:</span>
-<span class="sd">        :rtype: \</span>
+<span class="sd">        :rtype:</span>
 <span class="sd">            list(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">prov_data</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>

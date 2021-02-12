@@ -52,30 +52,17 @@
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
-<span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">add_metaclass</span>
-
-<span class="kn">from</span> <span class="nn">pacman.model.graphs.machine</span> <span class="kn">import</span> <span class="n">MachineVertex</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.exceptions</span> <span class="kn">import</span> <span class="n">ConfigurationException</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.abstract_base</span> <span class="kn">import</span> <span class="n">AbstractBase</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.require_subclass</span> <span class="kn">import</span> <span class="n">require_subclass</span>
+<span class="kn">from</span> <span class="nn">pacman.model.graphs.machine</span> <span class="kn">import</span> <span class="n">MachineVertex</span>
 
 
-<div class="viewcode-block" id="AbstractReadParametersBeforeSet"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractReadParametersBeforeSet">[docs]</a><span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">AbstractBase</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">AbstractReadParametersBeforeSet</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractReadParametersBeforeSet"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractReadParametersBeforeSet">[docs]</a><span class="nd">@require_subclass</span><span class="p">(</span><span class="n">MachineVertex</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">AbstractReadParametersBeforeSet</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">AbstractBase</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; A vertex whose parameters must be read before any can be set.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
-
-    <span class="n">_WRONG_VERTEX_TYPE_ERROR</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;The vertex </span><span class="si">{}</span><span class="s2"> is not of type MachineVertex. By not being a &quot;</span>
-        <span class="s2">&quot;machine vertex, the sPyNNaker population set function may not &quot;</span>
-        <span class="s2">&quot;work correctly.&quot;</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">MachineVertex</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
-                <span class="bp">cls</span><span class="o">.</span><span class="n">_WRONG_VERTEX_TYPE_ERROR</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">cls</span><span class="p">))</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">AbstractReadParametersBeforeSet</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
 
 <div class="viewcode-block" id="AbstractReadParametersBeforeSet.read_parameters_from_machine"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractReadParametersBeforeSet.read_parameters_from_machine">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">read_parameters_from_machine</span><span class="p">(</span>

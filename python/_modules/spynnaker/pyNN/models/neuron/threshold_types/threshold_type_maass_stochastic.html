@@ -83,17 +83,17 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">du_th</span><span class="p">,</span> <span class="n">tau_th</span><span class="p">,</span> <span class="n">v_thresh</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param du_th: :math:`du_{thresh}`</span>
-<span class="sd">        :type du_th: float, iterable(float), ~pyNN.random.RandomDistribution \</span>
-<span class="sd">                     or (mapping) function</span>
+<span class="sd">        :type du_th: float, iterable(float), ~pyNN.random.RandomDistribution</span>
+<span class="sd">            or (mapping) function</span>
 <span class="sd">        :param tau_th: :math:`\tau_{thresh}`</span>
-<span class="sd">        :type tau_th: float, iterable(float), ~pyNN.random.RandomDistribution \</span>
-<span class="sd">                      or (mapping) function</span>
+<span class="sd">        :type tau_th: float, iterable(float), ~pyNN.random.RandomDistribution</span>
+<span class="sd">            or (mapping) function</span>
 <span class="sd">        :param v_thresh: :math:`V_{thresh}`</span>
-<span class="sd">        :type v_thresh: \</span>
-<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution \</span>
+<span class="sd">        :type v_thresh:</span>
+<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution</span>
 <span class="sd">            or (mapping) function</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">ThresholdTypeMaassStochastic</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">([</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">([</span>
             <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># 1 / du_th</span>
             <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># 1 / tau_th</span>
             <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># v_thresh</span>

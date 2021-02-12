@@ -52,15 +52,16 @@
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
-<span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">add_metaclass</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.abstract_base</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractBase</span><span class="p">,</span> <span class="n">abstractmethod</span><span class="p">,</span> <span class="n">abstractproperty</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.require_subclass</span> <span class="kn">import</span> <span class="n">require_subclass</span>
+<span class="kn">from</span> <span class="nn">pacman.model.graphs.application</span> <span class="kn">import</span> <span class="n">ApplicationVertex</span>
 
 
-<div class="viewcode-block" id="AbstractPopulationInitializable"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable">[docs]</a><span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">AbstractBase</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">AbstractPopulationInitializable</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Indicates that this object has properties that can be initialised by a\</span>
-<span class="sd">        PyNN Population</span>
+<div class="viewcode-block" id="AbstractPopulationInitializable"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable">[docs]</a><span class="nd">@require_subclass</span><span class="p">(</span><span class="n">ApplicationVertex</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">AbstractPopulationInitializable</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">AbstractBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Indicates that this application vertex has properties that can be\</span>
+<span class="sd">        initialised by a PyNN Population</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
@@ -86,8 +87,8 @@
 <div class="viewcode-block" id="AbstractPopulationInitializable.get_initial_values"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.get_initial_values">[docs]</a>    <span class="k">def</span> <span class="nf">get_initial_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selector</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; A dict containing the initial values of the state variables.</span>
 
-<span class="sd">        :param selector: a description of the subrange to accept, or None for</span>
-<span class="sd">            all. See:</span>
+<span class="sd">        :param selector: a description of the subrange to accept, or ``None``</span>
+<span class="sd">            for all. See:</span>
 <span class="sd">            :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`</span>
 <span class="sd">        :type selector: None or slice or int or list(bool) or list(int)</span>
 <span class="sd">        :rtype: dict(str,Any)</span>
@@ -107,7 +108,7 @@
 
 <span class="sd">        Should return the current value not the default one.</span>
 
-<span class="sd">        Must support the variable as listed in initialize_parameters.keys, \</span>
+<span class="sd">        Must support the variable as listed in initialize_parameters.keys,</span>
 <span class="sd">        ideally also with ``_init`` removed or added.</span>
 
 <span class="sd">        :param str variable: variable name with or without ``_init``</span>
@@ -123,7 +124,7 @@
     <span class="k">def</span> <span class="nf">initialize_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; List the parameters that are initializable.</span>
 
-<span class="sd">        If &quot;foo&quot; is initializable there should be a setter ``initialize_foo``\</span>
+<span class="sd">        If &quot;foo&quot; is initializable there should be a setter ``initialize_foo``</span>
 <span class="sd">        and a getter property ``foo_init``</span>
 
 <span class="sd">        :return: list of property names</span>

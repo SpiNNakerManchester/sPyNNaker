@@ -104,14 +104,13 @@
 <span class="sd">        :param ~pacman.model.graphs.application.ApplicationVertex \</span>
 <span class="sd">                source_vertex:</span>
 <span class="sd">            where messages are coming from</span>
-
 <span class="sd">        :param iterable(~pacman.model.constraints.AbstractConstraint) \</span>
 <span class="sd">                constraints:</span>
 <span class="sd">            the vertex constraints</span>
 <span class="sd">        :param str label: the vertex label</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">DelayExtensionVertex</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">POP_TABLE_MAX_ROW_LENGTH</span><span class="p">,</span> <span class="n">splitter</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__source_vertex</span> <span class="o">=</span> <span class="n">source_vertex</span>
@@ -220,7 +219,7 @@
 <span class="sd">                synapse_information:</span>
 <span class="sd">            The synapse information of the connection</span>
 <span class="sd">        :param synapse_information:</span>
-<span class="sd">        :type synapse_information: \</span>
+<span class="sd">        :type synapse_information:</span>
 <span class="sd">            ~spynnaker.pyNN.models.neural_projections.SynapseInformation</span>
 <span class="sd">        :param int max_stage:</span>
 <span class="sd">            The maximum delay stage</span>

@@ -52,16 +52,19 @@
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
-<span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">add_metaclass</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.abstract_base</span> <span class="kn">import</span> <span class="n">AbstractBase</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.require_subclass</span> <span class="kn">import</span> <span class="n">require_subclass</span>
 <span class="kn">from</span> <span class="nn">pacman.exceptions</span> <span class="kn">import</span> <span class="n">PacmanConfigurationException</span>
+<span class="kn">from</span> <span class="nn">pacman.model.graphs.application</span> <span class="kn">import</span> <span class="n">ApplicationVertex</span>
 
 
-<div class="viewcode-block" id="AbstractAcceptsIncomingSynapses"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses">[docs]</a><span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">AbstractBase</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">AbstractAcceptsIncomingSynapses</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Indicates an object that can be a post-vertex in a PyNN projection.</span>
+<div class="viewcode-block" id="AbstractAcceptsIncomingSynapses"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses">[docs]</a><span class="nd">@require_subclass</span><span class="p">(</span><span class="n">ApplicationVertex</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">AbstractAcceptsIncomingSynapses</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">AbstractBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Indicates an application vertex that can be a post-vertex in a PyNN\</span>
+<span class="sd">        projection.</span>
 
-<span class="sd">    Note: See verify_splitter</span>
+<span class="sd">    .. note::</span>
+<span class="sd">        See :py:meth:`verify_splitter`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
 
@@ -86,13 +89,13 @@
         <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="sd">&quot;&quot;&quot; Get the connections from the machine post-run.</span>
 
-<span class="sd">        :param ~spinnman.transceiver.Transceiver transceiver:\</span>
+<span class="sd">        :param ~spinnman.transceiver.Transceiver transceiver:</span>
 <span class="sd">            How to read the connection data</span>
-<span class="sd">        :param ~pacman.model.placements.Placements placements:\</span>
+<span class="sd">        :param ~pacman.model.placements.Placements placements:</span>
 <span class="sd">            Where the connection data is on the machine</span>
-<span class="sd">        :param ProjectionApplicationEdge app_edge:\</span>
+<span class="sd">        :param ProjectionApplicationEdge app_edge:</span>
 <span class="sd">            The edge for which the data is being read</span>
-<span class="sd">        :param SynapseInformation synapse_info:\</span>
+<span class="sd">        :param SynapseInformation synapse_info:</span>
 <span class="sd">            The specific projection within the edge</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
@@ -112,7 +115,7 @@
 <span class="sd">        :param splitter: the splitter</span>
 <span class="sd">        :type splitter:</span>
 <span class="sd">            ~spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay</span>
-<span class="sd">        :raises PacmanConfigurationException: is the splitter is not an \</span>
+<span class="sd">        :raises PacmanConfigurationException: if the splitter is not an</span>
 <span class="sd">            instance of AbstractSpynnakerSplitterDelay</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Delayed import to avoid cicular dependency</span>

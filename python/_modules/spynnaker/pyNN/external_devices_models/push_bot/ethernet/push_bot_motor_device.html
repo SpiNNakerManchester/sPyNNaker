@@ -85,8 +85,7 @@
             <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
                 <span class="s2">&quot;motor parameter must be a PushBotMotor value&quot;</span><span class="p">)</span>
 
-        <span class="nb">super</span><span class="p">(</span><span class="n">PushBotEthernetMotorDevice</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">protocol</span><span class="p">,</span> <span class="n">motor</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">timesteps_between_send</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">protocol</span><span class="p">,</span> <span class="n">motor</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">timesteps_between_send</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__command_protocol</span> <span class="o">=</span> <span class="n">protocol</span>
 
 <div class="viewcode-block" id="PushBotEthernetMotorDevice.set_command_protocol"><a class="viewcode-back" href="../../../../../../spynnaker8.external_devices.html#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetMotorDevice.set_command_protocol">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PushBotEthernetDevice</span><span class="o">.</span><span class="n">set_command_protocol</span><span class="p">)</span>

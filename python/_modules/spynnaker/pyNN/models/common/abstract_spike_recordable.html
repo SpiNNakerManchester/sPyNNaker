@@ -52,12 +52,13 @@
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
-<span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">add_metaclass</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.abstract_base</span> <span class="kn">import</span> <span class="n">AbstractBase</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.require_subclass</span> <span class="kn">import</span> <span class="n">require_subclass</span>
+<span class="kn">from</span> <span class="nn">pacman.model.graphs.application</span> <span class="kn">import</span> <span class="n">ApplicationVertex</span>
 
 
-<div class="viewcode-block" id="AbstractSpikeRecordable"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.AbstractSpikeRecordable">[docs]</a><span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">AbstractBase</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">AbstractSpikeRecordable</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractSpikeRecordable"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.AbstractSpikeRecordable">[docs]</a><span class="nd">@require_subclass</span><span class="p">(</span><span class="n">ApplicationVertex</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">AbstractSpikeRecordable</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">AbstractBase</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Indicates that spikes can be recorded from this object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -110,7 +111,7 @@
 <span class="sd">            ~spinn_front_end_common.interface.buffer_management.BufferManager</span>
 <span class="sd">        :param int machine_time_step:</span>
 <span class="sd">            the time step of the simulation, in microseconds</span>
-<span class="sd">        :return: A numpy array of 2-element arrays of (neuron_id, time)\</span>
+<span class="sd">        :return: A numpy array of 2-element arrays of (neuron_id, time)</span>
 <span class="sd">            ordered by time, one element per event</span>
 <span class="sd">        :rtype: ~numpy.ndarray(tuple(int,int))</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>

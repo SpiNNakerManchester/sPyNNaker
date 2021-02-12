@@ -74,7 +74,7 @@
 <span class="sd">        :param str local_host: The optional host to listen on</span>
 <span class="sd">        :param int local_port: The optional port to listen on</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">EthernetControlConnection</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">live_packet_gather_label</span><span class="p">,</span> <span class="n">receive_labels</span><span class="o">=</span><span class="p">[</span><span class="n">label</span><span class="p">],</span>
             <span class="n">local_host</span><span class="o">=</span><span class="n">local_host</span><span class="p">,</span> <span class="n">local_port</span><span class="o">=</span><span class="n">local_port</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__translators</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -88,7 +88,7 @@
 <span class="sd">        :param AbstractEthernetTranslator translator:</span>
 <span class="sd">            The translator of multicast to control commands</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">EthernetControlConnection</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">add_receive_label</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_receive_label</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__translators</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">translator</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_receive_callback</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_translate</span><span class="p">,</span> <span class="n">translate_key</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 

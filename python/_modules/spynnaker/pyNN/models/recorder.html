@@ -54,8 +54,6 @@
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
-<span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">string_types</span>
-<span class="kn">from</span> <span class="nn">six.moves</span> <span class="kn">import</span> <span class="n">xrange</span>
 <span class="kn">import</span> <span class="nn">neo</span>
 <span class="kn">import</span> <span class="nn">quantities</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
@@ -157,7 +155,7 @@
             <span class="c1"># note that if record(None) is called, its a reset</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">turn_off_all_recording</span><span class="p">(</span><span class="n">indexes</span><span class="p">)</span>
             <span class="c1"># handle one element vs many elements</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="c1"># handle special case of &#39;all&#39;</span>
             <span class="k">if</span> <span class="n">variables</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
                 <span class="n">warn_once</span><span class="p">(</span>
@@ -237,7 +235,7 @@
         <span class="n">n_neurons</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
         <span class="n">column_length</span> <span class="o">=</span> <span class="n">n_machine_time_steps</span> <span class="o">*</span> <span class="n">n_neurons</span>
         <span class="n">times</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="n">sampling_interval</span>
-                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_machine_time_steps</span><span class="p">)]</span>
+                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_machine_time_steps</span><span class="p">)]</span>
         <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span>
                 <span class="n">numpy</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">n_machine_time_steps</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
                 <span class="n">numpy</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">),</span>
@@ -384,12 +382,12 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">find_units</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Population: </span><span class="si">{}</span><span class="s2"> Does not support units for </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span>
                            <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">variable</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">_DEFAULT_UNITS</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">_DEFAULT_UNITS</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span>
-            <span class="k">raise</span>
+            <span class="k">raise</span> <span class="n">e</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">__spike_sampling_interval</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -448,7 +446,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># if variable is a base string, plonk into a array for ease of</span>
         <span class="c1"># conversion</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">variables</span> <span class="o">=</span> <span class="p">[</span><span class="n">variables</span><span class="p">]</span>
 
         <span class="c1"># if all are needed to be extracted, extract each and plonk into the</span>
@@ -638,7 +636,7 @@
         <span class="n">t_stop</span> <span class="o">=</span> <span class="n">t</span> <span class="o">*</span> <span class="n">quantities</span><span class="o">.</span><span class="n">ms</span>
 
         <span class="k">if</span> <span class="n">indexes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">indexes</span> <span class="o">=</span> <span class="n">xrange</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">)</span>
+            <span class="n">indexes</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">indexes</span><span class="p">:</span>
             <span class="n">spiketrain</span> <span class="o">=</span> <span class="n">neo</span><span class="o">.</span><span class="n">SpikeTrain</span><span class="p">(</span>
                 <span class="n">times</span><span class="o">=</span><span class="n">spikes</span><span class="p">[</span><span class="n">spikes</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">index</span><span class="p">][:,</span> <span class="mi">1</span><span class="p">],</span>

@@ -51,15 +51,11 @@
 <span class="c1">#</span>
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
-
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
 <span class="kn">import</span> <span class="nn">itertools</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
-<span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">raise_from</span><span class="p">,</span> <span class="n">iteritems</span>
-<span class="kn">from</span> <span class="nn">six.moves</span> <span class="kn">import</span> <span class="nb">range</span><span class="p">,</span> <span class="n">xrange</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.progress_bar</span> <span class="kn">import</span> <span class="n">ProgressBar</span>
 <span class="kn">from</span> <span class="nn">pacman.model.resources.variable_sdram</span> <span class="kn">import</span> <span class="n">VariableSDRAM</span>
@@ -203,7 +199,7 @@
             <span class="k">return</span> <span class="nb">range</span><span class="p">(</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">indexes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span>
         <span class="k">return</span> <span class="p">[</span>
-            <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indexes</span><span class="p">]</span>
 
 <div class="viewcode-block" id="NeuronRecorder.get_neuron_sampling_interval"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.NeuronRecorder.get_neuron_sampling_interval">[docs]</a>    <span class="k">def</span> <span class="nf">get_neuron_sampling_interval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
@@ -235,7 +231,7 @@
             <span class="n">placement</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
         <span class="c1"># Start the fragment for this slice empty</span>
         <span class="n">fragment</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">expected_rows</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">))</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">expected_rows</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">expected_rows</span><span class="p">):</span>
             <span class="n">time</span> <span class="o">=</span> <span class="n">i</span> <span class="o">*</span> <span class="n">sampling_rate</span>
             <span class="c1"># Check if there is data for this time step</span>
             <span class="n">local_indexes</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">times</span> <span class="o">==</span> <span class="n">time</span><span class="p">)</span>
@@ -443,7 +439,7 @@
             <span class="n">vertex_slice</span> <span class="o">=</span> <span class="n">vertex</span><span class="o">.</span><span class="n">vertex_slice</span>
 
             <span class="n">ms_per_tick</span> <span class="o">=</span> <span class="n">machine_time_step</span> <span class="o">/</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span>
-            <span class="n">neurons</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_neurons_recording</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">)</span>
+            <span class="n">neurons</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_neurons_recording</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">))</span>
             <span class="n">neurons_recording</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">neurons</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">neurons_recording</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">continue</span>
@@ -515,7 +511,7 @@
             <span class="k">elif</span> <span class="n">variable</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__per_timestep_variables</span><span class="p">:</span>
                 <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Variable </span><span class="si">{}</span><span class="s2"> is not supported. Supported variables are&quot;</span>
                        <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_recordable_variables</span><span class="p">()))</span>
-                <span class="n">raise_from</span><span class="p">(</span><span class="n">ConfigurationException</span><span class="p">(</span><span class="n">msg</span><span class="p">),</span> <span class="n">e</span><span class="p">)</span></div>
+                <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">recording_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -537,7 +533,7 @@
 <span class="sd">        :rtype: list(int)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">results</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">variable</span><span class="p">,</span> <span class="n">rate</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">variable</span><span class="p">,</span> <span class="n">rate</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">rate</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__region_ids</span><span class="p">[</span><span class="n">variable</span><span class="p">])</span>
         <span class="c1"># Per timestep regions come after normal regions</span>
@@ -560,7 +556,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
         <span class="n">indexes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">indexes</span><span class="p">:</span>
                 <span class="k">return</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="kc">False</span>
@@ -883,7 +879,7 @@
         <span class="c1"># No need to consider per-timestep variables here as they won&#39;t</span>
         <span class="c1"># overflow</span>
         <span class="n">overflow</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">variable</span><span class="p">,</span> <span class="n">rate</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">variable</span><span class="p">,</span> <span class="n">rate</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="c1"># If rate is 0 no recording so no overflow</span>
             <span class="c1"># If rate is 1 there is no overflow as average is exact</span>
             <span class="k">if</span> <span class="n">rate</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
@@ -1076,7 +1072,7 @@
             <span class="n">indexes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span>
             <span class="n">local_index</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="n">local_indexes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-            <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">n_bytes_for_n_neurons</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_bytes_for_n_neurons</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">index</span> <span class="o">+</span> <span class="n">vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span> <span class="ow">in</span> <span class="n">indexes</span><span class="p">:</span>
                     <span class="n">local_indexes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">local_index</span><span class="p">)</span>
                     <span class="n">local_index</span> <span class="o">+=</span> <span class="mi">1</span>

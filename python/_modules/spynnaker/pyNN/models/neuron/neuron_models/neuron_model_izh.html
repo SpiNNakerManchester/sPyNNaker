@@ -51,10 +51,10 @@
 <span class="c1">#</span>
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> \
-    <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">data_specification.enums</span> <span class="kn">import</span> <span class="n">DataType</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.abstract_neuron_model</span> <span class="kn">import</span> <span class="n">AbstractNeuronModel</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.implementations</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractStandardNeuronComponent</span><span class="p">)</span>
@@ -88,31 +88,31 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">v_init</span><span class="p">,</span> <span class="n">u_init</span><span class="p">,</span> <span class="n">i_offset</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param a: :math:`a`</span>
-<span class="sd">        :type a: float, iterable(float), ~pyNN.random.RandomDistribution or \</span>
-<span class="sd">                 (mapping) function</span>
+<span class="sd">        :type a: float, iterable(float), ~pyNN.random.RandomDistribution or</span>
+<span class="sd">            (mapping) function</span>
 <span class="sd">        :param b: :math:`b`</span>
-<span class="sd">        :type b: float, iterable(float), ~pyNN.random.RandomDistribution or \</span>
-<span class="sd">                 (mapping) function</span>
+<span class="sd">        :type b: float, iterable(float), ~pyNN.random.RandomDistribution or</span>
+<span class="sd">            (mapping) function</span>
 <span class="sd">        :param c: :math:`c`</span>
-<span class="sd">        :type c: float, iterable(float), ~pyNN.random.RandomDistribution or \</span>
-<span class="sd">                 (mapping) function</span>
+<span class="sd">        :type c: float, iterable(float), ~pyNN.random.RandomDistribution or</span>
+<span class="sd">            (mapping) function</span>
 <span class="sd">        :param d: :math:`d`</span>
-<span class="sd">        :type d: float, iterable(float), ~pyNN.random.RandomDistribution or \</span>
-<span class="sd">                 (mapping) function</span>
+<span class="sd">        :type d: float, iterable(float), ~pyNN.random.RandomDistribution or</span>
+<span class="sd">            (mapping) function</span>
 <span class="sd">        :param v_init: :math:`v_{init}`</span>
-<span class="sd">        :type v_init: \</span>
-<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution or \</span>
+<span class="sd">        :type v_init:</span>
+<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution or</span>
 <span class="sd">            (mapping) function</span>
 <span class="sd">        :param u_init: :math:`u_{init}`</span>
-<span class="sd">        :type u_init: \</span>
-<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution or \</span>
+<span class="sd">        :type u_init:</span>
+<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution or</span>
 <span class="sd">            (mapping) function</span>
 <span class="sd">        :param i_offset: :math:`I_{offset}`</span>
-<span class="sd">        :type i_offset: \</span>
-<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution or \</span>
+<span class="sd">        :type i_offset:</span>
+<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution or</span>
 <span class="sd">            (mapping) function</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">NeuronModelIzh</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="p">[</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># a</span>
              <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># b</span>
              <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># c</span>

@@ -95,7 +95,7 @@
         <span class="s2">&quot;__binary_file_name&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__recorded_region_ids&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__resources&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__on_chip_generatable_area&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__on_chip_generatable_offset&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__on_chip_generatable_size&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__drop_late_spikes&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__change_requires_neuron_parameters_reload&quot;</span><span class="p">]</span>
@@ -211,8 +211,7 @@
 <span class="sd">            The slice of the population that this implements</span>
 <span class="sd">        :param str binary_file_name: binary name to be run for this verte</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">MachineVertex</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__binary_file_name</span> <span class="o">=</span> <span class="n">binary_file_name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__recorded_region_ids</span> <span class="o">=</span> <span class="n">recorded_region_ids</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__resources</span> <span class="o">=</span> <span class="n">resources_required</span>

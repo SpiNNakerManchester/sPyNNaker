@@ -72,7 +72,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param iterable(str) poisson_labels:</span>
 <span class="sd">            Labels of Poisson populations to be controlled</span>
-<span class="sd">        :param str local_host: Optional specification of the local hostname or\</span>
+<span class="sd">        :param str local_host: Optional specification of the local hostname or</span>
 <span class="sd">            IP address of the interface to listen on</span>
 <span class="sd">        :param int local_port:</span>
 <span class="sd">            Optional specification of the local port to listen on. Must match</span>
@@ -98,7 +98,7 @@
                 <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="n">control</span>
                  <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">control</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">poisson_labels</span><span class="p">,</span> <span class="n">control_labels</span><span class="p">)})</span>
 
-        <span class="nb">super</span><span class="p">(</span><span class="n">SpynnakerPoissonControlConnection</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">live_packet_gather_label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">send_labels</span><span class="o">=</span><span class="n">control_labels</span><span class="p">,</span>
             <span class="n">local_host</span><span class="o">=</span><span class="n">local_host</span><span class="p">,</span> <span class="n">local_port</span><span class="o">=</span><span class="n">local_port</span><span class="p">)</span>
 
@@ -135,20 +135,19 @@
 
 <div class="viewcode-block" id="SpynnakerPoissonControlConnection.add_start_callback"><a class="viewcode-back" href="../../../../spynnaker8.external_devices.html#spynnaker.pyNN.connections.SpynnakerPoissonControlConnection.add_start_callback">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">LiveEventConnection</span><span class="o">.</span><span class="n">add_start_callback</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">add_start_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">start_callback</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">SpynnakerPoissonControlConnection</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">add_start_callback</span><span class="p">(</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_start_callback</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__control_label</span><span class="p">(</span><span class="n">label</span><span class="p">),</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_start_callback_wrapper</span><span class="p">,</span> <span class="n">start_callback</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="SpynnakerPoissonControlConnection.add_start_resume_callback"><a class="viewcode-back" href="../../../../spynnaker8.external_devices.html#spynnaker.pyNN.connections.SpynnakerPoissonControlConnection.add_start_resume_callback">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">LiveEventConnection</span><span class="o">.</span><span class="n">add_start_resume_callback</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">add_start_resume_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">start_resume_callback</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">SpynnakerPoissonControlConnection</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>\
-            <span class="o">.</span><span class="n">add_start_resume_callback</span><span class="p">(</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_start_resume_callback</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__control_label</span><span class="p">(</span><span class="n">label</span><span class="p">),</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_start_callback_wrapper</span><span class="p">,</span> <span class="n">start_resume_callback</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="SpynnakerPoissonControlConnection.add_init_callback"><a class="viewcode-back" href="../../../../spynnaker8.external_devices.html#spynnaker.pyNN.connections.SpynnakerPoissonControlConnection.add_init_callback">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">LiveEventConnection</span><span class="o">.</span><span class="n">add_init_callback</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">add_init_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">init_callback</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">SpynnakerPoissonControlConnection</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">add_init_callback</span><span class="p">(</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_init_callback</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__control_label</span><span class="p">(</span><span class="n">label</span><span class="p">),</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_init_callback_wrapper</span><span class="p">,</span> <span class="n">init_callback</span><span class="p">))</span></div>
 
@@ -160,7 +159,7 @@
 
 <div class="viewcode-block" id="SpynnakerPoissonControlConnection.add_pause_stop_callback"><a class="viewcode-back" href="../../../../spynnaker8.external_devices.html#spynnaker.pyNN.connections.SpynnakerPoissonControlConnection.add_pause_stop_callback">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">LiveEventConnection</span><span class="o">.</span><span class="n">add_pause_stop_callback</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">add_pause_stop_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">pause_stop_callback</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">SpynnakerPoissonControlConnection</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">add_pause_stop_callback</span><span class="p">(</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_pause_stop_callback</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__control_label</span><span class="p">(</span><span class="n">label</span><span class="p">),</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_stop_callback_wrapper</span><span class="p">,</span> <span class="n">pause_stop_callback</span><span class="p">))</span></div>
 

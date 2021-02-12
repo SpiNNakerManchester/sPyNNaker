@@ -157,8 +157,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># pylint: disable=too-many-arguments, too-many-locals</span>
-        <span class="n">TDMAAwareApplicationVertex</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">,</span> <span class="n">splitter</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">,</span> <span class="n">splitter</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__n_atoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">round_n_atoms</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">,</span> <span class="s2">&quot;n_neurons&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__n_data_specs</span> <span class="o">=</span> <span class="mi">0</span>
@@ -483,8 +482,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">ContiguousKeyRangeContraint</span><span class="p">()]</span></div>
 
-<div class="viewcode-block" id="AbstractPopulationVertex.clear_recording"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.clear_recording">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span>
-        <span class="n">AbstractNeuronRecordable</span><span class="o">.</span><span class="n">clear_recording</span><span class="p">)</span>
+<div class="viewcode-block" id="AbstractPopulationVertex.clear_recording"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.clear_recording">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractNeuronRecordable</span><span class="o">.</span><span class="n">clear_recording</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">clear_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">variable</span> <span class="o">==</span> <span class="n">NeuronRecorder</span><span class="o">.</span><span class="n">SPIKES</span><span class="p">:</span>
             <span class="n">index</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__neuron_impl</span><span class="o">.</span><span class="n">get_recordable_variables</span><span class="p">())</span>

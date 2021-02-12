@@ -94,8 +94,8 @@
 <span class="sd">        :param start_frequency: The &quot;frequency&quot; to send at the start</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
-        <span class="n">PushBotEthernetLaserDevice</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">laser</span><span class="p">,</span> <span class="n">protocol</span><span class="p">,</span> <span class="n">start_active_time</span><span class="p">,</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">laser</span><span class="p">,</span> <span class="n">protocol</span><span class="p">,</span> <span class="n">start_active_time</span><span class="p">,</span>
             <span class="n">start_total_period</span><span class="p">,</span> <span class="n">start_frequency</span><span class="p">)</span>
         <span class="n">ApplicationSpiNNakerLinkVertex</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">spinnaker_link_id</span><span class="o">=</span><span class="n">spinnaker_link_id</span><span class="p">,</span> <span class="n">n_atoms</span><span class="o">=</span><span class="n">n_neurons</span><span class="p">,</span>

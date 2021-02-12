@@ -62,7 +62,6 @@
 <span class="c1"># common imports</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">__numpy</span>
-<span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">iteritems</span>
 <span class="kn">from</span> <span class="nn">pyNN</span> <span class="kn">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">pynn_common</span>
 <span class="kn">from</span> <span class="nn">pyNN.common</span> <span class="kn">import</span> <span class="n">control</span> <span class="k">as</span> <span class="n">_pynn_control</span>
 <span class="kn">from</span> <span class="nn">pyNN.recording</span> <span class="kn">import</span> <span class="n">get_io</span>
@@ -347,7 +346,7 @@
 <span class="sd">    :param extra_load_algorithms:</span>
 <span class="sd">        extra algorithms to use within the loading phase</span>
 <span class="sd">    :type extra_load_algorithms: list(str) or None</span>
-<span class="sd">    :param time_scale_factor: multiplicative factor to the machine time step\</span>
+<span class="sd">    :param time_scale_factor: multiplicative factor to the machine time step</span>
 <span class="sd">        (does not affect the neuron models accuracy)</span>
 <span class="sd">    :type time_scale_factor: int or None</span>
 <span class="sd">    :param n_chips_required:</span>
@@ -538,7 +537,7 @@
 <span class="sd">    :rtype: list(str)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">results</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-    <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="nb">globals</span><span class="p">()):</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">globals</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">AbstractPyNNModel</span><span class="p">):</span>
             <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">results</span></div>

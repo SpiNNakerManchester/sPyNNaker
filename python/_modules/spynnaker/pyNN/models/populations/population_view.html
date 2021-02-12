@@ -55,7 +55,6 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">neo</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
-<span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">integer_types</span><span class="p">,</span> <span class="n">string_types</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">from</span> <span class="nn">pyNN</span> <span class="kn">import</span> <span class="n">descriptions</span>
 <span class="kn">from</span> <span class="nn">pyNN.random</span> <span class="kn">import</span> <span class="n">NumpyRNG</span>
@@ -69,7 +68,7 @@
 
 <div class="viewcode-block" id="PopulationView"><a class="viewcode-back" href="../../../../../spynnaker8.html#spynnaker.pyNN.models.populations.PopulationView">[docs]</a><span class="k">class</span> <span class="nc">PopulationView</span><span class="p">(</span><span class="n">PopulationBase</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; A view of a subset of neurons within a\</span>
-<span class="sd">    :py:class:`~spynnaker.pyNN.models.populations.Population`.</span>
+<span class="sd">        :py:class:`~spynnaker.pyNN.models.populations.Population`.</span>
 
 <span class="sd">    In most ways, Populations and PopulationViews have the same behaviour,</span>
 <span class="sd">    i.e., they can be recorded, connected with Projections, etc.</span>
@@ -204,7 +203,7 @@
 
 <span class="sd">        :rtype: ~.IDMixin or ~.PopulationView</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">integer_types</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">IDMixin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">PopulationView</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">+</span><span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">))</span>
 
@@ -273,7 +272,7 @@
         <span class="sd">&quot;&quot;&quot; Get the units of a variable</span>
 
 <span class="sd">        .. warning::</span>
-<span class="sd">            NO PyNN description of this method.</span>
+<span class="sd">            No PyNN description of this method.</span>
 
 <span class="sd">        :param str variable: The name of the variable</span>
 <span class="sd">        :return: The units of the variable</span>
@@ -340,8 +339,8 @@
                            <span class="s2">&quot;as if gather was set to True.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">annotations</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">warn_once</span><span class="p">(</span>
-                <span class="n">logger</span><span class="p">,</span> <span class="s2">&quot;Annoations Parameter is not standard PyNN so may not &quot;</span>
-                        <span class="s2">&quot;be supported by all platformd.&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="p">,</span> <span class="s2">&quot;Annotations parameter is not standard PyNN so may &quot;</span>
+                <span class="s2">&quot;not be supported by all platforms.&quot;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">get_data_by_indexes</span><span class="p">(</span>
             <span class="n">variables</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">,</span> <span class="n">clear</span><span class="o">=</span><span class="n">clear</span><span class="p">)</span></div>
@@ -396,7 +395,7 @@
 <span class="sd">        :type id: int or list(int)</span>
 <span class="sd">        :rtype: int or list(int)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">integer_types</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">id</span><span class="p">]</span></div>
 
@@ -534,7 +533,7 @@
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">get_data_by_indexes</span><span class="p">(</span>
             <span class="n">variables</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">,</span> <span class="n">clear</span><span class="o">=</span><span class="n">clear</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">io</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">io</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">io</span> <span class="o">=</span> <span class="n">neo</span><span class="o">.</span><span class="n">get_io</span><span class="p">(</span><span class="n">io</span><span class="p">)</span>
 
         <span class="c1"># write the neo block to the file</span>

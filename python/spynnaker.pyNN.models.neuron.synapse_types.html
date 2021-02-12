@@ -114,12 +114,18 @@ they appear</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>exc_response</strong> – <span class="math notranslate nohighlight">\(response^\mathrm{linear}_e\)</span></p></li>
-<li><p><strong>exc_exp_response</strong> – <span class="math notranslate nohighlight">\(response^\mathrm{exponential}_e\)</span></p></li>
-<li><p><strong>tau_syn_E</strong> – <span class="math notranslate nohighlight">\(\tau^{syn}_e\)</span></p></li>
-<li><p><strong>inh_response</strong> – <span class="math notranslate nohighlight">\(response^\mathrm{linear}_i\)</span></p></li>
-<li><p><strong>inh_exp_response</strong> – <span class="math notranslate nohighlight">\(response^\mathrm{exponential}_i\)</span></p></li>
-<li><p><strong>tau_syn_I</strong> – <span class="math notranslate nohighlight">\(\tau^{syn}_i\)</span></p></li>
+<li><p><strong>exc_response</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em>
+or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(response^\mathrm{linear}_e\)</span></p></li>
+<li><p><strong>exc_exp_response</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em>
+or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(response^\mathrm{exponential}_e\)</span></p></li>
+<li><p><strong>tau_syn_E</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em>
+or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(\tau^{syn}_e\)</span></p></li>
+<li><p><strong>inh_response</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em>
+or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(response^\mathrm{linear}_i\)</span></p></li>
+<li><p><strong>inh_exp_response</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em>
+or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(response^\mathrm{exponential}_i\)</span></p></li>
+<li><p><strong>tau_syn_I</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em>
+or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(\tau^{syn}_i\)</span></p></li>
 </ul>
 </dd>
 </dl>
@@ -129,7 +135,7 @@ they appear</p>
 <dd><p>Add the initial values of the parameters to the parameter holder</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – A holder of the parameters</p>
+<dd class="field-odd"><p><strong>parameters</strong> (<em>RangeDictionary</em>) – A holder of the parameters</p>
 </dd>
 </dl>
 </dd></dl>
@@ -140,7 +146,7 @@ they appear</p>
 <dd><p>Add the initial values of the state variables to the state            variables holder</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – A holder of the state variables</p>
+<dd class="field-odd"><p><strong>state_variables</strong> (<em>RangeDictionary</em>) – A holder of the state variables</p>
 </dd>
 </dl>
 </dd></dl>
@@ -224,8 +230,8 @@ they appear</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – The holder of the parameters</p></li>
-<li><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – The holder of the state variables</p></li>
+<li><p><strong>parameters</strong> (<em>RangeDictionary</em>) – The holder of the parameters</p></li>
+<li><p><strong>state_variables</strong> (<em>RangeDictionary</em>) – The holder of the state variables</p></li>
 <li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN)"><em>Slice</em></a>) – The slice of variables being retrieved</p></li>
 <li><p><strong>ts</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – The time to be advanced in one call to the update of this component</p></li>
 <li><p><strong>ts</strong> – machine time step</p></li>
@@ -236,7 +242,7 @@ they appear</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a> or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>) or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a>) or
-<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangedList" title="(in SpiNNUtils)">RangedList</a>)</p>
+RangedList)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -278,8 +284,8 @@ they appear</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>values</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>)</em>) – The values read from the machine, one for each struct element</p></li>
-<li><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – The holder of the parameters to update</p></li>
-<li><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – The holder of the state variables to update</p></li>
+<li><p><strong>parameters</strong> (<em>RangeDictionary</em>) – The holder of the parameters to update</p></li>
+<li><p><strong>state_variables</strong> (<em>RangeDictionary</em>) – The holder of the state variables to update</p></li>
 </ul>
 </dd>
 </dl>
@@ -295,8 +301,10 @@ they appear</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>isyn_exc</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em>             or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(I^{syn}_e\)</span></p></li>
-<li><p><strong>isyn_inh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em>             or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(I^{syn}_i\)</span></p></li>
+<li><p><strong>isyn_exc</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em>
+or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(I^{syn}_e\)</span></p></li>
+<li><p><strong>isyn_inh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em>
+or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(I^{syn}_i\)</span></p></li>
 </ul>
 </dd>
 </dl>
@@ -306,7 +314,7 @@ they appear</p>
 <dd><p>Add the initial values of the parameters to the parameter holder</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – A holder of the parameters</p>
+<dd class="field-odd"><p><strong>parameters</strong> (<em>RangeDictionary</em>) – A holder of the parameters</p>
 </dd>
 </dl>
 </dd></dl>
@@ -317,7 +325,7 @@ they appear</p>
 <dd><p>Add the initial values of the state variables to the state            variables holder</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – A holder of the state variables</p>
+<dd class="field-odd"><p><strong>state_variables</strong> (<em>RangeDictionary</em>) – A holder of the state variables</p>
 </dd>
 </dl>
 </dd></dl>
@@ -396,8 +404,8 @@ they appear</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – The holder of the parameters</p></li>
-<li><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – The holder of the state variables</p></li>
+<li><p><strong>parameters</strong> (<em>RangeDictionary</em>) – The holder of the parameters</p></li>
+<li><p><strong>state_variables</strong> (<em>RangeDictionary</em>) – The holder of the state variables</p></li>
 <li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN)"><em>Slice</em></a>) – The slice of variables being retrieved</p></li>
 <li><p><strong>ts</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – The time to be advanced in one call to the update of this component</p></li>
 </ul>
@@ -407,7 +415,7 @@ they appear</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a> or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>) or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a>) or
-<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangedList" title="(in SpiNNUtils)">RangedList</a>)</p>
+RangedList)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -444,8 +452,8 @@ they appear</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>values</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>)</em>) – The values read from the machine, one for each struct element</p></li>
-<li><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – The holder of the parameters to update</p></li>
-<li><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – The holder of the state variables to update</p></li>
+<li><p><strong>parameters</strong> (<em>RangeDictionary</em>) – The holder of the parameters to update</p></li>
+<li><p><strong>state_variables</strong> (<em>RangeDictionary</em>) – The holder of the state variables to update</p></li>
 </ul>
 </dd>
 </dl>
@@ -460,12 +468,18 @@ they appear</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>tau_syn_E</strong> – <span class="math notranslate nohighlight">\(\tau^{syn}_{e_1}\)</span></p></li>
-<li><p><strong>tau_syn_E2</strong> – <span class="math notranslate nohighlight">\(\tau^{syn}_{e_2}\)</span></p></li>
-<li><p><strong>tau_syn_I</strong> – <span class="math notranslate nohighlight">\(\tau^{syn}_i\)</span></p></li>
-<li><p><strong>isyn_exc</strong> – <span class="math notranslate nohighlight">\(I^{syn}_{e_1}\)</span></p></li>
-<li><p><strong>isyn_exc2</strong> – <span class="math notranslate nohighlight">\(I^{syn}_{e_2}\)</span></p></li>
-<li><p><strong>isyn_inh</strong> – <span class="math notranslate nohighlight">\(I^{syn}_i\)</span></p></li>
+<li><p><strong>tau_syn_E</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em>
+or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(\tau^{syn}_{e_1}\)</span></p></li>
+<li><p><strong>tau_syn_E2</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em>
+or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(\tau^{syn}_{e_2}\)</span></p></li>
+<li><p><strong>tau_syn_I</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em>
+or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(\tau^{syn}_i\)</span></p></li>
+<li><p><strong>isyn_exc</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em>
+or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(I^{syn}_{e_1}\)</span></p></li>
+<li><p><strong>isyn_exc2</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em>
+or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(I^{syn}_{e_2}\)</span></p></li>
+<li><p><strong>isyn_inh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em>
+or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(I^{syn}_i\)</span></p></li>
 </ul>
 </dd>
 </dl>
@@ -475,7 +489,7 @@ they appear</p>
 <dd><p>Add the initial values of the parameters to the parameter holder</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – A holder of the parameters</p>
+<dd class="field-odd"><p><strong>parameters</strong> (<em>RangeDictionary</em>) – A holder of the parameters</p>
 </dd>
 </dl>
 </dd></dl>
@@ -486,7 +500,7 @@ they appear</p>
 <dd><p>Add the initial values of the state variables to the state            variables holder</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – A holder of the state variables</p>
+<dd class="field-odd"><p><strong>state_variables</strong> (<em>RangeDictionary</em>) – A holder of the state variables</p>
 </dd>
 </dl>
 </dd></dl>
@@ -565,8 +579,8 @@ they appear</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – The holder of the parameters</p></li>
-<li><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – The holder of the state variables</p></li>
+<li><p><strong>parameters</strong> (<em>RangeDictionary</em>) – The holder of the parameters</p></li>
+<li><p><strong>state_variables</strong> (<em>RangeDictionary</em>) – The holder of the state variables</p></li>
 <li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN)"><em>Slice</em></a>) – The slice of variables being retrieved</p></li>
 <li><p><strong>ts</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – The time to be advanced in one call to the update of this component</p></li>
 <li><p><strong>ts</strong> – machine time step</p></li>
@@ -577,7 +591,7 @@ they appear</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a> or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>) or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a>) or
-<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangedList" title="(in SpiNNUtils)">RangedList</a>)</p>
+RangedList)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -634,8 +648,8 @@ they appear</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>values</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>)</em>) – The values read from the machine, one for each struct element</p></li>
-<li><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – The holder of the parameters to update</p></li>
-<li><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – The holder of the state variables to update</p></li>
+<li><p><strong>parameters</strong> (<em>RangeDictionary</em>) – The holder of the parameters to update</p></li>
+<li><p><strong>state_variables</strong> (<em>RangeDictionary</em>) – The holder of the state variables to update</p></li>
 </ul>
 </dd>
 </dl>
@@ -650,10 +664,14 @@ they appear</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>tau_syn_E</strong> – <span class="math notranslate nohighlight">\(\tau^{syn}_e\)</span></p></li>
-<li><p><strong>tau_syn_I</strong> – <span class="math notranslate nohighlight">\(\tau^{syn}_i\)</span></p></li>
-<li><p><strong>isyn_exc</strong> – <span class="math notranslate nohighlight">\(I^{syn}_e\)</span></p></li>
-<li><p><strong>isyn_inh</strong> – <span class="math notranslate nohighlight">\(I^{syn}_i\)</span></p></li>
+<li><p><strong>tau_syn_E</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em>
+or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(\tau^{syn}_e\)</span></p></li>
+<li><p><strong>tau_syn_I</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em>
+or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(\tau^{syn}_i\)</span></p></li>
+<li><p><strong>isyn_exc</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em>
+or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(I^{syn}_e\)</span></p></li>
+<li><p><strong>isyn_inh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em>
+or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(I^{syn}_i\)</span></p></li>
 </ul>
 </dd>
 </dl>
@@ -663,7 +681,7 @@ they appear</p>
 <dd><p>Add the initial values of the parameters to the parameter holder</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – A holder of the parameters</p>
+<dd class="field-odd"><p><strong>parameters</strong> (<em>RangeDictionary</em>) – A holder of the parameters</p>
 </dd>
 </dl>
 </dd></dl>
@@ -674,7 +692,7 @@ they appear</p>
 <dd><p>Add the initial values of the state variables to the state            variables holder</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – A holder of the state variables</p>
+<dd class="field-odd"><p><strong>state_variables</strong> (<em>RangeDictionary</em>) – A holder of the state variables</p>
 </dd>
 </dl>
 </dd></dl>
@@ -753,8 +771,8 @@ they appear</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – The holder of the parameters</p></li>
-<li><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – The holder of the state variables</p></li>
+<li><p><strong>parameters</strong> (<em>RangeDictionary</em>) – The holder of the parameters</p></li>
+<li><p><strong>state_variables</strong> (<em>RangeDictionary</em>) – The holder of the state variables</p></li>
 <li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN)"><em>Slice</em></a>) – The slice of variables being retrieved</p></li>
 <li><p><strong>ts</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – The time to be advanced in one call to the update of this component</p></li>
 <li><p><strong>ts</strong> – machine time step</p></li>
@@ -765,7 +783,7 @@ they appear</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a> or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>) or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a>) or
-<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangedList" title="(in SpiNNUtils)">RangedList</a>)</p>
+RangedList)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -812,8 +830,8 @@ they appear</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>values</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>)</em>) – The values read from the machine, one for each struct element</p></li>
-<li><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – The holder of the parameters to update</p></li>
-<li><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – The holder of the state variables to update</p></li>
+<li><p><strong>parameters</strong> (<em>RangeDictionary</em>) – The holder of the parameters to update</p></li>
+<li><p><strong>state_variables</strong> (<em>RangeDictionary</em>) – The holder of the state variables to update</p></li>
 </ul>
 </dd>
 </dl>
@@ -828,15 +846,24 @@ they appear</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>tau_syn_E</strong> – <span class="math notranslate nohighlight">\(\tau^{syn}_{e_1}\)</span></p></li>
-<li><p><strong>tau_syn_E2</strong> – <span class="math notranslate nohighlight">\(\tau^{syn}_{e_2}\)</span></p></li>
-<li><p><strong>tau_syn_I</strong> – <span class="math notranslate nohighlight">\(\tau^{syn}_i\)</span></p></li>
-<li><p><strong>isyn_exc</strong> – <span class="math notranslate nohighlight">\(I^{syn}_{e_1}\)</span></p></li>
-<li><p><strong>isyn_exc2</strong> – <span class="math notranslate nohighlight">\(I^{syn}_{e_2}\)</span></p></li>
-<li><p><strong>isyn_inh</strong> – <span class="math notranslate nohighlight">\(I^{syn}_i\)</span></p></li>
-<li><p><strong>multiplicator</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – </p></li>
-<li><p><strong>exc2_old</strong> – </p></li>
-<li><p><strong>scaling_factor</strong> – </p></li>
+<li><p><strong>tau_syn_E</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em>
+or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(\tau^{syn}_{e_1}\)</span></p></li>
+<li><p><strong>tau_syn_E2</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em>
+or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(\tau^{syn}_{e_2}\)</span></p></li>
+<li><p><strong>tau_syn_I</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em>
+or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(\tau^{syn}_i\)</span></p></li>
+<li><p><strong>isyn_exc</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em>
+or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(I^{syn}_{e_1}\)</span></p></li>
+<li><p><strong>isyn_exc2</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em>
+or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(I^{syn}_{e_2}\)</span></p></li>
+<li><p><strong>isyn_inh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em>
+or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(I^{syn}_i\)</span></p></li>
+<li><p><strong>multiplicator</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em>
+or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – </p></li>
+<li><p><strong>exc2_old</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em>
+or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – </p></li>
+<li><p><strong>scaling_factor</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em>
+or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – </p></li>
 </ul>
 </dd>
 </dl>
@@ -846,7 +873,7 @@ they appear</p>
 <dd><p>Add the initial values of the parameters to the parameter holder</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – A holder of the parameters</p>
+<dd class="field-odd"><p><strong>parameters</strong> (<em>RangeDictionary</em>) – A holder of the parameters</p>
 </dd>
 </dl>
 </dd></dl>
@@ -857,7 +884,7 @@ they appear</p>
 <dd><p>Add the initial values of the state variables to the state            variables holder</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – A holder of the state variables</p>
+<dd class="field-odd"><p><strong>state_variables</strong> (<em>RangeDictionary</em>) – A holder of the state variables</p>
 </dd>
 </dl>
 </dd></dl>
@@ -941,8 +968,8 @@ they appear</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – The holder of the parameters</p></li>
-<li><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – The holder of the state variables</p></li>
+<li><p><strong>parameters</strong> (<em>RangeDictionary</em>) – The holder of the parameters</p></li>
+<li><p><strong>state_variables</strong> (<em>RangeDictionary</em>) – The holder of the state variables</p></li>
 <li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN)"><em>Slice</em></a>) – The slice of variables being retrieved</p></li>
 <li><p><strong>ts</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – The time to be advanced in one call to the update of this component</p></li>
 <li><p><strong>ts</strong> – machine time step</p></li>
@@ -953,7 +980,7 @@ they appear</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a> or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>) or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a>) or
-<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangedList" title="(in SpiNNUtils)">RangedList</a>)</p>
+RangedList)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1020,8 +1047,8 @@ they appear</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>values</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>)</em>) – The values read from the machine, one for each struct element</p></li>
-<li><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – The holder of the parameters to update</p></li>
-<li><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – The holder of the state variables to update</p></li>
+<li><p><strong>parameters</strong> (<em>RangeDictionary</em>) – The holder of the parameters to update</p></li>
+<li><p><strong>state_variables</strong> (<em>RangeDictionary</em>) – The holder of the state variables to update</p></li>
 </ul>
 </dd>
 </dl>

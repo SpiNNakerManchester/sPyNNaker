@@ -58,12 +58,11 @@
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">from</span> <span class="nn">pyNN.random</span> <span class="kn">import</span> <span class="n">NumpyRNG</span><span class="p">,</span> <span class="n">RandomDistribution</span>
-<span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">string_types</span><span class="p">,</span> <span class="n">with_metaclass</span>
 
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> \
-    <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.logger_utils</span> <span class="kn">import</span> <span class="n">warn_once</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.safe_eval</span> <span class="kn">import</span> <span class="n">SafeEval</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.utility_objs</span> <span class="kn">import</span> <span class="n">ProvenanceDataItem</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.abstract_base</span> <span class="kn">import</span> <span class="n">AbstractBase</span><span class="p">,</span> <span class="n">abstractmethod</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities</span> <span class="kn">import</span> <span class="n">utility_calls</span>
@@ -79,8 +78,7 @@
     <span class="n">numpy</span><span class="o">.</span><span class="n">maximum</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">minimum</span><span class="p">,</span> <span class="n">e</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">e</span><span class="p">,</span> <span class="n">pi</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
 
 
-<span class="c1"># with_metaclass due to https://github.com/benjaminp/six/issues/219</span>
-<div class="viewcode-block" id="AbstractConnector"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector">[docs]</a><span class="k">class</span> <span class="nc">AbstractConnector</span><span class="p">(</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">AbstractBase</span><span class="p">,</span> <span class="nb">object</span><span class="p">)):</span>
+<div class="viewcode-block" id="AbstractConnector"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector">[docs]</a><span class="k">class</span> <span class="nc">AbstractConnector</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">AbstractBase</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Abstract class that all PyNN Connectors extend.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># pylint: disable=unused-argument,too-many-arguments</span>
@@ -452,7 +450,7 @@
             <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span>
                 <span class="n">values</span><span class="p">[</span><span class="n">connection_slice</span><span class="p">]</span>
                 <span class="k">for</span> <span class="n">connection_slice</span> <span class="ow">in</span> <span class="n">connection_slices</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;float64&quot;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">string_types</span><span class="p">)</span> <span class="ow">or</span> <span class="n">callable</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="n">callable</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__space</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">SpynnakerException</span><span class="p">(</span>
                     <span class="s2">&quot;No space object specified in projection </span><span class="si">{}</span><span class="s2">-</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
@@ -460,7 +458,7 @@
                         <span class="n">synapse_info</span><span class="o">.</span><span class="n">post_population</span><span class="p">))</span>
 
             <span class="n">expand_distances</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
                 <span class="n">expand_distances</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_expand_distances</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
 
             <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__space</span><span class="o">.</span><span class="n">distances</span><span class="p">(</span>
@@ -468,7 +466,7 @@
                 <span class="n">synapse_info</span><span class="o">.</span><span class="n">post_population</span><span class="o">.</span><span class="n">positions</span><span class="p">,</span>
                 <span class="n">expand_distances</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
                 <span class="k">return</span> <span class="n">_expr_context</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">values</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
         <span class="k">raise</span> <span class="n">SpynnakerException</span><span class="p">(</span><span class="s2">&quot;what on earth are you giving me?&quot;</span><span class="p">)</span>

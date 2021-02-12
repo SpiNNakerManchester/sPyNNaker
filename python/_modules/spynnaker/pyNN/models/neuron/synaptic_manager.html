@@ -55,15 +55,11 @@
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">special</span>  <span class="c1"># @UnresolvedImport</span>
-<span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">itervalues</span>
 
 <span class="kn">from</span> <span class="nn">spinn_utilities.progress_bar</span> <span class="kn">import</span> <span class="n">ProgressBar</span>
-
 <span class="kn">from</span> <span class="nn">data_specification.enums</span> <span class="kn">import</span> <span class="n">DataType</span>
-
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">BYTES_PER_WORD</span><span class="p">,</span> <span class="n">MICRO_TO_SECOND_CONVERSION</span><span class="p">)</span>
-
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neural_projections</span> <span class="kn">import</span> <span class="n">ProjectionApplicationEdge</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="n">AbstractMaxSpikes</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.synapse_io</span> <span class="kn">import</span> <span class="n">SynapseIORowBased</span>
@@ -71,7 +67,6 @@
     <span class="n">POPULATION_BASED_REGIONS</span><span class="p">,</span> <span class="n">POSSION_SIGMA_SUMMATION_LIMIT</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.utility_calls</span> <span class="kn">import</span> <span class="p">(</span><span class="n">get_n_bits</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.running_stats</span> <span class="kn">import</span> <span class="n">RunningStats</span>
-
 <span class="kn">from</span> <span class="nn">.synapse_dynamics</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractSynapseDynamics</span><span class="p">,</span> <span class="n">AbstractSynapseDynamicsStructural</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.synaptic_matrices</span> <span class="kn">import</span> <span class="n">SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES</span>
@@ -795,7 +790,7 @@
 <div class="viewcode-block" id="SynapticManager.clear_connection_cache"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.SynapticManager.clear_connection_cache">[docs]</a>    <span class="k">def</span> <span class="nf">clear_connection_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Flush the cache of connection information; needed for a second run</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">matrices</span> <span class="ow">in</span> <span class="n">itervalues</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__synaptic_matrices</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">matrices</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synaptic_matrices</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
             <span class="n">matrices</span><span class="o">.</span><span class="n">clear_connection_cache</span><span class="p">()</span></div>
 
     <span class="nd">@property</span>

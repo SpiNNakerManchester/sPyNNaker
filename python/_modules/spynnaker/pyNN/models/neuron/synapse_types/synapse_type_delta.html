@@ -75,15 +75,15 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">isyn_exc</span><span class="p">,</span> <span class="n">isyn_inh</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param isyn_exc: :math:`I^{syn}_e`</span>
-<span class="sd">        :type isyn_exc: \</span>
-<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution \</span>
+<span class="sd">        :type isyn_exc:</span>
+<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution</span>
 <span class="sd">            or (mapping) function</span>
 <span class="sd">        :param isyn_inh: :math:`I^{syn}_i`</span>
-<span class="sd">        :type isyn_inh: \</span>
-<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution \</span>
+<span class="sd">        :type isyn_inh:</span>
+<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution</span>
 <span class="sd">            or (mapping) function</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">SynapseTypeDelta</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">([</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">([</span>
             <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># isyn_exc</span>
             <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">])</span>  <span class="c1"># isyn_inh</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__isyn_exc</span> <span class="o">=</span> <span class="n">isyn_exc</span>
@@ -112,13 +112,11 @@
 
 <div class="viewcode-block" id="SynapseTypeDelta.get_values"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDelta.get_values">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">get_values</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
-
         <span class="c1"># Add the rest of the data</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">state_variables</span><span class="p">[</span><span class="n">ISYN_EXC</span><span class="p">],</span> <span class="n">state_variables</span><span class="p">[</span><span class="n">ISYN_INH</span><span class="p">]]</span></div>
 
 <div class="viewcode-block" id="SynapseTypeDelta.update_values"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDelta.update_values">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">update_values</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">update_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">):</span>
-
         <span class="c1"># Read the data</span>
         <span class="p">(</span><span class="n">isyn_exc</span><span class="p">,</span> <span class="n">isyn_inh</span><span class="p">)</span> <span class="o">=</span> <span class="n">values</span>
 

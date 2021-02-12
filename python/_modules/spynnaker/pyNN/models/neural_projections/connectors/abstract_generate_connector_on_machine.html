@@ -55,7 +55,6 @@
 <span class="kn">from</span> <span class="nn">pyNN.random</span> <span class="kn">import</span> <span class="n">available_distributions</span><span class="p">,</span> <span class="n">RandomDistribution</span>
 <span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
-<span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">with_metaclass</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.abstract_base</span> <span class="kn">import</span> <span class="n">abstractproperty</span><span class="p">,</span> <span class="n">AbstractBase</span>
 <span class="kn">from</span> <span class="nn">data_specification.enums.data_type</span> <span class="kn">import</span> <span class="n">DataType</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
@@ -90,8 +89,8 @@
     <span class="n">KERNEL_CONNECTOR</span> <span class="o">=</span> <span class="mi">6</span>
 
 
-<div class="viewcode-block" id="AbstractGenerateConnectorOnMachine"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractGenerateConnectorOnMachine">[docs]</a><span class="k">class</span> <span class="nc">AbstractGenerateConnectorOnMachine</span><span class="p">(</span><span class="n">with_metaclass</span><span class="p">(</span>
-        <span class="n">AbstractBase</span><span class="p">,</span> <span class="n">AbstractConnector</span><span class="p">)):</span>
+<div class="viewcode-block" id="AbstractGenerateConnectorOnMachine"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractGenerateConnectorOnMachine">[docs]</a><span class="k">class</span> <span class="nc">AbstractGenerateConnectorOnMachine</span><span class="p">(</span>
+        <span class="n">AbstractConnector</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">AbstractBase</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Indicates that the connectivity can be generated on the machine</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -107,8 +106,7 @@
 <span class="sd">        :param callable callback: Ignored</span>
 <span class="sd">        :param bool verbose:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">AbstractConnector</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>  <span class="c1"># pylint: disable=non-parent-init-called</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="n">safe</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">callback</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">safe</span><span class="o">=</span><span class="n">safe</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">callback</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__delay_seed</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__weight_seed</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__connector_seed</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -235,10 +233,10 @@
 <span class="sd">        be generated on the machine</span>
 
 <span class="sd">        :param weights:</span>
-<span class="sd">        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\</span>
+<span class="sd">        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or</span>
 <span class="sd">            float or list(int) or list(float)</span>
 <span class="sd">        :param delays:</span>
-<span class="sd">        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\</span>
+<span class="sd">        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or</span>
 <span class="sd">            float or list(int) or list(float)</span>
 <span class="sd">        :rtype: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -249,7 +247,7 @@
         <span class="sd">&quot;&quot;&quot; Get the id of the weight generator on the machine</span>
 
 <span class="sd">        :param weights:</span>
-<span class="sd">        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\</span>
+<span class="sd">        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or</span>
 <span class="sd">            float or list(int) or list(float)</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -259,7 +257,7 @@
         <span class="sd">&quot;&quot;&quot; Get the parameters of the weight generator on the machine</span>
 
 <span class="sd">        :param weights:</span>
-<span class="sd">        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\</span>
+<span class="sd">        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or</span>
 <span class="sd">            float or list(int) or list(float)</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice post_vertex_slice:</span>
@@ -274,7 +272,7 @@
         <span class="sd">&quot;&quot;&quot; The size of the weight parameters in bytes</span>
 
 <span class="sd">        :param weights:</span>
-<span class="sd">        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\</span>
+<span class="sd">        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or</span>
 <span class="sd">            float or list(int) or list(float)</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -284,7 +282,7 @@
         <span class="sd">&quot;&quot;&quot; Get the id of the delay generator on the machine</span>
 
 <span class="sd">        :param delays:</span>
-<span class="sd">        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\</span>
+<span class="sd">        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or</span>
 <span class="sd">            float or list(int) or list(float)</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -294,7 +292,7 @@
         <span class="sd">&quot;&quot;&quot; Get the parameters of the delay generator on the machine</span>
 
 <span class="sd">        :param delays:</span>
-<span class="sd">        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\</span>
+<span class="sd">        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or</span>
 <span class="sd">            float or list(int) or list(float)</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice post_vertex_slice:</span>
@@ -309,7 +307,7 @@
         <span class="sd">&quot;&quot;&quot; The size of the delay parameters in bytes</span>
 
 <span class="sd">        :param delays:</span>
-<span class="sd">        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\</span>
+<span class="sd">        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or</span>
 <span class="sd">            float or list(int) or list(float)</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>

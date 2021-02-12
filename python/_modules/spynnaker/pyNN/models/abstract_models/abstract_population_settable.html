@@ -52,17 +52,18 @@
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
-<span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">add_metaclass</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.abstract_base</span> <span class="kn">import</span> <span class="n">AbstractBase</span><span class="p">,</span> <span class="n">abstractproperty</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.require_subclass</span> <span class="kn">import</span> <span class="n">require_subclass</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.ranged.abstract_list</span> <span class="kn">import</span> <span class="n">AbstractList</span>
+<span class="kn">from</span> <span class="nn">pacman.model.graphs.application</span> <span class="kn">import</span> <span class="n">ApplicationVertex</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.ranged</span> <span class="kn">import</span> <span class="n">SpynnakerRangedList</span>
 <span class="kn">from</span> <span class="nn">.abstract_settable</span> <span class="kn">import</span> <span class="n">AbstractSettable</span>
 
 
-<div class="viewcode-block" id="AbstractPopulationSettable"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractPopulationSettable">[docs]</a><span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">AbstractBase</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">AbstractPopulationSettable</span><span class="p">(</span><span class="n">AbstractSettable</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Indicates that some properties of this object can be accessed from\</span>
-<span class="sd">        the PyNN population set and get methods.</span>
+<div class="viewcode-block" id="AbstractPopulationSettable"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractPopulationSettable">[docs]</a><span class="nd">@require_subclass</span><span class="p">(</span><span class="n">ApplicationVertex</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">AbstractPopulationSettable</span><span class="p">(</span><span class="n">AbstractSettable</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">AbstractBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Indicates that some properties of this application vertex can be\</span>
+<span class="sd">        accessed from the PyNN population set and get methods.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
@@ -78,8 +79,8 @@
         <span class="sd">&quot;&quot;&quot; Gets the value for a particular key but only for the selected\</span>
 <span class="sd">            subset.</span>
 
-<span class="sd">        :param selector: See \</span>
-<span class="sd">            :py:meth:`~spinn_utilities.ranged.RangedList.get_value_by_selector`\</span>
+<span class="sd">        :param selector: See</span>
+<span class="sd">            :py:meth:`~spinn_utilities.ranged.RangedList.get_value_by_selector`</span>
 <span class="sd">            as this is just a pass through method</span>
 <span class="sd">        :type selector: None or slice or int or list(bool) or list(int)</span>
 <span class="sd">        :param str key: the name of the parameter to change</span>

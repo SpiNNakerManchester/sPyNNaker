@@ -51,19 +51,24 @@
 <span class="c1">#</span>
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">A trimmed down version of standard Python Abstract Base classes.</span>
 
-<span class="c1"># Trimmed down version of abc.py</span>
+<span class="sd">If using ``@add_metaclass``, this requires::</span>
 
-<span class="c1"># If using #@add_metaclass require from six import add_metaclass</span>
+<span class="sd">    from six import add_metaclass</span>
+
+<span class="sd">Using Python 3 style ``metaclass=AbstractBase`` is preferred.</span>
+<span class="sd">&quot;&quot;&quot;</span>
 
 
 <span class="k">def</span> <span class="nf">abstractmethod</span><span class="p">(</span><span class="n">funcobj</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; A decorator indicating abstract methods.</span>
 
-<span class="sd">    Requires that the metaclass is :py:class:`AbstractBase` or derived from\</span>
-<span class="sd">    it. A class that has a metaclass derived from :py:class:`AbstractBase` \</span>
-<span class="sd">    cannot be instantiated unless all of its abstract methods are overridden.\</span>
-<span class="sd">    The abstract methods can be called using any of the normal\</span>
+<span class="sd">    Requires that the metaclass is :py:class:`AbstractBase` or derived from</span>
+<span class="sd">    it. A class that has a metaclass derived from :py:class:`AbstractBase`</span>
+<span class="sd">    cannot be instantiated unless all of its abstract methods are overridden.</span>
+<span class="sd">    The abstract methods can be called using any of the normal</span>
 <span class="sd">    &#39;super&#39; call mechanisms.</span>
 
 <span class="sd">    Usage::</span>
@@ -72,7 +77,13 @@
 <span class="sd">        class C:</span>
 <span class="sd">            @abstractmethod</span>
 <span class="sd">            def my_abstract_method(self, ...):</span>
-<span class="sd">            ...</span>
+<span class="sd">                ...</span>
+
+<span class="sd">        # Python 3 only syntax</span>
+<span class="sd">        class C3(object, metaclass=AbstractBase):</span>
+<span class="sd">            @abstractmethod</span>
+<span class="sd">            def my_abstract_method(self, ...):</span>
+<span class="sd">                ...</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">funcobj</span><span class="o">.</span><span class="n">__isabstractmethod__</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="k">return</span> <span class="n">funcobj</span>
@@ -81,10 +92,10 @@
 <span class="k">class</span> <span class="nc">abstractproperty</span><span class="p">(</span><span class="nb">property</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; A decorator indicating abstract properties.</span>
 
-<span class="sd">    Requires that the metaclass is :py:class:`AbstractBase` or derived from\</span>
-<span class="sd">    it. A class that has a metaclass derived from :py:class:`AbstractBase` \</span>
-<span class="sd">    cannot be instantiated unless all of its abstract properties are\</span>
-<span class="sd">    overridden. The abstract properties can be called using any of the normal\</span>
+<span class="sd">    Requires that the metaclass is :py:class:`AbstractBase` or derived from</span>
+<span class="sd">    it. A class that has a metaclass derived from :py:class:`AbstractBase`</span>
+<span class="sd">    cannot be instantiated unless all of its abstract properties are</span>
+<span class="sd">    overridden. The abstract properties can be called using any of the normal</span>
 <span class="sd">    &#39;super&#39; call mechanisms.</span>
 
 <span class="sd">    Usage::</span>
@@ -95,11 +106,23 @@
 <span class="sd">            def my_abstract_property(self):</span>
 <span class="sd">                ...</span>
 
-<span class="sd">    This defines a read-only property; you can also define a read-write\</span>
+<span class="sd">        # Python 3 only syntax</span>
+<span class="sd">        class C3(object, metaclass=AbstractBase):</span>
+<span class="sd">            @abstractproperty</span>
+<span class="sd">            def my_abstract_property(self):</span>
+<span class="sd">                ...</span>
+
+<span class="sd">    This defines a read-only property; you can also define a read-write</span>
 <span class="sd">    abstract property using the &#39;long&#39; form of property declaration::</span>
 
 <span class="sd">        @add_metaclass(AbstractBase)</span>
 <span class="sd">        class C:</span>
+<span class="sd">            def getx(self): ...</span>
+<span class="sd">            def setx(self, value): ...</span>
+<span class="sd">            x = abstractproperty(getx, setx)</span>
+
+<span class="sd">        # Python 3 only syntax</span>
+<span class="sd">        class C3(object, metaclass=AbstractBase):</span>
 <span class="sd">            def getx(self): ...</span>
 <span class="sd">            def setx(self, value): ...</span>
 <span class="sd">            x = abstractproperty(getx, setx)</span>
@@ -110,16 +133,16 @@
 <span class="k">class</span> <span class="nc">AbstractBase</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Metaclass for defining Abstract Base Classes (AbstractBases).</span>
 
-<span class="sd">    Use this metaclass to create an AbstractBase. An AbstractBase can be\</span>
+<span class="sd">    Use this metaclass to create an AbstractBase. An AbstractBase can be</span>
 <span class="sd">    subclassed directly, and then acts as a mix-in class.</span>
 
-<span class="sd">    This is a trimmed down version of ABC.\</span>
+<span class="sd">    This is a trimmed down version of ABC.</span>
 <span class="sd">    Unlike ABC you can not register unrelated concrete classes.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">namespace</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="c1"># Actually make the class</span>
-        <span class="n">abs_cls</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">AbstractBase</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
+        <span class="n">abs_cls</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="c1"># Get set of abstract methods from namespace</span>
         <span class="n">abstracts</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">nm</span> <span class="k">for</span> <span class="n">nm</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">namespace</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>

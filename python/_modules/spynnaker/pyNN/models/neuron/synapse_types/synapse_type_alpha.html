@@ -93,31 +93,31 @@
                  <span class="n">tau_syn_E</span><span class="p">,</span> <span class="n">inh_response</span><span class="p">,</span> <span class="n">inh_exp_response</span><span class="p">,</span> <span class="n">tau_syn_I</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param exc_response: :math:`response^\mathrm{linear}_e`</span>
-<span class="sd">        :type exc_response: \</span>
-<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution \</span>
+<span class="sd">        :type exc_response:</span>
+<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution</span>
 <span class="sd">            or (mapping) function</span>
 <span class="sd">        :param exc_exp_response: :math:`response^\mathrm{exponential}_e`</span>
-<span class="sd">        :type exc_exp_response: \</span>
-<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution \</span>
+<span class="sd">        :type exc_exp_response:</span>
+<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution</span>
 <span class="sd">            or (mapping) function</span>
 <span class="sd">        :param tau_syn_E: :math:`\tau^{syn}_e`</span>
-<span class="sd">        :type tau_syn_E: \</span>
-<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution \</span>
+<span class="sd">        :type tau_syn_E:</span>
+<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution</span>
 <span class="sd">            or (mapping) function</span>
 <span class="sd">        :param inh_response: :math:`response^\mathrm{linear}_i`</span>
-<span class="sd">        :type inh_response: \</span>
-<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution \</span>
+<span class="sd">        :type inh_response:</span>
+<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution</span>
 <span class="sd">            or (mapping) function</span>
 <span class="sd">        :param inh_exp_response: :math:`response^\mathrm{exponential}_i`</span>
-<span class="sd">        :type inh_exp_response: \</span>
-<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution \</span>
+<span class="sd">        :type inh_exp_response:</span>
+<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution</span>
 <span class="sd">            or (mapping) function</span>
 <span class="sd">        :param tau_syn_I: :math:`\tau^{syn}_i`</span>
-<span class="sd">        :type tau_syn_I: \</span>
-<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution \</span>
+<span class="sd">        :type tau_syn_I:</span>
+<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution</span>
 <span class="sd">            or (mapping) function</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">SynapseTypeAlpha</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">([</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">([</span>
             <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># exc_response</span>
             <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># exc_exp_response</span>
             <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># 1 / tau_syn_E^2</span>

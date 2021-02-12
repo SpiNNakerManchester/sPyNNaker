@@ -52,15 +52,15 @@
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
-<span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">add_metaclass</span>
-<span class="kn">from</span> <span class="nn">spinn_utilities.abstract_base</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">AbstractBase</span><span class="p">,</span> <span class="n">abstractproperty</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.abstract_base</span> <span class="kn">import</span> <span class="n">AbstractBase</span><span class="p">,</span> <span class="n">abstractproperty</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.require_subclass</span> <span class="kn">import</span> <span class="n">require_subclass</span>
+<span class="kn">from</span> <span class="nn">pacman.model.graphs.application</span> <span class="kn">import</span> <span class="n">ApplicationVertex</span>
 
 
-<div class="viewcode-block" id="AbstractHasDelayStages"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractHasDelayStages">[docs]</a><span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">AbstractBase</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">AbstractHasDelayStages</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Indicates that this object (a vertex) has delay stages that are used \</span>
-<span class="sd">        to increase the space required for bitfields in \</span>
+<div class="viewcode-block" id="AbstractHasDelayStages"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractHasDelayStages">[docs]</a><span class="nd">@require_subclass</span><span class="p">(</span><span class="n">ApplicationVertex</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">AbstractHasDelayStages</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">AbstractBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Indicates that this object (an application vertex) has delay stages\</span>
+<span class="sd">        that are used to increase the space required for bitfields in \</span>
 <span class="sd">        :py:func:`spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_bit_field_region`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 

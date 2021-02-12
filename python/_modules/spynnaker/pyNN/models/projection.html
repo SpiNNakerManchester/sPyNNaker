@@ -55,7 +55,6 @@
 <span class="kn">import</span> <span class="nn">functools</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
-<span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">string_types</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">from</span> <span class="nn">pyNN</span> <span class="kn">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">pynn_common</span>
 <span class="kn">from</span> <span class="nn">pyNN.random</span> <span class="kn">import</span> <span class="n">RandomDistribution</span>
@@ -322,7 +321,7 @@
             <span class="n">warn_once</span><span class="p">(</span>
                 <span class="n">logger</span><span class="p">,</span> <span class="s2">&quot;sPyNNaker only supports gather=True. We will run &quot;</span>
                 <span class="s2">&quot;as if gather was set to True.&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">attribute_names</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">attribute_names</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">attribute_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">attribute_names</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">attribute_names</span> <span class="ow">in</span> <span class="p">([</span><span class="s1">&#39;all&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;connections&#39;</span><span class="p">]):</span>
             <span class="n">attribute_names</span> <span class="o">=</span> \
@@ -348,7 +347,7 @@
 <span class="sd">        :return: values selected</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># fix issue with 1 versus many</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">attribute_names</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">attribute_names</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">attribute_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">attribute_names</span><span class="p">]</span>
 
         <span class="n">data_items</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
@@ -393,7 +392,7 @@
             <span class="n">dtype</span> <span class="o">=</span> <span class="p">[(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;&lt;f8&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">names</span><span class="p">]</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">save_file</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">save_file</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">data_file</span> <span class="o">=</span> <span class="n">StandardTextFile</span><span class="p">(</span><span class="n">save_file</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;wb&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">data_file</span> <span class="o">=</span> <span class="n">save_file</span>

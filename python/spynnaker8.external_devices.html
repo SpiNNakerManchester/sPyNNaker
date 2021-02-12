@@ -884,7 +884,7 @@ accuracy to gain performance.</p>
 
 <dl class="py class">
 <dt id="spynnaker8.external_devices.MunichMotorDevice">
-<em class="property">class </em><code class="sig-prename descclassname">spynnaker8.external_devices.</code><code class="sig-name descname">MunichMotorDevice</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/munich_spinnaker_link_motor_device.html#MunichMotorDevice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker8.external_devices.MunichMotorDevice" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker8.external_devices.</code><code class="sig-name descname">MunichMotorDevice</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">spinnaker_link_id</span></em>, <em class="sig-param"><span class="n">board_address</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">speed</span><span class="o">=</span><span class="default_value">30</span></em>, <em class="sig-param"><span class="n">sample_time</span><span class="o">=</span><span class="default_value">4096</span></em>, <em class="sig-param"><span class="n">update_time</span><span class="o">=</span><span class="default_value">512</span></em>, <em class="sig-param"><span class="n">delay_time</span><span class="o">=</span><span class="default_value">5</span></em>, <em class="sig-param"><span class="n">delta_threshold</span><span class="o">=</span><span class="default_value">23</span></em>, <em class="sig-param"><span class="n">continue_if_not_different</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/munich_spinnaker_link_motor_device.html#MunichMotorDevice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker8.external_devices.MunichMotorDevice" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pacman.model.graphs.application.abstract.abstract_one_app_one_machine_vertex.AbstractOneAppOneMachineVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">spinn_front_end_common.abstract_models.abstract_vertex_with_dependent_vertices.AbstractVertexWithEdgeToDependentVertices</span></code></p>
 <p>An Omnibot motor control device. This has a real vertex and an         external device vertex.</p>
 <dl class="field-list simple">
@@ -1824,7 +1824,8 @@ whether to send 16-bit neuron IDs directly</p></li>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>poisson_labels</strong> (<em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>)</em>) – Labels of Poisson populations to be controlled</p></li>
-<li><p><strong>local_host</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Optional specification of the local hostname or            IP address of the interface to listen on</p></li>
+<li><p><strong>local_host</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Optional specification of the local hostname or
+IP address of the interface to listen on</p></li>
 <li><p><strong>local_port</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Optional specification of the local port to listen on. Must match
 the port that the toolchain will send the notification on (19999
 by default)</p></li>
@@ -2086,7 +2087,7 @@ used, False if SDP is to be used (default)</p></li>
 continue the simulation</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>returns when the application has started running on the        SpiNNaker platform.</p>
+<dd class="field-even"><p>when the application has started running on the SpiNNaker platform</p>
 </dd>
 </dl>
 </dd></dl>

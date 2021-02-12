@@ -51,7 +51,6 @@
 <span class="c1">#</span>
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
-
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">data_specification.enums.data_type</span> <span class="kn">import</span> <span class="n">DataType</span>
@@ -105,11 +104,11 @@
 <span class="sd">        :type shape_kernel: list(int) or tuple(int,int)</span>
 <span class="sd">        :param weight_kernel: (optional)</span>
 <span class="sd">            2D matrix of size shape_kernel describing the weights</span>
-<span class="sd">        :type weight_kernel: ~numpy.ndarray or ~pyNN.random.NumpyRNG \</span>
+<span class="sd">        :type weight_kernel: ~numpy.ndarray or ~pyNN.random.NumpyRNG</span>
 <span class="sd">            or int or float or list(int) or list(float) or None</span>
 <span class="sd">        :param delay_kernel: (optional)</span>
 <span class="sd">            2D matrix of size shape_kernel describing the delays</span>
-<span class="sd">        :type delay_kernel: ~numpy.ndarray or ~pyNN.random.NumpyRNG \</span>
+<span class="sd">        :type delay_kernel: ~numpy.ndarray or ~pyNN.random.NumpyRNG</span>
 <span class="sd">            or int or float or list(int) or list(float) or None</span>
 <span class="sd">        :param shape_common: (optional)</span>
 <span class="sd">            2D shape of common coordinate system (for both pre and post,</span>
@@ -137,8 +136,7 @@
 <span class="sd">            CSV file</span>
 <span class="sd">        :param callable callback: (ignored)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">KernelConnector</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">safe</span><span class="o">=</span><span class="n">safe</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">callback</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">safe</span><span class="o">=</span><span class="n">safe</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">callback</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
         <span class="k">assert</span> <span class="n">space</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;non-None space unsupported&quot;</span>
 
         <span class="c1"># Get the kernel size</span>
@@ -247,7 +245,7 @@
         <span class="sd">&quot;&quot;&quot; Convert kernel values given into the correct format.</span>
 
 <span class="sd">        :param vals:</span>
-<span class="sd">        :type vals: int or float or ~pyNN.random.NumpyRNG or ~numpy.ndarray\</span>
+<span class="sd">        :type vals: int or float or ~pyNN.random.NumpyRNG or ~numpy.ndarray</span>
 <span class="sd">            or ConvolutionKernel</span>
 <span class="sd">        :rtype: ~numpy.ndarray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -275,10 +273,10 @@
         <span class="sd">&quot;&quot;&quot; Compute the relevant information required for the connections.</span>
 
 <span class="sd">        :param weights:</span>
-<span class="sd">        :type weights: int or float or ~pyNN.random.NumpyRNG or \</span>
+<span class="sd">        :type weights: int or float or ~pyNN.random.NumpyRNG or</span>
 <span class="sd">            ~numpy.ndarray or ConvolutionKernel</span>
 <span class="sd">        :param delays:</span>
-<span class="sd">        :type delays: int or float or ~pyNN.random.NumpyRNG or ~numpy.ndarray\</span>
+<span class="sd">        :type delays: int or float or ~pyNN.random.NumpyRNG or ~numpy.ndarray</span>
 <span class="sd">            or ConvolutionKernel</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice post_vertex_slice:</span>
@@ -444,7 +442,7 @@
     <span class="k">def</span> <span class="nf">gen_delays_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delays</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_krn_delays</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">PARAM_TYPE_KERNEL</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">KernelConnector</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">gen_delays_id</span><span class="p">(</span><span class="n">delays</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">gen_delays_id</span><span class="p">(</span><span class="n">delays</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="KernelConnector.gen_delay_params_size_in_bytes"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.KernelConnector.gen_delay_params_size_in_bytes">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span>
         <span class="n">AbstractGenerateConnectorOnMachine</span><span class="o">.</span><span class="n">gen_delay_params_size_in_bytes</span><span class="p">)</span>
@@ -452,8 +450,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_krn_delays</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">(</span><span class="n">N_KERNEL_PARAMS</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_krn_delays</span><span class="o">.</span><span class="n">size</span><span class="p">)</span> <span class="o">*</span> \
                 <span class="n">BYTES_PER_WORD</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">KernelConnector</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">gen_delay_params_size_in_bytes</span><span class="p">(</span>
-            <span class="n">delays</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">gen_delay_params_size_in_bytes</span><span class="p">(</span><span class="n">delays</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="KernelConnector.gen_delay_params"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.KernelConnector.gen_delay_params">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractGenerateConnectorOnMachine</span><span class="o">.</span><span class="n">gen_delay_params</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">gen_delay_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delays</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">):</span>
@@ -463,14 +460,14 @@
             <span class="n">data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">properties</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint32&quot;</span><span class="p">)</span>
             <span class="n">values</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="o">.</span><span class="n">encode_as_numpy_int_array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_krn_delays</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">data</span><span class="p">,</span> <span class="n">values</span><span class="o">.</span><span class="n">flatten</span><span class="p">()))</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">KernelConnector</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">gen_delay_params</span><span class="p">(</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">gen_delay_params</span><span class="p">(</span>
             <span class="n">delays</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="KernelConnector.gen_weights_id"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.KernelConnector.gen_weights_id">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractGenerateConnectorOnMachine</span><span class="o">.</span><span class="n">gen_weights_id</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">gen_weights_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_krn_weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">PARAM_TYPE_KERNEL</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">KernelConnector</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">gen_weights_id</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">gen_weights_id</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="KernelConnector.gen_weight_params_size_in_bytes"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.KernelConnector.gen_weight_params_size_in_bytes">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span>
         <span class="n">AbstractGenerateConnectorOnMachine</span><span class="o">.</span><span class="n">gen_weight_params_size_in_bytes</span><span class="p">)</span>
@@ -478,8 +475,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_krn_weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">(</span><span class="n">N_KERNEL_PARAMS</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_krn_weights</span><span class="o">.</span><span class="n">size</span><span class="p">)</span> <span class="o">*</span> \
                 <span class="n">BYTES_PER_WORD</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">KernelConnector</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">gen_weight_params_size_in_bytes</span><span class="p">(</span>
-            <span class="n">weights</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">gen_weight_params_size_in_bytes</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="KernelConnector.gen_weights_params"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.KernelConnector.gen_weights_params">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractGenerateConnectorOnMachine</span><span class="o">.</span><span class="n">gen_weights_params</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">gen_weights_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">):</span>
@@ -490,7 +486,7 @@
             <span class="n">values</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="o">.</span><span class="n">encode_as_numpy_int_array</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_krn_weights</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">data</span><span class="p">,</span> <span class="n">values</span><span class="o">.</span><span class="n">flatten</span><span class="p">()))</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">KernelConnector</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">gen_weights_params</span><span class="p">(</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">gen_weights_params</span><span class="p">(</span>
             <span class="n">weights</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>

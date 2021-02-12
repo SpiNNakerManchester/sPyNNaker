@@ -142,7 +142,7 @@
         <span class="n">fixed_n_neurons</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_n_neurons</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">polarity</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__fixed_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_mask</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span>
 
-        <span class="nb">super</span><span class="p">(</span><span class="n">ExternalFPGARetinaDevice</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">n_atoms</span><span class="o">=</span><span class="n">fixed_n_neurons</span><span class="p">,</span> <span class="n">spinnaker_link_id</span><span class="o">=</span><span class="n">spinnaker_link_id</span><span class="p">,</span>
             <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="o">=</span><span class="n">fixed_n_neurons</span><span class="p">,</span>
             <span class="n">board_address</span><span class="o">=</span><span class="n">board_address</span><span class="p">)</span>

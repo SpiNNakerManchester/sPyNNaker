@@ -54,8 +54,10 @@
 <dl class="py class">
 <dt id="spynnaker.pyNN.utilities.ranged.SpynnakerRangeDictionary">
 <em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.utilities.ranged.</code><code class="sig-name descname">SpynnakerRangeDictionary</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">size</span></em>, <em class="sig-param"><span class="n">defaults</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/ranged/spynnaker_ranged_dict.html#SpynnakerRangeDictionary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.ranged.SpynnakerRangeDictionary" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.range_dictionary.RangeDictionary" title="(in SpiNNUtils)"><code class="xref py py-class docutils literal notranslate"><span class="pre">spinn_utilities.ranged.range_dictionary.RangeDictionary</span></code></a></p>
-<p>The Object is set up initially where every ID in the range will share        the same value for each key. All keys must be of type str. The        default Values can be anything including None.</p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spinn_utilities.ranged.range_dictionary.RangeDictionary</span></code></p>
+<p>The Object is set up initially where every ID in the range will share
+the same value for each key. All keys must be of type str. The
+default Values can be anything including None.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -92,13 +94,14 @@ All parameters are pass through ones to the List constructor</p>
 <dl class="py class">
 <dt id="spynnaker.pyNN.utilities.ranged.SpynnakerRangedList">
 <em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.utilities.ranged.</code><code class="sig-name descname">SpynnakerRangedList</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">size</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">value</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">key</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">use_list_as_value</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/ranged/spynnaker_ranged_list.html#SpynnakerRangedList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.ranged.SpynnakerRangedList" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.ranged_list.RangedList" title="(in SpiNNUtils)"><code class="xref py py-class docutils literal notranslate"><span class="pre">spinn_utilities.ranged.ranged_list.RangedList</span></code></a></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spinn_utilities.ranged.ranged_list.RangedList</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>size</strong> – Fixed length of the list</p></li>
 <li><p><strong>value</strong> – value to given to all elements in the list</p></li>
-<li><p><strong>key</strong> – The dict key this list covers.            This is used only for better Exception messages</p></li>
+<li><p><strong>key</strong> – The dict key this list covers.
+This is used only for better Exception messages</p></li>
 <li><p><strong>use_list_as_value</strong> – True if the value <em>is</em> a list</p></li>
 </ul>
 </dd>
@@ -109,7 +112,8 @@ All parameters are pass through ones to the List constructor</p>
 <dd><p>Converts (if required) the value into a list of a given size.             An exception is raised if value cannot be given size elements.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This method can be extended to add other conversions to list in            which case <a class="reference internal" href="#spynnaker.pyNN.utilities.ranged.SpynnakerRangedList.is_list" title="spynnaker.pyNN.utilities.ranged.SpynnakerRangedList.is_list"><code class="xref py py-meth docutils literal notranslate"><span class="pre">is_list()</span></code></a> must also be extended.</p>
+<p>This method can be extended to add other conversions to list in
+which case <a class="reference internal" href="#spynnaker.pyNN.utilities.ranged.SpynnakerRangedList.is_list" title="spynnaker.pyNN.utilities.ranged.SpynnakerRangedList.is_list"><code class="xref py py-meth docutils literal notranslate"><span class="pre">is_list()</span></code></a> must also be extended.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -130,7 +134,8 @@ All parameters are pass through ones to the List constructor</p>
 <dd><p>Determines if the value should be treated as a list.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This method can be extended to add other checks for list in which            case <a class="reference internal" href="#spynnaker.pyNN.utilities.ranged.SpynnakerRangedList.as_list" title="spynnaker.pyNN.utilities.ranged.SpynnakerRangedList.as_list"><code class="xref py py-meth docutils literal notranslate"><span class="pre">as_list()</span></code></a> must also be extended.</p>
+<p>This method can be extended to add other checks for list in which
+case <a class="reference internal" href="#spynnaker.pyNN.utilities.ranged.SpynnakerRangedList.as_list" title="spynnaker.pyNN.utilities.ranged.SpynnakerRangedList.as_list"><code class="xref py py-meth docutils literal notranslate"><span class="pre">as_list()</span></code></a> must also be extended.</p>
 </div>
 </dd></dl>
 

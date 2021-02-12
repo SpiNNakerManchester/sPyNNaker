@@ -620,7 +620,8 @@ of acceptable edge types.</p>
 <li><p><strong>app_graph</strong> (<em>ApplicationGraph</em>) – app graph</p></li>
 <li><p><strong>machine</strong> (<a class="reference external" href="https://spinnmachine.readthedocs.io/en/latest/spinn_machine/#spinn_machine.Machine" title="(in SpiNNMachine)"><em>Machine</em></a>) – machine</p></li>
 <li><p><strong>plan_n_time_steps</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – the number of time steps to run for</p></li>
-<li><p><strong>pre_allocated_resources</strong> (<em>PreAllocatedResourceContainer</em><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – any pre allocated res to account for            before doing any splitting.</p></li>
+<li><p><strong>pre_allocated_resources</strong> (<em>PreAllocatedResourceContainer</em><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – any pre-allocated res to account for
+before doing any splitting.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
@@ -635,7 +636,7 @@ of acceptable edge types.</p>
 <dl class="py method">
 <dt id="spynnaker.pyNN.extra_algorithms.splitter_components.SpynnakerSplitterPartitioner.create_machine_edge">
 <code class="sig-name descname">create_machine_edge</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">src_machine_vertex</span></em>, <em class="sig-param"><span class="n">dest_machine_vertex</span></em>, <em class="sig-param"><span class="n">common_edge_type</span></em>, <em class="sig-param"><span class="n">app_edge</span></em>, <em class="sig-param"><span class="n">machine_graph</span></em>, <em class="sig-param"><span class="n">app_outgoing_edge_partition</span></em>, <em class="sig-param"><span class="n">resource_tracker</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/spynnaker_splitter_partitioner.html#SpynnakerSplitterPartitioner.create_machine_edge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SpynnakerSplitterPartitioner.create_machine_edge" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates the machine edge (if needed) and adding it            to the graph</p>
+<dd><p>Create the machine edge (if needed) and add it to the graph.</p>
 <p>Some implementations of this method are able to detect that the
 requested edge is not actually needed so never create or add it.</p>
 <dl class="field-list simple">
@@ -742,6 +743,17 @@ requested edge is not actually needed so never create or add it.</p>
 </dl>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="py class">
+<dt id="spynnaker.pyNN.extra_algorithms.splitter_components.SpynnakerSplitterSliceLegacy">
+<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.extra_algorithms.splitter_components.</code><code class="sig-name descname">SpynnakerSplitterSliceLegacy</code><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/spynnaker_splitter_slice_legacy.html#SpynnakerSplitterSliceLegacy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SpynnakerSplitterSliceLegacy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pacman.model.partitioner_splitters.splitter_slice_legacy.SplitterSliceLegacy</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.extra_algorithms.splitter_components.abstract_spynnaker_splitter_delay.AbstractSpynnakerSplitterDelay</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>splitter_name</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – </p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>

@@ -77,16 +77,16 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>  <span class="n">tau_ca2</span><span class="p">,</span> <span class="n">i_ca2</span><span class="p">,</span> <span class="n">i_alpha</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param tau_ca2: :math:`\tau_{\mathrm{Ca}^{+2}}`</span>
-<span class="sd">        :type tau_ca2: float, iterable(float), \</span>
-<span class="sd">                       ~pyNN.random.RandomDistribution or (mapping) function</span>
+<span class="sd">        :type tau_ca2: float, iterable(float),</span>
+<span class="sd">            ~pyNN.random.RandomDistribution or (mapping) function</span>
 <span class="sd">        :param i_ca2: :math:`I_{\mathrm{Ca}^{+2}}`</span>
-<span class="sd">        :type i_ca2: float, iterable(float), \</span>
-<span class="sd">                     ~pyNN.random.RandomDistribution or (mapping) function</span>
+<span class="sd">        :type i_ca2: float, iterable(float),</span>
+<span class="sd">            ~pyNN.random.RandomDistribution or (mapping) function</span>
 <span class="sd">        :param i_alpha: :math:`I_{\alpha}`</span>
-<span class="sd">        :type i_alpha: float, iterable(float), \</span>
-<span class="sd">                       ~pyNN.random.RandomDistribution or (mapping) function</span>
+<span class="sd">        :type i_alpha: float, iterable(float),</span>
+<span class="sd">            ~pyNN.random.RandomDistribution or (mapping) function</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">AdditionalInputCa2Adaptive</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">([</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">([</span>
             <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># e^(-ts / tau_ca2)</span>
             <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># i_ca_2</span>
             <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">])</span>  <span class="c1"># i_alpha</span>
@@ -130,7 +130,6 @@
 
 <div class="viewcode-block" id="AdditionalInputCa2Adaptive.update_values"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.additional_inputs.html#spynnaker.pyNN.models.neuron.additional_inputs.AdditionalInputCa2Adaptive.update_values">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractAdditionalInput</span><span class="o">.</span><span class="n">update_values</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">update_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">):</span>
-
         <span class="c1"># Read the data</span>
         <span class="p">(</span><span class="n">_exp_tau_ca2</span><span class="p">,</span> <span class="n">i_ca2</span><span class="p">,</span> <span class="n">_i_alpha</span><span class="p">)</span> <span class="o">=</span> <span class="n">values</span>
 

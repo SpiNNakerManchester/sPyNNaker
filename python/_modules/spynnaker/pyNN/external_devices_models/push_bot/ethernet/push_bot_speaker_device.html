@@ -92,8 +92,7 @@
             <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
                 <span class="s2">&quot;speaker parameter must be a PushBotSpeaker value&quot;</span><span class="p">)</span>
 
-        <span class="nb">super</span><span class="p">(</span><span class="n">PushBotEthernetSpeakerDevice</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">protocol</span><span class="p">,</span> <span class="n">speaker</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">timesteps_between_send</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">protocol</span><span class="p">,</span> <span class="n">speaker</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">timesteps_between_send</span><span class="p">)</span>
 
         <span class="c1"># protocol specific data items</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__command_protocol</span> <span class="o">=</span> <span class="n">protocol</span>

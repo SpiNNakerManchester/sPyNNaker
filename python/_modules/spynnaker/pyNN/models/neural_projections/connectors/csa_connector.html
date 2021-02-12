@@ -66,7 +66,9 @@
 <div class="viewcode-block" id="CSAConnector"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.CSAConnector">[docs]</a><span class="k">class</span> <span class="nc">CSAConnector</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Make connections using a Connection Set Algebra (Djurfeldt 2012)\</span>
 <span class="sd">        description between the neurons in the pre- and post-populations.</span>
-<span class="sd">        If you get ``TypeError`` in Python 3 see:</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">        If you get TypeError in Python 3 see:</span>
 <span class="sd">        https://github.com/INCF/csa/issues/10</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -94,7 +96,7 @@
 <span class="sd">            some environments so we don&#39;t force it to be present unless you</span>
 <span class="sd">            want to actually use this class.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">CSAConnector</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">safe</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">safe</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
         <span class="n">found</span><span class="p">,</span> <span class="n">ex</span> <span class="o">=</span> <span class="n">_csa_found</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">found</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ex</span>

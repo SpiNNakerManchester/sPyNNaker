@@ -104,7 +104,7 @@
 <span class="sd">            CSV file</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">SmallWorldConnector</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">safe</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">verbose</span><span class="p">,</span> <span class="n">rng</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">safe</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">verbose</span><span class="p">,</span> <span class="n">rng</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__rewiring</span> <span class="o">=</span> <span class="n">rewiring</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__degree</span> <span class="o">=</span> <span class="n">degree</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__allow_self_connections</span> <span class="o">=</span> <span class="n">allow_self_connections</span>
@@ -116,8 +116,7 @@
 
 <div class="viewcode-block" id="SmallWorldConnector.set_projection_information"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.SmallWorldConnector.set_projection_information">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">set_projection_information</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">set_projection_information</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
-        <span class="n">AbstractConnector</span><span class="o">.</span><span class="n">set_projection_information</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">set_projection_information</span><span class="p">(</span><span class="n">machine_time_step</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_n_connections</span><span class="p">(</span><span class="n">synapse_info</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_set_n_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>

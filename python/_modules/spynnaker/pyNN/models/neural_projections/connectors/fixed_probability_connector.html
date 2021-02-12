@@ -57,7 +57,8 @@
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">data_specification.enums.data_type</span> <span class="kn">import</span> <span class="n">DataType</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.exceptions</span> <span class="kn">import</span> <span class="n">ConfigurationException</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities</span> <span class="kn">import</span> <span class="n">utility_calls</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.utility_calls</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">get_probable_maximum_selected</span><span class="p">,</span> <span class="n">get_probable_minimum_selected</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.abstract_connector</span> <span class="kn">import</span> <span class="n">AbstractConnector</span>
 <span class="kn">from</span> <span class="nn">.abstract_generate_connector_on_machine</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractGenerateConnectorOnMachine</span><span class="p">,</span> <span class="n">ConnectorIDs</span><span class="p">)</span>
@@ -106,15 +107,14 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="mf">0.0</span> <span class="o">&lt;=</span> <span class="n">p_connect</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
                 <span class="s2">&quot;The probability must be between 0 and 1 (inclusive)&quot;</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">FixedProbabilityConnector</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">safe</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">safe</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_p_connect</span> <span class="o">=</span> <span class="n">p_connect</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__allow_self_connections</span> <span class="o">=</span> <span class="n">allow_self_connections</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rng</span> <span class="o">=</span> <span class="n">rng</span>
 
 <div class="viewcode-block" id="FixedProbabilityConnector.get_delay_maximum"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.FixedProbabilityConnector.get_delay_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_delay_maximum</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_delay_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
-        <span class="n">n_connections</span> <span class="o">=</span> <span class="n">utility_calls</span><span class="o">.</span><span class="n">get_probable_maximum_selected</span><span class="p">(</span>
+        <span class="n">n_connections</span> <span class="o">=</span> <span class="n">get_probable_maximum_selected</span><span class="p">(</span>
             <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_pre_neurons</span> <span class="o">*</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_post_neurons</span><span class="p">,</span>
             <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_pre_neurons</span> <span class="o">*</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_post_neurons</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_p_connect</span><span class="p">)</span>
@@ -122,7 +122,7 @@
 
 <div class="viewcode-block" id="FixedProbabilityConnector.get_delay_minimum"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.FixedProbabilityConnector.get_delay_minimum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_delay_minimum</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_delay_minimum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
-        <span class="n">n_connections</span> <span class="o">=</span> <span class="n">utility_calls</span><span class="o">.</span><span class="n">get_probable_minimum_selected</span><span class="p">(</span>
+        <span class="n">n_connections</span> <span class="o">=</span> <span class="n">get_probable_minimum_selected</span><span class="p">(</span>
             <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_pre_neurons</span> <span class="o">*</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_post_neurons</span><span class="p">,</span>
             <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_pre_neurons</span> <span class="o">*</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_post_neurons</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_p_connect</span><span class="p">)</span>
@@ -133,7 +133,7 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">min_delay</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">max_delay</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
-        <span class="n">n_connections</span> <span class="o">=</span> <span class="n">utility_calls</span><span class="o">.</span><span class="n">get_probable_maximum_selected</span><span class="p">(</span>
+        <span class="n">n_connections</span> <span class="o">=</span> <span class="n">get_probable_maximum_selected</span><span class="p">(</span>
             <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_pre_neurons</span> <span class="o">*</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_post_neurons</span><span class="p">,</span>
             <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_p_connect</span><span class="p">,</span> <span class="n">chance</span><span class="o">=</span><span class="mf">1.0</span><span class="o">/</span><span class="mf">10000.0</span><span class="p">)</span>
 
@@ -148,7 +148,7 @@
 <div class="viewcode-block" id="FixedProbabilityConnector.get_n_connections_to_post_vertex_maximum"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.FixedProbabilityConnector.get_n_connections_to_post_vertex_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_n_connections_to_post_vertex_maximum</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_n_connections_to_post_vertex_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
-        <span class="n">n_connections</span> <span class="o">=</span> <span class="n">utility_calls</span><span class="o">.</span><span class="n">get_probable_maximum_selected</span><span class="p">(</span>
+        <span class="n">n_connections</span> <span class="o">=</span> <span class="n">get_probable_maximum_selected</span><span class="p">(</span>
             <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_pre_neurons</span> <span class="o">*</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_post_neurons</span><span class="p">,</span>
             <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_pre_neurons</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_p_connect</span><span class="p">,</span>
             <span class="n">chance</span><span class="o">=</span><span class="mf">1.0</span><span class="o">/</span><span class="mf">10000.0</span><span class="p">)</span>
@@ -157,7 +157,7 @@
 <div class="viewcode-block" id="FixedProbabilityConnector.get_weight_maximum"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.FixedProbabilityConnector.get_weight_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_weight_maximum</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_weight_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
-        <span class="n">n_connections</span> <span class="o">=</span> <span class="n">utility_calls</span><span class="o">.</span><span class="n">get_probable_maximum_selected</span><span class="p">(</span>
+        <span class="n">n_connections</span> <span class="o">=</span> <span class="n">get_probable_maximum_selected</span><span class="p">(</span>
             <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_pre_neurons</span> <span class="o">*</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_post_neurons</span><span class="p">,</span>
             <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_pre_neurons</span> <span class="o">*</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_post_neurons</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_p_connect</span><span class="p">)</span>

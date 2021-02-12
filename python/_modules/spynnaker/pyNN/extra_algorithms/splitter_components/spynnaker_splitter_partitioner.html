@@ -51,7 +51,6 @@
 <span class="c1">#</span>
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">pacman.model.partitioner_interfaces</span> <span class="kn">import</span> <span class="n">AbstractSlicesConnect</span>
 <span class="kn">from</span> <span class="nn">pacman.operations.partition_algorithms</span> <span class="kn">import</span> <span class="n">SplitterPartitioner</span>
@@ -70,7 +69,7 @@
 <span class="sd">        :param ApplicationGraph app_graph: app graph</span>
 <span class="sd">        :param ~spinn_machine.Machine machine: machine</span>
 <span class="sd">        :param int plan_n_time_steps: the number of time steps to run for</span>
-<span class="sd">        :param pre_allocated_resources: any pre allocated res to account for\</span>
+<span class="sd">        :param pre_allocated_resources: any pre-allocated res to account for</span>
 <span class="sd">            before doing any splitting.</span>
 <span class="sd">        :type pre_allocated_resources: PreAllocatedResourceContainer or None</span>
 <span class="sd">        :rtype: tuple(~pacman.model.graphs.machine.MachineGraph, int)</span>
@@ -78,9 +77,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># do partitioning in same way</span>
-        <span class="n">machine_graph</span><span class="p">,</span> <span class="n">chips_used</span> <span class="o">=</span> <span class="n">SplitterPartitioner</span><span class="o">.</span><span class="fm">__call__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">app_graph</span><span class="p">,</span> <span class="n">machine</span><span class="p">,</span> <span class="n">plan_n_time_steps</span><span class="p">,</span>
-            <span class="n">pre_allocated_resources</span><span class="p">)</span>
+        <span class="n">machine_graph</span><span class="p">,</span> <span class="n">chips_used</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__call__</span><span class="p">(</span>
+            <span class="n">app_graph</span><span class="p">,</span> <span class="n">machine</span><span class="p">,</span> <span class="n">plan_n_time_steps</span><span class="p">,</span> <span class="n">pre_allocated_resources</span><span class="p">)</span>
 
         <span class="c1"># return the accepted things</span>
         <span class="k">return</span> <span class="n">machine_graph</span><span class="p">,</span> <span class="n">chips_used</span></div>
@@ -90,7 +88,6 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">src_machine_vertex</span><span class="p">,</span> <span class="n">dest_machine_vertex</span><span class="p">,</span>
             <span class="n">common_edge_type</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span>
             <span class="n">app_outgoing_edge_partition</span><span class="p">,</span> <span class="n">resource_tracker</span><span class="p">):</span>
-
         <span class="c1"># filter off connectivity</span>
         <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">app_edge</span><span class="p">,</span> <span class="n">AbstractSlicesConnect</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span>
                 <span class="n">app_edge</span><span class="o">.</span><span class="n">could_connect</span><span class="p">(</span>
@@ -100,16 +97,15 @@
 
         <span class="c1"># TODO: this only works when the synaptic manager is reengineered to</span>
         <span class="c1">#       not assume the un-delayed edge still exists.</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        filter off delay values</span>
-<span class="sd">        post_splitter = dest_machine_vertex.app_vertex.splitter</span>
-<span class="sd">        if ((not isinstance(</span>
-<span class="sd">                src_machine_vertex, DelayExtensionMachineVertex)) and</span>
-<span class="sd">                isinstance(post_splitter, AbstractSpynnakerSplitterDelay)):</span>
-<span class="sd">            min_delay = self._app_edge_min_delay[app_edge]</span>
-<span class="sd">            if post_splitter.max_support_delay() &lt; min_delay:</span>
-<span class="sd">                return</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># filter off delay values</span>
+        <span class="c1"># post_splitter = dest_machine_vertex.app_vertex.splitter</span>
+        <span class="c1"># if ((not isinstance(</span>
+        <span class="c1">#         src_machine_vertex, DelayExtensionMachineVertex)) and</span>
+        <span class="c1">#         isinstance(post_splitter, AbstractSpynnakerSplitterDelay)):</span>
+        <span class="c1">#     min_delay = self._app_edge_min_delay[app_edge]</span>
+        <span class="c1">#     if post_splitter.max_support_delay() &lt; min_delay:</span>
+        <span class="c1">#         return</span>
 
         <span class="c1"># build edge and add to machine graph</span>
         <span class="n">machine_edge</span> <span class="o">=</span> <span class="n">common_edge_type</span><span class="p">(</span>

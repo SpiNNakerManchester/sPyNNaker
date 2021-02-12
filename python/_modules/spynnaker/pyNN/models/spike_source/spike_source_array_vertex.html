@@ -105,7 +105,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_spike_times</span> <span class="o">=</span> <span class="n">spike_times</span>
         <span class="n">time_step</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_spikes_sampling_interval</span><span class="p">()</span>
 
-        <span class="nb">super</span><span class="p">(</span><span class="n">SpikeSourceArrayVertex</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">n_keys</span><span class="o">=</span><span class="n">n_neurons</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="n">constraints</span><span class="p">,</span>
             <span class="n">max_atoms_per_core</span><span class="o">=</span><span class="n">max_atoms_per_core</span><span class="p">,</span>
             <span class="n">send_buffer_times</span><span class="o">=</span><span class="n">_send_buffer_times</span><span class="p">(</span><span class="n">spike_times</span><span class="p">,</span> <span class="n">time_step</span><span class="p">),</span>

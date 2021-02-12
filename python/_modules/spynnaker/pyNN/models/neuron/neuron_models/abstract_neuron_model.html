@@ -53,7 +53,6 @@
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span>
-<span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">with_metaclass</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.abstract_base</span> <span class="kn">import</span> <span class="n">AbstractBase</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.implementations</span> <span class="kn">import</span> <span class="p">(</span>
@@ -62,9 +61,8 @@
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.struct</span> <span class="kn">import</span> <span class="n">Struct</span>
 
 
-<span class="c1"># with_metaclass due to https://github.com/benjaminp/six/issues/219</span>
 <div class="viewcode-block" id="AbstractNeuronModel"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.neuron_models.html#spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel">[docs]</a><span class="k">class</span> <span class="nc">AbstractNeuronModel</span><span class="p">(</span>
-        <span class="n">with_metaclass</span><span class="p">(</span><span class="n">AbstractBase</span><span class="p">,</span> <span class="n">AbstractStandardNeuronComponent</span><span class="p">)):</span>
+        <span class="n">AbstractStandardNeuronComponent</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">AbstractBase</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Represents a neuron model.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -81,7 +79,7 @@
 <span class="sd">        :type global_data_types:</span>
 <span class="sd">            list(~data_specification.enums.DataType) or None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">AbstractNeuronModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">data_types</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">data_types</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">global_data_types</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">global_data_types</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__global_struct</span> <span class="o">=</span> <span class="n">Struct</span><span class="p">(</span><span class="n">global_data_types</span><span class="p">)</span>
@@ -94,19 +92,21 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__global_struct</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">__global_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; size of the global data, in bytes</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__global_struct</span><span class="o">.</span><span class="n">get_size_in_whole_words</span><span class="p">()</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
+
 <div class="viewcode-block" id="AbstractNeuronModel.get_dtcm_usage_in_bytes"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.neuron_models.html#spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel.get_dtcm_usage_in_bytes">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractStandardNeuronComponent</span><span class="o">.</span><span class="n">get_dtcm_usage_in_bytes</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_dtcm_usage_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
-        <span class="n">usage</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">AbstractNeuronModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_dtcm_usage_in_bytes</span><span class="p">(</span>
-            <span class="n">n_neurons</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">usage</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__global_struct</span><span class="o">.</span><span class="n">get_size_in_whole_words</span><span class="p">()</span> <span class="o">*</span>
-                        <span class="n">BYTES_PER_WORD</span><span class="p">)</span></div>
+        <span class="n">usage</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_dtcm_usage_in_bytes</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">usage</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__global_size</span></div>
 
 <div class="viewcode-block" id="AbstractNeuronModel.get_sdram_usage_in_bytes"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.neuron_models.html#spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel.get_sdram_usage_in_bytes">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractStandardNeuronComponent</span><span class="o">.</span><span class="n">get_sdram_usage_in_bytes</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_sdram_usage_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
-        <span class="n">usage</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">AbstractNeuronModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_sdram_usage_in_bytes</span><span class="p">(</span>
-            <span class="n">n_neurons</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">usage</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__global_struct</span><span class="o">.</span><span class="n">get_size_in_whole_words</span><span class="p">()</span> <span class="o">*</span>
-                        <span class="n">BYTES_PER_WORD</span><span class="p">)</span></div>
+        <span class="n">usage</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_sdram_usage_in_bytes</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">usage</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__global_size</span></div>
 
 <div class="viewcode-block" id="AbstractNeuronModel.get_global_values"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.neuron_models.html#spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel.get_global_values">[docs]</a>    <span class="k">def</span> <span class="nf">get_global_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>  <span class="c1"># pylint: disable=unused-argument</span>
         <span class="sd">&quot;&quot;&quot; Get the global values to be written to the machine for this model</span>
@@ -119,7 +119,7 @@
 
 <div class="viewcode-block" id="AbstractNeuronModel.get_data"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.neuron_models.html#spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel.get_data">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractStandardNeuronComponent</span><span class="o">.</span><span class="n">get_data</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
-        <span class="n">super_data</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">AbstractNeuronModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span>
+        <span class="n">super_data</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span>
             <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">ts</span><span class="p">)</span>
         <span class="n">values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_global_values</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
         <span class="n">global_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__global_struct</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
@@ -128,11 +128,9 @@
 <div class="viewcode-block" id="AbstractNeuronModel.read_data"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.neuron_models.html#spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel.read_data">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractStandardNeuronComponent</span><span class="o">.</span><span class="n">read_data</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">read_data</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">):</span>
-
         <span class="c1"># Assume that the global data doesn&#39;t change</span>
-        <span class="n">offset</span> <span class="o">+=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__global_struct</span><span class="o">.</span><span class="n">get_size_in_whole_words</span><span class="p">()</span> <span class="o">*</span>
-                   <span class="n">BYTES_PER_WORD</span><span class="p">)</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">AbstractNeuronModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">read_data</span><span class="p">(</span>
+        <span class="n">offset</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__global_size</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">read_data</span><span class="p">(</span>
             <span class="n">data</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">)</span></div></div>
 </pre></div>
 

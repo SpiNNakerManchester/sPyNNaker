@@ -53,20 +53,10 @@
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kn">import</span> <span class="nn">inspect</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">inspect</span> <span class="kn">import</span> <span class="n">getfullargspec</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="c1"># Python 2.7 hack</span>
-    <span class="kn">from</span> <span class="nn">inspect</span> <span class="kn">import</span> <span class="n">getargspec</span> <span class="k">as</span> <span class="n">getfullargspec</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
-
-
-<span class="k">def</span> <span class="nf">_get_args</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
-    <span class="c1"># So we have a disable in one place, not many</span>
-    <span class="k">return</span> <span class="n">getfullargspec</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>  <span class="c1"># pylint: disable=deprecated-method</span>
 
 
 <span class="k">def</span> <span class="nf">_check_args</span><span class="p">(</span><span class="n">args_to_find</span><span class="p">,</span> <span class="n">default_args</span><span class="p">,</span> <span class="n">init</span><span class="p">):</span>
@@ -87,7 +77,7 @@
 <span class="sd">    :return: an initialisation dictionary</span>
 <span class="sd">    :rtype: dict(str, Any)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">init_args</span> <span class="o">=</span> <span class="n">_get_args</span><span class="p">(</span><span class="n">init</span><span class="p">)</span>
+    <span class="n">init_args</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getfullargspec</span><span class="p">(</span><span class="n">init</span><span class="p">)</span>
     <span class="n">n_defaults</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">init_args</span><span class="o">.</span><span class="n">defaults</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">len</span><span class="p">(</span><span class="n">init_args</span><span class="o">.</span><span class="n">defaults</span><span class="p">)</span>
     <span class="n">n_args</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">init_args</span><span class="o">.</span><span class="n">args</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">len</span><span class="p">(</span><span class="n">init_args</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
     <span class="n">default_args</span> <span class="o">=</span> <span class="p">([]</span> <span class="k">if</span> <span class="n">init_args</span><span class="o">.</span><span class="n">args</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span>
@@ -123,7 +113,7 @@
 
         <span class="c1"># Set the parameters of the method to be used later</span>
         <span class="n">method</span><span class="o">.</span><span class="n">_parameters</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span>
-        <span class="n">method_args</span> <span class="o">=</span> <span class="n">_get_args</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
+        <span class="n">method_args</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getfullargspec</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
 
         <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
             <span class="c1"># Check for state variables that have been specified in cell_params</span>
@@ -159,7 +149,7 @@
 
         <span class="c1"># Store the state variables of the method to be used later</span>
         <span class="n">method</span><span class="o">.</span><span class="n">_state_variables</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(</span><span class="n">state_variables</span><span class="p">)</span>
-        <span class="n">method_args</span> <span class="o">=</span> <span class="n">_get_args</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
+        <span class="n">method_args</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getfullargspec</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
 
         <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
             <span class="c1"># Check for state variables that have been specified in cell_params</span>
