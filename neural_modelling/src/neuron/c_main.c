@@ -334,6 +334,9 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
     // Clear any outstanding spikes
     spike_processing_clear_input_buffer(time);
 
+    spin1_mode_restore(state);
+    state = spin1_irq_disable();
+
     // Also do synapses timestep update, as this is time-critical
     synapses_do_timestep_update(time);
 
