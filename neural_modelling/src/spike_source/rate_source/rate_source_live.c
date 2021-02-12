@@ -117,7 +117,7 @@ static inline void read_rate_values() {
     refresh_timer = 0;
 
     spin1_dma_transfer(
-        DMA_READ_TAG, memory_values[refresh_counter & 1] + (refresh_counter * generators),
+        DMA_READ_TAG, memory_values[refresh_counter & 1],
         rate_values, DMA_READ, pool_size);
 
     refresh_counter++;
@@ -292,16 +292,16 @@ static void timer_callback(uint timer_count, uint unused) {
 
     for(index_t i = 0; i < generators; i++) {
 
-        // while (!spin1_send_mc_packet(key | i, rate_values[i], WITH_PAYLOAD)) {
-        //         spin1_delay_us(1);
-        //     }
+        // Convert into S1615 such that the pixel intensity is between 0 and 1
+        uint32_t value_to_send = rate_values[i] << 7;
 
-        io_printf(IO_BUF, "%x ", rate_values[i]);
+        while (!spin1_send_mc_packet(key | i, value_to_send, WITH_PAYLOAD)) {
+                spin1_delay_us(2);
+            }
+        spin1_delay_us(2);
     }
-    io_printf(IO_BUF, "\n");
 
     if(refresh_timer > refresh) {
-        io_printf(IO_BUF, "ts %d refresh\n", time);
         read_rate_values();
     }
 
