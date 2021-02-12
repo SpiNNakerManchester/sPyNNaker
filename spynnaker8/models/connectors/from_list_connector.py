@@ -12,11 +12,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import logging
-from spinn_utilities.log import FormatAdapter
 from spynnaker.pyNN.models.neural_projections.connectors import (
     FromListConnector as _BaseClass)
-logger = FormatAdapter(logging.getLogger(__name__))
+from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
 
 
 class FromListConnector(_BaseClass):
@@ -58,9 +56,9 @@ class FromListConnector(_BaseClass):
             .. note::
                 Not supported by sPyNNaker.
         """
+        moved_in_v6("spynnaker8.models.connectors.FromListConnector",
+                    "spynnaker.pyNN.models.neural_projections.connectors"
+                    ".FromListConnector")
         _BaseClass.__init__(
             self, conn_list=conn_list, safe=safe, verbose=verbose,
             column_names=column_names, callback=callback)
-        logger.warning(
-            "please use spynnaker.pyNN.models.neural_projections.connectors."
-            "FromListConnector instead")

@@ -59,7 +59,7 @@ install_requires = [
     'pynn >= 0.9.1, < 0.10.0 ',
     'lazyarray >= 0.2.9, <= 0.4.0',
     'appdirs >= 1.4.2 , < 2.0.0',
-    'neo >= 0.5.2, < 0.9.0']
+    'neo >= 0.5.2, < 0.10.0']
 if os.environ.get('READTHEDOCS', None) != 'True':
     # scipy must be added in config.py as a mock
     # csa is a badly written package

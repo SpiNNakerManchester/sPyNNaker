@@ -12,12 +12,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import logging
-from spinn_utilities.log import FormatAdapter
 from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
     WeightDependenceAdditiveTriplet as
     _BaseClass)
-logger = FormatAdapter(logging.getLogger(__name__))
+from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
 
 
 class WeightDependenceAdditiveTriplet(_BaseClass):
@@ -38,8 +36,9 @@ class WeightDependenceAdditiveTriplet(_BaseClass):
         :param float A3_plus: :math:`A_3^+`
         :param float A3_minus: :math:`A_3^-`
         """
+        moved_in_v6("spynnaker8.models.synapse_dynamics.weight_dependence"
+                    ".WeightDependenceAdditiveTriplet",
+                    "spynnaker.pyNN.models.neuron.plasticity.stdp."
+                    "weight_dependence.WeightDependenceAdditiveTriplet")
         super(WeightDependenceAdditiveTriplet, self).__init__(
             w_max=w_max, w_min=w_min, A3_plus=A3_plus, A3_minus=A3_minus)
-        logger.warning(
-            "please use spynnaker.pyNN.models.neuron.plasticity.stdp."
-            "weight_dependence.WeightDependenceAdditiveTriplet instead")

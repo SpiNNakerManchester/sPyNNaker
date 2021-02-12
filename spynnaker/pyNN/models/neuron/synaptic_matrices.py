@@ -36,6 +36,8 @@ from .synaptic_matrix_app import SynapticMatrixApp
 SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES = (
     1 + 2 + 1 + 1 + 1) * BYTES_PER_WORD
 
+DIRECT_MATRIX_HEADER_COST_BYTES = 1 * BYTES_PER_WORD
+
 
 class SynapticMatrices(object):
     """ Handler of synaptic matrices for a core of a population vertex
@@ -174,7 +176,7 @@ class SynapticMatrices(object):
         """
         return (
             self.synapses_size(app_edges) +
-            self.__gen_info_size(app_edges) +
+            self.__gen_info_size(app_edges) + DIRECT_MATRIX_HEADER_COST_BYTES +
             self.__poptable.get_master_population_table_size(app_edges))
 
     def __gen_info_size(self, app_edges):
@@ -293,7 +295,9 @@ class SynapticMatrices(object):
         single_data_words = len(single_data)
         spec.reserve_memory_region(
             region=self.__direct_matrix_region,
-            size=(single_data_words + 1) * BYTES_PER_WORD,
+            size=(
+                single_data_words * BYTES_PER_WORD +
+                DIRECT_MATRIX_HEADER_COST_BYTES),
             label='DirectMatrix')
         spec.switch_write_focus(self.__direct_matrix_region)
         spec.write_value(single_data_words * BYTES_PER_WORD)

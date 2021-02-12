@@ -12,13 +12,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import logging
-from spinn_utilities.log import FormatAdapter
 from pyNN.standardmodels.synapses import StaticSynapse as PyNNStaticSynapse
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsSTDP as
     _BaseClass)
-logger = FormatAdapter(logging.getLogger(__name__))
+from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
 
 
 class SynapseDynamicsSTDP(_BaseClass):
@@ -49,10 +47,10 @@ class SynapseDynamicsSTDP(_BaseClass):
         # pylint: disable=too-many-arguments
 
         # instantiate common functionality.
+        moved_in_v6("spynnaker8.models.synapse_dynamics.SynapseDynamicsSTDP",
+                    "spynnaker.pyNN.models.neuron.synapse_dynamics"
+                    ".SynapseDynamicsSTDP")
         super(SynapseDynamicsSTDP, self).__init__(
             timing_dependence, weight_dependence, voltage_dependence,
             dendritic_delay_fraction, weight, delay,
             backprop_delay=backprop_delay)
-        logger.warning(
-            "please use spynnaker.pyNN.models.neuron.synapse_dynamics."
-            "SynapseDynamicsSTDP instead")

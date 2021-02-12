@@ -12,26 +12,14 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import spynnaker8 as sim
+from p8_integration_tests.base_test_case import BaseTestCase
 
-SpiNNUtilities >= 1!5.1.1, < 1!6.0.0
-SpiNNMachine >= 1!5.1.1, < 1!6.0.0
-SpiNNMan >= 1!5.1.1, < 1!6.0.0
-SpiNNaker_PACMAN >= 1!5.1.1, < 1!6.0.0
-SpiNNaker_DataSpecification >= 1!5.1.1, < 1!6.0.0
-spalloc >= 2.0.2, < 3.0.0
-SpiNNFrontEndCommon >= 1!5.1.1, < 1!6.0.0
-numpy > 1.13, < 1.20; python_version == '3.6'
-numpy > 1.13, < 1.21; python_version == '3.7'
-numpy; python_version >= '3.8'
-scipy
-lxml
-statistics
-quantities >= 0.12.1
-pynn >= 0.9.1, < 0.10
-lazyarray >= 0.2.9, <= 0.4.0
-appdirs >= 1.4.2 , < 2.0.0
-neo >= 0.5.2, < 0.10.0
-matplotlib
-quantities >= 0.12.1
-# csa  # needed but excluded due to readthedocs
-# spinnaker_tools
+
+class TestRecordingSDRAMCalcsNoExtraMonitors(BaseTestCase):
+
+    def test_no_projections(self):
+        sim.setup(timestep=1.0)
+        pop_1 = sim.Population(1, sim.IF_curr_exp(), label="pop_1")
+        pop_1.record(["spikes", "v"])
+        sim.run(10)
