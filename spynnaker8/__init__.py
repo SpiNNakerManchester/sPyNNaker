@@ -23,7 +23,6 @@ This package contains the profile of that code for PyNN 0.9
 # common imports
 import logging
 import numpy as __numpy
-from six import iteritems
 from pyNN import common as pynn_common
 from pyNN.common import control as _pynn_control
 from pyNN.recording import get_io
@@ -308,7 +307,7 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
     :param extra_load_algorithms:
         extra algorithms to use within the loading phase
     :type extra_load_algorithms: list(str) or None
-    :param time_scale_factor: multiplicative factor to the machine time step\
+    :param time_scale_factor: multiplicative factor to the machine time step
         (does not affect the neuron models accuracy)
     :type time_scale_factor: int or None
     :param n_chips_required:
@@ -499,7 +498,7 @@ def list_standard_models():
     :rtype: list(str)
     """
     results = list()
-    for (key, obj) in iteritems(globals()):
+    for (key, obj) in globals().items():
         if isinstance(obj, type) and issubclass(obj, AbstractPyNNModel):
             results.append(key)
     return results

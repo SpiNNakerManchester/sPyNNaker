@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy
-from six import with_metaclass
 from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.neuron.implementations import (
@@ -23,9 +22,8 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.utilities.struct import Struct
 
 
-# with_metaclass due to https://github.com/benjaminp/six/issues/219
 class AbstractNeuronModel(
-        with_metaclass(AbstractBase, AbstractStandardNeuronComponent)):
+        AbstractStandardNeuronComponent, metaclass=AbstractBase):
     """ Represents a neuron model.
     """
 
@@ -42,7 +40,7 @@ class AbstractNeuronModel(
         :type global_data_types:
             list(~data_specification.enums.DataType) or None
         """
-        super(AbstractNeuronModel, self).__init__(data_types)
+        super().__init__(data_types)
         if global_data_types is None:
             global_data_types = []
         self.__global_struct = Struct(global_data_types)
@@ -55,19 +53,21 @@ class AbstractNeuronModel(
         """
         return self.__global_struct
 
+    @property
+    def __global_size(self):
+        """ size of the global data, in bytes
+        """
+        return self.__global_struct.get_size_in_whole_words() * BYTES_PER_WORD
+
     @overrides(AbstractStandardNeuronComponent.get_dtcm_usage_in_bytes)
     def get_dtcm_usage_in_bytes(self, n_neurons):
-        usage = super(AbstractNeuronModel, self).get_dtcm_usage_in_bytes(
-            n_neurons)
-        return usage + (self.__global_struct.get_size_in_whole_words() *
-                        BYTES_PER_WORD)
+        usage = super().get_dtcm_usage_in_bytes(n_neurons)
+        return usage + self.__global_size
 
     @overrides(AbstractStandardNeuronComponent.get_sdram_usage_in_bytes)
     def get_sdram_usage_in_bytes(self, n_neurons):
-        usage = super(AbstractNeuronModel, self).get_sdram_usage_in_bytes(
-            n_neurons)
-        return usage + (self.__global_struct.get_size_in_whole_words() *
-                        BYTES_PER_WORD)
+        usage = super().get_sdram_usage_in_bytes(n_neurons)
+        return usage + self.__global_size
 
     def get_global_values(self, ts):  # pylint: disable=unused-argument
         """ Get the global values to be written to the machine for this model
@@ -80,7 +80,7 @@ class AbstractNeuronModel(
 
     @overrides(AbstractStandardNeuronComponent.get_data)
     def get_data(self, parameters, state_variables, vertex_slice, ts):
-        super_data = super(AbstractNeuronModel, self).get_data(
+        super_data = super().get_data(
             parameters, state_variables, vertex_slice, ts)
         values = self.get_global_values(ts)
         global_data = self.__global_struct.get_data(values)
@@ -89,9 +89,7 @@ class AbstractNeuronModel(
     @overrides(AbstractStandardNeuronComponent.read_data)
     def read_data(
             self, data, offset, vertex_slice, parameters, state_variables):
-
         # Assume that the global data doesn't change
-        offset += (self.__global_struct.get_size_in_whole_words() *
-                   BYTES_PER_WORD)
-        return super(AbstractNeuronModel, self).read_data(
+        offset += self.__global_size
+        return super().read_data(
             data, offset, vertex_slice, parameters, state_variables)

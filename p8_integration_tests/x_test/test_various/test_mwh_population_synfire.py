@@ -22,7 +22,7 @@ from unittest import SkipTest
 from spinnman.exceptions import SpinnmanTimeoutException
 import spynnaker.plot_utils as plot_utils
 import spynnaker8 as p
-from spynnaker8.utilities import neo_convertor
+from spynnaker.pyNN.utilities import neo_convertor
 from p8_integration_tests.base_test_case import BaseTestCase
 
 
@@ -105,7 +105,7 @@ class MwhPopulationSynfire(BaseTestCase):
             (v, gsyn, spikes) = do_run(nNeurons, neurons_per_core)
             self.assertEqual(600, len(spikes))
         except SpinnmanTimeoutException as ex:
-            raise SkipTest(ex)
+            raise SkipTest() from ex
         self.assertEqual(600, len(spikes))
 
     def test_run_light(self):

@@ -30,6 +30,7 @@
 import mock
 import os
 import sys
+from sphinx.ext import apidoc
 
 autodoc_mock_imports = ['_tkinter']
 
@@ -451,11 +452,4 @@ explicit_wanted_files = [
     "spynnaker8/utilities/neo_compare.py"]
 options = ['-o', output_dir, "."]
 options.extend(filtered_files(".", explicit_wanted_files, "tests"))
-try:
-    # Old style API; Python 2.7
-    from sphinx import apidoc
-    options = [None] + options
-except ImportError:
-    # New style API; Python 3.6 onwards
-    from sphinx.ext import apidoc
 apidoc.main(options)

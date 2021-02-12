@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy
-from pyNN.connectors import AllToAllConnector as PyNNAllToAllConnector
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .abstract_connector import AbstractConnector
@@ -27,8 +26,7 @@ N_GEN_PARAMS = 1
 
 
 class AllToAllConnector(AbstractGenerateConnectorOnMachine,
-                        AbstractConnectorSupportsViewsOnMachine,
-                        PyNNAllToAllConnector):
+                        AbstractConnectorSupportsViewsOnMachine):
     """ Connects all cells in the presynaptic population to all cells in \
         the postsynaptic population.
     """
@@ -55,10 +53,7 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
             .. note::
                 Not supported by sPyNNaker.
         """
-        super(AllToAllConnector, self).__init__(safe, callback, verbose)
-        PyNNAllToAllConnector.__init__(
-            self, allow_self_connections=allow_self_connections, safe=safe,
-            callback=callback)
+        super().__init__(safe, callback, verbose)
         self.__allow_self_connections = allow_self_connections
 
     def _connection_slices(

@@ -15,13 +15,11 @@
 
 import math
 import numpy
-from six import add_metaclass
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
 
 
-@add_metaclass(AbstractBase)
-class AbstractSynapseDynamics(object):
+class AbstractSynapseDynamics(object, metaclass=AbstractBase):
     """ How do the dynamics of a synapse interact with the rest of the model.
     """
 

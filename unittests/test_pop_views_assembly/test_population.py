@@ -41,12 +41,12 @@ class TestPopulation(BaseTestCase):
         vs = initial_values["v"]
         assert [-60, -59, -58, -57, -56] == vs
 
-        pop_1.all_cells
-        pop_1.local_cells
+        _ = pop_1.all_cells
+        _ = pop_1.local_cells
 
         self.assertEqual(n_neurons, pop_1.local_size)
 
-        pop_1.structure
+        _ = pop_1.structure
         sim.end()
 
     def test_position_generator(self):
@@ -58,10 +58,10 @@ class TestPopulation(BaseTestCase):
         try:
             gen = pop_1.position_generator
             print(gen(0))
-        except NotImplementedError:
+        except NotImplementedError as e:
             msg = "Depends on https://github.com/SpiNNakerManchester" \
                   "/sPyNNaker8/pull/73"
-            raise SkipTest(msg)
+            raise SkipTest(msg) from e
         sim.end()
 
     def test_set(self):
@@ -69,7 +69,25 @@ class TestPopulation(BaseTestCase):
         label = "pop_1"
         sim.setup(timestep=1.0)
         pop_1 = sim.Population(n_neurons, sim.IF_curr_exp(), label=label)
-        pop_1.set(v=2)
+        pop_1.set(i_offset=2)
+        sim.end()
+
+    def test_set_multiple(self):
+        n_neurons = 5
+        label = "pop_1"
+        sim.setup(timestep=1.0)
+        pop_1 = sim.Population(n_neurons, sim.IF_curr_exp(), label=label)
+        pop_1.set(i_offset=[2, 3, 4, 5, 6])
+        sim.end()
+
+    def test_set_multiple_via_indirect(self):
+        n_neurons = 5
+        label = "pop_1"
+        sim.setup(timestep=1.0)
+        pop_1 = sim.Population(
+            n_neurons, sim.IF_curr_exp(i_offset=0), label=label)
+        view = pop_1[0:3]
+        view.set(i_offset=[2, 3, 4])
         sim.end()
 
     def test_selector(self):
@@ -120,7 +138,7 @@ class TestPopulation(BaseTestCase):
         with pytest.raises(KeyError):
             pop.initialize(v="Anything")
         with pytest.raises(KeyError):
-            pop.initial_values
+            _ = pop.initial_values
         sim.end()
 
     def test_initial_values(self):

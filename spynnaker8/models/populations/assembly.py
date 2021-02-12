@@ -12,10 +12,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import logging
-from spinn_utilities.log import FormatAdapter
 from spynnaker.pyNN.models.populations import Assembly as _BaseClass
-logger = FormatAdapter(logging.getLogger(__name__))
+from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
 
 
 class Assembly(_BaseClass):
@@ -36,6 +34,6 @@ class Assembly(_BaseClass):
             ~spynnaker.pyNN.models.populations.PopulationView
         :param kwargs: may contain `label` (a string describing the assembly)
         """
+        moved_in_v6("spynnaker8.models.populations.Assembly",
+                    "spynnaker.pyNN.models.populations.Assembly")
         super(Assembly, self).__init__(*populations, **kwargs)
-        logger.warning(
-            "please use spynnaker.pyNN.models.populations.Assembly instead")

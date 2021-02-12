@@ -21,7 +21,7 @@ Synfirechain-like example
 from unittest import SkipTest
 import spynnaker.plot_utils as plot_utils
 import spynnaker8 as p
-from spynnaker8.utilities import neo_convertor
+from spynnaker.pyNN.utilities import neo_convertor
 from p8_integration_tests.base_test_case import BaseTestCase
 
 
@@ -55,7 +55,7 @@ class BigManySpikes(BaseTestCase):
             self.assertEqual(spike_count, 7200)
         except Exception as ex:
             # Just in case the range failed
-            raise SkipTest(ex)
+            raise SkipTest() from ex
 
     def test_sixty_nine(self):
         nNeurons = 600  # number of neurons in each population
@@ -65,7 +65,7 @@ class BigManySpikes(BaseTestCase):
             self.assertEqual(spike_count, 7200)
         except Exception as ex:
             # Just in case the range failed
-            raise SkipTest(ex)
+            raise SkipTest() from ex
 
 
 if __name__ == '__main__':

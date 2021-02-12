@@ -12,13 +12,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import logging
-from spinn_utilities.log import FormatAdapter
 from pyNN.standardmodels.synapses import StaticSynapse as PyNNStaticSynapse
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic as
     _BaseClass)
-logger = FormatAdapter(logging.getLogger(__name__))
+from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
 
 
 class SynapseDynamicsStatic(_BaseClass):
@@ -38,7 +36,7 @@ class SynapseDynamicsStatic(_BaseClass):
         :param delay:
         :type delay: float or None
         """
+        moved_in_v6("spynnaker8.models.synapse_dynamics.SynapseDynamicsStatic",
+                    "spynnaker.pyNN.models.neuron.synapse_dynamics"
+                    ".SynapseDynamicsStatic")
         super(SynapseDynamicsStatic, self).__init__(weight, delay)
-        logger.warning(
-            "please use spynnaker.pyNN.models.neuron.synapse_dynamics."
-            "SynapseDynamicsStatic instead")

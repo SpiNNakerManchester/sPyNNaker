@@ -44,7 +44,7 @@ class TestGetVoltage(BaseTestCase):
             # Exact v check removed as system overloads
         # System intentional overload so may error
         except SpinnmanTimeoutException as ex:
-            raise SkipTest(ex)
+            raise SkipTest() from ex
 
 
 if __name__ == '__main__':

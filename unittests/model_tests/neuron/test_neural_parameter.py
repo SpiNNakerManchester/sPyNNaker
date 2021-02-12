@@ -18,7 +18,6 @@ import os
 import platform
 import struct
 import tempfile
-from six.moves import xrange
 from data_specification.enums import DataType
 from data_specification import DataSpecificationGenerator
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
@@ -75,8 +74,7 @@ def test_range_list():
 
 
 def _generator(size):
-    for i in xrange(size):
-        yield i
+    yield from range(size)
 
 
 def range_list_as_list(spec):
@@ -93,7 +91,7 @@ def test_range_list_as_list():
 
 
 def real_list(spec):
-    value = range(10)
+    value = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     param = NeuronParameter(value, DataType.S1615)
     iterator = param.iterator_by_slice(0, 5, spec)
     values = _iterate_parameter_values(iterator, DataType.S1615)

@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 six
-enum34
 lxml
 -e git+https://github.com/SpiNNakerManchester/SpiNNUtils.git@master#egg=spinn_utilities
 -e git+https://github.com/SpiNNakerManchester/SpiNNMachine.git@master#egg=SpiNNMachine

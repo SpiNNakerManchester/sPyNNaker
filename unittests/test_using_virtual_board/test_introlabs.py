@@ -54,9 +54,9 @@ class TestScripts(BaseTestCase):
                 script = os.path.join(directory, a_script)
                 try:
                     self.check_script(script)
-                except Exception:
+                except Exception as e:
                     print("Error on {}".format(script))
-                    raise
+                    raise e
 
     def test_learning(self):
         self.check_directory("learning")

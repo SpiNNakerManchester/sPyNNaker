@@ -38,7 +38,7 @@ import unittest
 from unittest import SkipTest
 from p8_integration_tests.base_test_case import BaseTestCase
 import spynnaker8 as p
-from spynnaker8.utilities import neo_compare
+from spynnaker.pyNN.utilities import neo_compare
 from pyNN.random import NumpyRNG, RandomDistribution
 from pyNN.utility import Timer
 
@@ -178,9 +178,10 @@ class TestVABenchmarkSpikes(BaseTestCase):
             with open(neo_path, "r") as neo_file:
                 recorded_spikes = pickle.load(neo_file)
             neo_compare.compare_blocks(exc_spikes, recorded_spikes)
-        except UnicodeDecodeError:
+        except UnicodeDecodeError as ex:
             raise SkipTest(
-                "https://github.com/NeuralEnsemble/python-neo/issues/529")
+                "https://github.com/NeuralEnsemble/python-neo/issues/529"
+                ) from ex
 
 
 if __name__ == '__main__':

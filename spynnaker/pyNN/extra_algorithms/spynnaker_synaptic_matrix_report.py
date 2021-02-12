@@ -34,10 +34,10 @@ class SpYNNakerSynapticMatrixReport(object):
         """ Convert synaptic matrix for every application edge.
 
         :param str report_folder: where to write the report
-        :param connection_holder: where the synaptic matrices are stored \
+        :param connection_holder: where the synaptic matrices are stored
             (possibly after retrieval from the machine)
         :type connection_holder:
-            dict(tuple(ProjectionApplicationEdge, SynapseInformation), \
+            dict(tuple(ProjectionApplicationEdge, SynapseInformation),
             ConnectionHolder)
         :param dsg_targets: used to check if connection holders are populated
         """

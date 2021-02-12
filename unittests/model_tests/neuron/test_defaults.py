@@ -13,12 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 from spynnaker.pyNN.models.defaults import (
     defaults, default_parameters, default_initial_values)
 from testfixtures.logcapture import LogCapture
 import re
+# pylint: disable=no-member
 
 
 def test_nothing():
@@ -76,8 +76,7 @@ def test_both():
 
 
 def test_abstract():
-    @add_metaclass(AbstractBase)
-    class BaseClass(object):
+    class BaseClass(object, metaclass=AbstractBase):
 
         @abstractproperty
         @staticmethod

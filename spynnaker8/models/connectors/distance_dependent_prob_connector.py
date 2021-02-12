@@ -12,12 +12,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import logging
-from spinn_utilities.log import FormatAdapter
 from spynnaker.pyNN.models.neural_projections.connectors import (
     DistanceDependentProbabilityConnector as
     _BaseClass)
-logger = FormatAdapter(logging.getLogger(__name__))
+from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
 
 
 class DistanceDependentProbabilityConnector(_BaseClass):
@@ -59,10 +57,11 @@ class DistanceDependentProbabilityConnector(_BaseClass):
                 Not supported by sPyNNaker.
         """
         # pylint: disable=too-many-arguments
+        moved_in_v6("spynnaker8.models.connectors"
+                    ".DistanceDependentProbabilityConnector",
+                    "spynnaker.pyNN.models.neural_projections.connectors"
+                    ".DistanceDependentProbabilityConnector")
         _BaseClass.__init__(
             self, d_expression=d_expression,
             allow_self_connections=allow_self_connections,
             safe=safe, verbose=verbose, n_connections=n_connections)
-        logger.warning(
-            "please use spynnaker.pyNN.models.neural_projections.connectors."
-            "DistanceDependentProbabilityConnector instead")
