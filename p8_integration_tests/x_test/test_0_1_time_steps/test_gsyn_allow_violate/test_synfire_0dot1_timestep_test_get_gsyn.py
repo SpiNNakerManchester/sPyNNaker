@@ -45,7 +45,7 @@ class TestGsyn(BaseTestCase):
             # no check of gsyn as the system overloads
         # System intentional overload so may error
         except SpinnmanTimeoutException as ex:
-            raise SkipTest(ex)
+            raise SkipTest() from ex
 
 
 if __name__ == '__main__':

@@ -13,14 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    FromListConnector)
 import numpy
 import pytest
 from pacman.model.graphs.common.slice import Slice
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    FromListConnector)
 from unittests.mocks import MockSimulator, MockSynapseInfo, MockPopulation
-from six import reraise
-import sys
 
 
 @pytest.mark.parametrize(
@@ -87,16 +85,15 @@ class MockFromListConnector(FromListConnector):
     # Use to check that the split is done only once
 
     def __init__(self, conn_list, safe=True, verbose=False, column_names=None):
-        FromListConnector.__init__(
-            self, conn_list, safe=safe, verbose=verbose,
-            column_names=column_names)
+        super().__init__(
+            conn_list, safe=safe, verbose=verbose, column_names=column_names)
         self._split_count = 0
 
     def _split_connections(self, pre_slices, post_slices):
-        split = FromListConnector._split_connections(
-            self, pre_slices, post_slices)
+        split = super()._split_connections(pre_slices, post_slices)
         if split:
             self._split_count += 1
+        return split
 
 
 def test_connector_split():
@@ -141,9 +138,9 @@ def test_connector_split():
 
         # Check the split only happens once
         assert connector._split_count == 1
-    except AssertionError:
+    except AssertionError as e:
         print(connection_list)
-        reraise(*sys.exc_info())
+        raise e
 
 
 def test_could_connect():

@@ -112,8 +112,7 @@ def run_forever(sync_time=0):
     :param sync_time:
         The time in milliseconds after which to pause before the host must
         continue the simulation
-    :return: returns when the application has started running on the\
-        SpiNNaker platform.
+    :return: when the application has started running on the SpiNNaker platform
     """
     get_simulator().run(None, sync_time)
 

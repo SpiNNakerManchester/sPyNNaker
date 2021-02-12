@@ -16,15 +16,11 @@
 import math
 import numpy
 from scipy import special  # @UnresolvedImport
-from six import itervalues
 
 from spinn_utilities.progress_bar import ProgressBar
-
 from data_specification.enums import DataType
-
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, MICRO_TO_SECOND_CONVERSION)
-
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.abstract_models import AbstractMaxSpikes
 from spynnaker.pyNN.models.neuron.synapse_io import SynapseIORowBased
@@ -32,7 +28,6 @@ from spynnaker.pyNN.utilities.constants import (
     POPULATION_BASED_REGIONS, POSSION_SIGMA_SUMMATION_LIMIT)
 from spynnaker.pyNN.utilities.utility_calls import (get_n_bits)
 from spynnaker.pyNN.utilities.running_stats import RunningStats
-
 from .synapse_dynamics import (
     AbstractSynapseDynamics, AbstractSynapseDynamicsStructural)
 from .synaptic_matrices import SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES
@@ -756,7 +751,7 @@ class SynapticManager(object):
     def clear_connection_cache(self):
         """ Flush the cache of connection information; needed for a second run
         """
-        for matrices in itervalues(self.__synaptic_matrices):
+        for matrices in self.__synaptic_matrices.values():
             matrices.clear_connection_cache()
 
     @property

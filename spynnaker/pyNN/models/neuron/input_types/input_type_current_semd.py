@@ -36,15 +36,15 @@ class InputTypeCurrentSEMD(AbstractInputType):
     def __init__(self, multiplicator, inh_input_previous):
         """
         :param multiplicator:
-        :type multiplicator: \
-            float, iterable(float), ~pyNN.random.RandomDistribution \
+        :type multiplicator:
+            float, iterable(float), ~pyNN.random.RandomDistribution
             or (mapping) function
         :param inh_input_previous:
-        :type inh_input_previous: \
-            float, iterable(float), ~pyNN.random.RandomDistribution \
+        :type inh_input_previous:
+            float, iterable(float), ~pyNN.random.RandomDistribution
             or (mapping) function
         """
-        super(InputTypeCurrentSEMD, self).__init__([
+        super().__init__([
             DataType.S1615,   # multiplicator
             DataType.S1615])  # inh_input_previous
         self.__multiplicator = multiplicator

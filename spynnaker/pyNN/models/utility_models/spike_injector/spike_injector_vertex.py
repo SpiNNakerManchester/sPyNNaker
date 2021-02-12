@@ -51,7 +51,7 @@ class SpikeInjectorVertex(
         self.__receive_port = None
         self.__virtual_key = None
 
-        super(SpikeInjectorVertex, self).__init__(
+        super().__init__(
             n_keys=n_neurons, label=label, receive_port=port,
             virtual_key=virtual_key,
             reserve_reverse_ip_tag=reserve_reverse_ip_tag,
@@ -120,8 +120,7 @@ class SpikeInjectorVertex(
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
                get_outgoing_partition_constraints)
     def get_outgoing_partition_constraints(self, partition):
-        constraints = ReverseIpTagMultiCastSource\
-            .get_outgoing_partition_constraints(self, partition)
+        constraints = super().get_outgoing_partition_constraints(partition)
         constraints.append(ContiguousKeyRangeContraint())
         return constraints
 

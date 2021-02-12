@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [2.7, 3.6, 3.7, 3.8]
+        python-version: [3.6, 3.7, 3.8]
 
     steps:
     - name: Checkout
@@ -52,11 +52,8 @@ jobs:
           SpiNNUtils SpiNNMachine SpiNNMan PACMAN DataSpecification spalloc
           SpiNNFrontEndCommon
         install: true
-        preinstall: ${{ matrix.python-version == 2.7 }}
     - name: Setup
       uses: ./support/actions/run-setup
-      with:
-        preinstall: ${{ matrix.python-version == 2.7 }}
     - name: Checkout Spinnaker Test Cases
       uses: ./support/actions/checkout-spinn-deps
       with:
@@ -78,7 +75,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [2.7, 3.6, 3.7, 3.8]
+        python-version: [3.6, 3.7, 3.8]
 
     steps:
     - name: Checkout
@@ -102,17 +99,12 @@ jobs:
           SpiNNUtils SpiNNMachine SpiNNMan PACMAN DataSpecification spalloc
           SpiNNFrontEndCommon
         install: true
-        preinstall: ${{ matrix.python-version == 2.7 }}
     - name: Setup
       uses: ./support/actions/run-setup
-      with:
-        preinstall: ${{ matrix.python-version == 2.7 }}
 
     - name: Lint with flake8
       run: flake8 spynnaker unittests
     - name: Lint with pylint
-      # Broken in 2.7 as it can not find data_specification.exceptions
-      if: matrix.python-version != 2.7
       uses: ./support/actions/pylint
       with:
         package: spynnaker

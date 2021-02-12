@@ -15,15 +15,13 @@
 
 from collections import defaultdict
 import sys
-from six import add_metaclass
 from spinn_utilities.classproperty import classproperty
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
 from spynnaker.pyNN.models.defaults import get_dict_from_init
 
 
-@add_metaclass(AbstractBase)
-class AbstractPyNNModel(object):
+class AbstractPyNNModel(object, metaclass=AbstractBase):
     """ A Model that can be passed in to a Population object in PyNN
     """
 

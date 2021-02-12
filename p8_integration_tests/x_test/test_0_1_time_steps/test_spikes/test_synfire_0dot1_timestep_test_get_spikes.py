@@ -50,7 +50,7 @@ class TestGetSpikesAt0_1msTimeStep(BaseTestCase):
             spike_checker.synfire_spike_checker(spikes, n_neurons)
         # System intentional overload so may error
         except SpinnmanTimeoutException as ex:
-            raise SkipTest(ex)
+            raise SkipTest() from ex
 
 
 if __name__ == '__main__':

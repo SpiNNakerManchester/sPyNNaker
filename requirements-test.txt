@@ -21,8 +21,7 @@ pytest-cov
 pytest-timeout
 pytest-forked
 pytest-progress
-sphinx == 1.5.3; python_version < '3.0'
-sphinx >= 2; python_version >= '3.6'
+sphinx >= 2
 testfixtures
 statistics
 mock

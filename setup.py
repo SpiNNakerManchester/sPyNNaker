@@ -14,8 +14,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-from setuptools import setup
 from collections import defaultdict
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
 
 __version__ = None
 __version_type__ = None
@@ -48,12 +51,10 @@ install_requires = [
     'SpiNNaker_DataSpecification >= 1!5.1.1, < 1!6.0.0',
     'spalloc >= 2.0.2, < 3.0.0',
     'SpiNNFrontEndCommon >= 1!5.1.1, < 1!6.0.0',
-    "numpy > 1.13, < 1.17; python_version == '2.7'",
-    "numpy > 1.13, < 1.19; python_version == '3.5'",
     "numpy > 1.13, < 1.20; python_version == '3.6'",
     "numpy > 1.13, < 1.21; python_version == '3.7'",
     "numpy; python_version >= '3.8'",
-    'lxml', 'six',
+    'lxml',
     'quantities >= 0.12.1',
     'pynn >= 0.9.1, < 0.10.0 ',
     'lazyarray >= 0.2.9, <= 0.4.0',
@@ -113,7 +114,6 @@ setup(
 
         "Programming Language :: C",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",

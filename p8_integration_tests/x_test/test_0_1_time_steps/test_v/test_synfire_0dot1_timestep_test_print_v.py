@@ -60,7 +60,7 @@ class TestPrintVoltage(BaseTestCase):
             os.remove(current_v_file_path)
             # System intentional overload so may error
         except SpinnmanTimeoutException as ex:
-            raise SkipTest(ex)
+            raise SkipTest() from ex
 
 
 if __name__ == '__main__':

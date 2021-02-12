@@ -474,8 +474,7 @@ class SynapseDynamicsSTDP(
 
     @overrides(AbstractPlasticSynapseDynamics.get_weight_maximum)
     def get_weight_maximum(self, connector, synapse_info):
-        w_max = super(SynapseDynamicsSTDP, self).get_weight_maximum(
-            connector, synapse_info)
+        w_max = super().get_weight_maximum(connector, synapse_info)
         # The maximum weight is the largest that it could be set to from
         # the weight dependence
         return max(w_max, self.__weight_dependence.weight_maximum)
@@ -484,7 +483,7 @@ class SynapseDynamicsSTDP(
         """
         :param str pre_population_label:
         :param str post_population_label:
-        :rtype: \
+        :rtype:
             list(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)
         """
         prov_data = list()

@@ -12,8 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-from __future__ import print_function
 import numpy
 import spynnaker.spike_checker as spike_checker
 import spynnaker.plot_utils as plot_utils

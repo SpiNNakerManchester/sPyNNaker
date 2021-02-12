@@ -70,7 +70,7 @@ class TestMallocKeyAllocatorWithSynfire(BaseTestCase):
 
         except SpinnmanTimeoutException as ex:
             # System sometimes times outs
-            raise SkipTest(ex)
+            raise SkipTest() from ex
 
 
 if __name__ == '__main__':

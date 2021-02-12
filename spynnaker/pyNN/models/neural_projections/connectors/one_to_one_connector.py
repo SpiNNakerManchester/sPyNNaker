@@ -45,7 +45,8 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
             Whether to output extra information about the connectivity to a
             CSV file
         """
-        super(OneToOneConnector, self).__init__(safe, callback, verbose)
+        # pylint: disable=useless-super-delegation
+        super().__init__(safe, callback, verbose)
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):

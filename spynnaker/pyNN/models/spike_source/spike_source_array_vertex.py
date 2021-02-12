@@ -66,7 +66,7 @@ class SpikeSourceArrayVertex(
         self._spike_times = spike_times
         time_step = self.get_spikes_sampling_interval()
 
-        super(SpikeSourceArrayVertex, self).__init__(
+        super().__init__(
             n_keys=n_neurons, label=label, constraints=constraints,
             max_atoms_per_core=max_atoms_per_core,
             send_buffer_times=_send_buffer_times(spike_times, time_step),
