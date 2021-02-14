@@ -81,7 +81,7 @@ state_t neuron_model_state_update(
     if(v_mem_error < -1.k){
         v_mem_error = -1.k;
     }
-    neuron->L = v_mem_error;
+    neuron->L = v_mem_error;//*0.1k;
     for (uint32_t n_ind=0; n_ind < 10; n_ind++){
         if (n_ind == (uint32_t)dummy){
             neuron->L += learning_signal[n_ind];// * neuron->w_fb[n_ind];
@@ -106,8 +106,8 @@ state_t neuron_model_state_update(
 		// ******************************************************************
     	neuron->syn_state[syn_ind].z_bar =
     			neuron->syn_state[syn_ind].z_bar * neuron->exp_TC
-    			+ (1 - neuron->exp_TC) *
-//    			+
+//    			+ (1 - neuron->exp_TC) *
+    			+
     			neuron->syn_state[syn_ind].z_bar_inp; // updating z_bar is problematic, if spike could come and interrupt neuron update
 
 
@@ -162,9 +162,9 @@ state_t neuron_model_state_update(
 
 
     	// decrease timestep counter preventing rapid updates
-    	if (neuron->syn_state[syn_ind].update_ready > 0){
-    		neuron->syn_state[syn_ind].update_ready -= 1;
-    	}
+//    	if (neuron->syn_state[syn_ind].update_ready > 0){
+        neuron->syn_state[syn_ind].update_ready -= 1;
+//    	}
 
     }
 
@@ -200,6 +200,8 @@ void neuron_model_print_parameters(restrict neuron_pointer_t neuron) {
     io_printf(IO_BUF, "T refract     = %u timesteps\n", neuron->T_refract);
 
     io_printf(IO_BUF, "learning      = %k n/a\n", neuron->L);
+
+    io_printf(IO_BUF, "window      = %u n/a\n", neuron->window_size);
 
 //    io_printf(IO_BUF, "feedback w    = %k n/a\n\n", neuron->w_fb);
 //

@@ -360,10 +360,10 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
             self.__eta              # learning rate
             ]
 
-        print("\n ")
-        print(glob_vals)
-        print(ts)
-        print("\n")
+        # print("\n ")
+        # print(glob_vals)
+        # print(ts)
+        # print("\n")
         return glob_vals
 
 

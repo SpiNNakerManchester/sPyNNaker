@@ -13,7 +13,7 @@ typedef struct eprop_syn_state_t {
 	REAL z_bar; // low-pass filtered spike train
 //	REAL el_a; // adaptive component of eligibility vector
 //	REAL e_bar; // low-pass filtered eligibility trace
-	uint32_t update_ready; // counter to enable batch update (i.e. don't perform on every spike).
+	int32_t update_ready; // counter to enable batch update (i.e. don't perform on every spike).
 }eprop_syn_state_t;
 
 /////////////////////////////////////////////////////////////
@@ -45,10 +45,10 @@ typedef struct neuron_t {
     // refractory time of neuron [timesteps]
     int32_t  T_refract;
 
+    uint32_t window_size;
+
     REAL    L; // learning signal
 //    REAL w_fb; // feedback weight
-
-    uint32_t window_size;
 
     // array of synaptic states - peak fan-in of >250 for this case
     eprop_syn_state_t syn_state[SYNAPSES_PER_NEURON];
@@ -75,7 +75,7 @@ typedef struct global_neuron_params_t {
 //	REAL ticks_per_second;
 //	REAL readout_V[20];
 	REAL eta;
-	uint32_t target_V[1000];
+	uint32_t target_V[2100];
 } global_neuron_params_t;
 
 #endif // _NEURON_MODEL_SINUSOID_READOUT_IMPL_H_

@@ -123,23 +123,23 @@ state_t neuron_model_state_update(
 //                (accum)(time%1300) * 0.001k, (accum)(time%1300) * 0.001k * (accum)syn_dynamics_neurons_in_partition,
 //                accum_time);
 
-    if (neuron->V_membrane > neuron->B){
-        v_mem_error = neuron->V_membrane - neuron->B;
+    if (neuron->V_membrane - neuron->B > neuron->b_0){
+        v_mem_error = neuron->V_membrane - neuron->B - neuron->b_0;
 //        io_printf(IO_BUF, "> %k = %k - %k\n", v_mem_error, neuron->V_membrane, neuron->B);
     }
-    else if (neuron->V_membrane < -neuron->B){
-        v_mem_error = neuron->V_membrane + neuron->B;
+    else if (neuron->V_membrane - neuron->B < -neuron->b_0){
+        v_mem_error = neuron->V_membrane - neuron->B + neuron->b_0;
 //        io_printf(IO_BUF, "< %k = %k - %k\n", v_mem_error, -neuron->V_membrane, neuron->B);
     }
     else{
         v_mem_error = 0.k;
     }
-    if(v_mem_error > 1.k){
-        v_mem_error = 1.k;
-    }
-    if(v_mem_error < -1.k){
-        v_mem_error = -1.k;
-    }
+//    if(v_mem_error > 1.k){
+//        v_mem_error = 1.k;
+//    }
+//    if(v_mem_error < -1.k){
+//        v_mem_error = -1.k;
+//    }
 //    learning_signal += v_mem_error;
 
 //	REAL reg_error = (global_parameters->core_target_rate - global_parameters->core_pop_rate) / syn_dynamics_neurons_in_partition;
@@ -188,12 +188,13 @@ state_t neuron_model_state_update(
 
 
     REAL firing_reg = 0.k;
-    if (neuron->neuron_rate >
-                global_parameters->core_target_rate+(global_parameters->core_target_rate - 1.k)){
-        firing_reg = neuron->neuron_rate - global_parameters->core_target_rate;
-//        io_printf(IO_BUF, "> %k = %k - %k\n", v_mem_error, neuron->V_membrane, neuron->B);
-    }
-    else if (neuron->neuron_rate < 1.k){
+//    if (neuron->neuron_rate >
+//                global_parameters->core_target_rate+(global_parameters->core_target_rate - 1.k)){
+//        firing_reg = neuron->neuron_rate - global_parameters->core_target_rate;
+////        io_printf(IO_BUF, "> %k = %k - %k\n", v_mem_error, neuron->V_membrane, neuron->B);
+//    }
+//    else
+    if (neuron->neuron_rate < 1.k){
         firing_reg = -1.k + neuron->neuron_rate;
 //        io_printf(IO_BUF, "< %k = %k - %k\n", v_mem_error, -neuron->V_membrane, neuron->B);
     }
@@ -207,7 +208,8 @@ state_t neuron_model_state_update(
         firing_reg = -1.k;
     }
 
-    if (time % test_length < 600 && time % test_length > 100 && global_parameters->core_target_rate){ //todo make this relative to number of cues
+    if (time % test_length < 600 && time % test_length > 100 &&
+            global_parameters->core_target_rate){
         neuron->L = new_learning_signal + firing_reg;// * 0.1k);
     }
     else{
@@ -325,7 +327,9 @@ state_t neuron_model_state_update(
 		// ******************************************************************
     	neuron->syn_state[syn_ind].z_bar =
     			neuron->syn_state[syn_ind].z_bar * neuron->exp_TC
-    			+ (1 - neuron->exp_TC) * neuron->syn_state[syn_ind].z_bar_inp; // updating z_bar is problematic, if spike could come and interrupt neuron update
+//    			+ (1 - neuron->exp_TC) *
+    			+
+    			neuron->syn_state[syn_ind].z_bar_inp; // updating z_bar is problematic, if spike could come and interrupt neuron update
 
 
 		// ******************************************************************
@@ -443,4 +447,6 @@ void neuron_model_print_parameters(restrict neuron_pointer_t neuron) {
     io_printf(IO_BUF, "B    = %k n/a\n", neuron->B);
 
     io_printf(IO_BUF, "adpt          = %k n/a\n", neuron->adpt);
+
+    io_printf(IO_BUF, "neuron rate   = %k n/a\n", neuron->neuron_rate);
 }

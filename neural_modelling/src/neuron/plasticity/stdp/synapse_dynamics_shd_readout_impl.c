@@ -399,7 +399,10 @@ bool synapse_dynamics_process_plastic_synapses(
 
         // Perform weight update: only if batch time has elapsed
     	final_state_t final_state;
-
+//        if (time % 51 == 0){
+//            io_printf(IO_BUF, "syn %u - update %u - +%u\n", syn_ind_from_delay,
+//                neuron->syn_state[syn_ind_from_delay].update_ready, neuron->window_size);
+//        }
     	if (neuron->syn_state[syn_ind_from_delay].update_ready <= 0){
 
     		// enough time has elapsed - perform weight update

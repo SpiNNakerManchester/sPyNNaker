@@ -77,6 +77,7 @@ static bool neuron_impl_initialise(uint32_t n_neurons) {
 
     // Allocate DTCM for neuron array
     if (sizeof(neuron_t) != 0) {
+//        log_info("size = %u", sizeof(neuron_t));
         neuron_array = (neuron_t *) spin1_malloc(n_neurons * sizeof(neuron_t));
         if (neuron_array == NULL) {
             log_error("Unable to allocate neuron array - Out of DTCM");
@@ -185,6 +186,16 @@ static void neuron_impl_load_neuron_parameters(
 //    io_printf(IO_BUF, "seed 3: %u \n", global_parameters->spike_source_seed[2]);
 //    io_printf(IO_BUF, "seed 4: %u \n", global_parameters->spike_source_seed[3]);
     io_printf(IO_BUF, "eta: %k\n\n", global_parameters->eta);
+    io_printf(IO_BUF, "target data 0: %u\n\n", global_parameters->target_V[0]);
+    io_printf(IO_BUF, "target data 1: %u\n\n", global_parameters->target_V[1]);
+    io_printf(IO_BUF, "target data 2: %u\n\n", global_parameters->target_V[2]);
+    io_printf(IO_BUF, "target data 3: %u\n\n", global_parameters->target_V[3]);
+    io_printf(IO_BUF, "target data 4: %u\n\n", global_parameters->target_V[4]);
+    io_printf(IO_BUF, "target data 5: %u\n\n", global_parameters->target_V[5]);
+    io_printf(IO_BUF, "target data 6: %u\n\n", global_parameters->target_V[6]);
+    io_printf(IO_BUF, "target data 7: %u\n\n", global_parameters->target_V[7]);
+    io_printf(IO_BUF, "target data 8: %u\n\n", global_parameters->target_V[8]);
+    io_printf(IO_BUF, "target data 9: %u\n\n", global_parameters->target_V[9]);
 
 
     for (index_t n = 0; n < n_neurons; n++) {
@@ -345,6 +356,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 //                                    neuron->L;
 //                                    *exc_input_values;
 //                                    neuron->syn_state[neuron_index*5].delta_w;
+//                                    neuron->syn_state[neuron_index*5].update_ready;
 
     // Record target
     recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] =
@@ -355,6 +367,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 //        			exc_input_values[0];
 
     recorded_variable_values[V_RECORDING_INDEX] = result;
+//                                    neuron->syn_state[neuron_index*5].z_bar;
 
     // If spike occurs, communicate to relevant parts of model
     if (spike) {

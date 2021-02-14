@@ -301,7 +301,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     // determine if a spike should occur
     threshold_type_update_threshold(neuron->z, neuron);
 
-    neuron->neuron_rate = neuron->neuron_rate * global_parameters->rate_exp_TC;
+    neuron->neuron_rate = neuron->neuron_rate * 0.99973k;//global_parameters->rate_exp_TC;
 
 
     // Record B
@@ -387,7 +387,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 //    REAL reg_learning_signal = (global_parameters->core_pop_rate / syn_dynamics_neurons_in_partition) - global_parameters->core_target_rate;
     recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] =
 //                                            neuron->neuron_rate;
-                                            neuron->B;
+                                            neuron->syn_state[neuron_index].z_bar;
                                             //reg_learning_signal;//
 
 

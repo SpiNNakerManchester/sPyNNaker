@@ -104,14 +104,14 @@ class NeuronModelLeakyIntegrateAndFireSHDReadout(AbstractNeuronModel):
                 DataType.S1615, # z_bar
                 # DataType.S1615, # ep_a
                 # DataType.S1615, # e_bar
-                DataType.UINT32   # update_ready
+                DataType.INT32   # update_ready
             ]
         # Extend to include fan-in for each neuron
         data_types.extend(eprop_syn_state * SYNAPSES_PER_NEURON)
 
         global_data_types=[]
         global_data_types.extend([DataType.S1615])    # eta (learning rate)
-        global_data_types.extend([DataType.UINT32 for i in range(1000)])
+        global_data_types.extend([DataType.UINT32 for i in range(2100)])  # target data
 
 
         super(NeuronModelLeakyIntegrateAndFireSHDReadout, self).__init__(
@@ -148,7 +148,7 @@ class NeuronModelLeakyIntegrateAndFireSHDReadout(AbstractNeuronModel):
 
     @overrides(AbstractNeuronModel.add_parameters)
     def add_parameters(self, parameters):
-#         parameters[V] = self._v_init
+        # parameters[V] = self._v_init
         parameters[V_REST] = self._v_rest
         parameters[TAU_M] = self._tau_m
         parameters[CM] = self._cm
@@ -156,7 +156,7 @@ class NeuronModelLeakyIntegrateAndFireSHDReadout(AbstractNeuronModel):
         parameters[V_RESET] = self._v_reset
         parameters[TAU_REFRAC] = self._tau_refrac
         parameters[WINDOW_SIZE] = self._window_size
-#         parameters[L] = self._l
+        # parameters[L] = self._l
 
         #learning params
         # parameters[W_FB] = self._w_fb
@@ -202,7 +202,7 @@ class NeuronModelLeakyIntegrateAndFireSHDReadout(AbstractNeuronModel):
                 parameters[V_RESET],
                 parameters[TAU_REFRAC].apply_operation(
                     operation=lambda x: int(numpy.ceil(x / (ts / 1000.0)))),
-                # parameters[WINDOW_SIZE],
+                parameters[WINDOW_SIZE],
                 state_variables[L]
                 # parameters[W_FB]
                 ]
@@ -266,7 +266,7 @@ class NeuronModelLeakyIntegrateAndFireSHDReadout(AbstractNeuronModel):
         vals = []
 
         vals.extend([self._eta])
-        vals.extend(self._target_data)
+        vals.extend(numpy.hstack([self._target_data, numpy.zeros(2100-len(self._target_data))]))
         return vals
 
     @property
