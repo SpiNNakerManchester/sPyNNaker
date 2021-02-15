@@ -22,6 +22,7 @@ from spinn_front_end_common.abstract_models import (
     AbstractProvidesOutgoingPartitionConstraints)
 from spinn_front_end_common.abstract_models.impl import (
     TDMAAwareApplicationVertex)
+from spinn_front_end_common.utilities import globals_variables
 from spynnaker.pyNN.exceptions import DelayExtensionException
 from spynnaker.pyNN.models.abstract_models import AbstractHasDelayStages
 from spynnaker.pyNN.utilities.constants import (
@@ -44,7 +45,8 @@ class DelayExtensionVertex(
         "__n_delay_stages",
         "__source_vertex",
         "__delay_generator_data",
-        "__n_data_specs"]
+        "__n_data_specs",
+        "__drop_late_spikes"]
 
     # this maps to what master assumes
     MAX_TICKS_POSSIBLE_TO_SUPPORT = 8 * 16
@@ -90,9 +92,18 @@ class DelayExtensionVertex(
         # Dictionary of vertex_slice -> delay block for data specification
         self.__delay_blocks = dict()
 
+        # Read the config for dropping late spikes
+        config = globals_variables.get_simulator().config
+        self.__drop_late_spikes = config.getboolean(
+            "Simulation", "drop_late_spikes")
+
     @property
     def n_atoms(self):
         return self.__n_atoms
+
+    @property
+    def drop_late_spikes(self):
+        return self.__drop_late_spikes
 
     @staticmethod
     def get_max_delay_ticks_supported(delay_ticks_at_post_vertex):

@@ -32,7 +32,7 @@ from spinn_front_end_common.utilities.utility_objs import ExecutableType
 #  6. n_delay_stages, 7. the number of delay supported by each delay stage
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
-_DELAY_PARAM_HEADER_WORDS = 7
+_DELAY_PARAM_HEADER_WORDS = 8
 
 _EXPANDER_BASE_PARAMS_SIZE = 3 * BYTES_PER_WORD
 
@@ -44,7 +44,8 @@ class DelayExtensionMachineVertex(
         AbstractHasAssociatedBinary, AbstractGeneratesDataSpecification):
 
     __slots__ = [
-        "__resources"]
+        "__resources",
+        "__drop_late_spikes"]
 
     class _DELAY_EXTENSION_REGIONS(Enum):
         SYSTEM = 0
@@ -64,6 +65,7 @@ class DelayExtensionMachineVertex(
         N_PACKETS_LOST_DUE_TO_COUNT_SATURATION = 7
         N_PACKETS_WITH_INVALID_NEURON_IDS = 8
         N_PACKETS_DROPPED_DUE_TO_INVALID_KEY = 9
+        N_LATE_SPIKES = 10
 
     N_EXTRA_PROVENANCE_DATA_ENTRIES = len(EXTRA_PROVENANCE_DATA_ENTRIES)
 
@@ -115,6 +117,18 @@ class DelayExtensionMachineVertex(
         "too quickly for the number of neurons per core.  Please "
         "increase the timer_tic or time_scale_factor or decrease the "
         "number of neurons per core.")
+
+    N_LATE_SPIKES_NAME = "Number_of_late_spikes"
+    N_LATE_SPIKES_MESSAGE_DROP = (
+        "{} packets from {} on {}, {}, {} were dropped from the input buffer, "
+        "because they arrived too late to be processed in a given time step. "
+        "Try increasing the time_scale_factor located within the "
+        ".spynnaker.cfg file or in the pynn.setup() method.")
+    N_LATE_SPIKES_MESSAGE_NO_DROP = (
+        "{} packets from {} on {}, {}, {} arrived too late to be processed in"
+        " a given time step. "
+        "Try increasing the time_scale_factor located within the "
+        ".spynnaker.cfg file or in the pynn.setup() method.")
 
     DELAYED_FOR_TRAFFIC_NAME = "Number_of_times_delayed_to_spread_traffic"
 
@@ -188,6 +202,8 @@ class DelayExtensionMachineVertex(
         n_packets_invalid_keys = provenance_data[
             self.EXTRA_PROVENANCE_DATA_ENTRIES.
             N_PACKETS_DROPPED_DUE_TO_INVALID_KEY.value]
+        n_late_packets = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.N_LATE_SPIKES.value]
 
         label, x, y, p, names = self._get_placement_details(placement)
 
@@ -233,6 +249,14 @@ class DelayExtensionMachineVertex(
         provenance_items.append(
             self._app_vertex.get_tdma_provenance_item(
                 names, x, y, p, n_times_tdma_fell_behind))
+        late_message = (
+            self.N_LATE_SPIKES_MESSAGE_DROP
+            if self._app_vertex.drop_late_spikes
+            else self.N_LATE_SPIKES_MESSAGE_NO_DROP)
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names, self.N_LATE_SPIKES_NAME),
+            n_late_packets, report=n_late_packets > 0,
+            message=late_message.format(n_late_packets, label, x, y, p)))
         return provenance_items
 
     @overrides(MachineVertex.get_n_keys_for_partition)
@@ -399,6 +423,9 @@ class DelayExtensionMachineVertex(
 
         # write the delay per delay stage
         spec.write_value(data=self._app_vertex.delay_per_stage)
+
+        # write whether to throw away spikes
+        spec.write_value(data=int(self._app_vertex.drop_late_spikes))
 
         # Write the actual delay blocks (create a new one if it doesn't exist)
         spec.write_array(array_values=self._app_vertex.delay_blocks_for(
