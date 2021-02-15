@@ -58,6 +58,6 @@ class SpynnakerDataSpecificationWriter(GraphDataSpecificationWriter):
                 placement_order.append(placement)
         placement_order.extend(delay_extensions)
 
-        return super(SpynnakerDataSpecificationWriter, self).__call__(
+        return super().__call__(
             placements, hostname, report_default_directory, write_text_specs,
             machine, data_n_timesteps, placement_order)

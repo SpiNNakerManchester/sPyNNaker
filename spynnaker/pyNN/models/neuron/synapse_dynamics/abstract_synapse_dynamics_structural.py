@@ -13,13 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import add_metaclass
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractproperty, abstractmethod)
 
 
-@add_metaclass(AbstractBase)
-class AbstractSynapseDynamicsStructural(object):
+class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
 
     @abstractmethod
     def get_structural_parameters_sdram_usage_in_bytes(

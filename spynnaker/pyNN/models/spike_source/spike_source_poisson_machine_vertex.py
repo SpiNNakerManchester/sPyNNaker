@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import struct
 from enum import Enum
-
 import numpy
 
 from data_specification.enums import DataType
@@ -79,6 +78,9 @@ PARAMS_WORDS_PER_NEURON = 2
 # start_scaled, end_scaled, next_scaled, is_fast_source, exp_minus_lambda,
 # sqrt_lambda, isi_val, time_to_spike
 PARAMS_WORDS_PER_RATE = 8
+
+_ONE_WORD = struct.Struct("<I")
+_FOUR_WORDS = struct.Struct("<4I")
 
 
 class SpikeSourcePoissonMachineVertex(
@@ -150,7 +152,7 @@ class SpikeSourcePoissonMachineVertex(
             self, resources_required, is_recording, constraints=None,
             label=None, app_vertex=None, vertex_slice=None):
         # pylint: disable=too-many-arguments
-        super(SpikeSourcePoissonMachineVertex, self).__init__(
+        super().__init__(
             label, constraints=constraints, app_vertex=app_vertex,
             vertex_slice=vertex_slice)
         self.__is_recording = is_recording
@@ -168,8 +170,7 @@ class SpikeSourcePoissonMachineVertex(
         return self.POISSON_SPIKE_SOURCE_REGIONS.PROVENANCE_REGION.value
 
     @property
-    @overrides(
-        ProvidesProvenanceDataFromMachineImpl._n_additional_data_items)
+    @overrides(ProvidesProvenanceDataFromMachineImpl._n_additional_data_items)
     def _n_additional_data_items(self):
         return 1
 
@@ -635,11 +636,10 @@ class SpikeSourcePoissonMachineVertex(
         # locate SDRAM address where parameters are stored
         poisson_params = self.poisson_param_region_address(
             placement, transceiver)
-        seed_array = transceiver.read_memory(
+        seed_array = _FOUR_WORDS.unpack_from(transceiver.read_memory(
             placement.x, placement.y, poisson_params + self.SEED_OFFSET_BYTES,
-            self.SEED_SIZE_BYTES)
-        self._app_vertex.update_kiss_seed(
-            vertex_slice, struct.unpack_from("<4I", seed_array))
+            self.SEED_SIZE_BYTES))
+        self._app_vertex.update_kiss_seed(vertex_slice, seed_array)
 
         # locate SDRAM address where the rates are stored
         poisson_rate_region_sdram_address = (
@@ -656,7 +656,7 @@ class SpikeSourcePoissonMachineVertex(
         # For each atom, read the number of rates and the rate parameters
         offset = 0
         for i in range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1):
-            n_values = struct.unpack_from("<I", byte_array, offset)[0]
+            n_values, = _ONE_WORD.unpack_from(byte_array, offset)
             offset += 4
 
             # Skip reading the index, as it will be recalculated on data write

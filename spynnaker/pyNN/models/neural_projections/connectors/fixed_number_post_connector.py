@@ -12,13 +12,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-from __future__ import print_function
 import math
 import numpy
-from pyNN.connectors import (
-    FixedNumberPostConnector as
-    PyNNFixedNumberPostConnector)
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .abstract_connector import AbstractConnector
@@ -33,8 +28,7 @@ N_GEN_PARAMS = 8
 
 
 class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
-                               AbstractConnectorSupportsViewsOnMachine,
-                               PyNNFixedNumberPostConnector):
+                               AbstractConnectorSupportsViewsOnMachine):
     """ Connects a fixed number of post-synaptic neurons selected at random,\
         to all pre-synaptic neurons.
     """
@@ -80,12 +74,8 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
             .. note::
                 Not supported by sPyNNaker.
         """
-        super(FixedNumberPostConnector, self).__init__(safe, callback, verbose)
-        # We absolutely require an integer at this point!
+        super().__init__(safe, callback, verbose)
         self.__n_post = self._roundsize(n, "FixedNumberPostConnector")
-        PyNNFixedNumberPostConnector.__init__(
-            self, self.__n_post, allow_self_connections, with_replacement, rng,
-            safe, callback)
         self.__allow_self_connections = allow_self_connections
         self.__with_replacement = with_replacement
         self.__post_neurons = None
@@ -94,8 +84,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         self._rng = rng
 
     def set_projection_information(self, machine_time_step, synapse_info):
-        AbstractConnector.set_projection_information(
-            self, machine_time_step, synapse_info)
+        super().set_projection_information(machine_time_step, synapse_info)
         if (not self.__with_replacement and
                 self.__n_post > synapse_info.n_post_neurons):
             raise SpynnakerException(

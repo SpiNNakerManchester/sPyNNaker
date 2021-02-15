@@ -13,12 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase
 
 
-@add_metaclass(AbstractBase)
-class AbstractSpynnakerSplitterDelay(object):
+class AbstractSpynnakerSplitterDelay(object, metaclass=AbstractBase):
     """
     Defines that a splitter is able to handle delays in some way.
 

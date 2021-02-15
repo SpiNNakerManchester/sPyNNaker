@@ -12,12 +12,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import logging
-from spinn_utilities.log import FormatAdapter
 from spynnaker.pyNN.models.neural_projections.connectors import (
     CSAConnector as
     _BaseClass)
-logger = FormatAdapter(logging.getLogger(__name__))
+from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
 
 
 class CSAConnector(_BaseClass):
@@ -47,8 +45,8 @@ class CSAConnector(_BaseClass):
                 Not supported by sPyNNaker.
         """
         # pylint: disable=too-many-arguments
+        moved_in_v6("spynnaker8.models.connectors.CSAConnector",
+                    "spynnaker.pyNN.models.neural_projections.connectors"
+                    ".CSAConnector")
         super(CSAConnector, self).__init__(
             cset=cset, safe=safe, callback=callback, verbose=verbose)
-        logger.warning(
-            "please use spynnaker.pyNN.models.neural_projections.connectors."
-            "CSAConnector instead")

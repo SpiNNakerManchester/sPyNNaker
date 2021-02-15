@@ -13,10 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import iteritems
-import sys
-from six import reraise
-
 # Alternative implementation for
 # https://github.com/NeuralEnsemble/PyNN/blob/master/pyNN/common/populations.py
 
@@ -72,38 +68,36 @@ class IDMixin(object):
                                  [self.__id])
 
     def __getattr__(self, name):
-        # pylint: disable=broad-except
         if name == "initial_values":
             return self.__population._get_initial_values(self.__id)
         try:
             return self.__population._get_by_selector(
                 selector=self.__id, parameter_names=name)[0]
-        except Exception:
-            ei = sys.exc_info()
+        except Exception as e:
             try:
                 # try initialisable variable
                 return self.__population._get_initial_value(
                     selector=self.__id, variable=name)[0]
-            except Exception:
+            except Exception:  # pylint: disable=broad-except
                 # that failed too so raise the better original exception
-                reraise(*ei)
+                pass
+            raise e
 
     def __setattr__(self, name, value):
-        # pylint: disable=broad-except
         if name in self.__realslots__:
             object.__setattr__(self, name, value)
-        else:
+            return
+        try:
+            self.__population.set_by_selector(self.__id, name, value)
+        except Exception as e:
             try:
-                self.__population.set_by_selector(self.__id, name, value)
-            except Exception:
-                ei = sys.exc_info()
-                try:
-                    # try initialisable variable
-                    return self.__population._initialize(
-                        selector=self.__id, variable=name, value=value)
-                except Exception:
-                    # that failed too so raise the better original exception
-                    reraise(*ei)
+                # try initialisable variable
+                return self.__population._initialize(
+                    selector=self.__id, variable=name, value=value)
+            except Exception:  # pylint: disable=broad-except
+                # that failed too so raise the better original exception
+                pass
+            raise e
 
     def set_parameters(self, **parameters):
         """ Set cell parameters, given as a sequence of parameter=value\
@@ -189,7 +183,7 @@ class IDMixin(object):
         """ Set the initial value of a state variable of the cell.
 
         """
-        for variable, value in iteritems(initial_values):
+        for variable, value in initial_values.items():
             self.__population._initialize(variable, value, self.__id)
 
     def as_view(self):

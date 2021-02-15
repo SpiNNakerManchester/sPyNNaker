@@ -17,7 +17,8 @@ from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.abstract_models import AbstractPopulationSettable
 
 
-class SimplePopulationSettable(AbstractPopulationSettable):
+class SimplePopulationSettable(
+        AbstractPopulationSettable, allow_derivation=True):
     """ An object all of whose properties can be accessed from a PyNN\
         Population i.e. no properties are hidden
     """

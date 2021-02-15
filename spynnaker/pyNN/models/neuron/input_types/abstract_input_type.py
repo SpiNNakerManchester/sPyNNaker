@@ -13,15 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import add_metaclass
-from spinn_utilities.abstract_base import AbstractBase
-from spinn_utilities.abstract_base import abstractmethod
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spynnaker.pyNN.models.neuron.implementations import (
     AbstractStandardNeuronComponent)
 
 
-@add_metaclass(AbstractBase)
-class AbstractInputType(AbstractStandardNeuronComponent):
+class AbstractInputType(
+        AbstractStandardNeuronComponent, metaclass=AbstractBase):
     """ Represents a possible input type for a neuron model (e.g., current).
     """
     __slots__ = ()

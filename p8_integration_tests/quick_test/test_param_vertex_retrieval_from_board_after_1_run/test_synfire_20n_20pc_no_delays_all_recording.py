@@ -14,14 +14,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-from __future__ import print_function
 import os.path
 import matplotlib.pyplot as plt
 import numpy
 from pyNN.utility.plotting import Figure
 import spynnaker.spike_checker as spike_checker
-from spynnaker8.spynnaker_plotting import SpynnakerPanel
+from spynnaker.spynnaker_plotting import SpynnakerPanel
 from p8_integration_tests.base_test_case import BaseTestCase
 from p8_integration_tests.scripts.synfire_run import SynfireRunner
 """

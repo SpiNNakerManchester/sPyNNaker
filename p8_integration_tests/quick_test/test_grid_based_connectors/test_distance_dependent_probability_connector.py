@@ -12,13 +12,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-from __future__ import division
 import spynnaker8 as p
 from p8_integration_tests.base_test_case import BaseTestCase
 from pyNN.utility.plotting import Figure, Panel
 import matplotlib.pyplot as plt
-from spynnaker8.utilities import neo_convertor
+from spynnaker.pyNN.utilities import neo_convertor
 
 
 def do_run(plot):

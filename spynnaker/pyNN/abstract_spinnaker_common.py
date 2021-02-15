@@ -16,16 +16,14 @@
 import logging
 import math
 import os
-from six import with_metaclass
-
 from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.log import FormatAdapter
-from spinn_front_end_common.utilities.constants import (
-    MICRO_TO_MILLISECOND_CONVERSION)
 from spinn_utilities.make_tools.log_sqllite_database import (
     set_alternative_log_path)
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
     AbstractSpinnakerBase)
+from spinn_front_end_common.utilities.constants import (
+    MICRO_TO_MILLISECOND_CONVERSION)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utility_models import CommandSender
 from spinn_front_end_common.utilities.utility_objs import ExecutableFinder
@@ -40,8 +38,9 @@ from spynnaker import __version__ as version
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-class AbstractSpiNNakerCommon(with_metaclass(
-        AbstractBase, AbstractSpinnakerBase, SpynnakerSimulatorInterface)):
+class AbstractSpiNNakerCommon(
+        AbstractSpinnakerBase, SpynnakerSimulatorInterface,
+        metaclass=AbstractBase):
     """ Main interface for neural code.
     """
     __slots__ = [
@@ -133,7 +132,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
         if front_end_versions is not None:
             versions.extend(front_end_versions)
 
-        super(AbstractSpiNNakerCommon, self).__init__(
+        super().__init__(
             configfile=self.CONFIG_FILE_NAME,
             executable_finder=self.__EXECUTABLE_FINDER,
             graph_label=graph_label,
@@ -283,8 +282,8 @@ class AbstractSpiNNakerCommon(with_metaclass(
 
         :param bool reset_flags:
         """
-        changed, data_changed = super(AbstractSpiNNakerCommon, self).\
-            _detect_if_graph_has_changed(reset_flags)
+        changed, data_changed = super()._detect_if_graph_has_changed(
+            reset_flags)
 
         # Additionally check populations for changes
         for population in self._populations:
@@ -311,8 +310,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
     def add_application_vertex(self, vertex):
         if isinstance(vertex, CommandSender):
             self._command_sender = vertex
-
-        AbstractSpinnakerBase.add_application_vertex(self, vertex)
+        super().add_application_vertex(vertex)
 
     @staticmethod
     def _count_unique_keys(commands):
@@ -348,8 +346,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
         for population in self._populations:
             population._end()
 
-        super(AbstractSpiNNakerCommon, self).stop(
-            turn_off_machine, clear_routing_tables, clear_tags)
+        super().stop(turn_off_machine, clear_routing_tables, clear_tags)
         self.reset_number_of_neurons_per_core()
         unset_simulator(self)
 
@@ -380,7 +377,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
             self.extend_extra_post_run_algorithms(
                 ["RedundantPacketCountReport"])
 
-        super(AbstractSpiNNakerCommon, self).run(run_time, sync_time)
+        super().run(run_time, sync_time)
 
     @staticmethod
     def register_binary_search_path(search_path):

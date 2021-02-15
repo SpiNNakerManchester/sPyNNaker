@@ -12,12 +12,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import logging
-from spinn_utilities.log import FormatAdapter
 from spynnaker.pyNN.models.neural_projections.connectors import (
     OneToOneConnector as
     _BaseClass)
-logger = FormatAdapter(logging.getLogger(__name__))
+from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
 
 
 class OneToOneConnector(_BaseClass):
@@ -44,7 +42,7 @@ class OneToOneConnector(_BaseClass):
             .. note::
                 Not supported by sPyNNaker.
         """
+        moved_in_v6("spynnaker8.models.connectors.OneToOneConnector",
+                    "spynnaker.pyNN.models.neural_projections.connectors"
+                    ".OneToOneConnector")
         _BaseClass.__init__(self, safe=safe, callback=callback)
-        logger.warning(
-            "please use spynnaker.pyNN.models.neural_projections.connectors."
-            "OneToOneConnector instead")

@@ -116,7 +116,7 @@ class MunichRetinaDevice(
                 "The external Retina does not recognise this position")
         self.__is_right = position == self.RIGHT_RETINA
 
-        super(MunichRetinaDevice, self).__init__(
+        super().__init__(
             n_atoms=fixed_n_neurons, spinnaker_link_id=spinnaker_link_id,
             max_atoms_per_core=fixed_n_neurons, label=label,
             board_address=board_address)

@@ -13,10 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
-from spinn_utilities.log import FormatAdapter
 from spynnaker.pyNN.models.projection import Projection as _BaseClass
-logger = FormatAdapter(logging.getLogger(__name__))
+from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
 
 
 # pylint: disable=abstract-method,too-many-arguments
@@ -47,8 +45,8 @@ class Projection(_BaseClass):
         :param ~pyNN.space.Space space:
         :param str label:
         """
+        moved_in_v6("spynnaker8.models.projection",
+                    "spynnaker.pyNN.models.projection")
         super(Projection, self).__init__(
             pre_synaptic_population, post_synaptic_population, connector,
             synapse_type, source, receptor_type, space, label)
-        logger.warning(
-            "please use spynnaker.pyNN.models.projection.Projection instead")

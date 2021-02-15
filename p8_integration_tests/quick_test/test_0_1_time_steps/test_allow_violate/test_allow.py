@@ -44,7 +44,7 @@ class TestAllow(BaseTestCase):
             # no check of gsyn as the system overloads
         # System intentional overload so may error
         except SpinnmanTimeoutException as ex:
-            raise SkipTest(ex)
+            raise SkipTest() from ex
 
     def test_allow(self):
         self.runsafe(self.allow)

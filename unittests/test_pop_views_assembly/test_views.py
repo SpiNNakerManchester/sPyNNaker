@@ -152,6 +152,6 @@ class Test_IDMixin(BaseTestCase):
         try:
             sim.Projection(pop, view, sim.OneToOneConnector())
         except NotImplementedError:
-            pass  # Exceptable but better if it worked
+            pass  # Acceptable, but better if it worked
         with pytest.raises(ConfigurationException):
             sim.Projection(pop, "SOMETHING WIERD", sim.OneToOneConnector())

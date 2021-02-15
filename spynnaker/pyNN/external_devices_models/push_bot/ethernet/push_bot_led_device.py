@@ -56,8 +56,7 @@ class PushBotEthernetLEDDevice(
             raise ConfigurationException(
                 "led parameter must be a PushBotLED value")
 
-        super(PushBotEthernetLEDDevice, self).__init__(
-            protocol, led, True, timesteps_between_send)
+        super().__init__(protocol, led, True, timesteps_between_send)
 
         # protocol specific data items
         self.__command_protocol = protocol

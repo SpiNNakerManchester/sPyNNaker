@@ -13,14 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase
 from spynnaker.pyNN.models.neuron.implementations import (
     AbstractStandardNeuronComponent)
 
 
-@add_metaclass(AbstractBase)
-class AbstractThresholdType(AbstractStandardNeuronComponent):
+class AbstractThresholdType(
+        AbstractStandardNeuronComponent, metaclass=AbstractBase):
     """ Represents types of threshold for a neuron (e.g., stochastic).
     """
 
