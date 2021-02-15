@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.6, 3.7, 3.8]
+        python-version: [3.6, 3.7, 3.8, 3.9]
 
     steps:
     - name: Checkout
@@ -67,81 +67,30 @@ jobs:
       uses: ./support/actions/pytest
       with:
         tests: unittests
-        coverage: ${{ matrix.python-version == 3.6 }}
+        coverage: ${{ matrix.python-version == 3.8 }}
         cover-packages: spynnaker
         coveralls-token: ${{ secrets.COVERALLS_REPO_TOKEN }}
 
-  validate:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.6, 3.7, 3.8]
-
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-    - name: Checkout SupportScripts
-      uses: actions/checkout@v2
-      with:
-        repository: SpiNNakerManchester/SupportScripts
-        path: support
-
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install pip, etc
-      uses: ./support/actions/python-tools
-    - name: Install Spinnaker Dependencies
-      uses: ./support/actions/checkout-spinn-deps
-      with:
-        repositories: >
-          SpiNNUtils SpiNNMachine SpiNNMan PACMAN DataSpecification spalloc
-          SpiNNFrontEndCommon
-        install: true
-    - name: Setup
-      uses: ./support/actions/run-setup
-
     - name: Lint with flake8
       run: flake8 spynnaker unittests
+
     - name: Lint with pylint
       uses: ./support/actions/pylint
       with:
         package: spynnaker
+
     - name: Run rat copyright enforcement
+      if: matrix.python-version == 3.8
       uses: ./support/actions/check-copyrights
+
     - name: Validate all XML
+      if: matrix.python-version == 3.8
       uses: ./support/actions/validate-xml
       with:
         base-path: spynnaker
 
-  doc-check:
-    runs-on: ubuntu-latest
-    # Only runs with 3.6
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-    - name: Checkout SupportScripts
-      uses: actions/checkout@v2
-      with:
-        repository: SpiNNakerManchester/SupportScripts
-        path: support
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.6
-    - name: Install pip, etc
-      uses: ./support/actions/python-tools
-    - name: Install Spinnaker Dependencies
-      uses: ./support/actions/checkout-spinn-deps
-      with:
-        repositories: >
-          SpiNNUtils SpiNNMachine SpiNNMan PACMAN DataSpecification spalloc
-          SpiNNFrontEndCommon
-        install: true
-    - name: Setup
-      uses: ./support/actions/run-setup
     - name: Build documentation with sphinx
+      if: matrix.python-version == 3.8
       uses: ./support/actions/sphinx
       with:
         directory: doc/source
