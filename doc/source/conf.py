@@ -56,8 +56,8 @@ extensions = [
 ]
 
 intersphinx_mapping = {
-    'python': ('https://docs.python.org/3.6', None),
-    'numpy': ("https://numpy.org/doc/1.19/", None),
+    'python': ('https://docs.python.org/3.8', None),
+    'numpy': ("https://numpy.org/doc/1.20/", None),
     'matplotlib': ('https://matplotlib.org', None),
     'pynn': ("http://neuralensemble.org/docs/PyNN/", None),
     'neo': ('https://neo.readthedocs.io/en/stable/', None),
