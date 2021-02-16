@@ -13,8 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# This workflow will install Python dependencies, run tests, lint and rat with a variety of Python versions
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+# This workflow will install Python dependencies, run tests, lint and rat with
+# a variety of Python versions. For more information see:
+# https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+# Note that documentation building is done in parallel (with testing) because
+# that takes a long time in sPyNNaker right now.
 
 name: Python Actions
 on: [push]
@@ -89,8 +93,33 @@ jobs:
       with:
         base-path: spynnaker
 
+  doc-check:
+    runs-on: ubuntu-latest
+    # Only runs with 3.8
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Checkout SupportScripts
+      uses: actions/checkout@v2
+      with:
+        repository: SpiNNakerManchester/SupportScripts
+        path: support
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install pip, etc
+      uses: ./support/actions/python-tools
+    - name: Install Spinnaker Dependencies
+      uses: ./support/actions/checkout-spinn-deps
+      with:
+        repositories: >
+          SpiNNUtils SpiNNMachine SpiNNMan PACMAN DataSpecification spalloc
+          SpiNNFrontEndCommon
+        install: true
+    - name: Setup
+      uses: ./support/actions/run-setup
     - name: Build documentation with sphinx
-      if: matrix.python-version == 3.8
       uses: ./support/actions/sphinx
       with:
         directory: doc/source
