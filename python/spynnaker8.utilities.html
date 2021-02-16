@@ -12,7 +12,6 @@
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="prev" title="spynnaker8.models.synapse_dynamics.weight_dependence package" href="spynnaker8.models.synapse_dynamics.weight_dependence.html" /> 
@@ -50,7 +49,7 @@
 <span id="spynnaker8-utilities-neo-convertor-module"></span><h2>spynnaker8.utilities.neo_convertor module<a class="headerlink" href="#module-spynnaker8.utilities.neo_convertor" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt id="spynnaker8.utilities.neo_convertor.convert_analog_signal">
-<code class="sig-prename descclassname">spynnaker8.utilities.neo_convertor.</code><code class="sig-name descname">convert_analog_signal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">signal_array</span></em>, <em class="sig-param"><span class="n">time_unit</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/utilities/neo_convertor.html#convert_analog_signal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker8.utilities.neo_convertor.convert_analog_signal" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">spynnaker8.utilities.neo_convertor.</span></code><code class="sig-name descname"><span class="pre">convert_analog_signal</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signal_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_unit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/utilities/neo_convertor.html#convert_analog_signal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker8.utilities.neo_convertor.convert_analog_signal" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts part of a NEO object into told spynnaker7 format</p>
 <div class="deprecated">
 <p><span class="versionmodified deprecated">Deprecated since version 6.0: </span>Use
@@ -64,14 +63,14 @@
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/1.19/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">ndarray</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="spynnaker8.utilities.neo_convertor.convert_data">
-<code class="sig-prename descclassname">spynnaker8.utilities.neo_convertor.</code><code class="sig-name descname">convert_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">run</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/utilities/neo_convertor.html#convert_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker8.utilities.neo_convertor.convert_data" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">spynnaker8.utilities.neo_convertor.</span></code><code class="sig-name descname"><span class="pre">convert_data</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/utilities/neo_convertor.html#convert_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker8.utilities.neo_convertor.convert_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts the data into a numpy array in the format ID, time, value</p>
 <div class="deprecated">
 <p><span class="versionmodified deprecated">Deprecated since version 6.0: </span>Use
@@ -81,20 +80,20 @@
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.9)"><em>Block</em></a>) – Data as returned by a getData() call</p></li>
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of the data to be extracted.
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Name of the data to be extracted.
 Same values as used in getData()</p></li>
-<li><p><strong>run</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Zero based index of the run to extract data for</p></li>
+<li><p><strong>run</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Zero based index of the run to extract data for</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/1.19/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">ndarray</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="spynnaker8.utilities.neo_convertor.convert_data_list">
-<code class="sig-prename descclassname">spynnaker8.utilities.neo_convertor.</code><code class="sig-name descname">convert_data_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">runs</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/utilities/neo_convertor.html#convert_data_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker8.utilities.neo_convertor.convert_data_list" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">spynnaker8.utilities.neo_convertor.</span></code><code class="sig-name descname"><span class="pre">convert_data_list</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/utilities/neo_convertor.html#convert_data_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker8.utilities.neo_convertor.convert_data_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts the data into a list of numpy arrays in the format ID, time,        value</p>
 <div class="deprecated">
 <p><span class="versionmodified deprecated">Deprecated since version 6.0: </span>Use
@@ -104,21 +103,21 @@ Same values as used in getData()</p></li>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.9)"><em>Block</em></a>) – Data as returned by a getData() call</p></li>
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of the data to be extracted.
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Name of the data to be extracted.
 Same values as used in getData()</p></li>
-<li><p><strong>runs</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – List of Zero based index of the run to extract data for.
+<li><p><strong>runs</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – List of Zero based index of the run to extract data for.
 Or None to extract all runs</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://numpy.org/doc/1.19/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a>)</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">ndarray</a>)</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="spynnaker8.utilities.neo_convertor.convert_gsyn">
-<code class="sig-prename descclassname">spynnaker8.utilities.neo_convertor.</code><code class="sig-name descname">convert_gsyn</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gsyn_exc</span></em>, <em class="sig-param"><span class="n">gsyn_inh</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/utilities/neo_convertor.html#convert_gsyn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker8.utilities.neo_convertor.convert_gsyn" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">spynnaker8.utilities.neo_convertor.</span></code><code class="sig-name descname"><span class="pre">convert_gsyn</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gsyn_exc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gsyn_inh</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/utilities/neo_convertor.html#convert_gsyn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker8.utilities.neo_convertor.convert_gsyn" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts two neo objects into the spynnaker7 format</p>
 <div class="deprecated">
 <p><span class="versionmodified deprecated">Deprecated since version 6.0: </span>Use
@@ -132,14 +131,14 @@ Or None to extract all runs</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/1.19/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">ndarray</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="spynnaker8.utilities.neo_convertor.convert_gsyn_exc_list">
-<code class="sig-prename descclassname">spynnaker8.utilities.neo_convertor.</code><code class="sig-name descname">convert_gsyn_exc_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">runs</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/utilities/neo_convertor.html#convert_gsyn_exc_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker8.utilities.neo_convertor.convert_gsyn_exc_list" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">spynnaker8.utilities.neo_convertor.</span></code><code class="sig-name descname"><span class="pre">convert_gsyn_exc_list</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/utilities/neo_convertor.html#convert_gsyn_exc_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker8.utilities.neo_convertor.convert_gsyn_exc_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts the gsyn_exc into a list numpy array one per segment (all        runs) in the format ID, time, value</p>
 <div class="deprecated">
 <p><span class="versionmodified deprecated">Deprecated since version 6.0: </span>Use
@@ -149,19 +148,19 @@ Or None to extract all runs</p></li>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.9)"><em>Block</em></a>) – The data to convert; it must have Gsyn_exc data in it</p></li>
-<li><p><strong>runs</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – List of Zero based index of the run to extract data for.
+<li><p><strong>runs</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – List of Zero based index of the run to extract data for.
 Or None to extract all runs</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://numpy.org/doc/1.19/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a>)</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">ndarray</a>)</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="spynnaker8.utilities.neo_convertor.convert_gsyn_inh_list">
-<code class="sig-prename descclassname">spynnaker8.utilities.neo_convertor.</code><code class="sig-name descname">convert_gsyn_inh_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">runs</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/utilities/neo_convertor.html#convert_gsyn_inh_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker8.utilities.neo_convertor.convert_gsyn_inh_list" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">spynnaker8.utilities.neo_convertor.</span></code><code class="sig-name descname"><span class="pre">convert_gsyn_inh_list</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/utilities/neo_convertor.html#convert_gsyn_inh_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker8.utilities.neo_convertor.convert_gsyn_inh_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts the gsyn_inh into a list numpy array one per segment (all        runs) in the format ID, time, value</p>
 <div class="deprecated">
 <p><span class="versionmodified deprecated">Deprecated since version 6.0: </span>Use
@@ -171,19 +170,19 @@ Or None to extract all runs</p></li>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.9)"><em>Block</em></a>) – The data to convert; it must have Gsyn_inh data in it</p></li>
-<li><p><strong>runs</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – List of Zero based index of the run to extract data for.
+<li><p><strong>runs</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – List of Zero based index of the run to extract data for.
 Or None to extract all runs</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://numpy.org/doc/1.19/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a>)</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">ndarray</a>)</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="spynnaker8.utilities.neo_convertor.convert_spikes">
-<code class="sig-prename descclassname">spynnaker8.utilities.neo_convertor.</code><code class="sig-name descname">convert_spikes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">neo</span></em>, <em class="sig-param"><span class="n">run</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/utilities/neo_convertor.html#convert_spikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker8.utilities.neo_convertor.convert_spikes" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">spynnaker8.utilities.neo_convertor.</span></code><code class="sig-name descname"><span class="pre">convert_spikes</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">neo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/utilities/neo_convertor.html#convert_spikes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker8.utilities.neo_convertor.convert_spikes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extracts the spikes for run one from a Neo Object</p>
 <div class="deprecated">
 <p><span class="versionmodified deprecated">Deprecated since version 6.0: </span>Use
@@ -193,18 +192,18 @@ Or None to extract all runs</p></li>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>neo</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.9)"><em>Block</em></a>) – neo Object including Spike Data</p></li>
-<li><p><strong>run</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Zero based index of the run to extract data for</p></li>
+<li><p><strong>run</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Zero based index of the run to extract data for</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/1.19/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">ndarray</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="spynnaker8.utilities.neo_convertor.convert_spiketrains">
-<code class="sig-prename descclassname">spynnaker8.utilities.neo_convertor.</code><code class="sig-name descname">convert_spiketrains</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">spiketrains</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/utilities/neo_convertor.html#convert_spiketrains"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker8.utilities.neo_convertor.convert_spiketrains" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">spynnaker8.utilities.neo_convertor.</span></code><code class="sig-name descname"><span class="pre">convert_spiketrains</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spiketrains</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/utilities/neo_convertor.html#convert_spiketrains"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker8.utilities.neo_convertor.convert_spiketrains" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts a list of spiketrains into spynnaker7 format</p>
 <div class="deprecated">
 <p><span class="versionmodified deprecated">Deprecated since version 6.0: </span>Use
@@ -212,17 +211,17 @@ Or None to extract all runs</p></li>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>spiketrains</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.SpikeTrain" title="(in Neo v0.9)"><em>SpikeTrain</em></a><em>)</em>) – List of SpikeTrains</p>
+<dd class="field-odd"><p><strong>spiketrains</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.SpikeTrain" title="(in Neo v0.9)"><em>SpikeTrain</em></a><em>)</em>) – List of SpikeTrains</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/1.19/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">ndarray</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="spynnaker8.utilities.neo_convertor.convert_v_list">
-<code class="sig-prename descclassname">spynnaker8.utilities.neo_convertor.</code><code class="sig-name descname">convert_v_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">runs</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/utilities/neo_convertor.html#convert_v_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker8.utilities.neo_convertor.convert_v_list" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">spynnaker8.utilities.neo_convertor.</span></code><code class="sig-name descname"><span class="pre">convert_v_list</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/utilities/neo_convertor.html#convert_v_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker8.utilities.neo_convertor.convert_v_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts the voltage into a list numpy array one per segment (all        runs) in the format ID, time, value</p>
 <div class="deprecated">
 <p><span class="versionmodified deprecated">Deprecated since version 6.0: </span>Use
@@ -232,19 +231,19 @@ Or None to extract all runs</p></li>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.9)"><em>Block</em></a>) – The data to convert; it must have V data in it</p></li>
-<li><p><strong>runs</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – List of Zero based index of the run to extract data for.
+<li><p><strong>runs</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – List of Zero based index of the run to extract data for.
 Or None to extract all runs</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://numpy.org/doc/1.19/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a>)</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">ndarray</a>)</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="spynnaker8.utilities.neo_convertor.count_spikes">
-<code class="sig-prename descclassname">spynnaker8.utilities.neo_convertor.</code><code class="sig-name descname">count_spikes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">neo</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/utilities/neo_convertor.html#count_spikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker8.utilities.neo_convertor.count_spikes" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">spynnaker8.utilities.neo_convertor.</span></code><code class="sig-name descname"><span class="pre">count_spikes</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">neo</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/utilities/neo_convertor.html#count_spikes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker8.utilities.neo_convertor.count_spikes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Help function to count the number of spikes in a list of spiketrains</p>
 <div class="deprecated">
 <p><span class="versionmodified deprecated">Deprecated since version 6.0: </span>Use
@@ -262,7 +261,7 @@ Or None to extract all runs</p></li>
 
 <dl class="py function">
 <dt id="spynnaker8.utilities.neo_convertor.count_spiketrains">
-<code class="sig-prename descclassname">spynnaker8.utilities.neo_convertor.</code><code class="sig-name descname">count_spiketrains</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">spiketrains</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/utilities/neo_convertor.html#count_spiketrains"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker8.utilities.neo_convertor.count_spiketrains" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">spynnaker8.utilities.neo_convertor.</span></code><code class="sig-name descname"><span class="pre">count_spiketrains</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spiketrains</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/utilities/neo_convertor.html#count_spiketrains"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker8.utilities.neo_convertor.count_spiketrains" title="Permalink to this definition">¶</a></dt>
 <dd><p>Help function to count the number of spikes in a list of spiketrains</p>
 <div class="deprecated">
 <p><span class="versionmodified deprecated">Deprecated since version 6.0: </span>Use
@@ -270,13 +269,13 @@ Or None to extract all runs</p></li>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>spiketrains</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.SpikeTrain" title="(in Neo v0.9)"><em>SpikeTrain</em></a><em>)</em>) – List of SpikeTrains</p>
+<dd class="field-odd"><p><strong>spiketrains</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.SpikeTrain" title="(in Neo v0.9)"><em>SpikeTrain</em></a><em>)</em>) – List of SpikeTrains</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Total number of spikes in all the spiketrains</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -348,7 +347,7 @@ Or None to extract all runs</p></li>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.0.
     </div>
   </body>
 </html>

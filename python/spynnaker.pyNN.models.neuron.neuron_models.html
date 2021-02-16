@@ -54,22 +54,22 @@
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.models.neuron.neuron_models" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel">
-<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neuron.neuron_models.</code><code class="sig-name descname">AbstractNeuronModel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_types</span></em>, <em class="sig-param"><span class="n">global_data_types</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/abstract_neuron_model.html#AbstractNeuronModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.neuron_models.</span></code><code class="sig-name descname"><span class="pre">AbstractNeuronModel</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">global_data_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/abstract_neuron_model.html#AbstractNeuronModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent</span></code></p>
 <p>Represents a neuron model.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>data_types</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification)"><em>DataType</em></a><em>)</em>) – A list of data types in the neuron structure, in the order that
+<li><p><strong>data_types</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification)"><em>DataType</em></a><em>)</em>) – A list of data types in the neuron structure, in the order that
 they appear</p></li>
-<li><p><strong>global_data_types</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification)"><em>DataType</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – A list of data types in the neuron global structure, in the order
+<li><p><strong>global_data_types</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification)"><em>DataType</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – A list of data types in the neuron global structure, in the order
 that they appear</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel.get_data">
-<code class="sig-name descname">get_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parameters</span></em>, <em class="sig-param"><span class="n">state_variables</span></em>, <em class="sig-param"><span class="n">vertex_slice</span></em>, <em class="sig-param"><span class="n">ts</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/abstract_neuron_model.html#AbstractNeuronModel.get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel.get_data" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_data</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state_variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/abstract_neuron_model.html#AbstractNeuronModel.get_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel.get_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the data <em>to be written to the machine</em> for this model.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -80,59 +80,59 @@ that they appear</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/1.19/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a>(uint32)</p>
+<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">ndarray</a>(uint32)</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel.get_dtcm_usage_in_bytes">
-<code class="sig-name descname">get_dtcm_usage_in_bytes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n_neurons</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/abstract_neuron_model.html#AbstractNeuronModel.get_dtcm_usage_in_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel.get_dtcm_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_dtcm_usage_in_bytes</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/abstract_neuron_model.html#AbstractNeuronModel.get_dtcm_usage_in_bytes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel.get_dtcm_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the DTCM memory usage required</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – The number of neurons to get the usage for</p>
+<dd class="field-odd"><p><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of neurons to get the usage for</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel.get_global_values">
-<code class="sig-name descname">get_global_values</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ts</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/abstract_neuron_model.html#AbstractNeuronModel.get_global_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel.get_global_values" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_global_values</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/abstract_neuron_model.html#AbstractNeuronModel.get_global_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel.get_global_values" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the global values to be written to the machine for this model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>ts</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – The time to advance the model at each call</p>
+<dd class="field-odd"><p><strong>ts</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – The time to advance the model at each call</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>A list with the same length as self.global_struct.field_types</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a>) or <a class="reference external" href="https://numpy.org/doc/1.19/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a> or <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a>) or <a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">ndarray</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel.get_sdram_usage_in_bytes">
-<code class="sig-name descname">get_sdram_usage_in_bytes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n_neurons</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/abstract_neuron_model.html#AbstractNeuronModel.get_sdram_usage_in_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel.get_sdram_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_sdram_usage_in_bytes</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/abstract_neuron_model.html#AbstractNeuronModel.get_sdram_usage_in_bytes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel.get_sdram_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the SDRAM memory usage required</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – The number of neurons to get the usage for</p>
+<dd class="field-odd"><p><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of neurons to get the usage for</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel.global_struct">
-<em class="property">property </em><code class="sig-name descname">global_struct</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel.global_struct" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">global_struct</span></code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel.global_struct" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the global parameters structure</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -143,13 +143,13 @@ that they appear</p></li>
 
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel.read_data">
-<code class="sig-name descname">read_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">offset</span></em>, <em class="sig-param"><span class="n">vertex_slice</span></em>, <em class="sig-param"><span class="n">parameters</span></em>, <em class="sig-param"><span class="n">state_variables</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/abstract_neuron_model.html#AbstractNeuronModel.read_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel.read_data" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">read_data</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state_variables</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/abstract_neuron_model.html#AbstractNeuronModel.read_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel.read_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read the parameters and state variables of the model            <em>from the given data</em> (read from the machine)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#bytes" title="(in Python v3.6)"><em>bytes</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#bytearray" title="(in Python v3.6)"><em>bytearray</em></a>) – The data to be read</p></li>
-<li><p><strong>offset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – The offset where the data should be read from</p></li>
+<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#bytes" title="(in Python v3.8)"><em>bytes</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#bytearray" title="(in Python v3.8)"><em>bytearray</em></a>) – The data to be read</p></li>
+<li><p><strong>offset</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The offset where the data should be read from</p></li>
 <li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN)"><em>Slice</em></a>) – The slice of the vertex to read parameters for</p></li>
 <li><p><strong>parameters</strong> (<em>RangeDictionary</em>) – The holder of the parameters to update</p></li>
 <li><p><strong>state_variables</strong> (<em>RangeDictionary</em>) – The holder of the state variables to update</p></li>
@@ -159,7 +159,7 @@ that they appear</p></li>
 <dd class="field-even"><p>The offset after reading the data</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -168,43 +168,43 @@ that they appear</p></li>
 
 <dl class="py class">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh">
-<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neuron.neuron_models.</code><code class="sig-name descname">NeuronModelIzh</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">a</span></em>, <em class="sig-param"><span class="n">b</span></em>, <em class="sig-param"><span class="n">c</span></em>, <em class="sig-param"><span class="n">d</span></em>, <em class="sig-param"><span class="n">v_init</span></em>, <em class="sig-param"><span class="n">u_init</span></em>, <em class="sig-param"><span class="n">i_offset</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/neuron_model_izh.html#NeuronModelIzh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.neuron_models.</span></code><code class="sig-name descname"><span class="pre">NeuronModelIzh</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u_init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i_offset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/neuron_model_izh.html#NeuronModelIzh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.neuron_models.abstract_neuron_model.AbstractNeuronModel</span></code></p>
 <p>Model of neuron due to Eugene M. Izhikevich et al</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>a</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em> or
+<li><p><strong>a</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em> or
 </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(a\)</span></p></li>
-<li><p><strong>b</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em> or
+<li><p><strong>b</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em> or
 </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(b\)</span></p></li>
-<li><p><strong>c</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em> or
+<li><p><strong>c</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em> or
 </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(c\)</span></p></li>
-<li><p><strong>d</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em> or
+<li><p><strong>d</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em> or
 </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(d\)</span></p></li>
-<li><p><strong>v_init</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em> or
+<li><p><strong>v_init</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em> or
 </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(v_{init}\)</span></p></li>
-<li><p><strong>u_init</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em> or
+<li><p><strong>u_init</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em> or
 </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(u_{init}\)</span></p></li>
-<li><p><strong>i_offset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em> or
+<li><p><strong>i_offset</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em> or
 </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(I_{offset}\)</span></p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.a">
-<em class="property">property </em><code class="sig-name descname">a</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.a" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">a</span></code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.a" title="Permalink to this definition">¶</a></dt>
 <dd><p>Settable model parameter: <span class="math notranslate nohighlight">\(a\)</span></p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.add_parameters">
-<code class="sig-name descname">add_parameters</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parameters</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/neuron_model_izh.html#NeuronModelIzh.add_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.add_parameters" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">add_parameters</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/neuron_model_izh.html#NeuronModelIzh.add_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.add_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add the initial values of the parameters to the parameter holder</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -215,7 +215,7 @@ that they appear</p></li>
 
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.add_state_variables">
-<code class="sig-name descname">add_state_variables</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">state_variables</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/neuron_model_izh.html#NeuronModelIzh.add_state_variables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.add_state_variables" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">add_state_variables</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state_variables</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/neuron_model_izh.html#NeuronModelIzh.add_state_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.add_state_variables" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add the initial values of the state variables to the state            variables holder</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -226,82 +226,82 @@ that they appear</p></li>
 
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.b">
-<em class="property">property </em><code class="sig-name descname">b</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.b" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">b</span></code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.b" title="Permalink to this definition">¶</a></dt>
 <dd><p>Settable model parameter: <span class="math notranslate nohighlight">\(b\)</span></p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.c">
-<em class="property">property </em><code class="sig-name descname">c</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.c" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">c</span></code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.c" title="Permalink to this definition">¶</a></dt>
 <dd><p>Settable model parameter: <span class="math notranslate nohighlight">\(c\)</span></p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.d">
-<em class="property">property </em><code class="sig-name descname">d</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.d" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">d</span></code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.d" title="Permalink to this definition">¶</a></dt>
 <dd><p>Settable model parameter: <span class="math notranslate nohighlight">\(d\)</span></p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.get_global_values">
-<code class="sig-name descname">get_global_values</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ts</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/neuron_model_izh.html#NeuronModelIzh.get_global_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.get_global_values" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_global_values</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/neuron_model_izh.html#NeuronModelIzh.get_global_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.get_global_values" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the global values to be written to the machine for this model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>ts</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – The time to advance the model at each call</p>
+<dd class="field-odd"><p><strong>ts</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – The time to advance the model at each call</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>A list with the same length as self.global_struct.field_types</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a>) or <a class="reference external" href="https://numpy.org/doc/1.19/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a> or <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a>) or <a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">ndarray</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.get_n_cpu_cycles">
-<code class="sig-name descname">get_n_cpu_cycles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n_neurons</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/neuron_model_izh.html#NeuronModelIzh.get_n_cpu_cycles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.get_n_cpu_cycles" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_n_cpu_cycles</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/neuron_model_izh.html#NeuronModelIzh.get_n_cpu_cycles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.get_n_cpu_cycles" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the number of CPU cycles required to update the state</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – The number of neurons to get the cycles for</p>
+<dd class="field-odd"><p><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of neurons to get the cycles for</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.get_units">
-<code class="sig-name descname">get_units</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">variable</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/neuron_model_izh.html#NeuronModelIzh.get_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.get_units" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_units</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/neuron_model_izh.html#NeuronModelIzh.get_units"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.get_units" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the units of the given variable</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name of the variable</p>
+<dd class="field-odd"><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the variable</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.get_values">
-<code class="sig-name descname">get_values</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parameters</span></em>, <em class="sig-param"><span class="n">state_variables</span></em>, <em class="sig-param"><span class="n">vertex_slice</span></em>, <em class="sig-param"><span class="n">ts</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/neuron_model_izh.html#NeuronModelIzh.get_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.get_values" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_values</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state_variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/neuron_model_izh.html#NeuronModelIzh.get_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.get_values" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the values to be written to the machine for this model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -309,7 +309,7 @@ that they appear</p></li>
 <li><p><strong>parameters</strong> (<em>RangeDictionary</em>) – The holder of the parameters</p></li>
 <li><p><strong>state_variables</strong> (<em>RangeDictionary</em>) – The holder of the state variables</p></li>
 <li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN)"><em>Slice</em></a>) – The slice of variables being retrieved</p></li>
-<li><p><strong>ts</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – The time to be advanced in one call to the update of this component</p></li>
+<li><p><strong>ts</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – The time to be advanced in one call to the update of this component</p></li>
 <li><p><strong>ts</strong> – machine time step</p></li>
 </ul>
 </dd>
@@ -317,7 +317,7 @@ that they appear</p></li>
 <dd class="field-even"><p>A list with the same length as self.struct.field_types</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a> or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>) or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a>) or
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a> or <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a> or <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>) or <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a>) or
 RangedList)</p>
 </dd>
 </dl>
@@ -325,48 +325,48 @@ RangedList)</p>
 
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.has_variable">
-<code class="sig-name descname">has_variable</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">variable</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/neuron_model_izh.html#NeuronModelIzh.has_variable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.has_variable" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">has_variable</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/neuron_model_izh.html#NeuronModelIzh.has_variable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.has_variable" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine if this component has a variable by the given name</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name of the variable</p>
+<dd class="field-odd"><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the variable</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.i_offset">
-<em class="property">property </em><code class="sig-name descname">i_offset</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.i_offset" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">i_offset</span></code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.i_offset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Settable model parameter: <span class="math notranslate nohighlight">\(I_{offset}\)</span></p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.u_init">
-<em class="property">property </em><code class="sig-name descname">u_init</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.u_init" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">u_init</span></code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.u_init" title="Permalink to this definition">¶</a></dt>
 <dd><p>Settable model parameter: <span class="math notranslate nohighlight">\(u_{init}\)</span></p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.update_values">
-<code class="sig-name descname">update_values</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">values</span></em>, <em class="sig-param"><span class="n">parameters</span></em>, <em class="sig-param"><span class="n">state_variables</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/neuron_model_izh.html#NeuronModelIzh.update_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.update_values" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">update_values</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state_variables</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/neuron_model_izh.html#NeuronModelIzh.update_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.update_values" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the parameters and state variables with the given struct            values that have been read from the machine</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>values</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>)</em>) – The values read from the machine, one for each struct element</p></li>
+<li><p><strong>values</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>)</em>) – The values read from the machine, one for each struct element</p></li>
 <li><p><strong>parameters</strong> (<em>RangeDictionary</em>) – The holder of the parameters to update</p></li>
 <li><p><strong>state_variables</strong> (<em>RangeDictionary</em>) – The holder of the state variables to update</p></li>
 </ul>
@@ -376,11 +376,11 @@ RangedList)</p>
 
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.v_init">
-<em class="property">property </em><code class="sig-name descname">v_init</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.v_init" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">v_init</span></code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.v_init" title="Permalink to this definition">¶</a></dt>
 <dd><p>Settable model parameter: <span class="math notranslate nohighlight">\(v_{init}\)</span></p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -389,32 +389,32 @@ RangedList)</p>
 
 <dl class="py class">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire">
-<em class="property">class </em><code class="sig-prename descclassname">spynnaker.pyNN.models.neuron.neuron_models.</code><code class="sig-name descname">NeuronModelLeakyIntegrateAndFire</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">v_init</span></em>, <em class="sig-param"><span class="n">v_rest</span></em>, <em class="sig-param"><span class="n">tau_m</span></em>, <em class="sig-param"><span class="n">cm</span></em>, <em class="sig-param"><span class="n">i_offset</span></em>, <em class="sig-param"><span class="n">v_reset</span></em>, <em class="sig-param"><span class="n">tau_refrac</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/neuron_model_leaky_integrate_and_fire.html#NeuronModelLeakyIntegrateAndFire"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.neuron_models.</span></code><code class="sig-name descname"><span class="pre">NeuronModelLeakyIntegrateAndFire</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v_init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_rest</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau_m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i_offset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_reset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau_refrac</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/neuron_model_leaky_integrate_and_fire.html#NeuronModelLeakyIntegrateAndFire"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.neuron_models.abstract_neuron_model.AbstractNeuronModel</span></code></p>
 <p>Classic leaky integrate and fire neuron model.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>v_init</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em> or
+<li><p><strong>v_init</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em> or
 </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(V_{init}\)</span></p></li>
-<li><p><strong>v_rest</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em> or
+<li><p><strong>v_rest</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em> or
 </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(V_{rest}\)</span></p></li>
-<li><p><strong>tau_m</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em> or
+<li><p><strong>tau_m</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em> or
 </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(\tau_{m}\)</span></p></li>
-<li><p><strong>cm</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em> or
+<li><p><strong>cm</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em> or
 </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(C_m\)</span></p></li>
-<li><p><strong>i_offset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em> or
+<li><p><strong>i_offset</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em> or
 </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(I_{offset}\)</span></p></li>
-<li><p><strong>v_reset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em> or
+<li><p><strong>v_reset</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em> or
 </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(V_{reset}\)</span></p></li>
-<li><p><strong>tau_refrac</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em> or
+<li><p><strong>tau_refrac</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em> or
 </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(\tau_{refrac}\)</span></p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.add_parameters">
-<code class="sig-name descname">add_parameters</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parameters</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/neuron_model_leaky_integrate_and_fire.html#NeuronModelLeakyIntegrateAndFire.add_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.add_parameters" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">add_parameters</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/neuron_model_leaky_integrate_and_fire.html#NeuronModelLeakyIntegrateAndFire.add_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.add_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add the initial values of the parameters to the parameter holder</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -425,7 +425,7 @@ RangedList)</p>
 
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.add_state_variables">
-<code class="sig-name descname">add_state_variables</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">state_variables</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/neuron_model_leaky_integrate_and_fire.html#NeuronModelLeakyIntegrateAndFire.add_state_variables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.add_state_variables" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">add_state_variables</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state_variables</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/neuron_model_leaky_integrate_and_fire.html#NeuronModelLeakyIntegrateAndFire.add_state_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.add_state_variables" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add the initial values of the state variables to the state            variables holder</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -436,43 +436,43 @@ RangedList)</p>
 
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.cm">
-<em class="property">property </em><code class="sig-name descname">cm</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.cm" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">cm</span></code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.cm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Settable model parameter: <span class="math notranslate nohighlight">\(C_m\)</span></p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.get_n_cpu_cycles">
-<code class="sig-name descname">get_n_cpu_cycles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n_neurons</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/neuron_model_leaky_integrate_and_fire.html#NeuronModelLeakyIntegrateAndFire.get_n_cpu_cycles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.get_n_cpu_cycles" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_n_cpu_cycles</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/neuron_model_leaky_integrate_and_fire.html#NeuronModelLeakyIntegrateAndFire.get_n_cpu_cycles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.get_n_cpu_cycles" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the number of CPU cycles required to update the state</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – The number of neurons to get the cycles for</p>
+<dd class="field-odd"><p><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of neurons to get the cycles for</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.get_units">
-<code class="sig-name descname">get_units</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">variable</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/neuron_model_leaky_integrate_and_fire.html#NeuronModelLeakyIntegrateAndFire.get_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.get_units" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_units</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/neuron_model_leaky_integrate_and_fire.html#NeuronModelLeakyIntegrateAndFire.get_units"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.get_units" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the units of the given variable</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name of the variable</p>
+<dd class="field-odd"><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the variable</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.get_values">
-<code class="sig-name descname">get_values</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parameters</span></em>, <em class="sig-param"><span class="n">state_variables</span></em>, <em class="sig-param"><span class="n">vertex_slice</span></em>, <em class="sig-param"><span class="n">ts</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/neuron_model_leaky_integrate_and_fire.html#NeuronModelLeakyIntegrateAndFire.get_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.get_values" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_values</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state_variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/neuron_model_leaky_integrate_and_fire.html#NeuronModelLeakyIntegrateAndFire.get_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.get_values" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the values to be written to the machine for this model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -480,7 +480,7 @@ RangedList)</p>
 <li><p><strong>parameters</strong> (<em>RangeDictionary</em>) – The holder of the parameters</p></li>
 <li><p><strong>state_variables</strong> (<em>RangeDictionary</em>) – The holder of the state variables</p></li>
 <li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN)"><em>Slice</em></a>) – The slice of variables being retrieved</p></li>
-<li><p><strong>ts</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – The time to be advanced in one call to the update of this component</p></li>
+<li><p><strong>ts</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The time to be advanced in one call to the update of this component</p></li>
 <li><p><strong>ts</strong> – machine time step</p></li>
 </ul>
 </dd>
@@ -488,7 +488,7 @@ RangedList)</p>
 <dd class="field-even"><p>A list with the same length as self.struct.field_types</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a> or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>) or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a>) or
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a> or <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a> or <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>) or <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a>) or
 RangedList)</p>
 </dd>
 </dl>
@@ -496,59 +496,59 @@ RangedList)</p>
 
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.has_variable">
-<code class="sig-name descname">has_variable</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">variable</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/neuron_model_leaky_integrate_and_fire.html#NeuronModelLeakyIntegrateAndFire.has_variable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.has_variable" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">has_variable</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/neuron_model_leaky_integrate_and_fire.html#NeuronModelLeakyIntegrateAndFire.has_variable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.has_variable" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine if this component has a variable by the given name</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name of the variable</p>
+<dd class="field-odd"><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the variable</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.i_offset">
-<em class="property">property </em><code class="sig-name descname">i_offset</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.i_offset" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">i_offset</span></code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.i_offset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Settable model parameter: <span class="math notranslate nohighlight">\(I_{offset}\)</span></p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.tau_m">
-<em class="property">property </em><code class="sig-name descname">tau_m</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.tau_m" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">tau_m</span></code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.tau_m" title="Permalink to this definition">¶</a></dt>
 <dd><p>Settable model parameter: <span class="math notranslate nohighlight">\(\tau_{m}\)</span></p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.tau_refrac">
-<em class="property">property </em><code class="sig-name descname">tau_refrac</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.tau_refrac" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">tau_refrac</span></code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.tau_refrac" title="Permalink to this definition">¶</a></dt>
 <dd><p>Settable model parameter: <span class="math notranslate nohighlight">\(\tau_{refrac}\)</span></p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.update_values">
-<code class="sig-name descname">update_values</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">values</span></em>, <em class="sig-param"><span class="n">parameters</span></em>, <em class="sig-param"><span class="n">state_variables</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/neuron_model_leaky_integrate_and_fire.html#NeuronModelLeakyIntegrateAndFire.update_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.update_values" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">update_values</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state_variables</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/neuron_model_leaky_integrate_and_fire.html#NeuronModelLeakyIntegrateAndFire.update_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.update_values" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the parameters and state variables with the given struct            values that have been read from the machine</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>values</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>)</em>) – The values read from the machine, one for each struct element</p></li>
+<li><p><strong>values</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>)</em>) – The values read from the machine, one for each struct element</p></li>
 <li><p><strong>parameters</strong> (<em>RangeDictionary</em>) – The holder of the parameters to update</p></li>
 <li><p><strong>state_variables</strong> (<em>RangeDictionary</em>) – The holder of the state variables to update</p></li>
 </ul>
@@ -558,33 +558,33 @@ RangedList)</p>
 
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.v_init">
-<em class="property">property </em><code class="sig-name descname">v_init</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.v_init" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">v_init</span></code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.v_init" title="Permalink to this definition">¶</a></dt>
 <dd><p>Settable model parameter: <span class="math notranslate nohighlight">\(V_{init}\)</span></p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.v_reset">
-<em class="property">property </em><code class="sig-name descname">v_reset</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.v_reset" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">v_reset</span></code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.v_reset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Settable model parameter: <span class="math notranslate nohighlight">\(V_{reset}\)</span></p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.v_rest">
-<em class="property">property </em><code class="sig-name descname">v_rest</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.v_rest" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">v_rest</span></code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.v_rest" title="Permalink to this definition">¶</a></dt>
 <dd><p>Settable model parameter: <span class="math notranslate nohighlight">\(V_{rest}\)</span></p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -662,7 +662,7 @@ RangedList)</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.0.
     </div>
   </body>
 </html>
