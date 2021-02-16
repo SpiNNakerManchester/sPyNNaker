@@ -699,6 +699,8 @@ static void timer_callback(uint timer_count, UNUSED uint unused) {
         // go into pause and resume state to avoid another tick
         simulation_handle_pause_resume(resume_callback);
 
+        log_info("Max retries %d at time %d", max_retries, max_retries_time);
+
         // rewrite poisson params to SDRAM for reading out if needed
         if (!store_poisson_parameters()) {
             log_error("Failed to write poisson parameters to SDRAM");
