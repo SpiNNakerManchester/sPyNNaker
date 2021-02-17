@@ -75,24 +75,24 @@ state_t neuron_model_state_update(
     else{
         v_mem_error = 0.k;
     }
-    if(v_mem_error > 1.k){
-        v_mem_error = 1.k;
-    }
-    if(v_mem_error < -1.k){
-        v_mem_error = -1.k;
-    }
-    neuron->L = v_mem_error;//*0.1k;
+//    if(v_mem_error > 1.k){
+//        v_mem_error = 1.k;
+//    }
+//    if(v_mem_error < -1.k){
+//        v_mem_error = -1.k;
+//    }
+    neuron->L = v_mem_error*0.01k;
     for (uint32_t n_ind=0; n_ind < 10; n_ind++){
         if (n_ind == (uint32_t)dummy){
             neuron->L += learning_signal[n_ind];// * neuron->w_fb[n_ind];
         }
-        if (time % 1000 == 0){
-            io_printf(IO_BUF, "%u - %u - L:%k\n", (uint32_t)dummy, n_ind, learning_signal[n_ind]);
-        }
+//        if (time % 1000 == 0){
+//            io_printf(IO_BUF, "%u - %u - L:%k\n", (uint32_t)dummy, n_ind, learning_signal[n_ind]);
+//        }
     }
     if (time % 1000 == 0 || time % 1000 == 1){
         neuron->V_membrane = neuron->V_reset;
-        io_printf(IO_BUF, "%u total - L:%k - v_mem_error:%k\n", time, neuron->L, v_mem_error);
+//        io_printf(IO_BUF, "%u total - L:%k - v_mem_error:%k\n", time, neuron->L, v_mem_error);
     }
 
     // All operations now need doing once per eprop synapse

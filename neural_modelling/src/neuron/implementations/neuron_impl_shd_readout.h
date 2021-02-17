@@ -314,7 +314,17 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
                 output_errors[n_ind] /= accumulated_softmax;
             }
             REAL correct_output = 0.k;
+
+//            if (time % 1000 == 0){
+//                io_printf(IO_BUF, "n_ind:%u, target:%u\n", n_ind, global_parameters->target_V[target_ind]);
+//            }
+
             if (n_ind == global_parameters->target_V[target_ind]){
+
+//                if (time % 1000 == 0){
+//                    io_printf(IO_BUF, "32 == 8\n");
+//                }
+
                 correct_output = 1.k;
             }
             learning_signal[n_ind] = output_errors[n_ind] - correct_output;

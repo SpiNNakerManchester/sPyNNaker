@@ -75,7 +75,7 @@ typedef struct global_neuron_params_t {
 //	REAL ticks_per_second;
 //	REAL readout_V[20];
 	REAL eta;
-	uint32_t target_V[2100];
+	uint8_t target_V[4011];
 } global_neuron_params_t;
 
 #endif // _NEURON_MODEL_SINUSOID_READOUT_IMPL_H_
