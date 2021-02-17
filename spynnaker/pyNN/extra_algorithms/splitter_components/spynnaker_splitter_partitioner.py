@@ -12,7 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from __future__ import division
 from spinn_utilities.overrides import overrides
 from pacman.model.partitioner_interfaces import AbstractSlicesConnect
 from pacman.operations.partition_algorithms import SplitterPartitioner
@@ -31,7 +30,7 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
         :param ApplicationGraph app_graph: app graph
         :param ~spinn_machine.Machine machine: machine
         :param int plan_n_time_steps: the number of time steps to run for
-        :param pre_allocated_resources: any pre allocated res to account for\
+        :param pre_allocated_resources: any pre-allocated res to account for
             before doing any splitting.
         :type pre_allocated_resources: PreAllocatedResourceContainer or None
         :rtype: tuple(~pacman.model.graphs.machine.MachineGraph, int)
@@ -39,9 +38,8 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
         """
 
         # do partitioning in same way
-        machine_graph, chips_used = SplitterPartitioner.__call__(
-            self, app_graph, machine, plan_n_time_steps,
-            pre_allocated_resources)
+        machine_graph, chips_used = super().__call__(
+            app_graph, machine, plan_n_time_steps, pre_allocated_resources)
 
         # return the accepted things
         return machine_graph, chips_used
@@ -51,7 +49,6 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
             self, src_machine_vertex, dest_machine_vertex,
             common_edge_type, app_edge, machine_graph,
             app_outgoing_edge_partition, resource_tracker):
-
         # filter off connectivity
         if (isinstance(app_edge, AbstractSlicesConnect) and not
                 app_edge.could_connect(
@@ -61,16 +58,15 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
 
         # TODO: this only works when the synaptic manager is reengineered to
         #       not assume the un-delayed edge still exists.
-        """
-        filter off delay values
-        post_splitter = dest_machine_vertex.app_vertex.splitter
-        if ((not isinstance(
-                src_machine_vertex, DelayExtensionMachineVertex)) and
-                isinstance(post_splitter, AbstractSpynnakerSplitterDelay)):
-            min_delay = self._app_edge_min_delay[app_edge]
-            if post_splitter.max_support_delay() < min_delay:
-                return
-        """
+
+        # filter off delay values
+        # post_splitter = dest_machine_vertex.app_vertex.splitter
+        # if ((not isinstance(
+        #         src_machine_vertex, DelayExtensionMachineVertex)) and
+        #         isinstance(post_splitter, AbstractSpynnakerSplitterDelay)):
+        #     min_delay = self._app_edge_min_delay[app_edge]
+        #     if post_splitter.max_support_delay() < min_delay:
+        #         return
 
         # build edge and add to machine graph
         machine_edge = common_edge_type(

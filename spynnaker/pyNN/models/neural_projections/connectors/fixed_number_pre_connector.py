@@ -12,7 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 import math
 import numpy
 from spinn_utilities.overrides import overrides
@@ -77,7 +76,7 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
         # :param ~pyNN.space.Space space:
         # a Space object, needed if you wish to specify distance-dependent\
         # weights or delays - not implemented
-        super(FixedNumberPreConnector, self).__init__(safe, callback, verbose)
+        super().__init__(safe, callback, verbose)
         # We absolutely require an integer at this point!
         self.__n_pre = self._roundsize(n, "FixedNumberPreConnector")
         self.__allow_self_connections = allow_self_connections
@@ -88,8 +87,7 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
         self._rng = rng
 
     def set_projection_information(self, machine_time_step, synapse_info):
-        AbstractConnector.set_projection_information(
-            self, machine_time_step, synapse_info)
+        super().set_projection_information(machine_time_step, synapse_info)
         if (not self.__with_replacement and
                 self.__n_pre > synapse_info.n_pre_neurons):
             raise SpynnakerException(

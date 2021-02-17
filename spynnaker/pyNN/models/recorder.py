@@ -15,8 +15,6 @@
 from datetime import datetime
 import logging
 import numpy
-from six import string_types
-from six.moves import xrange
 import neo
 import quantities
 from spinn_utilities.log import FormatAdapter
@@ -118,7 +116,7 @@ class Recorder(object):
             # note that if record(None) is called, its a reset
             self.turn_off_all_recording(indexes)
             # handle one element vs many elements
-        elif isinstance(variables, string_types):
+        elif isinstance(variables, str):
             # handle special case of 'all'
             if variables == "all":
                 warn_once(
@@ -198,7 +196,7 @@ class Recorder(object):
         n_neurons = len(ids)
         column_length = n_machine_time_steps * n_neurons
         times = [i * sampling_interval
-                 for i in xrange(0, n_machine_time_steps)]
+                 for i in range(0, n_machine_time_steps)]
         return numpy.column_stack((
                 numpy.repeat(ids, n_machine_time_steps, 0),
                 numpy.tile(times, n_neurons),
@@ -345,12 +343,12 @@ class Recorder(object):
         """
         try:
             return self.__population.find_units(variable)
-        except Exception:
+        except Exception as e:
             logger.warning("Population: {} Does not support units for {}",
                            self.__population.label, variable)
             if variable in _DEFAULT_UNITS:
                 return _DEFAULT_UNITS[variable]
-            raise
+            raise e
 
     @property
     def __spike_sampling_interval(self):
@@ -409,7 +407,7 @@ class Recorder(object):
         """
         # if variable is a base string, plonk into a array for ease of
         # conversion
-        if isinstance(variables, string_types):
+        if isinstance(variables, str):
             variables = [variables]
 
         # if all are needed to be extracted, extract each and plonk into the
@@ -599,7 +597,7 @@ class Recorder(object):
         t_stop = t * quantities.ms
 
         if indexes is None:
-            indexes = xrange(n_neurons)
+            indexes = range(n_neurons)
         for index in indexes:
             spiketrain = neo.SpikeTrain(
                 times=spikes[spikes[:, 0] == index][:, 1],

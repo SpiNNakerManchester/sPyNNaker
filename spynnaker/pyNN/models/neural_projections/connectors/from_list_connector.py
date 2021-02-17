@@ -75,7 +75,7 @@ class FromListConnector(AbstractConnector):
             .. note::
                 Not supported by sPyNNaker.
         """
-        super(FromListConnector, self).__init__(safe, callback, verbose)
+        super().__init__(safe, callback, verbose)
 
         self.__column_names = column_names
         self.__split_conn_list = None

@@ -56,7 +56,7 @@ class PopulationMachineVertex(
         "__binary_file_name",
         "__recorded_region_ids",
         "__resources",
-        "__on_chip_generatable_area",
+        "__on_chip_generatable_offset",
         "__on_chip_generatable_size",
         "__drop_late_spikes",
         "__change_requires_neuron_parameters_reload"]
@@ -172,8 +172,7 @@ class PopulationMachineVertex(
             The slice of the population that this implements
         :param str binary_file_name: binary name to be run for this verte
         """
-        MachineVertex.__init__(
-            self, label, constraints, app_vertex, vertex_slice)
+        super().__init__(label, constraints, app_vertex, vertex_slice)
         self.__binary_file_name = binary_file_name
         self.__recorded_region_ids = recorded_region_ids
         self.__resources = resources_required

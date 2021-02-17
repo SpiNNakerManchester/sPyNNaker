@@ -48,7 +48,7 @@ class PushBotSpiNNakerLinkMotorDevice(
         :type board_address: str or None
         """
         # pylint: disable=too-many-arguments
-        PushBotEthernetMotorDevice.__init__(self, motor, protocol)
+        super().__init__(motor, protocol)
         ApplicationSpiNNakerLinkVertex.__init__(
             self, spinnaker_link_id=spinnaker_link_id, n_atoms=n_neurons,
             board_address=board_address, label=label)

@@ -30,6 +30,7 @@
 import mock
 import os
 import sys
+from sphinx.ext import apidoc
 
 autodoc_mock_imports = ['_tkinter']
 
@@ -55,8 +56,8 @@ extensions = [
 ]
 
 intersphinx_mapping = {
-    'python': ('https://docs.python.org/3.6', None),
-    'numpy': ("https://numpy.org/doc/1.19/", None),
+    'python': ('https://docs.python.org/3.8', None),
+    'numpy': ("https://numpy.org/doc/1.20/", None),
     'matplotlib': ('https://matplotlib.org', None),
     'pynn': ("http://neuralensemble.org/docs/PyNN/", None),
     'neo': ('https://neo.readthedocs.io/en/stable/', None),
@@ -451,11 +452,4 @@ explicit_wanted_files = [
     "spynnaker8/utilities/neo_compare.py"]
 options = ['-o', output_dir, "."]
 options.extend(filtered_files(".", explicit_wanted_files, "tests"))
-try:
-    # Old style API; Python 2.7
-    from sphinx import apidoc
-    options = [None] + options
-except ImportError:
-    # New style API; Python 3.6 onwards
-    from sphinx.ext import apidoc
 apidoc.main(options)

@@ -67,14 +67,13 @@ class DelayExtensionVertex(
         :param ~pacman.model.graphs.application.ApplicationVertex \
                 source_vertex:
             where messages are coming from
-
         :param iterable(~pacman.model.constraints.AbstractConstraint) \
                 constraints:
             the vertex constraints
         :param str label: the vertex label
         """
         # pylint: disable=too-many-arguments
-        super(DelayExtensionVertex, self).__init__(
+        super().__init__(
             label, constraints, POP_TABLE_MAX_ROW_LENGTH, splitter=None)
 
         self.__source_vertex = source_vertex
@@ -192,7 +191,7 @@ class DelayExtensionVertex(
                 synapse_information:
             The synapse information of the connection
         :param synapse_information:
-        :type synapse_information: \
+        :type synapse_information:
             ~spynnaker.pyNN.models.neural_projections.SynapseInformation
         :param int max_stage:
             The maximum delay stage

@@ -53,7 +53,7 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
             .. note::
                 Not supported by sPyNNaker.
         """
-        super(AllToAllConnector, self).__init__(safe, callback, verbose)
+        super().__init__(safe, callback, verbose)
         self.__allow_self_connections = allow_self_connections
 
     def _connection_slices(

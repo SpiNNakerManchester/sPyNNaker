@@ -36,15 +36,15 @@ class SynapseTypeDelta(AbstractSynapseType):
     def __init__(self, isyn_exc, isyn_inh):
         """
         :param isyn_exc: :math:`I^{syn}_e`
-        :type isyn_exc: \
-            float, iterable(float), ~pyNN.random.RandomDistribution \
+        :type isyn_exc:
+            float, iterable(float), ~pyNN.random.RandomDistribution
             or (mapping) function
         :param isyn_inh: :math:`I^{syn}_i`
-        :type isyn_inh: \
-            float, iterable(float), ~pyNN.random.RandomDistribution \
+        :type isyn_inh:
+            float, iterable(float), ~pyNN.random.RandomDistribution
             or (mapping) function
         """
-        super(SynapseTypeDelta, self).__init__([
+        super().__init__([
             DataType.S1615,   # isyn_exc
             DataType.S1615])  # isyn_inh
         self.__isyn_exc = isyn_exc
@@ -73,13 +73,11 @@ class SynapseTypeDelta(AbstractSynapseType):
 
     @overrides(AbstractSynapseType.get_values)
     def get_values(self, parameters, state_variables, vertex_slice, ts):
-
         # Add the rest of the data
         return [state_variables[ISYN_EXC], state_variables[ISYN_INH]]
 
     @overrides(AbstractSynapseType.update_values)
     def update_values(self, values, parameters, state_variables):
-
         # Read the data
         (isyn_exc, isyn_inh) = values
 

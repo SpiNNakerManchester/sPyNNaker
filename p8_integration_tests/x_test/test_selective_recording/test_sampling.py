@@ -16,11 +16,9 @@
 import os
 import sys
 import numpy
-from six.moves import xrange
 import spynnaker8 as sim
 from spynnaker.pyNN.models.populations import PopulationView
 from p8_integration_tests.base_test_case import BaseTestCase
-
 
 current_file_path = os.path.dirname(os.path.abspath(__file__))
 
@@ -353,7 +351,7 @@ def compare(current, full, rate, indexes):
                 return  # Empty so ignore shape
             raise Exception(
                 "Shape not equal {} {}".format(d1.shape, d2_rate.shape))
-        for i in xrange(d1.shape[0]):
+        for i in range(d1.shape[0]):
             if not numpy.array_equal(d1[i], d2_rate[i]):
                 for j in range(len(d1[i])):
                     if d1[i][j] != d2_rate[i][j]:

@@ -12,8 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-from __future__ import division
 from unittest import SkipTest
 from spynnaker.pyNN.exceptions import ConfigurationException
 import spynnaker8 as sim
@@ -39,9 +37,10 @@ class ManyBoards(object):
             machine = sim.get_machine()
         except ConfigurationException as oops:
             if "Failure to detect machine " in str(oops):
-                raise SkipTest("You Need at least {} boards to run this test"
-                               .format(n_boards))
-            raise
+                raise SkipTest(
+                    "You Need at least {} boards to run this test".format(
+                        n_boards)) from oops
+            raise oops
 
         input_spikes = list(range(0, simtime - 100, 10))
         self._expected_spikes = len(input_spikes)

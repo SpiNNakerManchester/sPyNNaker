@@ -44,7 +44,7 @@ class EthernetCommandConnection(DatabaseConnection):
             The optional port to listen on for the stop/pause message
         """
 
-        super(EthernetCommandConnection, self).__init__(
+        super().__init__(
             start_resume_callback_function=self._start_resume_callback,
             stop_pause_callback_function=self._stop_pause_callback,
             local_host=local_host, local_port=local_port)

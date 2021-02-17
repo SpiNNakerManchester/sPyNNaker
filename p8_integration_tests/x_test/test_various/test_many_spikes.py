@@ -55,7 +55,7 @@ class BigManySpikes(BaseTestCase):
             self.assertEqual(spike_count, 7200)
         except Exception as ex:
             # Just in case the range failed
-            raise SkipTest(ex)
+            raise SkipTest() from ex
 
     def test_sixty_nine(self):
         nNeurons = 600  # number of neurons in each population
@@ -65,7 +65,7 @@ class BigManySpikes(BaseTestCase):
             self.assertEqual(spike_count, 7200)
         except Exception as ex:
             # Just in case the range failed
-            raise SkipTest(ex)
+            raise SkipTest() from ex
 
 
 if __name__ == '__main__':

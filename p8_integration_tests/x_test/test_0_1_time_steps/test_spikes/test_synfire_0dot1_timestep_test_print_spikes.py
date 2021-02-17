@@ -55,13 +55,14 @@ class TestPrintSpikes(BaseTestCase):
                 read_in_spikes = io.read()[0]
 
                 neo_compare.compare_blocks(spikes, read_in_spikes)
-            except UnicodeDecodeError:
+            except UnicodeDecodeError as ex:
                 raise SkipTest(
-                    "https://github.com/NeuralEnsemble/python-neo/issues/529")
+                    "https://github.com/NeuralEnsemble/python-neo/issues/529"
+                    ) from ex
 
         except SpinnmanTimeoutException as ex:
             # System intentional overload so may error
-            raise SkipTest(ex)
+            raise SkipTest() from ex
 
 
 if __name__ == '__main__':

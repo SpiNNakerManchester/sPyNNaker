@@ -42,8 +42,7 @@ class DelayedApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
         :param str label:
             The edge label
         """
-        super(DelayedApplicationEdge, self).__init__(
-            pre_vertex, post_vertex, label=label)
+        super().__init__(pre_vertex, post_vertex, label=label)
         if hasattr(synapse_information, '__iter__'):
             self.__synapse_information = synapse_information
         else:
@@ -76,8 +75,7 @@ class DelayedApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
 
     @overrides(ApplicationEdge.remember_associated_machine_edge)
     def remember_associated_machine_edge(self, machine_edge):
-        super(DelayedApplicationEdge, self).\
-            remember_associated_machine_edge(machine_edge)
+        super().remember_associated_machine_edge(machine_edge)
         self.__machine_edges_by_slices[
             machine_edge.pre_vertex.vertex_slice,
             machine_edge.post_vertex.vertex_slice] = machine_edge

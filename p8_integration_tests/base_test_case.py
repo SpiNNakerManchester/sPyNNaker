@@ -141,7 +141,7 @@ class BaseTestCase(unittest.TestCase):
             # It might now exist if run in parallel
             try:
                 os.makedirs(report_dir)
-            except Exception:
+            except Exception:  # pylint: disable=broad-except
                 pass
         report_path = os.path.join(report_dir, file_name)
         with open(report_path, "a") as report_file:
@@ -209,7 +209,7 @@ class BaseTestCase(unittest.TestCase):
                 retries += 1
                 globals_variables.unset_simulator()
                 if retries >= max_tries:
-                    raise
+                    raise ex
             except SpinnmanException as ex:
                 class_file = sys.modules[self.__module__].__file__
                 with open(self.spinnman_exception_path(), "a") as exc_file:
@@ -220,7 +220,7 @@ class BaseTestCase(unittest.TestCase):
                 retries += 1
                 globals_variables.unset_simulator()
                 if retries >= max_tries:
-                    raise
+                    raise ex
             print("")
             print("==========================================================")
             print(" Will run {} again in {} seconds".format(

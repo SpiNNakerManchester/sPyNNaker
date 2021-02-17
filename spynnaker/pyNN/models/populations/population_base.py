@@ -13,9 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import division
 import logging
-from six import add_metaclass, itervalues
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
 from spinn_utilities.log import FormatAdapter
@@ -34,8 +32,7 @@ def _this_is_wholly_deprecated(msg, *args):  # pylint: disable=unused-argument
     raise NotImplementedError(msg)
 
 
-@add_metaclass(AbstractBase)
-class PopulationBase(object):
+class PopulationBase(object, metaclass=AbstractBase):
     r""" Shared methods between :py:class:`Population`\ s and
     :py:class:`PopulationView`\ s.
 
@@ -213,7 +210,7 @@ class PopulationBase(object):
                 logger, "sPyNNaker only supports gather=True. We will run "
                 "as if gather was set to True.")
         counts = self.get_spike_counts()
-        return sum(itervalues(counts)) / len(counts)
+        return sum(counts.values()) / len(counts)
 
     def nearest(self, position):
         """ Return the neuron closest to the specified position.

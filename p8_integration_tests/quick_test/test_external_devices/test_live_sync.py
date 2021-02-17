@@ -44,7 +44,7 @@ def send_sync(label, conn):
             try:
                 n_spikes.append(0)
                 p.external_devices.continue_simulation()
-            except Exception:
+            except Exception:  # pylint: disable=broad-except
                 traceback.print_exc()
 
 

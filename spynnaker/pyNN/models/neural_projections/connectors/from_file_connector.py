@@ -15,7 +15,6 @@
 
 import os
 import numpy
-from six import string_types
 from pyNN.recording.files import StandardTextFile
 from .from_list_connector import FromListConnector
 
@@ -64,7 +63,7 @@ class FromFileConnector(FromListConnector):
             CSV file
         """
         self._file = file
-        if isinstance(file, string_types):
+        if isinstance(file, str):
             real_file = self.get_reader(file)
             try:
                 conn_list = self._read_conn_list(real_file, distributed)
@@ -80,8 +79,8 @@ class FromFileConnector(FromListConnector):
                             if column not in ("i", "j")]
 
         # pylint: disable=too-many-arguments
-        FromListConnector.__init__(
-            self, conn_list, safe=safe, verbose=verbose,
+        super().__init__(
+            conn_list, safe=safe, verbose=verbose,
             column_names=column_names, callback=callback)
 
     def _read_conn_list(self, the_file, distributed):
