@@ -239,10 +239,7 @@ bool matrix_generator_generate(
                 weight_generator, n_indices, pre_neuron_index, indices, params);
         for (uint32_t j = 0; j < n_indices; j++) {
             weights[j] = rescale_weight(params[j], weight_scales[synapse_type]);
-            io_printf(IO_BUF, "weights %k\n", weights[j]);
         }
-
-        io_printf(IO_BUF, "max row n words %d\n", max_row_n_words);
 
         // Write row
         matrix_generator_write_row(
