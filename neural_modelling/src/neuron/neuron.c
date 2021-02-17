@@ -467,7 +467,7 @@ void neuron_do_timestep_update( // EXPORTED
         
         for (index_t synapse_type_index = 0; synapse_type_index < n_synapse_types; synapse_type_index++) {
 
-            register uint32_t buff_index = contribution_offset[synapse_type_index];
+            register uint32_t buff_index = contribution_offset[synapse_type_index] + neuron_index;
 
             //Add the values from synaptic_contributions
             sum = 0;
@@ -476,6 +476,7 @@ void neuron_do_timestep_update( // EXPORTED
 
                 sum += synaptic_contributions[buff_index];
                 buff_index += n_neurons_power_2;
+
             }
 
             //MAKE IT INLINE?

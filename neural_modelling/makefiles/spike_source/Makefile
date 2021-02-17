@@ -16,7 +16,8 @@
 MODELS = poisson \
 		rate_live_injector \
 		rate_source \
-		rate_source_live
+		rate_source_live \
+		rate_live_teacher
 		 
 
 

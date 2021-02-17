@@ -13,13 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .spike_source_array import SpikeSourceArray
-from .spike_source_from_file import SpikeSourceFromFile
-from .spike_source_poisson import SpikeSourcePoisson
-from .rate_source_array import RateSourceArray
-from .rate_source_live import RateSourceLive
-from .rate_live_teacher import RateLiveTeacher
+APP = rate_live_teacher
+SOURCES = spike_source/rate_source/rate_live_teacher.c
 
-__all__ = ["SpikeSourceArray", "SpikeSourceFromFile",
-        "SpikeSourcePoisson", "RateSourceArray",
-        "RateSourceLive", "RateLiveTeacher"]
+include ../../neural_support.mk

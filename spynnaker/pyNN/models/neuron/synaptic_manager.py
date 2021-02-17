@@ -95,7 +95,8 @@ _SYNAPSES_BASE_N_CPU_CYCLES = 8
 _SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES = 4 + 8 + 4 + 4 + 4
 
 # Amount to scale synapse SDRAM estimate by to make sure the synapses fit
-_SYNAPSE_SDRAM_OVERSCALE = 1.1
+# Reintroduced for now, but reduced from 1.1 to 1.05
+_SYNAPSE_SDRAM_OVERSCALE = 1.05
 
 _ONE_WORD = struct.Struct("<I")
 
@@ -464,10 +465,7 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
                     memory_size = self.__add_synapse_size(
                         memory_size, synapse_info, post_vertex_slice, in_edge,
                         machine_time_step)
-        # REMOVED SYNAPTIC MATRIC OVERSCALE FOR MATRIX IN DTCM. WE SHOULD ALREADY BE GIVING MORE
-        # SPACE THAN NEEDED
-        # return int(memory_size * _SYNAPSE_SDRAM_OVERSCALE)
-        return memory_size
+        return int(memory_size * _SYNAPSE_SDRAM_OVERSCALE)
 
     def __add_synapse_size(self, memory_size, synapse_info, post_vertex_slice,
                            in_edge, machine_time_step):

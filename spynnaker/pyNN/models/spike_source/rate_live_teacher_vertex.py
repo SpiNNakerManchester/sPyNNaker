@@ -42,14 +42,11 @@ from spynnaker.pyNN.models.abstract_models import (
 from .rate_source_live_machine_vertex import (
     RateSourceLiveMachineVertex)
 
-from .rate_live_injector_vertex import RateLiveInjectorVertex
-
 logger = logging.getLogger(__name__)
 
 # bool has_key; uint32_t key; uint32_t generators;
-# uint32_t timer_offset; uint32_t refresh; uint32_t mem_index;
-# uint32_t vertex_offset
-PARAMS_BASE_WORDS = 7
+# uint32_t timer_offset; uint32_t refresh; uint32_t teaching_signals;
+PARAMS_BASE_WORDS = 6
 
 START_OF_RATE_GENERATOR_PARAMETERS = PARAMS_BASE_WORDS * 4
 
@@ -62,7 +59,7 @@ _MAX_OFFSET_DENOMINATOR = 10
 _REGIONS = RateSourceLiveMachineVertex.RATE_SOURCE_REGIONS
 
 
-class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification,
+class RateLiveTeacherVertex(ApplicationVertex, AbstractGeneratesDataSpecification,
         AbstractHasAssociatedBinary, AbstractChangableAfterRun, AbstractRewritesDataSpecification,
         SimplePopulationSettable, ProvidesKeyToAtomMappingImpl):
 
@@ -70,7 +67,6 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
         "__model_name",
         "__model",
         "__n_atoms",
-        "__n_machine_vertices",
         "__machine_vertices",
         "__change_requires_neuron_parameters_reload",
         "__machine_time_step",
@@ -79,10 +75,7 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
         "__n_profile_samples",
         "__requires_mapping",
         "__refresh_rate",
-        "__injector_vertex",
-        "__vertex_offset",
-        "__partitioned_atoms",
-        "__starting_slices"
+        "__teaching_signals"
     ]
 
     RATE_RECORDING_REGION_ID = 0
@@ -90,13 +83,11 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
     _n_vertices = 0
 
     def __init__(self, sources, constraints, max_atoms_per_core, 
-            label, model, machine_vertices, refresh_rate,
-            injector_vertex, vertex_offset, starting_slices):
+            label, model, refresh_rate, teaching_signals):
         # pylint: disable=too-many-arguments
-        self.__model_name = "RateSourceLive"
+        self.__model_name = "RateLiveTeacher"
         self.__model = model
         self.__n_atoms = sources
-        self.__n_machine_vertices = machine_vertices
         self.__refresh_rate = refresh_rate
 
         self.__change_requires_neuron_parameters_reload = False
@@ -104,16 +95,13 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
 
         self.__n_subvertices = 0
         self.__n_data_specs = 0
-        self.__injector_vertex = injector_vertex
-        self.__vertex_offset = vertex_offset
-        self.__partitioned_atoms = 0
 
         self.__machine_vertices = dict()
 
         # The values each mahcine vertex will send at timestep 0
-        self.__starting_slices = starting_slices
+        self.__teaching_signals = teaching_signals
 
-        super(RateSourceLiveVertex, self).__init__(
+        super(RateLiveTeacherVertex, self).__init__(
             label=label, constraints=constraints,
             max_atoms_per_core=max_atoms_per_core)
 
@@ -183,7 +171,7 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
 
         :param vertex_slice:
         """
-        return vertex_slice.n_atoms
+        return len(self.__teaching_signals)
 
     @property
     def n_atoms(self):
@@ -195,20 +183,12 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
             constraints=None):
         # pylint: disable=too-many-arguments, arguments-differ
         machine_vertex = RateSourceLiveMachineVertex(
-            resources_required, False, constraints, label,
-            self.__vertex_offset + self.__partitioned_atoms,
-            self.__starting_slices[self.__n_subvertices])
+            resources_required, False, constraints, label)
 
-        RateSourceLiveVertex._n_vertices += 1
+        RateLiveTeacherVertex._n_vertices += 1
         self.__machine_vertices[self.__n_subvertices] = machine_vertex
 
-        connected_machine_vertex = self.__injector_vertex.machine_vertex
-
-        if connected_machine_vertex is not None:
-            machine_vertex.add_constraint(SameChipAsConstraint(connected_machine_vertex))
-            
         self.__n_subvertices += 1
-        self.__partitioned_atoms += vertex_slice.n_atoms
 
         return machine_vertex
 
@@ -286,7 +266,7 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
     def get_binary_file_name(self):
-        return "rate_source_live.aplx"
+        return "rate_live_teacher.aplx"
 
     @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
     def get_binary_start_type(self):
@@ -294,8 +274,7 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
 
     def _write_rate_parameters(
             self, spec, graph, placement, routing_info,
-            vertex_slice, machine_time_step, time_scale_factor,
-            vertex_index):
+            vertex_slice, machine_time_step, time_scale_factor):
         """ Generate Neuron Parameter data for rate sources
 
         :param spec: the data specification writer
@@ -311,8 +290,6 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
         # pylint: disable=too-many-arguments, too-many-locals
         spec.comment("\nWriting Rate Parameters for {} rate sources:\n"
                      .format(vertex_slice.n_atoms))
-
-        vertex = placement.vertex
 
         # Set the focus to the memory region 2 (rate parameters):
         spec.switch_write_focus(_REGIONS.RATE_PARAMS_REGION.value)
@@ -337,18 +314,15 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
         # Write the refesh rate
         spec.write_value(data=self.__refresh_rate)
 
-        # Write the vertex index for the shared memory region
-        spec.write_value(data=vertex_index)
-
-        # Write the offset for the first generator in memory
-        spec.write_value(data=vertex.vertex_offset)
+        #write how many teaching signals will be sent
+        spec.write_value(data=len(self.__teaching_signals))
 
         # Set the focus to the memory region 3 (rate values):
         spec.switch_write_focus(_REGIONS.RATE_VALUES_REGION.value)
 
         
         # Write the portion of image for the first timestep
-        spec.write_array(vertex.starting_slice, data_type=DataType.UINT8)
+        spec.write_array(self.__teaching_signals, data_type=DataType.UINT8)
 
 
     @inject_items({
@@ -416,16 +390,10 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
             self.get_binary_file_name(), machine_time_step,
             time_scale_factor))
 
-        if vertex.vertex_index is None:
-            for c in vertex.constraints:
-                if isinstance(c, SameChipAsConstraint) and \
-                isinstance(graph_mapper.get_application_vertex(c.vertex), RateLiveInjectorVertex):
-                    vertex.vertex_index = c.vertex.vertex_index
-
         # write parameters
         self._write_rate_parameters(
             spec, graph, placement, routing_info, vertex_slice,
-            machine_time_step, time_scale_factor, vertex.vertex_index)
+            machine_time_step, time_scale_factor)
 
         # write profile data
         profile_utils.write_profile_region_data(
