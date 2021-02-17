@@ -280,15 +280,10 @@ void resume_callback(void) {
 
 }
 
-extern uint32_t earliest_clear;
-extern uint32_t latest_clear;
-extern uint32_t max_dropped;
-extern uint32_t earliest_recv;
-extern uint32_t latest_recv;
-extern uint32_t earliest_proc;
-extern uint32_t latest_proc;
-extern uint32_t max_from_last_recv;
-
+//! \brief Background activites called from timer
+//! \param timer_count the number of times this call back has been
+//!        executed since start of simulation
+//! \param[in] local_time: The time step being executed
 void background_callback(uint timer_count, uint local_time) {
     global_timer_count = timer_count;
     profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
@@ -361,11 +356,7 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
         // Subtract 1 from the time so this tick gets done again on the next
         // run
         time--;
-
-        log_info("%d > clear > %d;  %d > recv > %d;  %d > proc > %d;  max_from_last = %d;  max_dropped = %d",
-                earliest_clear, latest_clear, earliest_recv, latest_recv,
-                earliest_proc, latest_proc, max_from_last_recv, max_dropped);
-
+        
         log_debug("Rewire tries = %d", count_rewire_attempts);
         simulation_ready_to_read();
         spin1_mode_restore(state);

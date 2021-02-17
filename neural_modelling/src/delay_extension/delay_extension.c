@@ -245,7 +245,7 @@ static bool read_parameters(struct delay_parameters *params) {
                 &params->delay_blocks[d * neuron_bit_field_words],
                 neuron_bit_field_words * sizeof(uint32_t));
 
-#if LOG_DEVEL >= LOG_DEBUG
+#if LOG_LEVEL >= LOG_DEBUG
         io_printf(IO_BUF, "\t\tNeurons set:");
         for (uint32_t i = 0; i < num_neurons; i++) {
             if (bit_field_test(neuron_delay_stage_config[d], i)) {

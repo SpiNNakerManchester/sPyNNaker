@@ -139,11 +139,6 @@ static inline void do_dma_read(
     next_buffer_to_fill = (next_buffer_to_fill + 1) % N_DMA_BUFFERS;
 }
 
-uint32_t earliest_proc = 0;
-uint32_t latest_proc = 0xFFFFFFFF;
-uint32_t max_from_last_recv = 0;
-uint32_t n_from_last_recv = 0;
-
 //! \brief Check if there is anything to do. If not, DMA is not busy
 //! \param[out] row:
 //!     The address of the synaptic row that has been processed
@@ -186,15 +181,6 @@ static inline bool is_something_to_do(
 
     // Are there any more spikes to process?
     while (in_spikes_get_next_spike(spike)) {
-        uint32_t timer_time = tc[T1_COUNT];
-        if (timer_time > earliest_proc) {
-            earliest_proc = timer_time;
-        }
-        if (timer_time < latest_proc) {
-            latest_proc = timer_time;
-        }
-        n_from_last_recv++;
-
         // Enable interrupts while looking up in the master pop table,
         // as this can be slow
         spin1_mode_restore(cpsr);
@@ -303,28 +289,11 @@ static inline void setup_synaptic_dma_write(
     }
 }
 
-uint32_t earliest_recv = 0;
-uint32_t latest_recv = 0xFFFFFFFF;
-
 //! \brief Called when a multicast packet is received
 //! \param[in] key: The key of the packet. The spike.
 //! \param payload: the payload of the packet. The count.
 static void multicast_packet_received_callback(uint key, uint payload) {
-    uint32_t timer_time = tc[T1_COUNT];
-    if (timer_time > earliest_recv) {
-        earliest_recv = timer_time;
-    }
-    if (timer_time < latest_recv) {
-        latest_recv = timer_time;
-    }
-    n_from_last_recv = 0;
-
     p_per_ts_struct.packets_this_time_step += 1;
-
-    if (in_spikes_size() > 1 && !dma_busy) {
-        log_error("At receive, %d packets in buffer but DMA not busy", in_spikes_size());
-        rt_error(RTE_SWERR);
-    }
 
     // handle the 2 cases separately
     if (payload == 0) {
@@ -446,9 +415,6 @@ void user_event_callback(UNUSED uint unused0, UNUSED uint unused1) {
 }
 
 /* INTERFACE FUNCTIONS - cannot be static */
-uint32_t latest_clear = 0xFFFFFFFF;
-uint32_t earliest_clear = 0;
-uint32_t max_dropped = 0;
 //! \brief clears the input buffer of packets and records them
 void spike_processing_clear_input_buffer(timer_t time) {
     uint32_t n_spikes = in_spikes_size();
@@ -458,25 +424,10 @@ void spike_processing_clear_input_buffer(timer_t time) {
         dma_busy = false;
     }
 
-    if (n_from_last_recv > max_from_last_recv) {
-        max_from_last_recv = n_from_last_recv;
-    }
-    uint32_t timer_time = tc[T1_COUNT];
-    if (timer_time > earliest_clear) {
-        earliest_clear = timer_time;
-    }
-    if (timer_time < latest_clear) {
-        latest_clear = timer_time;
-    }
-
     // Record the number of packets received last timer tick
     p_per_ts_struct.time = time;
     recording_record(p_per_ts_region, &p_per_ts_struct, sizeof(p_per_ts_struct));
     p_per_ts_struct.packets_this_time_step = 0;
-
-    if (n_spikes > max_dropped) {
-        max_dropped = n_spikes;
-    }
 
     // Record the count whether clearing or not for provenance
     count_input_buffer_packets_late += n_spikes;

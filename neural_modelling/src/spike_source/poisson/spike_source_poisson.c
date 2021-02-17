@@ -190,8 +190,6 @@ static volatile bool recording_in_progress = false;
 //! The timer period
 static uint32_t timer_period;
 
-static uint32_t latest_end = 0xFFFFFFFF;
-
 // ----------------------------------------------------------------------
 
 //! \brief Writes the provenance data
@@ -701,8 +699,6 @@ static void timer_callback(uint timer_count, UNUSED uint unused) {
         // go into pause and resume state to avoid another tick
         simulation_handle_pause_resume(resume_callback);
 
-        log_info("Max retries %d at time %d, latest end %d", max_retries, max_retries_time, latest_end);
-
         // rewrite poisson params to SDRAM for reading out if needed
         if (!store_poisson_parameters()) {
             log_error("Failed to write poisson parameters to SDRAM");
@@ -752,11 +748,6 @@ static void timer_callback(uint timer_count, UNUSED uint unused) {
     if (recording_flags > 0) {
         record_spikes(time);
         recording_do_timestep_update(time);
-    }
-
-    uint32_t timer_time = tc[T1_COUNT];
-    if (timer_time < latest_end) {
-        latest_end = timer_time;
     }
 }
 
