@@ -356,7 +356,7 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
         // Subtract 1 from the time so this tick gets done again on the next
         // run
         time--;
-        
+
         log_debug("Rewire tries = %d", count_rewire_attempts);
         simulation_ready_to_read();
         spin1_mode_restore(state);
@@ -365,7 +365,7 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
 
     // Push the rest to the background
     if (!spin1_schedule_callback(background_callback, timer_count, time, BACKGROUND)) {
-        log_error("Failed to add background task for time", time);
+        log_error("Failed to add background task for time %d", time);
     }
 
     spin1_mode_restore(state);
