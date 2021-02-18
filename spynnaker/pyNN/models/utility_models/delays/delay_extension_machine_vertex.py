@@ -66,6 +66,8 @@ class DelayExtensionMachineVertex(
         N_PACKETS_WITH_INVALID_NEURON_IDS = 8
         N_PACKETS_DROPPED_DUE_TO_INVALID_KEY = 9
         N_LATE_SPIKES = 10
+        MAX_BACKGROUND_QUEUED = 11
+        N_BACKGROUND_OVERLOADS = 12
 
     N_EXTRA_PROVENANCE_DATA_ENTRIES = len(EXTRA_PROVENANCE_DATA_ENTRIES)
 
@@ -131,6 +133,8 @@ class DelayExtensionMachineVertex(
         ".spynnaker.cfg file or in the pynn.setup() method.")
 
     DELAYED_FOR_TRAFFIC_NAME = "Number_of_times_delayed_to_spread_traffic"
+    BACKGROUND_OVERLOADS_NAME = "Times_the_background_queue_overloaded"
+    BACKGROUND_MAX_QUEUED_NAME = "Max_backgrounds_queued"
 
     def __init__(self, resources_required, label, constraints=None,
                  app_vertex=None, vertex_slice=None):
@@ -204,6 +208,10 @@ class DelayExtensionMachineVertex(
             N_PACKETS_DROPPED_DUE_TO_INVALID_KEY.value]
         n_late_packets = provenance_data[
             self.EXTRA_PROVENANCE_DATA_ENTRIES.N_LATE_SPIKES.value]
+        max_background_queued = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.MAX_BACKGROUND_QUEUED.value]
+        n_background_overloads = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.N_BACKGROUND_OVERLOADS.value]
 
         label, x, y, p, names = self._get_placement_details(placement)
 
@@ -257,6 +265,22 @@ class DelayExtensionMachineVertex(
             self._add_name(names, self.N_LATE_SPIKES_NAME),
             n_late_packets, report=n_late_packets > 0,
             message=late_message.format(n_late_packets, label, x, y, p)))
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names, self._BACKGROUND_MAX_QUEUED_NAME),
+            max_background_queued, report=max_background_queued > 1,
+            message=(
+                "A maximum of {} background tasks were queued on {} on"
+                " {}, {}, {}.  Try increasing the time_scale_factor located"
+                " within the .spynnaker.cfg file or in the pynn.setup()"
+                " method.".format(max_background_queued, label, x, y, p))))
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names, self._BACKGROUND_OVERLOADS_NAME),
+            n_background_overloads, report=n_background_overloads > 0,
+            message=(
+                "On {} on {}, {}, {}, the background queue overloaded {}"
+                " times.  Try increasing the time_scale_factor located within"
+                " the .spynnaker.cfg file or in the pynn.setup() method."
+                .format(label, x, y, p, n_background_overloads))))
         return provenance_items
 
     @overrides(MachineVertex.get_n_keys_for_partition)

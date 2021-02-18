@@ -83,6 +83,10 @@ struct neuron_provenance {
     uint32_t spike_processing_get_max_filled_input_buffer_size;
     //! the number of times the TDMA fully missed its slots
     uint32_t n_tdma_mises;
+    //! Maximum backgrounds queued
+    uint32_t max_backgrounds_queued;
+    //! Background queue overloads
+    uint32_t n_background_queue_overloads;
 };
 
 //! values for the priority for each callback
@@ -123,6 +127,15 @@ static uint32_t count_rewire_attempts = 0;
 //! The number of neurons on the core
 static uint32_t n_neurons;
 
+//! The number of background tasks queued / running
+static uint32_t n_backgrounds_queued = 0;
+
+//! The number of times the background couldn't be added
+static uint32_t n_background_overloads = 0;
+
+//! The maximum number of background tasks queued
+static uint32_t max_backgrounds_queued = 0;
+
 //! timer count for tdma of certain models; exported
 uint global_timer_count;
 
@@ -152,6 +165,8 @@ static void c_main_store_provenance_data(address_t provenance_region) {
     prov->spike_processing_get_max_filled_input_buffer_size =
         spike_processing_get_max_filled_input_buffer_size();
     prov->n_tdma_mises = tdma_processing_times_behind();
+    prov->n_background_queue_overloads = n_background_overloads;
+    prov->max_backgrounds_queued = max_backgrounds_queued;
 
     log_debug("finished other provenance data");
 }
@@ -314,6 +329,7 @@ void background_callback(uint timer_count, uint local_time) {
     neuron_do_timestep_update(local_time, timer_count);
 
     profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
+    n_backgrounds_queued--;
 }
 
 //! \brief Timer interrupt callback
@@ -365,7 +381,13 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
 
     // Push the rest to the background
     if (!spin1_schedule_callback(background_callback, timer_count, time, BACKGROUND)) {
-        log_error("Failed to add background task for time %d", time);
+        // We have failed to do this timer tick!
+        n_background_overloads++;
+    } else {
+        n_backgrounds_queued++;
+        if (n_backgrounds_queued > max_backgrounds_queued) {
+            max_backgrounds_queued++;
+        }
     }
 
     spin1_mode_restore(state);

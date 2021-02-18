@@ -69,6 +69,10 @@ struct delay_extension_provenance {
     uint32_t n_packets_dropped_due_to_invalid_key;
     //! number of packets dropped due to out of time
     uint32_t count_input_buffer_packets_late;
+    //! Maximum backgrounds queued
+    uint32_t max_backgrounds_queued;
+    //! Background queue overloads
+    uint32_t n_background_queue_overloads;
 };
 
 // Globals
@@ -151,6 +155,15 @@ static uint32_t timer_period = 0;
 
 //! Is spike processing happening right now?
 static bool spike_processing = false;
+
+//! The number of background tasks queued / running
+static uint32_t n_backgrounds_queued = 0;
+
+//! The number of times the background couldn't be added
+static uint32_t n_background_overloads = 0;
+
+//! The maximum number of background tasks queued
+static uint32_t max_backgrounds_queued = 0;
 
 //---------------------------------------
 // Because we don't want to include string.h or strings.h for memset
@@ -299,6 +312,8 @@ static void store_provenance_data(address_t provenance_region) {
     prov->n_packets_dropped_due_to_invalid_key =
         n_packets_dropped_due_to_invalid_key;
     prov->count_input_buffer_packets_late = count_input_buffer_packets_late;
+    prov->n_background_queue_overloads = n_background_overloads;
+    prov->max_backgrounds_queued = max_backgrounds_queued;
     log_debug("finished other provenance data");
 }
 
@@ -492,6 +507,7 @@ static void background_callback(uint local_time, UNUSED uint timer_count) {
             }
         }
     }
+    n_backgrounds_queued--;
 }
 
 //! \brief Main timer callback
@@ -538,7 +554,13 @@ static void timer_callback(uint timer_count, UNUSED uint unused1) {
     }
 
     if (!spin1_schedule_callback(background_callback, time, timer_count, BACKGROUND)) {
-        log_warning("Couldn't schedule the background task at time %d", time);
+        // We have failed to do this timer tick!
+        n_background_overloads++;
+    } else {
+        n_backgrounds_queued++;
+        if (n_backgrounds_queued > max_backgrounds_queued) {
+            max_backgrounds_queued++;
+        }
     }
     spin1_mode_restore(state);
 }
