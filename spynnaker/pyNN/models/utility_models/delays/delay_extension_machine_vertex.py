@@ -266,7 +266,7 @@ class DelayExtensionMachineVertex(
             n_late_packets, report=n_late_packets > 0,
             message=late_message.format(n_late_packets, label, x, y, p)))
         provenance_items.append(ProvenanceDataItem(
-            self._add_name(names, self._BACKGROUND_MAX_QUEUED_NAME),
+            self._add_name(names, self.BACKGROUND_MAX_QUEUED_NAME),
             max_background_queued, report=max_background_queued > 1,
             message=(
                 "A maximum of {} background tasks were queued on {} on"
@@ -274,7 +274,7 @@ class DelayExtensionMachineVertex(
                 " within the .spynnaker.cfg file or in the pynn.setup()"
                 " method.".format(max_background_queued, label, x, y, p))))
         provenance_items.append(ProvenanceDataItem(
-            self._add_name(names, self._BACKGROUND_OVERLOADS_NAME),
+            self._add_name(names, self.BACKGROUND_OVERLOADS_NAME),
             n_background_overloads, report=n_background_overloads > 0,
             message=(
                 "On {} on {}, {}, {}, the background queue overloaded {}"
