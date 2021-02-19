@@ -55,6 +55,9 @@ install_requires = [
     "numpy > 1.13, < 1.21; python_version == '3.7'",
     "numpy; python_version >= '3.8'",
     'lxml',
+    # We need to install matplotlib before quantities which has it uncapped
+    "matplotlib < 3.4; python_version == '3.6'",
+    "matplotlib; python_version >= '3.7'",
     'quantities >= 0.12.1',
     'pynn >= 0.9.1, < 0.10.0 ',
     'lazyarray >= 0.2.9, <= 0.4.0',
