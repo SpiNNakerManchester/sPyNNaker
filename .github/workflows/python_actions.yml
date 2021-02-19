@@ -23,10 +23,6 @@
 name: Python Actions
 on: [push]
 
-env:
-  # Magic to make matplotlib behave nicely
-  MPLBACKEND: module://matplotlib.backends.backend_agg
-
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -56,6 +52,8 @@ jobs:
           SpiNNUtils SpiNNMachine SpiNNMan PACMAN DataSpecification spalloc
           SpiNNFrontEndCommon
         install: true
+    - name: Install matplotlib
+      uses: ./support/actions/install-matplotlib
     - name: Setup
       uses: ./support/actions/run-setup
     - name: Checkout Spinnaker Test Cases
@@ -117,6 +115,8 @@ jobs:
           SpiNNUtils SpiNNMachine SpiNNMan PACMAN DataSpecification spalloc
           SpiNNFrontEndCommon
         install: true
+    - name: Install matplotlib
+      uses: ./support/actions/install-matplotlib
     - name: Setup
       uses: ./support/actions/run-setup
     - name: Build documentation with sphinx
