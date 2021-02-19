@@ -12,8 +12,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from p8_integration_tests.base_test_case import (
-    BaseTestCase, calculate_spike_pair_additive_stdp_weight)
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    calculate_spike_pair_additive_stdp_weight)
+from p8_integration_tests.base_test_case import BaseTestCase
 import spynnaker8 as p
 import numpy
 

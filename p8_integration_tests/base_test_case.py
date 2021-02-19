@@ -19,7 +19,6 @@ import sys
 import time
 import unittest
 from unittest import SkipTest
-import numpy
 import sqlite3
 import spinn_utilities.conf_loader as conf_loader
 from spinnman.exceptions import SpinnmanException
@@ -33,57 +32,6 @@ else:
     max_tries = 1
 
 
-def calculate_stdp_times(pre_spikes, post_spikes, plastic_delay):
-    # If no post spikes, no changes
-    if len(post_spikes) == 0:
-        return numpy.zeros(0), numpy.zeros(0)
-
-    # Get the spikes and time differences that will be considered by
-    # the simulation (as the last pre-spike will be considered differently)
-    last_pre_spike_delayed = pre_spikes[-1] - plastic_delay
-    considered_post_spikes = post_spikes[post_spikes < last_pre_spike_delayed]
-    if len(considered_post_spikes) == 0:
-        return numpy.zeros(0), numpy.zeros(0)
-    potentiation_time_diff = numpy.ravel(numpy.subtract.outer(
-        considered_post_spikes + plastic_delay, pre_spikes[:-1]))
-    potentiation_times = (
-        potentiation_time_diff[potentiation_time_diff > 0] * -1)
-    depression_time_diff = numpy.ravel(numpy.subtract.outer(
-        considered_post_spikes + plastic_delay, pre_spikes))
-    depression_times = depression_time_diff[depression_time_diff < 0]
-    return potentiation_times, depression_times
-
-
-def calculate_spike_pair_additive_stdp_weight(
-        pre_spikes, post_spikes, initial_weight, plastic_delay, max_weight,
-        a_plus, a_minus, tau_plus, tau_minus):
-    """ Calculates the expected stdp weight for SpikePair Additive STDP
-    """
-    potentiation_times, depression_times = calculate_stdp_times(
-        pre_spikes, post_spikes, plastic_delay)
-
-    # Work out the weight according to the additive rule
-    potentiations = max_weight * a_plus * numpy.exp(
-        (potentiation_times / tau_plus))
-    depressions = max_weight * a_minus * numpy.exp(
-        (depression_times / tau_minus))
-    return initial_weight + numpy.sum(potentiations) - numpy.sum(depressions)
-
-
-def calculate_spike_pair_multiplicative_stdp_weight(
-        pre_spikes, post_spikes, initial_weight, plastic_delay, min_weight,
-        max_weight, a_plus, a_minus, tau_plus, tau_minus):
-    """ Calculates the expected stdp weight for SpikePair Multiplicative STDP
-    """
-    potentiation_times, depression_times = calculate_stdp_times(
-        pre_spikes, post_spikes, plastic_delay)
-
-    # Work out the weight according to the multiplicative rule
-    potentiations = (max_weight - initial_weight) * a_plus * numpy.exp(
-        (potentiation_times / tau_plus))
-    depressions = (initial_weight - min_weight) * a_minus * numpy.exp(
-        (depression_times / tau_minus))
-    return initial_weight + numpy.sum(potentiations) - numpy.sum(depressions)
 
 
 class BaseTestCase(unittest.TestCase):
