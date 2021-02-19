@@ -23,10 +23,6 @@
 name: Python Actions
 on: [push]
 
-env:
-  # Magic to make matplotlib behave nicely
-  MPLBACKEND: module://matplotlib.backends.backend_agg
-
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -42,6 +38,7 @@ jobs:
       with:
         repository: SpiNNakerManchester/SupportScripts
         path: support
+        ref: update_make_references
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
@@ -49,6 +46,8 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install pip, etc
       uses: ./support/actions/python-tools
+    - name: Install matplotlib
+      uses: ./support/actions/install-matplotlib
     - name: Install Spinnaker Dependencies
       uses: ./support/actions/checkout-spinn-deps
       with:
