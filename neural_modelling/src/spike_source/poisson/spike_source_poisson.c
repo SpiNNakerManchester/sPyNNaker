@@ -635,8 +635,10 @@ static void process_fast_source(
             if (ssp_params.has_key) {
                 // Send spikes
                 const uint32_t spike_key = ssp_params.key | s_id;
-                tdma_processing_send_packet(
-                    spike_key, num_spikes, WITH_PAYLOAD, timer_count);
+                spin1_send_mc_packet(
+                    spike_key, num_spikes, WITH_PAYLOAD);
+//                tdma_processing_send_packet(
+//                    spike_key, num_spikes, WITH_PAYLOAD, timer_count);
             }
         }
     }
@@ -658,8 +660,10 @@ static void process_slow_source(
             // if no key has been given, do not send spike to fabric.
             if (ssp_params.has_key) {
                 // Send package
-                tdma_processing_send_packet(
-                    ssp_params.key | s_id, 0, NO_PAYLOAD, timer_count);
+                spin1_send_mc_packet(
+                    ssp_params.key | s_id, 0, NO_PAYLOAD);
+//                tdma_processing_send_packet(
+//                    ssp_params.key | s_id, 0, NO_PAYLOAD, timer_count);
             }
 
             // Update time to spike (note, this might not get us back above
