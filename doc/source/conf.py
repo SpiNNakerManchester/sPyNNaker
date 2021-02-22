@@ -393,16 +393,12 @@ autodoc_default_options = {
 }
 
 
-def filtered_files(base, excludes=None, exclude_dir=None):
-    if not excludes:
-        excludes = []
+def filtered_files(base, excludes=()):
     excludes = set(base + "/" + e for e in excludes)
     for root, _dirs, files in os.walk(base):
         for filename in files:
             full = root + "/" + filename
-            if exclude_dir and exclude_dir in root:
-                yield full
-            elif filename.endswith(".py") and not filename.startswith("_"):
+            if filename.endswith(".py") and not filename.startswith("_"):
                 if full not in excludes:
                     yield full
 
@@ -450,6 +446,9 @@ explicit_wanted_files = [
     "spynnaker8/spynnaker_plotting.py",
     "spynnaker8/utilities/neo_convertor.py",
     "spynnaker8/utilities/neo_compare.py"]
-options = ['-o', output_dir, "."]
-options.extend(filtered_files(".", explicit_wanted_files, "tests"))
+options = ['-o', output_dir, ".",
+           # Exclude test and setup code
+           "p8_integration_tests/*", "unittests/*", "setup.py"]
+options.extend(filtered_files("spynnaker", explicit_wanted_files))
+options.extend(filtered_files("spynnaker8", explicit_wanted_files))
 apidoc.main(options)
