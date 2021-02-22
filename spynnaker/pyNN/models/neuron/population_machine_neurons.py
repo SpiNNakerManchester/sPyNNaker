@@ -51,7 +51,8 @@ NeuronRegions = namedtuple(
     ["neuron_params", "neuron_recording"])
 
 
-class PopulationMachineNeurons(AbstractReadParametersBeforeSet):
+class PopulationMachineNeurons(
+        AbstractReadParametersBeforeSet, allow_derivation=True):
     """ Mix-in for machine vertices that have neurons in them
     """
 
@@ -166,7 +167,7 @@ class PopulationMachineNeurons(AbstractReadParametersBeforeSet):
             The data specification to write to
         :param int machine_time_step: The simulation time step
         """
-        self._app_vertex.update_state_variables()
+        self._app_vertex.set_has_run()
 
         # pylint: disable=too-many-arguments
         n_atoms = self._vertex_slice.n_atoms

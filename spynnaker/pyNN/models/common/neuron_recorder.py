@@ -12,15 +12,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-from __future__ import division
 from collections import OrderedDict
 import itertools
 import logging
 import math
 import numpy
-from six import iteritems
-from six.moves import range, xrange
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.resources.variable_sdram import VariableSDRAM
@@ -161,7 +157,7 @@ class NeuronRecorder(object):
             return range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1)
         indexes = self.__indexes[variable]
         return [
-            i for i in xrange(vertex_slice.lo_atom, vertex_slice.hi_atom + 1)
+            i for i in range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1)
             if i in indexes]
 
     def get_neuron_sampling_interval(self, variable):
@@ -193,7 +189,7 @@ class NeuronRecorder(object):
             placement.x, placement.y, placement.p)
         # Start the fragment for this slice empty
         fragment = numpy.empty((expected_rows, n_neurons))
-        for i in xrange(0, expected_rows):
+        for i in range(0, expected_rows):
             time = i * sampling_rate
             # Check if there is data for this time step
             local_indexes = numpy.where(times == time)
@@ -390,7 +386,7 @@ class NeuronRecorder(object):
             vertex_slice = vertex.vertex_slice
 
             ms_per_tick = machine_time_step / MICRO_TO_MILLISECOND_CONVERSION
-            neurons = self._neurons_recording(variable, vertex_slice)
+            neurons = list(self._neurons_recording(variable, vertex_slice))
             neurons_recording = len(neurons)
             if neurons_recording == 0:
                 continue
@@ -490,7 +486,7 @@ class NeuronRecorder(object):
         :rtype: list(int)
         """
         results = list()
-        for variable, rate in iteritems(self.__sampling_rates):
+        for variable, rate in self.__sampling_rates.items():
             if rate > 0:
                 results.append(self.__region_ids[variable])
         # Per timestep regions come after normal regions
@@ -513,7 +509,7 @@ class NeuronRecorder(object):
         if self.__indexes[variable] is None:
             return True
         indexes = self.__indexes[variable]
-        for index in xrange(vertex_slice.lo_atom, vertex_slice.hi_atom+1):
+        for index in range(vertex_slice.lo_atom, vertex_slice.hi_atom+1):
             if index in indexes:
                 return True
         return False
@@ -835,7 +831,7 @@ class NeuronRecorder(object):
         # No need to consider per-timestep variables here as they won't
         # overflow
         overflow = 0
-        for variable, rate in iteritems(self.__sampling_rates):
+        for variable, rate in self.__sampling_rates.items():
             # If rate is 0 no recording so no overflow
             # If rate is 1 there is no overflow as average is exact
             if rate > 1:
@@ -1003,7 +999,7 @@ class NeuronRecorder(object):
             indexes = self.__indexes[variable]
             local_index = 0
             local_indexes = list()
-            for index in xrange(n_bytes_for_n_neurons):
+            for index in range(n_bytes_for_n_neurons):
                 if index + vertex_slice.lo_atom in indexes:
                     local_indexes.append(local_index)
                     local_index += 1

@@ -12,19 +12,14 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from __future__ import division
-import logging
 import math
 import numpy
 import ctypes
-from spinn_utilities.log import FormatAdapter
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.exceptions import (
     SynapseRowTooBigException, SynapticConfigurationException)
 from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
 from spynnaker.pyNN.utilities.bit_field_utilities import BIT_IN_A_WORD
-
-logger = FormatAdapter(logging.getLogger(__name__))
 
 # Scale factor for an address; allows more addresses to be represented, but
 # means addresses have to be aligned to these offsets
@@ -381,7 +376,8 @@ class MasterPopTableAsBinarySearch(object):
         :param int next_address: The next address that would be used
         :return: The next address that can be used following next_address
         :rtype: int
-        :raises SynapticConfigurationException: if the address is out of range
+        :raises ~spynnaker.pyNN.exceptions.SynapticConfigurationException:
+            if the address is out of range
         """
         addr_scaled = (next_address + (_ADDRESS_SCALE - 1)) // _ADDRESS_SCALE
         if addr_scaled > _MAX_ADDRESS:
@@ -408,7 +404,8 @@ class MasterPopTableAsBinarySearch(object):
             Flag that states if the entry is a direct entry for a single row.
         :return: The index of the entry, to be used to retrieve it
         :rtype: int
-        :raises SynapticConfigurationException: If a bad address is used.
+        :raises ~spynnaker.pyNN.exceptions.SynapticConfigurationException:
+            If a bad address is used.
         """
         return self.__update_master_population_table(
             block_start_addr, row_length, key_and_mask, 0, 0, 0, is_single)
@@ -431,7 +428,8 @@ class MasterPopTableAsBinarySearch(object):
             Flag that states if the entry is a direct entry for a single row.
         :return: The index of the entry, to be used to retrieve it
         :rtype: int
-        :raises SynapticConfigurationException: If a bad address is used.
+        :raises ~spynnaker.pyNN.exceptions.SynapticConfigurationException:
+            If a bad address is used.
         """
         # If there are too many neurons per core, fail
         if n_neurons > _MAX_N_NEURONS:
@@ -467,7 +465,8 @@ class MasterPopTableAsBinarySearch(object):
             Flag that states if the entry is a direct entry for a single row.
         :return: The index of the entry, to be used to retrieve it
         :rtype: int
-        :raises SynapticConfigurationException: If a bad address is used.
+        :raises ~spynnaker.pyNN.exceptions.SynapticConfigurationException:
+            If a bad address is used.
         """
 
         # pylint: disable=too-many-arguments, arguments-differ

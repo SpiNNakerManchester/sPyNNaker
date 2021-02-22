@@ -132,7 +132,7 @@ class DelayExtensionMachineVertex(
             The slice of the application vertex that this machine vertex
             implements.
         """
-        super(DelayExtensionMachineVertex, self).__init__(
+        super().__init__(
             label, constraints=constraints, app_vertex=app_vertex,
             vertex_slice=vertex_slice)
         self.__slice_index = slice_index

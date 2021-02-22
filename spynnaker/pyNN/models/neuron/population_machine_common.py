@@ -25,8 +25,7 @@ from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
 from spinn_front_end_common.interface.profiling.profile_utils import (
     get_profiling_data, reserve_profile_region, write_profile_region_data)
-from spinn_front_end_common.abstract_models import (
-    AbstractRecordable, AbstractHasAssociatedBinary)
+from spinn_front_end_common.abstract_models import AbstractHasAssociatedBinary
 from spinn_front_end_common.interface.buffer_management\
     .recording_utilities import (
         get_recording_header_size, get_recording_header_array)
@@ -47,7 +46,6 @@ CommonRegions = namedtuple(
 class PopulationMachineCommon(
         MachineVertex,
         ProvidesProvenanceDataFromMachineImpl,
-        AbstractRecordable,
         AbstractReceiveBuffersToHost,
         AbstractHasProfileData,
         AbstractHasAssociatedBinary):
@@ -129,13 +127,6 @@ class PopulationMachineCommon(
         :param :param ~pacman.model.placements.Placement placement:
             the placement from which the data was read
         """
-
-    @overrides(AbstractRecordable.is_recording)
-    def is_recording(self):
-        # Note: this calls a function from AbstractReceiveBuffersToHost but
-        # that function is not defined in this class (but must be overridden,
-        # as it is abstract in AbstractReceiveBuffersToHost)
-        return len(self.get_recorded_region_ids()) > 0
 
     @overrides(AbstractReceiveBuffersToHost.get_recording_region_base_address)
     def get_recording_region_base_address(self, txrx, placement):

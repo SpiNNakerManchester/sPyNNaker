@@ -14,8 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import OrderedDict
-import logging
-from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
     FixedKeyAndMaskConstraint)
@@ -26,8 +24,6 @@ from spinn_front_end_common.abstract_models import (
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 from .abstract_ethernet_controller import AbstractEthernetController
-
-logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class ExternalDeviceLifControlVertex(
@@ -106,7 +102,7 @@ class ExternalDeviceLifControlVertex(
         if create_edges:
             self.__dependent_vertices = devices
 
-        super(ExternalDeviceLifControlVertex, self).__init__(
+        super().__init__(
             len(devices), label, constraints, max_atoms_per_core,
             spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
             neuron_impl, pynn_model, drop_late_spikes, splitter)

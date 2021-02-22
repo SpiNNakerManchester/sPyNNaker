@@ -51,23 +51,25 @@ class MunichRetinaDevice(
         "__fixed_key",
         "__fixed_mask",
         "__polarity",
-        "__position"]
+        "__is_right"]
 
     # key codes for the robot retina
-    MANAGEMENT_BIT = 0x400
-    MANAGEMENT_MASK = 0xFFFFF800
-    LEFT_RETINA_ENABLE = 0x45
-    RIGHT_RETINA_ENABLE = 0x46
-    LEFT_RETINA_DISABLE = 0x45
-    RIGHT_RETINA_DISABLE = 0x46
-    LEFT_RETINA_KEY_SET = 0x43
-    RIGHT_RETINA_KEY_SET = 0x44
+    _MANAGEMENT_BIT = 0x400
+    _MANAGEMENT_MASK = 0xFFFFF800
+    _LEFT_RETINA_ENABLE = 0x45
+    _RIGHT_RETINA_ENABLE = 0x46
+    _LEFT_RETINA_DISABLE = 0x45
+    _RIGHT_RETINA_DISABLE = 0x46
+    _LEFT_RETINA_KEY_SET = 0x43
+    _RIGHT_RETINA_KEY_SET = 0x44
 
     UP_POLARITY = "UP"
     DOWN_POLARITY = "DOWN"
     MERGED_POLARITY = "MERGED"
 
+    #: Select the left retina
     LEFT_RETINA = "LEFT"
+    #: Select the right retina
     RIGHT_RETINA = "RIGHT"
     _RETINAS = frozenset((LEFT_RETINA, RIGHT_RETINA))
 
@@ -88,7 +90,8 @@ class MunichRetinaDevice(
         :param str position: ``LEFT`` or ``RIGHT``
         :param str label:
         :param str polarity: ``UP``, ``DOWN`` or ``MERGED``
-        :param str board_address:
+        :param board_address:
+        :type board_address: str or None
         """
         # pylint: disable=too-many-arguments
         if polarity is None:
@@ -108,16 +111,15 @@ class MunichRetinaDevice(
             self.__fixed_mask = 0xFFFFC000
 
         self.__polarity = polarity
-        self.__position = position
+        if position not in self._RETINAS:
+            raise SpynnakerException(
+                "The external Retina does not recognise this position")
+        self.__is_right = position == self.RIGHT_RETINA
 
-        super(MunichRetinaDevice, self).__init__(
+        super().__init__(
             n_atoms=fixed_n_neurons, spinnaker_link_id=spinnaker_link_id,
             max_atoms_per_core=fixed_n_neurons, label=label,
             board_address=board_address)
-
-        if self.__position not in self._RETINAS:
-            raise SpynnakerException(
-                "The external Retina does not recognise this _position")
 
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
                get_outgoing_partition_constraints)
@@ -131,10 +133,9 @@ class MunichRetinaDevice(
         commands = list()
         # change the retina key it transmits with
         # (based off if its right or left)
-        if self.__position == self.RIGHT_RETINA:
-            key_set_command = self.MANAGEMENT_BIT | self.RIGHT_RETINA_KEY_SET
-        else:
-            key_set_command = self.MANAGEMENT_BIT | self.LEFT_RETINA_KEY_SET
+        key_set_command = self._MANAGEMENT_BIT | (
+            self._RIGHT_RETINA_KEY_SET if self.__is_right
+            else self._LEFT_RETINA_KEY_SET)
 
         # to ensure populations receive the correct packets, this needs to be
         # different based on which retina
@@ -146,10 +147,9 @@ class MunichRetinaDevice(
             delay_between_repeats=1000))
 
         # make retina enabled (dependent on if its a left or right retina
-        if self.__position == self.RIGHT_RETINA:
-            enable_command = self.MANAGEMENT_BIT | self.RIGHT_RETINA_ENABLE
-        else:
-            enable_command = self.MANAGEMENT_BIT | self.LEFT_RETINA_ENABLE
+        enable_command = self._MANAGEMENT_BIT | (
+            self._RIGHT_RETINA_ENABLE if self.__is_right
+            else self._LEFT_RETINA_ENABLE)
         commands.append(MultiCastCommand(
             key=enable_command, payload=1, repeat=5,
             delay_between_repeats=1000))
@@ -160,10 +160,9 @@ class MunichRetinaDevice(
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
     def pause_stop_commands(self):
         # disable retina
-        if self.__position == self.RIGHT_RETINA:
-            disable_command = self.MANAGEMENT_BIT | self.RIGHT_RETINA_DISABLE
-        else:
-            disable_command = self.MANAGEMENT_BIT | self.LEFT_RETINA_DISABLE
+        disable_command = self._MANAGEMENT_BIT | (
+            self._RIGHT_RETINA_DISABLE if self.__is_right
+            else self._LEFT_RETINA_DISABLE)
 
         return [MultiCastCommand(
             disable_command, payload=0, repeat=5, delay_between_repeats=1000)]

@@ -16,7 +16,6 @@
 from pyNN.random import available_distributions, RandomDistribution
 from enum import Enum
 import numpy
-from six import with_metaclass
 from spinn_utilities.abstract_base import abstractproperty, AbstractBase
 from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
@@ -51,8 +50,8 @@ class ConnectorIDs(Enum):
     KERNEL_CONNECTOR = 6
 
 
-class AbstractGenerateConnectorOnMachine(with_metaclass(
-        AbstractBase, AbstractConnector)):
+class AbstractGenerateConnectorOnMachine(
+        AbstractConnector, metaclass=AbstractBase):
     """ Indicates that the connectivity can be generated on the machine
     """
 
@@ -68,8 +67,7 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         :param callable callback: Ignored
         :param bool verbose:
         """
-        AbstractConnector.__init__(  # pylint: disable=non-parent-init-called
-            self, safe=safe, callback=callback, verbose=verbose)
+        super().__init__(safe=safe, callback=callback, verbose=verbose)
         self.__delay_seed = dict()
         self.__weight_seed = dict()
         self.__connector_seed = dict()
@@ -196,10 +194,10 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         be generated on the machine
 
         :param weights:
-        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or
             float or list(int) or list(float)
         :param delays:
-        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or
             float or list(int) or list(float)
         :rtype: bool
         """
@@ -210,7 +208,7 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         """ Get the id of the weight generator on the machine
 
         :param weights:
-        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or
             float or list(int) or list(float)
         :rtype: int
         """
@@ -220,7 +218,7 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         """ Get the parameters of the weight generator on the machine
 
         :param weights:
-        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or
             float or list(int) or list(float)
         :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
@@ -235,7 +233,7 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         """ The size of the weight parameters in bytes
 
         :param weights:
-        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or
             float or list(int) or list(float)
         :rtype: int
         """
@@ -245,7 +243,7 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         """ Get the id of the delay generator on the machine
 
         :param delays:
-        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or
             float or list(int) or list(float)
         :rtype: int
         """
@@ -255,7 +253,7 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         """ Get the parameters of the delay generator on the machine
 
         :param delays:
-        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or
             float or list(int) or list(float)
         :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
@@ -270,7 +268,7 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         """ The size of the delay parameters in bytes
 
         :param delays:
-        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or
             float or list(int) or list(float)
         :rtype: int
         """
@@ -311,7 +309,7 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
     def _get_view_lo_hi(view):
         """ Get the range of neuron IDs covered by a view.
 
-        :param spynnaker8.models.populations.PopulationView view:
+        :param ~spynnaker.pyNN.models.populations.PopulationView view:
         :rtype: tuple(int,int)
         """
         # Evil forward reference to subpackage implementation of type!

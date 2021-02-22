@@ -59,17 +59,44 @@ class SynapseTypeSEMD(AbstractSynapseType):
             self, tau_syn_E, tau_syn_E2, tau_syn_I, isyn_exc, isyn_exc2,
             isyn_inh, multiplicator, exc2_old, scaling_factor):
         r"""
-        :param float tau_syn_E: :math:`\tau^{syn}_{e_1}`
-        :param float tau_syn_E2: :math:`\tau^{syn}_{e_2}`
-        :param float tau_syn_I: :math:`\tau^{syn}_i`
-        :param float isyn_exc: :math:`I^{syn}_{e_1}`
-        :param float isyn_exc2: :math:`I^{syn}_{e_2}`
-        :param float isyn_inh: :math:`I^{syn}_i`
-        :param float multiplicator:
-        :param float exc2_old:
-        :param float scaling_factor:
+        :param tau_syn_E: :math:`\tau^{syn}_{e_1}`
+        :type tau_syn_E:
+            float, iterable(float), ~pyNN.random.RandomDistribution
+            or (mapping) function
+        :param tau_syn_E2: :math:`\tau^{syn}_{e_2}`
+        :type tau_syn_E2:
+            float, iterable(float), ~pyNN.random.RandomDistribution
+            or (mapping) function
+        :param tau_syn_I: :math:`\tau^{syn}_i`
+        :type tau_syn_I:
+            float, iterable(float), ~pyNN.random.RandomDistribution
+            or (mapping) function
+        :param isyn_exc: :math:`I^{syn}_{e_1}`
+        :type isyn_exc:
+            float, iterable(float), ~pyNN.random.RandomDistribution
+            or (mapping) function
+        :param isyn_exc2: :math:`I^{syn}_{e_2}`
+        :type isyn_exc2:
+            float, iterable(float), ~pyNN.random.RandomDistribution
+            or (mapping) function
+        :param isyn_inh: :math:`I^{syn}_i`
+        :type isyn_inh:
+            float, iterable(float), ~pyNN.random.RandomDistribution
+            or (mapping) function
+        :param multiplicator:
+        :type multiplicator:
+            float, iterable(float), ~pyNN.random.RandomDistribution
+            or (mapping) function
+        :param exc2_old:
+        :type exc2_old:
+            float, iterable(float), ~pyNN.random.RandomDistribution
+            or (mapping) function
+        :param scaling_factor:
+        :type scaling_factor:
+            float, iterable(float), ~pyNN.random.RandomDistribution
+            or (mapping) function
         """
-        super(SynapseTypeSEMD, self).__init__(
+        super().__init__(
             [DataType.U032,    # decay_E
              DataType.U032,    # init_E
              DataType.S1615,   # isyn_exc
@@ -182,70 +209,34 @@ class SynapseTypeSEMD(AbstractSynapseType):
     def tau_syn_E(self):
         return self.__tau_syn_E
 
-    @tau_syn_E.setter
-    def tau_syn_E(self, tau_syn_E):
-        self.__tau_syn_E = tau_syn_E
-
     @property
     def tau_syn_E2(self):
         return self.__tau_syn_E2
-
-    @tau_syn_E2.setter
-    def tau_syn_E2(self, tau_syn_E2):
-        self.__tau_syn_E2 = tau_syn_E2
 
     @property
     def tau_syn_I(self):
         return self.__tau_syn_I
 
-    @tau_syn_I.setter
-    def tau_syn_I(self, tau_syn_I):
-        self.__tau_syn_I = tau_syn_I
-
     @property
     def isyn_exc(self):
         return self.__isyn_exc
-
-    @isyn_exc.setter
-    def isyn_exc(self, isyn_exc):
-        self.__isyn_exc = isyn_exc
 
     @property
     def isyn_inh(self):
         return self.__isyn_inh
 
-    @isyn_inh.setter
-    def isyn_inh(self, isyn_inh):
-        self.__isyn_inh = isyn_inh
-
     @property
     def isyn_exc2(self):
         return self.__isyn_exc2
-
-    @isyn_exc2.setter
-    def isyn_exc2(self, isyn_exc2):
-        self.__isyn_exc2 = isyn_exc2
 
     @property
     def multiplicator(self):
         return self.__multiplicator
 
-    @multiplicator.setter
-    def multiplicator(self, multiplicator):
-        self.__multiplicator = multiplicator
-
     @property
     def exc2_old(self):
         return self.__exc2_old
 
-    @exc2_old.setter
-    def exc2_old(self, exc2_old):
-        self.__exc2_old = exc2_old
-
     @property
     def scaling_factor(self):
         return self.__scaling_factor
-
-    @scaling_factor.setter
-    def scaling_factor(self, scaling_factor):
-        self.__scaling_factor = scaling_factor

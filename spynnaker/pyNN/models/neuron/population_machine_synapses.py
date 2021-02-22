@@ -90,7 +90,7 @@ class PopulationMachineSynapses(
         AbstractSupportsBitFieldGeneration,
         AbstractSupportsBitFieldRoutingCompression,
         AbstractSynapseExpandable,
-        HasSynapses):
+        HasSynapses, allow_derivation=True):
     """ Mix-in for machine vertices that contain synapses
     """
 

@@ -17,6 +17,7 @@ import logging
 import numpy
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
+from spinn_utilities.ranged import RangedListOfList
 from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spinn_front_end_common.abstract_models.impl import (
@@ -37,7 +38,10 @@ def _as_numpy_ticks(times, time_step):
 def _send_buffer_times(spike_times, time_step):
     # Convert to ticks
     if len(spike_times) and hasattr(spike_times[0], "__len__"):
-        return [_as_numpy_ticks(times, time_step) for times in spike_times]
+        data = []
+        for times in spike_times:
+            data.append(_as_numpy_ticks(times, time_step))
+        return data
     else:
         return _as_numpy_ticks(spike_times, time_step)
 
@@ -57,13 +61,12 @@ class SpikeSourceArrayVertex(
         # pylint: disable=too-many-arguments
         self.__model_name = "SpikeSourceArray"
         self.__model = model
-
         if spike_times is None:
             spike_times = []
         self._spike_times = spike_times
         time_step = self.get_spikes_sampling_interval()
 
-        super(SpikeSourceArrayVertex, self).__init__(
+        super().__init__(
             n_keys=n_neurons, label=label, constraints=constraints,
             max_atoms_per_core=max_atoms_per_core,
             send_buffer_times=_send_buffer_times(spike_times, time_step),
@@ -89,7 +92,45 @@ class SpikeSourceArrayVertex(
     def spike_times(self):
         """ The spike times of the spike source array
         """
-        return self._spike_times
+        return list(self._spike_times)
+
+    def _to_early_spikes_single_list(self, spike_times):
+        """
+        Checks if there is one or more spike_times before the current time
+
+        Logs a warning for the first oen found
+
+        :param iterable(int spike_times:
+        """
+        current_time = globals_variables.get_simulator().get_current_time()
+        for i in range(len(spike_times)):
+            if spike_times[i] > current_time:
+                logger.warning(
+                    "SpikeSourceArray {} has spike_times that are lower than "
+                    "the current time {} For example {} - "
+                    "these will be ignored.".format(
+                        self, current_time, float(spike_times[i])))
+                return
+
+    def _check_spikes_double_list(self, spike_times):
+        """
+        Checks if there is one or more spike_times before the current time
+
+        Logs a warning for the first oen found
+
+        :param iterable(iterable(int) spike_times:
+        """
+        current_time = globals_variables.get_simulator().get_current_time()
+        for neuron_id in range(0, self.n_atoms):
+            id_times = spike_times[neuron_id]
+            for i in range(len(id_times)):
+                if id_times[i] > current_time:
+                    logger.warning(
+                       "SpikeSourceArray {} has spike_times that are lower "
+                       "than the current time {} For example {} - "
+                       "these will be ignored.".format(
+                            self, current_time, float(id_times[i])))
+                    return
 
     @spike_times.setter
     def spike_times(self, spike_times):
@@ -98,15 +139,12 @@ class SpikeSourceArrayVertex(
 
         """
         time_step = self.get_spikes_sampling_interval()
-        current_time = globals_variables.get_simulator().get_current_time()
         # warn the user if they are asking for a spike time out of range
-        for n in range(len(spike_times)):
-            if spike_times[n] < current_time:
-                logger.warning("A spike time of {} was specified for the "
-                               "SpikeSourceArray {} that is "
-                               "lower than the current time {} - this "
-                               "will be ignored.".format(
-                                   float(spike_times[n]), self, current_time))
+        if spike_times:  # in case of empty list do not check
+            if hasattr(spike_times[0], '__iter__'):
+                self._check_spikes_double_list(spike_times)
+            else:
+                self._to_early_spikes_single_list(spike_times)
         self.send_buffer_times = _send_buffer_times(spike_times, time_step)
         self._spike_times = spike_times
 
@@ -171,3 +209,21 @@ class SpikeSourceArrayVertex(
             "parameters": parameters,
         }
         return context
+
+    @overrides(SimplePopulationSettable.set_value_by_selector)
+    def set_value_by_selector(self, selector, key, value):
+        if key == "spike_times":
+            old_values = self.get_value(key)
+            if isinstance(old_values, RangedListOfList):
+                ranged_list = old_values
+            else:
+                # Keep all the setting stuff in one place by creating a
+                # RangedListofLists
+                ranged_list = RangedListOfList(
+                    size=self.n_atoms, value=old_values)
+            ranged_list.set_value_by_selector(
+                selector, value, ranged_list.is_list(value, self.n_atoms))
+            self.set_value(key, ranged_list)
+        else:
+            SimplePopulationSettable.set_value_by_selector(
+                self, selector, key, value)

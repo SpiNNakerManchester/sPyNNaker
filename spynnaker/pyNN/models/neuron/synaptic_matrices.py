@@ -15,23 +15,18 @@
 
 import math
 import numpy
-from six import iteritems, itervalues
 from collections import defaultdict
 
 from spinn_utilities.ordered_set import OrderedSet
-
 from pacman.model.routing_info import BaseKeyAndMask
-
 from data_specification.enums.data_type import DataType
 
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-
 from spynnaker.pyNN.models.neural_projections import (
     ProjectionApplicationEdge, DelayedApplicationEdge)
 from spynnaker.pyNN.models.neuron.master_pop_table import (
     MasterPopTableAsBinarySearch)
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
-
 from .key_space_tracker import KeySpaceTracker
 from .synaptic_matrix_app import SynapticMatrixApp
 
@@ -43,6 +38,8 @@ from .synaptic_matrix_app import SynapticMatrixApp
 # 1 for n_synapse_index_bits
 SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES = (
     1 + 1 + 2 + 1 + 1 + 1) * BYTES_PER_WORD
+
+DIRECT_MATRIX_HEADER_COST_BYTES = 1 * BYTES_PER_WORD
 
 
 class SynapticMatrices(object):
@@ -213,7 +210,7 @@ class SynapticMatrices(object):
         generate_on_machine = list()
 
         # For each machine edge in the vertex, create a synaptic list
-        for app_edge, m_edges in iteritems(in_edges_by_app_edge):
+        for app_edge, m_edges in in_edges_by_app_edge.items():
 
             spec.comment("\nWriting matrix for edge:{}\n".format(
                 app_edge.label))
@@ -256,7 +253,9 @@ class SynapticMatrices(object):
         single_data_words = len(single_data)
         spec.reserve_memory_region(
             region=self.__direct_matrix_region,
-            size=(single_data_words + 1) * BYTES_PER_WORD,
+            size=(
+                single_data_words * BYTES_PER_WORD +
+                DIRECT_MATRIX_HEADER_COST_BYTES),
             label='DirectMatrix')
         spec.switch_write_focus(self.__direct_matrix_region)
         spec.write_value(single_data_words * BYTES_PER_WORD)
@@ -570,13 +569,13 @@ class SynapticMatrices(object):
         :param ~pacman.model.placements.Placement placement:
             where the data is to be read from
         """
-        for matrix in itervalues(self.__matrices):
+        for matrix in self.__matrices.values():
             matrix.read_generated_connection_holders(transceiver, placement)
 
     def clear_connection_cache(self):
         """ Clear any values read from the machine
         """
-        for matrix in itervalues(self.__matrices):
+        for matrix in self.__matrices.values():
             matrix.clear_connection_cache()
 
     @property

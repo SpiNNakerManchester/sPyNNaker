@@ -28,7 +28,7 @@ from spynnaker.pyNN.utilities.spynnaker_failed_state import (
 
 class Close_Once(object):
 
-    __slots__ = ("closed")
+    __slots__ = ["closed"]
 
     def __init__(self):
         self.closed = False
@@ -45,7 +45,7 @@ class TestSpinnakerMainInterface(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # Normally this is done by spinnaker.py during import
-        globals_variables.set_failed_state(SpynnakerFailedState())
+        globals_variables._failed_state = SpynnakerFailedState("test")
 
     def test_min_init(self):
         class_file = sys.modules[self.__module__].__file__

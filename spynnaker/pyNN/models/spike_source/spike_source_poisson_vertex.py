@@ -106,12 +106,13 @@ class SpikeSourcePoissonVertex(
             max_rate=None, splitter=None):
         """
         :param int n_neurons:
-        :param iterable(~pacman.model.constraints.AbstractConstraint) \
-                constraints:
+        :param constraints:
+        :type constraints:
+            iterable(~pacman.model.constraints.AbstractConstraint)
         :param str label:
         :param float seed:
         :param int max_atoms_per_core:
-        :param SpikeSourcePoisson model:
+        :param ~spynnaker.pyNN.models.spike_source.SpikeSourcePoisson model:
         :param iterable(float) rate:
         :param iterable(int) start:
         :param iterable(int) duration:
@@ -120,8 +121,7 @@ class SpikeSourcePoissonVertex(
             ~pacman.model.partitioner_splitters.abstract_splitters.AbstractSplitterCommon
         """
         # pylint: disable=too-many-arguments
-        TDMAAwareApplicationVertex.__init__(
-            self, label, constraints, max_atoms_per_core, splitter)
+        super().__init__(label, constraints, max_atoms_per_core, splitter)
 
         # atoms params
         self.__n_atoms = self.round_n_atoms(n_neurons, "n_neurons")
@@ -419,7 +419,7 @@ class SpikeSourcePoissonVertex(
 
     @overrides(SimplePopulationSettable.set_value)
     def set_value(self, key, value):
-        SimplePopulationSettable.set_value(self, key, value)
+        super().set_value(key, value)
         for machine_vertex in self.machine_vertices:
             if isinstance(machine_vertex, AbstractRewritesDataSpecification):
                 machine_vertex.set_reload_required(True)

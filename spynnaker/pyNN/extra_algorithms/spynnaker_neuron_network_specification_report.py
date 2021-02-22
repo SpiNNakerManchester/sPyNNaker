@@ -13,15 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
 import os
-from six import raise_from
-from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
-
-logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
@@ -43,9 +38,10 @@ class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
         try:
             import graphviz
         except ImportError as e:
-            raise_from(SpynnakerException(
-                "graphviz is required to use this report.  "
-                "Please install graphviz if you want to use this report."), e)
+            raise SpynnakerException(
+                "graphviz is required to use this report. "
+                "Please install graphviz if you want to use this report."
+                ) from e
         return graphviz.Digraph(comment=label)
 
     def __call__(self, report_folder, application_graph):

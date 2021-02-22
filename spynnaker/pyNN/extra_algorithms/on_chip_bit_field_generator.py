@@ -24,10 +24,8 @@ from spinn_front_end_common.abstract_models import (
 from spinn_front_end_common.utilities import system_control_logic
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
-from spinn_front_end_common.utilities.helpful_functions import (
-    write_address_to_user1)
+from spinn_front_end_common.utilities.helpful_functions import n_word_struct
 
-_ONE_WORD = struct.Struct("<I")
 _THREE_WORDS = struct.Struct("<III")
 # bits in a word
 _BITS_IN_A_WORD = 32
@@ -272,8 +270,8 @@ class OnChipBitFieldGenerator(object):
 
             # get bitfield words
             if n_words:
-                bitfield = struct.unpack(
-                    "<{}I".format(n_words), self.__txrx.read_memory(
+                bitfield = n_word_struct(n_words).unpack(
+                    self.__txrx.read_memory(
                         placement.x, placement.y, read_pointer,
                         n_words * BYTES_PER_WORD))
             else:
@@ -312,8 +310,10 @@ class OnChipBitFieldGenerator(object):
         bit_field_builder_region = placement.vertex.bit_field_builder_region(
             self.__txrx, placement)
         # update user 1 with location
-        write_address_to_user1(
-            self.__txrx, placement.x, placement.y, placement.p,
+        user_1_base_address = \
+            self.__txrx.get_user_1_register_address_from_core(placement.p)
+        self.__txrx.write_memory(
+            placement.x, placement.y, user_1_base_address,
             bit_field_builder_region)
 
     def __check_for_success(self, executable_targets, transceiver):
@@ -330,10 +330,8 @@ class OnChipBitFieldGenerator(object):
             y = core_subset.y
             for p in core_subset.processor_ids:
                 # Read the result from USER0 register
-                user_2_base_address = \
-                    transceiver.get_user_2_register_address_from_core(p)
-                result, = _ONE_WORD.unpack(transceiver.read_memory(
-                    x, y, user_2_base_address, _ONE_WORD.size))
+                result = transceiver.read_word(
+                    x, y, transceiver.get_user_2_register_address_from_core(p))
 
                 # The result is 0 if success, otherwise failure
                 if result != self._SUCCESS:

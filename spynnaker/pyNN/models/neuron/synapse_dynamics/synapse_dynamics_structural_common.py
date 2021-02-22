@@ -15,7 +15,6 @@
 
 import collections
 import numpy
-from six import add_metaclass
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
 from spinn_utilities.overrides import overrides
@@ -38,14 +37,14 @@ DEFAULT_INITIAL_DELAY = 1
 DEFAULT_S_MAX = 32
 
 
-@add_metaclass(AbstractBase)
-class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
+class SynapseDynamicsStructuralCommon(
+        AbstractSynapseDynamicsStructural, metaclass=AbstractBase):
 
-    # 7 32-bit numbers (fast; p_rew; s_max; app_no_atoms; machine_no_atoms;
-    # low_atom; high_atom) + 2 4-word RNG seeds (shared_seed; local_seed)
-    # + 1 32-bit number (no_pre_pops)
+    # 8 32-bit numbers (fast; p_rew; s_max; app_no_atoms; machine_no_atoms;
+    # low_atom; high_atom; with_replacement) + 2 4-word RNG seeds (shared_seed;
+    # local_seed) + 1 32-bit number (no_pre_pops)
     _REWIRING_DATA_SIZE = (
-        (7 * BYTES_PER_WORD) + (2 * 4 * BYTES_PER_WORD) + BYTES_PER_WORD)
+        (8 * BYTES_PER_WORD) + (2 * 4 * BYTES_PER_WORD) + BYTES_PER_WORD)
 
     # Size excluding key_atom_info (as variable length)
     # 4 16-bit numbers (no_pre_vertices; sp_control; delay_lo; delay_hi)
@@ -67,7 +66,8 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         """
         :rtype: list(str)
         """
-        names = ['initial_weight', 'initial_delay', 'f_rew', 'p_rew', 's_max']
+        names = ['initial_weight', 'initial_delay', 'f_rew', 'p_rew', 's_max',
+                 'with_replacement']
         # pylint: disable=no-member
         names.extend(self.partner_selection.get_parameter_names())
         names.extend(self.formation.get_parameter_names())
@@ -196,6 +196,8 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         spec.write_value(data=post_slice.n_atoms)
         spec.write_value(data=post_slice.lo_atom)
         spec.write_value(data=post_slice.hi_atom)
+        # write with_replacement
+        spec.write_value(data=self.with_replacement)
 
         # write app level seeds
         spec.write_array(self.get_seeds(app_vertex))

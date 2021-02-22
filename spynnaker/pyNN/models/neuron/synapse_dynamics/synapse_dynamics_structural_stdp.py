@@ -14,16 +14,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy
+from pyNN.standardmodels.synapses import StaticSynapse
 from spinn_utilities.overrides import overrides
+from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
 from .synapse_dynamics_stdp import SynapseDynamicsSTDP
-from spynnaker.pyNN.models.neuron.synapse_dynamics.\
-    synapse_dynamics_structural_common import (
-        DEFAULT_F_REW, DEFAULT_INITIAL_WEIGHT, DEFAULT_INITIAL_DELAY,
-        DEFAULT_S_MAX, SynapseDynamicsStructuralCommon)
-from spynnaker.pyNN.exceptions import SynapticConfigurationException
+from .synapse_dynamics_structural_common import (
+    DEFAULT_F_REW, DEFAULT_INITIAL_WEIGHT, DEFAULT_INITIAL_DELAY,
+    DEFAULT_S_MAX, SynapseDynamicsStructuralCommon)
 
 
 class SynapseDynamicsStructuralSTDP(
@@ -76,14 +76,18 @@ class SynapseDynamicsStructuralSTDP(
             voltage_dependence=None, dendritic_delay_fraction=1.0,
             f_rew=DEFAULT_F_REW, initial_weight=DEFAULT_INITIAL_WEIGHT,
             initial_delay=DEFAULT_INITIAL_DELAY, s_max=DEFAULT_S_MAX,
-            seed=None, weight=0.0, delay=1.0, backprop_delay=True):
+            with_replacement=True, seed=None,
+            weight=StaticSynapse.default_parameters['weight'], delay=None,
+            backprop_delay=True):
         """
         :param AbstractPartnerSelection partner_selection:
             The partner selection rule
         :param AbstractFormation formation: The formation rule
         :param AbstractElimination elimination: The elimination rule
         :param AbstractTimingDependence timing_dependence:
+            The STDP timing dependence rule
         :param AbstractWeightDependence weight_dependence:
+            The STDP weight dependence rule
         :param None voltage_dependence:
             The STDP voltage dependence (unsupported)
         :param float dendritic_delay_fraction:
@@ -99,22 +103,30 @@ class SynapseDynamicsStructuralSTDP(
             values
         :type initial_delay: float or tuple(float, float)
         :param int s_max: Maximum fan-in per target layer neuron
-        :param int seed: seed the random number generators
+        :param bool with_replacement:
+            If set to True (default), a new synapse can be formed in a
+            location where a connection already exists; if False, then it must
+            form where no connection already exists
+        :param seed: seed for the random number generators
+        :type seed: int or None
         :param float weight: The weight of connections formed by the connector
-        :param float delay: The delay of connections formed by the connector
+        :param delay: The delay of connections formed by the connector
+            Use ``None`` to get the simulator default minimum delay.
+        :type delay: float or None
         """
-        SynapseDynamicsSTDP.__init__(
-            self, timing_dependence, weight_dependence, voltage_dependence,
+        super().__init__(
+            timing_dependence, weight_dependence, voltage_dependence,
             dendritic_delay_fraction, weight, delay, pad_to_length=s_max,
             backprop_delay=backprop_delay)
         self.__partner_selection = partner_selection
         self.__formation = formation
         self.__elimination = elimination
-        self.__f_rew = f_rew
+        self.__f_rew = float(f_rew)
         self.__p_rew = 1. / self.__f_rew
         self.__initial_weight = initial_weight
         self.__initial_delay = initial_delay
         self.__s_max = s_max
+        self.__with_replacement = with_replacement
         self.__seed = seed
         self.__connections = dict()
 
@@ -161,21 +173,20 @@ class SynapseDynamicsStructuralSTDP(
     @overrides(SynapseDynamicsSTDP.is_same_as)
     def is_same_as(self, synapse_dynamics):
         if (isinstance(synapse_dynamics, SynapseDynamicsSTDP) and
-                not SynapseDynamicsSTDP.is_same_as(self, synapse_dynamics)):
+                not super().is_same_as(synapse_dynamics)):
             return False
         return SynapseDynamicsStructuralCommon.is_same_as(
             self, synapse_dynamics)
 
     @overrides(SynapseDynamicsSTDP.get_vertex_executable_suffix)
     def get_vertex_executable_suffix(self):
-        return (SynapseDynamicsSTDP.get_vertex_executable_suffix(self) +
+        return (super().get_vertex_executable_suffix() +
                 SynapseDynamicsStructuralCommon.get_vertex_executable_suffix(
                     self))
 
     @overrides(SynapseDynamicsSTDP.get_n_words_for_plastic_connections)
     def get_n_words_for_plastic_connections(self, n_connections):
-        value = super(SynapseDynamicsStructuralSTDP,
-                      self).get_n_words_for_plastic_connections(n_connections)
+        value = super().get_n_words_for_plastic_connections(n_connections)
         self.__actual_row_max_length = value
         return value
 
@@ -193,7 +204,7 @@ class SynapseDynamicsStructuralSTDP(
 
     @overrides(SynapseDynamicsSTDP.get_parameter_names)
     def get_parameter_names(self):
-        names = SynapseDynamicsSTDP.get_parameter_names(self)
+        names = super().get_parameter_names()
         names.extend(SynapseDynamicsStructuralCommon.get_parameter_names(self))
         return names
 
@@ -206,6 +217,11 @@ class SynapseDynamicsStructuralSTDP(
     @overrides(AbstractSynapseDynamicsStructural.s_max)
     def s_max(self):
         return self.__s_max
+
+    @property
+    @overrides(AbstractSynapseDynamicsStructural.with_replacement)
+    def with_replacement(self):
+        return self.__with_replacement
 
     @property
     @overrides(AbstractSynapseDynamicsStructural.seed)
@@ -248,8 +264,7 @@ class SynapseDynamicsStructuralSTDP(
 
     @overrides(SynapseDynamicsSTDP.get_weight_maximum)
     def get_weight_maximum(self, connector, synapse_info):
-        w_max = super(SynapseDynamicsStructuralSTDP, self).get_weight_maximum(
-            connector, synapse_info)
+        w_max = super().get_weight_maximum(connector, synapse_info)
         return max(w_max, self.__initial_weight)
 
     @overrides(SynapseDynamicsStructuralCommon.get_seeds)

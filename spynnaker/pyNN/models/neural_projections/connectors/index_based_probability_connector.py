@@ -13,20 +13,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
 import math
 import numpy
 from numpy import (
     arccos, arcsin, arctan, arctan2, ceil, cos, cosh, exp, fabs, floor, fmod,
     hypot, ldexp, log, log10, modf, power, sin, sinh, sqrt, tan, tanh, maximum,
     minimum, e, pi)
-from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinn_utilities.safe_eval import SafeEval
 from spynnaker.pyNN.utilities import utility_calls
 from .abstract_connector import AbstractConnector
 
-logger = FormatAdapter(logging.getLogger(__name__))
 # support for arbitrary expression for the indices
 _index_expr_context = SafeEval(math, numpy, arccos, arcsin, arctan, arctan2,
                                ceil, cos, cosh, exp, fabs, floor, fmod, hypot,
@@ -51,20 +48,30 @@ class IndexBasedProbabilityConnector(AbstractConnector):
         :param str index_expression:
             the right-hand side of a valid python expression for
             probability, involving the indices of the pre and post populations,
-            that can be parsed by eval(), that computes a probability dist.
+            that can be parsed by eval(), that computes a probability dist;
+            the indices will be given as variables ``i`` and ``j`` when the
+            expression is evaluated.
         :param bool allow_self_connections:
             if the connector is used to connect a Population to itself, this
             flag determines whether a neuron is allowed to connect to itself,
             or only to other neurons in the Population.
         :param rng:
-            Seeded random number generator, or None to make one when needed
+            Seeded random number generator, or ``None`` to make one when
+            needed.
         :type rng: ~pyNN.random.NumpyRNG or None
         :param bool safe:
-        :param callable callback: Ignored
+            Whether to check that weights and delays have valid values.
+            If ``False``, this check is skipped.
+        :param callable callback:
+            if given, a callable that display a progress bar on the terminal.
+
+            .. note::
+                Not supported by sPyNNaker.
         :param bool verbose:
+            Whether to output extra information about the connectivity to a
+            CSV file
         """
-        super(IndexBasedProbabilityConnector, self).__init__(
-            safe, callback, verbose)
+        super().__init__(safe, callback, verbose)
         self._rng = rng
         self.__index_expression = index_expression
         self.__allow_self_connections = allow_self_connections

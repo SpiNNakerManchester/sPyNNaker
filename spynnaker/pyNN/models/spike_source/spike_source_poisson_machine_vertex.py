@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import struct
 from enum import Enum
-
 import numpy
 
 from data_specification.enums import DataType
@@ -31,8 +30,7 @@ from pacman.executor.injection_decorator import inject_items
 from pacman.model.graphs.machine import MachineVertex
 from spinn_front_end_common.abstract_models import (
     AbstractHasAssociatedBinary, AbstractSupportsDatabaseInjection,
-    AbstractRecordable, AbstractRewritesDataSpecification,
-    AbstractGeneratesDataSpecification)
+    AbstractRewritesDataSpecification, AbstractGeneratesDataSpecification)
 from spinn_front_end_common.interface.provenance import (
     ProvidesProvenanceDataFromMachineImpl)
 from spinn_front_end_common.interface.buffer_management.buffer_models import (
@@ -101,10 +99,13 @@ SDRAM_EDGE_PARAMS_BYTES_PER_WEIGHT = BYTES_PER_SHORT
 # 3. offset to start writing, 4. VLA of weights (not counted here)
 SDRAM_EDGE_PARAMS_BASE_BYTES = 3 * BYTES_PER_WORD
 
+_ONE_WORD = struct.Struct("<I")
+_FOUR_WORDS = struct.Struct("<4I")
+
 
 class SpikeSourcePoissonMachineVertex(
         MachineVertex, AbstractReceiveBuffersToHost,
-        ProvidesProvenanceDataFromMachineImpl, AbstractRecordable,
+        ProvidesProvenanceDataFromMachineImpl,
         AbstractSupportsDatabaseInjection, AbstractHasProfileData,
         AbstractHasAssociatedBinary, AbstractRewritesDataSpecification,
         AbstractGeneratesDataSpecification, AbstractReadParametersBeforeSet,
@@ -174,7 +175,7 @@ class SpikeSourcePoissonMachineVertex(
             self, resources_required, is_recording, constraints=None,
             label=None, app_vertex=None, vertex_slice=None, slice_index=None):
         # pylint: disable=too-many-arguments
-        super(SpikeSourcePoissonMachineVertex, self).__init__(
+        super().__init__(
             label, constraints=constraints, app_vertex=app_vertex,
             vertex_slice=vertex_slice)
         self.__is_recording = is_recording
@@ -197,14 +198,9 @@ class SpikeSourcePoissonMachineVertex(
         return self.POISSON_SPIKE_SOURCE_REGIONS.PROVENANCE_REGION.value
 
     @property
-    @overrides(
-        ProvidesProvenanceDataFromMachineImpl._n_additional_data_items)
+    @overrides(ProvidesProvenanceDataFromMachineImpl._n_additional_data_items)
     def _n_additional_data_items(self):
         return 1
-
-    @overrides(AbstractRecordable.is_recording)
-    def is_recording(self):
-        return self.__is_recording
 
     @overrides(AbstractReceiveBuffersToHost.get_recorded_region_ids)
     def get_recorded_region_ids(self):
@@ -708,11 +704,10 @@ class SpikeSourcePoissonMachineVertex(
         # locate SDRAM address where parameters are stored
         poisson_params = self.poisson_param_region_address(
             placement, transceiver)
-        seed_array = transceiver.read_memory(
+        seed_array = _FOUR_WORDS.unpack_from(transceiver.read_memory(
             placement.x, placement.y, poisson_params + self.SEED_OFFSET_BYTES,
-            self.SEED_SIZE_BYTES)
-        self._app_vertex.update_kiss_seed(
-            vertex_slice, struct.unpack_from("<4I", seed_array))
+            self.SEED_SIZE_BYTES))
+        self._app_vertex.update_kiss_seed(vertex_slice, seed_array)
 
         # locate SDRAM address where the rates are stored
         poisson_rate_region_sdram_address = (
@@ -729,7 +724,7 @@ class SpikeSourcePoissonMachineVertex(
         # For each atom, read the number of rates and the rate parameters
         offset = 0
         for i in range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1):
-            n_values = struct.unpack_from("<I", byte_array, offset)[0]
+            n_values, = _ONE_WORD.unpack_from(byte_array, offset)
             offset += 4
 
             # Skip reading the index, as it will be recalculated on data write

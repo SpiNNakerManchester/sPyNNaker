@@ -12,17 +12,13 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from __future__ import division
 import numpy
-from six import itervalues
 
 from pacman.model.graphs.common.slice import Slice
-
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
-
 from .synaptic_matrix import SynapticMatrix
 from .generator_data import GeneratorData, SYN_REGION_UNUSED
 from .synapse_io import read_all_synapses, convert_to_connections
@@ -723,7 +719,7 @@ class SynapticMatrixApp(object):
         """
         self.__received_block = None
         self.__delay_received_block = None
-        for matrix in itervalues(self.__matrices):
+        for matrix in self.__matrices.values():
             matrix.clear_connection_cache()
 
     def read_generated_connection_holders(self, transceiver, placement):

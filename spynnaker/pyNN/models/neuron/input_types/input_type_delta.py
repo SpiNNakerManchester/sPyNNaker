@@ -26,7 +26,7 @@ class InputTypeDelta(AbstractInputType):
     def __init__(self):
         """
         """
-        super(InputTypeDelta, self).__init__([
+        super().__init__([
             DataType.S1615])  # scale_factor, calculated from timestep
 
     @overrides(AbstractInputType.get_n_cpu_cycles)
