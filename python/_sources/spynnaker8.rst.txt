@@ -12,17 +12,6 @@ Subpackages
    spynnaker8.models
    spynnaker8.utilities
 
-Submodules
-----------
-
-spynnaker8.spynnaker\_plotting module
--------------------------------------
-
-.. automodule:: spynnaker8.spynnaker_plotting
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 Module contents
 ---------------
 

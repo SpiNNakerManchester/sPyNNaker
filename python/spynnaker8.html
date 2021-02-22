@@ -78,138 +78,11 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="spynnaker8.utilities.html">spynnaker8.utilities package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker8.utilities.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker8.utilities.html#module-spynnaker8.utilities.neo_convertor">spynnaker8.utilities.neo_convertor module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="spynnaker8.utilities.html#module-spynnaker8.utilities">Module contents</a></li>
 </ul>
 </li>
 </ul>
 </div>
-</div>
-<div class="section" id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-spynnaker8.spynnaker_plotting">
-<span id="spynnaker8-spynnaker-plotting-module"></span><h2>spynnaker8.spynnaker_plotting module<a class="headerlink" href="#module-spynnaker8.spynnaker_plotting" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt id="spynnaker8.spynnaker_plotting.SpynnakerPanel">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">spynnaker8.spynnaker_plotting.</span></code><code class="sig-name descname"><span class="pre">SpynnakerPanel</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/spynnaker_plotting.html#SpynnakerPanel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker8.spynnaker_plotting.SpynnakerPanel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.spynnaker_plotting.SpynnakerPanel</span></code></p>
-<p>Represents a single panel in a multi-panel figure.</p>
-<div class="deprecated">
-<p><span class="versionmodified deprecated">Deprecated since version 6.0: </span>Use
-<code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.spynnaker_plotting</span></code> instead.</p>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.SpikeTrain" title="(in Neo v0.9)"><em>SpikeTrain</em></a><em>) or </em><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.AnalogSignal" title="(in Neo v0.9)"><em>AnalogSignal</em></a><em>             or </em><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a><em> or </em><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.9)"><em>Block</em></a><em> or </em><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Segment" title="(in Neo v0.9)"><em>Segment</em></a>) – One or more data series to be plotted.</p></li>
-<li><p><strong>options</strong> – Any additional information.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="spynnaker8.spynnaker_plotting.heat_plot_neo">
-<code class="sig-prename descclassname"><span class="pre">spynnaker8.spynnaker_plotting.</span></code><code class="sig-name descname"><span class="pre">heat_plot_neo</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/spynnaker_plotting.html#heat_plot_neo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker8.spynnaker_plotting.heat_plot_neo" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plots neurons, times and values into a heatmap</p>
-<div class="deprecated">
-<p><span class="versionmodified deprecated">Deprecated since version 6.0: </span>Use
-<code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.spynnaker_plotting</span></code> instead.</p>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>ax</strong> (<a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.3.4)"><em>Axes</em></a>) – An Axes in a matplotlib figure</p></li>
-<li><p><strong>signal_array</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.AnalogSignal" title="(in Neo v0.9)"><em>AnalogSignal</em></a>) – Neo Signal array Object</p></li>
-<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Label for the graph</p></li>
-<li><p><strong>options</strong> – plotting options</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="spynnaker8.spynnaker_plotting.heat_plot_numpy">
-<code class="sig-prename descclassname"><span class="pre">spynnaker8.spynnaker_plotting.</span></code><code class="sig-name descname"><span class="pre">heat_plot_numpy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/spynnaker_plotting.html#heat_plot_numpy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker8.spynnaker_plotting.heat_plot_numpy" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plots neurons, times and values into a heatmap</p>
-<div class="deprecated">
-<p><span class="versionmodified deprecated">Deprecated since version 6.0: </span>Use
-<code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.spynnaker_plotting</span></code> instead.</p>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>ax</strong> (<a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.3.4)"><em>Axes</em></a>) – An Axes in a matplotlib figure</p></li>
-<li><p><strong>data</strong> (<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a>) – nparray of values in spynnaker7 format</p></li>
-<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Label for the graph</p></li>
-<li><p><strong>options</strong> – plotting options</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="spynnaker8.spynnaker_plotting.plot_segment">
-<code class="sig-prename descclassname"><span class="pre">spynnaker8.spynnaker_plotting.</span></code><code class="sig-name descname"><span class="pre">plot_segment</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segment</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/spynnaker_plotting.html#plot_segment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker8.spynnaker_plotting.plot_segment" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plots a segment into a plot of spikes or a heatmap</p>
-<div class="deprecated">
-<p><span class="versionmodified deprecated">Deprecated since version 6.0: </span>Use
-<code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.spynnaker_plotting</span></code> instead.</p>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>axes</strong> (<a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.3.4)"><em>Axes</em></a>) – An Axes in a matplotlib figure</p></li>
-<li><p><strong>segment</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Segment" title="(in Neo v0.9)"><em>Segment</em></a>) – Data for one run to plot</p></li>
-<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Label for the graph</p></li>
-<li><p><strong>options</strong> – plotting options</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="spynnaker8.spynnaker_plotting.plot_spikes_numpy">
-<code class="sig-prename descclassname"><span class="pre">spynnaker8.spynnaker_plotting.</span></code><code class="sig-name descname"><span class="pre">plot_spikes_numpy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spikes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/spynnaker_plotting.html#plot_spikes_numpy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker8.spynnaker_plotting.plot_spikes_numpy" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plot all spikes</p>
-<div class="deprecated">
-<p><span class="versionmodified deprecated">Deprecated since version 6.0: </span>Use
-<code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.spynnaker_plotting</span></code> instead.</p>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>ax</strong> (<a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.3.4)"><em>Axes</em></a>) – An Axes in a matplotlib figure</p></li>
-<li><p><strong>spikes</strong> (<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a>) – spynakker7 format nparray of spikes</p></li>
-<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Label for the graph</p></li>
-<li><p><strong>options</strong> – plotting options</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="spynnaker8.spynnaker_plotting.plot_spiketrains">
-<code class="sig-prename descclassname"><span class="pre">spynnaker8.spynnaker_plotting.</span></code><code class="sig-name descname"><span class="pre">plot_spiketrains</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spiketrains</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker8/spynnaker_plotting.html#plot_spiketrains"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker8.spynnaker_plotting.plot_spiketrains" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plot all spike trains in a Segment in a raster plot.</p>
-<div class="deprecated">
-<p><span class="versionmodified deprecated">Deprecated since version 6.0: </span>Use
-<code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.spynnaker_plotting</span></code> instead.</p>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>ax</strong> (<a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.3.4)"><em>Axes</em></a>) – An Axes in a matplotlib figure</p></li>
-<li><p><strong>spiketrains</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.SpikeTrain" title="(in Neo v0.9)"><em>SpikeTrain</em></a><em>)</em>) – List of spiketimes</p></li>
-<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Label for the graph</p></li>
-<li><p><strong>options</strong> – plotting options</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 </div>
 <div class="section" id="module-spynnaker8">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker8" title="Permalink to this headline">¶</a></h2>
@@ -2901,7 +2774,7 @@ or </em><a class="reference external" href="https://docs.python.org/3.8/library/
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>size</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of neurons in the population</p></li>
-<li><p><strong>cellclass</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#type" title="(in Python v3.8)"><em>type</em></a><em> or </em><a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel" title="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel"><em>AbstractPyNNModel</em></a>) – The implementation of the individual neurons.</p></li>
+<li><p><strong>cellclass</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#type" title="(in Python v3.8)"><em>type</em></a><em> or </em><em>AbstractPyNNModel</em>) – The implementation of the individual neurons.</p></li>
 <li><p><strong>cellparams</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><em>object</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – Parameters to pass to <code class="docutils literal notranslate"><span class="pre">cellclass</span></code> if it
 is a class to instantiate. Must be <code class="docutils literal notranslate"><span class="pre">None</span></code> if <code class="docutils literal notranslate"><span class="pre">cellclass</span></code> is an
 instantiated object.</p></li>
@@ -2983,7 +2856,7 @@ instantiated object.</p></li>
 <dd class="field-odd"><p>The celltype this property has been set to</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel" title="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel">AbstractPyNNModel</a></p>
+<dd class="field-even"><p>AbstractPyNNModel</p>
 </dd>
 </dl>
 </dd></dl>
@@ -3006,7 +2879,7 @@ instantiated object.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>cellclass</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#type" title="(in Python v3.8)"><em>type</em></a><em> or </em><a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel" title="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel"><em>AbstractPyNNModel</em></a>) – see <code class="xref py py-meth docutils literal notranslate"><span class="pre">__init__()</span></code></p></li>
+<li><p><strong>cellclass</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#type" title="(in Python v3.8)"><em>type</em></a><em> or </em><em>AbstractPyNNModel</em>) – see <code class="xref py py-meth docutils literal notranslate"><span class="pre">__init__()</span></code></p></li>
 <li><p><strong>cellparams</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><em>object</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – see <code class="xref py py-meth docutils literal notranslate"><span class="pre">__init__()</span></code></p></li>
 <li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – see <code class="xref py py-meth docutils literal notranslate"><span class="pre">__init__()</span></code> (<code class="docutils literal notranslate"><span class="pre">size</span></code> parameter)</p></li>
 </ul>
@@ -3598,7 +3471,7 @@ i.e. if <cite>p.size == 5</cite> then:</p>
 <dd><p>The type of neurons making up the underlying Population.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel" title="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel">AbstractPyNNModel</a></p>
+<dd class="field-odd"><p>AbstractPyNNModel</p>
 </dd>
 </dl>
 </dd></dl>
@@ -3977,7 +3850,7 @@ record.</p>
 <dd class="field-even"><p>a projection object for SpiNNaker</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.projection.Projection" title="spynnaker.pyNN.models.projection.Projection">Projection</a></p>
+<dd class="field-odd"><p>Projection</p>
 </dd>
 </dl>
 </dd></dl>
@@ -4439,7 +4312,7 @@ From <a class="reference external" href="http://projects.scipy.org/pipermail/num
 <dl class="py attribute">
 <dt id="spynnaker8.SpiNNakerProjection">
 <code class="sig-prename descclassname"><span class="pre">spynnaker8.</span></code><code class="sig-name descname"><span class="pre">SpiNNakerProjection</span></code><a class="headerlink" href="#spynnaker8.SpiNNakerProjection" title="Permalink to this definition">¶</a></dt>
-<dd><p>alias of <a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.projection.Projection" title="spynnaker.pyNN.models.projection.Projection"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.projection.Projection</span></code></a></p>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.projection.Projection</span></code></p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -4451,7 +4324,7 @@ From <a class="reference external" href="http://projects.scipy.org/pipermail/num
 <dl class="py class">
 <dt id="spynnaker8.SpikeSourceArray">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">spynnaker8.</span></code><code class="sig-name descname"><span class="pre">SpikeSourceArray</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spike_times</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_array.html#SpikeSourceArray"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker8.SpikeSourceArray" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel" title="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel</span></code></a></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel</span></code></p>
 <dl class="py method">
 <dt id="spynnaker8.SpikeSourceArray.create_vertex">
 <code class="sig-name descname"><span class="pre">create_vertex</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">splitter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_array.html#SpikeSourceArray.create_vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker8.SpikeSourceArray.create_vertex" title="Permalink to this definition">¶</a></dt>
@@ -4483,7 +4356,7 @@ From <a class="reference external" href="http://projects.scipy.org/pipermail/num
 <dl class="py class">
 <dt id="spynnaker8.SpikeSourcePoisson">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">spynnaker8.</span></code><code class="sig-name descname"><span class="pre">SpikeSourcePoisson</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson.html#SpikeSourcePoisson"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker8.SpikeSourcePoisson" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel" title="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel</span></code></a></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel</span></code></p>
 <dl class="py method">
 <dt id="spynnaker8.SpikeSourcePoisson.create_vertex">
 <code class="sig-name descname"><span class="pre">create_vertex</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_rate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">splitter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson.html#SpikeSourcePoisson.create_vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker8.SpikeSourcePoisson.create_vertex" title="Permalink to this definition">¶</a></dt>
@@ -4578,7 +4451,7 @@ From <a class="reference external" href="http://projects.scipy.org/pipermail/num
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>cellclass</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#type" title="(in Python v3.8)"><em>type</em></a><em> or </em><a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel" title="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel"><em>AbstractPyNNModel</em></a>) – population class</p></li>
+<li><p><strong>cellclass</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#type" title="(in Python v3.8)"><em>type</em></a><em> or </em><em>AbstractPyNNModel</em>) – population class</p></li>
 <li><p><strong>cellparams</strong> – population params.</p></li>
 <li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – n neurons</p></li>
 </ul>
@@ -4674,7 +4547,7 @@ so is a non-existent parameter</p>
 <dd class="field-even"><p>a extracted data object with get method for getting the data</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.extracted_data.ExtractedData" title="spynnaker.pyNN.utilities.extracted_data.ExtractedData">ExtractedData</a></p>
+<dd class="field-odd"><p>ExtractedData</p>
 </dd>
 </dl>
 </dd></dl>
@@ -4973,8 +4846,6 @@ big enough for your needs.</p></li>
   <ul>
 <li><a class="reference internal" href="#">spynnaker8 package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
-<li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-spynnaker8.spynnaker_plotting">spynnaker8.spynnaker_plotting module</a></li>
 <li><a class="reference internal" href="#module-spynnaker8">Module contents</a></li>
 </ul>
 </li>

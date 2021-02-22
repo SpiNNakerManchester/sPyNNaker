@@ -48,115 +48,6 @@
             
   <div class="section" id="spynnaker-pynn-models-common-package">
 <h1>spynnaker.pyNN.models.common package<a class="headerlink" href="#spynnaker-pynn-models-common-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-spynnaker.pyNN.models.common.recording_utils">
-<span id="spynnaker-pynn-models-common-recording-utils-module"></span><h2>spynnaker.pyNN.models.common.recording_utils module<a class="headerlink" href="#module-spynnaker.pyNN.models.common.recording_utils" title="Permalink to this headline">¶</a></h2>
-<dl class="py function">
-<dt id="spynnaker.pyNN.models.common.recording_utils.get_buffer_sizes">
-<code class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.common.recording_utils.</span></code><code class="sig-name descname"><span class="pre">get_buffer_sizes</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">buffer_max</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_needed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enable_buffered_recording</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/recording_utils.html#get_buffer_sizes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.recording_utils.get_buffer_sizes" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>buffer_max</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
-<li><p><strong>space_needed</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
-<li><p><strong>enable_buffered_recording</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – </p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="spynnaker.pyNN.models.common.recording_utils.get_data">
-<code class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.common.recording_utils.</span></code><code class="sig-name descname"><span class="pre">get_data</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transceiver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">placement</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region_size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/recording_utils.html#get_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.recording_utils.get_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the recorded data from a region.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan)"><em>Transceiver</em></a>) – </p></li>
-<li><p><strong>placement</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placement" title="(in PACMAN)"><em>Placement</em></a>) – </p></li>
-<li><p><strong>region</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
-<li><p><strong>region_size</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#bytearray" title="(in Python v3.8)">bytearray</a>, <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>)</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="spynnaker.pyNN.models.common.recording_utils.get_recording_region_size_in_bytes">
-<code class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.common.recording_utils.</span></code><code class="sig-name descname"><span class="pre">get_recording_region_size_in_bytes</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_machine_time_steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bytes_per_timestep</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/recording_utils.html#get_recording_region_size_in_bytes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.recording_utils.get_recording_region_size_in_bytes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the size of a recording region in bytes.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>n_machine_time_steps</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
-<li><p><strong>bytes_per_timestep</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="spynnaker.pyNN.models.common.recording_utils.make_missing_string">
-<code class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.common.recording_utils.</span></code><code class="sig-name descname"><span class="pre">make_missing_string</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">missing</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/recording_utils.html#make_missing_string"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.recording_utils.make_missing_string" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>missing</strong> (<em>iterable</em><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placement" title="(in PACMAN)"><em>Placement</em></a><em>)</em>) – </p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="spynnaker.pyNN.models.common.recording_utils.needs_buffering">
-<code class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.common.recording_utils.</span></code><code class="sig-name descname"><span class="pre">needs_buffering</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">buffer_max</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_needed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enable_buffered_recording</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/recording_utils.html#needs_buffering"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.recording_utils.needs_buffering" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>buffer_max</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
-<li><p><strong>space_needed</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
-<li><p><strong>enable_buffered_recording</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – </p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="spynnaker.pyNN.models.common.recording_utils.pull_off_cached_lists">
-<code class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.common.recording_utils.</span></code><code class="sig-name descname"><span class="pre">pull_off_cached_lists</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">no_loads</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/recording_utils.html#pull_off_cached_lists"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.recording_utils.pull_off_cached_lists" title="Permalink to this definition">¶</a></dt>
-<dd><p>Extracts numpy based data from a file</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>no_loads</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the number of numpy elements in the file</p></li>
-<li><p><strong>cache_file</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/io.html#io.FileIO" title="(in Python v3.8)"><em>FileIO</em></a>) – the file to extract from</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The extracted data</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">ndarray</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-</div>
 <div class="section" id="module-spynnaker.pyNN.models.common">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.models.common" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
@@ -1042,8 +933,6 @@ by the c code</p>
   <h3><a href="index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.models.common package</a><ul>
-<li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.common.recording_utils">spynnaker.pyNN.models.common.recording_utils module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.models.common">Module contents</a></li>
 </ul>
 </li>
