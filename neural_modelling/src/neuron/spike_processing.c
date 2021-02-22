@@ -352,13 +352,13 @@ static void dma_complete_callback(UNUSED uint unused, uint tag) {
     bool plastic_only = true;
 
     // If rewiring, do rewiring first
-    for (uint32_t i = 0; i < n_rewires; i++) {
-        if (synaptogenesis_row_restructure(time, current_buffer->row)) {
-            write_back = true;
-            plastic_only = false;
-            n_successful_rewires++;
-        }
-    }
+//    for (uint32_t i = 0; i < n_rewires; i++) {
+//        if (synaptogenesis_row_restructure(time, current_buffer->row)) {
+//            write_back = true;
+//            plastic_only = false;
+//            n_successful_rewires++;
+//        }
+//    }
 
     // Process synaptic row repeatedly for any upcoming spikes
     while (n_spikes > 0) {
@@ -423,10 +423,10 @@ void spike_processing_clear_input_buffer(timer_t time) {
 
     // Record the count whether clearing or not for provenance
     count_input_buffer_packets_late += in_spikes_size();
-
-    if (clear_input_buffers_of_late_packets) {
-        in_spikes_clear();
-    }
+//
+//    if (clear_input_buffers_of_late_packets) {
+//        in_spikes_clear();
+//    }
 }
 
 bool spike_processing_initialise( // EXPORTED
@@ -446,7 +446,7 @@ bool spike_processing_initialise( // EXPORTED
     }
     dma_busy = false;
     clear_input_buffers_of_late_packets =
-        clear_input_buffers_of_late_packets_init;
+        false;
     next_buffer_to_fill = 0;
     buffer_being_read = N_DMA_BUFFERS;
     p_per_ts_region = packets_per_timestep_region;
