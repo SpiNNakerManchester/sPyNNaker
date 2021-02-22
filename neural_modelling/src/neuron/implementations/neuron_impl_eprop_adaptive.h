@@ -301,7 +301,9 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     // determine if a spike should occur
     threshold_type_update_threshold(neuron->z, neuron);
 
+//    if(time % 1000 > 100 && time % 1000 < 600){
     neuron->neuron_rate = neuron->neuron_rate * 0.99973k;//global_parameters->rate_exp_TC;
+//    }
 
 
     // Record B

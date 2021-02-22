@@ -233,6 +233,7 @@ state_t neuron_model_state_update(
 
 //    if (time % 51 == 0){
 //        io_printf(IO_BUF, "%u update_ready = %d\n", time, neuron->syn_state[0].update_ready);
+//        io_printf(IO_BUF, "vmem = %k, firing rate = %k, L = %k\n", v_mem_error, firing_reg, neuron->L);
 //    }
 
 //    io_printf(IO_BUF, "check B = %k, b = %k, time = %u\n", neuron->B, neuron->b, time);

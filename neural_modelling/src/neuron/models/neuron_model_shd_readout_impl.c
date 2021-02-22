@@ -81,12 +81,12 @@ state_t neuron_model_state_update(
 //    if(v_mem_error < -1.k){
 //        v_mem_error = -1.k;
 //    }
-    neuron->L = v_mem_error*0.01k;
+    neuron->L = 0.k;//v_mem_error*0.01k;
     for (uint32_t n_ind=0; n_ind < 10; n_ind++){
         if (n_ind == (uint32_t)dummy){
             neuron->L += learning_signal[n_ind];// * neuron->w_fb[n_ind];
         }
-//        if (time % 1000 == 0){
+//        if (time % 51 == 0){
 //            io_printf(IO_BUF, "%u - %u - L:%k\n", (uint32_t)dummy, n_ind, learning_signal[n_ind]);
 //        }
     }
@@ -94,6 +94,10 @@ state_t neuron_model_state_update(
         neuron->V_membrane = neuron->V_reset;
 //        io_printf(IO_BUF, "%u total - L:%k - v_mem_error:%k\n", time, neuron->L, v_mem_error);
     }
+//    if (time % 51 == 0){
+////        io_printf(IO_BUF, "%u update_ready = %d\n", time, neuron->syn_state[0].update_ready);
+//        io_printf(IO_BUF, "vmem = %k, L = %k\n", v_mem_error, neuron->L);
+//    }
 
     // All operations now need doing once per eprop synapse
     for (uint32_t syn_ind=0; syn_ind < total_synapses_per_neuron; syn_ind++){
@@ -136,6 +140,12 @@ state_t neuron_model_state_update(
     	REAL this_dt_weight_change =
 //    			-local_eta * neuron->L * neuron->syn_state[syn_ind].e_bar;
     			local_eta * neuron->L * neuron->syn_state[syn_ind].z_bar;
+//    	this_dt_weight_change += v_mem_error * 0.01k;
+
+//        if (time % 51 == 0 && syn_ind % 19 == 0){
+////            io_printf(IO_BUF, "%u update_ready = %d\n", time, neuron->syn_state[0].update_ready);
+//            io_printf(IO_BUF, "thisdw = %k, vmemdw = %k\n", this_dt_weight_change, v_mem_error * 0.01k);
+//        }
 
     	neuron->syn_state[syn_ind].delta_w -= this_dt_weight_change;
 //    	if ((time % 51 == 0 && !syn_ind && !printed_variables) || neuron->syn_state[syn_ind].delta_w > 1000.k){// || neuron->syn_state[syn_ind].z_bar){// || neuron->syn_state[syn_ind].z_bar_inp){
