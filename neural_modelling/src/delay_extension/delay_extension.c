@@ -219,10 +219,12 @@ static bool read_parameters(struct delay_parameters *params) {
     clear_input_buffers_of_late_packets = params->clear_packets;
 
     num_delay_slots = num_delay_stages * n_delay_in_a_stage;
-    uint32_t num_delay_slots_pot = round_to_next_pot(num_delay_slots);
+    // We need an extra slot here (to make one clearable after the maximum delay
+    // time), and a power of 2 (to make it easier to loop)
+    uint32_t num_delay_slots_pot = round_to_next_pot(num_delay_slots + 1);
     num_delay_slots_mask = num_delay_slots_pot - 1;
 
-    log_debug("\t parrot neurons = %u, neuron bit field words = %u,"
+    log_info("\t parrot neurons = %u, neuron bit field words = %u,"
             " num delay stages = %u, num delay slots = %u (pot = %u),"
             " num delay slots mask = %08x",
             num_neurons, neuron_bit_field_words,
