@@ -85,6 +85,9 @@ class PopulationMachineVertex(
         MAX_PIPELINE_RESTARTS = 17
         TIMER_CALLBACK_COMPLETED = 18
         SPIKES_PIPELINE_ACTIVATED = 19
+        # FLUSH SPIKES
+        MAX_FLUSHED_SPIKES = 20
+        TOTAL_FLUSHED_SPIKES = 21
 
     SATURATION_COUNT_NAME = "Times_synaptic_weights_have_saturated"
     SATURATION_COUNT_MESSAGE = (
@@ -291,6 +294,13 @@ class PopulationMachineVertex(
         spike_pipeline_deactivated = provenance_data[
             self.EXTRA_PROVENANCE_DATA_ENTRIES.
                 SPIKES_PIPELINE_ACTIVATED.value]
+        # FLUSH SPIKES
+        max_flushed_spikes = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.
+                MAX_FLUSHED_SPIKES.value]
+        total_flushed_spikes = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.
+                TOTAL_FLUSHED_SPIKES.value]
 
         label, x, y, p, names = self._get_placement_details(placement)
 
@@ -400,6 +410,26 @@ class PopulationMachineVertex(
             self._add_name(names,
                            "SPIKES_PIPELINE_ACTIVATED"),
             spike_pipeline_deactivated))
+        # FLUSHED SPIKES
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names,
+                           "MAX_FLUSHED_SPIKES"),
+            max_flushed_spikes,
+            report=max_flushed_spikes > 0,
+            message=(
+                "Max number of flushed spikes for {} on {}, {}, {} "
+                "was {}. ".format(
+                    label, x, y, p, max_flushed_spikes))))
+
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names,
+                           "TOTAL_FLUSHED_SPIKES"),
+            total_flushed_spikes,
+            report=total_flushed_spikes > 0,
+            message=(
+                "Total number of flushed spikes for {} on {}, {}, {} "
+                "was {}. ".format(
+                    label, x, y, p, total_flushed_spikes))))
 
         late_message = (
             self._N_LATE_SPIKES_MESSAGE_DROP if self.__drop_late_spikes

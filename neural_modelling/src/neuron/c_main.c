@@ -78,6 +78,9 @@ struct spike_holder_t spike_cache;
 struct spike_holder_t spike_counter_inh;
 struct spike_holder_t spike_cache_inh;
 
+// FLUSH SPIKES
+bool timer_callback_active = false;
+extern volatile bool dma_busy;
 
 //! The provenance information written on application shutdown.
 struct neuron_provenance {
@@ -109,6 +112,9 @@ struct neuron_provenance {
     uint32_t max_pipeline_restarts;
     uint32_t timer_callback_completed;
     uint32_t spike_pipeline_deactivated;
+    // FLUSH SPIKES
+    uint32_t max_flushed_spikes;
+    uint32_t total_flushed_spikes;
 };
 
 //! values for the priority for each callback
@@ -183,6 +189,9 @@ static void c_main_store_provenance_data(address_t provenance_region) {
     prov->max_pipeline_restarts = max_pipeline_restarts;
     prov->timer_callback_completed = timer_callback_completed;
     prov->spike_pipeline_deactivated = spike_pipeline_deactivated;
+    // FLUSH SPIKES
+    prov->max_flushed_spikes = spike_processing_get_max_flushed_spikes();
+    prov->total_flushed_spikes = spike_processing_get_total_flushed_spikes();
     log_debug("finished other provenance data");
 }
 
@@ -393,7 +402,7 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
 //        count_rewire_attempts++;
 //    }
 
-    uint32_t state = spin1_irq_disable();
+    uint32_t state = spin1_int_disable();
     // Now do neuron time step update
     neuron_do_timestep_update(time, timer_count);
     // First do synapses timestep update, as this is time-critical
@@ -401,6 +410,7 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
 
     // Re-enable the interrupts
     spin1_mode_restore(state);
+    timer_callback_active = false;
 
     profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 }

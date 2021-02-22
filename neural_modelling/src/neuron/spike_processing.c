@@ -35,6 +35,11 @@ uint32_t dmas_this_tick = 0;
 uint32_t pipeline_restarts_this_tick = 0;
 uint32_t spike_pipeline_deactivation_time = 0;
 
+// FLUSH SPIKES variables needed
+static uint32_t total_flushed_spikes;
+static uint32_t max_flushed_spikes;
+extern bool timer_callback_active;
+
 //! DMA buffer structure combines the row read from SDRAM with information
 //! about the read.
 typedef struct dma_buffer {
@@ -331,6 +336,28 @@ static void multicast_packet_received_callback(uint key, uint payload) {
             log_warning("Could not trigger user event\n");
         }
     }
+
+    // if timer is getting low, don't do next DMA and instead flush spike buffer
+     // originally 6657 clock cycles from the end of the interval was used
+//    if (tc[T1_COUNT] < 6657){//6657){
+//    	    uint cpsr = spin1_int_disable();
+//    	    uint32_t spikes_remaining = in_spikes_flush_buffer();
+//    	    timer_callback_active = true;
+//    	    spin1_mode_restore(cpsr);
+//
+//    	    if (spikes_remaining > 0){
+//    	    	total_flushed_spikes += spikes_remaining;
+//
+//    	    	if (spikes_remaining > max_flushed_spikes){
+//    	    		max_flushed_spikes = spikes_remaining;
+//    	    	}
+//
+////    	    	log_info("--------At time: %u, flushed spikes: %u", time, spikes_remaining);
+//
+//    	    	//io_printf(IO_BUF, "At time: %u, flushed spikes: %u\n",
+//    	    	//		time, spikes_remaining);
+//    	    }
+//    }
 }
 
 //! \brief Called when a DMA completes
@@ -556,4 +583,13 @@ uint32_t spike_processing_get_and_reset_pipeline_restarts_this_tick(){
 
 uint32_t spike_processing_get_pipeline_deactivation_time(){
 	return spike_pipeline_deactivation_time;
+}
+
+// FLUSH SPIKES
+uint32_t spike_processing_get_total_flushed_spikes(){
+	return total_flushed_spikes;
+}
+
+uint32_t spike_processing_get_max_flushed_spikes(){
+	return max_flushed_spikes;
 }
