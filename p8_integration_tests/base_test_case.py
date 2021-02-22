@@ -32,8 +32,6 @@ else:
     max_tries = 1
 
 
-
-
 class BaseTestCase(unittest.TestCase):
 
     def setUp(self):
