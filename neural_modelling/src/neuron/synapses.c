@@ -338,7 +338,8 @@ bool synapses_initialise(
 }
 
 void synapses_do_timestep_update(timer_t time) {
-    print_ring_buffers(time);
+// Squeezing out performance
+//    print_ring_buffers(time);
 
     // Disable interrupts to stop DMAs interfering with the ring buffers
     uint32_t state = spin1_irq_disable();
@@ -370,8 +371,8 @@ void synapses_do_timestep_update(timer_t time) {
             ring_buffers[ring_buffer_index] = 0;
         }
     }
-
-    print_inputs();
+// Squeezing out performance
+//    print_inputs();
 
     // Re-enable the interrupts
     spin1_mode_restore(state);

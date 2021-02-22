@@ -79,6 +79,12 @@ class PopulationMachineVertex(
         INPUT_BUFFER_FILLED_SIZE = 13
         # the number of tdma misses
         TDMA_MISSES = 14
+        # Custom provenance from SpiNNCer
+        MAX_SPIKES_IN_A_TICK = 15
+        MAX_DMAS_IN_A_TICK = 16
+        MAX_PIPELINE_RESTARTS = 17
+        TIMER_CALLBACK_COMPLETED = 18
+        SPIKES_PIPELINE_ACTIVATED = 19
 
     SATURATION_COUNT_NAME = "Times_synaptic_weights_have_saturated"
     SATURATION_COUNT_MESSAGE = (
@@ -269,6 +275,23 @@ class PopulationMachineVertex(
         tdma_misses = provenance_data[
             self.EXTRA_PROVENANCE_DATA_ENTRIES.TDMA_MISSES.value]
 
+        # Custom provenance from SpiNNCer
+        max_spikes_in_a_tick = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.
+                MAX_SPIKES_IN_A_TICK.value]
+        max_dmas_in_a_tick = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.
+                MAX_DMAS_IN_A_TICK.value]
+        max_pipeline_restarts = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.
+                MAX_PIPELINE_RESTARTS.value]
+        timer_callback_completed = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.
+                TIMER_CALLBACK_COMPLETED.value]
+        spike_pipeline_deactivated = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.
+                SPIKES_PIPELINE_ACTIVATED.value]
+
         label, x, y, p, names = self._get_placement_details(placement)
 
         # translate into provenance data items
@@ -345,6 +368,39 @@ class PopulationMachineVertex(
                 "packets are filtered in the router to improve "
                 "performance.".format(
                     n_packets_filtered_by_bit_field_filter, x, y, p)))))
+
+        # Custom provenance from SpiNNCer
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names,
+                           "MAX_SPIKES_IN_A_TICK"),
+            max_spikes_in_a_tick,
+            report=max_spikes_in_a_tick > 200,
+            message=(
+                "Max number of spikes for {} on {}, {}, {} "
+                "was {}. Empirically, we can deal with ~200 for real time "
+                "performance using a 1.0 ms timestep.".format(
+                    label, x, y, p, max_spikes_in_a_tick))))
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names,
+                           "MAX_DMAS_IN_A_TICK"),
+            max_dmas_in_a_tick))
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names,
+                           "MAX_PIPELINE_RESTARTS"),
+            max_pipeline_restarts))
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names,
+                           "MAX_PIPELINE_RESTARTS"),
+            max_pipeline_restarts))
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names,
+                           "TIMER_CALLBACK_COMPLETED"),
+            timer_callback_completed))
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names,
+                           "SPIKES_PIPELINE_ACTIVATED"),
+            spike_pipeline_deactivated))
+
         late_message = (
             self._N_LATE_SPIKES_MESSAGE_DROP if self.__drop_late_spikes
             else self._N_LATE_SPIKES_MESSAGE_NO_DROP)

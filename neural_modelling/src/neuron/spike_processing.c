@@ -28,6 +28,13 @@
 #include <common/in_spikes.h>
 #include <recording.h>
 
+// Custom provenance from SpiNNCer
+// counter for number of spikes between timer events
+uint32_t spikes_this_tick = 0;
+uint32_t dmas_this_tick = 0;
+uint32_t pipeline_restarts_this_tick = 0;
+uint32_t spike_pipeline_deactivation_time = 0;
+
 //! DMA buffer structure combines the row read from SDRAM with information
 //! about the read.
 typedef struct dma_buffer {
@@ -293,6 +300,9 @@ static inline void setup_synaptic_dma_write(
 static void multicast_packet_received_callback(uint key, uint payload) {
     p_per_ts_struct.packets_this_time_step += 1;
 
+    // Increment the count of number of spikes received this tick by this core
+    spikes_this_tick++;
+
     // handle the 2 cases separately
     if (payload == 0) {
         log_debug(
@@ -329,6 +339,7 @@ static void multicast_packet_received_callback(uint key, uint payload) {
 static void dma_complete_callback(UNUSED uint unused, uint tag) {
 
     // increment the dma complete count for provenance generation
+    dmas_this_tick++;
     dma_complete_count++;
 
     log_debug("DMA transfer complete at time %u with tag %u", time, tag);
@@ -399,6 +410,9 @@ void user_event_callback(UNUSED uint unused0, UNUSED uint unused1) {
     // Reset the counters as this is a new process
     dma_n_rewires = 0;
     dma_n_spikes = 0;
+
+    // Increment counter for spike processing pipeline restarts
+    pipeline_restarts_this_tick++;
 
     if (buffer_being_read < N_DMA_BUFFERS) {
         // If the DMA buffer is full of valid data, attempt to reuse it on the
@@ -514,4 +528,32 @@ bool spike_processing_do_rewiring(int number_of_rewires) {
     // enable interrupts
     spin1_mode_restore(cpsr);
     return true;
+}
+
+// Custom provenance from SpiNNCer
+uint32_t spike_processing_get_and_reset_spikes_this_tick(){
+
+	uint32_t spikes_to_return = spikes_this_tick;
+	spikes_this_tick = 0;
+
+	return spikes_to_return;
+}
+
+uint32_t spike_processing_get_and_reset_dmas_this_tick(){
+
+	uint32_t dmas_to_return = dmas_this_tick;
+	dmas_this_tick = 0;
+
+	return dmas_to_return;
+}
+
+uint32_t spike_processing_get_and_reset_pipeline_restarts_this_tick(){
+	uint32_t pipeline_restarts_to_return = pipeline_restarts_this_tick;
+	pipeline_restarts_this_tick = 0;
+
+	return pipeline_restarts_to_return;
+}
+
+uint32_t spike_processing_get_pipeline_deactivation_time(){
+	return spike_pipeline_deactivation_time;
 }

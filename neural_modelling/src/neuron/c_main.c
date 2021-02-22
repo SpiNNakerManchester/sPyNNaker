@@ -43,6 +43,7 @@
 #include "structural_plasticity/synaptogenesis_dynamics.h"
 #include "profile_tags.h"
 #include "direct_synapses.h"
+#include "spike_profiling.h"
 
 #include <data_specification.h>
 #include <simulation.h>
@@ -58,6 +59,25 @@
 #error APPLICATION_NAME_HASH was undefined.  Make sure you define this\
     constant
 #endif
+// Custom provenance from SpiNNCer
+// Counters to assess maximum spikes per timer tick
+uint32_t max_spikes_in_a_tick = 0;
+uint32_t max_dmas_in_a_tick = 0;
+uint32_t max_pipeline_restarts = 0;
+
+uint32_t timer_callback_completed = 20000000;
+uint32_t temp_timer_callback_completed = 0;
+uint32_t spike_pipeline_deactivated = 0;
+
+uint32_t last_spikes = 0;
+uint32_t last_restarts = 0;
+uint32_t deactivation_time = 0;
+
+struct spike_holder_t spike_counter;
+struct spike_holder_t spike_cache;
+struct spike_holder_t spike_counter_inh;
+struct spike_holder_t spike_cache_inh;
+
 
 //! The provenance information written on application shutdown.
 struct neuron_provenance {
@@ -83,6 +103,12 @@ struct neuron_provenance {
     uint32_t spike_processing_get_max_filled_input_buffer_size;
     //! the number of times the TDMA fully missed its slots
     uint32_t n_tdma_mises;
+    //! Custom provenance from SpiNNCer
+    uint32_t max_spikes_in_a_tick;
+    uint32_t max_dmas_in_a_tick;
+    uint32_t max_pipeline_restarts;
+    uint32_t timer_callback_completed;
+    uint32_t spike_pipeline_deactivated;
 };
 
 //! values for the priority for each callback
@@ -109,7 +135,7 @@ static uint32_t simulation_ticks = 0;
 static uint32_t infinite_run;
 
 //! Timer callbacks since last rewiring
-static int32_t last_rewiring_time = 0;
+//static int32_t last_rewiring_time = 0;
 
 //! Rewiring period represented as an integer
 static int32_t rewiring_period = 0;
@@ -151,7 +177,12 @@ static void c_main_store_provenance_data(address_t provenance_region) {
     prov->spike_processing_get_max_filled_input_buffer_size =
         spike_processing_get_max_filled_input_buffer_size();
     prov->n_tdma_mises = tdma_processing_times_behind();
-
+    // Custom provenance from SpiNNCer
+    prov->max_spikes_in_a_tick = max_spikes_in_a_tick;
+    prov->max_dmas_in_a_tick = max_dmas_in_a_tick;
+    prov->max_pipeline_restarts = max_pipeline_restarts;
+    prov->timer_callback_completed = timer_callback_completed;
+    prov->spike_pipeline_deactivated = spike_pipeline_deactivated;
     log_debug("finished other provenance data");
 }
 
@@ -284,6 +315,28 @@ void resume_callback(void) {
 //!            executed since start of simulation
 //! \param[in] unused: unused parameter kept for API consistency
 void timer_callback(uint timer_count, UNUSED uint unused) {
+    // Custom provenance from SpiNNCer
+    // Get number of spikes in last tick, and reset spike counter
+    last_spikes = spike_processing_get_and_reset_spikes_this_tick();
+    uint32_t last_dmas = spike_processing_get_and_reset_dmas_this_tick();
+    last_restarts =
+    		spike_processing_get_and_reset_pipeline_restarts_this_tick();
+    deactivation_time = spike_processing_get_pipeline_deactivation_time();
+
+    // cache and flush spike counters
+    // /localhome/mbax3pb2/py3_venv/spinnaker/sPyNNaker/neural_modelling/src/neuron/spike_profiling.h
+	spike_profiling_cache_and_flush_spike_holder(&spike_counter,
+			&spike_cache);
+	spike_profiling_cache_and_flush_spike_holder(&spike_counter_inh,
+			&spike_cache_inh);
+
+    if (last_spikes > max_spikes_in_a_tick){
+    	max_spikes_in_a_tick = last_spikes;
+    	max_dmas_in_a_tick = last_dmas;
+    	max_pipeline_restarts = last_restarts;
+    	timer_callback_completed = temp_timer_callback_completed;
+    	spike_pipeline_deactivated = deactivation_time;
+    }
 
     global_timer_count = timer_count;
     profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
