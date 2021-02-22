@@ -6917,15 +6917,15 @@
       <type>static input_t *</type>
       <name>synapse_types_get_excitatory_input</name>
       <anchorfile>synapse__types_8h.html</anchorfile>
-      <anchor>a9fd01e5900cf9b627c21265d1a295602</anchor>
-      <arglist>(synapse_param_t *parameters)</arglist>
+      <anchor>a445fbc87ae924aa89de5d72e6841cad6</anchor>
+      <arglist>(input_t *excitatory_response, synapse_param_t *parameters)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static input_t *</type>
       <name>synapse_types_get_inhibitory_input</name>
       <anchorfile>synapse__types_8h.html</anchorfile>
-      <anchor>ae75a451bed82759a5aaf19b930688771</anchor>
-      <arglist>(synapse_param_t *parameters)</arglist>
+      <anchor>ae4d30d854f0664fe4cef10f4ecc00831</anchor>
+      <arglist>(input_t *inhibitory_response, synapse_param_t *parameters)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static const char *</type>
@@ -7036,15 +7036,15 @@
       <type>static input_t *</type>
       <name>synapse_types_get_excitatory_input</name>
       <anchorfile>synapse__types__alpha__impl_8h.html</anchorfile>
-      <anchor>a9fd01e5900cf9b627c21265d1a295602</anchor>
-      <arglist>(synapse_param_t *parameters)</arglist>
+      <anchor>a445fbc87ae924aa89de5d72e6841cad6</anchor>
+      <arglist>(input_t *excitatory_response, synapse_param_t *parameters)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static input_t *</type>
       <name>synapse_types_get_inhibitory_input</name>
       <anchorfile>synapse__types__alpha__impl_8h.html</anchorfile>
-      <anchor>ae75a451bed82759a5aaf19b930688771</anchor>
-      <arglist>(synapse_param_t *parameters)</arglist>
+      <anchor>ae4d30d854f0664fe4cef10f4ecc00831</anchor>
+      <arglist>(input_t *inhibitory_response, synapse_param_t *parameters)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static const char *</type>
@@ -7066,20 +7066,6 @@
       <anchorfile>synapse__types__alpha__impl_8h.html</anchorfile>
       <anchor>a8c173175ef5d71b07f3bc7d511cc11c7</anchor>
       <arglist>(synapse_param_t *parameters)</arglist>
-    </member>
-    <member kind="variable">
-      <type>input_t</type>
-      <name>excitatory_response</name>
-      <anchorfile>synapse__types__alpha__impl_8h.html</anchorfile>
-      <anchor>ae1f301d101d1e4954564a57317649d50</anchor>
-      <arglist>[NUM_EXCITATORY_RECEPTORS]</arglist>
-    </member>
-    <member kind="variable">
-      <type>input_t</type>
-      <name>inhibitory_response</name>
-      <anchorfile>synapse__types__alpha__impl_8h.html</anchorfile>
-      <anchor>a5ef64fabd445e3721d6d59a083793b97</anchor>
-      <arglist>[NUM_INHIBITORY_RECEPTORS]</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -7169,15 +7155,15 @@
       <type>static input_t *</type>
       <name>synapse_types_get_excitatory_input</name>
       <anchorfile>synapse__types__delta__impl_8h.html</anchorfile>
-      <anchor>a9fd01e5900cf9b627c21265d1a295602</anchor>
-      <arglist>(synapse_param_t *parameters)</arglist>
+      <anchor>a445fbc87ae924aa89de5d72e6841cad6</anchor>
+      <arglist>(input_t *excitatory_response, synapse_param_t *parameters)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static input_t *</type>
       <name>synapse_types_get_inhibitory_input</name>
       <anchorfile>synapse__types__delta__impl_8h.html</anchorfile>
-      <anchor>ae75a451bed82759a5aaf19b930688771</anchor>
-      <arglist>(synapse_param_t *parameters)</arglist>
+      <anchor>ae4d30d854f0664fe4cef10f4ecc00831</anchor>
+      <arglist>(input_t *inhibitory_response, synapse_param_t *parameters)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static const char *</type>
@@ -7199,20 +7185,6 @@
       <anchorfile>synapse__types__delta__impl_8h.html</anchorfile>
       <anchor>a8c173175ef5d71b07f3bc7d511cc11c7</anchor>
       <arglist>(synapse_param_t *parameters)</arglist>
-    </member>
-    <member kind="variable">
-      <type>input_t</type>
-      <name>excitatory_response</name>
-      <anchorfile>synapse__types__delta__impl_8h.html</anchorfile>
-      <anchor>ae1f301d101d1e4954564a57317649d50</anchor>
-      <arglist>[NUM_EXCITATORY_RECEPTORS]</arglist>
-    </member>
-    <member kind="variable">
-      <type>input_t</type>
-      <name>inhibitory_response</name>
-      <anchorfile>synapse__types__delta__impl_8h.html</anchorfile>
-      <anchor>a5ef64fabd445e3721d6d59a083793b97</anchor>
-      <arglist>[NUM_INHIBITORY_RECEPTORS]</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -7308,15 +7280,15 @@
       <type>static input_t *</type>
       <name>synapse_types_get_excitatory_input</name>
       <anchorfile>synapse__types__dual__excitatory__exponential__impl_8h.html</anchorfile>
-      <anchor>a9fd01e5900cf9b627c21265d1a295602</anchor>
-      <arglist>(synapse_param_t *parameters)</arglist>
+      <anchor>a445fbc87ae924aa89de5d72e6841cad6</anchor>
+      <arglist>(input_t *excitatory_response, synapse_param_t *parameters)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static input_t *</type>
       <name>synapse_types_get_inhibitory_input</name>
       <anchorfile>synapse__types__dual__excitatory__exponential__impl_8h.html</anchorfile>
-      <anchor>ae75a451bed82759a5aaf19b930688771</anchor>
-      <arglist>(synapse_param_t *parameters)</arglist>
+      <anchor>ae4d30d854f0664fe4cef10f4ecc00831</anchor>
+      <arglist>(input_t *inhibitory_response, synapse_param_t *parameters)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static const char *</type>
@@ -7338,20 +7310,6 @@
       <anchorfile>synapse__types__dual__excitatory__exponential__impl_8h.html</anchorfile>
       <anchor>a8c173175ef5d71b07f3bc7d511cc11c7</anchor>
       <arglist>(synapse_param_t *parameters)</arglist>
-    </member>
-    <member kind="variable">
-      <type>input_t</type>
-      <name>excitatory_response</name>
-      <anchorfile>synapse__types__dual__excitatory__exponential__impl_8h.html</anchorfile>
-      <anchor>ae1f301d101d1e4954564a57317649d50</anchor>
-      <arglist>[NUM_EXCITATORY_RECEPTORS]</arglist>
-    </member>
-    <member kind="variable">
-      <type>input_t</type>
-      <name>inhibitory_response</name>
-      <anchorfile>synapse__types__dual__excitatory__exponential__impl_8h.html</anchorfile>
-      <anchor>a5ef64fabd445e3721d6d59a083793b97</anchor>
-      <arglist>[NUM_INHIBITORY_RECEPTORS]</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -7441,15 +7399,15 @@
       <type>static input_t *</type>
       <name>synapse_types_get_excitatory_input</name>
       <anchorfile>synapse__types__exponential__impl_8h.html</anchorfile>
-      <anchor>a9fd01e5900cf9b627c21265d1a295602</anchor>
-      <arglist>(synapse_param_t *parameters)</arglist>
+      <anchor>a445fbc87ae924aa89de5d72e6841cad6</anchor>
+      <arglist>(input_t *excitatory_response, synapse_param_t *parameters)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static input_t *</type>
       <name>synapse_types_get_inhibitory_input</name>
       <anchorfile>synapse__types__exponential__impl_8h.html</anchorfile>
-      <anchor>ae75a451bed82759a5aaf19b930688771</anchor>
-      <arglist>(synapse_param_t *parameters)</arglist>
+      <anchor>ae4d30d854f0664fe4cef10f4ecc00831</anchor>
+      <arglist>(input_t *inhibitory_response, synapse_param_t *parameters)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static const char *</type>
@@ -7471,20 +7429,6 @@
       <anchorfile>synapse__types__exponential__impl_8h.html</anchorfile>
       <anchor>a8c173175ef5d71b07f3bc7d511cc11c7</anchor>
       <arglist>(synapse_param_t *parameters)</arglist>
-    </member>
-    <member kind="variable">
-      <type>input_t</type>
-      <name>excitatory_response</name>
-      <anchorfile>synapse__types__exponential__impl_8h.html</anchorfile>
-      <anchor>ae1f301d101d1e4954564a57317649d50</anchor>
-      <arglist>[NUM_EXCITATORY_RECEPTORS]</arglist>
-    </member>
-    <member kind="variable">
-      <type>input_t</type>
-      <name>inhibitory_response</name>
-      <anchorfile>synapse__types__exponential__impl_8h.html</anchorfile>
-      <anchor>a5ef64fabd445e3721d6d59a083793b97</anchor>
-      <arglist>[NUM_INHIBITORY_RECEPTORS]</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -7580,15 +7524,15 @@
       <type>static input_t *</type>
       <name>synapse_types_get_excitatory_input</name>
       <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
-      <anchor>a9fd01e5900cf9b627c21265d1a295602</anchor>
-      <arglist>(synapse_param_t *parameters)</arglist>
+      <anchor>a445fbc87ae924aa89de5d72e6841cad6</anchor>
+      <arglist>(input_t *excitatory_response, synapse_param_t *parameters)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static input_t *</type>
       <name>synapse_types_get_inhibitory_input</name>
       <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
-      <anchor>ae75a451bed82759a5aaf19b930688771</anchor>
-      <arglist>(synapse_param_t *parameters)</arglist>
+      <anchor>ae4d30d854f0664fe4cef10f4ecc00831</anchor>
+      <arglist>(input_t *inhibitory_response, synapse_param_t *parameters)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static const char *</type>
@@ -7610,20 +7554,6 @@
       <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
       <anchor>a8c173175ef5d71b07f3bc7d511cc11c7</anchor>
       <arglist>(synapse_param_t *parameters)</arglist>
-    </member>
-    <member kind="variable">
-      <type>input_t</type>
-      <name>excitatory_response</name>
-      <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
-      <anchor>ae1f301d101d1e4954564a57317649d50</anchor>
-      <arglist>[NUM_EXCITATORY_RECEPTORS]</arglist>
-    </member>
-    <member kind="variable">
-      <type>input_t</type>
-      <name>inhibitory_response</name>
-      <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
-      <anchor>a5ef64fabd445e3721d6d59a083793b97</anchor>
-      <arglist>[NUM_INHIBITORY_RECEPTORS]</arglist>
     </member>
   </compound>
   <compound kind="file">
