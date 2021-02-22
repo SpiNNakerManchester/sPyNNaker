@@ -203,7 +203,7 @@ static bool initialise(void) {
             &clear_input_buffers_of_late_packets_init)) {
         return false;
     }
-
+    clear_input_buffers_of_late_packets_init = false;
     // set up direct synapses
     address_t direct_synapses_address;
     if (!direct_synapses_initialise(
@@ -289,7 +289,7 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
     profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
 
     time++;
-    last_rewiring_time++;
+//    last_rewiring_time++;
 
     // This is the part where I save the input and output indices
     //   from the circular buffer
@@ -324,25 +324,30 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
         return;
     }
 
+
+    // Then do rewiring
+    // Squeezing out performance
+//    if (rewiring &&
+//            ((last_rewiring_time >= rewiring_period && !synaptogenesis_is_fast())
+//                || synaptogenesis_is_fast())) {
+//        last_rewiring_time = 0;
+//        // put flag in spike processing to do synaptic rewiring
+//        if (synaptogenesis_is_fast()) {
+//            spike_processing_do_rewiring(rewiring_period);
+//        } else {
+//            spike_processing_do_rewiring(1);
+//        }
+//        count_rewire_attempts++;
+//    }
+
+    uint32_t state = spin1_irq_disable();
+    // Now do neuron time step update
+    neuron_do_timestep_update(time, timer_count);
     // First do synapses timestep update, as this is time-critical
     synapses_do_timestep_update(time);
 
-    // Then do rewiring
-    if (rewiring &&
-            ((last_rewiring_time >= rewiring_period && !synaptogenesis_is_fast())
-                || synaptogenesis_is_fast())) {
-        last_rewiring_time = 0;
-        // put flag in spike processing to do synaptic rewiring
-        if (synaptogenesis_is_fast()) {
-            spike_processing_do_rewiring(rewiring_period);
-        } else {
-            spike_processing_do_rewiring(1);
-        }
-        count_rewire_attempts++;
-    }
-
-    // Now do neuron time step update
-    neuron_do_timestep_update(time, timer_count);
+    // Re-enable the interrupts
+    spin1_mode_restore(state);
 
     profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 }
