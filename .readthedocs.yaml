@@ -13,11 +13,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-lxml
--e git+https://github.com/SpiNNakerManchester/SpiNNUtils.git@master#egg=SpiNNUtilities
--e git+https://github.com/SpiNNakerManchester/SpiNNMachine.git@master#egg=SpiNNMachine
--e git+https://github.com/SpiNNakerManchester/SpiNNMan.git@master#egg=spinnman
--e git+https://github.com/SpiNNakerManchester/PACMAN.git@master#egg=spinnaker-pacman
--e git+https://github.com/SpiNNakerManchester/DataSpecification.git@master#egg=spinnaker-dataspecification
--e git+https://github.com/SpiNNakerManchester/spalloc.git@master#egg=spalloc
--e git+https://github.com/SpiNNakerManchester/SpiNNFrontEndCommon.git@master#egg=spinnfrontendcommon
+version: 2
+build:
+  image: latest
+sphinx:
+  configuration: doc/source/conf.py
+  builder: dirhtml
+  fail_on_warning: false
+formats: [pdf]  # This is ADDITIONAL to HTML
+python:
+  version: 3.8
+  install:
+    - requirements: doc/doc_requirements.txt
