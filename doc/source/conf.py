@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017-2021 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -37,6 +37,8 @@ from sphinx.ext import apidoc
 # sys.path.insert(0, os.path.abspath('.'))
 
 # -- General configuration ------------------------------------------------
+
+_on_rtd = os.environ.get('READTHEDOCS', 'False') == 'True'
 
 # If your documentation needs a minimal Sphinx version, state it here.
 # needs_sphinx = '1.0'
@@ -384,10 +386,12 @@ autodoc_default_options = {
     "members": None,
     "special-members": "__call__"
 }
-# Some packages need mocking
-autodoc_mock_imports = [
-    '_tkinter', 'scipy', 'scipy.stats', 'matplotlib',
-    'pyNN', 'pyNN.random', 'pyNN.common', 'neo', 'quantities', 'lazyarray']
+
+if _on_rtd:
+    # Some packages need mocking
+    autodoc_mock_imports = [
+        '_tkinter', 'scipy', 'scipy.stats', 'matplotlib',
+        'pyNN', 'pyNN.random', 'pyNN.common', 'neo', 'quantities', 'lazyarray']
 
 
 def filtered_files(base, excludes=()):
