@@ -47,9 +47,7 @@ class TestFromListConnectorMixed(BaseTestCase):
         sim.end()
 
         target1 = [(0, 0, 2.1, 8), (0, 1, 2.6, 6), (1, 1, 3.2, 4)]
-        target2 = [(0, 0, 1.786, 2), (0, 1, 2.082, 6), (1, 1, 2.499, 3)]
-
-        print(conns1, conns2)
+        target2 = [(0, 0, 1.7864, 2), (0, 1, 2.0823, 6), (1, 1, 2.4995, 3)]
 
         # assertAlmostEqual doesn't work on lists, so loop required
         for i in range(3):
