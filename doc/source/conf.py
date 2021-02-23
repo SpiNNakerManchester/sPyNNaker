@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017-2021 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,12 +27,9 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import mock
 import os
 import sys
 from sphinx.ext import apidoc
-
-autodoc_mock_imports = ['_tkinter']
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -40,6 +37,8 @@ autodoc_mock_imports = ['_tkinter']
 # sys.path.insert(0, os.path.abspath('.'))
 
 # -- General configuration ------------------------------------------------
+
+_on_rtd = os.environ.get('READTHEDOCS', 'False') == 'True'
 
 # If your documentation needs a minimal Sphinx version, state it here.
 # needs_sphinx = '1.0'
@@ -374,10 +373,6 @@ epub_exclude_files = ['search.html']
 
 autoclass_content = 'both'
 
-MOCK_MODULES = ['scipy', 'scipy.stats']
-for mod_name in MOCK_MODULES:
-    sys.modules[mod_name] = mock.Mock()
-
 sys.path.append(os.path.abspath('../..'))
 
 # Do the rst generation
@@ -388,9 +383,15 @@ for f in os.listdir("."):
 
 # We want to document __call__ when encountered
 autodoc_default_options = {
-    "members": True,
+    "members": None,
     "special-members": "__call__"
 }
+
+if _on_rtd:
+    # Some packages need mocking
+    autodoc_mock_imports = [
+        '_tkinter', 'scipy', 'scipy.stats', 'matplotlib',
+        'pyNN', 'pyNN.random', 'pyNN.common', 'neo', 'quantities', 'lazyarray']
 
 
 def filtered_files(base, excludes=()):
