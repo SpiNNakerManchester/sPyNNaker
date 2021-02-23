@@ -13,10 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import numpy
 import spynnaker8 as p
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     calculate_spike_pair_multiplicative_stdp_weight)
-import numpy
+from spinnaker_testbase import BaseTestCase
+
 
 
 def post_spike_same_time():
