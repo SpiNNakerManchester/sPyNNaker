@@ -18,7 +18,7 @@ import sys
 import numpy
 import spynnaker8 as sim
 from spynnaker.pyNN.models.populations import PopulationView
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 
 current_file_path = os.path.dirname(os.path.abspath(__file__))
 

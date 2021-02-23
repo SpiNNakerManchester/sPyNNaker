@@ -20,7 +20,7 @@ Synfirechain-like example
 # spynnaker imports
 import os
 from neo.io import PickleIO
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 from p8_integration_tests.scripts.synfire_run import SynfireRunner
 import spynnaker.plot_utils as plot_utils
 import spynnaker.spike_checker as spike_checker

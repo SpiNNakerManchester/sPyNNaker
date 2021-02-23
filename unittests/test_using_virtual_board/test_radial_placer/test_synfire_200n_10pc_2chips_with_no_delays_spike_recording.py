@@ -21,7 +21,7 @@ Synfirechain-like example
 
 from pacman.model.constraints.placer_constraints import (
     RadialPlacementFromChipConstraint)
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 from p8_integration_tests.scripts.synfire_run import SynfireRunner
 
 nNeurons = 200  # number of neurons in each population

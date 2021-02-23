@@ -16,7 +16,7 @@
 import spynnaker8 as p
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     calculate_spike_pair_additive_stdp_weight)
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 
 import numpy
 

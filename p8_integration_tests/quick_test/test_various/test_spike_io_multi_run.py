@@ -17,7 +17,7 @@ from threading import Condition
 import time
 import spynnaker8 as Frontend
 from spynnaker.pyNN.utilities import neo_convertor
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 
 # Create a condition to avoid overlapping prints
 print_condition = Condition()

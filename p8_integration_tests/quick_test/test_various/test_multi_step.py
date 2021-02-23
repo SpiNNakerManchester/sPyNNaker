@@ -15,7 +15,7 @@
 import spynnaker8 as p
 import numpy
 import sys
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 
 
 def run_network(timestep, steps_per_timestep):

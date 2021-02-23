@@ -36,7 +36,7 @@ import os
 import pickle
 import unittest
 from unittest import SkipTest
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 import spynnaker8 as p
 from spynnaker.pyNN.utilities import neo_compare
 from pyNN.random import NumpyRNG, RandomDistribution

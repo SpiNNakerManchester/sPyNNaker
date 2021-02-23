@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import spynnaker8 as p
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 from pyNN.utility.plotting import Figure, Panel
 import matplotlib.pyplot as plt
 from spynnaker.pyNN.utilities import neo_convertor

@@ -21,7 +21,7 @@ from neo.io import PickleIO
 import unittest
 from unittest import SkipTest
 from spinnman.exceptions import SpinnmanTimeoutException
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 from p8_integration_tests.scripts.synfire_run import SynfireRunner
 from spynnaker.pyNN.utilities import neo_compare
 
