@@ -27,12 +27,9 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import mock
 import os
 import sys
 from sphinx.ext import apidoc
-
-autodoc_mock_imports = ['_tkinter']
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -374,10 +371,6 @@ epub_exclude_files = ['search.html']
 
 autoclass_content = 'both'
 
-MOCK_MODULES = ['scipy', 'scipy.stats', 'pyNN']
-for mod_name in MOCK_MODULES:
-    sys.modules[mod_name] = mock.Mock()
-
 sys.path.append(os.path.abspath('../..'))
 
 # Do the rst generation
@@ -391,6 +384,10 @@ autodoc_default_options = {
     "members": None,
     "special-members": "__call__"
 }
+# Some packages need mocking
+autodoc_mock_imports = [
+    '_tkinter', 'scipy', 'scipy.stats', 'matplotlib',
+    'pyNN', 'pyNN.random', 'pyNN.common', 'neo']
 
 
 def filtered_files(base, excludes=()):
