@@ -122,8 +122,7 @@ class BaseTestCase(unittest.TestCase):
                 "times".format(sub_message, log_level, count, seen))
 
     def assert_not_spin_three(self):
-        config = conf_loader.load_config(
-            filename="spynnaker.cfg", defaults=[])
+        config = globals_variables.config
         if config.has_option("Machine", "version"):
             version = config.get("Machine", "version")
             if version in ["2", "3"]:
