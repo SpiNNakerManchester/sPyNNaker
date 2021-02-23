@@ -387,7 +387,7 @@ autodoc_default_options = {
 # Some packages need mocking
 autodoc_mock_imports = [
     '_tkinter', 'scipy', 'scipy.stats', 'matplotlib',
-    'pyNN', 'pyNN.random', 'pyNN.common', 'neo', 'quantities']
+    'pyNN', 'pyNN.random', 'pyNN.common', 'neo', 'quantities', 'lazyarray']
 
 
 def filtered_files(base, excludes=()):
