@@ -59,7 +59,7 @@ struct delay_extension_provenance {
     uint32_t n_buffer_overflows;
     //! Number of times we had to back off because the comms hardware was busy
     uint32_t n_delays;
-    //! number of times the tdma fell behind its slot
+    //! number of times the TDMA fell behind its slot
     uint32_t times_tdma_fell_behind;
     //! number of packets lost due to count saturation of uint8
     uint32_t n_packets_lost_due_to_count_saturation;
@@ -352,7 +352,7 @@ static bool initialize(void) {
         return false;
     }
 
-    // get tdma parameters
+    // get TDMA parameters
     void *data_addr = data_specification_get_region(TDMA_REGION, ds_regions);
     if (!tdma_processing_initialise(&data_addr)) {
         return false;
@@ -449,7 +449,7 @@ static void user_callback(UNUSED uint unused0, UNUSED uint unused1) {
 }
 
 static void background_callback(uint local_time, UNUSED uint timer_count) {
-    // reset the tdma for this next cycle.
+    // reset the TDMA for this next cycle.
     tdma_processing_reset_phase();
 
     // Loop through delay stages
@@ -457,7 +457,7 @@ static void background_callback(uint local_time, UNUSED uint timer_count) {
         // If any neurons emit spikes after this delay stage
         bit_field_t delay_stage_config = neuron_delay_stage_config[d];
         if (nonempty_bit_field(delay_stage_config, neuron_bit_field_words)) {
-            // Get key mask for this delay stage and it's time slot
+            // Get key mask for this delay stage and its time slot
             uint32_t delay_stage_delay = (d + 1) * n_delay_in_a_stage;
             if (local_time >= delay_stage_delay) {
                 uint32_t delay_stage_time_slot =
@@ -479,12 +479,14 @@ static void background_callback(uint local_time, UNUSED uint timer_count) {
                         uint32_t neuron_index = ((d * num_neurons) + n);
                         uint32_t spike_key = neuron_index + key;
 
+                        #if LOG_LEVEL >= LOG_DEBUG
                         if (delay_stage_spike_counters[n] > 0) {
                             log_debug("Neuron %u sending %u spikes after delay"
                                     "stage %u with key %x",
                                     n, delay_stage_spike_counters[n], d,
                                     spike_key);
                         }
+                        #endif
 
                         // fire n spikes as payload, 1 as none payload.
                         if (has_key) {
