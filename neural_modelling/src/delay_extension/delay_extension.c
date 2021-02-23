@@ -371,16 +371,21 @@ static bool initialize(void) {
 //!
 //! \param[in] key: the key of the multicast message
 //! \param payload: ignored
-static void incoming_spike_callback(uint key, UNUSED uint payload) {
-    log_debug("Received spike %x", key);
-    n_in_spikes++;
+static void incoming_spike_callback(uint key, uint payload) {
 
-    // If there was space to add spike to incoming spike queue
-    if (in_spikes_add_spike(key)) {
-        if (!spike_processing) {
-            if (spin1_trigger_user_event(0, 0)) {
-                spike_processing = true;
-            }
+    if (payload == 0) {
+        payload = 1;
+    }
+    log_debug("Received spike %x", key);
+
+    for (uint32_t i = payload; i > 0; i--) {
+        n_in_spikes++;
+        in_spikes_add_spike(key);
+    }
+
+    if (!spike_processing) {
+        if (spin1_trigger_user_event(0, 0)) {
+            spike_processing = true;
         }
     }
 }
@@ -589,6 +594,7 @@ void c_main(void) {
 
     // Register callbacks
     spin1_callback_on(MC_PACKET_RECEIVED, incoming_spike_callback, MC_PACKET);
+    spin1_callback_on(MCPL_PACKET_RECEIVED, incoming_spike_callback, MC_PACKET);
     spin1_callback_on(TIMER_TICK, timer_callback, TIMER);
     spin1_callback_on(USER_EVENT, user_callback, USER);
 
