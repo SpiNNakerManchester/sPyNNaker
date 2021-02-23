@@ -60,9 +60,9 @@
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>) or
 </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>) or </em><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a><em> or
-</em><em>AbstractList</em>) – what the value of the parameter is; if a list or array,
+</em><a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.AbstractList" title="(in SpiNNUtils)"><em>AbstractList</em></a>) – what the value of the parameter is; if a list or array,
 potentially provides a different value for each neuron</p></li>
-<li><p><strong>data_type</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification)"><em>DataType</em></a>) – The serialization type of the parameter in the neuron model.</p></li>
+<li><p><strong>data_type</strong> (<em>DataType</em>) – The serialization type of the parameter in the neuron model.</p></li>
 </ul>
 </dd>
 </dl>
@@ -72,7 +72,7 @@ potentially provides a different value for each neuron</p></li>
 <dd><p>Get the serialization type of the parameter in the neuron model.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification)">DataType</a></p>
+<dd class="field-odd"><p>DataType</p>
 </dd>
 </dl>
 </dd></dl>
@@ -85,7 +85,7 @@ potentially provides a different value for each neuron</p></li>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a> or <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a> or <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a> or <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>) or <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a>) or
 <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a>) or <a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">ndarray</a> or
-AbstractList</p>
+<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.AbstractList" title="(in SpiNNUtils)">AbstractList</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -99,7 +99,7 @@ AbstractList</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>slice_start</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Inclusive start of the range</p></li>
 <li><p><strong>slice_stop</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Exclusive end of the range</p></li>
-<li><p><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification)"><em>DataSpecificationGenerator</em></a>) – The data specification to eventually write to.
+<li><p><strong>spec</strong> (<em>DataSpecificationGenerator</em>) – The data specification to eventually write to.
 (Note that this does not actually do the write).</p></li>
 </ul>
 </dd>
