@@ -101,6 +101,13 @@ class FromListConnector(AbstractConnector):
         else:
             return numpy.min(self.__delays)
 
+    @overrides(AbstractConnector.get_delay_variance)
+    def get_delay_variance(self, delays):
+        if self.__delays is None:
+            return AbstractConnector.get_delay_variance(self, delays)
+        else:
+            return numpy.var(self.__delays)
+
     def _split_connections(self, pre_slices, post_slices):
         """
         :param list(~pacman.model.graphs.commmon.Slice) pre_slices:
@@ -204,6 +211,13 @@ class FromListConnector(AbstractConnector):
         return numpy.max(numpy.bincount(
             self.__targets.astype('int64', copy=False)))
 
+    @overrides(AbstractConnector.get_weight_mean)
+    def get_weight_mean(self, weights):
+        if self.__weights is None:
+            return AbstractConnector.get_weight_mean(self, weights)
+        else:
+            return numpy.mean(numpy.abs(self.__weights))
+
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, synapse_info):
         # pylint: disable=too-many-arguments
@@ -212,6 +226,14 @@ class FromListConnector(AbstractConnector):
                 synapse_info.weights, len(self.__targets))
         else:
             return numpy.amax(numpy.abs(self.__weights))
+
+    @overrides(AbstractConnector.get_weight_variance)
+    def get_weight_variance(self, weights):
+        # pylint: disable=too-many-arguments
+        if self.__weights is None:
+            return AbstractConnector.get_weight_variance(self, weights)
+        else:
+            return numpy.var(numpy.abs(self.__weights))
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
