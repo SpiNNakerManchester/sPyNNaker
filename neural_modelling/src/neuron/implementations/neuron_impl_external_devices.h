@@ -117,7 +117,7 @@ static uint32_t n_neurons;
 static uint32_t timer_period;
 
 //! setup from c_main
-static uint global_timer_count;
+extern uint global_timer_count;
 
 #ifndef SOMETIMES_UNUSED
 #define SOMETIMES_UNUSED __attribute__((unused))
