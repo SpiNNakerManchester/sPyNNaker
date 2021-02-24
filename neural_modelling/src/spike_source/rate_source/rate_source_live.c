@@ -265,11 +265,13 @@ static void timer_callback(uint timer_count, uint unused) {
     refresh_timer++;
 
     if(time == 0) {
-
+        
         memory_values[0] = sark_tag_ptr(mem_index, 0);
         memory_values[1] = sark_tag_ptr(mem_index+1, 0);
+
         memory_values[0] += vertex_offset;
         memory_values[1] += vertex_offset;
+
     }
 
     log_debug("Timer tick %u", time);
@@ -296,7 +298,7 @@ static void timer_callback(uint timer_count, uint unused) {
         uint32_t value_to_send = rate_values[i] << 7;
 
         while (!spin1_send_mc_packet(key | i, value_to_send, WITH_PAYLOAD)) {
-                spin1_delay_us(2);
+                spin1_delay_us(3);
             }
         spin1_delay_us(2);
     }

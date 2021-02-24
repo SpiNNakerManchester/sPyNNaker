@@ -25,7 +25,7 @@ class RateSourceLive(AbstractPyNNModel):
 
         self.__sources = sources
         self.__partitions = partitions
-        # Number of sources for MNIST. To Be Changed!
+        # Number of sources for MNIST. To Be Changed for generalisation!
         self._max_atoms_per_core = 784
         # Numer of timesteps we want to keep each rate fixed
         self.__refresh_rate = refresh_rate

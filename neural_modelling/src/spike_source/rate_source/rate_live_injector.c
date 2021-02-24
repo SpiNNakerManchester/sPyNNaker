@@ -280,7 +280,6 @@ static void timer_callback(uint timer_count, uint unused) {
     }
 
     if(refresh_timer > refresh) {
-        io_printf(IO_BUF, "refreshing t %d\n", time);
         update_mem_values();
     }
 

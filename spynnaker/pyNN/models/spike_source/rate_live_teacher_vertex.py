@@ -171,7 +171,14 @@ class RateLiveTeacherVertex(ApplicationVertex, AbstractGeneratesDataSpecificatio
 
         :param vertex_slice:
         """
-        return len(self.__teaching_signals)
+
+        pad = (len(self.__teaching_signals) % 4)
+
+        if pad == 0:
+            return len(self.__teaching_signals)
+        pad = 4 - pad
+        return len(self.__teaching_signals) + pad
+        
 
     @property
     def n_atoms(self):
@@ -320,6 +327,11 @@ class RateLiveTeacherVertex(ApplicationVertex, AbstractGeneratesDataSpecificatio
         # Set the focus to the memory region 3 (rate values):
         spec.switch_write_focus(_REGIONS.RATE_VALUES_REGION.value)
 
+        pad = (len(self.__teaching_signals) % 4)
+        pad = 4 - pad if pad != 0 else 0
+
+        for _ in range(pad):
+            self.__teaching_signals.append(0)
         
         # Write the portion of image for the first timestep
         spec.write_array(self.__teaching_signals, data_type=DataType.UINT8)

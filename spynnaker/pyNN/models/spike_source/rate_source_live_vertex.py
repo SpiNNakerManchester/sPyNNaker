@@ -183,7 +183,13 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
 
         :param vertex_slice:
         """
-        return vertex_slice.n_atoms
+
+        pad = vertex_slice.n_atoms % 4
+
+        if pad == 0:
+            return vertex_slice.n_atoms
+        pad = 4 - pad
+        return vertex_slice.n_atoms + pad
 
     @property
     def n_atoms(self):
@@ -346,6 +352,11 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
         # Set the focus to the memory region 3 (rate values):
         spec.switch_write_focus(_REGIONS.RATE_VALUES_REGION.value)
 
+        pad = (vertex_slice.n_atoms % 4)
+        pad = 4 - pad if pad != 0 else 0
+
+        for _ in range(pad):
+            vertex.starting_slice.append(0)
         
         # Write the portion of image for the first timestep
         spec.write_array(vertex.starting_slice, data_type=DataType.UINT8)
