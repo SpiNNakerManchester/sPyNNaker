@@ -21,7 +21,6 @@
 #include "spike_processing.h"
 #include "neuron.h"
 #include "plasticity/synapse_dynamics.h"
-#include "structural_plasticity/synaptogenesis_dynamics.h"
 #include <profiler.h>
 #include <debug.h>
 #include <spin1_api.h>
@@ -319,9 +318,6 @@ bool synapses_initialise(
 
 // Flush ring buffers for the given time
 void synapses_flush_ring_buffers(timer_t time) {
-    // Disable interrupts to stop DMAs interfering with the ring buffers
-    uint32_t state = spin1_irq_disable();
-
     for (uint32_t neuron_index = 0; neuron_index < n_neurons;
                 neuron_index++) {
         // Loop through all synapse types
@@ -335,29 +331,11 @@ void synapses_flush_ring_buffers(timer_t time) {
             ring_buffers[ring_buffer_index] = 0;
         }
     }
-
-    // Re-enable the interrupts
-    spin1_mode_restore(state);
 }
 
 void synapses_do_timestep_update(timer_t time) {
-    print_ring_buffers(time);
-
-    // Disable interrupts to stop DMAs interfering with the ring buffers
-    uint32_t state = spin1_irq_disable();
-
-    // Clear any outstanding spikes
-    spike_processing_clear_input_buffer(time);
-
-    // Reset any outstanding DMAs
-    spin1_dma_flush();
-
     // Call external process inputs function
     process_ring_buffers(time, n_neurons, n_synapse_types, ring_buffers);
-
-    // Re-enable the interrupts
-    spin1_mode_restore(state);
-
 }
 
 bool synapses_process_synaptic_row(

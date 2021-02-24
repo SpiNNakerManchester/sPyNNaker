@@ -45,11 +45,6 @@
 //---------------------------------------
 // Synapse parameters
 //---------------------------------------
-//! Buffer used for result of synapse_types_get_excitatory_input()
-input_t excitatory_response[NUM_EXCITATORY_RECEPTORS];
-//! Buffer used for result of synapse_types_get_inhibitory_input()
-input_t inhibitory_response[NUM_INHIBITORY_RECEPTORS];
-
 //! Internal structure of an alpha-shaped synaptic input
 typedef struct alpha_params_t {
     input_t lin_buff;           //!< buffer for linear term
@@ -148,7 +143,7 @@ static inline void synapse_types_add_neuron_input(
 //! \param[in] parameters: the pointer to the parameters to use
 //! \return Pointer to array of excitatory input buffers for a given neuron ID.
 static inline input_t* synapse_types_get_excitatory_input(
-        synapse_param_t *parameters) {
+        input_t *excitatory_response, synapse_param_t *parameters) {
     excitatory_response[0] =
             parameters->exc.lin_buff * parameters->exc.exp_buff;
     return &excitatory_response[0];
@@ -159,7 +154,7 @@ static inline input_t* synapse_types_get_excitatory_input(
 //! \param[in] parameters: the pointer to the parameters to use
 //! \return Pointer to array of inhibitory input buffers for a given neuron ID.
 static inline input_t* synapse_types_get_inhibitory_input(
-        synapse_param_t *parameters) {
+        input_t *inhibitory_response, synapse_param_t *parameters) {
     inhibitory_response[0] =
             parameters->inh.lin_buff * parameters->inh.exp_buff;
     return &inhibitory_response[0];

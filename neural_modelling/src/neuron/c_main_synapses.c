@@ -39,7 +39,7 @@
 
 //! values for the priority for each callback
 typedef enum callback_priorities {
-    MC = -1, DMA = 0, USER = 0, SDP = 1, TIMER = 2
+    MC = -1, DMA = 0, USER = 0, TIMER = 0, SDP = 1
 } callback_priorities;
 
 enum regions {
@@ -165,12 +165,19 @@ INT_HANDLER write_contributions(void) {
 //!            executed since start of simulation
 //! \param[in] unused: unused parameter kept for API consistency
 void timer_callback(UNUSED uint timer_count, UNUSED uint unused) {
-
-    profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
+    // Disable interrupts to stop DMAs and MC getting in the way of this bit
+    uint32_t state = spin1_int_disable();
 
     time++;
 
-    log_debug("Timer tick %u \n", time);
+    // Clear any outstanding spikes
+    spike_processing_clear_input_buffer(time);
+
+    spin1_mode_restore(state);
+    state = spin1_irq_disable();
+
+    // Also do synapses timestep update, as this is time-critical
+    synapses_do_timestep_update(time);
 
     /* if a fixed number of simulation ticks that were specified at startup
      * then do reporting for finishing */
@@ -183,13 +190,12 @@ void timer_callback(UNUSED uint timer_count, UNUSED uint unused) {
         // Pause common functions
         common_pause(recording_flags);
 
-        profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
-
         // Subtract 1 from the time so this tick gets done again on the next
         // run
         time--;
 
         simulation_ready_to_read();
+        spin1_mode_restore(state);
         return;
     }
 
@@ -201,13 +207,13 @@ void timer_callback(UNUSED uint timer_count, UNUSED uint unused) {
     tc[T2_LOAD] = time_to_transfer;
     tc[T2_CONTROL] = 0xe3;
     spin1_mode_restore(cspr);
-    
+
     synapses_flush_ring_buffers(time);
 
     // Do rewiring as needed
     synaptogenesis_do_timestep_update();
 
-    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
+    spin1_mode_restore(state);
 }
 
 //! \brief Initialises the model by reading in the regions and checking

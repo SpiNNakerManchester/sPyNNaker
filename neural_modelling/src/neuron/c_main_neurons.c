@@ -39,7 +39,7 @@
 
 //! values for the priority for each callback
 typedef enum callback_priorities {
-    DMA = 0, USER = 0, SDP = 1, TIMER = 2
+    DMA = 0, USER = 0, TIMER = 0, SDP = 1
 } callback_priorities;
 
 enum regions {
@@ -174,8 +174,6 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
         simulation_ready_to_read();
         return;
     }
-
-
 
     // Start the transfer of the first part of the weight data
     uint8_t *sdram = sdram_inputs.address;

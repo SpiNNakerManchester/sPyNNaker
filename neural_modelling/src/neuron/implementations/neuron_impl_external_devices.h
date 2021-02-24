@@ -117,7 +117,7 @@ static uint32_t n_neurons;
 static uint32_t timer_period;
 
 //! setup from c_main
-static uint global_timer_count;
+extern uint global_timer_count;
 
 #ifndef SOMETIMES_UNUSED
 #define SOMETIMES_UNUSED __attribute__((unused))
@@ -368,16 +368,18 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
         state_t soma_voltage = neuron_model_get_membrane_voltage(this_neuron);
 
         // Get the exc and inh values from the synapses
-        input_t *exc_values =
-                synapse_types_get_excitatory_input(the_synapse_type);
-        input_t *inh_values =
-                synapse_types_get_inhibitory_input(the_synapse_type);
+        input_t exc_values[NUM_EXCITATORY_RECEPTORS];
+        input_t *exc_syn_values =
+                synapse_types_get_excitatory_input(exc_values, the_synapse_type);
+        input_t inh_values[NUM_INHIBITORY_RECEPTORS];
+        input_t *inh_syn_values =
+                synapse_types_get_inhibitory_input(inh_values, the_synapse_type);
 
         // Call functions to obtain exc_input and inh_input
         input_t *exc_input_values = input_type_get_input_value(
-                exc_values, input_types, NUM_EXCITATORY_RECEPTORS);
+                exc_syn_values, input_types, NUM_EXCITATORY_RECEPTORS);
         input_t *inh_input_values = input_type_get_input_value(
-                inh_values, input_types, NUM_INHIBITORY_RECEPTORS);
+                inh_syn_values, input_types, NUM_INHIBITORY_RECEPTORS);
 
         // Sum g_syn contributions from all receptors for recording
         REAL total_exc = 0;
