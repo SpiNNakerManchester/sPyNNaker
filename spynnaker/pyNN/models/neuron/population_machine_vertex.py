@@ -90,6 +90,10 @@ class PopulationMachineVertex(
         INPUT_BUFFER_FILLED_SIZE = 13
         # the number of tdma misses
         TDMA_MISSES = 14
+        # the maxmimum number of background tasks queued
+        MAX_BACKGROUND_QUEUED = 15
+        # the number of times the background queue overloaded
+        N_BACKGROUND_OVERLOADS = 16
 
     SATURATION_COUNT_NAME = "Times_synaptic_weights_have_saturated"
     _SATURATION_COUNT_MESSAGE = (
@@ -131,6 +135,9 @@ class PopulationMachineVertex(
         ".spynnaker.cfg file or in the pynn.setup() method.")
 
     _MAX_FILLED_SIZE_OF_INPUT_BUFFER_NAME = "Max_filled_size_input_buffer"
+
+    _BACKGROUND_OVERLOADS_NAME = "Times_the_background_queue_overloaded"
+    _BACKGROUND_MAX_QUEUED_NAME = "Max_backgrounds_queued"
 
     _PROFILE_TAG_LABELS = {
         0: "TIMER",
@@ -274,6 +281,10 @@ class PopulationMachineVertex(
             self.EXTRA_PROVENANCE_DATA_ENTRIES.INPUT_BUFFER_FILLED_SIZE.value]
         tdma_misses = provenance_data[
             self.EXTRA_PROVENANCE_DATA_ENTRIES.TDMA_MISSES.value]
+        max_background_queued = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.MAX_BACKGROUND_QUEUED.value]
+        n_background_overloads = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.N_BACKGROUND_OVERLOADS.value]
 
         label, x, y, p, names = self._get_placement_details(placement)
 
@@ -364,6 +375,23 @@ class PopulationMachineVertex(
 
         provenance_items.append(self._app_vertex.get_tdma_provenance_item(
             names, x, y, p, tdma_misses))
+
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names, self._BACKGROUND_MAX_QUEUED_NAME),
+            max_background_queued, report=max_background_queued > 1,
+            message=(
+                "A maximum of {} background tasks were queued on {} on"
+                " {}, {}, {}.  Try increasing the time_scale_factor located"
+                " within the .spynnaker.cfg file or in the pynn.setup()"
+                " method.".format(max_background_queued, label, x, y, p))))
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names, self._BACKGROUND_OVERLOADS_NAME),
+            n_background_overloads, report=n_background_overloads > 0,
+            message=(
+                "On {} on {}, {}, {}, the background queue overloaded {}"
+                " times.  Try increasing the time_scale_factor located within"
+                " the .spynnaker.cfg file or in the pynn.setup() method."
+                .format(label, x, y, p, n_background_overloads))))
         return provenance_items
 
     @overrides(AbstractReceiveBuffersToHost.get_recorded_region_ids)
