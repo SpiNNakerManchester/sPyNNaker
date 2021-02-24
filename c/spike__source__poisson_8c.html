@@ -149,14 +149,15 @@ Enumerations</h2></td></tr>
 &#160;&#160;<b>MC</b> = -1
 , <b>DMA</b> = 0
 , <b>USER</b> = 0
-, <b>SDP</b> = 1
+, <b>TIMER</b> = 0
 , <br />
-&#160;&#160;<b>TIMER</b> = 2
+&#160;&#160;<b>SDP</b> = 1
+, <b>BACKGROUND</b> = 1
 , <a class="el" href="spike__source__poisson_8c.html#a65b19dabf5283c1ea37df964ca25e964a607d700b2c0a01c54bdadde074a7cb12">MULTICAST</a> = -1
 , <a class="el" href="spike__source__poisson_8c.html#a65b19dabf5283c1ea37df964ca25e964ad645defae8408de2415f3dc417f69773">SDP</a> = 0
-, <a class="el" href="spike__source__poisson_8c.html#a65b19dabf5283c1ea37df964ca25e964a6537a62f6f155792bb9a320ee2ec4d68">DMA</a> = 1
 , <br />
-&#160;&#160;<a class="el" href="spike__source__poisson_8c.html#a65b19dabf5283c1ea37df964ca25e964a17ba9bae1b8d7e8d6c12d46ec58e0769">TIMER</a> = 2
+&#160;&#160;<a class="el" href="spike__source__poisson_8c.html#a65b19dabf5283c1ea37df964ca25e964a6537a62f6f155792bb9a320ee2ec4d68">DMA</a> = 1
+, <a class="el" href="spike__source__poisson_8c.html#a65b19dabf5283c1ea37df964ca25e964a17ba9bae1b8d7e8d6c12d46ec58e0769">TIMER</a> = 2
 <br />
  }</td></tr>
 <tr class="memdesc:a65b19dabf5283c1ea37df964ca25e964"><td class="mdescLeft">&#160;</td><td class="mdescRight">Priorities for interrupt handlers.  <a href="spike__source__poisson_8c.html#a65b19dabf5283c1ea37df964ca25e964">More...</a><br /></td></tr>
@@ -250,8 +251,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spik
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:a7fcd6915876e066781399d7b00f1b1f0"><td class="memItemLeft" align="right" valign="top"><a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a7fcd6915876e066781399d7b00f1b1f0">ticks</a></td></tr>
-<tr class="memdesc:a7fcd6915876e066781399d7b00f1b1f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Spin1 API ticks, to know when the timer wraps.  <a href="spike__source__poisson_8c.html#a7fcd6915876e066781399d7b00f1b1f0">More...</a><br /></td></tr>
+<tr class="memitem:a7fcd6915876e066781399d7b00f1b1f0"><td class="memItemLeft" align="right" valign="top"><a id="a7fcd6915876e066781399d7b00f1b1f0"></a>
+<a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a7fcd6915876e066781399d7b00f1b1f0">ticks</a></td></tr>
+<tr class="memdesc:a7fcd6915876e066781399d7b00f1b1f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Spin1 API ticks, to know when the timer wraps. <br /></td></tr>
 <tr class="separator:a7fcd6915876e066781399d7b00f1b1f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3474215ce02c1bf76bceafe71ef89c7b"><td class="memItemLeft" align="right" valign="top"><a id="a3474215ce02c1bf76bceafe71ef89c7b"></a>
 static <a class="el" href="spike__source__poisson_8c.html#structglobal__parameters">global_parameters</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a3474215ce02c1bf76bceafe71ef89c7b">ssp_params</a></td></tr>
@@ -1359,7 +1361,7 @@ Array of rate descriptors. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00686">686</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00690">690</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
@@ -1398,7 +1400,7 @@ Array of rate descriptors. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00754">754</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00758">758</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
@@ -1445,36 +1447,11 @@ Array of rate descriptors. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00790">790</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00794">794</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Variable Documentation</h2>
-<a id="a7fcd6915876e066781399d7b00f1b1f0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7fcd6915876e066781399d7b00f1b1f0">&#9670;&nbsp;</a></span>ticks</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> ticks</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Spin1 API ticks, to know when the timer wraps. </p>
-<p>Spin1 API ticks, to know when the timer wraps. </p>
-
-</div>
-</div>
 <a id="ae73654f333e4363463ad8c594eca1905"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae73654f333e4363463ad8c594eca1905">&#9670;&nbsp;</a></span>time</h2>
 
@@ -1503,7 +1480,7 @@ Array of rate descriptors. </td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Feb 23 2021 16:40:12 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Wed Feb 24 2021 07:56:09 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

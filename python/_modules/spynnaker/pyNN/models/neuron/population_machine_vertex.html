@@ -127,7 +127,11 @@
         <span class="c1"># the max filled size of the input buffer</span>
         <span class="n">INPUT_BUFFER_FILLED_SIZE</span> <span class="o">=</span> <span class="mi">13</span>
         <span class="c1"># the number of tdma misses</span>
-        <span class="n">TDMA_MISSES</span> <span class="o">=</span> <span class="mi">14</span></div>
+        <span class="n">TDMA_MISSES</span> <span class="o">=</span> <span class="mi">14</span>
+        <span class="c1"># the maxmimum number of background tasks queued</span>
+        <span class="n">MAX_BACKGROUND_QUEUED</span> <span class="o">=</span> <span class="mi">15</span>
+        <span class="c1"># the number of times the background queue overloaded</span>
+        <span class="n">N_BACKGROUND_OVERLOADS</span> <span class="o">=</span> <span class="mi">16</span></div>
 
     <span class="n">SATURATION_COUNT_NAME</span> <span class="o">=</span> <span class="s2">&quot;Times_synaptic_weights_have_saturated&quot;</span>
     <span class="n">_SATURATION_COUNT_MESSAGE</span> <span class="o">=</span> <span class="p">(</span>
@@ -169,6 +173,9 @@
         <span class="s2">&quot;.spynnaker.cfg file or in the pynn.setup() method.&quot;</span><span class="p">)</span>
 
     <span class="n">_MAX_FILLED_SIZE_OF_INPUT_BUFFER_NAME</span> <span class="o">=</span> <span class="s2">&quot;Max_filled_size_input_buffer&quot;</span>
+
+    <span class="n">_BACKGROUND_OVERLOADS_NAME</span> <span class="o">=</span> <span class="s2">&quot;Times_the_background_queue_overloaded&quot;</span>
+    <span class="n">_BACKGROUND_MAX_QUEUED_NAME</span> <span class="o">=</span> <span class="s2">&quot;Max_backgrounds_queued&quot;</span>
 
     <span class="n">_PROFILE_TAG_LABELS</span> <span class="o">=</span> <span class="p">{</span>
         <span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;TIMER&quot;</span><span class="p">,</span>
@@ -312,6 +319,10 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="o">.</span><span class="n">INPUT_BUFFER_FILLED_SIZE</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
         <span class="n">tdma_misses</span> <span class="o">=</span> <span class="n">provenance_data</span><span class="p">[</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="o">.</span><span class="n">TDMA_MISSES</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
+        <span class="n">max_background_queued</span> <span class="o">=</span> <span class="n">provenance_data</span><span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="o">.</span><span class="n">MAX_BACKGROUND_QUEUED</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
+        <span class="n">n_background_overloads</span> <span class="o">=</span> <span class="n">provenance_data</span><span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="o">.</span><span class="n">N_BACKGROUND_OVERLOADS</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
 
         <span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_placement_details</span><span class="p">(</span><span class="n">placement</span><span class="p">)</span>
 
@@ -402,6 +413,23 @@
 
         <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">get_tdma_provenance_item</span><span class="p">(</span>
             <span class="n">names</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">tdma_misses</span><span class="p">))</span>
+
+        <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_BACKGROUND_MAX_QUEUED_NAME</span><span class="p">),</span>
+            <span class="n">max_background_queued</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">max_background_queued</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="n">message</span><span class="o">=</span><span class="p">(</span>
+                <span class="s2">&quot;A maximum of </span><span class="si">{}</span><span class="s2"> background tasks were queued on </span><span class="si">{}</span><span class="s2"> on&quot;</span>
+                <span class="s2">&quot; </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">.  Try increasing the time_scale_factor located&quot;</span>
+                <span class="s2">&quot; within the .spynnaker.cfg file or in the pynn.setup()&quot;</span>
+                <span class="s2">&quot; method.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">max_background_queued</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">))))</span>
+        <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_BACKGROUND_OVERLOADS_NAME</span><span class="p">),</span>
+            <span class="n">n_background_overloads</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">n_background_overloads</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="n">message</span><span class="o">=</span><span class="p">(</span>
+                <span class="s2">&quot;On </span><span class="si">{}</span><span class="s2"> on </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">, the background queue overloaded </span><span class="si">{}</span><span class="s2">&quot;</span>
+                <span class="s2">&quot; times.  Try increasing the time_scale_factor located within&quot;</span>
+                <span class="s2">&quot; the .spynnaker.cfg file or in the pynn.setup() method.&quot;</span>
+                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">n_background_overloads</span><span class="p">))))</span>
         <span class="k">return</span> <span class="n">provenance_items</span></div>
 
 <div class="viewcode-block" id="PopulationMachineVertex.get_recorded_region_ids"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.get_recorded_region_ids">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractReceiveBuffersToHost</span><span class="o">.</span><span class="n">get_recorded_region_ids</span><span class="p">)</span>

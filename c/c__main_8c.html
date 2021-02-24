@@ -119,14 +119,15 @@ Enumerations</h2></td></tr>
 &#160;&#160;<b>MC</b> = -1
 , <b>DMA</b> = 0
 , <b>USER</b> = 0
-, <b>SDP</b> = 1
+, <b>TIMER</b> = 0
 , <br />
-&#160;&#160;<b>TIMER</b> = 2
+&#160;&#160;<b>SDP</b> = 1
+, <b>BACKGROUND</b> = 1
 , <a class="el" href="spike__source__poisson_8c.html#a65b19dabf5283c1ea37df964ca25e964a607d700b2c0a01c54bdadde074a7cb12">MULTICAST</a> = -1
 , <a class="el" href="spike__source__poisson_8c.html#a65b19dabf5283c1ea37df964ca25e964ad645defae8408de2415f3dc417f69773">SDP</a> = 0
-, <a class="el" href="spike__source__poisson_8c.html#a65b19dabf5283c1ea37df964ca25e964a6537a62f6f155792bb9a320ee2ec4d68">DMA</a> = 1
 , <br />
-&#160;&#160;<a class="el" href="spike__source__poisson_8c.html#a65b19dabf5283c1ea37df964ca25e964a17ba9bae1b8d7e8d6c12d46ec58e0769">TIMER</a> = 2
+&#160;&#160;<a class="el" href="spike__source__poisson_8c.html#a65b19dabf5283c1ea37df964ca25e964a6537a62f6f155792bb9a320ee2ec4d68">DMA</a> = 1
+, <a class="el" href="spike__source__poisson_8c.html#a65b19dabf5283c1ea37df964ca25e964a17ba9bae1b8d7e8d6c12d46ec58e0769">TIMER</a> = 2
 <br />
  }</td></tr>
 <tr class="memdesc:a65b19dabf5283c1ea37df964ca25e964"><td class="mdescLeft">&#160;</td><td class="mdescRight">values for the priority for each callback  <a href="c__main_8c.html#a65b19dabf5283c1ea37df964ca25e964">More...</a><br /></td></tr>
@@ -144,6 +145,9 @@ Functions</h2></td></tr>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#a8967e8eb09363007076f840186a20995">resume_callback</a> (void)</td></tr>
 <tr class="memdesc:a8967e8eb09363007076f840186a20995"><td class="mdescLeft">&#160;</td><td class="mdescRight">the function to call when resuming a simulation <br /></td></tr>
 <tr class="separator:a8967e8eb09363007076f840186a20995"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa6bf2a62e10a1dd22d4ec7fb3716cab9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#aa6bf2a62e10a1dd22d4ec7fb3716cab9">background_callback</a> (<a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> timer_count, <a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> local_time)</td></tr>
+<tr class="memdesc:aa6bf2a62e10a1dd22d4ec7fb3716cab9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Background activites called from timer.  <a href="c__main_8c.html#aa6bf2a62e10a1dd22d4ec7fb3716cab9">More...</a><br /></td></tr>
+<tr class="separator:aa6bf2a62e10a1dd22d4ec7fb3716cab9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a217aea663c8dd444052831cbde49bd62"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#a217aea663c8dd444052831cbde49bd62">timer_callback</a> (<a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> timer_count, <a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> unused)</td></tr>
 <tr class="memdesc:a217aea663c8dd444052831cbde49bd62"><td class="mdescLeft">&#160;</td><td class="mdescRight">Timer interrupt callback.  <a href="c__main_8c.html#a217aea663c8dd444052831cbde49bd62">More...</a><br /></td></tr>
 <tr class="separator:a217aea663c8dd444052831cbde49bd62"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -190,9 +194,20 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
 static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a></td></tr>
 <tr class="memdesc:a7368643a28282d8b3429f0fb145aa5db"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of neurons on the core. <br /></td></tr>
 <tr class="separator:a7368643a28282d8b3429f0fb145aa5db"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5d218df3d38c1fe5b37eb202ddd28700"><td class="memItemLeft" align="right" valign="top"><a id="a5d218df3d38c1fe5b37eb202ddd28700"></a>
-static <a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#a5d218df3d38c1fe5b37eb202ddd28700">global_timer_count</a></td></tr>
-<tr class="memdesc:a5d218df3d38c1fe5b37eb202ddd28700"><td class="mdescLeft">&#160;</td><td class="mdescRight">timer count for tdma of certain models <br /></td></tr>
+<tr class="memitem:aaa9d9edd5bdfe2c8fedec47a25acfee8"><td class="memItemLeft" align="right" valign="top"><a id="aaa9d9edd5bdfe2c8fedec47a25acfee8"></a>
+static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#aaa9d9edd5bdfe2c8fedec47a25acfee8">n_backgrounds_queued</a> = 0</td></tr>
+<tr class="memdesc:aaa9d9edd5bdfe2c8fedec47a25acfee8"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of background tasks queued / running. <br /></td></tr>
+<tr class="separator:aaa9d9edd5bdfe2c8fedec47a25acfee8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afcea30e1e9196cb82aafc8502bda0a3b"><td class="memItemLeft" align="right" valign="top"><a id="afcea30e1e9196cb82aafc8502bda0a3b"></a>
+static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#afcea30e1e9196cb82aafc8502bda0a3b">n_background_overloads</a> = 0</td></tr>
+<tr class="memdesc:afcea30e1e9196cb82aafc8502bda0a3b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of times the background couldn't be added. <br /></td></tr>
+<tr class="separator:afcea30e1e9196cb82aafc8502bda0a3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac8502bcf887a00b1f6f9193d43365488"><td class="memItemLeft" align="right" valign="top"><a id="ac8502bcf887a00b1f6f9193d43365488"></a>
+static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#ac8502bcf887a00b1f6f9193d43365488">max_backgrounds_queued</a> = 0</td></tr>
+<tr class="memdesc:ac8502bcf887a00b1f6f9193d43365488"><td class="mdescLeft">&#160;</td><td class="mdescRight">The maximum number of background tasks queued. <br /></td></tr>
+<tr class="separator:ac8502bcf887a00b1f6f9193d43365488"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5d218df3d38c1fe5b37eb202ddd28700"><td class="memItemLeft" align="right" valign="top"><a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#a5d218df3d38c1fe5b37eb202ddd28700">global_timer_count</a></td></tr>
+<tr class="memdesc:a5d218df3d38c1fe5b37eb202ddd28700"><td class="mdescLeft">&#160;</td><td class="mdescRight">timer count for tdma of certain models; exported  <a href="c__main_8c.html#a5d218df3d38c1fe5b37eb202ddd28700">More...</a><br /></td></tr>
 <tr class="separator:a5d218df3d38c1fe5b37eb202ddd28700"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -310,6 +325,18 @@ spike_processing_get_max_filled_input_buffer_size</td>
 n_tdma_mises</td>
 <td class="fielddoc">
 the number of times the TDMA fully missed its slots </td></tr>
+<tr><td class="fieldtype">
+<a id="ab5ee7e0c23a7078a25cce1324aaeba64"></a>uint32_t</td>
+<td class="fieldname">
+max_backgrounds_queued</td>
+<td class="fielddoc">
+Maximum backgrounds queued. </td></tr>
+<tr><td class="fieldtype">
+<a id="ac78a4fc6fd2e44b01c34688b09a76f89"></a>uint32_t</td>
+<td class="fieldname">
+n_background_queue_overloads</td>
+<td class="fielddoc">
+Background queue overloads. </td></tr>
 </table>
 
 </div>
@@ -339,7 +366,7 @@ the number of times the TDMA fully missed its slots </td></tr>
 </td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="c__main_8c_source.html#l00089">89</a> of file <a class="el" href="c__main_8c_source.html">c_main.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="c__main_8c_source.html#l00093">93</a> of file <a class="el" href="c__main_8c_source.html">c_main.c</a>.</p>
 
 </div>
 </div>
@@ -376,7 +403,7 @@ the number of times the TDMA fully missed its slots </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="c__main_8c_source.html#l00131">131</a> of file <a class="el" href="c__main_8c_source.html">c_main.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="c__main_8c_source.html#l00145">145</a> of file <a class="el" href="c__main_8c_source.html">c_main.c</a>.</p>
 
 </div>
 </div>
@@ -407,7 +434,46 @@ the number of times the TDMA fully missed its slots </td></tr>
 <p>Initialises the model by reading in the regions and checking recording data. </p>
 <dl class="section return"><dt>Returns</dt><dd>True if it successfully initialised, false otherwise </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="c__main_8c_source.html#l00161">161</a> of file <a class="el" href="c__main_8c_source.html">c_main.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="c__main_8c_source.html#l00177">177</a> of file <a class="el" href="c__main_8c_source.html">c_main.c</a>.</p>
+
+</div>
+</div>
+<a id="aa6bf2a62e10a1dd22d4ec7fb3716cab9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa6bf2a62e10a1dd22d4ec7fb3716cab9">&#9670;&nbsp;</a></span>background_callback()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void background_callback </td>
+          <td>(</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a>&#160;</td>
+          <td class="paramname"><em>timer_count</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a>&#160;</td>
+          <td class="paramname"><em>local_time</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Background activites called from timer. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir"></td><td class="paramname">timer_count</td><td>the number of times this call back has been executed since start of simulation </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">local_time</td><td>The time step being executed </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="c__main_8c_source.html#l00302">302</a> of file <a class="el" href="c__main_8c_source.html">c_main.c</a>.</p>
 
 </div>
 </div>
@@ -446,14 +512,34 @@ the number of times the TDMA fully missed its slots </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="c__main_8c_source.html#l00286">286</a> of file <a class="el" href="c__main_8c_source.html">c_main.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="c__main_8c_source.html#l00339">339</a> of file <a class="el" href="c__main_8c_source.html">c_main.c</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="a5d218df3d38c1fe5b37eb202ddd28700"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5d218df3d38c1fe5b37eb202ddd28700">&#9670;&nbsp;</a></span>global_timer_count</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> global_timer_count</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>timer count for tdma of certain models; exported </p>
+<p>setup from c_main </p>
+
+<p class="definition">Definition at line <a class="el" href="c__main_8c_source.html#l00140">140</a> of file <a class="el" href="c__main_8c_source.html">c_main.c</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Feb 23 2021 16:40:12 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Wed Feb 24 2021 07:56:09 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

@@ -1435,9 +1435,9 @@
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
-      <name>SDP</name>
+      <name>TIMER</name>
       <anchorfile>delay__extension_8c.html</anchorfile>
-      <anchor>a9754029f237bd209c67ffa701d8250c6ad645defae8408de2415f3dc417f69773</anchor>
+      <anchor>a9754029f237bd209c67ffa701d8250c6a17ba9bae1b8d7e8d6c12d46ec58e0769</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
@@ -1447,15 +1447,21 @@
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
-      <name>DMA</name>
+      <name>SDP</name>
       <anchorfile>delay__extension_8c.html</anchorfile>
-      <anchor>a9754029f237bd209c67ffa701d8250c6a6537a62f6f155792bb9a320ee2ec4d68</anchor>
+      <anchor>a9754029f237bd209c67ffa701d8250c6ad645defae8408de2415f3dc417f69773</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
-      <name>TIMER</name>
+      <name>BACKGROUND</name>
       <anchorfile>delay__extension_8c.html</anchorfile>
-      <anchor>a9754029f237bd209c67ffa701d8250c6a17ba9bae1b8d7e8d6c12d46ec58e0769</anchor>
+      <anchor>a9754029f237bd209c67ffa701d8250c6aa44b734476c2f3d073ee7aca08660a0e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>DMA</name>
+      <anchorfile>delay__extension_8c.html</anchorfile>
+      <anchor>a9754029f237bd209c67ffa701d8250c6a6537a62f6f155792bb9a320ee2ec4d68</anchor>
       <arglist></arglist>
     </member>
     <member kind="function" static="yes">
@@ -1578,6 +1584,13 @@
       <arglist></arglist>
     </member>
     <member kind="variable" static="yes">
+      <type>static bool</type>
+      <name>clear_input_buffers_of_late_packets</name>
+      <anchorfile>delay__extension_8c.html</anchorfile>
+      <anchor>a6553b0c9813c830009e32639e34855a2</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
       <type>static uint32_t</type>
       <name>time</name>
       <anchorfile>delay__extension_8c.html</anchorfile>
@@ -1624,6 +1637,13 @@
       <name>n_delay_in_a_stage</name>
       <anchorfile>delay__extension_8c.html</anchorfile>
       <anchor>aeb4240f3e630b0b67c607c606562b3d1</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static uint32_t</type>
+      <name>num_delay_slots</name>
+      <anchorfile>delay__extension_8c.html</anchorfile>
+      <anchor>a69be46ad5911bdfcdb97bc33d2cbfc63</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable" static="yes">
@@ -1696,11 +1716,11 @@
       <anchor>ae8c134de34cba293cb75cb5b5dc24e21</anchor>
       <arglist></arglist>
     </member>
-    <member kind="variable">
-      <type>uint</type>
-      <name>ticks</name>
+    <member kind="variable" static="yes">
+      <type>static uint32_t</type>
+      <name>count_input_buffer_packets_late</name>
       <anchorfile>delay__extension_8c.html</anchorfile>
-      <anchor>a7fcd6915876e066781399d7b00f1b1f0</anchor>
+      <anchor>aec7439b9895311b77cf2ee71500b4206</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable" static="yes">
@@ -1708,6 +1728,34 @@
       <name>timer_period</name>
       <anchorfile>delay__extension_8c.html</anchorfile>
       <anchor>ac0c27301e134af3ce80814a553601074</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static bool</type>
+      <name>spike_processing</name>
+      <anchorfile>delay__extension_8c.html</anchorfile>
+      <anchor>ab1e120fbfb78e0e1e63b3ce5f050d825</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static uint32_t</type>
+      <name>n_backgrounds_queued</name>
+      <anchorfile>delay__extension_8c.html</anchorfile>
+      <anchor>aaa9d9edd5bdfe2c8fedec47a25acfee8</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static uint32_t</type>
+      <name>n_background_overloads</name>
+      <anchorfile>delay__extension_8c.html</anchorfile>
+      <anchor>afcea30e1e9196cb82aafc8502bda0a3b</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static uint32_t</type>
+      <name>max_backgrounds_queued</name>
+      <anchorfile>delay__extension_8c.html</anchorfile>
+      <anchor>ac8502bcf887a00b1f6f9193d43365488</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -1920,6 +1968,13 @@
     </member>
     <member kind="function">
       <type>void</type>
+      <name>background_callback</name>
+      <anchorfile>c__main_8c.html</anchorfile>
+      <anchor>aa6bf2a62e10a1dd22d4ec7fb3716cab9</anchor>
+      <arglist>(uint timer_count, uint local_time)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
       <name>timer_callback</name>
       <anchorfile>c__main_8c.html</anchorfile>
       <anchor>a217aea663c8dd444052831cbde49bd62</anchor>
@@ -1996,7 +2051,28 @@
       <arglist></arglist>
     </member>
     <member kind="variable" static="yes">
-      <type>static uint</type>
+      <type>static uint32_t</type>
+      <name>n_backgrounds_queued</name>
+      <anchorfile>c__main_8c.html</anchorfile>
+      <anchor>aaa9d9edd5bdfe2c8fedec47a25acfee8</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static uint32_t</type>
+      <name>n_background_overloads</name>
+      <anchorfile>c__main_8c.html</anchorfile>
+      <anchor>afcea30e1e9196cb82aafc8502bda0a3b</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static uint32_t</type>
+      <name>max_backgrounds_queued</name>
+      <anchorfile>c__main_8c.html</anchorfile>
+      <anchor>ac8502bcf887a00b1f6f9193d43365488</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint</type>
       <name>global_timer_count</name>
       <anchorfile>c__main_8c.html</anchorfile>
       <anchor>a5d218df3d38c1fe5b37eb202ddd28700</anchor>
@@ -2429,8 +2505,8 @@
       <anchor>ac0c27301e134af3ce80814a553601074</anchor>
       <arglist></arglist>
     </member>
-    <member kind="variable" static="yes">
-      <type>static uint</type>
+    <member kind="variable">
+      <type>uint</type>
       <name>global_timer_count</name>
       <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
       <anchor>a5d218df3d38c1fe5b37eb202ddd28700</anchor>
@@ -5431,6 +5507,13 @@
     </member>
     <member kind="function" static="yes">
       <type>static uint32_t</type>
+      <name>get_bitfield_sum</name>
+      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
+      <anchor>a4dab389e388857fd430ade234d606239</anchor>
+      <arglist>(extra_info extra, spike_t spike)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static uint32_t</type>
       <name>get_neuron_id</name>
       <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
       <anchor>ab08d6807fc8fd46ed5f70a8bd14a5a93</anchor>
@@ -5441,13 +5524,6 @@
       <name>get_local_neuron_id</name>
       <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
       <anchor>a0e1b8eb97598151a700431dc6226d089</anchor>
-      <arglist>(master_population_table_entry entry, extra_info extra, spike_t spike)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static uint32_t</type>
-      <name>get_extended_neuron_id</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>ade00099bbb9f871ad526b30d6446d03c</anchor>
       <arglist>(master_population_table_entry entry, extra_info extra, spike_t spike)</arglist>
     </member>
     <member kind="function" static="yes">
@@ -5648,6 +5724,13 @@
     </member>
     <member kind="function" static="yes">
       <type>static uint32_t</type>
+      <name>get_bitfield_sum</name>
+      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
+      <anchor>a4dab389e388857fd430ade234d606239</anchor>
+      <arglist>(extra_info extra, spike_t spike)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static uint32_t</type>
       <name>get_neuron_id</name>
       <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
       <anchor>ab08d6807fc8fd46ed5f70a8bd14a5a93</anchor>
@@ -5658,13 +5741,6 @@
       <name>get_local_neuron_id</name>
       <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
       <anchor>a0e1b8eb97598151a700431dc6226d089</anchor>
-      <arglist>(master_population_table_entry entry, extra_info extra, spike_t spike)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static uint32_t</type>
-      <name>get_extended_neuron_id</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>ade00099bbb9f871ad526b30d6446d03c</anchor>
       <arglist>(master_population_table_entry entry, extra_info extra, spike_t spike)</arglist>
     </member>
     <member kind="function" static="yes">
@@ -10124,6 +10200,27 @@
       <anchor>a1dce1d90e3a85858e234dda0be1c229b</anchor>
       <arglist></arglist>
     </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>count_input_buffer_packets_late</name>
+      <anchorfile>delay__extension_8c.html</anchorfile>
+      <anchor>ad66252e46fee6d3abdb2071f548532c5</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>max_backgrounds_queued</name>
+      <anchorfile>delay__extension_8c.html</anchorfile>
+      <anchor>aca8046fc67baa1fe980be61d07096396</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_background_queue_overloads</name>
+      <anchorfile>delay__extension_8c.html</anchorfile>
+      <anchor>aa6f8cf72b9fbed71a4cd0989050ef04d</anchor>
+      <arglist></arglist>
+    </member>
   </compound>
   <compound kind="struct">
     <name>delay_parameters</name>
@@ -10176,6 +10273,13 @@
       <name>n_delay_in_a_stage</name>
       <anchorfile>delay__extension_8h.html</anchorfile>
       <anchor>a834003ce931356a849f561dcd7fa2960</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>clear_packets</name>
+      <anchorfile>delay__extension_8h.html</anchorfile>
+      <anchor>a419319f82ec1b09d73f76ef2a298eef9</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
@@ -11138,6 +11242,20 @@
       <name>n_tdma_mises</name>
       <anchorfile>c__main_8c.html</anchorfile>
       <anchor>a9567e9ef2fd91cdd106404ec2e2ed282</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>max_backgrounds_queued</name>
+      <anchorfile>c__main_8c.html</anchorfile>
+      <anchor>ab5ee7e0c23a7078a25cce1324aaeba64</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_background_queue_overloads</name>
+      <anchorfile>c__main_8c.html</anchorfile>
+      <anchor>ac78a4fc6fd2e44b01c34688b09a76f89</anchor>
       <arglist></arglist>
     </member>
   </compound>

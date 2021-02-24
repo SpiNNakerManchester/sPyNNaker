@@ -70,7 +70,7 @@
 <span class="c1">#  6. n_delay_stages, 7. the number of delay supported by each delay stage</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="n">SPIKE_PARTITION_ID</span>
 
-<span class="n">_DELAY_PARAM_HEADER_WORDS</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="n">_DELAY_PARAM_HEADER_WORDS</span> <span class="o">=</span> <span class="mi">8</span>
 
 <span class="n">_EXPANDER_BASE_PARAMS_SIZE</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
 
@@ -82,7 +82,8 @@
         <span class="n">AbstractHasAssociatedBinary</span><span class="p">,</span> <span class="n">AbstractGeneratesDataSpecification</span><span class="p">):</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;__resources&quot;</span><span class="p">]</span>
+        <span class="s2">&quot;__resources&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__drop_late_spikes&quot;</span><span class="p">]</span>
 
     <span class="k">class</span> <span class="nc">_DELAY_EXTENSION_REGIONS</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
         <span class="n">SYSTEM</span> <span class="o">=</span> <span class="mi">0</span>
@@ -101,7 +102,10 @@
         <span class="n">N_TIMES_TDMA_FELL_BEHIND</span> <span class="o">=</span> <span class="mi">6</span>
         <span class="n">N_PACKETS_LOST_DUE_TO_COUNT_SATURATION</span> <span class="o">=</span> <span class="mi">7</span>
         <span class="n">N_PACKETS_WITH_INVALID_NEURON_IDS</span> <span class="o">=</span> <span class="mi">8</span>
-        <span class="n">N_PACKETS_DROPPED_DUE_TO_INVALID_KEY</span> <span class="o">=</span> <span class="mi">9</span></div>
+        <span class="n">N_PACKETS_DROPPED_DUE_TO_INVALID_KEY</span> <span class="o">=</span> <span class="mi">9</span>
+        <span class="n">N_LATE_SPIKES</span> <span class="o">=</span> <span class="mi">10</span>
+        <span class="n">MAX_BACKGROUND_QUEUED</span> <span class="o">=</span> <span class="mi">11</span>
+        <span class="n">N_BACKGROUND_OVERLOADS</span> <span class="o">=</span> <span class="mi">12</span></div>
 
     <span class="n">N_EXTRA_PROVENANCE_DATA_ENTRIES</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="p">)</span>
 
@@ -154,7 +158,21 @@
         <span class="s2">&quot;increase the timer_tic or time_scale_factor or decrease the &quot;</span>
         <span class="s2">&quot;number of neurons per core.&quot;</span><span class="p">)</span>
 
+    <span class="n">N_LATE_SPIKES_NAME</span> <span class="o">=</span> <span class="s2">&quot;Number_of_late_spikes&quot;</span>
+    <span class="n">N_LATE_SPIKES_MESSAGE_DROP</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> packets from </span><span class="si">{}</span><span class="s2"> on </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2"> were dropped from the input buffer, &quot;</span>
+        <span class="s2">&quot;because they arrived too late to be processed in a given time step. &quot;</span>
+        <span class="s2">&quot;Try increasing the time_scale_factor located within the &quot;</span>
+        <span class="s2">&quot;.spynnaker.cfg file or in the pynn.setup() method.&quot;</span><span class="p">)</span>
+    <span class="n">N_LATE_SPIKES_MESSAGE_NO_DROP</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> packets from </span><span class="si">{}</span><span class="s2"> on </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2"> arrived too late to be processed in&quot;</span>
+        <span class="s2">&quot; a given time step. &quot;</span>
+        <span class="s2">&quot;Try increasing the time_scale_factor located within the &quot;</span>
+        <span class="s2">&quot;.spynnaker.cfg file or in the pynn.setup() method.&quot;</span><span class="p">)</span>
+
     <span class="n">DELAYED_FOR_TRAFFIC_NAME</span> <span class="o">=</span> <span class="s2">&quot;Number_of_times_delayed_to_spread_traffic&quot;</span>
+    <span class="n">BACKGROUND_OVERLOADS_NAME</span> <span class="o">=</span> <span class="s2">&quot;Times_the_background_queue_overloaded&quot;</span>
+    <span class="n">BACKGROUND_MAX_QUEUED_NAME</span> <span class="o">=</span> <span class="s2">&quot;Max_backgrounds_queued&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_required</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">app_vertex</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -226,6 +244,12 @@
         <span class="n">n_packets_invalid_keys</span> <span class="o">=</span> <span class="n">provenance_data</span><span class="p">[</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="o">.</span>
             <span class="n">N_PACKETS_DROPPED_DUE_TO_INVALID_KEY</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
+        <span class="n">n_late_packets</span> <span class="o">=</span> <span class="n">provenance_data</span><span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="o">.</span><span class="n">N_LATE_SPIKES</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
+        <span class="n">max_background_queued</span> <span class="o">=</span> <span class="n">provenance_data</span><span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="o">.</span><span class="n">MAX_BACKGROUND_QUEUED</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
+        <span class="n">n_background_overloads</span> <span class="o">=</span> <span class="n">provenance_data</span><span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="o">.</span><span class="n">N_BACKGROUND_OVERLOADS</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
 
         <span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_placement_details</span><span class="p">(</span><span class="n">placement</span><span class="p">)</span>
 
@@ -271,6 +295,30 @@
         <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">get_tdma_provenance_item</span><span class="p">(</span>
                 <span class="n">names</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">n_times_tdma_fell_behind</span><span class="p">))</span>
+        <span class="n">late_message</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">N_LATE_SPIKES_MESSAGE_DROP</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">drop_late_spikes</span>
+            <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">N_LATE_SPIKES_MESSAGE_NO_DROP</span><span class="p">)</span>
+        <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N_LATE_SPIKES_NAME</span><span class="p">),</span>
+            <span class="n">n_late_packets</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">n_late_packets</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="n">message</span><span class="o">=</span><span class="n">late_message</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n_late_packets</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">)))</span>
+        <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">BACKGROUND_MAX_QUEUED_NAME</span><span class="p">),</span>
+            <span class="n">max_background_queued</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">max_background_queued</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="n">message</span><span class="o">=</span><span class="p">(</span>
+                <span class="s2">&quot;A maximum of </span><span class="si">{}</span><span class="s2"> background tasks were queued on </span><span class="si">{}</span><span class="s2"> on&quot;</span>
+                <span class="s2">&quot; </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">.  Try increasing the time_scale_factor located&quot;</span>
+                <span class="s2">&quot; within the .spynnaker.cfg file or in the pynn.setup()&quot;</span>
+                <span class="s2">&quot; method.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">max_background_queued</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">))))</span>
+        <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">BACKGROUND_OVERLOADS_NAME</span><span class="p">),</span>
+            <span class="n">n_background_overloads</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">n_background_overloads</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="n">message</span><span class="o">=</span><span class="p">(</span>
+                <span class="s2">&quot;On </span><span class="si">{}</span><span class="s2"> on </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">, the background queue overloaded </span><span class="si">{}</span><span class="s2">&quot;</span>
+                <span class="s2">&quot; times.  Try increasing the time_scale_factor located within&quot;</span>
+                <span class="s2">&quot; the .spynnaker.cfg file or in the pynn.setup() method.&quot;</span>
+                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">n_background_overloads</span><span class="p">))))</span>
         <span class="k">return</span> <span class="n">provenance_items</span></div>
 
 <div class="viewcode-block" id="DelayExtensionMachineVertex.get_n_keys_for_partition"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.get_n_keys_for_partition">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">MachineVertex</span><span class="o">.</span><span class="n">get_n_keys_for_partition</span><span class="p">)</span>
@@ -437,6 +485,9 @@
 
         <span class="c1"># write the delay per delay stage</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">delay_per_stage</span><span class="p">)</span>
+
+        <span class="c1"># write whether to throw away spikes</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">drop_late_spikes</span><span class="p">))</span>
 
         <span class="c1"># Write the actual delay blocks (create a new one if it doesn&#39;t exist)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">array_values</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">delay_blocks_for</span><span class="p">(</span>
