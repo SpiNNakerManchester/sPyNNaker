@@ -415,9 +415,14 @@ void user_event_callback(UNUSED uint unused0, UNUSED uint unused1) {
 }
 
 /* INTERFACE FUNCTIONS - cannot be static */
-
 //! \brief clears the input buffer of packets and records them
 void spike_processing_clear_input_buffer(timer_t time) {
+    uint32_t n_spikes = in_spikes_size();
+    if (clear_input_buffers_of_late_packets) {
+        spin1_dma_flush();
+        in_spikes_clear();
+        dma_busy = false;
+    }
 
     // Record the number of packets received last timer tick
     p_per_ts_struct.time = time;
@@ -425,11 +430,8 @@ void spike_processing_clear_input_buffer(timer_t time) {
     p_per_ts_struct.packets_this_time_step = 0;
 
     // Record the count whether clearing or not for provenance
-    count_input_buffer_packets_late += in_spikes_size();
+    count_input_buffer_packets_late += n_spikes;
 
-    if (clear_input_buffers_of_late_packets) {
-        in_spikes_clear();
-    }
 }
 
 bool spike_processing_initialise( // EXPORTED
