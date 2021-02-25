@@ -146,7 +146,8 @@ void process_ring_buffers(timer_t time, UNUSED uint32_t n_neurons,
     uint32_t first_ring_buffer = synapse_row_get_ring_buffer_index(time + 1,
             0, 0, synapse_type_index_bits, synapse_index_bits, synapse_delay_mask);
     // Do the DMA transfer
-    // log_info("Writing %d bytes to 0x%08x from ring buffer %d", sdram_inputs.size_in_bytes, sdram_inputs.address, first_ring_buffer);
+    log_debug("Writing %d bytes to 0x%08x from ring buffer %d",
+             sdram_inputs.size_in_bytes, sdram_inputs.address, first_ring_buffer);
     spin1_dma_transfer(DMA_COMPLETE_TAG, sdram_inputs.address,
             &ring_buffers[first_ring_buffer], DMA_WRITE,
             sdram_inputs.size_in_bytes);
