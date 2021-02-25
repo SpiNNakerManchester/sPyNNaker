@@ -111,20 +111,20 @@ static inline void store_synapse_provenance(struct synapse_provenance *prov) {
 //! \param[in] regions: The indices of the regions to be read
 //! \param[in] pkts_per_ts_rec_region:
 //!    The *recording* region to use for packets per time step
+//! \param[out] ring_buffers: The ring buffers that will be used
 //! \return a boolean indicating success (True) or failure (False)
 static inline bool initialise_synapse_regions(
         data_specification_metadata_t *ds_regions,
         struct synapse_regions regions, struct synapse_priorities priorities,
-        uint32_t pkts_per_ts_rec_region) {
+        uint32_t pkts_per_ts_rec_region, uint32_t *n_neurons,
+        uint32_t *n_synapse_types, weight_t **ring_buffers) {
     // Set up the synapses
     uint32_t *ring_buffer_to_input_buffer_left_shifts;
     bool clear_input_buffers_of_late_packets_init;
     uint32_t incoming_spike_buffer_size;
-    uint32_t n_neurons;
-    uint32_t n_synapse_types;
     if (!synapses_initialise(
             data_specification_get_region(regions.synapse_params, ds_regions),
-            &n_neurons, &n_synapse_types,
+            n_neurons, n_synapse_types, ring_buffers,
             &ring_buffer_to_input_buffer_left_shifts,
             &clear_input_buffers_of_late_packets_init,
             &incoming_spike_buffer_size)) {
@@ -150,7 +150,7 @@ static inline bool initialise_synapse_regions(
     // Set up the synapse dynamics
     if (!synapse_dynamics_initialise(
             data_specification_get_region(regions.synapse_dynamics, ds_regions),
-            n_neurons, n_synapse_types,
+            *n_neurons, *n_synapse_types,
             ring_buffer_to_input_buffer_left_shifts)) {
         return false;
     }

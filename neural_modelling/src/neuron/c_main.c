@@ -114,7 +114,16 @@ static uint32_t n_background_overloads = 0;
 //! The maximum number of background tasks queued
 static uint32_t max_backgrounds_queued = 0;
 
-//! timer count for tdma of certain models; exported
+//! The number of neurons in the simulation
+static uint32_t n_neurons;
+
+//! The number of synapse types in the simulation
+static uint32_t n_synapse_types;
+
+//! The ring buffers to be used in the simulation
+static weight_t *ring_buffers;
+
+//! timer count for TDMA of certain models; exported
 uint global_timer_count;
 
 //! \brief Callback to store provenance data (format: neuron_provenance).
@@ -144,8 +153,7 @@ void resume_callback(void) {
     synapses_resume(time + 1);
 }
 
-void process_ring_buffers(timer_t time, uint32_t n_neurons,
-        uint32_t n_synapse_types, weight_t *ring_buffers) {
+static inline void process_ring_buffers(void) {
     // Transfer the input from the ring buffers into the input buffers
     for (uint32_t neuron_index = 0; neuron_index < n_neurons;
             neuron_index++) {
@@ -202,16 +210,21 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
     // Disable interrupts to stop DMAs and MC getting in the way of this bit
     uint32_t state = spin1_int_disable();
 
+    // Store timer count globally for external usage
+    global_timer_count = timer_count;
+
+    // Increment time step
     time++;
 
     // Clear any outstanding spikes
     spike_processing_clear_input_buffer(time);
 
+    // Next bit without DMA, but with MC
     spin1_mode_restore(state);
     state = spin1_irq_disable();
 
-    // Also do synapses timestep update, as this is time-critical
-    synapses_do_timestep_update(time);
+    // Process ring buffers for the inputs from last time step
+    process_ring_buffers();
 
     /* if a fixed number of simulation ticks that were specified at startup
      * then do reporting for finishing */
@@ -273,7 +286,7 @@ static bool initialise(void) {
     // Setup synapses
     if (!initialise_synapse_regions(
             ds_regions, SYNAPSE_REGIONS, SYNAPSE_PRIORITIES,
-            n_rec_regions_used)) {
+            n_rec_regions_used, &n_neurons, &n_synapse_types, &ring_buffers)) {
         return false;
     }
 

@@ -31,10 +31,6 @@
 #include "profile_tags.h"
 #endif //PROFILER_ENABLED
 
-//! Process to handle ring buffers
-extern void process_ring_buffers(timer_t time, uint32_t n_neurons,
-        uint32_t n_synapse_types, weight_t *ring_buffers);
-
 //! Globals required for synapse benchmarking to work.
 uint32_t  num_fixed_pre_synaptic_events = 0;
 
@@ -254,7 +250,8 @@ struct synapse_params {
 /* INTERFACE FUNCTIONS */
 bool synapses_initialise(
         address_t synapse_params_address,
-        uint32_t *n_neurons_value, uint32_t *n_synapse_types_value,
+        uint32_t *n_neurons_out, uint32_t *n_synapse_types_out,
+        weight_t **ring_buffers_out,
         uint32_t **ring_buffer_to_input_buffer_left_shifts,
         bool* clear_input_buffers_of_late_packets_init,
         uint32_t *incoming_spike_buffer_size) {
@@ -263,9 +260,9 @@ bool synapses_initialise(
     *clear_input_buffers_of_late_packets_init = params->drop_late_packets;
     *incoming_spike_buffer_size = params->incoming_spike_buffer_size;
     n_neurons = params->n_neurons;
-    *n_neurons_value = n_neurons;
+    *n_neurons_out = n_neurons;
     n_synapse_types = params->n_synapse_types;
-    *n_synapse_types_value = n_synapse_types;
+    *n_synapse_types_out = n_synapse_types;
 
     uint32_t log_n_neurons = params->log_n_neurons;
     uint32_t log_n_synapse_types = params->log_n_synapse_types;
@@ -312,6 +309,7 @@ bool synapses_initialise(
     for (uint32_t i = 0; i < ring_buffer_size; i++) {
         ring_buffers[i] = 0;
     }
+    *ring_buffers_out = ring_buffers;
 
     return true;
 }
@@ -331,11 +329,6 @@ void synapses_flush_ring_buffers(timer_t time) {
             ring_buffers[ring_buffer_index] = 0;
         }
     }
-}
-
-void synapses_do_timestep_update(timer_t time) {
-    // Call external process inputs function
-    process_ring_buffers(time, n_neurons, n_synapse_types, ring_buffers);
 }
 
 bool synapses_process_synaptic_row(

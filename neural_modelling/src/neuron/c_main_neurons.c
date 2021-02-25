@@ -36,6 +36,7 @@
 #include "c_main_neuron.h"
 #include "c_main_common.h"
 #include "profile_tags.h"
+extern void spin1_wfi(void);
 
 //! values for the priority for each callback
 typedef enum callback_priorities {
@@ -116,6 +117,9 @@ static weight_t *synaptic_contributions[N_SYNAPTIC_BUFFERS];
 //! Variable to indicate DMA completion
 static bool dma_complete;
 
+//! timer count for TDMA of certain models; exported
+uint global_timer_count;
+
 static void dma_complete_callback(UNUSED uint unused0, UNUSED uint unused1) {
     dma_complete = true;
 }
@@ -147,6 +151,8 @@ void resume_callback(void) {
 void timer_callback(uint timer_count, UNUSED uint unused) {
 
     profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
+
+    global_timer_count = timer_count;
 
     time++;
 

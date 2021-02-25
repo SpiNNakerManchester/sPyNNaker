@@ -122,6 +122,9 @@ static uint32_t recording_flags = 0;
 //! Where synaptic input is to be written
 static struct sdram_config sdram_inputs;
 
+// The ring buffers to use
+static weight_t *ring_buffers;
+
 //! \brief Callback to store provenance data (format: neuron_provenance).
 //! \param[out] provenance_region: Where to write the provenance data
 static void store_provenance_data(address_t provenance_region) {
@@ -140,8 +143,7 @@ void resume_callback(void) {
     synapses_resume(time + 1);
 }
 
-void process_ring_buffers(timer_t time, UNUSED uint32_t n_neurons,
-        UNUSED uint32_t n_synapse_types, weight_t *ring_buffers) {
+static inline void process_ring_buffers(void) {
     // Get the index of the first ring buffer for the next time step
     uint32_t first_ring_buffer = synapse_row_get_ring_buffer_index(time + 1,
             0, 0, synapse_type_index_bits, synapse_index_bits, synapse_delay_mask);
@@ -157,7 +159,7 @@ void process_ring_buffers(timer_t time, UNUSED uint32_t n_neurons,
 INT_HANDLER write_contributions(void) {
     tc[T2_INT_CLR] = (uint) tc;         // Clear interrupt in timer
     // Copy things out of DTCM
-    synapses_do_timestep_update(time);
+    process_ring_buffers();
     vic[VIC_VADDR] = (uint) vic;        // Ack the VIC
 }
 
@@ -176,9 +178,6 @@ void timer_callback(UNUSED uint timer_count, UNUSED uint unused) {
 
     spin1_mode_restore(state);
     state = spin1_irq_disable();
-
-    // Also do synapses timestep update, as this is time-critical
-    synapses_do_timestep_update(time);
 
     /* if a fixed number of simulation ticks that were specified at startup
      * then do reporting for finishing */
@@ -232,8 +231,11 @@ static bool initialise(void) {
     }
 
     // Setup synapses
+    uint32_t n_neurons;
+    uint32_t n_synapse_types;
     if (!initialise_synapse_regions(
-            ds_regions, SYNAPSE_REGIONS, SYNAPSE_PRIORITIES, 0)) {
+            ds_regions, SYNAPSE_REGIONS, SYNAPSE_PRIORITIES, 0,
+            &n_neurons, &n_synapse_types, &ring_buffers)) {
         return false;
     }
 
