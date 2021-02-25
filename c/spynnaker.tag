@@ -2491,20 +2491,6 @@
       <anchor>adc2145aaa2f8435401d2c077d42c7b91</anchor>
       <arglist></arglist>
     </member>
-    <member kind="variable" static="yes">
-      <type>static uint32_t</type>
-      <name>n_neurons</name>
-      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
-      <anchor>a7368643a28282d8b3429f0fb145aa5db</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" static="yes">
-      <type>static uint32_t</type>
-      <name>timer_period</name>
-      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
-      <anchor>ac0c27301e134af3ce80814a553601074</anchor>
-      <arglist></arglist>
-    </member>
     <member kind="variable">
       <type>uint</type>
       <name>global_timer_count</name>
