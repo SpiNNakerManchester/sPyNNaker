@@ -111,12 +111,6 @@ static synapse_param_t *neuron_synapse_shaping_params;
 static uint n_steps_per_timestep;
 
 //! setup from c_main
-static uint32_t n_neurons;
-
-//! setup from c_main
-static uint32_t timer_period;
-
-//! setup from c_main
 extern uint global_timer_count;
 
 #ifndef SOMETIMES_UNUSED
