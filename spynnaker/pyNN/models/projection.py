@@ -196,9 +196,6 @@ class Projection(object):
         # add projection to the SpiNNaker control system
         sim.add_projection(self)
 
-        # reset the ring buffer shifts
-        post_vertex.reset_ring_buffer_shifts()
-
         # If there is a virtual board, we need to hold the data in case the
         # user asks for it
         self.__virtual_connection_list = None

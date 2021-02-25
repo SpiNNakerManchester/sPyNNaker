@@ -420,7 +420,6 @@ class SpikeSourcePoissonMachineVertex(
                 .post_vertex.weight_scales)
             weights = connections["weight"] * weight_scales[synapse_type]
             weights = numpy.rint(numpy.abs(weights)).astype("uint16")
-            print("Poisson weights: {}".format(weights))
             if len(weights) % 2 != 0:
                 padding = numpy.array([0], dtype="uint16")
                 weights = numpy.concatenate((weights, padding))

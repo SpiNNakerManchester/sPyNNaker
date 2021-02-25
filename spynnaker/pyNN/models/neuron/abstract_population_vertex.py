@@ -112,7 +112,8 @@ class AbstractPopulationVertex(
         "__drop_late_spikes",
         "__incoming_projections",
         "__synapse_dynamics",
-        "__max_row_info"]
+        "__max_row_info",
+        "__synapse_expander_size"]
 
     #: recording region IDs
     _SPIKE_RECORDING_REGION = 0
@@ -201,11 +202,10 @@ class AbstractPopulationVertex(
         self.__neuron_impl = neuron_impl
         self.__pynn_model = pynn_model
         self._parameters = SpynnakerRangeDictionary(n_neurons)
-        self._state_variables = SpynnakerRangeDictionary(n_neurons)
         self.__neuron_impl.add_parameters(self._parameters)
-        self.__neuron_impl.add_state_variables(self._state_variables)
-        self.__initial_state_variables = None
-        self.__updated_state_variables = set()
+        self.__initial_state_variables = SpynnakerRangeDictionary(n_neurons)
+        self.__neuron_impl.add_state_variables(self.__initial_state_variables)
+        self._state_variables = self.__initial_state_variables.copy()
 
         # Set up for recording
         neuron_recordable_variables = list(
