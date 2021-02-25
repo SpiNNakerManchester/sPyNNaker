@@ -17,7 +17,7 @@
 Synfirechain-like example
 """
 import spynnaker8 as p
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 
 
 def read_spikefile(file_name, n_neurons):

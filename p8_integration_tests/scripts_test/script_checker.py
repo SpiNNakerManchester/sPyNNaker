@@ -16,7 +16,7 @@
 import os
 import time
 import matplotlib
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 matplotlib.use('Agg')
 
 

@@ -16,7 +16,7 @@
 import os
 from spinn_front_end_common.utilities import globals_variables
 import spynnaker8 as sim
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 
 
 class TestIobuffMultirun(BaseTestCase):

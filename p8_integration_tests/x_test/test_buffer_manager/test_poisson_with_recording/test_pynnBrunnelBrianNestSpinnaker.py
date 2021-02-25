@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import p8_integration_tests.scripts.pynnBrunnelPlot as pblt
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 import p8_integration_tests.scripts.pynnBrunnelBrianNestSpinnaker as script
 from spynnaker.pyNN.utilities import neo_convertor
 

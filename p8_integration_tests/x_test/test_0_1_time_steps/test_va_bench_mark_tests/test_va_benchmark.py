@@ -37,7 +37,7 @@ from neo.io import PickleIO
 # import socket
 import unittest
 from unittest import SkipTest
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 import spynnaker8 as p
 from spynnaker.pyNN.utilities import neo_compare, neo_convertor
 from pyNN.random import NumpyRNG, RandomDistribution

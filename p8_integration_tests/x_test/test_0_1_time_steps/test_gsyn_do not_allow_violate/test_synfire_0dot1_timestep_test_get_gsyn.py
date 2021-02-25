@@ -19,7 +19,7 @@ Synfirechain-like example
 # general imports
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from p8_integration_tests.scripts.synfire_run import SynfireRunner
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 
 n_neurons = 10  # number of neurons in each population
 runtime = 50

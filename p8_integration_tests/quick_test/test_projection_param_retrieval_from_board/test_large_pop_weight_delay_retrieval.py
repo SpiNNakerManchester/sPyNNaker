@@ -15,7 +15,7 @@
 
 import numpy
 import spynnaker8 as p
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 import os
 
 sources = 1000  # number of neurons in each population
