@@ -76,6 +76,8 @@ class CheckDebug(BaseTestCase):
             # write_board_chip_report
             BoardChipReport.AREA_CODE_REPORT_NAME,
             ]
+
+        sim.setup(1.0)
         configs = globals_variables.config()
         if (configs.getboolean("Machine", "enable_advanced_monitor_support")
                 and not configs.getboolean("Java", "use_java")):
