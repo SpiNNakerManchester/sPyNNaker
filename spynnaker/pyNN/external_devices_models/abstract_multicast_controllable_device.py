@@ -13,9 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import add_metaclass
-from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 from enum import Enum
+from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 
 
 class SendType(Enum):
@@ -29,8 +28,7 @@ class SendType(Enum):
     SEND_TYPE_UFRACT = 5
 
 
-@add_metaclass(AbstractBase)
-class AbstractMulticastControllableDevice(object):
+class AbstractMulticastControllableDevice(object, metaclass=AbstractBase):
     """ A device that can be controlled by sending multicast packets to it,\
         either directly, or via Ethernet using an AbstractEthernetTranslator
     """

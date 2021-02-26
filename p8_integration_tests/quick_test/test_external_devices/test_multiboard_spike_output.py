@@ -18,7 +18,7 @@ from unittest import SkipTest
 from spynnaker.pyNN.exceptions import ConfigurationException
 import spynnaker8 as p
 import spynnaker8.external_devices as e
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 
 
 class TestMultiBoardSpikeOutput(BaseTestCase):
@@ -36,7 +36,8 @@ class TestMultiBoardSpikeOutput(BaseTestCase):
             machine = p.get_machine()
         except ConfigurationException as oops:
             if "Failure to detect machine of " in str(oops):
-                raise SkipTest("You Need at least 3 boards to run this test")
+                raise SkipTest(
+                    "You Need at least 3 boards to run this test") from oops
 
         labels = list()
         for chip in machine.ethernet_connected_chips:

@@ -102,7 +102,7 @@ class ExternalDeviceLifControlVertex(
         if create_edges:
             self.__dependent_vertices = devices
 
-        super(ExternalDeviceLifControlVertex, self).__init__(
+        super().__init__(
             len(devices), label, constraints, max_atoms_per_core,
             spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
             neuron_impl, pynn_model, drop_late_spikes, splitter)

@@ -16,9 +16,9 @@
 import os
 from neo.io import PickleIO
 import unittest
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 from p8_integration_tests.scripts.synfire_run import SynfireRunner
-from spynnaker8.utilities import neo_compare
+from spynnaker.pyNN.utilities import neo_compare
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 synfire_run = SynfireRunner()

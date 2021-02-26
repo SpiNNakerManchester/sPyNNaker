@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import random
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 import numpy
 import spynnaker8 as p
 
@@ -129,7 +129,28 @@ class TestSpikeSourceArray(BaseTestCase):
     def test_recording_numerous_element_with_zero(self):
         self.runsafe(self.recording_numerous_elements_with_zero)
 
-    def recording_with_empty_lists(self):
+    def recording_with_empty_lists_first_empty(self):
+        p.setup(timestep=1.0)
+        p.set_number_of_neurons_per_core(p.SpikeSourceArray, 2)
+        spike_times = [[], [1], [], [], [4], [3]]
+        input1 = p.Population(
+            6, p.SpikeSourceArray(spike_times=spike_times), label="input1")
+        input1.record("spikes")
+        p.run(50)
+
+        neo = input1.get_data(variables=["spikes"])
+        spikes = neo.segments[0].spiketrains
+
+        spikes_test = [list(spikes[i].times.magnitude) for i in range(
+            len(spikes))]
+        numpy.testing.assert_array_equal(spikes_test, spike_times)
+
+        p.end()
+
+    def test_recording_with_empty_lists_first_empty(self):
+        self.runsafe(self.recording_with_empty_lists_first_empty)
+
+    def recording_with_empty_lists_first_not_empty(self):
         p.setup(timestep=1.0)
         p.set_number_of_neurons_per_core(p.SpikeSourceArray, 2)
         spike_times = [[1], [], [], [], [4], [3]]
@@ -147,5 +168,5 @@ class TestSpikeSourceArray(BaseTestCase):
 
         p.end()
 
-    def test_recording_with_empty_lists(self):
-        self.runsafe(self.recording_with_empty_lists)
+    def test_recording_with_empty_lists_first_not_empty(self):
+        self.runsafe(self.recording_with_empty_lists_first_not_empty)

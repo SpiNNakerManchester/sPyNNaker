@@ -21,5 +21,4 @@ class SpynnakerSplitterSliceLegacy(
         SplitterSliceLegacy, AbstractSpynnakerSplitterDelay):
 
     def __init__(self):
-        SplitterSliceLegacy.__init__(self, "spynnaker_splitter_slice_legacy")
-        AbstractSpynnakerSplitterDelay.__init__(self)
+        super().__init__("spynnaker_splitter_slice_legacy")

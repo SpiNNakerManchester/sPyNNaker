@@ -23,8 +23,8 @@ import matplotlib.pyplot as plt
 import numpy
 from pyNN.utility.plotting import Figure
 import spynnaker.spike_checker as spike_checker
-from spynnaker8.spynnaker_plotting import SpynnakerPanel
-from p8_integration_tests.base_test_case import BaseTestCase
+from spynnaker.spynnaker_plotting import SpynnakerPanel
+from spinnaker_testbase import BaseTestCase
 from p8_integration_tests.scripts.synfire_run import SynfireRunner
 
 n_neurons = 20  # number of neurons in each population

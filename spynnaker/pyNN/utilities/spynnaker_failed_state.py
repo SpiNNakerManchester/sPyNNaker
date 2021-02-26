@@ -13,17 +13,23 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import add_metaclass
+import logging
 from spinn_utilities.abstract_base import AbstractBase
+import spinn_utilities.conf_loader as conf_loader
+from spinn_utilities.log import FormatAdapter
+from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.failed_state import (
     FailedState, FAILED_STATE_MSG)
+from spynnaker.pyNN.abstract_spinnaker_common import AbstractSpiNNakerCommon
 from spynnaker.pyNN.spynnaker_simulator_interface import (
     SpynnakerSimulatorInterface)
 
+logger = FormatAdapter(logging.getLogger(__name__))
 
-@add_metaclass(AbstractBase)
-class SpynnakerFailedState(SpynnakerSimulatorInterface, FailedState):
+
+class SpynnakerFailedState(
+        SpynnakerSimulatorInterface, FailedState, metaclass=AbstractBase):
     """ Marks the simulation as failed.
     """
 
@@ -82,3 +88,12 @@ class SpynnakerFailedState(SpynnakerSimulatorInterface, FailedState):
     @property
     def name(self):
         return self._name
+
+    @property
+    @overrides(FailedState.config)
+    def config(self):
+        logger.warning(
+            "Accessing config before setup is not recommended as setup could"
+            " change some config values. ")
+        return conf_loader.load_config(
+            filename=AbstractSpiNNakerCommon.CONFIG_FILE_NAME, defaults=[])

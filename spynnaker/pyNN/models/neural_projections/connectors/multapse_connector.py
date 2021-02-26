@@ -15,7 +15,6 @@
 
 import math
 import numpy.random
-from six import raise_from
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.common import Slice
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
@@ -72,7 +71,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
             .. note::
                 Not supported by sPyNNaker.
         """
-        super(MultapseConnector, self).__init__(safe, callback, verbose)
+        super().__init__(safe, callback, verbose)
         # We absolutely require an integer at this point!
         self.__num_synapses = self._roundsize(n, "MultapseConnector")
         self.__allow_self_connections = allow_self_connections
@@ -238,11 +237,11 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
             chosen = numpy.random.choice(
                 pairs.shape[0], size=n_connections,
                 replace=self.__with_replacement)
-        except Exception as e:  # pylint: disable=broad-except
-            raise_from(SpynnakerException(
+        except Exception as e:
+            raise SpynnakerException(
                 "MultapseConnector: The number of connections is too large "
                 "for sampling without replacement; "
-                "reduce the value specified in the connector"), e)
+                "reduce the value specified in the connector") from e
 
         # Set up synaptic block
         block["source"] = pairs[chosen, 0]

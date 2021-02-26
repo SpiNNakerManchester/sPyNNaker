@@ -18,7 +18,7 @@ import os
 import unittest
 import matplotlib.pyplot as plt
 from spinn_front_end_common.utilities import globals_variables
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 
 
 class TestScripts(BaseTestCase):
@@ -75,7 +75,7 @@ class TestScripts(BaseTestCase):
                             script, "scripts_skipped_with_unknown_issues")
                     else:
                         print("Error on {}".format(script))
-                        raise
+                        raise ex
 
     def examples(self):
         self.check_directory(

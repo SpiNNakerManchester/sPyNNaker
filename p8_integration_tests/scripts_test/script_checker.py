@@ -16,7 +16,7 @@
 import os
 import time
 import matplotlib
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 matplotlib.use('Agg')
 
 
@@ -40,10 +40,10 @@ class ScriptChecker(BaseTestCase):
             duration = time.time() - start
             self.report("{} for {}".format(duration, script),
                         "scripts_ran_successfully")
-        except Exception:  # pylint: disable=broad-except
+        except Exception as ex:  # pylint: disable=broad-except
             if broken:
                 self.report(
                     script, "scripts_skipped_with_unkown_issues")
             else:
                 print("Error on {}".format(script))
-                raise
+                raise ex

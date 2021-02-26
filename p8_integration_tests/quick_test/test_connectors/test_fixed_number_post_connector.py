@@ -15,7 +15,7 @@
 
 import spynnaker8 as sim
 from spynnaker.pyNN.exceptions import SpynnakerException
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 
 SOURCES = 5
 DESTINATIONS = 10

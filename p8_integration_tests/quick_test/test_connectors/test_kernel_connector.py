@@ -15,7 +15,7 @@
 
 import numpy as np
 import spynnaker8 as sim
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 
 
 class TestKernelConnector(BaseTestCase):

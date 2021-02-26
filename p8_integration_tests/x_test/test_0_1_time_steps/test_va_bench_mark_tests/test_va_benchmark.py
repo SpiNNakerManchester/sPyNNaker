@@ -37,10 +37,9 @@ from neo.io import PickleIO
 # import socket
 import unittest
 from unittest import SkipTest
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 import spynnaker8 as p
-from spynnaker8.utilities import neo_compare
-from spynnaker8.utilities import neo_convertor
+from spynnaker.pyNN.utilities import neo_compare, neo_convertor
 from pyNN.random import NumpyRNG, RandomDistribution
 from pyNN.utility import Timer
 from spinnman.exceptions import SpinnmanTimeoutException
@@ -183,7 +182,7 @@ class TestVABenchmarkSpikes(BaseTestCase):
             exc_spikes = do_run()
         # System intentional overload so may error
         except SpinnmanTimeoutException as ex:
-            raise SkipTest(ex)
+            raise SkipTest() from ex
         spike_count = neo_convertor.count_spikes(exc_spikes)
         print(spike_count)
         # CB Jan 14 2019 Result varie between runs

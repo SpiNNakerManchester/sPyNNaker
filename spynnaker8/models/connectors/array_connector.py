@@ -12,11 +12,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import logging
-from spinn_utilities.log import FormatAdapter
 from spynnaker.pyNN.models.neural_projections.connectors import (
     ArrayConnector as _BaseClass)
-logger = FormatAdapter(logging.getLogger(__name__))
+from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
 
 
 class ArrayConnector(_BaseClass):
@@ -47,8 +45,8 @@ class ArrayConnector(_BaseClass):
             Whether to output extra information about the connectivity to a
             CSV file
         """
+        moved_in_v6("spynnaker8.models.connectors.ArrayConnector",
+                    "spynnaker.pyNN.models.neural_projections.connectors"
+                    ".ArrayConnector")
         super(ArrayConnector, self).__init__(
             array=array, safe=safe, callback=callback, verbose=verbose)
-        logger.warning(
-            "please use spynnaker.pyNN.models.neural_projections.connectors."
-            "ArrayConnector instead")

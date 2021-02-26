@@ -21,7 +21,7 @@ Synfirechain-like example
 import unittest
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 import spynnaker8 as p
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 
 
 class TestMultipleStdpMechsOnSameNeuron(BaseTestCase):

@@ -27,8 +27,7 @@ class DelayAfferentApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
         :param DelayExtensionVertex delay_vertex:
         :param str label:
         """
-        super(DelayAfferentApplicationEdge, self).__init__(
-            pre_vertex, delay_vertex, label=label)
+        super().__init__(pre_vertex, delay_vertex, label=label)
 
     @overrides(AbstractSlicesConnect.could_connect)
     def could_connect(self, pre_slice, post_slice):

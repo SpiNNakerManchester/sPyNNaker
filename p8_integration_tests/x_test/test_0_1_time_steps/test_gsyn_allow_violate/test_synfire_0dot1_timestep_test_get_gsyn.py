@@ -18,7 +18,7 @@ Synfirechain-like example
 """
 # general imports
 from p8_integration_tests.scripts.synfire_run import SynfireRunner
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 import spynnaker.spike_checker as spike_checker
 from spinnman.exceptions import SpinnmanTimeoutException
 from unittest import SkipTest
@@ -45,14 +45,14 @@ class TestGsyn(BaseTestCase):
             # no check of gsyn as the system overloads
         # System intentional overload so may error
         except SpinnmanTimeoutException as ex:
-            raise SkipTest(ex)
+            raise SkipTest() from ex
 
 
 if __name__ == '__main__':
     # plotting stuff delay import so unittestsz do not need them
     import matplotlib.pyplot as plt
     from pyNN.utility.plotting import Figure
-    from spynnaker8.spynnaker_plotting import SpynnakerPanel
+    from spynnaker.spynnaker_plotting import SpynnakerPanel
 
     synfire_run.do_run(
         n_neurons, max_delay=14.4, time_step=0.1, neurons_per_core=5,

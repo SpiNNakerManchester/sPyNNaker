@@ -106,9 +106,9 @@ def test_csa_block_connector():
         assert(len(block) >= 0)
         assert(all(item["weight"] == 1.0 for item in block))
         assert(all(item["delay"] == 2.0 for item in block))
-    except TypeError:
-        raise SkipTest("https://github.com/INCF/csa/issues/17")
-    except RuntimeError:
+    except TypeError as e:
+        raise SkipTest("https://github.com/INCF/csa/issues/17") from e
+    except RuntimeError as e:
         if sys.version_info >= (3, 7):
-            raise SkipTest("https://github.com/INCF/csa/issues/16")
-        raise
+            raise SkipTest("https://github.com/INCF/csa/issues/16") from e
+        raise e

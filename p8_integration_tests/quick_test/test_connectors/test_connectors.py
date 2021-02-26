@@ -17,7 +17,7 @@ import numpy
 import spynnaker8 as sim
 from spinn_front_end_common.utilities import globals_variables
 from spynnaker.pyNN.exceptions import SpynnakerException
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 from pyNN.random import NumpyRNG
 
 SOURCES = 5

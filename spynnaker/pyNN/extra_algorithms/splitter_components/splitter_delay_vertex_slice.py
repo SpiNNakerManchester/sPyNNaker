@@ -80,8 +80,7 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
 
         :param other_splitter: the other splitter to split slices via.
         """
-        AbstractDependentSplitter.__init__(
-            self, other_splitter, self.SPLITTER_NAME)
+        super().__init__(other_splitter, self.SPLITTER_NAME)
         self._machine_vertex_by_slice = dict()
 
     @overrides(AbstractDependentSplitter.get_out_going_vertices)
@@ -98,6 +97,7 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
         additional_arguments=["app_graph"])
     def create_machine_vertices(
             self, resource_tracker, machine_graph, app_graph):
+        # pylint: disable=arguments-differ
         pre_slices, is_exact = self._other_splitter.get_out_going_slices()
 
         # check for exacts.
@@ -132,7 +132,7 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
 
     @overrides(AbstractDependentSplitter.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
-        AbstractDependentSplitter.set_governed_app_vertex(self, app_vertex)
+        super().set_governed_app_vertex(app_vertex)
         if not isinstance(app_vertex, DelayExtensionVertex):
             raise PacmanConfigurationException(
                 self.INVALID_POP_ERROR_MESSAGE.format(app_vertex))
@@ -253,8 +253,7 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
             connector, AbstractGenerateConnectorOnMachine) and
             connector.generate_on_machine(
                 synapse_info.weights, synapse_info.delays))
-        synapse_gen = isinstance(
-            dynamics, AbstractGenerateOnMachine)
+        synapse_gen = isinstance(dynamics, AbstractGenerateOnMachine)
         if connector_gen and synapse_gen:
             return sum((
                 DelayGeneratorData.BASE_SIZE,
@@ -278,5 +277,4 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
 
     @overrides(AbstractDependentSplitter.reset_called)
     def reset_called(self):
-        AbstractDependentSplitter.reset_called(self)
         self._machine_vertex_by_slice = dict()

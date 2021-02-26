@@ -56,12 +56,11 @@ class SplitterAbstractPopulationVertexSlice(
         "your vertex and try again.")
 
     def __init__(self):
-        AbstractSplitterSlice.__init__(self, self.SPLITTER_NAME)
-        AbstractSpynnakerSplitterDelay.__init__(self)
+        super().__init__(self.SPLITTER_NAME)
 
     @overrides(AbstractSplitterSlice.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
-        AbstractSplitterSlice.set_governed_app_vertex(self, app_vertex)
+        super().set_governed_app_vertex(app_vertex)
         if not isinstance(app_vertex, AbstractPopulationVertex):
             raise PacmanConfigurationException(
                 self.INVALID_POP_ERROR_MESSAGE.format(app_vertex))
@@ -98,6 +97,7 @@ class SplitterAbstractPopulationVertexSlice(
         :param ~pacman.model.graphs.machine.MachineGraph graph: app graph
         :rtype: ~pacman.model.resources.ResourceContainer
         """
+        # pylint: disable=arguments-differ
         variable_sdram = self.get_variable_sdram(vertex_slice)
         constant_sdram = self.constant_sdram(vertex_slice, graph)
 

@@ -13,15 +13,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import with_metaclass
 from spinn_utilities.overrides import overrides
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spynnaker.pyNN.external_devices_models import (
     AbstractMulticastControllableDevice)
 
 
-class PushBotEthernetDevice(with_metaclass(
-        AbstractBase, AbstractMulticastControllableDevice)):
+class PushBotEthernetDevice(
+        AbstractMulticastControllableDevice, metaclass=AbstractBase):
     """ An arbitrary PushBot device
     """
 

@@ -17,7 +17,7 @@ import os
 import unittest
 import matplotlib.pyplot as plt
 from spinn_front_end_common.utilities import globals_variables
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 
 
 class TestScripts(BaseTestCase):
@@ -54,9 +54,9 @@ class TestScripts(BaseTestCase):
                 script = os.path.join(directory, a_script)
                 try:
                     self.check_script(script)
-                except Exception:
+                except Exception as e:
                     print("Error on {}".format(script))
-                    raise
+                    raise e
 
     def test_learning(self):
         self.check_directory("learning")

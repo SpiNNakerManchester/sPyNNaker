@@ -16,7 +16,7 @@
 import pytest
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 import spynnaker8 as sim
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 
 
 class TestPopulation(BaseTestCase):
@@ -86,7 +86,8 @@ class TestPopulation(BaseTestCase):
     def test_record_with_indexes(self):
         sim.setup(timestep=1.0)
         pop = sim.Population(10, sim.IF_curr_exp())
-        pop.record("v", indexes=[2, 3, 4])
+        pop._record(
+            "v", to_file=None, sampling_interval=None, indexes=[2, 3, 4])
         target = {"v"}
         assert target == set(pop._recorder.get_all_recording_variables())
         target1 = [2, 3, 4]

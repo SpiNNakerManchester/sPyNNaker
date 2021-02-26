@@ -12,8 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import logging
-from spinn_utilities.log import FormatAdapter
 from pyNN.standardmodels.synapses import StaticSynapse
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStructuralSTDP as
@@ -22,7 +20,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics.\
     synapse_dynamics_structural_common import (
         DEFAULT_F_REW, DEFAULT_INITIAL_WEIGHT, DEFAULT_INITIAL_DELAY,
         DEFAULT_S_MAX)
-logger = FormatAdapter(logging.getLogger(__name__))
+from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
 
 
 class SynapseDynamicsStructuralSTDP(_BaseClass):
@@ -70,6 +68,10 @@ class SynapseDynamicsStructuralSTDP(_BaseClass):
         :param delay: The delay of connections formed by the connector
         :type delay: float or None
         """
+        moved_in_v6("spynnaker8.models.synapse_dynamics."
+                    "SynapseDynamicsStructuralSTDP",
+                    "spynnaker.pyNN.models.neuron.synapse_dynamics"
+                    ".synapseDynamicsStructuralSTDP")
         _BaseClass.__init__(
             self, partner_selection, formation, elimination,
             timing_dependence=timing_dependence,
@@ -79,6 +81,3 @@ class SynapseDynamicsStructuralSTDP(_BaseClass):
             initial_weight=initial_weight, initial_delay=initial_delay,
             s_max=s_max, seed=seed, weight=weight, delay=delay,
             backprop_delay=backprop_delay, neuromodulation=neuromodulation)
-        logger.warning(
-            "please use spynnaker.pyNN.models.neuron.synapse_dynamics."
-            "SynapseDynamicsStructuralSTDP instead")

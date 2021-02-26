@@ -77,7 +77,7 @@ class SynapseRowTooBigException(SpynnakerException):
         :param max_size: the maximum permitted size of row
         :param message: the excepton message
         """
-        super(SynapseRowTooBigException, self).__init__(message)
+        super().__init__(message)
         self._max_size = max_size
 
     @property

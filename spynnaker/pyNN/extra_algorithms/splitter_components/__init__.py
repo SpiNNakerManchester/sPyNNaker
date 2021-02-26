@@ -19,8 +19,10 @@ from .spynnaker_splitter_selector import SpynnakerSplitterSelector
 from .splitter_abstract_pop_vertex_slice import (
     SplitterAbstractPopulationVertexSlice)
 from .splitter_delay_vertex_slice import SplitterDelayVertexSlice
+from .spynnaker_splitter_slice_legacy import SpynnakerSplitterSliceLegacy
 
 __all__ = [
     'AbstractSpynnakerSplitterDelay', 'SplitterAbstractPopulationVertexSlice',
     'SplitterDelayVertexSlice',
-    'SpynnakerSplitterPartitioner', 'SpynnakerSplitterSelector']
+    'SpynnakerSplitterPartitioner', 'SpynnakerSplitterSelector',
+    'SpynnakerSplitterSliceLegacy']
