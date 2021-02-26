@@ -228,8 +228,7 @@ class SynapticMatrix(object):
             raise Exception("Data is incorrect size: {} instead of {}".format(
                 size, self.__matrix_size))
 
-        is_direct, _ = self.__is_direct(single_addr)
-        if is_direct:
+        if self.__is_direct(single_addr):
             single_addr = self.__write_single_machine_matrix(
                 single_synapses, single_addr, row_data)
             return block_addr, single_addr
