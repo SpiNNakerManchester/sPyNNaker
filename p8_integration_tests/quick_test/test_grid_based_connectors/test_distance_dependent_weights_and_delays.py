@@ -15,7 +15,7 @@
 
 import spynnaker8 as p
 import math
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 from pyNN.utility.plotting import Figure, Panel
 from pyNN.random import NumpyRNG
 import matplotlib.pyplot as plt
