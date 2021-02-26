@@ -76,9 +76,7 @@ class CheckDebug(BaseTestCase):
             # write_board_chip_report
             BoardChipReport.AREA_CODE_REPORT_NAME,
             ]
-
-        sim.setup(1.0)
-        configs = globals_variables.get_simulator()._config
+        configs = globals_variables.config()
         if (configs.getboolean("Machine", "enable_advanced_monitor_support")
                 and not configs.getboolean("Java", "use_java")):
             # write_data_speed_up_report
@@ -95,10 +93,9 @@ class CheckDebug(BaseTestCase):
             sim.run(0)
         sim.run(1000)
         pop.get_data("v")
-        report_directory = globals_variables.get_simulator().\
-            _report_default_directory
         sim.end()
 
+        report_directory = globals_variables.run_report_directory()
         found = os.listdir(report_directory)
         for report in reports:
             self.assertIn(report, found)
