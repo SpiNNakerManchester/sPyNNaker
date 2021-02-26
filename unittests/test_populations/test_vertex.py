@@ -26,9 +26,8 @@ from unittests.mocks import MockSimulator
 
 
 class EmptyNeuronComponent(AbstractStandardNeuronComponent):
-
     def __init__(self):
-        AbstractStandardNeuronComponent.__init__(self, [])
+        super().__init__([])
 
     def get_n_cpu_cycles(self, n_neurons):
         return 0
@@ -53,7 +52,6 @@ class EmptyNeuronComponent(AbstractStandardNeuronComponent):
 
 
 class EmptySynapseType(AbstractSynapseType, EmptyNeuronComponent):
-
     def get_n_synapse_types(self):
         return 0
 
@@ -65,9 +63,8 @@ class EmptySynapseType(AbstractSynapseType, EmptyNeuronComponent):
 
 
 class _MyNeuronModel(AbstractNeuronModel):
-
     def __init__(self, foo, bar):
-        AbstractNeuronModel.__init__(self, [], [])
+        super().__init__([], [])
         self._foo = foo
         self._bar = bar
 
@@ -96,10 +93,9 @@ class _MyNeuronModel(AbstractNeuronModel):
 
 @defaults
 class FooBar(AbstractPyNNNeuronModelStandard):
-
     @default_initial_values({"foo", "bar"})
     def __init__(self, foo=1, bar=11):
-        super(FooBar, self).__init__(
+        super().__init__(
             "FooBar", "foobar.aplx", _MyNeuronModel(foo, bar),
             EmptyNeuronComponent(), EmptySynapseType(), EmptyNeuronComponent())
 
@@ -109,11 +105,9 @@ class FooBar(AbstractPyNNNeuronModelStandard):
 
 
 class MockNeuron(AbstractPopulationVertex):
-
     def __init__(self):
         foo_bar = FooBar()
-
-        super(MockNeuron, self).__init__(
+        super().__init__(
             n_neurons=5, label="Mock", constraints=None,
             max_atoms_per_core=None, spikes_per_second=None,
             ring_buffer_sigma=None, min_weights=None, weight_random_sigma=None,

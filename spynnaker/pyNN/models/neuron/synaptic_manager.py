@@ -13,31 +13,32 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import division
-
 import struct
-import numpy
+import math
 import sys
 
+import numpy
+
+from scipy import special  # @UnresolvedImport
 from collections import defaultdict
-from six import itervalues
 
 from spinn_utilities.progress_bar import ProgressBar
-
 from data_specification.enums import DataType
 
 from spinn_front_end_common.utilities.helpful_functions import read_config
-from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_front_end_common.utilities.constants import (
+    BYTES_PER_WORD, MICRO_TO_SECOND_CONVERSION)
 from spinn_front_end_common.utilities.utility_objs\
     .provenance_data_item import ProvenanceDataItem
-
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.neuron.synapse_io import SynapseIORowBased
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsSTDP, SynapseDynamicsStructuralStatic)
-from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
+from spynnaker.pyNN.utilities.constants import (
+    POPULATION_BASED_REGIONS, POSSION_SIGMA_SUMMATION_LIMIT)
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits, float_gcd
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
+from spynnaker.pyNN.utilities.running_stats import RunningStats
 
 from .synapse_dynamics import (
     AbstractSynapseDynamics, AbstractSynapseDynamicsStructural)
@@ -53,9 +54,6 @@ _SYNAPSES_BASE_DTCM_USAGE_IN_BYTES = 7 * BYTES_PER_WORD
 _SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES = 1 * BYTES_PER_WORD
 _SYNAPSES_BASE_N_CPU_CYCLES_PER_NEURON = 10
 _SYNAPSES_BASE_N_CPU_CYCLES = 8
-
-# Struct to read or write a word
-_ONE_WORD = struct.Struct("<I")
 
 
 class SynapticManager(object):
@@ -732,7 +730,7 @@ class SynapticManager(object):
     def clear_connection_cache(self):
         """ Flush the cache of connection information; needed for a second run
         """
-        for matrices in itervalues(self.__synaptic_matrices):
+        for matrices in self.__synaptic_matrices.values():
             matrices.clear_connection_cache()
 
     @property

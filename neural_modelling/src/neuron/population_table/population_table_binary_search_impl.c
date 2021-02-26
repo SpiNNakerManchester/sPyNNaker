@@ -193,6 +193,15 @@ static inline uint32_t get_core_sum(extra_info extra, spike_t spike) {
     return get_core_index(extra, spike) * extra.n_neurons;
 }
 
+//! \brief Get the total number of bits in bitfields for cores which came before
+//!        this core.
+//! \param[in] extra: The extra info entry
+//! \param[in] spike: The spike received
+//! \return the base bitfield bit index of this core
+static inline uint32_t get_bitfield_sum(extra_info extra, spike_t spike) {
+    return get_core_index(extra, spike) * extra.n_words * BITS_PER_WORD;
+}
+
 //! \brief Get the source neuron ID for a spike given its table entry (without extra info)
 //! \param[in] entry: the table entry
 //! \param[in] spike: the spike
@@ -213,26 +222,6 @@ static inline uint32_t get_local_neuron_id(
     return spike & ~(entry.mask | (extra.core_mask << extra.mask_shift));
 }
 
-//! \brief Get the full source neuron id for a spike with extra info
-//! \param[in] entry: the table entry
-//! \param[in] extra_info: the extra info entry
-//! \param[in] spike: the spike received
-//! \return the source neuron id
-static inline uint32_t get_extended_neuron_id(
-        master_population_table_entry entry, extra_info extra, spike_t spike) {
-    uint32_t local_neuron_id = get_local_neuron_id(entry, extra, spike);
-    uint32_t neuron_id = local_neuron_id + get_core_sum(extra, spike);
-#ifdef DEBUG
-    uint32_t n_neurons = get_n_neurons(extra);
-    if (local_neuron_id > n_neurons) {
-        log_error("Spike %u is outside of expected neuron id range"
-            "(neuron id %u of maximum %u)", spike, local_neuron_id, n_neurons);
-        rt_error(RTE_SWERR);
-    }
-#endif
-    return neuron_id;
-}
-
 //! \brief Prints the master pop table.
 //! \details For debugging
 static inline void print_master_population_table(void) {
@@ -246,8 +235,8 @@ static inline void print_master_population_table(void) {
         if (entry.extra_info_flag) {
             extra_info extra = address_list[start].extra;
             start += 1;
-            log_debug("    core_mask: 0x%08x, core_shift: %u, n_neurons: %u",
-                    extra.core_mask, extra.mask_shift, extra.n_neurons);
+            log_info("    core_mask: 0x%08x, core_shift: %u, n_neurons: %u, n_words: %u",
+                    extra.core_mask, extra.mask_shift, extra.n_neurons, extra.n_words);
         }
         for (uint16_t j = start; j < (start + count); j++) {
             address_and_row_length addr = address_list[j].addr;
@@ -506,11 +495,15 @@ bool population_table_get_first_address(
     last_spike = spike;
     next_item = entry.start;
     items_to_go = entry.count;
+    uint32_t bit_field_id = 0;
     if (entry.extra_info_flag) {
         extra_info extra = address_list[next_item++].extra;
-        last_neuron_id = get_extended_neuron_id(entry, extra, spike);
+        uint32_t local_neuron_id = get_local_neuron_id(entry, extra, spike);
+        last_neuron_id = local_neuron_id + get_core_sum(extra, spike);
+        bit_field_id = local_neuron_id + get_bitfield_sum(extra, spike);
     } else {
         last_neuron_id = get_neuron_id(entry, spike);
+        bit_field_id = last_neuron_id;
     }
 
     // check we have a entry in the bit field for this (possible not to due to
@@ -521,7 +514,6 @@ bool population_table_get_first_address(
         log_debug("Can be checked, bitfield is allocated");
         // check that the bit flagged for this neuron id does hit a
         // neuron here. If not return false and avoid the DMA check.
-        uint32_t bit_field_id = get_neuron_id(entry, spike);
         if (!bit_field_test(
                 connectivity_bit_field[position], bit_field_id)) {
             log_debug("Tested and was not set");

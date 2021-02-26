@@ -12,12 +12,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import logging
-from spinn_utilities.log import FormatAdapter
 from spynnaker.pyNN.models.neural_projections.connectors import (
     KernelConnector as
     _BaseClass)
-logger = FormatAdapter(logging.getLogger(__name__))
+from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
 
 
 class KernelConnector(_BaseClass):
@@ -81,12 +79,12 @@ class KernelConnector(_BaseClass):
         :param callable callback: (ignored)
         """
         # pylint: disable=too-many-arguments
+        moved_in_v6("spynnaker8.models.connectors.KernelConnector",
+                    "spynnaker.pyNN.models.neural_projections.connectors"
+                    ".KernelConnector")
         super(KernelConnector, self).__init__(
             shape_pre, shape_post, shape_kernel, weight_kernel,
             delay_kernel, shape_common, pre_sample_steps_in_post,
             pre_start_coords_in_post, post_sample_steps_in_pre,
             post_start_coords_in_pre, safe=safe, space=space, verbose=verbose,
             callback=callback)
-        logger.warning(
-            "please use spynnaker.pyNN.models.neural_projections.connectors."
-            "KernelConnector instead")

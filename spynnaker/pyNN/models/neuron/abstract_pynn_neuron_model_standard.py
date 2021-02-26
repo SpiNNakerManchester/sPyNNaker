@@ -47,7 +47,7 @@ class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
             The model (if any) of additional environmental inputs
         :type additional_input_type: AbstractAdditionalInput or None
         """
-        AbstractPyNNNeuronModel.__init__(self, NeuronImplStandard(
+        super().__init__(NeuronImplStandard(
             model_name, binary, neuron_model, input_type, synapse_type,
             threshold_type, additional_input_type))
 
@@ -60,7 +60,7 @@ class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
             n_steps_per_timestep, drop_late_spikes, splitter):
         # pylint: disable=arguments-differ
         self._model.n_steps_per_timestep = n_steps_per_timestep
-        return super(AbstractPyNNNeuronModelStandard, self).create_vertex(
+        return super().create_vertex(
             n_neurons, label, constraints, spikes_per_second,
             ring_buffer_sigma, min_weights, weight_random_sigma,
             max_stdp_spike_delta, incoming_spike_buffer_size,

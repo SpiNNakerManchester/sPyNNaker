@@ -51,7 +51,7 @@ def get_estimated_sdram_for_bit_field_region(app_graph, vertex):
     :return: the estimated number of bytes used by the bit field region
     :rtype: int
     """
-    sdram = 0
+    sdram = ELEMENTS_USED_IN_BIT_FIELD_HEADER * BYTES_PER_WORD
     for incoming_edge in app_graph.get_edges_ending_at_vertex(vertex):
         if isinstance(incoming_edge, ProjectionApplicationEdge):
             slices, _ = (

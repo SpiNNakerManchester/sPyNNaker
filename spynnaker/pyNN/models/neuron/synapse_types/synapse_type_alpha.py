@@ -54,31 +54,31 @@ class SynapseTypeAlpha(AbstractSynapseType):
                  tau_syn_E, inh_response, inh_exp_response, tau_syn_I):
         r"""
         :param exc_response: :math:`response^\mathrm{linear}_e`
-        :type exc_response: \
-            float, iterable(float), ~pyNN.random.RandomDistribution \
+        :type exc_response:
+            float, iterable(float), ~pyNN.random.RandomDistribution
             or (mapping) function
         :param exc_exp_response: :math:`response^\mathrm{exponential}_e`
-        :type exc_exp_response: \
-            float, iterable(float), ~pyNN.random.RandomDistribution \
+        :type exc_exp_response:
+            float, iterable(float), ~pyNN.random.RandomDistribution
             or (mapping) function
         :param tau_syn_E: :math:`\tau^{syn}_e`
-        :type tau_syn_E: \
-            float, iterable(float), ~pyNN.random.RandomDistribution \
+        :type tau_syn_E:
+            float, iterable(float), ~pyNN.random.RandomDistribution
             or (mapping) function
         :param inh_response: :math:`response^\mathrm{linear}_i`
-        :type inh_response: \
-            float, iterable(float), ~pyNN.random.RandomDistribution \
+        :type inh_response:
+            float, iterable(float), ~pyNN.random.RandomDistribution
             or (mapping) function
         :param inh_exp_response: :math:`response^\mathrm{exponential}_i`
-        :type inh_exp_response: \
-            float, iterable(float), ~pyNN.random.RandomDistribution \
+        :type inh_exp_response:
+            float, iterable(float), ~pyNN.random.RandomDistribution
             or (mapping) function
         :param tau_syn_I: :math:`\tau^{syn}_i`
-        :type tau_syn_I: \
-            float, iterable(float), ~pyNN.random.RandomDistribution \
+        :type tau_syn_I:
+            float, iterable(float), ~pyNN.random.RandomDistribution
             or (mapping) function
         """
-        super(SynapseTypeAlpha, self).__init__([
+        super().__init__([
             DataType.S1615,   # exc_response
             DataType.S1615,   # exc_exp_response
             DataType.S1615,   # 1 / tau_syn_E^2

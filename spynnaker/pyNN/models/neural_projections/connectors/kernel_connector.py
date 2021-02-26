@@ -12,7 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 import numpy
 from spinn_utilities.overrides import overrides
 from data_specification.enums.data_type import DataType
@@ -66,11 +65,11 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         :type shape_kernel: list(int) or tuple(int,int)
         :param weight_kernel: (optional)
             2D matrix of size shape_kernel describing the weights
-        :type weight_kernel: ~numpy.ndarray or ~pyNN.random.NumpyRNG \
+        :type weight_kernel: ~numpy.ndarray or ~pyNN.random.NumpyRNG
             or int or float or list(int) or list(float) or None
         :param delay_kernel: (optional)
             2D matrix of size shape_kernel describing the delays
-        :type delay_kernel: ~numpy.ndarray or ~pyNN.random.NumpyRNG \
+        :type delay_kernel: ~numpy.ndarray or ~pyNN.random.NumpyRNG
             or int or float or list(int) or list(float) or None
         :param shape_common: (optional)
             2D shape of common coordinate system (for both pre and post,
@@ -98,8 +97,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             CSV file
         :param callable callback: (ignored)
         """
-        super(KernelConnector, self).__init__(
-            safe=safe, callback=callback, verbose=verbose)
+        super().__init__(safe=safe, callback=callback, verbose=verbose)
         assert space is None, "non-None space unsupported"
 
         # Get the kernel size
@@ -208,7 +206,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         """ Convert kernel values given into the correct format.
 
         :param vals:
-        :type vals: int or float or ~pyNN.random.NumpyRNG or ~numpy.ndarray\
+        :type vals: int or float or ~pyNN.random.NumpyRNG or ~numpy.ndarray
             or ConvolutionKernel
         :rtype: ~numpy.ndarray
         """
@@ -236,10 +234,10 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         """ Compute the relevant information required for the connections.
 
         :param weights:
-        :type weights: int or float or ~pyNN.random.NumpyRNG or \
+        :type weights: int or float or ~pyNN.random.NumpyRNG or
             ~numpy.ndarray or ConvolutionKernel
         :param delays:
-        :type delays: int or float or ~pyNN.random.NumpyRNG or ~numpy.ndarray\
+        :type delays: int or float or ~pyNN.random.NumpyRNG or ~numpy.ndarray
             or ConvolutionKernel
         :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
@@ -425,7 +423,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
     def gen_delays_id(self, delays):
         if self._krn_delays is not None:
             return PARAM_TYPE_KERNEL
-        return super(KernelConnector, self).gen_delays_id(delays)
+        return super().gen_delays_id(delays)
 
     @overrides(
         AbstractGenerateConnectorOnMachine.gen_delay_params_size_in_bytes)
@@ -433,8 +431,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         if self._krn_delays is not None:
             return (N_KERNEL_PARAMS + 1 + self._krn_delays.size) * \
                 BYTES_PER_WORD
-        return super(KernelConnector, self).gen_delay_params_size_in_bytes(
-            delays)
+        return super().gen_delay_params_size_in_bytes(delays)
 
     @overrides(AbstractGenerateConnectorOnMachine.gen_delay_params)
     def gen_delay_params(self, delays, pre_vertex_slice, post_vertex_slice):
@@ -444,14 +441,14 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             data = numpy.array(properties, dtype="uint32")
             values = DataType.S1615.encode_as_numpy_int_array(self._krn_delays)
             return numpy.concatenate((data, values.flatten()))
-        return super(KernelConnector, self).gen_delay_params(
+        return super().gen_delay_params(
             delays, pre_vertex_slice, post_vertex_slice)
 
     @overrides(AbstractGenerateConnectorOnMachine.gen_weights_id)
     def gen_weights_id(self, weights):
         if self._krn_weights is not None:
             return PARAM_TYPE_KERNEL
-        return super(KernelConnector, self).gen_weights_id(weights)
+        return super().gen_weights_id(weights)
 
     @overrides(
         AbstractGenerateConnectorOnMachine.gen_weight_params_size_in_bytes)
@@ -459,8 +456,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         if self._krn_weights is not None:
             return (N_KERNEL_PARAMS + 1 + self._krn_weights.size) * \
                 BYTES_PER_WORD
-        return super(KernelConnector, self).gen_weight_params_size_in_bytes(
-            weights)
+        return super().gen_weight_params_size_in_bytes(weights)
 
     @overrides(AbstractGenerateConnectorOnMachine.gen_weights_params)
     def gen_weights_params(self, weights, pre_vertex_slice, post_vertex_slice):
@@ -471,7 +467,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             values = DataType.S1615.encode_as_numpy_int_array(
                 self._krn_weights)
             return numpy.concatenate((data, values.flatten()))
-        return super(KernelConnector, self).gen_weights_params(
+        return super().gen_weights_params(
             weights, pre_vertex_slice, post_vertex_slice)
 
     @property

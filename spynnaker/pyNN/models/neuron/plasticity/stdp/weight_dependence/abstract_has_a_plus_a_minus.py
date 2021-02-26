@@ -13,11 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import with_metaclass
 from spinn_utilities.abstract_base import AbstractBase
 
 
-class AbstractHasAPlusAMinus(with_metaclass(AbstractBase, object)):
+class AbstractHasAPlusAMinus(object, metaclass=AbstractBase):
     r""" An object that has :math:`A^+` and :math:`A^-` properties.
     """
     __slots__ = [

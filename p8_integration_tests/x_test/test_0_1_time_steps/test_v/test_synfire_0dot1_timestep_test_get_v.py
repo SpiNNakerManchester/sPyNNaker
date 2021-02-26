@@ -19,7 +19,7 @@ Synfirechain-like example
 import unittest
 from unittest import SkipTest
 from spinnman.exceptions import SpinnmanTimeoutException
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 from p8_integration_tests.scripts.synfire_run import SynfireRunner
 
 synfire_run = SynfireRunner()
@@ -44,7 +44,7 @@ class TestGetVoltage(BaseTestCase):
             # Exact v check removed as system overloads
         # System intentional overload so may error
         except SpinnmanTimeoutException as ex:
-            raise SkipTest(ex)
+            raise SkipTest() from ex
 
 
 if __name__ == '__main__':

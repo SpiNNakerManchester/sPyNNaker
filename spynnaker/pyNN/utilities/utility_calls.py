@@ -16,13 +16,13 @@
 """
 utility class containing simple helper methods
 """
-from __future__ import division
-
+import logging
 import os
 import math
 import numpy
 from pyNN.random import RandomDistribution
 from scipy.stats import binom
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.safe_eval import SafeEval
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.utilities.random_stats import (
@@ -30,6 +30,8 @@ from spynnaker.pyNN.utilities.random_stats import (
     RandomStatsNormalClippedImpl, RandomStatsNormalImpl,
     RandomStatsPoissonImpl, RandomStatsRandIntImpl, RandomStatsUniformImpl,
     RandomStatsVonmisesImpl, RandomStatsBinomialImpl)
+
+logger = FormatAdapter(logging.getLogger(__name__))
 
 MAX_RATE = 2 ** 32 - 1  # To allow a unit32_t to be used to store the rate
 
@@ -342,13 +344,14 @@ def get_n_bits(n_values):
 
 
 def float_gcd(a, b):
-    """ Floating point gcd of two values
     """
-    # Using absolute values for cases where a user has supplied a negative
-    # weight appears necessary for Python 2.7
-    a = abs(a)
-    b = abs(b)
+    Floating point gcd of two values
 
+    :param float a: first input
+    :param float b: second input
+    :return: the gcd of the two values (to a specified tolerance)
+    :rtype: float
+    """
     if (a < b):
         return float_gcd(b, a)
 
@@ -360,7 +363,8 @@ def float_gcd(a, b):
 
 
 def float_gcd_of_array(input):
-    """ Work out the floating point gcd of an array of numbers
+    """
+    Work out the floating point gcd of an array of numbers
 
     :param numpy.float(array) input: the input array
     :return: the floating point gcd of the array
@@ -375,3 +379,19 @@ def float_gcd_of_array(input):
         gcd = float_gcd(gcd, input[i])
 
     return gcd
+
+def moved_in_v6(old_location, new_location):
+    """
+    Warns the users that they are using an old import.
+
+    In version 7 this will ne upgraded to a exception and then later removed
+
+    :param str old_location: old import
+    :param str new_location: new import
+    :raise: an exception if in CONTINUOUS_INTEGRATION
+    """
+    if os.environ.get('CONTINUOUS_INTEGRATION', 'false').lower() == 'true':
+        raise NotImplementedError("Old import: {}".format(old_location))
+    logger.warning("File {} moved to {}. Please fix your imports. "
+                   "In version 7 this will fail completely."
+                   "".format(old_location, new_location))

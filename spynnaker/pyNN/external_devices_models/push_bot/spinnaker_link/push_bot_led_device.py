@@ -64,9 +64,9 @@ class PushBotSpiNNakerLinkLEDDevice(
         :type start_frequency: int or None
         """
         # pylint: disable=too-many-arguments
-        PushBotEthernetLEDDevice.__init__(
-            self, led, protocol, start_active_time_front,
-            start_active_time_back, start_total_period, start_frequency)
+        super().__init__(
+            led, protocol, start_active_time_front, start_active_time_back,
+            start_total_period, start_frequency)
         ApplicationSpiNNakerLinkVertex.__init__(
             self, spinnaker_link_id=spinnaker_link_id, n_atoms=n_neurons,
             board_address=board_address, label=label)

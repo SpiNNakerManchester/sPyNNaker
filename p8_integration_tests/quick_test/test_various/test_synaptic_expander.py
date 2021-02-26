@@ -16,7 +16,7 @@
 import spynnaker8 as p
 from spynnaker8 import RandomDistribution
 import functools
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 import numpy
 from pyNN.random import NumpyRNG
 from collections import defaultdict

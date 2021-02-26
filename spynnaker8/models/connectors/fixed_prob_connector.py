@@ -12,11 +12,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import logging
-from spinn_utilities.log import FormatAdapter
+
 from spynnaker.pyNN.models.neural_projections.connectors import (
     FixedProbabilityConnector as _BaseClass)
-logger = FormatAdapter(logging.getLogger(__name__))
+from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
 
 
 class FixedProbabilityConnector(_BaseClass):
@@ -56,10 +55,9 @@ class FixedProbabilityConnector(_BaseClass):
                 Not supported by sPyNNaker.
         """
         # pylint: disable=too-many-arguments
+        moved_in_v6("spynnaker8.models.connectors",
+                    "spynnaker.pyNN.models.neural_projections.connectors")
         _BaseClass.__init__(
             self, p_connect=p_connect,
             allow_self_connections=allow_self_connections, safe=safe,
             verbose=verbose, rng=rng, callback=callback)
-        logger.warning(
-            "please use spynnaker.pyNN.models.neural_projections.connectors."
-            "FixedProbabilityConnector instead")

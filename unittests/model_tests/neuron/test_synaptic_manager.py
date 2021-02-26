@@ -12,11 +12,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from __future__ import division
 import io
 import math
 import os
 import shutil
+import struct
 import tempfile
 from tempfile import mkdtemp
 import numpy
@@ -65,9 +65,9 @@ from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.utility_models.delays import (
     DelayExtensionVertex, DelayExtensionMachineVertex)
+from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
     SplitterDelayVertexSlice, AbstractSpynnakerSplitterDelay)
-from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
 from unittests.mocks import MockSimulator, MockPopulation
 
 
@@ -102,15 +102,19 @@ class MockTransceiverRawData(object):
     def read_memory(self, x, y, base_address, length):
         return self._data_to_read[base_address:base_address + length]
 
+    def read_word(self, x, y, base_address):
+        datum, = struct.unpack("<I", self.read_memory(x, y, base_address, 4))
+        return datum
+
 
 class MockSplitter(SplitterSliceLegacy, AbstractSpynnakerSplitterDelay):
     def __init__(self):
-        super(MockSplitter, self).__init__("mock splitter")
+        super().__init__("mock splitter")
 
 
 class SimpleApplicationVertex(ApplicationVertex, LegacyPartitionerAPI):
     def __init__(self, n_atoms, label=None):
-        super(SimpleApplicationVertex, self).__init__(label=label)
+        super().__init__(label=label)
         self._n_atoms = n_atoms
 
     @property

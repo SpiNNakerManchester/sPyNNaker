@@ -83,11 +83,15 @@ struct neuron_provenance {
     uint32_t spike_processing_get_max_filled_input_buffer_size;
     //! the number of times the TDMA fully missed its slots
     uint32_t n_tdma_mises;
+    //! Maximum backgrounds queued
+    uint32_t max_backgrounds_queued;
+    //! Background queue overloads
+    uint32_t n_background_queue_overloads;
 };
 
 //! values for the priority for each callback
 typedef enum callback_priorities {
-    MC = -1, DMA = 0, USER = 0, SDP = 1, TIMER = 2
+    MC = -1, DMA = 0, USER = 0, TIMER = 0, SDP = 1, BACKGROUND = 1
 } callback_priorities;
 
 //! The number of regions that are to be used for recording
@@ -123,8 +127,18 @@ static uint32_t count_rewire_attempts = 0;
 //! The number of neurons on the core
 static uint32_t n_neurons;
 
-//! timer count for tdma of certain models
-static uint global_timer_count;
+//! The number of background tasks queued / running
+static uint32_t n_backgrounds_queued = 0;
+
+//! The number of times the background couldn't be added
+static uint32_t n_background_overloads = 0;
+
+//! The maximum number of background tasks queued
+static uint32_t max_backgrounds_queued = 0;
+
+//! timer count for tdma of certain models; exported
+uint global_timer_count;
+
 
 //! \brief Callback to store provenance data (format: neuron_provenance).
 //! \param[out] provenance_region: Where to write the provenance data
@@ -151,6 +165,8 @@ static void c_main_store_provenance_data(address_t provenance_region) {
     prov->spike_processing_get_max_filled_input_buffer_size =
         spike_processing_get_max_filled_input_buffer_size();
     prov->n_tdma_mises = tdma_processing_times_behind();
+    prov->n_background_queue_overloads = n_background_overloads;
+    prov->max_backgrounds_queued = max_backgrounds_queued;
 
     log_debug("finished other provenance data");
 }
@@ -279,23 +295,61 @@ void resume_callback(void) {
 
 }
 
-//! \brief Timer interrupt callback
-//! \param[in] timer_count: the number of times this call back has been
-//!            executed since start of simulation
-//! \param[in] unused: unused parameter kept for API consistency
-void timer_callback(uint timer_count, UNUSED uint unused) {
-
+//! \brief Background activites called from timer
+//! \param timer_count the number of times this call back has been
+//!        executed since start of simulation
+//! \param[in] local_time: The time step being executed
+void background_callback(uint timer_count, uint local_time) {
     global_timer_count = timer_count;
     profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
 
-    time++;
     last_rewiring_time++;
 
     // This is the part where I save the input and output indices
     //   from the circular buffer
     // If time == 0 as well as output == input == 0  then no rewire is
     //   supposed to happen. No spikes yet
-    log_debug("Timer tick %u \n", time);
+    log_debug("Timer tick %u \n", local_time);
+
+    // Then do rewiring
+    if (rewiring &&
+            ((last_rewiring_time >= rewiring_period && !synaptogenesis_is_fast())
+                || synaptogenesis_is_fast())) {
+        last_rewiring_time = 0;
+        // put flag in spike processing to do synaptic rewiring
+        if (synaptogenesis_is_fast()) {
+            spike_processing_do_rewiring(rewiring_period);
+        } else {
+            spike_processing_do_rewiring(1);
+        }
+        count_rewire_attempts++;
+    }
+
+    // Now do neuron time step update
+    neuron_do_timestep_update(local_time, timer_count);
+
+    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
+    n_backgrounds_queued--;
+}
+
+//! \brief Timer interrupt callback
+//! \param[in] timer_count: the number of times this call back has been
+//!            executed since start of simulation
+//! \param[in] unused: unused parameter kept for API consistency
+void timer_callback(uint timer_count, UNUSED uint unused) {
+    // Disable interrupts to stop DMAs and MC getting in the way of this bit
+    uint32_t state = spin1_int_disable();
+
+    time++;
+
+    // Clear any outstanding spikes
+    spike_processing_clear_input_buffer(time);
+
+    spin1_mode_restore(state);
+    state = spin1_irq_disable();
+
+    // Also do synapses timestep update, as this is time-critical
+    synapses_do_timestep_update(time);
 
     /* if a fixed number of simulation ticks that were specified at startup
      * then do reporting for finishing */
@@ -321,30 +375,22 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
 
         log_debug("Rewire tries = %d", count_rewire_attempts);
         simulation_ready_to_read();
+        spin1_mode_restore(state);
         return;
     }
 
-    // First do synapses timestep update, as this is time-critical
-    synapses_do_timestep_update(time);
-
-    // Then do rewiring
-    if (rewiring &&
-            ((last_rewiring_time >= rewiring_period && !synaptogenesis_is_fast())
-                || synaptogenesis_is_fast())) {
-        last_rewiring_time = 0;
-        // put flag in spike processing to do synaptic rewiring
-        if (synaptogenesis_is_fast()) {
-            spike_processing_do_rewiring(rewiring_period);
-        } else {
-            spike_processing_do_rewiring(1);
+    // Push the rest to the background
+    if (!spin1_schedule_callback(background_callback, timer_count, time, BACKGROUND)) {
+        // We have failed to do this timer tick!
+        n_background_overloads++;
+    } else {
+        n_backgrounds_queued++;
+        if (n_backgrounds_queued > max_backgrounds_queued) {
+            max_backgrounds_queued++;
         }
-        count_rewire_attempts++;
     }
 
-    // Now do neuron time step update
-    neuron_do_timestep_update(time, timer_count);
-
-    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
+    spin1_mode_restore(state);
 }
 
 //! \brief The entry point for this model.

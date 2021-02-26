@@ -12,12 +12,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import logging
-from spinn_utilities.log import FormatAdapter
 from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
     WeightDependenceAdditive as
     _BaseClass)
-logger = FormatAdapter(logging.getLogger(__name__))
+from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
 
 
 class WeightDependenceAdditive(_BaseClass):
@@ -35,8 +33,9 @@ class WeightDependenceAdditive(_BaseClass):
         :param float w_min: :math:`w_\mathrm{min}`
         :param float w_max: :math:`w_\mathrm{max}`
         """
+        moved_in_v6("spynnaker8.models.synapse_dynamics.weight_dependence"
+                    ".WeightDependenceAdditive",
+                    "spynnaker.pyNN.models.neuron.plasticity.stdp."
+                    "weight_dependence.WeightDependenceAdditive")
         super(WeightDependenceAdditive, self).__init__(
             w_min=w_min, w_max=w_max)
-        logger.warning(
-            "please use spynnaker.pyNN.models.neuron.plasticity.stdp."
-            "weight_dependence.WeightDependenceAdditive instead")

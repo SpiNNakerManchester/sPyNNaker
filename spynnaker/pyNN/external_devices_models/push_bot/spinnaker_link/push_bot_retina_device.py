@@ -42,8 +42,7 @@ class PushBotSpiNNakerLinkRetinaDevice(
         :param board_address:
         :param label:
         """
-
-        AbstractPushBotRetinaDevice.__init__(self, protocol, resolution)
+        super().__init__(protocol, resolution)
         ApplicationSpiNNakerLinkVertex.__init__(
             self, spinnaker_link_id=spinnaker_link_id,
             n_atoms=resolution.value.n_neurons,
@@ -61,14 +60,9 @@ class PushBotSpiNNakerLinkRetinaDevice(
     @property
     @overrides(AbstractPushBotRetinaDevice.start_resume_commands)
     def start_resume_commands(self):
-        # Note this is not undefined, it is just a property so, it can't
-        # be statically analysed
-        sr_cmds = AbstractPushBotRetinaDevice.start_resume_commands
-        commands = sr_cmds.fget(self)  # pylint: disable=no-member
-
         # Update the commands with the additional one to set the key
         new_commands = list()
-        for command in commands:
+        for command in super().start_resume_commands:
             if command.key == self._protocol.disable_retina_key:
                 # This has to be stored so that the payload can be updated
                 self.__new_key_command = self._protocol.set_retina_key(0)

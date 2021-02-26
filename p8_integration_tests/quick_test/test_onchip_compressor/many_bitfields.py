@@ -12,8 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-from __future__ import division
 import math
 from unittest import SkipTest
 from spynnaker.pyNN.exceptions import ConfigurationException
@@ -44,9 +42,10 @@ def do_bitfield_run():
         machine = sim.get_machine()
     except ConfigurationException as oops:
         if "Failure to detect machine " in str(oops):
-            raise SkipTest("You Need at least {} boards to run this test"
-                           .format(n_boards))
-        raise
+            raise SkipTest(
+                "You Need at least {} boards to run this test".format(
+                    n_boards)) from oops
+        raise oops
     target_x, target_y = find_good_chip(machine, n_target)
     print(machine)
     print(target_x, target_y)

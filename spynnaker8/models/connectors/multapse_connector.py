@@ -13,12 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
-from spinn_utilities.log import FormatAdapter
 from spynnaker.pyNN.models.neural_projections.connectors import (
     MultapseConnector as
     _BaseClass)
-logger = FormatAdapter(logging.getLogger(__name__))
+from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
 
 
 class MultapseConnector(_BaseClass):
@@ -54,10 +52,10 @@ class MultapseConnector(_BaseClass):
         :param rng: random number generator
         :type rng: ~pyNN.random.NumpyRNG or None
         """
+        moved_in_v6("spynnaker8.models.connectors.MultapseConnector",
+                    "spynnaker.pyNN.models.neural_projections.connectors."
+                    "MultapseConnector")
         super(MultapseConnector, self).__init__(
             num_synapses=n, allow_self_connections=allow_self_connections,
             with_replacement=with_replacement, safe=safe, verbose=verbose,
             rng=rng)
-        logger.warning(
-            "please use spynnaker.pyNN.models.neural_projections.connectors."
-            "MultapseConnector instead")

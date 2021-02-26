@@ -16,7 +16,7 @@
 import os
 from spinn_front_end_common.utilities import globals_variables
 import spynnaker8 as sim
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 
 
 class TestIobuffMultirun(BaseTestCase):
@@ -30,7 +30,7 @@ class TestIobuffMultirun(BaseTestCase):
 
     def do_run(self):
         sim.setup(timestep=1.0, min_delay=1.0, max_delay=144.0)
-        prov_path = globals_variables.get_simulator()._app_provenance_file_path
+        prov_path = globals_variables.app_provenance_file_path()
         pop = sim.Population(10, sim.IF_curr_exp(), label='pop_1')
         sim.run(50)
 
@@ -60,7 +60,7 @@ class TestIobuffMultirun(BaseTestCase):
         sim.Population(10, sim.IF_curr_exp(), label='pop_1')
         sim.run(50)
         prov_patha = \
-            globals_variables.get_simulator()._app_provenance_file_path
+            globals_variables.app_provenance_file_path()
         self.assertNotEqual(prov_path, prov_patha)
         size6 = self.check_size(prov_patha, placement)
         # Should write the same thing again

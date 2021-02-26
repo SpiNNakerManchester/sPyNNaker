@@ -38,14 +38,13 @@ class SpikeSourcePoisson(AbstractPyNNModel):
 
     @classmethod
     def set_model_max_atoms_per_core(cls, n_atoms=DEFAULT_MAX_ATOMS_PER_CORE):
-        super(SpikeSourcePoisson, cls).set_model_max_atoms_per_core(
-            n_atoms)
+        super().set_model_max_atoms_per_core(n_atoms)
 
     @classmethod
     def get_max_atoms_per_core(cls):
-        if cls not in super(SpikeSourcePoisson, cls)._max_atoms_per_core:
+        if cls not in super()._max_atoms_per_core:
             return DEFAULT_MAX_ATOMS_PER_CORE
-        return super(SpikeSourcePoisson, cls).get_max_atoms_per_core()
+        return super().get_max_atoms_per_core()
 
     @overrides(AbstractPyNNModel.create_vertex,
                additional_arguments=default_population_parameters.keys())

@@ -12,15 +12,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import logging
-from spinn_utilities.log import FormatAdapter
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
     TimingDependenceVogels2011 as
     _BaseClass)
 
 _defaults = _BaseClass.default_parameters
-logger = FormatAdapter(logging.getLogger(__name__))
-
+from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
 
 class TimingDependenceVogels2011(_BaseClass):
     """
@@ -39,8 +36,9 @@ class TimingDependenceVogels2011(_BaseClass):
         :param float A_plus: :math:`A^+`
         :param float A_minus: :math:`A^-`
         """
+        moved_in_v6("spynnaker8.models.synapse_dynamics.timing_dependence."
+                    "TimingDependenceVogels2011",
+                    "spynnaker.pyNN.models.neuron.plasticity.stdp."
+                    "timing_dependence.TimingDependenceVogels2011")
         super(TimingDependenceVogels2011, self).__init__(
             tau=tau, alpha=alpha, A_plus=A_plus, A_minus=A_minus)
-        logger.warning(
-            "please use spynnaker.pyNN.models.neuron.plasticity.stdp."
-            "timing_dependence.TimingDependenceVogels2011 instead")

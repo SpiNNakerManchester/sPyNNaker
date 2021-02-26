@@ -18,7 +18,7 @@ from pyNN.random import RandomDistribution, NumpyRNG
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.models.populations import PopulationView
 import spynnaker8 as sim
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 
 
 class Test_IDMixin(BaseTestCase):
@@ -152,6 +152,6 @@ class Test_IDMixin(BaseTestCase):
         try:
             sim.Projection(pop, view, sim.OneToOneConnector())
         except NotImplementedError:
-            pass  # Exceptable but better if it worked
+            pass  # Acceptable, but better if it worked
         with pytest.raises(ConfigurationException):
             sim.Projection(pop, "SOMETHING WIERD", sim.OneToOneConnector())

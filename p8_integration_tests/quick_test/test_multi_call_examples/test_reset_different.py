@@ -14,8 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import spynnaker8 as sim
-from spynnaker8.utilities import neo_compare
-from p8_integration_tests.base_test_case import BaseTestCase
+from spynnaker.pyNN.utilities import neo_compare
+from spinnaker_testbase import BaseTestCase
 from p8_integration_tests.scripts.checker import check_neuron_data
 
 n_neurons = 20  # number of neurons in each population
