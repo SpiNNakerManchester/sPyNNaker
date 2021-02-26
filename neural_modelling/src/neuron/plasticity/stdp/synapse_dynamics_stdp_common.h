@@ -231,10 +231,8 @@ bool synapse_dynamics_process_plastic_synapses(
     // Extract separate arrays of plastic synapses (from plastic region),
     // Control words (from fixed region) and number of plastic synapses
     plastic_synapse_t *plastic_words = plastic_region_address->synapses;
-    const control_t *control_words =
-            synapse_row_plastic_controls(fixed_region);
-    size_t plastic_synapse =
-            synapse_row_num_plastic_controls(fixed_region);
+    const control_t *control_words = synapse_row_plastic_controls(fixed_region);
+    size_t plastic_synapse = synapse_row_num_plastic_controls(fixed_region);
 
     num_plastic_pre_synaptic_events += plastic_synapse;
 
@@ -343,8 +341,7 @@ bool synapse_dynamics_add_neuron(uint32_t id, synaptic_row_t row,
     control_t new_control = control_conversion(id, delay, type);
 
     synapse_row_fixed_part_t *fixed_region = synapse_row_fixed_region(row);
-    synapse_row_plastic_data_t *plastic_data = (void *)
-            synapse_row_plastic_region(row);
+    synapse_row_plastic_data_t *plastic_data = synapse_row_plastic_region(row);
     plastic_synapse_t *plastic_words = plastic_data->synapses;
     control_t *control_words = synapse_row_plastic_controls(fixed_region);
     int32_t plastic_synapse = synapse_row_num_plastic_controls(fixed_region);
