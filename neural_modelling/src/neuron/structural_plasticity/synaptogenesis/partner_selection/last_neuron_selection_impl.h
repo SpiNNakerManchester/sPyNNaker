@@ -23,9 +23,6 @@
 #include "partner.h"
 #include <neuron/spike_processing.h>
 
-// Include debug header for log_info etc
-#include <debug.h>
-
 //! \brief Spike accumulation buffers
 //! \details Two arrays, one for current timestep, one for previous
 extern spike_t* last_spikes_buffer[2];

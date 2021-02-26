@@ -46,7 +46,7 @@ bool direct_synapses_initialise(
     // Work out the positions of the direct and indirect synaptic matrices
     // and copy the direct matrix to DTCM
     uint32_t direct_matrix_size = direct_matrix->size;
-    log_info("Direct matrix malloc size is %d", direct_matrix_size);
+    log_debug("Direct matrix malloc size is %d", direct_matrix_size);
 
     if (direct_matrix_size != 0) {
         void *dtcm_copy = spin1_malloc(direct_matrix_size);
