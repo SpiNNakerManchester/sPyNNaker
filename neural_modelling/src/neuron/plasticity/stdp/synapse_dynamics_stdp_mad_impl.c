@@ -398,7 +398,8 @@ bool synapse_dynamics_find_neuron(
         uint32_t control_word = *control_words++;
         if (synapse_row_sparse_index(control_word, synapse_index_mask) == id) {
             *offset = synapse_row_num_plastic_controls(fixed_region) - plastic_synapse;
-            *delay = synapse_row_sparse_delay(control_word, synapse_type_index_bits, synapse_delay_mask);
+            *delay = synapse_row_sparse_delay(control_word, synapse_type_index_bits,
+                    synapse_delay_mask);
             *synapse_type = synapse_row_sparse_type(
                     control_word, synapse_index_bits, synapse_type_mask);
             return true;

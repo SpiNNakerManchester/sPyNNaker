@@ -196,8 +196,8 @@ static inline void process_fixed_synapses(
         uint32_t synaptic_word = *synaptic_words++;
 
         // Extract components from this word
-        uint32_t delay =
-                synapse_row_sparse_delay(synaptic_word, synapse_type_index_bits, synapse_delay_mask);
+        uint32_t delay = synapse_row_sparse_delay(synaptic_word, synapse_type_index_bits,
+                synapse_delay_mask);
         uint32_t combined_synapse_neuron_index = synapse_row_sparse_type_index(
                 synaptic_word, synapse_type_index_mask);
         uint32_t weight = synapse_row_sparse_weight(synaptic_word);
