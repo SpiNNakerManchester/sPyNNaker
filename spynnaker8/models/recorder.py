@@ -13,9 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
 from spynnaker.pyNN.models.recorder import Recorder as _BaseClass
-logger = logging.getLogger(__name__)
+from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
 
 
 class Recorder(_BaseClass):
@@ -31,6 +30,6 @@ class Recorder(_BaseClass):
         :param population: the population to record for
         :type population: ~spynnaker.pyNN.models.populations.Population
         """
+        moved_in_v6("spynnaker8.models.recorder",
+                    "spynnaker.pyNN.models.recorder")
         super(Recorder, self).__init__(population)
-        logger.warning(
-            "please use spynnaker.pyNN.models.recorder.Recorder instead")

@@ -13,9 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
 from spynnaker.pyNN.models.populations import PopulationView as _BaseClass
-logger = logging.getLogger(__name__)
+from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
 
 
 class PopulationView(_BaseClass):
@@ -60,7 +59,6 @@ class PopulationView(_BaseClass):
             ~numpy.ndarray(bool) or ~numpy.ndarray(int)
         :param str label: A label for the view
         """
+        moved_in_v6("spynnaker8.models.populations.PopulationView",
+                    "spynnaker.pyNN.models.populations.PopulationView")
         super(PopulationView, self).__init__(parent, selector, label)
-        logger.warning(
-            "please use spynnaker.pyNN.models.populations."
-            "PopulationView instead")

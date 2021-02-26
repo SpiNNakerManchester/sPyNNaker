@@ -22,8 +22,8 @@ from neo.io import PickleIO
 import unittest
 from unittest import SkipTest
 from spinnman.exceptions import SpinnmanTimeoutException
-from spynnaker8.utilities import neo_compare
-from p8_integration_tests.base_test_case import BaseTestCase
+from spynnaker.pyNN.utilities import neo_compare
+from spinnaker_testbase import BaseTestCase
 from p8_integration_tests.scripts.synfire_run import SynfireRunner
 
 n_neurons = 200  # number of neurons in each population
@@ -60,7 +60,7 @@ class TestPrintVoltage(BaseTestCase):
             os.remove(current_v_file_path)
             # System intentional overload so may error
         except SpinnmanTimeoutException as ex:
-            raise SkipTest(ex)
+            raise SkipTest() from ex
 
 
 if __name__ == '__main__':

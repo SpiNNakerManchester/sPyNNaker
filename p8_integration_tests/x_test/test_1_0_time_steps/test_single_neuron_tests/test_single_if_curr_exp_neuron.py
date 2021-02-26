@@ -20,7 +20,7 @@ test that a single neuron of if curr exp works as expected
 # general imports
 import spynnaker.plot_utils as plot_utils
 from spynnaker8 import SpikeSourcePoisson
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 from p8_integration_tests.scripts.synfire_run import SynfireRunner
 
 cell_params = {'cm': 0.25,

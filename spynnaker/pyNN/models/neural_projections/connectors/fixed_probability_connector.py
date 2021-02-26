@@ -15,13 +15,11 @@
 
 import math
 import numpy
-from pyNN.connectors import (
-    FixedProbabilityConnector as
-    PyNNFixedProbabilityConnector)
 from spinn_utilities.overrides import overrides
 from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spynnaker.pyNN.utilities import utility_calls
+from spynnaker.pyNN.utilities.utility_calls import (
+    get_probable_maximum_selected, get_probable_minimum_selected)
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
@@ -33,8 +31,7 @@ N_GEN_PARAMS = 6
 
 
 class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
-                                AbstractConnectorSupportsViewsOnMachine,
-                                PyNNFixedProbabilityConnector):
+                                AbstractConnectorSupportsViewsOnMachine):
     """ For each pair of pre-post cells, the connection probability is constant.
     """
 
@@ -71,17 +68,14 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
         if not 0.0 <= p_connect <= 1.0:
             raise ConfigurationException(
                 "The probability must be between 0 and 1 (inclusive)")
-        super(FixedProbabilityConnector, self).__init__(
-            safe, callback, verbose)
-        PyNNFixedProbabilityConnector.__init__(
-            self, p_connect, allow_self_connections, rng, safe, callback)
+        super().__init__(safe, callback, verbose)
         self._p_connect = p_connect
         self.__allow_self_connections = allow_self_connections
         self._rng = rng
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
-        n_connections = utility_calls.get_probable_maximum_selected(
+        n_connections = get_probable_maximum_selected(
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             self._p_connect)
@@ -89,7 +83,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractConnector.get_delay_minimum)
     def get_delay_minimum(self, synapse_info):
-        n_connections = utility_calls.get_probable_minimum_selected(
+        n_connections = get_probable_minimum_selected(
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             self._p_connect)
@@ -100,7 +94,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
             self, post_vertex_slice, synapse_info, min_delay=None,
             max_delay=None):
         # pylint: disable=too-many-arguments
-        n_connections = utility_calls.get_probable_maximum_selected(
+        n_connections = get_probable_maximum_selected(
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             post_vertex_slice.n_atoms, self._p_connect, chance=1.0/10000.0)
 
@@ -115,7 +109,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):
         # pylint: disable=too-many-arguments
-        n_connections = utility_calls.get_probable_maximum_selected(
+        n_connections = get_probable_maximum_selected(
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             synapse_info.n_pre_neurons, self._p_connect,
             chance=1.0/10000.0)
@@ -124,7 +118,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, synapse_info):
         # pylint: disable=too-many-arguments
-        n_connections = utility_calls.get_probable_maximum_selected(
+        n_connections = get_probable_maximum_selected(
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             self._p_connect)

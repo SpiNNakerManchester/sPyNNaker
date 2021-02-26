@@ -650,17 +650,10 @@ static void process_slow_source(
         index_t s_id, spike_source_t *source, uint timer_count) {
     if ((time >= source->start_ticks) && (time < source->end_ticks)
             && (source->mean_isi_ticks != 0)) {
+        uint32_t count = 0;
         // Mark a spike while the "timer" is below the scale factor value
         while (source->time_to_spike_ticks < ISI_SCALE_FACTOR) {
-            // Write spike to out_spikes
-            mark_spike(s_id, 1);
-
-            // if no key has been given, do not send spike to fabric.
-            if (ssp_params.has_key) {
-                // Send package
-                tdma_processing_send_packet(
-                    ssp_params.key | s_id, 0, NO_PAYLOAD, timer_count);
-            }
+            count++;
 
             // Update time to spike (note, this might not get us back above
             // the scale factor, particularly if the mean_isi is smaller)
@@ -670,6 +663,17 @@ static void process_slow_source(
                     slow_spike_source_get_time_to_spike(source->mean_isi_ticks);
             profiler_write_entry_disable_irq_fiq(
                     PROFILER_EXIT | PROFILER_PROB_FUNC);
+        }
+        if (count) {
+            // Write spike to out_spikes
+            mark_spike(s_id, count);
+
+            // if no key has been given, do not send spike to fabric.
+            if (ssp_params.has_key) {
+                // Send package
+                tdma_processing_send_packet(
+                    ssp_params.key | s_id, count, WITH_PAYLOAD, timer_count);
+            }
         }
 
         // Now we have finished for this tick, subtract the scale factor

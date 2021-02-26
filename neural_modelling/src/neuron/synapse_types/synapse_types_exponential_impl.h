@@ -51,11 +51,6 @@
 //---------------------------------------
 // Synapse parameters
 //---------------------------------------
-//! Buffer used for result of synapse_types_get_excitatory_input()
-input_t excitatory_response[NUM_EXCITATORY_RECEPTORS];
-//! Buffer used for result of synapse_types_get_inhibitory_input()
-input_t inhibitory_response[NUM_INHIBITORY_RECEPTORS];
-
 typedef struct exp_params_t {
     decay_t decay;                  //!< Decay multiplier per timestep
     decay_t init;                   //!< Initial decay factor
@@ -132,7 +127,7 @@ static inline void synapse_types_add_neuron_input(
 //! \param[in] parameters: the pointer to the parameters to use
 //! \return the excitatory input buffers for a given neuron ID.
 static inline input_t* synapse_types_get_excitatory_input(
-        synapse_param_t *parameters) {
+        input_t *excitatory_response, synapse_param_t *parameters) {
     excitatory_response[0] = parameters->exc.synaptic_input_value;
     return &excitatory_response[0];
 }
@@ -142,7 +137,7 @@ static inline input_t* synapse_types_get_excitatory_input(
 //! \param[in] parameters: the pointer to the parameters to use
 //! \return the inhibitory input buffers for a given neuron ID.
 static inline input_t* synapse_types_get_inhibitory_input(
-        synapse_param_t *parameters) {
+        input_t *inhibitory_response, synapse_param_t *parameters) {
     inhibitory_response[0] = parameters->inh.synaptic_input_value;
     return &inhibitory_response[0];
 }

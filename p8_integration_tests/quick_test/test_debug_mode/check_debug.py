@@ -27,7 +27,7 @@ from spinn_front_end_common.utilities.report_functions.board_chip_report \
     import BoardChipReport
 from spinn_front_end_common.utility_models import \
      DataSpeedUpPacketGatherMachineVertex
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 import spynnaker8 as sim
 
 

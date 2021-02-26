@@ -29,7 +29,7 @@ class SpikeSourceFromFile(SpikeSourceArray):
         spike_times = utility_calls.read_spikes_from_file(
             spike_time_file, min_atom, max_atom, min_time, max_time,
             split_value)
-        super(SpikeSourceFromFile, self).__init__(spike_times)
+        super().__init__(spike_times)
 
     @staticmethod
     def _subsample_spikes_by_time(spike_array, start, stop, step):

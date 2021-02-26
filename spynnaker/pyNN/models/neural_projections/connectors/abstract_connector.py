@@ -19,12 +19,11 @@ import re
 import numpy
 from spinn_utilities.log import FormatAdapter
 from pyNN.random import NumpyRNG, RandomDistribution
-from six import string_types, with_metaclass
 
-from spinn_front_end_common.utilities.constants import \
-    MICRO_TO_MILLISECOND_CONVERSION
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.safe_eval import SafeEval
+from spinn_front_end_common.utilities.constants import (
+    MICRO_TO_MILLISECOND_CONVERSION)
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spynnaker.pyNN.utilities import utility_calls
@@ -40,8 +39,7 @@ _expr_context = SafeEval(
     numpy.maximum, numpy.minimum, e=numpy.e, pi=numpy.pi)
 
 
-# with_metaclass due to https://github.com/benjaminp/six/issues/219
-class AbstractConnector(with_metaclass(AbstractBase, object)):
+class AbstractConnector(object, metaclass=AbstractBase):
     """ Abstract class that all PyNN Connectors extend.
     """
     # pylint: disable=unused-argument,too-many-arguments
@@ -154,7 +152,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
 
             # The minimum is the maximum of the possible maximums
             return max(low_estimated_delay, low, 1)
-        elif isinstance(delays, string_types):
+        elif isinstance(delays, str):
             if self.__space is None:
                 raise Exception(
                     "No space object specified in projection {}-{}".format(
@@ -194,7 +192,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
 
             # The maximum is the minimum of the possible maximums
             return min(max_estimated_delay, high)
-        elif isinstance(delays, string_types):
+        elif isinstance(delays, str):
             if self.__space is None:
                 raise Exception(
                     "No space object specified in projection {}-{}".format(
@@ -244,7 +242,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         """
         if isinstance(delays, RandomDistribution):
             return utility_calls.get_variance(delays)
-        elif isinstance(delays, string_types):
+        elif isinstance(delays, str):
             if self.__space is None:
                 raise Exception(
                     "No space object specified in projection {}-{}".format(
@@ -286,7 +284,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
                 delays, min_delay, max_delay)
             return int(math.ceil(utility_calls.get_probable_maximum_selected(
                 n_total_connections, n_connections, prob_in_range)))
-        elif isinstance(delays, string_types):
+        elif isinstance(delays, str):
             if self.__space is None:
                 raise Exception(
                     "No space object specified in projection {}-{}".format(
@@ -366,7 +364,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         """
         if isinstance(weights, RandomDistribution):
             return abs(utility_calls.get_mean(weights))
-        elif isinstance(weights, string_types):
+        elif isinstance(weights, str):
             if self.__space is None:
                 raise Exception(
                     "No space object specified in projection {}-{}".format(
@@ -413,7 +411,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
                     return abs(max_weight)
                 return abs(min(max_weight, high))
 
-        elif isinstance(weights, string_types):
+        elif isinstance(weights, str):
             if self.__space is None:
                 raise Exception(
                     "No space object specified in projection {}-{}".format(
@@ -452,7 +450,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         """
         if isinstance(weights, RandomDistribution):
             return utility_calls.get_variance(weights)
-        elif isinstance(weights, string_types):
+        elif isinstance(weights, str):
             if self.__space is None:
                 raise Exception(
                     "No space object specified in projection {}-{}".format(
@@ -525,7 +523,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         if isinstance(values, RandomDistribution):
             return self._generate_random_values(
                 values, n_connections, pre_slice, post_slice)
-        elif isinstance(values, string_types) or callable(values):
+        elif isinstance(values, str) or callable(values):
             if self.__space is None:
                 raise SpynnakerException(
                     "No space object specified in projection {}-{}".format(
@@ -533,10 +531,9 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
                         synapse_info.post_population))
 
             expand_distances = True
-            if isinstance(values, string_types):
+            if isinstance(values, str):
                 expand_distances = self._expand_distances(values)
 
-            if isinstance(values, string_types):
                 # At this point we need to now get the values corresponding to
                 # the distances between connections in "sources" and "targets"
                 eval_values = numpy.zeros(n_connections, dtype="float64")

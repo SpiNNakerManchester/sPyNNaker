@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
@@ -35,10 +34,11 @@ from spynnaker.pyNN.models.abstract_models import (
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-@add_metaclass(AbstractBase)
-class AbstractMachineBitFieldRouterCompressor(object):
-    """ Adds in regeneration of synaptic matrices to bitfield compression to\
-    :py:class:`spinn_front_end_common.interface.interface_functions.MachineBitFieldRouterCompressor`
+class AbstractMachineBitFieldRouterCompressor(object, metaclass=AbstractBase):
+    """ Algorithm that adds in regeneration of synaptic matrices to bitfield\
+    compression to\
+    :py:class:`spinn_front_end_common.interface.interface_functions.\
+    MachineBitFieldRouterCompressor`
     """
 
     _RERUN_IOBUF_NAME_PATTERN = "rerun_of_synaptic_expander_on_{}_{}_{}.txt"
@@ -202,18 +202,17 @@ class SpynnakerMachineBitFieldOrderedCoveringCompressor(
 
 
 class SpynnakerMachineBitFieldUnorderedRouterCompressor(
-        AbstractMachineBitFieldRouterCompressor):
-    """ DEPRACATED use MachineBitFieldRouterCompressor """
+        SpynnakerMachineBitFieldOrderedCoveringCompressor):
+    """ DEPRACATED use SpynnakerMachineBitFieldOrderedCoveringCompressor """
 
     def __new__(cls, *args, **kwargs):
         logger.warning(
             "SpynnakerMachineBitFieldUnorderedRouterCompressor "
             "algorithm name is deprecated. "
-            "Please use MachineBitFieldOrderedCoveringCompressor instead. "
+            "Please use SpynnakerMachineBitFieldOrderedCoveringCompressor "
+            "instead. "
             "Remove algorithms from your cfg to use defaults")
-        return super(
-            SpynnakerMachineBitFieldUnorderedRouterCompressor, cls).__new__(
-            cls, *args, **kwargs)
+        return super().__new__(cls, *args, **kwargs)
 
     @overrides(AbstractMachineBitFieldRouterCompressor._compressor_factory)
     def _compressor_factory(self):

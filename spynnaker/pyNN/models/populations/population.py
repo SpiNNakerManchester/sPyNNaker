@@ -17,7 +17,6 @@ import logging
 import numpy
 import neo
 import inspect
-from six import iteritems, string_types
 from pyNN import descriptions
 from pyNN.random import NumpyRNG
 from spinn_utilities.log import FormatAdapter
@@ -45,6 +44,10 @@ from .population_view import PopulationView
 
 logger = FormatAdapter(logging.getLogger(__file__))
 
+REMOVED_V6 = "The method {} is not standard PyNN so has been permanently " \
+      "removed. Use {} instead. " \
+      "(Even this warning will be removed in version 7)"
+
 
 # Not in the class so pylint doesn't get confused about abstractness of methods
 def _we_dont_do_this_now(*args):  # pylint: disable=unused-argument
@@ -67,9 +70,6 @@ class Population(PopulationBase):
         "__last_id",
         "_positions",
         "_recorder",
-        "__record_gsyn_file",
-        "__record_spike_file",
-        "__record_v_file",
         "_size",
         "__structure",
         "__vertex",
@@ -127,9 +127,6 @@ class Population(PopulationBase):
             size = self.__vertex.n_atoms
         self._size = size
         self._annotations = dict()
-        self.__record_spike_file = None
-        self.__record_v_file = None
-        self.__record_gsyn_file = None
 
         # parameter
         self.__change_requires_mapping = True
@@ -146,7 +143,7 @@ class Population(PopulationBase):
 
         # set up initial values if given
         if initial_values:
-            for variable, value in iteritems(initial_values):
+            for variable, value in initial_values.items():
                 self._initialize(variable, value)
 
     def __iter__(self):
@@ -196,8 +193,8 @@ class Population(PopulationBase):
         return variable in \
             self._recorder.get_all_possible_recordable_variables()
 
-    def record(self, variables, to_file=None, sampling_interval=None,
-               indexes=None):
+    @overrides(PopulationBase.record, extend_doc=False)
+    def record(self, variables, to_file=None, sampling_interval=None):
         """ Record the specified variable or variables for all cells in the\
             Population or view.
 
@@ -211,26 +208,14 @@ class Population(PopulationBase):
         :type to_file: ~neo.io or ~neo.rawio or str
         :param int sampling_interval: a value in milliseconds, and an integer
             multiple of the simulation timestep.
-        :param indexes: The indexes of neurons to record from.
-            This is non-standard PyNN and equivalent to creating a view with
-            these indexes and asking the View to record.
-        :type indexes: None or list(int)
         """
-        # pylint: disable=arguments-differ
-        if indexes is not None:
-            warn_once(
-                logger, "record indexes parameter is non-standard PyNN, "
-                "so may not be portable to other simulators. "
-                "It is now deprecated and replaced with views")
-        self._record_with_indexes(
-            variables, to_file, sampling_interval, indexes)
+        self._recorder.record(
+            variables, to_file, sampling_interval, indexes=None)
 
-    def _record_with_indexes(
+    def _record(
             self, variables, to_file, sampling_interval, indexes):
-        """ Same as record but without non-standard PyNN warning
-
-        This method is non-standard PyNN and is intended only to be called by
-        record in a Population, View or Assembly
+        """ Record the specified variable or variables for all cells in the\
+            Population or view.
 
         :param variables: either a single variable name or a list of variable
             names. For a given celltype class, ``celltype.recordable`` contains
@@ -248,44 +233,8 @@ class Population(PopulationBase):
             these indexes and asking the View to record.
         :type indexes: None or list(int)
         """
-        if variables is None:  # reset the list of things to record
-            if sampling_interval is not None:
-                raise ConfigurationException(
-                    "Clash between parameters in record."
-                    "variables=None turns off recording,"
-                    "while sampling_interval!=None implies turn on recording")
-            if indexes is not None:
-                warn_once(
-                    logger,
-                    "View.record with variable None is non-standard PyNN. "
-                    "Only the neurons in the view have their record turned "
-                    "off. Other neurons already set to record will remain "
-                    "set to record")
-
-            # note that if record(None) is called, its a reset
-            self._recorder.turn_off_all_recording(indexes)
-            # handle one element vs many elements
-        elif isinstance(variables, string_types):
-            # handle special case of 'all'
-            if variables == "all":
-                warn_once(
-                    logger, 'record("all") is non-standard PyNN, and '
-                    'therefore may not be portable to other simulators.')
-
-                # iterate though all possible recordings for this vertex
-                for variable in self._recorder.\
-                        get_all_possible_recordable_variables():
-                    self._recorder.record(
-                        variable, sampling_interval, to_file, indexes)
-            else:
-                # record variable
-                self._recorder.record(
-                    variables, sampling_interval, to_file, indexes)
-
-        else:  # list of variables, so just iterate though them
-            for variable in variables:
-                self._recorder.record(
-                    variable, sampling_interval, to_file, indexes)
+        self._recorder.record(
+            variables, to_file, sampling_interval, indexes=indexes)
 
     def sample(self, n, rng=None):
         """ Randomly sample `n` cells from the Population, and return a\
@@ -304,6 +253,7 @@ class Population(PopulationBase):
             self, indices,
             label="Random sample size {} from {}".format(n, self.label))
 
+    @overrides(PopulationBase.write_data, extend_doc=False)
     def write_data(self, io, variables='all', gather=True, clear=False,
                    annotations=None):
         """ Write recorded data to file, using one of the file formats\
@@ -337,7 +287,7 @@ class Population(PopulationBase):
                 "sPyNNaker only supports gather=True. We will run "
                 "as if gather was set to True.")
 
-        if isinstance(io, string_types):
+        if isinstance(io, str):
             io = neo.get_io(io)
 
         data = self._recorder.extract_neo_block(
@@ -389,6 +339,7 @@ class Population(PopulationBase):
                     io=self._recorder.write_to_files_indicators[variable],
                     variables=[variable])
 
+    @overrides(PopulationBase.get_data, extend_doc=False)
     def get_data(
             self, variables='all', gather=True, clear=False, annotations=None):
         """ Return a Neo Block containing the data\
@@ -476,8 +427,8 @@ class Population(PopulationBase):
             return self._recorder.get_spikes()
         return self._recorder.get_recorded_pynn7(variable)
 
-    def get_spike_counts(self,  # pylint: disable=arguments-differ
-                         gather=True):
+    @overrides(PopulationBase.get_spike_counts, extend_doc=False)
+    def get_spike_counts(self, gather=True):
         """ Return the number of spikes for each neuron.
 
         :rtype: ~numpy.ndarray
@@ -520,7 +471,7 @@ class Population(PopulationBase):
 
         :param parameters: The parameters to set.
         """
-        for parameter, value in iteritems(parameters):
+        for parameter, value in parameters.items():
             try:
                 self._set(parameter, value)
             except InvalidParameterType:
@@ -530,7 +481,7 @@ class Population(PopulationBase):
     def tset(self, **kwargs):
         logger.warning(
             "This function is deprecated; call pop.set(...) instead")
-        for parameter, value in iteritems(kwargs):
+        for parameter, value in kwargs.items():
             try:
                 self._set(parameter, value)
             except InvalidParameterType:
@@ -556,7 +507,7 @@ class Population(PopulationBase):
             p.initialize(v=rand_distr, gsyn_exc=0.0)
             p.initialize(v=lambda i: -65 + i / 10.0)
         """
-        for parameter, value in iteritems(kwargs):
+        for parameter, value in kwargs.items():
             self._initialize(parameter, value)
 
     @property
@@ -569,8 +520,15 @@ class Population(PopulationBase):
                 "Population does not support the initialisation")
         return self._vertex.initial_values
 
-    # NON-PYNN API CALL
     def get_initial_value(self, variable, selector=None):
+        """
+        .. deprecated:: 6.0
+            Use :py:meth:`initial_values` instead.
+        """
+        raise NotImplementedError(REMOVED_V6.format(
+            "get_initial_value", "initial_values"))
+
+    def _get_initial_value(self, variable, selector):
         """ See :py:meth:`~.AbstractPopulationInitializable.get_initial_value`
 
         :param str variable: variable name with or without ``_init`` suffix
@@ -587,30 +545,15 @@ class Population(PopulationBase):
                     variable))
         return self._vertex.get_initial_value(variable, selector)
 
-    # NON-PYNN API CALL
     def set_initial_value(self, variable, value, selector=None):
-        """ See :py:meth:`~.AbstractPopulationInitializable.set_initial_value`
-
-        :param str variable: variable name with or without ``_init`` suffix
-        :param value: New value for the variable
-        :type value: int or float or list(int) or list(float)
-        :param selector: a description of the subrange to accept, or None for
-            all. See:
-            :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
-        :type selector: None or slice or int or list(bool) or list(int)
         """
-        if not self.__vertex_population_initializable:
-            raise KeyError(
-                "Population does not support the initialisation of {}".format(
-                    variable))
-        if get_not_running_simulator().has_ran \
-                and not self.__vertex_changeable_after_run:
-            raise Exception("Population does not support changes after run")
-        self._read_parameters_before_set()
-        self._vertex.set_initial_value(variable, value, selector)
+        .. deprecated:: 6.0
+            Use :py:meth:`initialize` instead.
+        """
+        raise NotImplementedError(REMOVED_V6.format(
+            "set_initial_value", "initialize"))
 
-    # NON-PYNN API CALL
-    def get_initial_values(self, selector=None):
+    def _get_initial_values(self, selector=None):
         """ See :py:meth:`~.AbstractPopulationInitializable.get_initial_values`
 
         :param selector: a description of the subrange to accept, or ``None``
@@ -749,7 +692,7 @@ class Population(PopulationBase):
                 logger, "The simplify value is ignored if not set to true")
         if not self.__vertex_population_settable:
             raise KeyError("Population does not support setting")
-        if isinstance(parameter_names, string_types):
+        if isinstance(parameter_names, str):
             return self.__vertex.get_value(parameter_names)
         results = dict()
         for parameter_name in parameter_names:
@@ -757,7 +700,7 @@ class Population(PopulationBase):
         return results
 
     # NON-PYNN API CALL
-    def get_by_selector(self, selector, parameter_names):
+    def _get_by_selector(self, selector, parameter_names):
         """ Get the values of a parameter for the selected cell in the\
             population.
 
@@ -775,7 +718,7 @@ class Population(PopulationBase):
         """
         if not self.__vertex_population_settable:
             raise KeyError("Population does not support setting")
-        if isinstance(parameter_names, string_types):
+        if isinstance(parameter_names, str):
             return self.__vertex.get_value_by_selector(
                 selector, parameter_names)
         results = dict()
@@ -836,13 +779,17 @@ class Population(PopulationBase):
         # TODO: Need __getitem__
         _we_dont_do_this_now(cell_id)
 
-    def _initialize(self, variable, value):
+    def _initialize(self, variable, value, selector=None):
         """ Set the initial value of one of the state variables of the neurons\
             in this population.
 
         :param str variable:
         :param value:
         :type value: float or int or list(float) or list(int)
+        :param selector: a description of the subrange to accept.
+            Or None for all. See:
+            :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
+        :type selector: slice or int or iterable(bool) or iterable(int)
         """
         if not self.__vertex_population_initializable:
             raise KeyError(
@@ -852,7 +799,7 @@ class Population(PopulationBase):
                 and not self.__vertex_changeable_after_run:
             raise Exception("Population does not support changes after run")
         self._read_parameters_before_set()
-        self.__vertex.initialize(variable, value)
+        self.__vertex.initialize(variable, value, selector)
 
     def inject(self, current_source):
         """ Connect a current source to all cells in the Population.
@@ -898,12 +845,12 @@ class Population(PopulationBase):
             raise KeyError("Population does not have property {}".format(
                 parameter))
 
-        if get_not_running_simulator().has_ran \
-                and not self.__vertex_changeable_after_run:
+        sim = get_not_running_simulator()
+        if sim.has_ran and not self.__vertex_changeable_after_run:
             raise Exception(
-                " run has been called")
+                "Run has been called but vertex is not changable.")
 
-        if isinstance(parameter, string_types):
+        if isinstance(parameter, str):
             if value is None:
                 raise Exception("A value (not None) must be specified")
         elif type(parameter) is not dict:
@@ -911,7 +858,8 @@ class Population(PopulationBase):
                 "Parameter must either be the name of a single parameter to"
                 " set, or a dict of parameter: value items to set")
 
-        self._read_parameters_before_set()
+        if not sim.has_reset_last:
+            self._read_parameters_before_set()
 
     def _set(self, parameter, value=None):
         """ Set one or more parameters for every cell in the population.
@@ -934,7 +882,7 @@ class Population(PopulationBase):
         self._set_check(parameter, value)
 
         # set new parameters
-        if isinstance(parameter, string_types):
+        if isinstance(parameter, str):
             if value is None:
                 raise Exception("A value (not None) must be specified")
             self.__vertex.set_value(parameter, value)

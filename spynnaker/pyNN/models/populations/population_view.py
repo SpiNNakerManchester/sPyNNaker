@@ -16,7 +16,7 @@
 import logging
 import neo
 import numpy
-from six import integer_types, string_types
+from spinn_utilities.log import FormatAdapter
 from pyNN import descriptions
 from pyNN.random import NumpyRNG
 from spinn_utilities.logger_utils import warn_once
@@ -24,12 +24,12 @@ from spinn_utilities.ranged.abstract_sized import AbstractSized
 from .idmixin import IDMixin
 from .population_base import PopulationBase
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class PopulationView(PopulationBase):
     """ A view of a subset of neurons within a\
-    :py:class:`~spynnaker.pyNN.models.populations.Population`.
+        :py:class:`~spynnaker.pyNN.models.populations.Population`.
 
     In most ways, Populations and PopulationViews have the same behaviour,
     i.e., they can be recorded, connected with Projections, etc.
@@ -115,7 +115,7 @@ class PopulationView(PopulationBase):
 
         :rtype: dict(str, ...)
         """
-        return self.__population.get_initial_values(selector=self.__indexes)
+        return self.__population._get_initial_values(selector=self.__indexes)
 
     @property
     def parent(self):
@@ -164,7 +164,7 @@ class PopulationView(PopulationBase):
 
         :rtype: ~.IDMixin or ~.PopulationView
         """
-        if isinstance(index, integer_types):
+        if isinstance(index, int):
             return IDMixin(self.__population, index)
         return PopulationView(self, index, label=self.label+"_" + str(index))
 
@@ -233,7 +233,7 @@ class PopulationView(PopulationBase):
         """ Get the units of a variable
 
         .. warning::
-            NO PyNN description of this method.
+            No PyNN description of this method.
 
         :param str variable: The name of the variable
         :return: The units of the variable
@@ -264,7 +264,7 @@ class PopulationView(PopulationBase):
         if simplify is not True:
             logger.warning("The simplify value is ignored if not set to true")
 
-        return self.__population.get_by_selector(
+        return self.__population._get_by_selector(
             self.__indexes, parameter_names)
 
     def get_data(
@@ -300,8 +300,8 @@ class PopulationView(PopulationBase):
                            "as if gather was set to True.")
         if annotations is not None:
             warn_once(
-                logger, "Annoations Parameter is not standard PyNN so may not "
-                        "be supported by all platformd.")
+                logger, "Annotations parameter is not standard PyNN so may "
+                "not be supported by all platforms.")
 
         return self.__population.get_data_by_indexes(
             variables, self.__indexes, clear=clear)
@@ -356,7 +356,7 @@ class PopulationView(PopulationBase):
         :type id: int or list(int)
         :rtype: int or list(int)
         """
-        if isinstance(id, integer_types):
+        if isinstance(id, int):
             return self.__indexes.index(id)
         return [self.__indexes.index(idx) for idx in id]
 
@@ -390,7 +390,7 @@ class PopulationView(PopulationBase):
             p.initialize(v=lambda i: -65 + i / 10.0)
         """
         for variable, value in initial_values.items():
-            self.__population.set_initial_value(
+            self.__population._initialize(
                 variable, value, self.__indexes)
 
     def record(self, variables,  # pylint: disable=arguments-differ
@@ -412,7 +412,7 @@ class PopulationView(PopulationBase):
             should be a value in milliseconds, and an integer multiple of the
             simulation timestep.
         """
-        self.__population._record_with_indexes(
+        self.__population._record(
             variables, to_file, sampling_interval, self.__indexes)
 
     def sample(self, n, rng=None):
@@ -494,7 +494,7 @@ class PopulationView(PopulationBase):
         data = self.__population.get_data_by_indexes(
             variables, self.__indexes, clear=clear)
 
-        if isinstance(io, string_types):
+        if isinstance(io, str):
             io = neo.get_io(io)
 
         # write the neo block to the file

@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017-2021 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -12,10 +12,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import logging
 from spynnaker.pyNN.models.neural_projections.connectors import (
     ArrayConnector as _BaseClass)
-logger = logging.getLogger(__file__)
+from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
 
 
 class ArrayConnector(_BaseClass):
@@ -46,8 +45,8 @@ class ArrayConnector(_BaseClass):
             Whether to output extra information about the connectivity to a
             CSV file
         """
+        moved_in_v6("spynnaker8.models.connectors.ArrayConnector",
+                    "spynnaker.pyNN.models.neural_projections.connectors"
+                    ".ArrayConnector")
         super(ArrayConnector, self).__init__(
             array=array, safe=safe, callback=callback, verbose=verbose)
-        logger.warning(
-            "please use spynnaker.pyNN.models.neural_projections.connectors."
-            "ArrayConnector instead")

@@ -71,8 +71,7 @@ class IndexBasedProbabilityConnector(AbstractConnector):
             Whether to output extra information about the connectivity to a
             CSV file
         """
-        super(IndexBasedProbabilityConnector, self).__init__(
-            safe, callback, verbose)
+        super().__init__(safe, callback, verbose)
         self._rng = rng
         self.__index_expression = index_expression
         self.__allow_self_connections = allow_self_connections

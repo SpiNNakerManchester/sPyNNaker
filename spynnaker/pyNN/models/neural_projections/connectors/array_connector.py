@@ -45,7 +45,7 @@ class ArrayConnector(AbstractConnector):
             Whether to output extra information about the connectivity to a
             CSV file
         """
-        super(ArrayConnector, self).__init__(safe, callback, verbose)
+        super().__init__(safe, callback, verbose)
         self.__array = array
         # we can get the total number of connections straight away
         # from the boolean matrix

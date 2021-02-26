@@ -20,7 +20,7 @@ import unittest
 from unittest import SkipTest
 from spinnman.exceptions import SpinnmanTimeoutException
 import spynnaker.spike_checker as spike_checker
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 from p8_integration_tests.scripts.synfire_run import SynfireRunner
 
 n_neurons = 200
@@ -50,7 +50,7 @@ class TestGetSpikesAt0_1msTimeStep(BaseTestCase):
             spike_checker.synfire_spike_checker(spikes, n_neurons)
         # System intentional overload so may error
         except SpinnmanTimeoutException as ex:
-            raise SkipTest(ex)
+            raise SkipTest() from ex
 
 
 if __name__ == '__main__':

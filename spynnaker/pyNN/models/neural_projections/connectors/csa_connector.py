@@ -27,7 +27,9 @@ except ImportError as _ex:  # noqa: F821
 class CSAConnector(AbstractConnector):
     """ Make connections using a Connection Set Algebra (Djurfeldt 2012)\
         description between the neurons in the pre- and post-populations.
-        If you get ``TypeError`` in Python 3 see:
+
+    .. note::
+        If you get TypeError in Python 3 see:
         https://github.com/INCF/csa/issues/10
     """
 
@@ -55,7 +57,7 @@ class CSAConnector(AbstractConnector):
             some environments so we don't force it to be present unless you
             want to actually use this class.
         """
-        super(CSAConnector, self).__init__(safe, callback, verbose)
+        super().__init__(safe, callback, verbose)
         found, ex = _csa_found
         if not found:
             raise ex

@@ -13,30 +13,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import add_metaclass
-
-from pacman.model.graphs.machine import MachineVertex
-from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_utilities.require_subclass import require_subclass
+from pacman.model.graphs.machine import MachineVertex
 
 
-@add_metaclass(AbstractBase)
-class AbstractReadParametersBeforeSet(object):
+@require_subclass(MachineVertex)
+class AbstractReadParametersBeforeSet(object, metaclass=AbstractBase):
     """ A vertex whose parameters must be read before any can be set.
     """
 
     __slots__ = ()
-
-    _WRONG_VERTEX_TYPE_ERROR = (
-        "The vertex {} is not of type MachineVertex. By not being a "
-        "machine vertex, the sPyNNaker population set function may not "
-        "work correctly.")
-
-    def __new__(cls, *args, **kwargs):
-        if not issubclass(cls, MachineVertex):
-            raise ConfigurationException(
-                cls._WRONG_VERTEX_TYPE_ERROR.format(cls))
-        return super(AbstractReadParametersBeforeSet, cls).__new__(cls)
 
     @abstractmethod
     def read_parameters_from_machine(

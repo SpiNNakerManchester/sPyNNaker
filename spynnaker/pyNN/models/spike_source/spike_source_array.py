@@ -32,6 +32,7 @@ class SpikeSourceArray(AbstractPyNNModel):
                additional_arguments=default_population_parameters.keys())
     def create_vertex(
             self, n_neurons, label, constraints, splitter):
+        # pylint: disable=arguments-differ
         max_atoms = self.get_max_atoms_per_core()
         return SpikeSourceArrayVertex(
             n_neurons, self.__spike_times, constraints, label, max_atoms, self,

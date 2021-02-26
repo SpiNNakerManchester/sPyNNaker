@@ -31,7 +31,7 @@ def check_neuron_data(spikes, v, exc, expected_spikes, simtime, label, index):
             last_spike = next_spike
             try:
                 next_spike = int(next(iter_spikes).magnitude)
-            except (StopIteration):
+            except StopIteration:
                 next_spike = simtime
         t_delta = t - last_spike
         if t_delta <= 2:

@@ -17,7 +17,7 @@ from unittest import SkipTest
 import pytest
 from pyNN.space import Sphere, RandomStructure
 import spynnaker8 as sim
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 
 
 class TestPopulation(BaseTestCase):
@@ -41,12 +41,12 @@ class TestPopulation(BaseTestCase):
         vs = initial_values["v"]
         assert [-60, -59, -58, -57, -56] == vs
 
-        pop_1.all_cells
-        pop_1.local_cells
+        _ = pop_1.all_cells
+        _ = pop_1.local_cells
 
         self.assertEqual(n_neurons, pop_1.local_size)
 
-        pop_1.structure
+        _ = pop_1.structure
         sim.end()
 
     def test_position_generator(self):
@@ -58,10 +58,10 @@ class TestPopulation(BaseTestCase):
         try:
             gen = pop_1.position_generator
             print(gen(0))
-        except NotImplementedError:
+        except NotImplementedError as e:
             msg = "Depends on https://github.com/SpiNNakerManchester" \
                   "/sPyNNaker8/pull/73"
-            raise SkipTest(msg)
+            raise SkipTest(msg) from e
         sim.end()
 
     def test_set(self):
@@ -69,7 +69,25 @@ class TestPopulation(BaseTestCase):
         label = "pop_1"
         sim.setup(timestep=1.0)
         pop_1 = sim.Population(n_neurons, sim.IF_curr_exp(), label=label)
-        pop_1.set(v=2)
+        pop_1.set(i_offset=2)
+        sim.end()
+
+    def test_set_multiple(self):
+        n_neurons = 5
+        label = "pop_1"
+        sim.setup(timestep=1.0)
+        pop_1 = sim.Population(n_neurons, sim.IF_curr_exp(), label=label)
+        pop_1.set(i_offset=[2, 3, 4, 5, 6])
+        sim.end()
+
+    def test_set_multiple_via_indirect(self):
+        n_neurons = 5
+        label = "pop_1"
+        sim.setup(timestep=1.0)
+        pop_1 = sim.Population(
+            n_neurons, sim.IF_curr_exp(i_offset=0), label=label)
+        view = pop_1[0:3]
+        view.set(i_offset=[2, 3, 4])
         sim.end()
 
     def test_selector(self):
@@ -80,7 +98,7 @@ class TestPopulation(BaseTestCase):
         pop_1.set(tau_m=2)
         values = pop_1.get("tau_m")
         self.assertEqual([2, 2, 2, 2, 2], values)
-        values = pop_1.get_by_selector(slice(1, 3), "tau_m")
+        values = pop_1._get_by_selector(slice(1, 3), "tau_m")
         self.assertEqual([2, 2], values)
         pop_1.set_by_selector(slice(1, 3), "tau_m", 3)
         values = pop_1.get("tau_m")
@@ -89,7 +107,7 @@ class TestPopulation(BaseTestCase):
         self.assertEqual([1.0, 1.0, 1.0, 1.0, 1.0], values['cm'])
         self.assertEqual(
             [-50.0, -50.0, -50.0, -50.0, -50.0], values["v_thresh"])
-        values = pop_1.get_by_selector([1, 3, 4], ["cm", "v_thresh"])
+        values = pop_1._get_by_selector([1, 3, 4], ["cm", "v_thresh"])
         self.assertEqual([1.0, 1.0, 1.0], values['cm'])
         self.assertEqual(
             [-50.0, -50.0, -50.0], values["v_thresh"])
@@ -98,11 +116,11 @@ class TestPopulation(BaseTestCase):
     def test_init_by_in(self):
         sim.setup(timestep=1.0)
         pop = sim.Population(4, sim.IF_curr_exp())
-        assert [-65.0, -65.0, -65.0, -65.0] == pop.get_initial_value("v")
-        pop.set_initial_value(variable="v", value=-60, selector=1)
-        assert [-65, -60, -65, -65] == pop.get_initial_value("v")
-        pop.set_initial_value(variable="v", value=12, selector=2)
-        assert [-60] == pop.get_initial_value("v", selector=1)
+        assert [-65.0, -65.0, -65.0, -65.0] == pop.initial_values["v"]
+        pop._initialize(variable="v", value=-60, selector=1)
+        assert [-65, -60, -65, -65] == pop.initial_values["v"]
+        pop._initialize(variable="v", value=12, selector=2)
+        assert [-60] == pop._get_initial_value("v", selector=1)
         sim.end()
 
     def test_init_bad(self):
@@ -118,11 +136,9 @@ class TestPopulation(BaseTestCase):
         sim.setup(timestep=1.0)
         pop = sim.Population(4, sim.SpikeSourceArray())
         with pytest.raises(KeyError):
-            pop.set_initial_value(variable="v", value="Anything")
+            pop.initialize(v="Anything")
         with pytest.raises(KeyError):
-            pop.get_initial_value(variable="v")
-        with pytest.raises(KeyError):
-            pop.initial_values
+            _ = pop.initial_values
         sim.end()
 
     def test_initial_values(self):
@@ -131,7 +147,7 @@ class TestPopulation(BaseTestCase):
             cellclass=sim.IF_curr_exp, cellparams=None, n=4)
         initial_values = pop.initial_values
         assert "v" in initial_values
-        initial_values = pop.get_initial_values(selector=3)
+        initial_values = pop._get_initial_values(selector=3)
         assert {"v": [-65], "isyn_exc": [0], "isyn_inh": [0]} == initial_values
         sim.end()
 

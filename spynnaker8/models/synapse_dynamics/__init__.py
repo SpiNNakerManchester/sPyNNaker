@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2021 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,10 +19,10 @@
     :py:mod:`spynnaker.pyNN.models.neuron.synapse_dynamics` instead.
 """
 
-from .static import SynapseDynamicsStatic
-from .stdp import SynapseDynamicsSTDP
-from .structural_static import SynapseDynamicsStructuralStatic
-from .structural_stdp import SynapseDynamicsStructuralSTDP
+from .synapse_dynamics_static import SynapseDynamicsStatic
+from .synapse_dynamics_stdp import SynapseDynamicsSTDP
+from .synapse_dynamics_structural_static import SynapseDynamicsStructuralStatic
+from .synapse_dynamics_structural_stdp import SynapseDynamicsStructuralSTDP
 
 __all__ = ["SynapseDynamicsStatic", "SynapseDynamicsSTDP",
            "SynapseDynamicsStructuralStatic", "SynapseDynamicsStructuralSTDP"]

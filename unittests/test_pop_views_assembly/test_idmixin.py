@@ -13,9 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import numpy
 import pytest
 import spynnaker8 as sim
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 
 N_NEURONS = 4
 LABEL = "pop_1"
@@ -83,10 +84,13 @@ class TestIDMixin(BaseTestCase):
     def test_init_by_in(self):
         sim.setup(timestep=1.0)
         pop = sim.Population(N_NEURONS, sim.IF_curr_exp(), label=LABEL)
-        assert [-65.0, -65.0, -65.0, -65.0] == pop.get_initial_value("v")
+        assert [-65.0, -65.0, -65.0, -65.0] == pop.initial_values["v"]
         cells = pop.all_cells
         cells[1].set_initial_value(variable="v", value=-60)
         assert [-60] == cells[1].get_initial_value("v")
+        cells[2].initialize(v=-59)
+        assert [-59] == cells[2].initial_values["v"]
+        assert [-65.0, -60.0, -59.0, -65.0] == pop.initial_values["v"]
         sim.end()
 
     def test_initial_values(self):
@@ -96,7 +100,7 @@ class TestIDMixin(BaseTestCase):
         assert -65 == cells[1].v
         assert -65 == cells[1].v_init
         cells[1].v = -60
-        assert [-65.0, -60.0, -65.0, -65.0] == pop.get_initial_value("v")
+        assert [-65.0, -60.0, -65.0, -65.0] == pop.initial_values["v"]
         sim.end()
 
     def test_asview(self):
@@ -104,3 +108,19 @@ class TestIDMixin(BaseTestCase):
         pop = sim.Population(4, sim.IF_curr_exp(), label=LABEL)
         cell = pop[2]
         cell.as_view()
+
+    def test_ssa_spike_times(self):
+        n_atoms = 10
+        set_id = 1
+        set_value = [5]
+        sim.setup(timestep=1.0)
+        pop = sim.Population(n_atoms, sim.SpikeSourceArray([]))
+        pop[set_id].set_parameters(spike_times=set_value)
+        result = pop.get("spike_times")
+        result_should_be = []
+        for atom in range(n_atoms):
+            if atom == set_id:
+                result_should_be.append(numpy.array(set_value))
+            else:
+                result_should_be.append([])
+        self.assertEqual(result, result_should_be)

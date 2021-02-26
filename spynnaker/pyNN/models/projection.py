@@ -16,7 +16,7 @@
 import functools
 import logging
 import numpy
-from six import string_types
+from spinn_utilities.log import FormatAdapter
 from pyNN import common as pynn_common
 from pyNN.random import RandomDistribution
 from pyNN.recording.files import StandardTextFile
@@ -39,7 +39,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 from spynnaker._version import __version__
 from spynnaker.pyNN.models.populations import Population, PopulationView
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 def _we_dont_do_this_now(*args):  # pylint: disable=unused-argument
@@ -143,8 +143,7 @@ class Projection(object):
         # round the delays to multiples of full timesteps
         # (otherwise SDRAM estimation calculations can go wrong)
         if ((not isinstance(synapse_dynamics.delay, RandomDistribution))
-                and (not isinstance(
-                    synapse_dynamics.delay, string_types))):
+                and (not isinstance(synapse_dynamics.delay, str))):
             synapse_dynamics.set_delay(
                 numpy.rint(
                     numpy.array(synapse_dynamics.delay) *
@@ -284,7 +283,7 @@ class Projection(object):
             warn_once(
                 logger, "sPyNNaker only supports gather=True. We will run "
                 "as if gather was set to True.")
-        if isinstance(attribute_names, string_types):
+        if isinstance(attribute_names, str):
             attribute_names = [attribute_names]
         if attribute_names in (['all'], ['connections']):
             attribute_names = \
@@ -310,7 +309,7 @@ class Projection(object):
         :return: values selected
         """
         # fix issue with 1 versus many
-        if isinstance(attribute_names, string_types):
+        if isinstance(attribute_names, str):
             attribute_names = [attribute_names]
 
         data_items = list()
@@ -355,7 +354,7 @@ class Projection(object):
             dtype = [(name, "<f8") for name in data.dtype.names]
             data = data.astype(dtype)
         data = numpy.nan_to_num(data)
-        if isinstance(save_file, string_types):
+        if isinstance(save_file, str):
             data_file = StandardTextFile(save_file, mode='wb')
         else:
             data_file = save_file

@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import spynnaker8 as sim
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utility_models import \
     ReverseIPTagMulticastSourceMachineVertex

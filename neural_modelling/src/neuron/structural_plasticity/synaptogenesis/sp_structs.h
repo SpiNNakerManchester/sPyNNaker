@@ -77,6 +77,7 @@ typedef struct {
     uint32_t machine_no_atoms;
     uint32_t low_atom;
     uint32_t high_atom;
+    uint32_t with_replacement;
     // the 2 seeds that are used: shared for sync, local for everything else
     mars_kiss64_seed_t shared_seed;
     mars_kiss64_seed_t local_seed;
@@ -89,6 +90,8 @@ typedef struct {
     mars_kiss64_seed_t *local_seed;
     //! Low atom copied from rewiring data
     uint32_t post_low_atom;
+    // with_replacement copied from rewiring data
+    uint32_t with_replacement;
     // what are the currently selecting pre- and post-synaptic neurons
     uint32_t pre_syn_id;
     uint32_t post_syn_id;

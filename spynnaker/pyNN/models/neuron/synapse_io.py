@@ -15,10 +15,9 @@
 
 import math
 import numpy
-from six import raise_from
 
-from spinn_front_end_common.utilities.constants import \
-    MICRO_TO_MILLISECOND_CONVERSION, BYTES_PER_WORD
+from spinn_front_end_common.utilities.constants import (
+    MICRO_TO_MILLISECOND_CONVERSION, BYTES_PER_WORD)
 from spinn_front_end_common.utilities import globals_variables
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
@@ -180,7 +179,7 @@ class SynapseIORowBased(object):
             # Find the number of synapses available for the maximum population
             # table size, as extracted from the exception
             max_synapses = dynamics.get_max_synapses(e.max_size)
-            raise_from(SynapseRowTooBigException(
+            raise SynapseRowTooBigException(
                 max_synapses,
                 "The connection between {} and {} has more synapses ({}) than"
                 " can currently be supported on this implementation of PyNN"
@@ -188,7 +187,7 @@ class SynapseIORowBased(object):
                 " Please reduce the size of the target population, or reduce"
                 " the number of neurons per core.".format(
                     in_edge.pre_vertex, in_edge.post_vertex, n_synapses,
-                    max_synapses)), e)
+                    max_synapses)) from e
 
     def get_max_row_info(
             self, synapse_info, post_vertex_slice, n_delay_stages,

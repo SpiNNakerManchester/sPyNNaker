@@ -38,16 +38,16 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
     def __init__(self,  tau_ca2, i_ca2, i_alpha):
         r"""
         :param tau_ca2: :math:`\tau_{\mathrm{Ca}^{+2}}`
-        :type tau_ca2: float, iterable(float), \
-                       ~pyNN.random.RandomDistribution or (mapping) function
+        :type tau_ca2: float, iterable(float),
+            ~pyNN.random.RandomDistribution or (mapping) function
         :param i_ca2: :math:`I_{\mathrm{Ca}^{+2}}`
-        :type i_ca2: float, iterable(float), \
-                     ~pyNN.random.RandomDistribution or (mapping) function
+        :type i_ca2: float, iterable(float),
+            ~pyNN.random.RandomDistribution or (mapping) function
         :param i_alpha: :math:`I_{\alpha}`
-        :type i_alpha: float, iterable(float), \
-                       ~pyNN.random.RandomDistribution or (mapping) function
+        :type i_alpha: float, iterable(float),
+            ~pyNN.random.RandomDistribution or (mapping) function
         """
-        super(AdditionalInputCa2Adaptive, self).__init__([
+        super().__init__([
             DataType.S1615,   # e^(-ts / tau_ca2)
             DataType.S1615,   # i_ca_2
             DataType.S1615])  # i_alpha
@@ -91,7 +91,6 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
 
     @overrides(AbstractAdditionalInput.update_values)
     def update_values(self, values, parameters, state_variables):
-
         # Read the data
         (_exp_tau_ca2, i_ca2, _i_alpha) = values
 

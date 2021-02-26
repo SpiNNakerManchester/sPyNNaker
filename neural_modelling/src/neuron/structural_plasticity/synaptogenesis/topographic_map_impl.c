@@ -252,6 +252,7 @@ bool synaptogenesis_dynamics_rewire(
     current_state->post_to_pre.sub_pop_index = pre_sub_pop;
     current_state->local_seed = &rewiring_data.local_seed;
     current_state->post_low_atom = rewiring_data.low_atom;
+    current_state->with_replacement = rewiring_data.with_replacement;
     _queue_state(current_state);
     return true;
 }
@@ -272,8 +273,7 @@ static inline bool row_restructure(
                 current_state->post_syn_id, row,
                 &current_state->weight, &current_state->delay,
                 &current_state->offset, &current_state->synapse_type)) {
-            log_debug("Post neuron %d not in row",
-                    current_state->post_syn_id);
+            log_debug("Post neuron %u not in row", current_state->post_syn_id);
             return false;
         }
         return synaptogenesis_elimination_rule(current_state,
@@ -286,10 +286,25 @@ static inline bool row_restructure(
         if (no_elems >= rewiring_data.s_max) {
             log_debug("row is full");
             return false;
+        } else {
+            if (current_state->with_replacement) {
+                // A synapse can be added anywhere on the current row, so just do it
+                return synaptogenesis_formation_rule(current_state,
+                        formation_params[current_state->post_to_pre.pop_index], time, row);
+            } else {
+        	    // A synapse cannot be added if one exists between the current pair of neurons
+        	    if (!synapse_dynamics_find_neuron(
+        	            current_state->post_syn_id, row,
+						&(current_state->weight), &(current_state->delay),
+						&(current_state->offset), &(current_state->synapse_type))) {
+        		    return synaptogenesis_formation_rule(current_state,
+        		        formation_params[current_state->post_to_pre.pop_index], time, row);
+        		} else {
+        		    log_debug("Post neuron %u already in row", current_state->post_syn_id);
+        		    return false;
+        		}
+            }
         }
-        return synaptogenesis_formation_rule(current_state,
-                formation_params[current_state->post_to_pre.pop_index],
-                time, row);
     }
 }
 

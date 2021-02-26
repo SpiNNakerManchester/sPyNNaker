@@ -15,7 +15,7 @@
 
 from pyNN.random import NumpyRNG
 import spynnaker8 as p
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 
 
 class ParamsUsingRandomDists(BaseTestCase):

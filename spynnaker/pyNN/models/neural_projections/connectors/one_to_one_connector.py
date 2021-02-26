@@ -15,9 +15,7 @@
 
 import numpy
 import math
-from six import string_types
 from pyNN.random import RandomDistribution
-from pyNN.connectors import OneToOneConnector as PyNNOneToOneConnector
 from spinn_utilities.overrides import overrides
 from spinn_utilities.safe_eval import SafeEval
 from .abstract_connector import AbstractConnector
@@ -34,8 +32,7 @@ _expr_context = SafeEval(
 
 
 class OneToOneConnector(AbstractGenerateConnectorOnMachine,
-                        AbstractConnectorSupportsViewsOnMachine,
-                        PyNNOneToOneConnector):
+                        AbstractConnectorSupportsViewsOnMachine):
     """ Where the pre- and postsynaptic populations have the same size,\
         connect cell *i* in the presynaptic population to cell *i* in\
         the postsynaptic population, for all *i*.
@@ -56,8 +53,8 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
             Whether to output extra information about the connectivity to a
             CSV file
         """
-        super(OneToOneConnector, self).__init__(safe, callback, verbose)
-        PyNNOneToOneConnector.__init__(self, safe=safe, callback=callback)
+        # pylint: disable=useless-super-delegation
+        super().__init__(safe, callback, verbose)
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
@@ -81,7 +78,7 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
 
         delays = synapse_info.delays
 
-        if isinstance(delays, string_types):
+        if isinstance(delays, str):
             if self.__space is None:
                 raise Exception(
                     "No space object specified in projection {}-{}".format(

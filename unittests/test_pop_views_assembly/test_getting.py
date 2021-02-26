@@ -12,8 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-from __future__ import division
 import pickle
 from unittest import SkipTest
 import numpy
@@ -22,8 +20,8 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.models.recorder import Recorder
 import spynnaker8 as sim
-from spynnaker8.utilities import neo_convertor
-from p8_integration_tests.base_test_case import BaseTestCase
+from spynnaker.pyNN.utilities import neo_convertor
+from spinnaker_testbase import BaseTestCase
 
 
 def mock_spikes(_self):
@@ -225,9 +223,10 @@ class TestGetting(BaseTestCase):
                 neo = pickle.load(pkl)
                 spikes = neo_convertor.convert_spikes(neo)
                 assert numpy.array_equal(spikes,  mock_spikes(None))
-        except UnicodeDecodeError:
+        except UnicodeDecodeError as e:
             raise SkipTest(
-                "https://github.com/NeuralEnsemble/python-neo/issues/529")
+                "https://github.com/NeuralEnsemble/python-neo/issues/529"
+                ) from e
 
         pop.printSpikes("spikes.pkl")
         try:
@@ -235,9 +234,10 @@ class TestGetting(BaseTestCase):
                 neo = pickle.load(pkl)
                 spikes = neo_convertor.convert_spikes(neo)
                 assert numpy.array_equal(spikes,  mock_spikes(None))
-        except UnicodeDecodeError:
+        except UnicodeDecodeError as e:
             raise SkipTest(
-                "https://github.com/NeuralEnsemble/python-neo/issues/529")
+                "https://github.com/NeuralEnsemble/python-neo/issues/529"
+                ) from e
 
         (target, _, _) = mock_v_all(None, "any")
 

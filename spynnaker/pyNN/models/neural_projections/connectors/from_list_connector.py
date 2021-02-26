@@ -75,7 +75,7 @@ class FromListConnector(AbstractConnector):
             .. note::
                 Not supported by sPyNNaker.
         """
-        super(FromListConnector, self).__init__(safe, callback, verbose)
+        super().__init__(safe, callback, verbose)
 
         self.__column_names = column_names
         self.__split_conn_list = None
@@ -88,21 +88,23 @@ class FromListConnector(AbstractConnector):
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
         if self.__delays is None:
-            return numpy.max(synapse_info.delays)
+            return self._get_delay_maximum(
+                synapse_info.delays, len(self.__targets))
         else:
             return numpy.max(self.__delays)
 
     @overrides(AbstractConnector.get_delay_minimum)
     def get_delay_minimum(self, synapse_info):
         if self.__delays is None:
-            return numpy.min(synapse_info.delays)
+            return self._get_delay_minimum(
+                synapse_info.delays, len(self.__targets))
         else:
             return numpy.min(self.__delays)
 
     @overrides(AbstractConnector.get_delay_variance)
     def get_delay_variance(self, delays):
         if self.__delays is None:
-            return numpy.var(delays)
+            return AbstractConnector.get_delay_variance(self, delays)
         else:
             return numpy.var(self.__delays)
 
@@ -212,7 +214,7 @@ class FromListConnector(AbstractConnector):
     @overrides(AbstractConnector.get_weight_mean)
     def get_weight_mean(self, weights):
         if self.__weights is None:
-            return numpy.mean(weights)
+            return AbstractConnector.get_weight_mean(self, weights)
         else:
             return numpy.mean(numpy.abs(self.__weights))
 
@@ -220,7 +222,8 @@ class FromListConnector(AbstractConnector):
     def get_weight_maximum(self, synapse_info):
         # pylint: disable=too-many-arguments
         if self.__weights is None:
-            return numpy.amax(synapse_info.weights)
+            return self._get_weight_maximum(
+                synapse_info.weights, len(self.__targets))
         else:
             return numpy.amax(numpy.abs(self.__weights))
 
@@ -228,7 +231,7 @@ class FromListConnector(AbstractConnector):
     def get_weight_variance(self, weights):
         # pylint: disable=too-many-arguments
         if self.__weights is None:
-            return numpy.var(weights)
+            return AbstractConnector.get_weight_variance(self, weights)
         else:
             return numpy.var(numpy.abs(self.__weights))
 
