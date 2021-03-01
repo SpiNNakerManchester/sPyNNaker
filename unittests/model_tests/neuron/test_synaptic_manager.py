@@ -13,8 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import io
-import math
-import os
 import shutil
 import struct
 import tempfile
@@ -22,30 +20,19 @@ from tempfile import mkdtemp
 import numpy
 import pytest
 
-from spinn_utilities.overrides import overrides
-from spinn_utilities.conf_loader import load_config
 from spinn_machine import SDRAM
-from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
-from pacman.model.placements import Placement, Placements
-from pacman.model.resources import ResourceContainer
-from pacman.model.graphs.common import Slice
-from pacman.model.graphs.machine import (
-    MachineGraph, SimpleMachineVertex, MachineEdge)
-from pacman.model.routing_info import (
-    RoutingInfo, PartitionRoutingInfo, BaseKeyAndMask)
-from pacman.model.graphs.application import ApplicationVertex, ApplicationGraph
-from pacman.model.partitioner_splitters import SplitterSliceLegacy
+from spinn_machine.virtual_machine import virtual_machine
+from pacman.model.placements import Placement
+from pacman.executor.injection_decorator import injection_context
+from pacman.operations.routing_info_allocator_algorithms import (
+    ZonedRoutingInfoAllocator)
 from data_specification import (
     DataSpecificationGenerator, DataSpecificationExecutor)
 from data_specification.constants import MAX_MEM_REGIONS
+from spinn_front_end_common.utilities import globals_variables
+from spinn_front_end_common.interface.interface_functions import (
+    EdgeToNKeysMapper)
 from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
-from spynnaker.pyNN.abstract_spinnaker_common import AbstractSpiNNakerCommon
-import spynnaker.pyNN.abstract_spinnaker_common as abstract_spinnaker_common
-from spynnaker.pyNN.models.neural_projections import (
-    ProjectionApplicationEdge, SynapseInformation, DelayedApplicationEdge)
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractGenerateConnectorOnMachine, OneToOneConnector, AllToAllConnector,
-    FromListConnector)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic, SynapseDynamicsStructuralSTDP,
     SynapseDynamicsSTDP, SynapseDynamicsStructuralStatic)
@@ -54,41 +41,20 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
 from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
     WeightDependenceAdditive, WeightDependenceMultiplicative)
 from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
-    .partner_selection import (
-        LastNeuronSelection, RandomSelection)
+    .partner_selection import (LastNeuronSelection, RandomSelection)
 from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
-    .formation import (
-        DistanceDependentFormation)
+    .formation import DistanceDependentFormation
 from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
-    .elimination import (
-        RandomByWeightElimination)
+    .elimination import RandomByWeightElimination
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
-from spynnaker.pyNN.models.utility_models.delays import (
-    DelayExtensionVertex, DelayExtensionMachineVertex)
-from spynnaker.pyNN.extra_algorithms.splitter_components.\
-    splitter_delay_vertex_slice import SplitterDelayVertexSlice
 from spynnaker.pyNN.models.neuron.builds.if_curr_exp_base import IFCurrExpBase
-from pacman.model.placements.placements import Placements
-from pacman.model.graphs.application.application_graph import ApplicationGraph
-from data_specification.constants import MAX_MEM_REGIONS
+from unittests.mocks import MockSimulator
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SplitterDelayVertexSlice, AbstractSpynnakerSplitterDelay)
-from unittests.mocks import MockSimulator, MockPopulation
-
-
-# pylint: disable=unused-argument
-class MockSynapseIO(object):
-    def get_block_n_bytes(self, max_row_length, n_rows):
-        return 4
-
-
-class MockMasterPopulationTable(object):
-    def __init__(self, key_to_entry_map):
-        self._key_to_entry_map = key_to_entry_map
-
-    def extract_synaptic_matrix_data_location(
-            self, key, master_pop_table_address, transceiver, x, y):
-        return self._key_to_entry_map[key]
+    SplitterAbstractPopulationVertexSlice, SpynnakerSplitterPartitioner)
+from spynnaker.pyNN.extra_algorithms import DelaySupportAdder
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    AbstractGenerateConnectorOnMachine)
+import spynnaker8 as p
 
 
 class MockCPUInfo(object):
@@ -112,160 +78,58 @@ class MockTransceiverRawData(object):
         return datum
 
 
-class MockSplitter(SplitterSliceLegacy, AbstractSpynnakerSplitterDelay):
-    def __init__(self):
-        super().__init__("mock splitter")
-
-
-class SimpleApplicationVertex(ApplicationVertex, LegacyPartitionerAPI):
-    def __init__(self, n_atoms, label=None):
-        super().__init__(label=label)
-        self._n_atoms = n_atoms
-
-    @property
-    @overrides(LegacyPartitionerAPI.n_atoms)
-    def n_atoms(self):
-        return self._n_atoms
-
-    @property
-    def size(self):
-        return self._n_atoms
-
-    @overrides(LegacyPartitionerAPI.create_machine_vertex)
-    def create_machine_vertex(
-            self, vertex_slice, resources_required, label=None,
-            constraints=None):
-        return SimpleMachineVertex(
-            resources_required, label, constraints, self, vertex_slice)
-
-    @overrides(LegacyPartitionerAPI.get_resources_used_by_atoms)
-    def get_resources_used_by_atoms(self, vertex_slice):
-        return ResourceContainer()
-
-    def add_delays(self, *args, **kwargs):
-        pass
-
-
 def say_false(self, weights, delays):
     return False
 
 
 def test_write_data_spec():
-    MockSimulator.setup()
-    # Add an sdram so max SDRAM is high enough
-    SDRAM(100000)
-
     # UGLY but the mock transceiver NEED generate_on_machine to be False
     AbstractGenerateConnectorOnMachine.generate_on_machine = say_false
-    default_config_paths = os.path.join(
-        os.path.dirname(abstract_spinnaker_common.__file__),
-        AbstractSpiNNakerCommon.CONFIG_FILE_NAME)
-
-    config = load_config(
-        AbstractSpiNNakerCommon.CONFIG_FILE_NAME, default_config_paths)
+    machine = virtual_machine(2, 2)
+    p.setup(1.0)
+    config = globals_variables.get_simulator().config
     config.set("Simulation", "one_to_one_connection_dtcm_max_bytes", 40)
-
-    machine_time_step = 1000.0
-
-    placements = Placements()
-    pre_app_population = MockPopulation(10, "mock pop pre")
-    pre_app_vertex = SimpleApplicationVertex(10, label="pre")
-    pre_app_vertex.splitter = MockSplitter()
-    pre_app_vertex.splitter._called = True
-    pre_vertex_slice = Slice(0, 9)
-
-    post_app_population = MockPopulation(10, "mock pop post")
-    pre_vertex = pre_app_vertex.create_machine_vertex(
-        pre_vertex_slice, None)
-    placements.add_placement(Placement(pre_vertex, 0, 0, 1))
-    post_app_vertex = SimpleApplicationVertex(10, label="post")
-    post_app_vertex.splitter = MockSplitter()
-    post_app_vertex.splitter._called = True
-    post_vertex_slice = Slice(0, 9)
-    post_vertex = post_app_vertex.create_machine_vertex(
-        post_vertex_slice, None)
-    post_vertex_placement = Placement(post_vertex, 0, 0, 2)
-    placements.add_placement(post_vertex_placement)
-    delay_app_vertex = DelayExtensionVertex(
-        10, 16, 51, pre_app_vertex, label="delay")
-    delay_app_vertex.set_new_n_delay_stages_and_delay_per_stage(
-        16, 51)
-    delay_app_vertex.splitter = SplitterDelayVertexSlice(
-        pre_app_vertex.splitter)
-    delay_vertex = DelayExtensionMachineVertex(
-        resources_required=None, label="", constraints=[],
-        app_vertex=delay_app_vertex, vertex_slice=post_vertex_slice)
-    placements.add_placement(Placement(delay_vertex, 0, 0, 3))
-    one_to_one_connector_1 = OneToOneConnector(None)
-    direct_synapse_information_1 = SynapseInformation(
-        one_to_one_connector_1, pre_app_population, post_app_population,
-        False, False, None, SynapseDynamicsStatic(), 0, True, 1.5, 1.0)
-    one_to_one_connector_1.set_projection_information(
-        machine_time_step, direct_synapse_information_1)
-    one_to_one_connector_2 = OneToOneConnector(None)
-    direct_synapse_information_2 = SynapseInformation(
-        one_to_one_connector_2, pre_app_population, post_app_population,
-        False, False, None, SynapseDynamicsStatic(), 1, True, 2.5, 2.0)
-    one_to_one_connector_2.set_projection_information(
-        machine_time_step, direct_synapse_information_2)
-    all_to_all_connector = AllToAllConnector(False)
-    all_to_all_synapse_information = SynapseInformation(
-        all_to_all_connector, pre_app_population, post_app_population,
-        False, False, None, SynapseDynamicsStatic(), 0, True, 4.5, 4.0)
-    all_to_all_connector.set_projection_information(
-        machine_time_step, all_to_all_synapse_information)
+    p.set_number_of_neurons_per_core(p.IF_curr_exp, 100)
+    pre_pop = p.Population(
+        10, p.IF_curr_exp(), label="Pre",
+        additional_parameters={
+            "splitter": SplitterAbstractPopulationVertexSlice()})
+    post_pop = p.Population(
+        10, p.IF_curr_exp(), label="Post",
+        additional_parameters={
+            "splitter": SplitterAbstractPopulationVertexSlice()})
+    proj_one_to_one_1 = p.Projection(
+        pre_pop, post_pop, p.OneToOneConnector(),
+        p.StaticSynapse(weight=1.5, delay=1.0))
+    proj_one_to_one_2 = p.Projection(
+        pre_pop, post_pop, p.OneToOneConnector(),
+        p.StaticSynapse(weight=2.5, delay=2.0))
+    proj_all_to_all = p.Projection(
+        pre_pop, post_pop, p.AllToAllConnector(allow_self_connections=False),
+        p.StaticSynapse(weight=4.5, delay=4.0))
     from_list_list = [(i, i, i, (i * 5) + 1) for i in range(10)]
-    from_list_connector = FromListConnector(conn_list=from_list_list)
-    from_list_synapse_information = SynapseInformation(
-        from_list_connector, pre_app_population, post_app_population,
-        False, False, None, SynapseDynamicsStatic(), 0, True)
-    from_list_connector.set_projection_information(
-        machine_time_step, from_list_synapse_information)
-    app_edge = ProjectionApplicationEdge(
-        pre_app_vertex, post_app_vertex, direct_synapse_information_1)
-    app_edge.add_synapse_information(direct_synapse_information_2)
-    app_edge.add_synapse_information(all_to_all_synapse_information)
-    app_edge.add_synapse_information(from_list_synapse_information)
-    delay_edge = DelayedApplicationEdge(
-        delay_app_vertex, post_app_vertex, direct_synapse_information_1,
-        app_edge)
-    delay_edge.add_synapse_information(direct_synapse_information_2)
-    delay_edge.add_synapse_information(all_to_all_synapse_information)
-    delay_edge.add_synapse_information(from_list_synapse_information)
-    app_edge.delay_edge = delay_edge
-    machine_edge = MachineEdge(
-        pre_vertex, post_vertex, app_edge=app_edge)
-    delay_machine_edge = MachineEdge(
-        delay_vertex, post_vertex, app_edge=delay_edge)
-    partition_name = "TestPartition"
+    proj_from_list = p.Projection(
+        pre_pop, post_pop, p.FromListConnector(from_list_list),
+        p.StaticSynapse())
 
-    app_graph = ApplicationGraph("Test")
-    graph = MachineGraph("Test", app_graph)
-    graph.add_vertex(pre_vertex)
-    graph.add_vertex(post_vertex)
-    graph.add_vertex(delay_vertex)
-    graph.add_edge(machine_edge, partition_name)
-    graph.add_edge(delay_machine_edge, partition_name)
+    app_graph = globals_variables.get_simulator().original_application_graph
+    context = {
+        "MemoryApplicationGraph": app_graph
+    }
+    with (injection_context(context)):
+        delay_adder = DelaySupportAdder()
+        delay_adder.__call__(app_graph, 1000, 16.0)
+        partitioner = SpynnakerSplitterPartitioner()
+        machine_graph, _ = partitioner.__call__(app_graph, machine, 100)
+        allocator = ZonedRoutingInfoAllocator()
+        n_keys_mapper = EdgeToNKeysMapper()
+        n_keys_map = n_keys_mapper.__call__(machine_graph)
+        routing_info = allocator.__call__(
+            machine_graph, n_keys_map, flexible=False)
 
-    app_graph.add_vertex(pre_app_vertex)
-    app_graph.add_vertex(post_app_vertex)
-    app_graph.add_vertex(delay_app_vertex)
-    app_graph.add_edge(app_edge, partition_name)
-    app_graph.add_edge(delay_edge, partition_name)
-
-    routing_info = RoutingInfo()
-    key = 0
-    routing_info.add_partition_info(PartitionRoutingInfo(
-        [BaseKeyAndMask(key, 0xFFFFFFF0)],
-        graph.get_outgoing_edge_partition_starting_at_vertex(
-            pre_vertex, partition_name)))
-    delay_key = 0xF0
-    delay_key_and_mask = BaseKeyAndMask(delay_key, 0xFFFFFFF0)
-    delay_routing_info = PartitionRoutingInfo(
-        [delay_key_and_mask],
-        graph.get_outgoing_edge_partition_starting_at_vertex(
-            delay_vertex, partition_name))
-    routing_info.add_partition_info(delay_routing_info)
+    post_vertex = next(iter(post_pop._vertex.machine_vertices))
+    post_vertex_slice = post_vertex.vertex_slice
+    post_vertex_placement = Placement(post_vertex, 0, 0, 3)
 
     temp_spec = tempfile.mktemp()
     spec = DataSpecificationGenerator(io.FileIO(temp_spec, "wb"), None)
@@ -276,7 +140,7 @@ def test_write_data_spec():
         connection_builder_region=4)
     synaptic_matrices.write_synaptic_data(
         spec, post_vertex, all_syn_block_sz=10000, weight_scales=[32, 32],
-        routing_info=routing_info, machine_graph=graph)
+        routing_info=routing_info, machine_graph=machine_graph)
     spec.end_specification()
 
     with io.FileIO(temp_spec, "rb") as spec_reader:
@@ -295,8 +159,9 @@ def test_write_data_spec():
     try:
         connections_1 = numpy.concatenate(
             synaptic_matrices.get_connections_from_machine(
-                transceiver, post_vertex_placement, app_edge,
-                direct_synapse_information_1))
+                transceiver, post_vertex_placement,
+                proj_one_to_one_1._projection_edge,
+                proj_one_to_one_1._synapse_information))
 
         # Check that all the connections have the right weight and delay
         assert len(connections_1) == post_vertex_slice.n_atoms
@@ -305,8 +170,9 @@ def test_write_data_spec():
 
         connections_2 = numpy.concatenate(
             synaptic_matrices.get_connections_from_machine(
-                transceiver, post_vertex_placement, app_edge,
-                direct_synapse_information_2))
+                transceiver, post_vertex_placement,
+                proj_one_to_one_2._projection_edge,
+                proj_one_to_one_2._synapse_information))
 
         # Check that all the connections have the right weight and delay
         assert len(connections_2) == post_vertex_slice.n_atoms
@@ -315,19 +181,20 @@ def test_write_data_spec():
 
         connections_3 = numpy.concatenate(
             synaptic_matrices.get_connections_from_machine(
-                transceiver, post_vertex_placement, app_edge,
-                all_to_all_synapse_information))
+                transceiver, post_vertex_placement,
+                proj_all_to_all._projection_edge,
+                proj_all_to_all._synapse_information))
 
         # Check that all the connections have the right weight and delay
-        assert len(connections_3) == \
-            post_vertex_slice.n_atoms * pre_vertex_slice.n_atoms
+        assert len(connections_3) == 100
         assert all([conn["weight"] == 4.5 for conn in connections_3])
         assert all([conn["delay"] == 4.0 for conn in connections_3])
 
         connections_4 = numpy.concatenate(
             synaptic_matrices.get_connections_from_machine(
-                transceiver, post_vertex_placement, app_edge,
-                from_list_synapse_information))
+                transceiver, post_vertex_placement,
+                proj_from_list._projection_edge,
+                proj_from_list._synapse_information))
 
         # Check that all the connections have the right weight and delay
         assert len(connections_4) == len(from_list_list)
@@ -503,124 +370,71 @@ def test_set_synapse_dynamics():
 
 
 @pytest.mark.parametrize(
-    "undelayed_indices_connected,delayed_indices_connected, expect_app_keys", [
+    "undelayed_indices_connected,delayed_indices_connected,expect_app_keys", [
         # Only undelayed, all edges exist
-        (set(range(10)), None, True),
+        (range(10), [], True),
         # Only delayed, all edges exist
-        (None, set(range(10)), True),
+        ([], range(10), True),
         # All undelayed and delayed edges exist
-        (set(range(10)), set(range(10)), True),
+        (range(10), range(10), True),
         # Only undelayed, some edges are filtered (app keys shouldn't work)
-        ({0, 1, 2, 3, 4}, None, False),
+        ([0, 1, 2, 3, 4], [], False),
         # Only delayed, some edges are filtered (app keys shouldn't work)
-        (None, {5, 6, 7, 8, 9}, False),
+        ([], [5, 6, 7, 8, 9], False),
         # Both delayed and undelayed, some undelayed edges don't exist
-        ({3, 4, 5, 6, 7}, set(range(10)), False),
+        # (app keys work because undelayed aren't filtered)
+        ([3, 4, 5, 6, 7], range(10), True),
         # Both delayed and undelayed, some delayed edges don't exist
-        (set(range(10)), {4, 5, 6, 7}, False)
+        # (app keys work because all undelayed exist)
+        (range(10), [4, 5, 6, 7], True)
     ])
 def test_pop_based_master_pop_table_standard(
         undelayed_indices_connected, delayed_indices_connected,
         expect_app_keys):
-    MockSimulator.setup()
-    # Add an sdram so max SDRAM is high enough
-    SDRAM(4000000)
+    machine = virtual_machine(2, 2)
+
+    # Build a from list connector with the delays we want
+    connections = []
+    connections.extend([(i * 100 + j, j, 0, 10)
+                        for i in undelayed_indices_connected
+                        for j in range(100)])
+    connections.extend([(i * 100 + j, j, 0, 20)
+                        for i in delayed_indices_connected
+                        for j in range(100)])
 
     # Make simple source and target, where the source has 1000 atoms
     # split into 10 vertices (100 each) and the target has 100 atoms in
     # a single vertex
-    app_graph = ApplicationGraph("Test")
-    mac_graph = MachineGraph("Test", app_graph)
-    pre_app_vertex = SimpleApplicationVertex(1000)
-    pre_app_vertex.splitter = MockSplitter()
-    app_graph.add_vertex(pre_app_vertex)
-    post_vertex_slice = Slice(0, 99)
-    post_app_vertex = SimpleApplicationVertex(100)
-    post_app_vertex.splitter = MockSplitter()
-    app_graph.add_vertex(post_app_vertex)
-    post_mac_vertex = post_app_vertex.create_machine_vertex(
-        post_vertex_slice, None)
-    mac_graph.add_vertex(post_mac_vertex)
+    p.setup(1.0)
+    p.set_number_of_neurons_per_core(p.IF_curr_exp, 100)
+    pre_pop = p.Population(
+        1000, p.IF_curr_exp(), label="Pre",
+        additional_parameters={
+            "splitter": SplitterAbstractPopulationVertexSlice()})
+    post_pop = p.Population(
+        100, p.IF_curr_exp(), label="Post",
+        additional_parameters={
+            "splitter": SplitterAbstractPopulationVertexSlice()})
+    p.Projection(
+        pre_pop, post_pop, p.FromListConnector(connections), p.StaticSynapse())
 
-    # Create the pre-machine-vertices
-    for i in range(10):
-        pre_mac_slice = Slice(i * 100, ((i + 1) * 100) - 1)
-        pre_mac_vertex = pre_app_vertex.create_machine_vertex(
-            pre_mac_slice, None)
-        mac_graph.add_vertex(pre_mac_vertex)
+    app_graph = globals_variables.get_simulator().original_application_graph
+    context = {
+        "MemoryApplicationGraph": app_graph
+    }
+    with (injection_context(context)):
+        delay_adder = DelaySupportAdder()
+        delay_adder.__call__(app_graph, 1000, 16.0)
+        partitioner = SpynnakerSplitterPartitioner()
+        machine_graph, _ = partitioner.__call__(app_graph, machine, 100)
+        allocator = ZonedRoutingInfoAllocator()
+        n_keys_mapper = EdgeToNKeysMapper()
+        n_keys_map = n_keys_mapper.__call__(machine_graph)
+        routing_info = allocator.__call__(
+            machine_graph, n_keys_map, flexible=False)
 
-    # Add delays if needed
-    if delayed_indices_connected:
-        pre_app_delay_vertex = DelayExtensionVertex(
-            1000, 16.0, 4, pre_app_vertex)
-        pre_app_delay_vertex.set_new_n_delay_stages_and_delay_per_stage(
-            16, 20)
-        app_graph.add_vertex(pre_app_delay_vertex)
-
-        for i in range(10):
-            pre_mac_slice = Slice(i * 100, ((i + 1) * 100) - 1)
-            pre_mac_vertex = DelayExtensionMachineVertex(
-                None, "", [], pre_app_delay_vertex, pre_mac_slice)
-            mac_graph.add_vertex(pre_mac_vertex)
-
-    # Make the routing info line up to force an app key in the pop table if
-    # the constraints match up
-    routing_info = RoutingInfo()
-    n_key_bits = int(math.ceil(math.log(100, 2)))
-    n_keys = 2**n_key_bits
-    mask = 0xFFFFFFFF - (n_keys - 1)
-
-    # Build a from list connector that is really an all-to-all connector,
-    # but with delays that depend on what types of connection we want
-    delays = []
-    if undelayed_indices_connected:
-        delays.append(10)
-    if delayed_indices_connected:
-        delays.append(20)
-    connections = [(i, j, 0, delays[i % len(delays)])
-                   for i in range(1000) for j in range(100)]
-    connector = FromListConnector(connections)
-    synapse_dynamics = SynapseDynamicsStatic()
-    synapse_info = SynapseInformation(
-        connector, pre_app_vertex, post_app_vertex, False, False, None,
-        synapse_dynamics, 0, True)
-
-    # Create the application edge
-    app_edge = ProjectionApplicationEdge(
-        pre_app_vertex, post_app_vertex, synapse_info)
-    app_graph.add_edge(app_edge, "Test")
-
-    # Create the machine edges
-    for pre_mac_vertex in pre_app_vertex.machine_vertices:
-        i = pre_mac_vertex.index
-        mac_edge = MachineEdge(
-            pre_mac_vertex, post_mac_vertex, app_edge=app_edge)
-        if undelayed_indices_connected and i in undelayed_indices_connected:
-            mac_graph.add_edge(mac_edge, "Test")
-            partition = mac_graph.get_outgoing_partition_for_edge(mac_edge)
-            partition_info = PartitionRoutingInfo(
-                [BaseKeyAndMask(i * n_keys, mask)], partition)
-            routing_info.add_partition_info(partition_info)
-
-    # Create the delay application edge and delay machine edges
-    if delayed_indices_connected:
-        delay_app_edge = DelayedApplicationEdge(
-            pre_app_delay_vertex, post_app_vertex, synapse_info, app_edge)
-        app_edge.delay_edge = delay_app_edge
-        app_graph.add_edge(delay_app_edge, "Test")
-
-        base_d_key = 16 * n_keys
-        for pre_mac_vertex in pre_app_delay_vertex.machine_vertices:
-            i = pre_mac_vertex.index
-            mac_edge = MachineEdge(
-                pre_mac_vertex, post_mac_vertex, app_edge=delay_app_edge)
-            if i in delayed_indices_connected:
-                mac_graph.add_edge(mac_edge, "Test")
-                partition = mac_graph.get_outgoing_partition_for_edge(mac_edge)
-                partition_info = PartitionRoutingInfo(
-                    [BaseKeyAndMask(base_d_key + (i * n_keys), mask)],
-                    partition)
-                routing_info.add_partition_info(partition_info)
+    post_mac_vertex = next(iter(post_pop._vertex.machine_vertices))
+    post_vertex_slice = post_mac_vertex.vertex_slice
 
     # Generate the data
     temp_spec = tempfile.mktemp()
@@ -633,7 +447,7 @@ def test_pop_based_master_pop_table_standard(
     synaptic_matrices.write_synaptic_data(
         spec, post_mac_vertex, all_syn_block_sz=1000000,
         weight_scales=[32, 32], routing_info=routing_info,
-        machine_graph=mac_graph)
+        machine_graph=machine_graph)
 
     with io.FileIO(temp_spec, "rb") as spec_reader:
         executor = DataSpecificationExecutor(
@@ -651,19 +465,30 @@ def test_pop_based_master_pop_table_standard(
     expected_n_entries = 0
     expected_n_addresses = 0
     if expect_app_keys:
-        n_app_entries = (int(bool(undelayed_indices_connected)) +
-                         int(bool(delayed_indices_connected)))
+        # Always one for undelayed, maybe one for delayed if present
+        n_app_entries = 1 + int(bool(delayed_indices_connected))
         expected_n_entries += n_app_entries
-        # 2 addresses for an app key because of the extra info
-        expected_n_addresses += n_app_entries * 2
+        # 2 address list entries for each entry, as there is also extra_info
+        expected_n_addresses += 2 * n_app_entries
+
+    # If both delayed and undelayed, there are 2 entries for each incoming
+    # machine edge
+    elif delayed_indices_connected and undelayed_indices_connected:
+            all_connected = set(undelayed_indices_connected)
+            all_connected.update(delayed_indices_connected)
+            expected_n_entries += len(all_connected)
+            expected_n_addresses += len(all_connected)
+
+    # If there are only undelayed indices, there is an entry for each
+    elif undelayed_indices_connected:
+        expected_n_entries += len(undelayed_indices_connected)
+        expected_n_addresses += len(undelayed_indices_connected)
+
+    # If there are only delayed indices, there are two entries for each because
+    # the undelayed ones are still connected
     else:
-        # An entry and address for each incoming machine edge
-        if undelayed_indices_connected:
-            expected_n_entries += len(undelayed_indices_connected)
-            expected_n_addresses += len(undelayed_indices_connected)
-        if delayed_indices_connected:
-            expected_n_entries += len(delayed_indices_connected)
-            expected_n_addresses += len(delayed_indices_connected)
+        expected_n_entries += 2 * len(delayed_indices_connected)
+        expected_n_addresses += 2 * len(delayed_indices_connected)
 
     assert(n_entries == expected_n_entries)
     assert(n_addresses == expected_n_addresses)

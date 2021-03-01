@@ -244,10 +244,34 @@ class _MasterPopEntry(object):
     @property
     def mask(self):
         """
-        :return: the mask of the key for this master pop entry
+        :return: the mask of the key for this entry
         :rtype: int
         """
         return self.__mask
+
+    @property
+    def core_mask(self):
+        """
+        :return: the mask of the key once shifted to get the source core ID
+        :rtype: int
+        """
+        return self.__core_mask
+
+    @property
+    def core_shift(self):
+        """
+        :return: the shift of the key to get the source core ID
+        :rtype: int
+        """
+        return self.__core_shift
+
+    @property
+    def n_neurons(self):
+        """
+        :return: the number of neurons per source core
+        :rtype: int
+        """
+        return self.__n_neurons
 
     @property
     def addresses_and_row_lengths(self):
@@ -468,20 +492,6 @@ class MasterPopTableAsBinarySearch(object):
         :raises ~spynnaker.pyNN.exceptions.SynapticConfigurationException:
             If a bad address is used.
         """
-
-        # pylint: disable=too-many-arguments, arguments-differ
-        if key_and_mask.key not in self.__entries:
-            if self.__n_addresses > _MAX_ADDRESS_START:
-                raise SynapticConfigurationException(
-                    "The table already contains {} entries;"
-                    " adding another is too many".format(self.__n_addresses))
-            self.__entries[key_and_mask.key] = _MasterPopEntry(
-                key_and_mask.key, key_and_mask.mask, core_mask, core_shift,
-                n_neurons)
-            # Need to add an extra "address" for the extra_info if needed
-            if core_mask != 0:
-                self.__n_addresses += 1
-
         # if not single, scale the address
         start_addr = block_start_addr
         if not is_single:
@@ -495,13 +505,64 @@ class MasterPopTableAsBinarySearch(object):
                     "Address {} is too big for this table".format(
                         block_start_addr))
         row_length = self.get_allowed_row_length(row_length)
-        index = self.__entries[key_and_mask.key].append(
-            start_addr, row_length - 1, is_single)
+
+        entry = self.__add_entry(
+            key_and_mask, core_mask, core_shift, n_neurons)
+        index = entry.append(start_addr, row_length - 1, is_single)
         self.__n_addresses += 1
         return index
 
-    def add_invalid_entry(
+    def add_invalid_machine_entry(self, key_and_mask):
+        """ Add an entry to the table from a machine vertex that doesn't point
+            to anywhere.  Used to keep indices in synchronisation between e.g.
+            normal and delay entries and between entries on different cores.
+
+        :param ~pacman.model.routing_info.BaseKeyAndMask key_and_mask:
+            a key_and_mask object used as part of describing
+            an edge that will require being received to be stored in the
+            master pop table; the whole edge will become multiple calls to
+            this function
+        :return: The index of the added entry
+        :rtype: int
+        """
+        return self.__add_invalid_entry(key_and_mask, 0, 0, 0)
+
+    def add_invalid_application_entry(
             self, key_and_mask, core_mask=0, core_shift=0, n_neurons=0):
+        """ Add an entry to the table from an application vertex that doesn't
+            point to anywhere.  Used to keep indices in synchronisation between
+            e.g. normal and delay entries and between entries on different
+            cores.
+
+        :param ~pacman.model.routing_info.BaseKeyAndMask key_and_mask:
+            a key_and_mask object used as part of describing
+            an edge that will require being received to be stored in the
+            master pop table; the whole edge will become multiple calls to
+            this function
+        :param int core_mask:
+            Mask for the part of the key that identifies the core
+        :param int core_shift: The shift of the mask to get to the core_mask
+        :param int n_neurons:
+            The number of neurons in each machine vertex (bar the last)
+        :return: The index of the added entry
+        :rtype: int
+        """
+        # If there are too many neurons per core, fail
+        if n_neurons > _MAX_N_NEURONS:
+            raise SynapticConfigurationException(
+                "The parameter n_neurons of {} is too big (maximum {})".format(
+                    n_neurons, _MAX_N_NEURONS))
+
+        # If the core mask is too big, fail
+        if core_mask > _MAX_CORE_MASK:
+            raise SynapticConfigurationException(
+                "The core mask of {} is too big (maximum {})".format(
+                    core_mask, _MAX_CORE_MASK))
+        return self.__add_invalid_entry(
+            key_and_mask, core_mask, core_shift, n_neurons)
+
+    def __add_invalid_entry(
+            self, key_and_mask, core_mask, core_shift, n_neurons):
         """ Add an entry to the table that doesn't point to anywhere.  Used
             to keep indices in synchronisation between e.g. normal and delay
             entries and between entries on different cores.
@@ -519,16 +580,41 @@ class MasterPopTableAsBinarySearch(object):
         :return: The index of the added entry
         :rtype: int
         """
+        entry = self.__add_entry(
+            key_and_mask, core_mask, core_shift, n_neurons)
+        index = entry.append_invalid()
+        self.__n_addresses += 1
+        return index
+
+    def __add_entry(self, key_and_mask, core_mask, core_shift, n_neurons):
+        if self.__n_addresses >= _MAX_ADDRESS_START:
+            raise SynapticConfigurationException(
+                "The table already contains {} entries;"
+                " adding another is too many".format(self.__n_addresses))
         if key_and_mask.key not in self.__entries:
-            self.__entries[key_and_mask.key] = _MasterPopEntry(
+            entry = _MasterPopEntry(
                 key_and_mask.key, key_and_mask.mask, core_mask, core_shift,
                 n_neurons)
+            self.__entries[key_and_mask.key] = entry
             # Need to add an extra "address" for the extra_info if needed
             if core_mask != 0:
                 self.__n_addresses += 1
-        index = self.__entries[key_and_mask.key].append_invalid()
-        self.__n_addresses += 1
-        return index
+            return entry
+        entry = self.__entries[key_and_mask.key]
+        if (key_and_mask.mask != entry.mask or
+                core_mask != entry.core_mask or
+                core_shift != entry.core_shift or
+                n_neurons != entry.n_neurons):
+            raise SynapticConfigurationException(
+                "Existing entry for key {} doesn't match one being added:"
+                " Existing mask: {} core_mask: {} core_shift: {}"
+                " n_neurons: {}"
+                " Adding mask: {} core_mask: {} core_shift: {}"
+                " n_neurons: {}".format(
+                    key_and_mask.key, entry.mask, entry.core_mask,
+                    entry.core_shift, entry.n_neurons, key_and_mask.mask,
+                    core_mask, core_shift, n_neurons))
+        return entry
 
     def finish_master_pop_table(self, spec, master_pop_table_region):
         """ Complete the master pop table in the data specification.

@@ -328,8 +328,10 @@ class SynapticMatrixApp(object):
 
         # If we have routing info but no synapses, write an invalid entry
         if self.__max_row_info.undelayed_max_n_synapses == 0:
-            self.__index = self.__poptable.add_invalid_entry(
-                self.__app_key_info.key_and_mask)
+            self.__index = self.__poptable.add_invalid_application_entry(
+                self.__app_key_info.key_and_mask,
+                self.__app_key_info.core_mask, self.__app_key_info.core_shift,
+                self.__app_key_info.n_neurons)
             return block_addr
 
         # Write a matrix for the whole application vertex
@@ -377,8 +379,11 @@ class SynapticMatrixApp(object):
 
         # If we have routing info but no synapses, write an invalid entry
         if self.__max_row_info.delayed_max_n_synapses == 0:
-            self.__delay_index = self.__poptable.add_invalid_entry(
-                self.__delay_app_key_info.key_and_mask)
+            self.__delay_index = self.__poptable.add_invalid_application_entry(
+                self.__delay_app_key_info.key_and_mask,
+                self.__delay_app_key_info.core_mask,
+                self.__delay_app_key_info.core_shift,
+                self.__delay_app_key_info.n_neurons)
             return block_addr
 
         # Write a matrix for the whole application vertex
@@ -603,8 +608,10 @@ class SynapticMatrixApp(object):
 
         # If we have routing info but no synapses, write an invalid entry
         if self.__max_row_info.undelayed_max_n_synapses == 0:
-            self.__index = self.__poptable.add_invalid_entry(
-                self.__app_key_info.key_and_mask)
+            self.__index = self.__poptable.add_invalid_application_entry(
+                self.__app_key_info.key_and_mask,
+                self.__app_key_info.core_mask, self.__app_key_info.core_shift,
+                self.__app_key_info.n_neurons)
             return block_addr, SYN_REGION_UNUSED, None
 
         block_addr = self.__poptable.get_next_allowed_address(block_addr)
@@ -631,8 +638,11 @@ class SynapticMatrixApp(object):
 
         # If we have routing info but no synapses, write an invalid entry
         if self.__max_row_info.delayed_max_n_synapses == 0:
-            self.__delay_index = self.__poptable.add_invalid_entry(
-                self.__delay_app_key_info.key_and_mask)
+            self.__delay_index = self.__poptable.add_invalid_application_entry(
+                self.__delay_app_key_info.key_and_mask,
+                self.__delay_app_key_info.core_mask,
+                self.__delay_app_key_info.core_shift,
+                self.__delay_app_key_info.n_neurons)
             return block_addr, SYN_REGION_UNUSED, None
 
         block_addr = self.__poptable.get_next_allowed_address(block_addr)

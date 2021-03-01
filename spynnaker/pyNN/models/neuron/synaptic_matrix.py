@@ -219,7 +219,7 @@ class SynapticMatrix(object):
 
         # If we have routing info but no synapses, write an invalid entry
         if self.__max_row_info.undelayed_max_n_synapses == 0:
-            self.__index = self.__poptable.add_invalid_entry(
+            self.__index = self.__poptable.add_invalid_machine_entry(
                 self.__routing_info.first_key_and_mask)
             return block_addr, single_addr
 
@@ -259,7 +259,7 @@ class SynapticMatrix(object):
 
         # If we have routing info but no synapses, write an invalid entry
         if self.__max_row_info.delayed_max_n_synapses == 0:
-            self.__delay_index = self.__poptable.add_invalid_entry(
+            self.__delay_index = self.__poptable.add_invalid_machine_entry(
                 self.__delay_routing_info.first_key_and_mask)
             return block_addr
 
@@ -317,7 +317,7 @@ class SynapticMatrix(object):
 
         # If we have routing info but no synapses, add an invalid entry
         if self.__max_row_info.undelayed_max_n_synapses == 0:
-            self.__index = self.__poptable.add_invalid_entry(
+            self.__index = self.__poptable.add_invalid_machine_entry(
                 self.__routing_info.first_key_and_mask)
             return block_addr, SYN_REGION_UNUSED
 
@@ -346,7 +346,7 @@ class SynapticMatrix(object):
 
         # If we have routing info but no synapses, add an invalid entry
         if self.__max_row_info.delayed_max_n_synapses == 0:
-            self.__delay_index = self.__poptable.add_invalid_entry(
+            self.__delay_index = self.__poptable.add_invalid_machine_entry(
                 self.__delay_routing_info.first_key_and_mask)
             return block_addr, SYN_REGION_UNUSED
 
