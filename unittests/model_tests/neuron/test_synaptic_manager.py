@@ -471,13 +471,13 @@ def test_pop_based_master_pop_table_standard(
         # 2 address list entries for each entry, as there is also extra_info
         expected_n_addresses += 2 * n_app_entries
 
-    # If both delayed and undelayed, there are 2 entries for each incoming
+    # If both delayed and undelayed, there is an entry for each incoming
     # machine edge
     elif delayed_indices_connected and undelayed_indices_connected:
-            all_connected = set(undelayed_indices_connected)
-            all_connected.update(delayed_indices_connected)
-            expected_n_entries += len(all_connected)
-            expected_n_addresses += len(all_connected)
+        all_connected = set(undelayed_indices_connected)
+        all_connected.update(delayed_indices_connected)
+        expected_n_entries += len(all_connected)
+        expected_n_addresses += len(all_connected)
 
     # If there are only undelayed indices, there is an entry for each
     elif undelayed_indices_connected:
