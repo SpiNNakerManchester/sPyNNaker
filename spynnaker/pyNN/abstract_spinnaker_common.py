@@ -35,6 +35,8 @@ from spynnaker import __version__ as version
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
+CONFIG_FILE_NAME = "spynnaker.cfg"
+
 
 class AbstractSpiNNakerCommon(
         AbstractSpinnakerBase, SpynnakerSimulatorInterface,
@@ -52,9 +54,11 @@ class AbstractSpiNNakerCommon(
         "_populations",
         "_projections"]
 
-    CONFIG_FILE_NAME = "spynnaker.cfg"
-
     __EXECUTABLE_FINDER = ExecutableFinder()
+
+    @staticmethod
+    def extended_config_path():
+        return os.path.join(os.path.dirname(__file__), CONFIG_FILE_NAME)
 
     def __init__(
             self, graph_label, database_socket_addresses, n_chips_required,
@@ -130,16 +134,14 @@ class AbstractSpiNNakerCommon(
             versions.extend(front_end_versions)
 
         super().__init__(
-            configfile=self.CONFIG_FILE_NAME,
+            configfile=CONFIG_FILE_NAME,
             executable_finder=self.__EXECUTABLE_FINDER,
             graph_label=graph_label,
             database_socket_addresses=database_socket_addresses,
             extra_algorithm_xml_paths=extra_algorithm_xml_path,
             n_chips_required=n_chips_required,
             n_boards_required=n_boards_required,
-            default_config_paths=[
-                os.path.join(os.path.dirname(__file__),
-                             self.CONFIG_FILE_NAME)],
+            default_config_paths=[self.extended_config_path()],
             front_end_versions=versions)
 
         # update inputs needed by the machine level calls.
