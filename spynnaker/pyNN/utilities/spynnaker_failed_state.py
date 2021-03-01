@@ -15,7 +15,6 @@
 
 import logging
 from spinn_utilities.abstract_base import AbstractBase
-import spinn_utilities.conf_loader as conf_loader
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.interface.config_handler import ConfigHandler
