@@ -914,21 +914,6 @@ class AbstractPopulationVertex(
     @overrides(AbstractAcceptsIncomingSynapses.get_connections_from_machine)
     def get_connections_from_machine(
             self, transceiver, placements, app_edge, synapse_info):
-        """ Read the connections from the machine for a given projection.
-
-        :param ~spinnman.transciever.Transceiver transceiver:
-            Used to read the data from the machine
-        :param ~pacman.model.placements.Placements placements:
-            Where the vertices are on the machine
-        :param ProjectionApplicationEdge app_edge:
-            The application edge of the projection
-        :param SynapseInformation synapse_info:
-            The synapse information of the projection
-        :return: The connections from the machine, with dtype
-            AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
-        :rtype: ~numpy.ndarray
-        """
-
         # Start with something in the list so that concatenate works
         connections = [numpy.zeros(
                 0, dtype=AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE)]
