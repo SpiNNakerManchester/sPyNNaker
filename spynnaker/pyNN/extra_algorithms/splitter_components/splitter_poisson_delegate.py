@@ -38,9 +38,6 @@ class SplitterPoissonDelegate(SpynnakerSplitterSliceLegacy):
         "SpikeSourcePoissonVertex. Please use the correct splitter for "
         "your vertex and try again.")
 
-    def __init__(self):
-        super(SplitterPoissonDelegate, self).__init__()
-
     @property
     def send_over_sdram(self):
         """ Determine if this vertex is to be sent using SDRAM

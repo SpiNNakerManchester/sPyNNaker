@@ -17,8 +17,7 @@ class ReceivesSynapticInputsOverSDRAM(AbstractSupportsSDRAMEdges):
         scales.
     """
 
-    """ The size of each input in bytes
-    """
+    # The size of each input in bytes
     N_BYTES_PER_INPUT = BYTES_PER_SHORT
 
     @abstractproperty
