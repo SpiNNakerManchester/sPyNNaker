@@ -380,6 +380,7 @@ def float_gcd_of_array(input):
 
     return gcd
 
+
 def moved_in_v6(old_location, new_location):
     """
     Warns the users that they are using an old import.
