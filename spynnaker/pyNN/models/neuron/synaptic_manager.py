@@ -15,7 +15,6 @@
 
 import sys
 import numpy
-
 from collections import defaultdict
 
 from spinn_utilities.progress_bar import ProgressBar
@@ -25,6 +24,7 @@ from spinn_front_end_common.utilities.helpful_functions import read_config
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.utility_objs\
     .provenance_data_item import ProvenanceDataItem
+
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.neuron.synapse_io import SynapseIORowBased
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
