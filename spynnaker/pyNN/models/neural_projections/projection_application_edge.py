@@ -22,7 +22,7 @@ from spinn_front_end_common.interface.provenance import (
 _DynamicsStructural = None
 
 
-def _are_dynamics_structural(synapse_dynamics):
+def are_dynamics_structural(synapse_dynamics):
     global _DynamicsStructural
     if _DynamicsStructural is None:
         # Avoid import loop by postponing this import
@@ -130,7 +130,7 @@ class ProjectionApplicationEdge(
     def could_connect(self, pre_slice, post_slice):
         for synapse_info in self.__synapse_information:
             # Structual Plasticity can learn connection not originally included
-            if _are_dynamics_structural(synapse_info.synapse_dynamics):
+            if are_dynamics_structural(synapse_info.synapse_dynamics):
                 return True
             if synapse_info.connector.could_connect(
                     synapse_info, pre_slice, post_slice):
