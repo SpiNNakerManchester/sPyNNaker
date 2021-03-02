@@ -119,7 +119,7 @@ which allows a syntax like:</p>
 <em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">celltype</span></code><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.celltype" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>AbstractPyNNModel</p>
+<dd class="field-odd"><p><a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel" title="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel">AbstractPyNNModel</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -252,7 +252,7 @@ simulation timestep.</p></li>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>size</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of neurons in the population</p></li>
-<li><p><strong>cellclass</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#type" title="(in Python v3.8)"><em>type</em></a><em> or </em><em>AbstractPyNNModel</em>) – The implementation of the individual neurons.</p></li>
+<li><p><strong>cellclass</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#type" title="(in Python v3.8)"><em>type</em></a><em> or </em><a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel" title="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel"><em>AbstractPyNNModel</em></a>) – The implementation of the individual neurons.</p></li>
 <li><p><strong>cellparams</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><em>object</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – Parameters to pass to <code class="docutils literal notranslate"><span class="pre">cellclass</span></code> if it
 is a class to instantiate. Must be <code class="docutils literal notranslate"><span class="pre">None</span></code> if <code class="docutils literal notranslate"><span class="pre">cellclass</span></code> is an
 instantiated object.</p></li>
@@ -334,7 +334,7 @@ instantiated object.</p></li>
 <dd class="field-odd"><p>The celltype this property has been set to</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p>AbstractPyNNModel</p>
+<dd class="field-even"><p><a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel" title="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel">AbstractPyNNModel</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -357,7 +357,7 @@ instantiated object.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>cellclass</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#type" title="(in Python v3.8)"><em>type</em></a><em> or </em><em>AbstractPyNNModel</em>) – see <code class="xref py py-meth docutils literal notranslate"><span class="pre">__init__()</span></code></p></li>
+<li><p><strong>cellclass</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#type" title="(in Python v3.8)"><em>type</em></a><em> or </em><a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel" title="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel"><em>AbstractPyNNModel</em></a>) – see <code class="xref py py-meth docutils literal notranslate"><span class="pre">__init__()</span></code></p></li>
 <li><p><strong>cellparams</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><em>object</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – see <code class="xref py py-meth docutils literal notranslate"><span class="pre">__init__()</span></code></p></li>
 <li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – see <code class="xref py py-meth docutils literal notranslate"><span class="pre">__init__()</span></code> (<code class="docutils literal notranslate"><span class="pre">size</span></code> parameter)</p></li>
 </ul>
@@ -1327,7 +1327,7 @@ i.e. if <cite>p.size == 5</cite> then:</p>
 <dd><p>The type of neurons making up the underlying Population.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>AbstractPyNNModel</p>
+<dd class="field-odd"><p><a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel" title="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel">AbstractPyNNModel</a></p>
 </dd>
 </dl>
 </dd></dl>

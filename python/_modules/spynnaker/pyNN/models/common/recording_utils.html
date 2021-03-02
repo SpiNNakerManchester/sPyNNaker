@@ -62,7 +62,7 @@
 <span class="n">_RECORDING_COUNT</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">Struct</span><span class="p">(</span><span class="s2">&quot;&lt;I&quot;</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="get_recording_region_size_in_bytes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.get_recording_region_size_in_bytes">[docs]</a><span class="k">def</span> <span class="nf">get_recording_region_size_in_bytes</span><span class="p">(</span>
+<div class="viewcode-block" id="get_recording_region_size_in_bytes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.recording_utils.get_recording_region_size_in_bytes">[docs]</a><span class="k">def</span> <span class="nf">get_recording_region_size_in_bytes</span><span class="p">(</span>
         <span class="n">n_machine_time_steps</span><span class="p">,</span> <span class="n">bytes_per_timestep</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Get the size of a recording region in bytes.</span>
 
@@ -77,7 +77,7 @@
             <span class="p">(</span><span class="n">n_machine_time_steps</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="get_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.get_data">[docs]</a><span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">region_size</span><span class="p">):</span>
+<div class="viewcode-block" id="get_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.recording_utils.get_data">[docs]</a><span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">region_size</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Get the recorded data from a region.</span>
 
 <span class="sd">    :param ~spinnman.transceiver.Transceiver transceiver:</span>
@@ -106,7 +106,7 @@
         <span class="n">number_of_bytes_written</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="pull_off_cached_lists"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.pull_off_cached_lists">[docs]</a><span class="k">def</span> <span class="nf">pull_off_cached_lists</span><span class="p">(</span><span class="n">no_loads</span><span class="p">,</span> <span class="n">cache_file</span><span class="p">):</span>
+<div class="viewcode-block" id="pull_off_cached_lists"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.recording_utils.pull_off_cached_lists">[docs]</a><span class="k">def</span> <span class="nf">pull_off_cached_lists</span><span class="p">(</span><span class="n">no_loads</span><span class="p">,</span> <span class="n">cache_file</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Extracts numpy based data from a file</span>
 
 <span class="sd">    :param int no_loads: the number of numpy elements in the file</span>
@@ -131,7 +131,7 @@
     <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">lists</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="needs_buffering"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.needs_buffering">[docs]</a><span class="k">def</span> <span class="nf">needs_buffering</span><span class="p">(</span><span class="n">buffer_max</span><span class="p">,</span> <span class="n">space_needed</span><span class="p">,</span> <span class="n">enable_buffered_recording</span><span class="p">):</span>
+<div class="viewcode-block" id="needs_buffering"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.recording_utils.needs_buffering">[docs]</a><span class="k">def</span> <span class="nf">needs_buffering</span><span class="p">(</span><span class="n">buffer_max</span><span class="p">,</span> <span class="n">space_needed</span><span class="p">,</span> <span class="n">enable_buffered_recording</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param int buffer_max:</span>
 <span class="sd">    :param int space_needed:</span>
@@ -147,7 +147,7 @@
     <span class="k">return</span> <span class="kc">False</span></div>
 
 
-<div class="viewcode-block" id="get_buffer_sizes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.get_buffer_sizes">[docs]</a><span class="k">def</span> <span class="nf">get_buffer_sizes</span><span class="p">(</span><span class="n">buffer_max</span><span class="p">,</span> <span class="n">space_needed</span><span class="p">,</span> <span class="n">enable_buffered_recording</span><span class="p">):</span>
+<div class="viewcode-block" id="get_buffer_sizes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.recording_utils.get_buffer_sizes">[docs]</a><span class="k">def</span> <span class="nf">get_buffer_sizes</span><span class="p">(</span><span class="n">buffer_max</span><span class="p">,</span> <span class="n">space_needed</span><span class="p">,</span> <span class="n">enable_buffered_recording</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param int buffer_max:</span>
 <span class="sd">    :param int space_needed:</span>
@@ -163,14 +163,14 @@
     <span class="k">return</span> <span class="n">space_needed</span></div>
 
 
-<span class="k">def</span> <span class="nf">make_missing_string</span><span class="p">(</span><span class="n">missing</span><span class="p">):</span>
+<div class="viewcode-block" id="make_missing_string"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.recording_utils.make_missing_string">[docs]</a><span class="k">def</span> <span class="nf">make_missing_string</span><span class="p">(</span><span class="n">missing</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param iterable(~pacman.model.placements.Placement) missing:</span>
 <span class="sd">    :rtype: str</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="s2">&quot;; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
         <span class="s2">&quot;(</span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">placement</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">placement</span> <span class="ow">in</span> <span class="n">missing</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">placement</span> <span class="ow">in</span> <span class="n">missing</span><span class="p">)</span></div>
 </pre></div>
 
             <div class="clearer"></div>

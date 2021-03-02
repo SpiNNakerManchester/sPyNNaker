@@ -1,0 +1,167 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>spynnaker.pyNN.exceptions &#8212; sPyNNaker  documentation</title>
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/sphinxdoc.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.exceptions</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for spynnaker.pyNN.exceptions</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2017-2019 The University of Manchester</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.exceptions</span> <span class="kn">import</span> <span class="n">ConfigurationException</span>
+
+
+<div class="viewcode-block" id="SpynnakerException"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.exceptions.SpynnakerException">[docs]</a><span class="k">class</span> <span class="nc">SpynnakerException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Superclass of all exceptions from the PyNN module.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="MemReadException"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.exceptions.MemReadException">[docs]</a><span class="k">class</span> <span class="nc">MemReadException</span><span class="p">(</span><span class="n">SpynnakerException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Raised when the PyNN front end fails to read a certain memory region.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="FilterableException"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.exceptions.FilterableException">[docs]</a><span class="k">class</span> <span class="nc">FilterableException</span><span class="p">(</span><span class="n">SpynnakerException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Raised when it is not possible to determine if an edge should be\</span>
+<span class="sd">        filtered.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="SynapticConfigurationException"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.exceptions.SynapticConfigurationException">[docs]</a><span class="k">class</span> <span class="nc">SynapticConfigurationException</span><span class="p">(</span><span class="n">ConfigurationException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Raised when the synaptic manager fails for some reason.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="SynapticBlockGenerationException"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.exceptions.SynapticBlockGenerationException">[docs]</a><span class="k">class</span> <span class="nc">SynapticBlockGenerationException</span><span class="p">(</span><span class="n">ConfigurationException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Raised when the synaptic manager fails to generate a synaptic block.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="SynapticBlockReadException"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.exceptions.SynapticBlockReadException">[docs]</a><span class="k">class</span> <span class="nc">SynapticBlockReadException</span><span class="p">(</span><span class="n">ConfigurationException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Raised when the synaptic manager fails to read a synaptic block or\</span>
+<span class="sd">        convert it into readable values.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="SynapticMaxIncomingAtomsSupportException"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.exceptions.SynapticMaxIncomingAtomsSupportException">[docs]</a><span class="k">class</span> <span class="nc">SynapticMaxIncomingAtomsSupportException</span><span class="p">(</span><span class="n">ConfigurationException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Raised when a synaptic sublist exceeds the max atoms possible to be\</span>
+<span class="sd">        supported.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="DelayExtensionException"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.exceptions.DelayExtensionException">[docs]</a><span class="k">class</span> <span class="nc">DelayExtensionException</span><span class="p">(</span><span class="n">ConfigurationException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Raised when a delay extension vertex fails.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="SpynnakerSplitterConfigurationException"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.exceptions.SpynnakerSplitterConfigurationException">[docs]</a><span class="k">class</span> <span class="nc">SpynnakerSplitterConfigurationException</span><span class="p">(</span><span class="n">ConfigurationException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Raised when a splitter configuration fails.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="InvalidParameterType"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.exceptions.InvalidParameterType">[docs]</a><span class="k">class</span> <span class="nc">InvalidParameterType</span><span class="p">(</span><span class="n">SpynnakerException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Raised when a parameter is not recognised.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="SynapseRowTooBigException"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.exceptions.SynapseRowTooBigException">[docs]</a><span class="k">class</span> <span class="nc">SynapseRowTooBigException</span><span class="p">(</span><span class="n">SpynnakerException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Raised when a synapse row is bigger than is allowed.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_size</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param max_size: the maximum permitted size of row</span>
+<span class="sd">        :param message: the excepton message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_max_size</span> <span class="o">=</span> <span class="n">max_size</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">max_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The maximum size allowed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_size</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.exceptions</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2021.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.1.
+    </div>
+  </body>
+</html>

@@ -9,6 +9,33 @@ Subpackages
 
    spynnaker.pyNN
 
+Submodules
+----------
+
+spynnaker.gsyn\_tools module
+----------------------------
+
+.. automodule:: spynnaker.gsyn_tools
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+spynnaker.plot\_utils module
+----------------------------
+
+.. automodule:: spynnaker.plot_utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+spynnaker.spike\_checker module
+-------------------------------
+
+.. automodule:: spynnaker.spike_checker
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 
