@@ -47,7 +47,7 @@ class WeightDependenceAdditiveTriplet(
         :param float A3_plus: :math:`A_3^+`
         :param float A3_minus: :math:`A_3^-`
         """
-        super(WeightDependenceAdditiveTriplet, self).__init__()
+        super().__init__()
         self.__w_min = w_min
         self.__w_max = w_max
         self.__a3_plus = A3_plus

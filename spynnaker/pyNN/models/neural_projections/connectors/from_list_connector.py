@@ -13,17 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
 import numpy
-
-from spinn_front_end_common.utilities.constants import \
-    MICRO_TO_MILLISECOND_CONVERSION
 from spinn_utilities.overrides import overrides
-from spinn_front_end_common.utilities import globals_variables
-from .abstract_connector import AbstractConnector
+from spinn_front_end_common.utilities.constants import (
+    MICRO_TO_MILLISECOND_CONVERSION)
+from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.exceptions import InvalidParameterType
-
-logger = logging.getLogger(__name__)
+from .abstract_connector import AbstractConnector
 
 # Indices of the source and target in the connection list array
 _SOURCE = 0
@@ -47,50 +43,77 @@ class FromListConnector(AbstractConnector):
         "__split_pre_slices",
         "__split_post_slices"]
 
-    def __init__(self, conn_list, safe=True, callback=None, verbose=False,
-                 column_names=None):
+    def __init__(self, conn_list, safe=True, verbose=False, column_names=None,
+                 callback=None):
         """
-        :param: conn_list:
-            a list of tuples, one tuple for each connection. Each\
-            tuple should contain at least::
+        :param conn_list:
+            A numpy array or a list of tuples, one tuple for each connection.
+            Each tuple should contain::
 
-                (pre_idx, post_idx)
+                (pre_idx, post_idx, p1, p2, ..., pn)
 
-            where pre_idx is the index (i.e. order in the Population,\
-            not the ID) of the presynaptic neuron, and post_idx is\
-            the index of the postsynaptic neuron.
+            where ``pre_idx`` is the index (i.e. order in the Population,
+            not the ID) of the presynaptic neuron, ``post_idx`` is
+            the index of the postsynaptic neuron, and
+            ``p1``, ``p2``, etc. are the synaptic parameters (e.g.,
+            weight, delay, plasticity parameters).
+            All tuples/rows must have the same number of items.
+        :type conn_list: ~numpy.ndarray or list(tuple(int,int,...))
+        :param bool safe:
+            if ``True``, check that weights and delays have valid values.
+            If ``False``, this check is skipped.
+        :param bool verbose:
+            Whether to output extra information about the connectivity to a
+            CSV file
+        :param column_names: the names of the parameters ``p1``, ``p2``, etc.
+            If not provided, it is assumed the parameters are ``weight, delay``
+            (for backwards compatibility).
+        :type column_names: None or tuple(str) or list(str)
+        :param callable callback:
+            if given, a callable that display a progress bar on the terminal.
 
-            Additional items per synapse are acceptable but all synapses\
-            should have the same number of items.
+            .. note::
+                Not supported by sPyNNaker.
         """
-        super(FromListConnector, self).__init__(safe, callback, verbose)
+        super().__init__(safe, callback, verbose)
 
-        # Need to set column names first, as setter uses this
         self.__column_names = column_names
-
-        # Call the conn_list setter, as this sets the internal values
-        self.conn_list = conn_list
-
-        # The connection list split by pre/post vertex slices
         self.__split_conn_list = None
         self.__split_pre_slices = None
         self.__split_post_slices = None
 
+        # Call the conn_list setter, as this sets the internal values
+        self.conn_list = conn_list
+
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
         if self.__delays is None:
-            return numpy.max(synapse_info.delays)
+            return self._get_delay_maximum(
+                synapse_info.delays, len(self.__targets))
         else:
             return numpy.max(self.__delays)
+
+    @overrides(AbstractConnector.get_delay_minimum)
+    def get_delay_minimum(self, synapse_info):
+        if self.__delays is None:
+            return self._get_delay_minimum(
+                synapse_info.delays, len(self.__targets))
+        else:
+            return numpy.min(self.__delays)
 
     @overrides(AbstractConnector.get_delay_variance)
     def get_delay_variance(self, delays):
         if self.__delays is None:
-            return numpy.var(delays)
+            return AbstractConnector.get_delay_variance(self, delays)
         else:
             return numpy.var(self.__delays)
 
     def _split_connections(self, pre_slices, post_slices):
+        """
+        :param list(~pacman.model.graphs.commmon.Slice) pre_slices:
+        :param list(~pacman.model.graphs.commmon.Slice) post_slices:
+        :rtype: bool
+        """
         # If there are no connections, return
         if not len(self.__sources):
             return False
@@ -100,8 +123,8 @@ class FromListConnector(AbstractConnector):
                 self.__split_post_slices == post_slices):
             return False
 
-        self.__split_pre_slices = pre_slices
-        self.__split_post_slices = post_slices
+        self.__split_pre_slices = list(pre_slices)
+        self.__split_post_slices = list(post_slices)
 
         # Create bins into which connections are to be grouped
         pre_bins = numpy.concatenate((
@@ -191,7 +214,7 @@ class FromListConnector(AbstractConnector):
     @overrides(AbstractConnector.get_weight_mean)
     def get_weight_mean(self, weights):
         if self.__weights is None:
-            return numpy.mean(weights)
+            return AbstractConnector.get_weight_mean(self, weights)
         else:
             return numpy.mean(numpy.abs(self.__weights))
 
@@ -199,7 +222,8 @@ class FromListConnector(AbstractConnector):
     def get_weight_maximum(self, synapse_info):
         # pylint: disable=too-many-arguments
         if self.__weights is None:
-            return numpy.amax(synapse_info.weights)
+            return self._get_weight_maximum(
+                synapse_info.weights, len(self.__targets))
         else:
             return numpy.amax(numpy.abs(self.__weights))
 
@@ -207,21 +231,20 @@ class FromListConnector(AbstractConnector):
     def get_weight_variance(self, weights):
         # pylint: disable=too-many-arguments
         if self.__weights is None:
-            return numpy.var(weights)
+            return AbstractConnector.get_weight_variance(self, weights)
         else:
             return numpy.var(numpy.abs(self.__weights))
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
+            self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
             synapse_type, synapse_info):
         # pylint: disable=too-many-arguments
         if not len(self.__sources):
             return numpy.zeros(0, dtype=self.NUMPY_SYNAPSES_DTYPE)
         self._split_connections(pre_slices, post_slices)
         indices = self.__split_conn_list[
-            (pre_vertex_slice.hi_atom, post_vertex_slice.hi_atom)]
+            pre_vertex_slice.hi_atom, post_vertex_slice.hi_atom]
         block = numpy.zeros(len(indices), dtype=self.NUMPY_SYNAPSES_DTYPE)
         block["source"] = self.__sources[indices]
         block["target"] = self.__targets[indices]
@@ -254,11 +277,24 @@ class FromListConnector(AbstractConnector):
 
     @property
     def conn_list(self):
+        """ The connection list.
+
+        :rtype: ~numpy.ndarray
+        """
         return self.__conn_list
 
     def get_n_connections(self, pre_slices, post_slices, pre_hi, post_hi):
+        """
+        :param list(~pacman.model.graphs.common.Slice) pre_slices:
+        :param list(~pacman.model.graphs.common.Slice) post_slices:
+        :param int pre_hi:
+        :param int post_hi:
+        :rtype: int
+        """
         self._split_connections(pre_slices, post_slices)
-        return len(self.__split_conn_list[(pre_hi, post_hi)])
+        if not self.__split_conn_list:
+            return 0
+        return len(self.__split_conn_list[pre_hi, post_hi])
 
     @conn_list.setter
     def conn_list(self, conn_list):
@@ -316,8 +352,7 @@ class FromListConnector(AbstractConnector):
         self.__delays = None
         try:
             delay_column = column_names.index('delay') + _FIRST_PARAM
-            machine_time_step = globals_variables.get_simulator(
-                ).machine_time_step
+            machine_time_step = get_simulator().machine_time_step
             self.__delays = (numpy.rint(
                 numpy.array(self.__conn_list[:, delay_column]) * (
                     MICRO_TO_MILLISECOND_CONVERSION / machine_time_step)) *
@@ -352,6 +387,12 @@ class FromListConnector(AbstractConnector):
 
     @property
     def column_names(self):
+        """ The names of the columns in the array after the first two. \
+        Of particular interest is whether ``weight`` and ``delay`` columns\
+        are present.
+
+        :rtype: list(str)
+        """
         return self.__column_names
 
     @column_names.setter
@@ -359,13 +400,32 @@ class FromListConnector(AbstractConnector):
         self.__column_names = column_names
 
     def get_extra_parameters(self):
-        """ Getter for the extra parameters.
+        """ Getter for the extra parameters. Excludes ``weight`` and\
+        ``delay`` columns.
 
         :return: The extra parameters
+        :rtype: ~numpy.ndarray
         """
         return self.__extra_parameters
 
     def get_extra_parameter_names(self):
-        """ Getter for the names of the extra parameters
+        """ Getter for the names of the extra parameters.
+
+        :rtype: list(str)
         """
         return self.__extra_parameter_names
+
+    @overrides(AbstractConnector.could_connect)
+    def could_connect(self, _synapse_info, _pre_slice, _post_slice):
+        return any((_pre_slice.lo_atom <= self.__sources) &
+                   (self.__sources <= _pre_slice.hi_atom) &
+                   (_post_slice.lo_atom <= self.__targets) &
+                   (self.__targets <= _post_slice.hi_atom))
+
+    def _apply_parameters_to_synapse_type(self, synapse_type):
+        """
+        :param AbstractStaticSynapseDynamics synapse_type:
+        """
+        if self.__extra_parameter_names:
+            for i, name in enumerate(self.__extra_parameter_names):
+                synapse_type.set_value(name, self.__extra_parameters[:, i])

@@ -18,7 +18,8 @@ import numpy
 from spinn_utilities.overrides import overrides
 from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spynnaker.pyNN.utilities import utility_calls
+from spynnaker.pyNN.utilities.utility_calls import (
+    get_probable_maximum_selected, get_probable_minimum_selected)
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
@@ -40,44 +41,60 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
 
     def __init__(
             self, p_connect, allow_self_connections=True, safe=True,
-            callback=None, verbose=False, rng=None):
+            verbose=False, rng=None, callback=None):
         """
-        :param p_connect:
-            a float between zero and one. Each potential connection is created\
+        :param float p_connect:
+            a value between zero and one. Each potential connection is created
             with this probability.
-        :type p_connect: float
-        :param allow_self_connections:
-            if the connector is used to connect a Population to itself, this\
-            flag determines whether a neuron is allowed to connect to itself,\
+        :param bool allow_self_connections:
+            if the connector is used to connect a Population to itself, this
+            flag determines whether a neuron is allowed to connect to itself,
             or only to other neurons in the Population.
-        :type allow_self_connections: bool
-        :param `pyNN.Space` space:
-            a Space object, needed if you wish to specify distance-dependent\
-            weights or delays - not implemented
+        :param bool safe:
+            If ``True``, check that weights and delays have valid values.
+            If ``False``, this check is skipped.
+        :param bool verbose:
+            Whether to output extra information about the connectivity to a
+            CSV file
+        :param rng:
+            Seeded random number generator, or None to make one when needed
+        :type rng: ~pyNN.random.NumpyRNG or None
+        :param callable callback:
+            if given, a callable that display a progress bar on the terminal.
+
+            .. note::
+                Not supported by sPyNNaker.
         """
-        super(FixedProbabilityConnector, self).__init__(
-            safe, callback, verbose)
+        if not 0.0 <= p_connect <= 1.0:
+            raise ConfigurationException(
+                "The probability must be between 0 and 1 (inclusive)")
+        super().__init__(safe, callback, verbose)
         self._p_connect = p_connect
         self.__allow_self_connections = allow_self_connections
         self._rng = rng
-        if not 0 <= self._p_connect <= 1:
-            raise ConfigurationException(
-                "The probability must be between 0 and 1 (inclusive)")
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
-        n_connections = utility_calls.get_probable_maximum_selected(
+        n_connections = get_probable_maximum_selected(
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             self._p_connect)
         return self._get_delay_maximum(synapse_info.delays, n_connections)
+
+    @overrides(AbstractConnector.get_delay_minimum)
+    def get_delay_minimum(self, synapse_info):
+        n_connections = get_probable_minimum_selected(
+            synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
+            synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
+            self._p_connect)
+        return self._get_delay_minimum(synapse_info.delays, n_connections)
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, post_vertex_slice, synapse_info, min_delay=None,
             max_delay=None):
         # pylint: disable=too-many-arguments
-        n_connections = utility_calls.get_probable_maximum_selected(
+        n_connections = get_probable_maximum_selected(
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             post_vertex_slice.n_atoms, self._p_connect, chance=1.0/10000.0)
 
@@ -92,7 +109,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):
         # pylint: disable=too-many-arguments
-        n_connections = utility_calls.get_probable_maximum_selected(
+        n_connections = get_probable_maximum_selected(
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             synapse_info.n_pre_neurons, self._p_connect,
             chance=1.0/10000.0)
@@ -101,7 +118,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, synapse_info):
         # pylint: disable=too-many-arguments
-        n_connections = utility_calls.get_probable_maximum_selected(
+        n_connections = get_probable_maximum_selected(
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             self._p_connect)
@@ -109,8 +126,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
+            self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
             synapse_type, synapse_info):
         # pylint: disable=too-many-arguments
         n_items = pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms
@@ -147,28 +163,36 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
     def gen_connector_id(self):
         return ConnectorIDs.FIXED_PROBABILITY_CONNECTOR.value
 
-    @overrides(AbstractGenerateConnectorOnMachine.
-               gen_connector_params)
+    @overrides(AbstractGenerateConnectorOnMachine.gen_connector_params)
     def gen_connector_params(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
+            self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
             synapse_type, synapse_info):
         params = self._basic_connector_params(synapse_info)
-
-        params.extend([self.__allow_self_connections])
+        params.append(self.__allow_self_connections)
 
         # If prob=1.0 has been specified, take care when scaling value to
         # ensure that it doesn't wrap round to zero as an unsigned long fract
-        params.extend([DataType.U032.encode_as_int(
-            DataType.U032.max if self._p_connect == 1.0 else self._p_connect)])
+        params.append(DataType.U032.encode_as_int(
+            DataType.U032.max if self._p_connect == 1.0 else self._p_connect))
 
         params.extend(self._get_connector_seed(
             pre_vertex_slice, post_vertex_slice, self._rng))
         return numpy.array(params, dtype="uint32")
 
     @property
-    @overrides(AbstractGenerateConnectorOnMachine.
-               gen_connector_params_size_in_bytes)
+    @overrides(
+        AbstractGenerateConnectorOnMachine.gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
         # view + params + seeds
         return self._view_params_bytes + (N_GEN_PARAMS * BYTES_PER_WORD)
+
+    @property
+    def p_connect(self):
+        return self._p_connect
+
+    @p_connect.setter
+    def p_connect(self, new_value):
+        if not 0.0 <= new_value <= 1.0:
+            raise ConfigurationException(
+                "The probability must be between 0 and 1 (inclusive)")
+        self._p_connect = new_value

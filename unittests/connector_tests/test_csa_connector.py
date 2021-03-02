@@ -34,8 +34,8 @@ def test_csa_one_to_one_connector():
     pre_vertex_slice = Slice(0, 10)
     post_vertex_slice = Slice(0, 10)
     block = connector.create_synaptic_block(
-        [pre_vertex_slice], 0, [post_vertex_slice], 0,
-        pre_vertex_slice, post_vertex_slice, 0, mock_synapse_info)
+        [pre_vertex_slice], [post_vertex_slice], pre_vertex_slice,
+        post_vertex_slice, 0, mock_synapse_info)
     assert(len(block) > 0)
     assert(all(item["source"] == item["target"] for item in block))
     assert(all(item["weight"] == 1.0 for item in block))
@@ -55,7 +55,7 @@ def test_csa_from_list_connector():
     pre_vertex_slice = Slice(0, 10)
     post_vertex_slice = Slice(0, 10)
     block = connector.create_synaptic_block(
-        [pre_vertex_slice], 0, [post_vertex_slice], 0,
+        [pre_vertex_slice], [post_vertex_slice],
         pre_vertex_slice, post_vertex_slice, 0, mock_synapse_info)
     assert(len(block) > 0)
     assert(all(item["source"] == conn[0]
@@ -78,8 +78,8 @@ def test_csa_random_connector():
     pre_vertex_slice = Slice(0, 10)
     post_vertex_slice = Slice(0, 10)
     block = connector.create_synaptic_block(
-        [pre_vertex_slice], 0, [post_vertex_slice], 0,
-        pre_vertex_slice, post_vertex_slice, 0, mock_synapse_info)
+        [pre_vertex_slice], [post_vertex_slice], pre_vertex_slice,
+        post_vertex_slice, 0, mock_synapse_info)
     assert(len(block) >= 0)
     assert(all(item["weight"] == 1.0 for item in block))
     assert(all(item["delay"] == 2.0 for item in block))
@@ -106,9 +106,9 @@ def test_csa_block_connector():
         assert(len(block) >= 0)
         assert(all(item["weight"] == 1.0 for item in block))
         assert(all(item["delay"] == 2.0 for item in block))
-    except TypeError:
-        raise SkipTest("https://github.com/INCF/csa/issues/17")
-    except RuntimeError:
+    except TypeError as e:
+        raise SkipTest("https://github.com/INCF/csa/issues/17") from e
+    except RuntimeError as e:
         if sys.version_info >= (3, 7):
-            raise SkipTest("https://github.com/INCF/csa/issues/16")
-        raise
+            raise SkipTest("https://github.com/INCF/csa/issues/16") from e
+        raise e

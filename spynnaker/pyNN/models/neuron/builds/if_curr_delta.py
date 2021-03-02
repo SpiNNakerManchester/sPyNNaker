@@ -25,16 +25,36 @@ from spynnaker.pyNN.models.neuron.synapse_types import SynapseTypeDelta
 class IFCurrDelta(AbstractPyNNNeuronModelStandard):
     """ Leaky integrate and fire neuron with an instantaneous current input.
 
-    :param float tau_m: :math:`\\tau_m`
-    :param float cm: :math:`C_m`
-    :param float v_rest: :math:`V_{rest}`
-    :param float v_reset: :math:`V_{reset}`
-    :param float v_thresh: :math:`V_{thresh}`
-    :param float tau_refrac: :math:`\\tau_{refrac}`
-    :param float i_offset: :math:`I_{offset}`
-    :param float v: :math:`V_{init}`
-    :param float isyn_exc: :math:`I^{syn}_e`
-    :param float isyn_inh: :math:`I^{syn}_i`
+    :param tau_m: :math:`\\tau_m`
+    :type tau_m: float, iterable(float), ~pyNN.random.RandomDistribution
+        or (mapping) function
+    :param cm: :math:`C_m`
+    :type cm: float, iterable(float), ~pyNN.random.RandomDistribution
+        or (mapping) function
+    :param v_rest: :math:`V_{rest}`
+    :type v_rest: float, iterable(float), ~pyNN.random.RandomDistribution
+        or (mapping) function
+    :param v_reset: :math:`V_{reset}`
+    :type v_reset: float, iterable(float), ~pyNN.random.RandomDistribution
+        or (mapping) function
+    :param v_thresh: :math:`V_{thresh}`
+    :type v_thresh: float, iterable(float), ~pyNN.random.RandomDistribution
+        or (mapping) function
+    :param tau_refrac: :math:`\\tau_{refrac}`
+    :type tau_refrac: float, iterable(float), ~pyNN.random.RandomDistribution
+        or (mapping) function
+    :param i_offset: :math:`I_{offset}`
+    :type i_offset: float, iterable(float), ~pyNN.random.RandomDistribution
+        or (mapping) function
+    :param v: :math:`V_{init}`
+    :type v: float, iterable(float), ~pyNN.random.RandomDistribution
+        or (mapping) function
+    :param isyn_exc: :math:`I^{syn}_e`
+    :type isyn_exc: float, iterable(float), ~pyNN.random.RandomDistribution
+        or (mapping) function
+    :param isyn_inh: :math:`I^{syn}_i`
+    :type: isyn_inh: float, iterable(float), ~pyNN.random.RandomDistribution
+        or (mapping) function
     """
 
     # noinspection PyPep8Naming
@@ -50,7 +70,7 @@ class IFCurrDelta(AbstractPyNNNeuronModelStandard):
         input_type = InputTypeDelta()
         threshold_type = ThresholdTypeStatic(v_thresh)
 
-        super(IFCurrDelta, self).__init__(
+        super().__init__(
             model_name="IF_curr_delta", binary="IF_curr_delta.aplx",
             neuron_model=neuron_model, input_type=input_type,
             synapse_type=synapse_type, threshold_type=threshold_type)

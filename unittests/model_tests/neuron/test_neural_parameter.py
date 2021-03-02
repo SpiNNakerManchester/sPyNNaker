@@ -13,12 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import io
 import os
 import platform
 import struct
 import tempfile
-from six.moves import xrange
-from spinn_storage_handlers import FileDataWriter
 from data_specification.enums import DataType
 from data_specification import DataSpecificationGenerator
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
@@ -44,7 +43,7 @@ def _iterate_parameter_values(iterator, data_type):
 def run_spec_check(method):
     MockSimulator.setup()
     if platform.system() == "Windows":
-        spec_writer = FileDataWriter("test.dat")
+        spec_writer = io.FileIO("test.dat", "wb")
         spec = DataSpecificationGenerator(spec_writer, None)
         try:
             method(spec)
@@ -53,7 +52,7 @@ def run_spec_check(method):
             os.remove("test.dat")
     else:
         with tempfile.NamedTemporaryFile() as temp:
-            spec = DataSpecificationGenerator(FileDataWriter(temp.name), None)
+            spec = DataSpecificationGenerator(io.FileIO(temp.name, "wb"), None)
             try:
                 method(spec)
             finally:
@@ -75,7 +74,7 @@ def test_range_list():
 
 
 def _generator(size):
-    for i in xrange(size):
+    for i in range(size):
         yield i
 
 
@@ -93,7 +92,7 @@ def test_range_list_as_list():
 
 
 def real_list(spec):
-    value = range(10)
+    value = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     param = NeuronParameter(value, DataType.S1615)
     iterator = param.iterator_by_slice(0, 5, spec)
     values = _iterate_parameter_values(iterator, DataType.S1615)

@@ -15,24 +15,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*! \file
+/*!
+ * \file
+ * \brief This file contains the main interface for structural plasticity
+ * and some shared code. For the main implementation, see topographic_map_impl.c
  *
- * SUMMARY
- *  \brief This file contains the main interface for structural plasticity
- * but no actual code. For that, look at topographic_map_impl.c
- *
- *
- * Author: Petrut Bogdan
- *
+ * \author Petrut Bogdan
  */
 #include "synapse_dynamics.h"
 #include <debug.h>
 #include <utils.h>
 
+//! ::synapse_index_bits + ::synapse_type_bits
 static uint32_t synapse_type_index_bits;
+//! Number of bits to hold the neuron index
 static uint32_t synapse_index_bits;
+//! Mask to extract the neuron index (has ::synapse_index_bits bits set)
 static uint32_t synapse_index_mask;
+//! Number of bits to hold the synapse type
 static uint32_t synapse_type_bits;
+//! Mask to extract the synapse type (has ::synapse_type_bits bits set)
 static uint32_t synapse_type_mask;
 
 typedef struct structural_rec_t {
@@ -45,11 +47,9 @@ typedef struct structural_rec_t* structural_rec_pointer_t;
 //! Array of things for structural recording
 static structural_rec_pointer_t structural_rec_array;
 
-address_t synapse_dynamics_initialise(
-        address_t address, uint32_t n_neurons, uint32_t n_synapse_types,
-        uint32_t *ring_buffer_to_input_buffer_left_shifts) {
-    use(address);
-    use(ring_buffer_to_input_buffer_left_shifts);
+bool synapse_dynamics_initialise(
+        UNUSED address_t address, uint32_t n_neurons, uint32_t n_synapse_types,
+        UNUSED uint32_t *ring_buffer_to_input_buffer_left_shifts) {
 
     if (sizeof(structural_rec_t)) {
         structural_rec_array = spin1_malloc(n_neurons * sizeof(structural_rec_t));
@@ -59,10 +59,10 @@ address_t synapse_dynamics_initialise(
             return false;
         }
         for (uint32_t i = 0; i < n_neurons; i++) {
-//        	structural_rec_array[i].changed = 0;
-        	structural_rec_array[i].recorded_val = -1;
-        	log_info("structural_rec_array[%u].recorded_val = %d",
-        			i, structural_rec_array[i].recorded_val);
+//          structural_rec_array[i].changed = 0;
+            structural_rec_array[i].recorded_val = -1;
+            log_info("structural_rec_array[%u].recorded_val = %d",
+                    i, structural_rec_array[i].recorded_val);
         }
     }
 
@@ -87,43 +87,33 @@ address_t synapse_dynamics_initialise(
     synapse_index_mask = (1 << synapse_index_bits) - 1;
     synapse_type_mask = (1 << synapse_type_bits) - 1;
 
-    return address;
+    return true;
 }
 
 //---------------------------------------
 void synapse_dynamics_process_post_synaptic_event(
-        uint32_t time, index_t neuron_index) {
-    use(time);
-    use(neuron_index);
+        UNUSED uint32_t time, UNUSED index_t neuron_index) {
 }
 
 //---------------------------------------
 bool synapse_dynamics_process_plastic_synapses(
-        address_t plastic_region_address, address_t fixed_region_address,
-        weight_t *ring_buffer, uint32_t time) {
-    use(plastic_region_address);
-    use(fixed_region_address);
-    use(ring_buffer);
-    use(time);
-
+        UNUSED synapse_row_plastic_data_t *plastic_region_data,
+        UNUSED synapse_row_fixed_part_t *fixed_region,
+        UNUSED weight_t *ring_buffer, UNUSED uint32_t time) {
     log_error("There should be no plastic synapses!");
     return false;
 }
 
 //---------------------------------------
 input_t synapse_dynamics_get_intrinsic_bias(
-        uint32_t time, index_t neuron_index) {
-    use(time);
-    use(neuron_index);
-    return REAL_CONST(0.0);
+        UNUSED uint32_t time, UNUSED index_t neuron_index) {
+    return ZERO;
 }
 
 void synapse_dynamics_print_plastic_synapses(
-        address_t plastic_region_address, address_t fixed_region_address,
-        uint32_t *ring_buffer_to_input_left_shifts) {
-    use(plastic_region_address);
-    use(fixed_region_address);
-    use(ring_buffer_to_input_left_shifts);
+        UNUSED synapse_row_plastic_data_t *plastic_region_data,
+        UNUSED synapse_row_fixed_part_t *fixed_region,
+        UNUSED uint32_t *ring_buffer_to_input_left_shifts) {
 }
 
 uint32_t synapse_dynamics_get_plastic_pre_synaptic_events(void) {
@@ -135,12 +125,11 @@ uint32_t synapse_dynamics_get_plastic_saturation_count(void) {
 }
 
 bool synapse_dynamics_find_neuron(
-        uint32_t id, address_t row, weight_t *weight, uint16_t *delay,
+        uint32_t id, synaptic_row_t row, weight_t *weight, uint16_t *delay,
         uint32_t *offset, uint32_t *synapse_type) {
-    address_t fixed_region = synapse_row_fixed_region(row);
+    synapse_row_fixed_part_t *fixed_region = synapse_row_fixed_region(row);
     int32_t fixed_synapse = synapse_row_num_fixed_synapses(fixed_region);
-    uint32_t *synaptic_words = synapse_row_fixed_weight_controls(
-        fixed_region);
+    uint32_t *synaptic_words = synapse_row_fixed_weight_controls(fixed_region);
 
     // Loop through plastic synapses
     for (; fixed_synapse > 0; fixed_synapse--) {
@@ -152,7 +141,8 @@ bool synapse_dynamics_find_neuron(
             *offset = synapse_row_num_fixed_synapses(fixed_region) -
                     fixed_synapse;
             *weight = synapse_row_sparse_weight(synaptic_word);
-            *delay = synapse_row_sparse_delay(synaptic_word, synapse_type_index_bits);
+            *delay = synapse_row_sparse_delay(synaptic_word,
+                    synapse_type_index_bits);
             *synapse_type = synapse_row_sparse_type(
                     synaptic_word, synapse_index_bits, synapse_type_mask);
             return true;
@@ -163,22 +153,21 @@ bool synapse_dynamics_find_neuron(
 }
 
 bool synapse_dynamics_remove_neuron(
-		uint32_t pre_id, uint32_t post_id, uint32_t offset, address_t row) {
-    address_t fixed_region = synapse_row_fixed_region(row);
+		uint32_t pre_id, uint32_t post_id, uint32_t offset, synaptic_row_t row) {
+    synapse_row_fixed_part_t *fixed_region = synapse_row_fixed_region(row);
     int32_t fixed_synapse = synapse_row_num_fixed_synapses(fixed_region);
-    uint32_t *synaptic_words = synapse_row_fixed_weight_controls(
-        fixed_region);
+    uint32_t *synaptic_words = synapse_row_fixed_weight_controls(fixed_region);
 
-   // Delete control word at offset (contains weight)
-    synaptic_words[offset] = synaptic_words[fixed_synapse-1];
+    // Delete control word at offset (contains weight)
+    synaptic_words[offset] = synaptic_words[fixed_synapse - 1];
 
     // Decrement FF
-    fixed_region[0] = fixed_region[0] - 1;
+    fixed_region->num_fixed--;
 
     // Create recorded value
     // (bottom bit: added/removed, next 8: local_id, remainder: other id)
-//    structural_rec_array[pre_id].changed = 1;
-	structural_rec_array[pre_id].recorded_val = (0 << 0) | (post_id << 1) | (pre_id << 9);
+    //    structural_rec_array[pre_id].changed = 1;
+    structural_rec_array[pre_id].recorded_val = (0 << 0) | (post_id << 1) | (pre_id << 9);
 
     return true;
 }
@@ -196,19 +185,18 @@ static inline uint32_t _fixed_synapse_convert(
 }
 
 bool synapse_dynamics_add_neuron(
-        uint32_t pre_id, uint32_t id, address_t row, weight_t weight,
+        uint32_t pre_id, uint32_t id, synaptic_row_t row, weight_t weight,
         uint32_t delay, uint32_t type) {
-    address_t fixed_region = synapse_row_fixed_region(row);
+    synapse_row_fixed_part_t *fixed_region = synapse_row_fixed_region(row);
     int32_t fixed_synapse = synapse_row_num_fixed_synapses(fixed_region);
-    uint32_t *synaptic_words = synapse_row_fixed_weight_controls(
-        fixed_region);
+    uint32_t *synaptic_words = synapse_row_fixed_weight_controls(fixed_region);
     uint32_t new_synapse = _fixed_synapse_convert(id, weight, delay, type);
 
     // Add control word at offset
     synaptic_words[fixed_synapse] = new_synapse;
 
     // Increment FF
-    fixed_region[0] = fixed_region[0] + 1;
+    fixed_region->num_fixed++;
 
     // Create recorded value
     // (bottom bit: added/removed, next 8: local_id, remainder: other id)
@@ -218,7 +206,8 @@ bool synapse_dynamics_add_neuron(
     return true;
 }
 
-uint32_t synapse_dynamics_n_connections_in_row(address_t fixed) {
+uint32_t synapse_dynamics_n_connections_in_row(
+        synapse_row_fixed_part_t *fixed) {
     return synapse_row_num_fixed_synapses(fixed);
 }
 

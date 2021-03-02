@@ -40,12 +40,24 @@ class SynapseTypeExponential(AbstractSynapseType):
 
     def __init__(self, tau_syn_E, tau_syn_I, isyn_exc, isyn_inh):
         r"""
-        :param float tau_syn_E: :math:`\tau^{syn}_e`
-        :param float tau_syn_I: :math:`\tau^{syn}_i`
-        :param float isyn_exc: :math:`I^{syn}_e`
-        :param float isyn_inh: :math:`I^{syn}_i`
+        :param tau_syn_E: :math:`\tau^{syn}_e`
+        :type tau_syn_E:
+            float, iterable(float), ~pyNN.random.RandomDistribution
+            or (mapping) function
+        :param tau_syn_I: :math:`\tau^{syn}_i`
+        :type tau_syn_I:
+            float, iterable(float), ~pyNN.random.RandomDistribution
+            or (mapping) function
+        :param isyn_exc: :math:`I^{syn}_e`
+        :type isyn_exc:
+            float, iterable(float), ~pyNN.random.RandomDistribution
+            or (mapping) function
+        :param isyn_inh: :math:`I^{syn}_i`
+        :type isyn_inh:
+            float, iterable(float), ~pyNN.random.RandomDistribution
+            or (mapping) function
         """
-        super(SynapseTypeExponential, self).__init__([
+        super().__init__([
             DataType.U032,    # decay_E
             DataType.U032,    # init_E
             DataType.S1615,   # isyn_exc
@@ -127,30 +139,14 @@ class SynapseTypeExponential(AbstractSynapseType):
     def tau_syn_E(self):
         return self.__tau_syn_E
 
-    @tau_syn_E.setter
-    def tau_syn_E(self, tau_syn_E):
-        self.__tau_syn_E = tau_syn_E
-
     @property
     def tau_syn_I(self):
         return self.__tau_syn_I
-
-    @tau_syn_I.setter
-    def tau_syn_I(self, tau_syn_I):
-        self.__tau_syn_I = tau_syn_I
 
     @property
     def isyn_exc(self):
         return self.__isyn_exc
 
-    @isyn_exc.setter
-    def isyn_exc(self, isyn_exc):
-        self.__isyn_exc = isyn_exc
-
     @property
     def isyn_inh(self):
         return self.__isyn_inh
-
-    @isyn_inh.setter
-    def isyn_inh(self, isyn_inh):
-        self.__isyn_inh = isyn_inh

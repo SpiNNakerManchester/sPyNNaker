@@ -26,9 +26,8 @@ from unittests.mocks import MockSimulator
 
 
 class EmptyNeuronComponent(AbstractStandardNeuronComponent):
-
     def __init__(self):
-        AbstractStandardNeuronComponent.__init__(self, [])
+        super().__init__([])
 
     def get_n_cpu_cycles(self, n_neurons):
         return 0
@@ -53,7 +52,6 @@ class EmptyNeuronComponent(AbstractStandardNeuronComponent):
 
 
 class EmptySynapseType(AbstractSynapseType, EmptyNeuronComponent):
-
     def get_n_synapse_types(self):
         return 0
 
@@ -65,9 +63,8 @@ class EmptySynapseType(AbstractSynapseType, EmptyNeuronComponent):
 
 
 class _MyNeuronModel(AbstractNeuronModel):
-
     def __init__(self, foo, bar):
-        AbstractNeuronModel.__init__(self, [], [])
+        super().__init__([], [])
         self._foo = foo
         self._bar = bar
 
@@ -96,10 +93,9 @@ class _MyNeuronModel(AbstractNeuronModel):
 
 @defaults
 class FooBar(AbstractPyNNNeuronModelStandard):
-
     @default_initial_values({"foo", "bar"})
     def __init__(self, foo=1, bar=11):
-        super(FooBar, self).__init__(
+        super().__init__(
             "FooBar", "foobar.aplx", _MyNeuronModel(foo, bar),
             EmptyNeuronComponent(), EmptySynapseType(), EmptyNeuronComponent())
 
@@ -109,15 +105,14 @@ class FooBar(AbstractPyNNNeuronModelStandard):
 
 
 class MockNeuron(AbstractPopulationVertex):
-
     def __init__(self):
         foo_bar = FooBar()
-
-        super(MockNeuron, self).__init__(
+        super().__init__(
             n_neurons=5, label="Mock", constraints=None,
             max_atoms_per_core=None, spikes_per_second=None,
             ring_buffer_sigma=None, incoming_spike_buffer_size=None,
-            neuron_impl=foo_bar.model, pynn_model=foo_bar)
+            neuron_impl=foo_bar.model, pynn_model=foo_bar,
+            drop_late_spikes=True, splitter=None)
 
 
 def test_initializable():
@@ -134,9 +129,9 @@ def test_init_by_in():
     MockSimulator.setup()
     neuron = MockNeuron()
     assert [1, 1, 1, 1, 1] == neuron.get_initial_value("foo")
-    neuron.set_initial_value(variable="foo", value=11, selector=1)
+    neuron.initialize(variable="foo", value=11, selector=1)
     assert [1, 11, 1, 1, 1] == neuron.get_initial_value("foo")
-    neuron.set_initial_value(variable="foo", value=12, selector=2)
+    neuron.initialize(variable="foo", value=12, selector=2)
     assert [1, 11, 12, 1, 1] == neuron.get_initial_value("foo")
     assert [11] == neuron.get_initial_value("bar", selector=1)
     assert [12] == neuron.get_initial_value("foo", selector=2)

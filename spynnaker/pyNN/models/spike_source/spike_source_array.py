@@ -20,19 +20,23 @@ from .spike_source_array_vertex import SpikeSourceArrayVertex
 
 class SpikeSourceArray(AbstractPyNNModel):
 
-    default_population_parameters = {}
+    default_population_parameters = {
+        "splitter": None}
 
     def __init__(self, spike_times=None):
         if spike_times is None:
             spike_times = []
         self.__spike_times = spike_times
 
-    @overrides(AbstractPyNNModel.create_vertex)
+    @overrides(AbstractPyNNModel.create_vertex,
+               additional_arguments=default_population_parameters.keys())
     def create_vertex(
-            self, n_neurons, label, constraints):
+            self, n_neurons, label, constraints, splitter):
+        # pylint: disable=arguments-differ
         max_atoms = self.get_max_atoms_per_core()
         return SpikeSourceArrayVertex(
-            n_neurons, self.__spike_times, constraints, label, max_atoms, self)
+            n_neurons, self.__spike_times, constraints, label, max_atoms, self,
+            splitter)
 
     @property
     def _spike_times(self):

@@ -43,11 +43,18 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
 
     def __init__(self, du_th, tau_th, v_thresh):
         r"""
-        :param float du_th: :math:`du_{thresh}`
-        :param float tau_th: :math:`\tau_{thresh}`
-        :param float v_thresh: :math:`V_{thresh}`
+        :param du_th: :math:`du_{thresh}`
+        :type du_th: float, iterable(float), ~pyNN.random.RandomDistribution
+            or (mapping) function
+        :param tau_th: :math:`\tau_{thresh}`
+        :type tau_th: float, iterable(float), ~pyNN.random.RandomDistribution
+            or (mapping) function
+        :param v_thresh: :math:`V_{thresh}`
+        :type v_thresh:
+            float, iterable(float), ~pyNN.random.RandomDistribution
+            or (mapping) function
         """
-        super(ThresholdTypeMaassStochastic, self).__init__([
+        super().__init__([
             DataType.S1615,   # 1 / du_th
             DataType.S1615,   # 1 / tau_th
             DataType.S1615,   # v_thresh
@@ -89,8 +96,7 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
 
     @overrides(AbstractThresholdType.update_values)
     def update_values(self, values, parameters, state_variables):
-        # Read the data
-        (_du_th, _tau_th, _v_thresh, _time_step_ms_div_10) = values
+        pass
 
     @property
     def v_thresh(self):
@@ -99,10 +105,6 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
         """
         return self.__v_thresh
 
-    @v_thresh.setter
-    def v_thresh(self, v_thresh):
-        self.__v_thresh = v_thresh
-
     @property
     def du_th(self):
         """
@@ -110,17 +112,9 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
         """
         return self.__du_th
 
-    @du_th.setter
-    def du_th(self, du_th):
-        self.__du_th = du_th
-
     @property
     def tau_th(self):
         r"""
         :math:`\tau_{thresh}`
         """
         return self.__tau_th
-
-    @tau_th.setter
-    def tau_th(self, tau_th):
-        self.__tau_th = tau_th

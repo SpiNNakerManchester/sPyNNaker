@@ -13,8 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import division
-import logging
+import os
 import struct
 import numpy
 from spinn_front_end_common.utilities.helpful_functions import (
@@ -22,9 +21,7 @@ from spinn_front_end_common.utilities.helpful_functions import (
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.exceptions import MemReadException
 
-logger = logging.getLogger(__name__)
 _RECORDING_COUNT = struct.Struct("<I")
-_SEEK_END = 2  # Define here for Py2.7 compatibility
 
 
 def get_recording_region_size_in_bytes(
@@ -54,10 +51,8 @@ def get_data(transceiver, placement, region, region_size):
 
     region_base_address = locate_memory_region_for_placement(
         placement, region, transceiver)
-    number_of_bytes_written = _RECORDING_COUNT.unpack_from(
-        transceiver.read_memory(
-            placement.x, placement.y, region_base_address,
-            BYTES_PER_WORD))[0]
+    number_of_bytes_written = transceiver.read_word(
+        placement.x, placement.y, region_base_address)
 
     # Subtract 4 for the word representing the size itself
     expected_size = region_size - BYTES_PER_WORD
@@ -85,7 +80,7 @@ def pull_off_cached_lists(no_loads, cache_file):
     if no_loads == 1:
         values = numpy.load(cache_file)
         # Seek to the end of the file (for windows compatibility)
-        cache_file.seek(0, _SEEK_END)
+        cache_file.seek(0, os.SEEK_END)
         return values
     elif no_loads == 0:
         return []
@@ -94,7 +89,7 @@ def pull_off_cached_lists(no_loads, cache_file):
     for _ in range(0, no_loads):
         lists.append(numpy.load(cache_file))
     # Seek to the end of the file (for windows compatibility)
-    cache_file.seek(0, _SEEK_END)
+    cache_file.seek(0, os.SEEK_END)
     return numpy.concatenate(lists)
 
 
@@ -135,10 +130,6 @@ def make_missing_string(missing):
     :param iterable(~pacman.model.placements.Placement) missing:
     :rtype: str
     """
-    missing_str = ""
-    separator = ""
-    for placement in missing:
-        missing_str += "{}({}, {}, {})".format(
-            separator, placement.x, placement.y, placement.p)
-        separator = "; "
-    return missing_str
+    return "; ".join(
+        "({}, {}, {})".format(placement.x, placement.y, placement.p)
+        for placement in missing)

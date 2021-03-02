@@ -13,14 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    FromListConnector)
 import numpy
 import pytest
 from pacman.model.graphs.common.slice import Slice
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    FromListConnector)
 from unittests.mocks import MockSimulator, MockSynapseInfo, MockPopulation
-from six import reraise
-import sys
 
 
 @pytest.mark.parametrize(
@@ -78,8 +76,7 @@ def test_connector(
                                         MockPopulation(10, "Post"),
                                         weights, delays)
     block = connector.create_synaptic_block(
-        [pre_slice], 0, [post_slice], 0,
-        pre_slice, post_slice, 1, mock_synapse_info)
+        [pre_slice], [post_slice], pre_slice, post_slice, 1, mock_synapse_info)
     assert(numpy.array_equal(block["weight"], numpy.array(expected_weights)))
     assert(numpy.array_equal(block["delay"], numpy.array(expected_delays)))
 
@@ -88,16 +85,15 @@ class MockFromListConnector(FromListConnector):
     # Use to check that the split is done only once
 
     def __init__(self, conn_list, safe=True, verbose=False, column_names=None):
-        FromListConnector.__init__(
-            self, conn_list, safe=safe, verbose=verbose,
-            column_names=column_names)
+        super().__init__(
+            conn_list, safe=safe, verbose=verbose, column_names=column_names)
         self._split_count = 0
 
     def _split_connections(self, pre_slices, post_slices):
-        split = FromListConnector._split_connections(
-            self, pre_slices, post_slices)
+        split = super()._split_connections(pre_slices, post_slices)
         if split:
             self._split_count += 1
+        return split
 
 
 def test_connector_split():
@@ -124,11 +120,11 @@ def test_connector_split():
     has_block = set()
     try:
         # Check each connection is in the right place
-        for i, pre_slice in enumerate(pre_slices):
-            for j, post_slice in enumerate(post_slices):
+        for pre_slice in pre_slices:
+            for post_slice in post_slices:
                 block = connector.create_synaptic_block(
-                    pre_slices, i, post_slices, j,
-                    pre_slice, post_slice, 1, mock_synapse_info)
+                    pre_slices, post_slices, pre_slice, post_slice, 1,
+                    mock_synapse_info)
                 for source in block["source"]:
                     assert(pre_slice.lo_atom <= source <= pre_slice.hi_atom)
                 for target in block["target"]:
@@ -142,6 +138,24 @@ def test_connector_split():
 
         # Check the split only happens once
         assert connector._split_count == 1
-    except AssertionError:
+    except AssertionError as e:
         print(connection_list)
-        reraise(*sys.exc_info())
+        raise e
+
+
+def test_could_connect():
+    connector = FromListConnector(
+        [[0, 0], [1, 2], [2, 0], [3, 3], [2, 6], [1, 8], [4, 1], [5, 0],
+         [6, 2], [4, 8]])
+    pre_slices = [Slice(0, 3), Slice(4, 6), Slice(7, 9)]
+    post_slices = [Slice(0, 2), Slice(3, 5), Slice(6, 9)]
+    for pre_slice in pre_slices:
+        for post_slice in post_slices:
+            count = connector.get_n_connections(
+                pre_slices, post_slices, pre_slice.hi_atom,
+                post_slice.hi_atom)
+            if count:
+                assert(connector.could_connect(None, pre_slice, post_slice))
+            else:
+                assert(not connector.could_connect(
+                    None, pre_slice, post_slice))

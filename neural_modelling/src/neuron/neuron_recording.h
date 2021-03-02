@@ -15,41 +15,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Recording of the state of a neuron (spiking, voltage, etc.)
+
 #ifndef _NEURON_RECORDING_H_
 #define _NEURON_RECORDING_H_
 
 #include <common/neuron-typedefs.h>
 #include <bit_field.h>
 #include <recording.h>
+#include <wfi.h>
 
-
-#ifndef N_RECORDED_VARS
-#define N_RECORDED_VARS 1
-#error N_RECORDED_VARS was undefined.  It should be defined by a neuron impl include.
-#endif
-
-#ifndef N_BITFIELD_VARS
-#define N_BITFIELD_VARS 1
-#error N_BITFIELD_VARS was undefined.  It should be defined by a neuron impl include.
-#endif
-
-// declare spin1_wfi
-void spin1_wfi();
-
-// A struct of the different types of recorded data
+//! A struct of the different types of recorded data
 // Note data is just bytes here but actual type is used on writing
 typedef struct recording_values_t {
     uint32_t time;
     uint8_t data[];
 } recording_values_t;
 
-// A struct for bitfield data
+//! A struct for bitfield data
 typedef struct bitfield_values_t {
     uint32_t time;
     uint32_t bits[];
 } bitfield_values_t;
 
-// A struct for information for a non-bitfield recording
+//! A struct for information for a non-bitfield recording
 typedef struct recording_info_t {
     uint32_t element_size;
     uint32_t rate;
@@ -59,7 +49,7 @@ typedef struct recording_info_t {
     recording_values_t *values;
 } recording_info_t;
 
-// A struct for information on a bitfield recording
+//! A struct for information on a bitfield recording
 typedef struct bitfield_info_t {
     uint32_t rate;
     uint32_t count;
@@ -76,7 +66,7 @@ extern uint8_t **neuron_recording_indexes;
 extern uint8_t **bitfield_recording_indexes;
 
 //! The number of recordings outstanding
-extern uint32_t n_recordings_outstanding;
+extern volatile uint32_t n_recordings_outstanding;
 
 //! An array of recording information structures
 extern recording_info_t *recording_info;
@@ -245,7 +235,7 @@ static inline void neuron_recording_setup_for_next_recording(void) {
     // Wait until recordings have completed, to ensure the recording space
     // can be re-written
     while (n_recordings_outstanding > 0) {
-       spin1_wfi();
+        wait_for_interrupt();
     }
 
     // Reset the bitfields before starting if a beginning of recording
@@ -267,10 +257,12 @@ bool neuron_recording_reset(uint32_t n_neurons);
 //! \param[out] recording_flags: Output of flags which can be used to check if
 //!            a channel is enabled for recording
 //! \param[in] n_neurons: the number of neurons to setup for
+//! \param[out] n_rec_regions_used: Output the number of regions used by neuron
+//!            recording
 //! \return bool stating if the init was successful or not
 bool neuron_recording_initialise(
         void *recording_address, uint32_t *recording_flags,
-        uint32_t n_neurons);
+        uint32_t n_neurons, uint32_t *n_rec_regions_used);
 
 //! \brief finishes recording
 void neuron_recording_finalise(void);

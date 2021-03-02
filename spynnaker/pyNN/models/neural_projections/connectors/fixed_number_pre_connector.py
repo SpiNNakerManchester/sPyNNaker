@@ -12,8 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-import logging
 import math
 import numpy
 from spinn_utilities.overrides import overrides
@@ -27,8 +25,6 @@ from .abstract_connector_supports_views_on_machine import (
     AbstractConnectorSupportsViewsOnMachine)
 
 N_GEN_PARAMS = 8
-
-logger = logging.getLogger(__file__)
 
 
 class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
@@ -46,33 +42,43 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
         "__pre_connector_seed"]
 
     def __init__(
-            self, n, allow_self_connections=True, with_replacement=False,
-            safe=True, callback=None, verbose=False, rng=None):
+            self, n, allow_self_connections=True, safe=True, verbose=False,
+            with_replacement=False, rng=None, callback=None):
         """
-        :param n: \
+        :param int n:
             number of random pre-synaptic neurons connected to output
-        :type n: int
-        :param allow_self_connections: \
-            if the connector is used to connect a\
-            Population to itself, this flag determines whether a neuron is\
-            allowed to connect to itself, or only to other neurons in the\
-            Population.
-        :type allow_self_connections: bool
-        :param with_replacement:
-            this flag determines how the random selection of pre-synaptic\
-            neurons is performed; if true, then every pre-synaptic neuron\
-            can be chosen on each occasion, and so multiple connections\
-            between neuron pairs are possible; if false, then once a\
-            pre-synaptic neuron has been connected to a post-neuron, it\
+        :param bool allow_self_connections:
+            if the connector is used to connect a Population to itself,
+            this flag determines whether a neuron is allowed to connect to
+            itself, or only to other neurons in the Population.
+        :param bool safe:
+            Whether to check that weights and delays have valid values.
+            If ``False``, this check is skipped.
+        :param bool verbose:
+            Whether to output extra information about the connectivity to a
+            CSV file
+        :param bool with_replacement:
+            this flag determines how the random selection of pre-synaptic
+            neurons is performed; if true, then every pre-synaptic neuron
+            can be chosen on each occasion, and so multiple connections
+            between neuron pairs are possible; if false, then once a
+            pre-synaptic neuron has been connected to a post-neuron, it
             can't be connected again.
-        :type with_replacement: bool
+        :param rng:
+            Seeded random number generator, or None to make one when needed
+        :type rng: ~pyNN.random.NumpyRNG or None
+        :param callable callback:
+            if given, a callable that display a progress bar on the terminal.
+
+            .. note::
+                Not supported by sPyNNaker.
         """
-        # :param space:
+        # :param ~pyNN.space.Space space:
         # a Space object, needed if you wish to specify distance-dependent\
         # weights or delays - not implemented
-        # :type space: pyNN.Space
-        super(FixedNumberPreConnector, self).__init__(safe, callback, verbose)
-        self.__n_pre = n
+        super().__init__(safe, callback, verbose)
+        # We absolutely require an integer at this point!
+        self.__n_pre = self._roundsize(n, "FixedNumberPreConnector")
         self.__allow_self_connections = allow_self_connections
         self.__with_replacement = with_replacement
         self.__pre_neurons_set = False
@@ -81,8 +87,7 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
         self._rng = rng
 
     def set_projection_information(self, machine_time_step, synapse_info):
-        AbstractConnector.set_projection_information(
-            self, machine_time_step, synapse_info)
+        super().set_projection_information(machine_time_step, synapse_info)
         if (not self.__with_replacement and
                 self.__n_pre > synapse_info.n_pre_neurons):
             raise SpynnakerException(
@@ -102,7 +107,16 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
         return self._get_delay_maximum(
             synapse_info.delays, self.__n_pre * synapse_info.n_post_neurons)
 
+    @overrides(AbstractConnector.get_delay_minimum)
+    def get_delay_minimum(self, synapse_info):
+        return self._get_delay_minimum(
+            synapse_info.delays, self.__n_pre * synapse_info.n_post_neurons)
+
     def _get_pre_neurons(self, synapse_info):
+        """
+        :param SynapseInformation synapse_info:
+        :rtype: list(~numpy.ndarray)
+        """
         # If we haven't set the array up yet, do it now
         if not self.__pre_neurons_set:
             self.__pre_neurons = [None] * synapse_info.n_post_neurons
@@ -157,14 +171,38 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
         return self.__pre_neurons
 
     def _pre_neurons_in_slice(self, pre_vertex_slice, n, synapse_info):
+        """
+        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+        :param int n:
+        :param SynapseInformation synapse_info:
+        :rtype: ~numpy.ndarray
+        """
         pre_neurons = self._get_pre_neurons(synapse_info)
 
         # Take the nth array and get the bits from it we need
         # for this pre-vertex slice
         this_pre_neuron_array = pre_neurons[n]
-        return this_pre_neuron_array[
-            (this_pre_neuron_array >= pre_vertex_slice.lo_atom) &
-            (this_pre_neuron_array <= pre_vertex_slice.hi_atom)]
+        return this_pre_neuron_array[numpy.logical_and(
+            this_pre_neuron_array >= pre_vertex_slice.lo_atom,
+            this_pre_neuron_array <= pre_vertex_slice.hi_atom)]
+
+    def _n_pre_neurons_in_slice(self, pre_vertex_slice, n, synapse_info):
+        """ Count the number of post neurons in the slice. \
+            Faster than ``len(_pre_neurons_in_slice(...))``.
+
+        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+        :param int n:
+        :param SynapseInformation synapse_info:
+        :rtype: int
+        """
+        pre_neurons = self._get_pre_neurons(synapse_info)
+
+        # Take the nth array and get the bits from it we need
+        # for this pre-vertex slice
+        this_pre_neuron_array = pre_neurons[n]
+        return numpy.count_nonzero(numpy.logical_and(
+            this_pre_neuron_array >= pre_vertex_slice.lo_atom,
+            this_pre_neuron_array <= pre_vertex_slice.hi_atom))
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
@@ -204,8 +242,7 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
+            self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
             synapse_type, synapse_info):
         # pylint: disable=too-many-arguments
 
@@ -214,10 +251,9 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
         hi = post_vertex_slice.hi_atom
 
         # Get number of connections
-        n_connections = 0
-        for n in range(lo, hi + 1):
-            n_connections += len(self._pre_neurons_in_slice(
-                pre_vertex_slice, n, synapse_info))
+        n_connections = sum(
+            self._n_pre_neurons_in_slice(pre_vertex_slice, n, synapse_info)
+            for n in range(lo, hi + 1))
 
         # Set up the block
         block = numpy.zeros(
@@ -228,11 +264,10 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
         post_neurons_in_slice = []
         post_vertex_array = numpy.arange(lo, hi + 1)
         for n in range(lo, hi + 1):
-            pre_neurons = self._pre_neurons_in_slice(
-                pre_vertex_slice, n, synapse_info)
-            for m in range(0, len(pre_neurons)):
-                pre_neurons_in_slice.append(pre_neurons[m])
-                post_neurons_in_slice.append(post_vertex_array[n-lo])
+            for pn in self._pre_neurons_in_slice(
+                    pre_vertex_slice, n, synapse_info):
+                pre_neurons_in_slice.append(pn)
+                post_neurons_in_slice.append(post_vertex_array[n - lo])
 
         block["source"] = pre_neurons_in_slice
         block["target"] = post_neurons_in_slice
@@ -262,19 +297,17 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
     def gen_connector_id(self):
         return ConnectorIDs.FIXED_NUMBER_PRE_CONNECTOR.value
 
-    @overrides(AbstractGenerateConnectorOnMachine.
-               gen_connector_params)
+    @overrides(AbstractGenerateConnectorOnMachine.gen_connector_params)
     def gen_connector_params(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
+            self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
             synapse_type, synapse_info):
         params = self._basic_connector_params(synapse_info)
 
         # The same seed needs to be sent to each of the slices
-        key = (id(pre_slices), id(post_vertex_slice))
+        key = (id(synapse_info), id(post_vertex_slice))
         if key not in self.__pre_connector_seed:
-            self.__pre_connector_seed[key] = [
-                int(i * 0xFFFFFFFF) for i in self._rng.next(n=4)]
+            self.__pre_connector_seed[
+                key] = utility_calls.create_mars_kiss_seeds(self._rng)
 
         # Only deal with self-connections if the two populations are the same
         self_connections = True
@@ -291,7 +324,7 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
         return numpy.array(params, dtype="uint32")
 
     @property
-    @overrides(AbstractGenerateConnectorOnMachine.
-               gen_connector_params_size_in_bytes)
+    @overrides(
+        AbstractGenerateConnectorOnMachine.gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
         return self._view_params_bytes + (N_GEN_PARAMS * BYTES_PER_WORD)

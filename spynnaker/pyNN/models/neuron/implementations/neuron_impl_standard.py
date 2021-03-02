@@ -229,12 +229,3 @@ class NeuronImplStandard(AbstractNeuronImpl):
         # ... or fail
         raise AttributeError("'{}' object has no attribute {}".format(
             self.__class__.__name__, key))
-
-    def __setitem__(self, key, value):
-        # Find the property in the components...
-        for component in self.__components:
-            if hasattr(component, key):
-                return setattr(component, key, value)
-        # ... or fail
-        raise AttributeError("'{}' object has no attribute {}".format(
-            self.__class__.__name__, key))

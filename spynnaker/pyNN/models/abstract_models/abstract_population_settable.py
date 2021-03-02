@@ -13,17 +13,18 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
+from spinn_utilities.require_subclass import require_subclass
 from spinn_utilities.ranged.abstract_list import AbstractList
+from pacman.model.graphs.application import ApplicationVertex
 from spynnaker.pyNN.utilities.ranged import SpynnakerRangedList
 from .abstract_settable import AbstractSettable
 
 
-@add_metaclass(AbstractBase)
-class AbstractPopulationSettable(AbstractSettable):
-    """ Indicates that some properties of this object can be accessed from\
-        the PyNN population set and get methods.
+@require_subclass(ApplicationVertex)
+class AbstractPopulationSettable(AbstractSettable, metaclass=AbstractBase):
+    """ Indicates that some properties of this application vertex can be\
+        accessed from the PyNN population set and get methods.
     """
 
     __slots__ = ()
@@ -31,15 +32,16 @@ class AbstractPopulationSettable(AbstractSettable):
     @abstractproperty
     def n_atoms(self):
         """" See \
-            :py:meth:`~pacman.model.graphs.application.ApplicationVertex.n_atoms`
+            :py:meth:`~pacman.model.partitioner_interfaces.\
+            legacy_partitioner_api.LegacyPartitionerAPI.n_atoms`
         """
 
     def get_value_by_selector(self, selector, key):
         """ Gets the value for a particular key but only for the selected\
             subset.
 
-        :param selector: See \
-            :py:meth:`~spinn_utilities.ranged.RangedList.get_value_by_selector`\
+        :param selector: See
+            :py:meth:`~spinn_utilities.ranged.RangedList.get_value_by_selector`
             as this is just a pass through method
         :type selector: None or slice or int or list(bool) or list(int)
         :param str key: the name of the parameter to change
@@ -75,5 +77,7 @@ class AbstractPopulationSettable(AbstractSettable):
             # Keep all the setting stuff in one place by creating a RangedList
             ranged_list = SpynnakerRangedList(
                 size=self.n_atoms, value=old_values)
-            self.set_value(key, ranged_list)
-        ranged_list.set_value_by_selector(selector, value)
+
+        ranged_list.set_value_by_selector(
+            selector, value, ranged_list.is_list(value, self.n_atoms))
+        self.set_value(key, ranged_list)

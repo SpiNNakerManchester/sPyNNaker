@@ -13,9 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from spynnaker.pyNN.models.neuron.threshold_types import AbstractThresholdType
-from spinn_utilities.overrides import overrides
 
 DEVICE = "device"
 TIME_UNTIL_SEND = "time_until_send"
@@ -33,7 +33,10 @@ class ThresholdTypeMulticastDeviceControl(AbstractThresholdType):
     __slots__ = ["__device"]
 
     def __init__(self, device):
-        super(ThresholdTypeMulticastDeviceControl, self).__init__([
+        """
+        :param list(AbstractMulticastControllableDevice) device:
+        """
+        super().__init__([
             DataType.UINT32,   # control_key
             DataType.UINT32,   # control_uses_payload
             DataType.S1615,    # min_value
@@ -65,7 +68,6 @@ class ThresholdTypeMulticastDeviceControl(AbstractThresholdType):
 
     @overrides(AbstractThresholdType.get_values)
     def get_values(self, parameters, state_variables, vertex_slice, ts):
-
         # Add the rest of the data
         return [parameters[DEVICE].apply_operation(
                     lambda x: x.device_control_key),
@@ -88,7 +90,6 @@ class ThresholdTypeMulticastDeviceControl(AbstractThresholdType):
 
     @overrides(AbstractThresholdType.update_values)
     def update_values(self, values, parameters, state_variables):
-
         # Read the data
         (_key, _uses_payload, _min, _max, _between, time_until_send,
          _send_type) = values

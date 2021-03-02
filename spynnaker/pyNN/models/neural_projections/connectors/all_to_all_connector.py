@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
 import numpy
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
@@ -25,8 +24,6 @@ from .abstract_connector_supports_views_on_machine import (
 
 N_GEN_PARAMS = 1
 
-logger = logging.getLogger(__file__)
-
 
 class AllToAllConnector(AbstractGenerateConnectorOnMachine,
                         AbstractConnectorSupportsViewsOnMachine):
@@ -37,22 +34,36 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
     __slots__ = [
         "__allow_self_connections"]
 
-    def __init__(self, allow_self_connections=True, safe=True, callback=None,
-                 verbose=None):
+    def __init__(self, allow_self_connections=True, safe=True,
+                 verbose=None, callback=None):
         """
-        :param allow_self_connections:
-            if the connector is used to connect a\
-            Population to itself, this flag determines whether a neuron is\
-            allowed to connect to itself, or only to other neurons in the\
-            Population.
-        :type allow_self_connections: bool
+        :param bool allow_self_connections:
+            if the connector is used to connect a Population to itself, this
+            flag determines whether a neuron is allowed to connect to itself,
+            or only to other neurons in the Population.
+        :param bool safe:
+            If ``True``, check that weights and delays have valid values.
+            If ``False``, this check is skipped.
+        :param bool verbose:
+            Whether to output extra information about the connectivity to a
+            CSV file
+        :param callable callback:
+            if given, a callable that display a progress bar on the terminal.
+
+            .. note::
+                Not supported by sPyNNaker.
         """
-        super(AllToAllConnector, self).__init__(safe, callback, verbose)
+        super().__init__(safe, callback, verbose)
         self.__allow_self_connections = allow_self_connections
 
-    def _connection_slices(self, pre_vertex_slice, post_vertex_slice,
-                           synapse_info):
+    def _connection_slices(
+            self, pre_vertex_slice, post_vertex_slice, synapse_info):
         """ Get a slice of the overall set of connections.
+
+        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param SynapseInformation synapse_info:
+        :rtype: list(slice)
         """
         n_post_neurons = synapse_info.n_post_neurons
         stop_atom = post_vertex_slice.hi_atom + 1
@@ -70,6 +81,12 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
         return self._get_delay_maximum(
+            synapse_info.delays,
+            synapse_info.n_pre_neurons * synapse_info.n_post_neurons)
+
+    @overrides(AbstractConnector.get_delay_minimum)
+    def get_delay_minimum(self, synapse_info):
+        return self._get_delay_minimum(
             synapse_info.delays,
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons)
 
@@ -99,8 +116,7 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
+            self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
             synapse_type, synapse_info):
         # pylint: disable=too-many-arguments
         n_connections = pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms
@@ -143,6 +159,9 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
 
     @property
     def allow_self_connections(self):
+        """
+        :rtype: bool
+        """
         return self.__allow_self_connections
 
     @allow_self_connections.setter
@@ -154,19 +173,17 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
     def gen_connector_id(self):
         return ConnectorIDs.ALL_TO_ALL_CONNECTOR.value
 
-    @overrides(AbstractGenerateConnectorOnMachine.
-               gen_connector_params)
+    @overrides(AbstractGenerateConnectorOnMachine.gen_connector_params)
     def gen_connector_params(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
+            self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
             synapse_type, synapse_info):
         params = self._basic_connector_params(synapse_info)
-        params.extend([self.allow_self_connections])
+        params.append(self.__allow_self_connections)
         return numpy.array(params, dtype="uint32")
 
     @property
-    @overrides(AbstractGenerateConnectorOnMachine.
-               gen_connector_params_size_in_bytes)
+    @overrides(
+        AbstractGenerateConnectorOnMachine.gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
         # view parameters + allow_self_connections
         return self._view_params_bytes + (N_GEN_PARAMS * BYTES_PER_WORD)

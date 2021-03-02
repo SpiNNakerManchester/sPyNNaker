@@ -13,13 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from .abstract_synapse_dynamics import AbstractSynapseDynamics
 
 
-@add_metaclass(AbstractBase)
-class AbstractPlasticSynapseDynamics(AbstractSynapseDynamics):
+class AbstractPlasticSynapseDynamics(
+        AbstractSynapseDynamics, metaclass=AbstractBase):
     """ Synapses which change over time
     """
     # pylint: disable=too-many-arguments
@@ -37,7 +36,7 @@ class AbstractPlasticSynapseDynamics(AbstractSynapseDynamics):
     @abstractmethod
     def get_plastic_synaptic_data(
             self, connections, connection_row_indices, n_rows,
-            post_vertex_slice, n_synapse_types):
+            post_vertex_slice, n_synapse_types, max_n_synapses):
         """ Get the fixed-plastic data, and plastic-plastic data for each row,\
             and lengths for the fixed_plastic and plastic-plastic parts of\
             each row.
@@ -51,11 +50,14 @@ class AbstractPlasticSynapseDynamics(AbstractSynapseDynamics):
         Lengths are returned as an array made up of an integer for each row,\
         for each of the fixed-plastic and plastic-plastic regions.
 
-        :param ~numpy.ndarray connections:
+        :param ~numpy.ndarray connections: The connections to get data for
         :param ~numpy.ndarray connection_row_indices:
-        :param int n_rows:
+            The row into which each connection should go
+        :param int n_rows: The total number of rows
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
-        :param int n_synapse_types:
+            The slice of the post vertex to get the connections for
+        :param int n_synapse_types: The number of synapse types
+        :param int max_n_synapses: The maximum number of synapses to generate
         :return: (fp_data, pp_data, fp_size, pp_size)
         :rtype:
             tuple(~numpy.ndarray, ~numpy.ndarray, ~numpy.ndarray,

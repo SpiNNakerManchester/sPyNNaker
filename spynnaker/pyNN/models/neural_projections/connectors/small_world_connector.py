@@ -12,13 +12,19 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+import math
 import numpy
 from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
 
 
 class SmallWorldConnector(AbstractConnector):
+    """ A connector that uses connection statistics based on the Small World\
+        network connectivity model.
+
+    .. note::
+        This is typically used from a population to itself.
+    """
     __slots__ = [
         "__allow_self_connections",  # TODO: currently ignored
         "__degree",
@@ -30,8 +36,36 @@ class SmallWorldConnector(AbstractConnector):
             self, degree, rewiring, allow_self_connections=True,
             n_connections=None, rng=None, safe=True, callback=None,
             verbose=False):
+        """
+        :param float degree:
+            the region length where nodes will be connected locally
+        :param float rewiring: the probability of rewiring each edge
+        :param bool allow_self_connections:
+            if the connector is used to connect a Population to itself, this
+            flag determines whether a neuron is allowed to connect to itself,
+            or only to other neurons in the Population.
+        :param n_connections:
+            if specified, the number of efferent synaptic connections per
+            neuron
+        :type n_connections: int or None
+        :param rng:
+            Seeded random number generator, or ``None`` to make one when
+            needed.
+        :type rng: ~pyNN.random.NumpyRNG or None
+        :param bool safe:
+            If ``True``, check that weights and delays have valid values.
+            If ``False``, this check is skipped.
+        :param callable callback:
+            if given, a callable that display a progress bar on the terminal.
+
+            .. note::
+                Not supported by sPyNNaker.
+        :param bool verbose:
+            Whether to output extra information about the connectivity to a
+            CSV file
+        """
         # pylint: disable=too-many-arguments
-        super(SmallWorldConnector, self).__init__(safe, callback, verbose, rng)
+        super().__init__(safe, callback, verbose, rng)
         self.__rewiring = rewiring
         self.__degree = degree
         self.__allow_self_connections = allow_self_connections
@@ -43,11 +77,13 @@ class SmallWorldConnector(AbstractConnector):
 
     @overrides(AbstractConnector.set_projection_information)
     def set_projection_information(self, machine_time_step, synapse_info):
-        AbstractConnector.set_projection_information(
-            self, machine_time_step, synapse_info)
+        super().set_projection_information(machine_time_step, synapse_info)
         self._set_n_connections(synapse_info)
 
     def _set_n_connections(self, synapse_info):
+        """
+        :param SynapseInformation synapse_info:
+        """
         # Get the probabilities up-front for now
         # TODO: Work out how this can be done statistically
         # space.distances(...) expects N,3 array in PyNN0.7, but 3,N in PyNN0.8
@@ -60,7 +96,7 @@ class SmallWorldConnector(AbstractConnector):
         # PyNN 0.8 returns a flattened (C-style) array from space.distances,
         # so the easiest thing to do here is to reshape back to the "expected"
         # PyNN 0.7 shape; otherwise later code gets confusing and difficult
-        if (len(distances.shape) == 1):
+        if len(distances.shape) == 1:
             d = numpy.reshape(distances, (pre_positions.shape[0],
                                           post_positions.shape[0]))
         else:
@@ -68,11 +104,16 @@ class SmallWorldConnector(AbstractConnector):
 
         self.__mask = (d < self.__degree).astype(float)
 
-        self.__n_connections = numpy.sum(self.__mask)
+        self.__n_connections = int(math.ceil(numpy.sum(self.__mask)))
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
         return self._get_delay_maximum(
+            synapse_info.delays, self.__n_connections)
+
+    @overrides(AbstractConnector.get_delay_minimum)
+    def get_delay_minimum(self, synapse_info):
+        return self._get_delay_minimum(
             synapse_info.delays, self.__n_connections)
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
@@ -106,8 +147,7 @@ class SmallWorldConnector(AbstractConnector):
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
+            self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
             synapse_type, synapse_info):
         # pylint: disable=too-many-arguments
         ids = numpy.where(self.__mask[

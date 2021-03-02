@@ -15,7 +15,6 @@
 
 from enum import Enum
 import numpy
-from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 
 
@@ -24,8 +23,7 @@ class MatrixGeneratorID(Enum):
     STDP_MATRIX = 1
 
 
-@add_metaclass(AbstractBase)
-class AbstractGenerateOnMachine(object):
+class AbstractGenerateOnMachine(object, metaclass=AbstractBase):
     """ A synapse dynamics that can be generated on the machine.
     """
     __slots__ = []
