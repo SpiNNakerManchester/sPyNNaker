@@ -14,15 +14,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import random
+import time
+from spinn_front_end_common.utilities.globals_variables import config
 import spynnaker8 as sim
 from spinnaker_testbase import BaseTestCase
 
 
 class TestBigConnection(BaseTestCase):
 
-    def test_big(self):
-        sources = 3000
-        destinations = 3000
+    def do_run(self):
+        sources = 300
+        destinations = 300
         aslist = []
         spiketimes = []
         for s in range(sources):
@@ -48,7 +50,27 @@ class TestBigConnection(BaseTestCase):
         self.assertEqual(sources * destinations, len(spikes))
         sim.end()
 
+    def do_big(self):
+        report_file = self.report_file()
+        t_before = time.time()
 
-if __name__ == "__main__":
-    obj = TestBigConnection()
-    obj.test_big()
+        self.do_run()
+
+        t_after = time.time()
+        results = self.get_run_time_of_BufferExtractor()
+        self.report(results, report_file)
+        self.report(
+            "total run time was: {} seconds\n".format(t_after-t_before),
+            report_file)
+
+    def report_file(self):
+        the_config = config()
+        if the_config.getboolean("Java", "use_java"):
+            style = "java_"
+        else:
+            style = "python_"
+        if the_config.getboolean("Machine", "enable_advanced_monitor_support"):
+            style += "advanced"
+        else:
+            style += "simple"
+        return "{}_test_big_connection".format()
