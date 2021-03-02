@@ -15,6 +15,7 @@
 
 import time
 from spinnaker_testbase import BaseTestCase
+from spinn_front_end_common.interface.provenance import ProvenanceReader
 from p8_integration_tests.scripts.manyBoards import ManyBoards
 
 
@@ -27,7 +28,7 @@ class TestPythonSimple(BaseTestCase):
         t_after_machine = time.time()
         me.check_all_data()
         t_after_check = time.time()
-        results = self.get_run_time_of_BufferExtractor()
+        results = ProvenanceReader().get_run_time_of_BufferExtractor()
         self.report(
             results, "java_simple_n_boards=2_n_neurons=50_simtime=300")
         self.report(

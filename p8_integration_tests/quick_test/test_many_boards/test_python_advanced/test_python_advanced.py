@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import time
+from spinn_front_end_common.interface.provenance import ProvenanceReader
 from spinnaker_testbase import BaseTestCase
 from p8_integration_tests.scripts.manyBoards import ManyBoards
 
@@ -27,7 +28,7 @@ class TestPythonAdvanced(BaseTestCase):
         t_after_machine = time.time()
         me.check_all_data()
         t_after_check = time.time()
-        results = self.get_run_time_of_BufferExtractor()
+        results = ProvenanceReader().get_run_time_of_BufferExtractor()
         self.report(
             results, "python_advanced_n_boards=2_n_neurons=50_simtime=300")
         self.report(
