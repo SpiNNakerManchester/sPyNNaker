@@ -36,11 +36,12 @@
 #include "c_main_neuron.h"
 #include "c_main_common.h"
 #include "profile_tags.h"
+#include <spin1_api_params.h>
 extern void spin1_wfi(void);
 
 //! values for the priority for each callback
 typedef enum callback_priorities {
-    DMA = 0, USER = 0, SDP = 1, TIMER = 2
+    DMA = 0, USER = 0, SDP = 1, TIMER = 0
 } callback_priorities;
 
 enum regions {
@@ -87,6 +88,9 @@ struct sdram_config {
     uint32_t synapse_index_bits;
 };
 
+static const uint32_t DMA_FLAGS = DMA_WIDTH << 24 | DMA_BURST_SIZE << 21
+        | DMA_READ << 19;
+
 //! The number of buffers for synaptic data (one processing, one in progress)
 #define N_SYNAPTIC_BUFFERS 2
 
@@ -114,15 +118,9 @@ static struct sdram_config sdram_inputs;
 //! The inputs from the various synapse cores
 static weight_t *synaptic_contributions[N_SYNAPTIC_BUFFERS];
 
-//! Variable to indicate DMA completion
-static bool dma_complete;
-
 //! timer count for TDMA of certain models; exported
 uint global_timer_count;
 
-static void dma_complete_callback(UNUSED uint unused0, UNUSED uint unused1) {
-    dma_complete = true;
-}
 
 //! \brief Callback to store provenance data (format: neuron_provenance).
 //! \param[out] provenance_region: Where to write the provenance data
@@ -142,6 +140,14 @@ void resume_callback(void) {
         log_error("failed to resume neuron.");
         rt_error(RTE_SWERR);
     }
+}
+
+static inline void read(uint8_t *system_address, weight_t *tcm_address,
+        uint32_t length) {
+    uint32_t desc = DMA_FLAGS | length;
+    dma[DMA_ADRS] = (uint32_t) system_address;
+    dma[DMA_ADRT] = (uint32_t) tcm_address;
+    dma[DMA_DESC] = desc;
 }
 
 //! \brief Timer interrupt callback
@@ -185,23 +191,24 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
     uint8_t *sdram = sdram_inputs.address;
     uint32_t write_index = 0;
     uint32_t read_index = 0;
-    dma_complete = false;
-    spin1_dma_transfer(0, sdram, synaptic_contributions[write_index], DMA_READ,
-            sdram_inputs.size_in_bytes);
+
+    // Reset DMA
+    dma[DMA_CTRL] = 0x0d;
+    read(sdram, synaptic_contributions[write_index], sdram_inputs.size_in_bytes);
     write_index = !write_index;
 
     for (uint32_t i = 0; i < sdram_inputs.n_synapse_cores; i++) {
         // Wait for the last DMA to complete
-        while (!dma_complete) {
-            spin1_wfi();
+        while (!(dma[DMA_STAT] & (1 << 10))) {
+            continue;
         }
+        dma[DMA_CTRL] = 0x0d;
 
         // Start the next DMA if not finished
         if (i + 1 < sdram_inputs.n_synapse_cores) {
-            dma_complete = false;
             sdram += sdram_inputs.size_in_bytes;
-            spin1_dma_transfer(0, sdram, synaptic_contributions[write_index],
-                    DMA_READ, sdram_inputs.size_in_bytes);
+            read(sdram, synaptic_contributions[write_index],
+                    sdram_inputs.size_in_bytes);
             write_index = !write_index;
         }
 
@@ -277,9 +284,6 @@ static bool initialise(void) {
             return false;
         }
     }
-
-    // Add DMA complete callback
-    simulation_dma_transfer_done_callback_on(0, dma_complete_callback);
 
     log_debug("Initialise: finished");
     return true;
