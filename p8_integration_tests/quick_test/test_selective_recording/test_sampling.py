@@ -20,27 +20,32 @@ from p8_integration_tests.scripts.patternSpiker import PatternSpiker
 
 class TestSampling(BaseTestCase):
 
-    def small(self):
+    def medium(self):
         ps = PatternSpiker()
         sim.setup(timestep=1)
-        simtime = 100
+        simtime = 1000
         spike_rate = 5
-        spike_rec_indexes = [1, 3, 5, 7, 9, 10]
-        v_rec_indexes = [0, 21, 32, 45]
+        n_neurons = 320
+        spike_rec_indexes = list(range(0, 100, 2)) \
+                            + list(range(100, 200, 3)) \
+                            + list(range(200, 300, 1)) \
+                            + list(range(300, 320, 4))
+        v_rec_indexes = list(range(0, 100, 1)) \
+                        + list(range(100, 200, 3)) \
+                        + list(range(200, 300, 4)) \
+                        + list(range(300, 320, 2))
         v_rate = 3
-        pop = ps.create_population(
-            sim, n_neurons=32 * 2, label="test",
-            spike_rate=spike_rate, spike_rec_indexes=spike_rec_indexes,
-            v_rate=v_rate, v_rec_indexes=v_rec_indexes)
+        pop = ps.create_population(sim, n_neurons=n_neurons, label="test",
+                                   spike_rate=spike_rate,
+                                   spike_rec_indexes=spike_rec_indexes,
+                                   v_rate=v_rate, v_rec_indexes=v_rec_indexes)
         sim.run(simtime)
-        ps.check(
-            pop, simtime, spike_rate=spike_rate,
-            spike_rec_indexes=spike_rec_indexes,
-            v_rate=v_rate, v_rec_indexes=v_rec_indexes, is_view=False)
-        sim.end()
+        ps.check(pop, simtime,
+                 spike_rate=spike_rate, spike_rec_indexes=spike_rec_indexes,
+                 v_rate=v_rate, v_rec_indexes=v_rec_indexes, is_view=False)
 
-    def test_small(self):
-        self.runsafe(self.small)
+    def test_medium(self):
+        self.runsafe(self.medium)
 
     def multirun(self):
         ps = PatternSpiker()
