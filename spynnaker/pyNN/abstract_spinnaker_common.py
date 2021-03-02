@@ -35,8 +35,6 @@ from spynnaker import __version__ as version
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
-CONFIG_FILE_NAME = "spynnaker.cfg"
-
 
 class AbstractSpiNNakerCommon(
         AbstractSpinnakerBase, SpynnakerSimulatorInterface,
@@ -56,9 +54,12 @@ class AbstractSpiNNakerCommon(
 
     __EXECUTABLE_FINDER = ExecutableFinder()
 
-    @staticmethod
-    def extended_config_path():
-        return os.path.join(os.path.dirname(__file__), CONFIG_FILE_NAME)
+    CONFIG_FILE_NAME = "spynnaker.cfg"
+
+    @classmethod
+    def extended_config_path(cls):
+        return os.path.join(os.path.dirname(__file__),
+                            cls.CONFIG_FILE_NAME)
 
     def __init__(
             self, graph_label, database_socket_addresses, n_chips_required,
@@ -134,7 +135,7 @@ class AbstractSpiNNakerCommon(
             versions.extend(front_end_versions)
 
         super().__init__(
-            configfile=CONFIG_FILE_NAME,
+            configfile=self.CONFIG_FILE_NAME,
             executable_finder=self.__EXECUTABLE_FINDER,
             graph_label=graph_label,
             database_socket_addresses=database_socket_addresses,
@@ -248,7 +249,7 @@ class AbstractSpiNNakerCommon(
                     "automatically slow the simulation down from real time "
                     "by a factor of {}. To remove this automatic behaviour, "
                     "please enter a timescaleFactor value in your .{}",
-                    self.time_scale_factor, CONFIG_FILE_NAME)
+                    self.time_scale_factor, self.CONFIG_FILE_NAME)
 
         # Check the combination of machine time step and time scale factor
         if (self.machine_time_step * self.time_scale_factor <
@@ -262,7 +263,7 @@ class AbstractSpiNNakerCommon(
                     "SpiNNaker machine.  If you would like to override this"
                     "behaviour (at your own risk), please add "
                     "violate_1ms_wall_clock_restriction = True to the [Mode] "
-                    "section of your .{} file".format(CONFIG_FILE_NAME))
+                    "section of your .{} file".format(self.CONFIG_FILE_NAME))
             logger.warning(
                 "****************************************************")
             logger.warning(
