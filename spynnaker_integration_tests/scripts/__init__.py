@@ -12,3 +12,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+from .checker import check_data, check_neuron_data
+from .pattern_spiker import PatternSpiker
+from .synfire_npop_run import do_synfire_npop
+from .synfire_runner import SynfireRunner
+
+__all__ = ["check_data", "check_neuron_data", "do_synfire_npop",
+           "PatternSpiker", "SynfireRunner"]

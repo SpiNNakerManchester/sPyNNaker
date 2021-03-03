@@ -15,7 +15,7 @@
 
 import numpy
 from spinnaker_testbase import BaseTestCase
-from spynnaker_integration_tests.scripts.synfire_run import SynfireRunner
+from spynnaker_integration_tests.scripts import SynfireRunner
 
 n_neurons = 20  # number of neurons in each population
 runtimes = [0, 100]  # The zero uis to read data before a run

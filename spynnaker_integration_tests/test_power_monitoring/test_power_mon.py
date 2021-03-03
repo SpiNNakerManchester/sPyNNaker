@@ -17,7 +17,7 @@ import os
 import numpy
 import spynnaker8 as p
 from spinnaker_testbase import BaseTestCase
-from spynnaker_integration_tests.scripts.synfire_run import SynfireRunner
+from spynnaker_integration_tests.scripts import SynfireRunner
 from spinn_front_end_common.utilities.report_functions import EnergyReport
 import sqlite3
 

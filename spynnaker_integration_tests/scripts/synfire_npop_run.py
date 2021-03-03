@@ -22,7 +22,7 @@ import numpy
 import spynnaker8 as p
 
 
-def do_run(nNeurons, n_pops, neurons_per_core, runtime=25000):
+def do_synfire_npop(nNeurons, n_pops, neurons_per_core, runtime=25000):
     """
     Runs the script Does the run based on the parameters
 

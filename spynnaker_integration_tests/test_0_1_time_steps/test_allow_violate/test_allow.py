@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinnaker_testbase import BaseTestCase
-from spynnaker_integration_tests.scripts.synfire_run import SynfireRunner
+from spynnaker_integration_tests.scripts import SynfireRunner
 import spynnaker.spike_checker as spike_checker
 from spinnman.exceptions import SpinnmanTimeoutException
 from unittest import SkipTest

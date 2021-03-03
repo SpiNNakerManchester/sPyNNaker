@@ -20,7 +20,7 @@ Synfirechain-like example
 """
 import spynnaker.plot_utils as plot_utils
 from spinnaker_testbase import BaseTestCase
-import spynnaker_integration_tests.scripts.synfire_npop_run as synfire_npop_run
+from spynnaker_integration_tests.scripts import do_synfire_npop
 
 n_neurons = 10  # number of neurons in each population
 n_pops = 630
@@ -30,15 +30,15 @@ class TestZonedRoutingInfo(BaseTestCase):
 
     def test_run(self):
         self.assert_not_spin_three()
-        results = synfire_npop_run.do_run(n_neurons, n_pops=n_pops,
-                                          neurons_per_core=n_neurons)
+        results = do_synfire_npop(
+            n_neurons, n_pops=n_pops, neurons_per_core=n_neurons)
         spikes = results
         self.assertAlmostEqual(8335, len(spikes), delta=10)
 
 
 if __name__ == '__main__':
-    results = synfire_npop_run.do_run(n_neurons, n_pops=n_pops,
-                                      neurons_per_core=n_neurons)
+    results = do_synfire_npop(
+        n_neurons, n_pops=n_pops, neurons_per_core=n_neurons)
     spikes = results
     print(len(spikes))
     plot_utils.plot_spikes(spikes)
