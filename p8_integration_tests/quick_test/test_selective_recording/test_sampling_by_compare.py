@@ -20,8 +20,18 @@ import spynnaker8 as sim
 from spynnaker.pyNN.models.populations import PopulationView
 from spinnaker_testbase import BaseTestCase
 
-current_file_path = os.path.dirname(os.path.abspath(__file__))
+"""
+This is the original way of testing selective recording.
 
+It worked by running the same seeded script twice. 
+Once recording all and once with selective recording on.
+
+The main selective recording is now done by test_sampling 
+based on the PatternSpiker.
+
+This is kept mainly for all the useful compare methods.
+Which is why most tests are commented out.
+"""
 
 def run_script(
         simtime, n_neurons, run_split=1,
@@ -79,7 +89,7 @@ def run_script(
             view = PopulationView(pop_1, spike_get_indexes)
             neo = view.get_data("spikes")
         spikes = neo.segments[0].spiketrains
-        spike_file = os.path.join(current_file_path, file_prefix+"spikes.csv")
+        spike_file = file_prefix+"spikes.csv"
         write_spikes(spikes, spike_file)
     else:
         spikes = None
@@ -91,7 +101,7 @@ def run_script(
             view = PopulationView(pop_1, v_get_indexes)
             neo = view.get_data("v")
         v = neo.segments[0].filter(name='v')[0]
-        v_file = os.path.join(current_file_path, file_prefix+"v.csv")
+        v_file = file_prefix+"v.csv"
         numpy.savetxt(v_file, v, delimiter=',')
     else:
         v = None
@@ -103,7 +113,7 @@ def run_script(
             view = PopulationView(pop_1, exc_get_indexes)
             neo = view.get_data('gsyn_exc')
         exc = neo.segments[0].filter(name='gsyn_exc')[0]
-        exc_file = os.path.join(current_file_path, file_prefix+"exc.csv")
+        exc_file = file_prefix+"exc.csv"
         numpy.savetxt(exc_file, exc, delimiter=',')
     else:
         exc = None
@@ -114,7 +124,7 @@ def run_script(
             view = PopulationView(pop_1, inh_get_indexes)
             neo = view.get_data('gsyn_inh')
         inh = neo.segments[0].filter(name='gsyn_inh')[0]
-        inh_file = os.path.join(current_file_path, file_prefix+"inh.csv")
+        inh_file = file_prefix+"inh.csv"
         numpy.savetxt(inh_file, inh, delimiter=',')
     else:
         inh = None
@@ -193,21 +203,21 @@ def compare_results(
         record_inh=False, inh_rate=None, inh_indexes=None, full_prefix="",
         tolerance=sys.maxsize):
     if record_spikes:
-        file_path = os.path.join(current_file_path, "spikes.csv")
-        full_path = os.path.join(current_file_path, full_prefix+"spikes.csv")
+        file_path = "spikes.csv"
+        full_path = full_prefix+"spikes.csv"
         compare_spikes(file_path, full_path, simtime, n_neurons,
                        spike_rate, spike_indexes, tolerance)
     if record_v:
-        file_path = os.path.join(current_file_path, "v.csv")
-        full_path = os.path.join(current_file_path, full_prefix+"v.csv")
+        file_path = "v.csv"
+        full_path = full_prefix+"v.csv"
         compare(file_path, full_path, v_rate, v_indexes)
     if record_exc:
-        file_path = os.path.join(current_file_path, "exc.csv")
-        full_path = os.path.join(current_file_path, full_prefix+"exc.csv")
+        file_path = "exc.csv"
+        full_path = full_prefix+"exc.csv"
         compare(file_path, full_path, exc_rate, exc_indexes)
     if record_inh:
-        file_path = os.path.join(current_file_path, "inh.csv")
-        full_path = os.path.join(current_file_path, full_prefix+"inh.csv")
+        file_path = "inh.csv"
+        full_path = full_prefix+"inh.csv"
         compare(file_path, full_path, inh_rate, inh_indexes)
 
 
@@ -235,14 +245,10 @@ def run_and_compare_script(
         inh_get_indexes=None,
         tolerance=sys.maxsize):
     full_prefix = "{}_{}_".format(simtime, n_neurons)
-    if (not os.path.exists(
-            os.path.join(current_file_path, full_prefix + "spikes.csv")) or
-            not os.path.exists(
-                os.path.join(current_file_path, full_prefix + "v.csv")) or
-            not os.path.exists(
-                os.path.join(current_file_path, full_prefix + "v.csv")) or
-            not os.path.exists(
-                os.path.join(current_file_path, full_prefix + "v.csv"))):
+    if (not os.path.exists(full_prefix + "spikes.csv") or
+            not os.path.exists(full_prefix + "v.csv") or
+            not os.path.exists(full_prefix + "v.csv") or
+            not os.path.exists(full_prefix + "v.csv")):
         print("Comparison files do not exist so creating them")
         run_script(
             simtime, n_neurons,
@@ -361,7 +367,7 @@ def compare(current, full, rate, indexes):
 
 
 class TestSampling(BaseTestCase):
-
+    """
     def test_big_with_rate(self):
         simtime = 20000
         n_neurons = 500
@@ -450,10 +456,11 @@ class TestSampling(BaseTestCase):
             exc_get_indexes=range(0, n_neurons, 3),
             record_inh=True, inh_rate=2,
             inh_get_indexes=range(0, n_neurons, 4))
+    """
 
     def test_mixed_medium(self):
-        simtime = 5000
-        n_neurons = 500
+        simtime = 500
+        n_neurons = 300
         run_and_compare_script(
             simtime, n_neurons,
             record_spikes=True, spike_rate=5,
@@ -467,6 +474,7 @@ class TestSampling(BaseTestCase):
             inh_rec_indexes=range(0, n_neurons, 4),
             inh_get_indexes=range(2, n_neurons, 4))
 
+    """
     def test_one(self):
         simtime = 500
         n_neurons = 300
@@ -477,6 +485,7 @@ class TestSampling(BaseTestCase):
             record_v=True, v_rec_indexes=[0],
             record_exc=True, exc_rec_indexes=[0],
             record_inh=True, inh_rec_indexes=[0])
+    """
 
 
 if __name__ == '__main__':
@@ -489,8 +498,3 @@ if __name__ == '__main__':
         record_v=True, v_rate=3, v_indexes=None,
         record_exc=True, exc_rate=4, exc_indexes=None,
         record_inh=True, inh_rate=5, inh_indexes=None)
-    """
-    file_path = os.path.join(current_file_path, "20000_500_spikes.csv")
-    full_path = os.path.join(current_file_path, "master_20000_500_spikes.csv")
-    compare_spikes(file_path, full_path)
-    """
