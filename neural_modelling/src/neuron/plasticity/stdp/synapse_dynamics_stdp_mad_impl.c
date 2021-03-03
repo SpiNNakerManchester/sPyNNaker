@@ -585,4 +585,3 @@ void synapse_dynamics_recording_values(uint32_t n_neurons, int32_t* rec_values) 
 		structural_rec_array[i].recorded_val = -1;
 	}
 }
-
