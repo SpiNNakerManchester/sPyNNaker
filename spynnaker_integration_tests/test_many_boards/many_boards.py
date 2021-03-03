@@ -86,7 +86,8 @@ class ManyBoards(BaseTestCase):
         self.setup()
         sim.run(self.simtime)
         t_after_machine = time.time()
-        me.check_all_data()
+        for pop in self._pops:
+            check_data(pop, self._expected_spikes, self.simtime)
         t_after_check = time.time()
         results = ProvenanceReader().get_run_time_of_BufferExtractor()
         self.report(results, report_file)
@@ -98,10 +99,6 @@ class ManyBoards(BaseTestCase):
             "total run time was: {} seconds\n".format(t_after_check-t_before),
             report_file)
         sim.end()
-
-    def check_all_data(self):
-        for pop in self._pops:
-            check_data(pop, self._expected_spikes, self.simtime)
 
 
 if __name__ == '__main__':
