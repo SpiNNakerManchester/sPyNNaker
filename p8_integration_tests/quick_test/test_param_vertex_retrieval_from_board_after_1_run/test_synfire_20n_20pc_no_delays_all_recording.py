@@ -32,11 +32,10 @@ runtime = 100
 neurons_per_core = None
 placement_constraint = (0, 0)
 expected_spikes = 33
-current_file_path = os.path.dirname(os.path.abspath(__file__))
-spike_file = os.path.join(current_file_path, "20_1_spikes.csv")
-v_file = os.path.join(current_file_path, "20_1_v.csv")
-gysn_file = os.path.join(current_file_path, "20_1_gsyn.csv")
-gysn_exc_file = os.path.join(current_file_path, "20_1_gsyn_exc.csv")
+spike_file = "20_1_spikes.csv"
+v_file = "20_1_v.csv"
+gysn_file = "20_1_gsyn.csv"
+gysn_exc_file = "20_1_gsyn_exc.csv"
 
 
 class Synfire20n20pcDelaysDelayExtensionsAllRecording(BaseTestCase):
