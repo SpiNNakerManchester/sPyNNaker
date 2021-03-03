@@ -15,7 +15,7 @@
 
 import spynnaker8 as sim
 from spinnaker_testbase import BaseTestCase
-from p8_integration_tests.scripts.checker import check_data
+from spynnaker_integration_tests.scripts import check_data
 
 n_neurons = 2  # number of neurons in each population
 neurons_per_core = n_neurons / 2

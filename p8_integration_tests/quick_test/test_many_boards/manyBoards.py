@@ -18,7 +18,7 @@ from spinn_front_end_common.interface.provenance import ProvenanceReader
 from spinn_front_end_common.utilities.globals_variables import config
 from spynnaker.pyNN.exceptions import ConfigurationException
 import spynnaker8 as sim
-from p8_integration_tests.scripts.checker import check_data
+from spynnaker_integration_tests.scripts import check_data
 from spinnaker_testbase import BaseTestCase
 
 CHIPS_PER_BOARD_EXCLUDING_SAFETY = 43.19

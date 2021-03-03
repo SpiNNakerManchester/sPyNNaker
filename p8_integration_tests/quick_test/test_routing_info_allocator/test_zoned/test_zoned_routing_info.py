@@ -20,7 +20,7 @@ Synfirechain-like example
 """
 import spynnaker.plot_utils as plot_utils
 from spinnaker_testbase import BaseTestCase
-import p8_integration_tests.scripts.synfire_npop_run as synfire_npop_run
+import spynnaker_integration_tests.scripts.synfire_npop_run as synfire_npop_run
 
 n_neurons = 10  # number of neurons in each population
 n_pops = 630

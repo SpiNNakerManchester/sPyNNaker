@@ -18,7 +18,7 @@ Synfirechain-like example
 """
 import pytest
 from spinnaker_testbase import BaseTestCase
-from p8_integration_tests.scripts.synfire_run import SynfireRunner
+from spynnaker_integration_tests.scripts.synfire_run import SynfireRunner
 from pacman.exceptions import PacmanPartitionException
 
 n_neurons = 200  # number of neurons in each population
