@@ -28,7 +28,9 @@ class TestSampling(BaseTestCase):
                                label="input")
         sim.Projection(input, pop_1, sim.AllToAllConnector(),
                        synapse_type=sim.StaticSynapse(weight=5, delay=1))
-        pop_1.record(["spikes", "v"], indexes=range(32))
+        # A range of 32 was problematic
+        # due to the need for one more index to point none recording at
+        pop_1[0:32].record(["spikes", "v"])
         simtime = 10
         sim.run(simtime)
 
