@@ -20,8 +20,7 @@ import spynnaker8 as sim
 from spynnaker.pyNN.utilities import neo_compare
 from spinnaker_testbase import BaseTestCase
 
-current_file_path = os.path.dirname(os.path.abspath(__file__))
-pickle_path = os.path.join(current_file_path, "data.pickle")
+pickle_path = "data.pickle"
 
 
 class TestRecordingOnOff(BaseTestCase):
