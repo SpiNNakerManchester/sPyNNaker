@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import time
 from unittest import SkipTest
+from spinn_front_end_common.interface.provenance import ProvenanceReader
 from spinn_front_end_common.utilities.globals_variables import config
 from spynnaker.pyNN.exceptions import ConfigurationException
 import spynnaker8 as sim
@@ -87,7 +88,7 @@ class ManyBoards(BaseTestCase):
         t_after_machine = time.time()
         me.check_all_data()
         t_after_check = time.time()
-        results = self.get_run_time_of_BufferExtractor()
+        results = ProvenanceReader().get_run_time_of_BufferExtractor()
         self.report(results, report_file)
         self.report(
             "machine run time was: {} seconds\n".format(

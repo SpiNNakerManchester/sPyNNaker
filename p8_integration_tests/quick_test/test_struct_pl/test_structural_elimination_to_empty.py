@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import os
 import sqlite3
+from spinn_front_end_common.utilities import globals_variables
 from spinnaker_testbase import BaseTestCase
 import spynnaker8 as p
 
@@ -44,9 +45,9 @@ def structural_without_stdp():
 
     num_rewires = None
 
-    report_dir = p.globals_variables.get_simulator()._report_default_directory
+    report_dir = globals_variables.run_report_directory()
     prov_file = os.path.join(
-        report_dir, "provenance_data", "provenance.sqlite3")
+            report_dir, "provenance_data", "provenance.sqlite3")
     with sqlite3.connect(prov_file) as prov_db:
         prov_db.row_factory = sqlite3.Row
         rows = list(prov_db.execute(
