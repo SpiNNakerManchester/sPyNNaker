@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import time
+from spinn_front_end_common.interface.provenance import ProvenanceReader
 from spinnaker_testbase import BaseTestCase
 from p8_integration_tests.scripts.manyBoards import ManyBoards
 
@@ -25,7 +26,7 @@ class TestJavaSimple(BaseTestCase):
         t_before = time.time()
         sim = me.do_run(n_boards=10, n_neurons=2550, simtime=3000)
         t_after = time.time()
-        results = self.get_run_time_of_BufferExtractor()
+        results = ProvenanceReader().get_run_time_of_BufferExtractor()
         report_name = "java_simple_n_boards=10_n_neurons=2550_simtime=3000"
         self.report(results, report_name)
         self.report(
