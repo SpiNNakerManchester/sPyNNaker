@@ -13,8 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from spynnaker_integration_tests.test_many_boards.manyBoards import (
-    ManyBoards)
+from spynnaker_integration_tests.test_many_boards import ManyBoards
 
 
 class TestJavaAdvanced(ManyBoards):
