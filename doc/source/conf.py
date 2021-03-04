@@ -414,6 +414,6 @@ os.chdir("../..")  # WARNING! RELATIVE FILENAMES CHANGE MEANING HERE!
 apidoc.main([
     '-o', _output_dir, ".",
     # Exclude test and setup code
-    "p8_integration_tests/*", "unittests/*", "setup.py",
+    "spynnaker_integration_tests/*", "unittests/*", "setup.py",
     *filtered_files("spynnaker", _unfiltered_files),
     *filtered_files("spynnaker8", _unfiltered_files)])
