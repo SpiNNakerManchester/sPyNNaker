@@ -16,7 +16,7 @@
 import spynnaker8 as sim
 from pacman.model.constraints.placer_constraints import (
     RadialPlacementFromChipConstraint)
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 
 
 class TestConstraint(BaseTestCase):
