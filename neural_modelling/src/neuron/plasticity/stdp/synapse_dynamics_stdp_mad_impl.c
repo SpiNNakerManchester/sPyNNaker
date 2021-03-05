@@ -495,7 +495,7 @@ bool synapse_dynamics_remove_neuron(
     // Create recorded value
     // (bottom bit: added/removed, next 8: local_id, remainder: other id)
     //    structural_rec_array[pre_id].changed = 1;
-    structural_rec_array[pre_id].recorded_val = (0 << 0) | (post_id << 1) | (pre_id << 9);
+    structural_rec_array[post_id].recorded_val = (0 << 0) | (post_id << 1) | (pre_id << 9);
 
     return true;
 }
@@ -537,7 +537,7 @@ bool synapse_dynamics_add_neuron(uint32_t pre_id, uint32_t id, synaptic_row_t ro
     // Create recorded value
     // (bottom bit: added/removed, next 8: local_id, remainder: other id)
     //    structural_rec_array[pre_id].changed = 1;
-    structural_rec_array[pre_id].recorded_val = (1 << 0) | (id << 1) | (pre_id << 9);
+    structural_rec_array[id].recorded_val = (1 << 0) | (id << 1) | (pre_id << 9);
     //    structural_rec_array[pre_id].n_added += 1;
 
     return true;
