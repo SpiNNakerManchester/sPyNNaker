@@ -402,7 +402,7 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
 //        count_rewire_attempts++;
 //    }
 
-    uint32_t state = spin1_int_disable();
+    uint32_t state = spin1_irq_disable();
     // Now do neuron time step update
     neuron_do_timestep_update(time, timer_count);
     // First do synapses timestep update, as this is time-critical
