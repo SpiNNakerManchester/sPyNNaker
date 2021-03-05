@@ -50,16 +50,12 @@ jobs:
       with:
         repositories: >
           SpiNNUtils SpiNNMachine SpiNNMan PACMAN DataSpecification spalloc
-          SpiNNFrontEndCommon
+          SpiNNFrontEndCommon TestBase
         install: true
     - name: Install matplotlib
       uses: ./support/actions/install-matplotlib
     - name: Setup
       uses: ./support/actions/run-setup
-    - name: Checkout Spinnaker Test Cases
-      uses: ./support/actions/checkout-spinn-deps
-      with:
-        repositories: IntroLab PyNN8Examples
 
     - name: Create a spynnaker.cfg
       uses: ./support/actions/configure-spynnaker

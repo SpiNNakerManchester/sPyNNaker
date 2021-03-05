@@ -198,9 +198,6 @@ static uint32_t n_spike_buffer_words;
 //! The size of each spike buffer in bytes
 static uint32_t spike_buffer_size;
 
-//! True if DMA recording is currently in progress
-static volatile bool recording_in_progress = false;
-
 //! The timer period
 static uint32_t timer_period;
 
@@ -620,23 +617,12 @@ static inline void mark_spike(uint32_t neuron_id, uint32_t n_spikes) {
     }
 }
 
-//! \brief callback for completed recording
-static void recording_complete_callback(void) {
-    recording_in_progress = false;
-}
-
 //! \brief writing spikes to SDRAM
 //! \param[in] time: the time to which these spikes are being recorded
 static inline void record_spikes(uint32_t time) {
-    while (recording_in_progress) {
-        wait_for_interrupt();
-    }
     if ((spikes != NULL) && (spikes->n_buffers > 0)) {
-        recording_in_progress = true;
         spikes->time = time;
-        recording_record_and_notify(
-                0, spikes, 8 + (spikes->n_buffers * spike_buffer_size),
-                recording_complete_callback);
+        recording_record(0, spikes, 8 + (spikes->n_buffers * spike_buffer_size));
         reset_spikes();
     }
 }
@@ -810,7 +796,6 @@ static void timer_callback(uint timer_count, UNUSED uint unused) {
     // Record output spikes if required
     if (recording_flags > 0) {
         record_spikes(time);
-        recording_do_timestep_update(time);
     }
 }
 
