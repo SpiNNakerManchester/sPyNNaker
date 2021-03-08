@@ -153,19 +153,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
             # The minimum is the maximum of the possible maximums
             return max(low_estimated_delay, low, 1)
         elif isinstance(delays, str):
-            if self.__space is None:
-                raise Exception(
-                    "No space object specified in projection {}-{}".format(
-                        self.__synapse_info.pre_population,
-                        self.__synapse_info.post_population))
-
-            expand_distances = self._expand_distances(delays)
-
-            d = self.__space.distances(
-                self.__synapse_info.pre_population.positions,
-                self.__synapse_info.post_population.positions,
-                expand_distances)
-
+            d = self._get_distances(delays)
             return numpy.min(_expr_context.eval(delays, d=d))
         elif numpy.isscalar(delays):
             return delays
@@ -193,19 +181,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
             # The maximum is the minimum of the possible maximums
             return min(max_estimated_delay, high)
         elif isinstance(delays, str):
-            if self.__space is None:
-                raise Exception(
-                    "No space object specified in projection {}-{}".format(
-                        self.__synapse_info.pre_population,
-                        self.__synapse_info.post_population))
-
-            expand_distances = self._expand_distances(delays)
-
-            d = self.__space.distances(
-                self.__synapse_info.pre_population.positions,
-                self.__synapse_info.post_population.positions,
-                expand_distances)
-
+            d = self._get_distances(delays)
             return numpy.max(_expr_context.eval(delays, d=d))
         elif numpy.isscalar(delays):
             return delays
@@ -243,19 +219,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         if isinstance(delays, RandomDistribution):
             return utility_calls.get_variance(delays)
         elif isinstance(delays, str):
-            if self.__space is None:
-                raise Exception(
-                    "No space object specified in projection {}-{}".format(
-                        self.__synapse_info.pre_population,
-                        self.__synapse_info.post_population))
-
-            expand_distances = self._expand_distances(delays)
-
-            d = self.__space.distances(
-                self.__synapse_info.pre_population.positions,
-                self.__synapse_info.post_population.positions,
-                expand_distances)
-
+            d = self._get_distances(delays)
             return numpy.var(_expr_context.eval(delays, d=d))
         elif numpy.isscalar(delays):
             return 0.0
@@ -285,19 +249,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return int(math.ceil(utility_calls.get_probable_maximum_selected(
                 n_total_connections, n_connections, prob_in_range)))
         elif isinstance(delays, str):
-            if self.__space is None:
-                raise Exception(
-                    "No space object specified in projection {}-{}".format(
-                        self.__synapse_info.pre_population,
-                        self.__synapse_info.post_population))
-
-            expand_distances = self._expand_distances(delays)
-
-            d = self.__space.distances(
-                self.__synapse_info.pre_population.positions,
-                self.__synapse_info.post_population.positions,
-                expand_distances)
-
+            d = self._get_distances(delays)
             delays = _expr_context.eval(delays, d=d)
             n_delayed = sum([len([
                 delay for delay in delays
@@ -365,19 +317,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         if isinstance(weights, RandomDistribution):
             return abs(utility_calls.get_mean(weights))
         elif isinstance(weights, str):
-            if self.__space is None:
-                raise Exception(
-                    "No space object specified in projection {}-{}".format(
-                        self.__synapse_info.pre_population,
-                        self.__synapse_info.post_population))
-
-            expand_distances = self._expand_distances(weights)
-
-            d = self.__space.distances(
-                self.__synapse_info.pre_population.positions,
-                self.__synapse_info.post_population.positions,
-                expand_distances)
-
+            d = self._get_distances(weights)
             return numpy.mean(_expr_context.eval(weights, d=d))
         elif numpy.isscalar(weights):
             return abs(weights)
@@ -410,21 +350,8 @@ class AbstractConnector(object, metaclass=AbstractBase):
                 if high is None:
                     return abs(max_weight)
                 return abs(min(max_weight, high))
-
         elif isinstance(weights, str):
-            if self.__space is None:
-                raise Exception(
-                    "No space object specified in projection {}-{}".format(
-                        self.__synapse_info.pre_population,
-                        self.__synapse_info.post_population))
-
-            expand_distances = self._expand_distances(weights)
-
-            d = self.__space.distances(
-                self.__synapse_info.pre_population.positions,
-                self.__synapse_info.post_population.positions,
-                expand_distances)
-
+            d = self._get_distances(weights)
             return numpy.max(_expr_context.eval(weights, d=d))
         elif numpy.isscalar(weights):
             return abs(weights)
@@ -451,19 +378,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         if isinstance(weights, RandomDistribution):
             return utility_calls.get_variance(weights)
         elif isinstance(weights, str):
-            if self.__space is None:
-                raise Exception(
-                    "No space object specified in projection {}-{}".format(
-                        self.__synapse_info.pre_population,
-                        self.__synapse_info.post_population))
-
-            expand_distances = self._expand_distances(weights)
-
-            d = self.__space.distances(
-                self.__synapse_info.pre_population.positions,
-                self.__synapse_info.post_population.positions,
-                expand_distances)
-
+            d = self._get_distances(weights)
             return numpy.var(_expr_context.eval(weights, d=d))
         elif numpy.isscalar(weights):
             return 0.0
@@ -483,6 +398,21 @@ class AbstractConnector(object, metaclass=AbstractBase):
         """
         regexpr = re.compile(r'.*d\[\d*\].*')
         return regexpr.match(d_expression)
+
+    def _get_distances(self, values):
+        if self.__space is None:
+            raise Exception(
+                "Weights or delays are distance-dependent but no space object"
+                "was specified in projection {}-{}".format(
+                    self.__synapse_info.pre_population,
+                    self.__synapse_info.post_population))
+
+        expand_distances = self._expand_distances(weights)
+
+        return self.__space.distances(
+            self.__synapse_info.pre_population.positions,
+            self.__synapse_info.post_population.positions,
+            expand_distances)
 
     def _generate_random_values(
             self, values, n_connections, pre_vertex_slice, post_vertex_slice):
