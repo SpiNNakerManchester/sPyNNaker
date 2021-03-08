@@ -36,12 +36,12 @@
 #include "c_main_neuron.h"
 #include "c_main_common.h"
 #include "profile_tags.h"
+#include <tdma_processing.h>
 #include <spin1_api_params.h>
-extern void spin1_wfi(void);
 
 //! values for the priority for each callback
 typedef enum callback_priorities {
-    DMA = 0, USER = 0, SDP = 1, TIMER = 0
+    DMA = -2, USER = 0, SDP = 0, TIMER = 0
 } callback_priorities;
 
 enum regions {
@@ -118,6 +118,11 @@ static struct sdram_config sdram_inputs;
 //! The inputs from the various synapse cores
 static weight_t *synaptic_contributions[N_SYNAPTIC_BUFFERS];
 
+static union {
+    uint32_t *as_int;
+    weight_t *as_weight;
+} all_synaptic_contributions;
+
 //! timer count for TDMA of certain models; exported
 uint global_timer_count;
 
@@ -150,6 +155,32 @@ static inline void read(uint8_t *system_address, weight_t *tcm_address,
     dma[DMA_DESC] = desc;
 }
 
+static inline void transfer(weight_t *syns) {
+    uint32_t n_neurons_peak = 1 << sdram_inputs.synapse_index_bits;
+    uint32_t synapse_index = 0;
+    uint32_t neuron_index = 0;
+    uint32_t ring_buffer_index = 0;
+    for (uint32_t s_i = sdram_inputs.n_synapse_types; s_i > 0; s_i--) {
+        for (uint32_t n_i = n_neurons_peak; n_i > 0; n_i--) {
+            weight_t value = syns[ring_buffer_index];
+            syns[ring_buffer_index] = 0;
+            ring_buffer_index++;
+            neuron_add_inputs(synapse_index, neuron_index, value);
+            neuron_index++;
+        }
+        synapse_index++;
+    }
+}
+
+static inline void sum(weight_t *syns) {
+    uint32_t n_words = sdram_inputs.size_in_bytes >> 2;
+    const uint32_t *src = (const uint32_t *) syns;
+    uint32_t *tgt = all_synaptic_contributions.as_int;
+    for (uint32_t i = n_words; i > 0; i--) {
+        *tgt++ += *src++;
+    }
+}
+
 //! \brief Timer interrupt callback
 //! \param[in] timer_count: the number of times this call back has been
 //!            executed since start of simulation
@@ -157,6 +188,8 @@ static inline void read(uint8_t *system_address, weight_t *tcm_address,
 void timer_callback(uint timer_count, UNUSED uint unused) {
 
     profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
+
+    uint32_t start_time = tc[T1_COUNT];
 
     global_timer_count = timer_count;
 
@@ -182,6 +215,8 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
         // Subtract 1 from the time so this tick gets done again on the next
         // run
         time--;
+
+        log_info("TDMA waits: %u, TDMA Latest Send: %u", tdma_waits, tdma_latest_send);
 
         simulation_ready_to_read();
         return;
@@ -212,34 +247,17 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
             write_index = !write_index;
         }
 
-        // Read the data while the next transfer happens
-        // Transfer the input from the ring buffers into the input buffers
-        for (uint32_t neuron_index = 0; neuron_index < sdram_inputs.n_neurons;
-                neuron_index++) {
-            // Loop through all synapse types
-            for (uint32_t synapse_type_index = 0;
-                    synapse_type_index < sdram_inputs.n_synapse_types;
-                    synapse_type_index++) {
-                // Get the index, knowing that there is only the front of the
-                // ring buffers here, so use time = 0
-                // and synapse_type_index_bits then doesn't matter.
-                uint32_t ring_buffer_index = synapse_row_get_ring_buffer_index(
-                        0, synapse_type_index, neuron_index,
-                        0, sdram_inputs.synapse_index_bits, 0);
-
-                // Convert ring-buffer entry to input and add on to correct
-                // input for this synapse type and neuron
-                weight_t value = synaptic_contributions[read_index][ring_buffer_index];
-                if (value != 0) {
-                    neuron_add_inputs(synapse_type_index, neuron_index, value);
-                }
-            }
-        }
+        sum(synaptic_contributions[read_index]);
         read_index = !read_index;
     }
 
+    transfer(all_synaptic_contributions.as_weight);
+
     // Now do neuron time step update
     neuron_do_timestep_update(time, timer_count);
+
+    uint32_t end_time = tc[T1_COUNT];
+    log_info("%u: Time taken in timer = %u (start = %u, end = %u)", time, start_time - end_time, start_time, end_time);
 
     profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 }
@@ -283,6 +301,12 @@ static bool initialise(void) {
                     sdram_inputs.size_in_bytes, i);
             return false;
         }
+    }
+    all_synaptic_contributions.as_int = spin1_malloc(sdram_inputs.size_in_bytes);
+    if (all_synaptic_contributions.as_int == NULL) {
+        log_error("Could not allocate %d bytes for all synaptic contributions",
+                sdram_inputs.size_in_bytes);
+        return false;
     }
 
     log_debug("Initialise: finished");
