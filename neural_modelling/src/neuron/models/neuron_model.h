@@ -41,7 +41,7 @@ typedef global_neuron_params_t* global_neuron_params_pointer_t;
 
 //! \brief set the global neuron parameters
 //! \param[in] params: The parameters to set
-void neuron_model_set_global_neuron_params(
+static void neuron_model_set_global_neuron_params(
         const global_neuron_params_t *params);
 
 //! \brief primary function called in timer loop after synaptic updates
@@ -59,7 +59,7 @@ void neuron_model_set_global_neuron_params(
 //!     contains all the parameters for a specific neuron
 //! \return the value to be compared with a threshold value to determine if the
 //!     neuron has spiked
-state_t neuron_model_state_update(
+static state_t neuron_model_state_update(
         uint16_t num_excitatory_inputs, const input_t *exc_input,
         uint16_t num_inhibitory_inputs, const input_t *inh_input,
         input_t external_bias, neuron_t *restrict neuron);
@@ -67,14 +67,14 @@ state_t neuron_model_state_update(
 //! \brief Indicates that the neuron has spiked
 //! \param[in, out] neuron pointer to a neuron parameter struct which contains
 //!     all the parameters for a specific neuron
-void neuron_model_has_spiked(neuron_t *restrict neuron);
+static void neuron_model_has_spiked(neuron_t *restrict neuron);
 
 //! \brief get the neuron membrane voltage for a given neuron parameter set
 //! \param[in] neuron: a pointer to a neuron parameter struct which contains
 //!     all the parameters for a specific neuron
 //! \return the membrane voltage for a given neuron with the neuron
 //!     parameters specified in neuron
-state_t neuron_model_get_membrane_voltage(const neuron_t *neuron);
+static state_t neuron_model_get_membrane_voltage(const neuron_t *neuron);
 
 //! \brief printout of state variables i.e. those values that might change
 //! \param[in] neuron: a pointer to a neuron parameter struct which contains all
