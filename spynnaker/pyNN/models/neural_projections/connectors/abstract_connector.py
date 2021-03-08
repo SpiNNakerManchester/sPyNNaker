@@ -407,7 +407,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
                     self.__synapse_info.pre_population,
                     self.__synapse_info.post_population))
 
-        expand_distances = self._expand_distances(weights)
+        expand_distances = self._expand_distances(values)
 
         return self.__space.distances(
             self.__synapse_info.pre_population.positions,
