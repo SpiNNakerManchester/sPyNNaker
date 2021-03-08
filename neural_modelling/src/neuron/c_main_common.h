@@ -113,8 +113,11 @@ static inline bool initialise_common_regions(
     log_debug("setting timer tick callback for %d microseconds", *timer_period);
     spin1_set_timer_tick(*timer_period);
 
-    // Set up the timer tick callback (others are handled elsewhere)
-    spin1_callback_on(TIMER_TICK, timer_callback, priorities.timer);
+    if (timer_callback) {
+
+        // Set up the timer tick callback (others are handled elsewhere)
+        spin1_callback_on(TIMER_TICK, timer_callback, priorities.timer);
+    }
 
     return true;
 }
