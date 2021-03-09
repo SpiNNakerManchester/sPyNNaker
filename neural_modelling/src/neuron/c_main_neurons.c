@@ -257,7 +257,9 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
     neuron_do_timestep_update(time, timer_count);
 
     uint32_t end_time = tc[T1_COUNT];
-    log_info("%u: Time taken in timer = %u (start = %u, end = %u)", time, start_time - end_time, start_time, end_time);
+    if (end_time > start_time) {
+        log_info("%u: Time taken in timer = %u (start = %u, end = %u)", time, start_time - end_time, start_time, end_time);
+    }
 
     profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 }
