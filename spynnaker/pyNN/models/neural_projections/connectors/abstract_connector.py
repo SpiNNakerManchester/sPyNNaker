@@ -57,7 +57,8 @@ class AbstractConnector(object, metaclass=AbstractBase):
         "__space",
         "__verbose",
         "_weights",
-        "__param_seeds"]
+        "__param_seeds",
+        "__synapse_info"]
 
     def __init__(self, safe=True, callback=None, verbose=False, rng=None):
         """
@@ -81,6 +82,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         self.__n_clipped_delays = numpy.int64(0)
         self.__min_delay = 0
         self.__param_seeds = dict()
+        self.__synapse_info = None
 
     def set_space(self, space):
         """ Set the space object (allowed after instantiation).
@@ -131,7 +133,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         self._check_parameter(weights, "weights", allow_lists)
         self._check_parameter(delays, "delays", allow_lists)
 
-    def _get_delay_minimum(self, delays, n_connections):
+    def _get_delay_minimum(self, delays, n_connections, synapse_info):
         """ Get the minimum delay given a float, RandomDistribution or list of\
             delays.
 
@@ -149,6 +151,9 @@ class AbstractConnector(object, metaclass=AbstractBase):
 
             # The minimum is the maximum of the possible maximums
             return max(low_estimated_delay, low, 1)
+        elif isinstance(delays, str):
+            d = self._get_distances(delays, synapse_info)
+            return numpy.min(_expr_context.eval(delays, d=d))
         elif numpy.isscalar(delays):
             return delays
         elif hasattr(delays, "__getitem__"):
@@ -156,7 +161,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         raise SpynnakerException("Unrecognised delay format: {:s}".format(
             type(delays)))
 
-    def _get_delay_maximum(self, delays, n_connections):
+    def _get_delay_maximum(self, delays, n_connections, synapse_info):
         """ Get the maximum delay given a float, RandomDistribution or list of\
             delays.
 
@@ -174,6 +179,9 @@ class AbstractConnector(object, metaclass=AbstractBase):
 
             # The maximum is the minimum of the possible maximums
             return min(max_estimated_delay, high)
+        elif isinstance(delays, str):
+            d = self._get_distances(delays, synapse_info)
+            return numpy.max(_expr_context.eval(delays, d=d))
         elif numpy.isscalar(delays):
             return delays
         elif hasattr(delays, "__getitem__"):
@@ -199,7 +207,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         :rtype: int or None
         """
 
-    def get_delay_variance(self, delays):
+    def get_delay_variance(self, delays, synapse_info):
         """ Get the variance of the delays.
 
         :param delays:
@@ -209,6 +217,9 @@ class AbstractConnector(object, metaclass=AbstractBase):
         """
         if isinstance(delays, RandomDistribution):
             return utility_calls.get_variance(delays)
+        elif isinstance(delays, str):
+            d = self._get_distances(delays, synapse_info)
+            return numpy.var(_expr_context.eval(delays, d=d))
         elif numpy.isscalar(delays):
             return 0.0
         elif hasattr(delays, "__getitem__"):
@@ -217,7 +228,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
 
     def _get_n_connections_from_pre_vertex_with_delay_maximum(
             self, delays, n_total_connections, n_connections,
-            min_delay, max_delay):
+            min_delay, max_delay, synapse_info):
         """ Get the expected number of delays that will fall within min_delay
             and max_delay given given a float, RandomDistribution or list of
             delays.
@@ -236,6 +247,18 @@ class AbstractConnector(object, metaclass=AbstractBase):
                 delays, min_delay, max_delay)
             return int(math.ceil(utility_calls.get_probable_maximum_selected(
                 n_total_connections, n_connections, prob_in_range)))
+        elif isinstance(delays, str):
+            d = self._get_distances(delays, synapse_info)
+            delays = _expr_context.eval(delays, d=d)
+            n_delayed = sum([len([
+                delay for delay in delays
+                if min_delay <= delay <= max_delay])])
+            if n_delayed == 0:
+                return 0
+            n_total = len(delays)
+            prob_delayed = float(n_delayed) / float(n_total)
+            return int(math.ceil(utility_calls.get_probable_maximum_selected(
+                n_total_connections, n_connections, prob_delayed)))
         elif numpy.isscalar(delays):
             if min_delay <= delays <= max_delay:
                 return int(math.ceil(n_connections))
@@ -282,7 +305,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         :rtype: int
         """
 
-    def get_weight_mean(self, weights):
+    def get_weight_mean(self, weights, synapse_info):
         """ Get the mean of the weights.
 
         :param weights:
@@ -292,13 +315,16 @@ class AbstractConnector(object, metaclass=AbstractBase):
         """
         if isinstance(weights, RandomDistribution):
             return abs(utility_calls.get_mean(weights))
+        elif isinstance(weights, str):
+            d = self._get_distances(weights, synapse_info)
+            return numpy.mean(_expr_context.eval(weights, d=d))
         elif numpy.isscalar(weights):
             return abs(weights)
         elif hasattr(weights, "__getitem__"):
             return numpy.mean(weights)
         raise SpynnakerException("Unrecognised weight format")
 
-    def _get_weight_maximum(self, weights, n_connections):
+    def _get_weight_maximum(self, weights, n_connections, synapse_info):
         """ Get the maximum of the weights.
 
         :param weights:
@@ -323,7 +349,9 @@ class AbstractConnector(object, metaclass=AbstractBase):
                 if high is None:
                     return abs(max_weight)
                 return abs(min(max_weight, high))
-
+        elif isinstance(weights, str):
+            d = self._get_distances(weights, synapse_info)
+            return numpy.max(_expr_context.eval(weights, d=d))
         elif numpy.isscalar(weights):
             return abs(weights)
         elif hasattr(weights, "__getitem__"):
@@ -338,7 +366,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         :rtype: float
         """
 
-    def get_weight_variance(self, weights):
+    def get_weight_variance(self, weights, synapse_info):
         """ Get the variance of the weights.
 
         :param weights:
@@ -348,6 +376,9 @@ class AbstractConnector(object, metaclass=AbstractBase):
         """
         if isinstance(weights, RandomDistribution):
             return utility_calls.get_variance(weights)
+        elif isinstance(weights, str):
+            d = self._get_distances(weights, synapse_info)
+            return numpy.var(_expr_context.eval(weights, d=d))
         elif numpy.isscalar(weights):
             return 0.0
         elif hasattr(weights, "__getitem__"):
@@ -366,6 +397,21 @@ class AbstractConnector(object, metaclass=AbstractBase):
         """
         regexpr = re.compile(r'.*d\[\d*\].*')
         return regexpr.match(d_expression)
+
+    def _get_distances(self, values, synapse_info):
+        if self.__space is None:
+            raise Exception(
+                "Weights or delays are distance-dependent but no space object"
+                "was specified in projection {}-{}".format(
+                    synapse_info.pre_population,
+                    synapse_info.post_population))
+
+        expand_distances = self._expand_distances(values)
+
+        return self.__space.distances(
+            synapse_info.pre_population.positions,
+            synapse_info.post_population.positions,
+            expand_distances)
 
     def _generate_random_values(
             self, values, n_connections, pre_vertex_slice, post_vertex_slice):
@@ -389,8 +435,9 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return numpy.array([copy_rd.next(1)], dtype="float64")
         return copy_rd.next(n_connections)
 
-    def _generate_values(self, values, n_connections, connection_slices,
-                         pre_slice, post_slice, synapse_info):
+    def _generate_values(
+            self, values, sources, targets, n_connections, connection_slices,
+            pre_slice, post_slice, synapse_info):
         """
         :param values:
         :type values: ~pyNN.random.NumpyRNG or int or float or list(int) or
@@ -405,12 +452,6 @@ class AbstractConnector(object, metaclass=AbstractBase):
         if isinstance(values, RandomDistribution):
             return self._generate_random_values(
                 values, n_connections, pre_slice, post_slice)
-        elif numpy.isscalar(values):
-            return numpy.repeat([values], n_connections).astype("float64")
-        elif hasattr(values, "__getitem__"):
-            return numpy.concatenate([
-                values[connection_slice]
-                for connection_slice in connection_slices]).astype("float64")
         elif isinstance(values, str) or callable(values):
             if self.__space is None:
                 raise SpynnakerException(
@@ -422,18 +463,37 @@ class AbstractConnector(object, metaclass=AbstractBase):
             if isinstance(values, str):
                 expand_distances = self._expand_distances(values)
 
+                # At this point we need to now get the values corresponding to
+                # the distances between connections in "sources" and "targets"
+                eval_values = numpy.zeros(n_connections, dtype="float64")
+                for i in range(n_connections):
+                    # get the distance for this source and target pair
+                    dist = self.__space.distances(
+                        synapse_info.pre_population.positions[sources[i]],
+                        synapse_info.post_population.positions[targets[i]],
+                        expand_distances)
+                    # evaluate expression at this distance
+                    eval_values[i] = _expr_context.eval(values, d=dist)
+                return eval_values
+
             d = self.__space.distances(
-                synapse_info.pre_population.positions,
-                synapse_info.post_population.positions,
+                synapse_info.pre_population.positions[sources[i]],
+                synapse_info.post_population.positions[targets[i]],
                 expand_distances)
 
-            if isinstance(values, str):
-                return _expr_context.eval(values)
             return values(d)
-        raise SpynnakerException("what on earth are you giving me?")
+        elif numpy.isscalar(values):
+            return numpy.repeat([values], n_connections).astype("float64")
+        elif hasattr(values, "__getitem__"):
+            return numpy.concatenate([
+                values[connection_slice]
+                for connection_slice in connection_slices]).astype("float64")
+        raise SpynnakerException("Unrecognised values format {} - what on "
+                                 "earth are you giving me?".format(values))
 
-    def _generate_weights(self, n_connections, connection_slices,
-                          pre_slice, post_slice, synapse_info):
+    def _generate_weights(
+            self, sources, targets, n_connections, connection_slices,
+            pre_slice, post_slice, synapse_info):
         """ Generate weight values.
 
         :param int n_connections:
@@ -444,8 +504,8 @@ class AbstractConnector(object, metaclass=AbstractBase):
         :rtype: ~numpy.ndarray
         """
         weights = self._generate_values(
-            synapse_info.weights, n_connections, connection_slices, pre_slice,
-            post_slice, synapse_info)
+            synapse_info.weights, sources, targets, n_connections,
+            connection_slices, pre_slice, post_slice, synapse_info)
         if self.__safe:
             if not weights.size:
                 warn_once(logger, "No connection in " + str(self))
@@ -475,8 +535,9 @@ class AbstractConnector(object, metaclass=AbstractBase):
                 delays[delays < self.__min_delay] = self.__min_delay
         return delays
 
-    def _generate_delays(self, n_connections, connection_slices,
-                         pre_slice, post_slice, synapse_info):
+    def _generate_delays(
+            self, sources, targets, n_connections, connection_slices,
+            pre_slice, post_slice, synapse_info):
         """ Generate valid delay values.
 
         :param int n_connections:
@@ -487,8 +548,8 @@ class AbstractConnector(object, metaclass=AbstractBase):
         :rtype: ~numpy.ndarray
         """
         delays = self._generate_values(
-            synapse_info.delays, n_connections, connection_slices, pre_slice,
-            post_slice, synapse_info)
+            synapse_info.delays, sources, targets, n_connections,
+            connection_slices, pre_slice, post_slice, synapse_info)
 
         return self._clip_delays(delays)
 
@@ -563,6 +624,14 @@ class AbstractConnector(object, metaclass=AbstractBase):
         :param ~pyNN.space.Space new_value:
         """
         self.__space = new_value
+
+    @property
+    def synapse_info(self):
+        """ The synapse_info object (may be updated after instantiation).
+
+        :rtype: synapse_info or None
+        """
+        return self.__synapse_info
 
     @property
     def verbose(self):

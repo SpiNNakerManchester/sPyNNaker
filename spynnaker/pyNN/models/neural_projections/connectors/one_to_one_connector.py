@@ -14,13 +14,21 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy
+import math
 from pyNN.random import RandomDistribution
 from spinn_utilities.overrides import overrides
+from spinn_utilities.safe_eval import SafeEval
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
 from .abstract_connector_supports_views_on_machine import (
     AbstractConnectorSupportsViewsOnMachine)
+_expr_context = SafeEval(
+    math, numpy, numpy.arccos, numpy.arcsin, numpy.arctan, numpy.arctan2,
+    numpy.ceil, numpy.cos, numpy.cosh, numpy.exp, numpy.fabs, numpy.floor,
+    numpy.fmod, numpy.hypot, numpy.ldexp, numpy.log, numpy.log10, numpy.modf,
+    numpy.power, numpy.sin, numpy.sinh, numpy.sqrt, numpy.tan, numpy.tanh,
+    numpy.maximum, numpy.minimum, e=numpy.e, pi=numpy.pi)
 
 
 class OneToOneConnector(AbstractGenerateConnectorOnMachine,
@@ -52,13 +60,15 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
     def get_delay_maximum(self, synapse_info):
         return self._get_delay_maximum(
             synapse_info.delays,
-            max(synapse_info.n_pre_neurons, synapse_info.n_post_neurons))
+            max(synapse_info.n_pre_neurons, synapse_info.n_post_neurons),
+            synapse_info)
 
     @overrides(AbstractConnector.get_delay_minimum)
     def get_delay_minimum(self, synapse_info):
         return self._get_delay_minimum(
             synapse_info.delays,
-            max(synapse_info.n_pre_neurons, synapse_info.n_post_neurons))
+            max(synapse_info.n_pre_neurons, synapse_info.n_post_neurons),
+            synapse_info)
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
@@ -70,6 +80,14 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
 
         delays = synapse_info.delays
 
+        if isinstance(delays, str):
+            d = self._get_distances(delays, synapse_info)
+            delays = _expr_context.eval(delays, d=d)
+            if ((min_delay <= min(delays) <= max_delay) and (
+                    min_delay <= max(delays) <= max_delay)):
+                return 1
+            else:
+                return 0
         if numpy.isscalar(delays):
             return int(min_delay <= delays <= max_delay)
         if isinstance(delays, RandomDistribution):
@@ -91,7 +109,8 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
     def get_weight_maximum(self, synapse_info):
         return self._get_weight_maximum(
             synapse_info.weights,
-            max(synapse_info.n_pre_neurons, synapse_info.n_post_neurons))
+            max(synapse_info.n_pre_neurons, synapse_info.n_post_neurons),
+            synapse_info)
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
@@ -112,11 +131,13 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
         block["source"] = numpy.arange(max_lo_atom, min_hi_atom + 1)
         block["target"] = numpy.arange(max_lo_atom, min_hi_atom + 1)
         block["weight"] = self._generate_weights(
-            n_connections, [connection_slice], pre_vertex_slice,
-            post_vertex_slice, synapse_info)
+            block["source"], block["target"], n_connections,
+            [connection_slice], pre_vertex_slice, post_vertex_slice,
+            synapse_info)
         block["delay"] = self._generate_delays(
-            n_connections, [connection_slice], pre_vertex_slice,
-            post_vertex_slice, synapse_info)
+            block["source"], block["target"], n_connections,
+            [connection_slice], pre_vertex_slice, post_vertex_slice,
+            synapse_info)
         block["synapse_type"] = synapse_type
         return block
 

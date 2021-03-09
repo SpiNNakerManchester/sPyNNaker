@@ -316,10 +316,12 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             self._pre_w * self._pre_h * self._kernel_w * self._kernel_h)
         # Use the kernel delays if user has supplied them
         if self._krn_delays is not None:
-            return self._get_delay_maximum(self._krn_delays, n_conns)
+            return self._get_delay_maximum(
+                self._krn_delays, n_conns, synapse_info)
 
         # if not then use the values that came in
-        return self._get_delay_maximum(synapse_info.delays, n_conns)
+        return self._get_delay_maximum(
+            synapse_info.delays, n_conns, synapse_info)
 
     @overrides(AbstractConnector.get_delay_minimum)
     def get_delay_minimum(self, synapse_info):
@@ -328,10 +330,12 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             self._pre_w * self._pre_h * self._kernel_w * self._kernel_h)
         # Use the kernel delays if user has supplied them
         if self._krn_delays is not None:
-            return self._get_delay_minimum(self._krn_delays, n_conns)
+            return self._get_delay_minimum(
+                self._krn_delays, n_conns, synapse_info)
 
         # if not then use the values that came in
-        return self._get_delay_minimum(synapse_info.delays, n_conns)
+        return self._get_delay_minimum(
+            synapse_info.delays, n_conns, synapse_info)
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
@@ -352,9 +356,11 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             self._pre_w * self._pre_h * self._kernel_w * self._kernel_h)
         # Use the kernel weights if user has supplied them
         if self._krn_weights is not None:
-            return self._get_weight_maximum(self._krn_weights, n_conns)
+            return self._get_weight_maximum(
+                self._krn_weights, n_conns, synapse_info)
 
-        return self._get_weight_maximum(synapse_info.weights, n_conns)
+        return self._get_weight_maximum(
+            synapse_info.weights, n_conns, synapse_info)
 
     def __repr__(self):
         return "KernelConnector(shape_kernel[{},{}])".format(

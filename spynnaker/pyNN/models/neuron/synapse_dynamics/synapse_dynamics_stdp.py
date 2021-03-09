@@ -467,7 +467,7 @@ class SynapseDynamicsSTDP(
         return self.get_weight_maximum(connector, synapse_info)
 
     @overrides(AbstractPlasticSynapseDynamics.get_weight_variance)
-    def get_weight_variance(self, connector, weights):
+    def get_weight_variance(self, connector, weights, synapse_info):
         # Because the weights could all be changed to the maximum, the variance
         # has to be given as no variance
         return 0.0
