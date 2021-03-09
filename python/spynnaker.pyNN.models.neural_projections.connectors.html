@@ -175,7 +175,7 @@ or </em><a class="reference external" href="https://docs.python.org/3.8/library/
 
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.get_delay_variance">
-<code class="sig-name descname"><span class="pre">get_delay_variance</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">delays</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/abstract_connector.html#AbstractConnector.get_delay_variance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.get_delay_variance" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_delay_variance</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">delays</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synapse_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/abstract_connector.html#AbstractConnector.get_delay_variance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.get_delay_variance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the variance of the delays.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -260,7 +260,7 @@ or </em><a class="reference external" href="https://docs.python.org/3.8/library/
 
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.get_weight_mean">
-<code class="sig-name descname"><span class="pre">get_weight_mean</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/abstract_connector.html#AbstractConnector.get_weight_mean"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.get_weight_mean" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_weight_mean</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synapse_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/abstract_connector.html#AbstractConnector.get_weight_mean"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.get_weight_mean" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the mean of the weights.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -275,7 +275,7 @@ or </em><a class="reference external" href="https://docs.python.org/3.8/library/
 
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.get_weight_variance">
-<code class="sig-name descname"><span class="pre">get_weight_variance</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/abstract_connector.html#AbstractConnector.get_weight_variance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.get_weight_variance" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_weight_variance</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synapse_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/abstract_connector.html#AbstractConnector.get_weight_variance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.get_weight_variance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the variance of the weights.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -324,6 +324,17 @@ or </em><a class="reference external" href="https://docs.python.org/3.8/library/
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/space.html#pyNN.space.Space" title="(in PyNN v0.9)">Space</a> or <a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)">None</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.synapse_info">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">synapse_info</span></code><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.synapse_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>The synapse_info object (may be updated after instantiation).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>synapse_info or <a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)">None</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2019,7 +2030,7 @@ or </em><a class="reference external" href="https://docs.python.org/3.8/library/
 
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.get_delay_variance">
-<code class="sig-name descname"><span class="pre">get_delay_variance</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">delays</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/from_list_connector.html#FromListConnector.get_delay_variance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.get_delay_variance" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_delay_variance</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">delays</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synapse_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/from_list_connector.html#FromListConnector.get_delay_variance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.get_delay_variance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the variance of the delays.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -2134,7 +2145,7 @@ or </em><a class="reference external" href="https://docs.python.org/3.8/library/
 
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.get_weight_mean">
-<code class="sig-name descname"><span class="pre">get_weight_mean</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/from_list_connector.html#FromListConnector.get_weight_mean"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.get_weight_mean" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_weight_mean</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synapse_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/from_list_connector.html#FromListConnector.get_weight_mean"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.get_weight_mean" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the mean of the weights.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -2149,7 +2160,7 @@ or </em><a class="reference external" href="https://docs.python.org/3.8/library/
 
 <dl class="py method">
 <dt id="spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.get_weight_variance">
-<code class="sig-name descname"><span class="pre">get_weight_variance</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/from_list_connector.html#FromListConnector.get_weight_variance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.get_weight_variance" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_weight_variance</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synapse_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/from_list_connector.html#FromListConnector.get_weight_variance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.get_weight_variance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the variance of the weights.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>

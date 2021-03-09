@@ -119,6 +119,9 @@
 <span class="sd">        :type values: int or ~pyNN.random.NumpyRNG</span>
 <span class="sd">        :rtype: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Strings (i.e. for distance-dependent weights/delays) not supported</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
 
         <span class="c1"># Scalars are fine on the machine</span>
         <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>

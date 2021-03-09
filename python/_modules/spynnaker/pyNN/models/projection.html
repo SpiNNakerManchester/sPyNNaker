@@ -180,7 +180,8 @@
 
         <span class="c1"># round the delays to multiples of full timesteps</span>
         <span class="c1"># (otherwise SDRAM estimation calculations can go wrong)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">delay</span><span class="p">,</span> <span class="n">RandomDistribution</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">((</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">delay</span><span class="p">,</span> <span class="n">RandomDistribution</span><span class="p">))</span>
+                <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">delay</span><span class="p">,</span> <span class="nb">str</span><span class="p">))):</span>
             <span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">set_delay</span><span class="p">(</span>
                 <span class="n">numpy</span><span class="o">.</span><span class="n">rint</span><span class="p">(</span>
                     <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">delay</span><span class="p">)</span> <span class="o">*</span>

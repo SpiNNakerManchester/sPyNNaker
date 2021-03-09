@@ -505,7 +505,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_weight_maximum</span><span class="p">(</span><span class="n">connector</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SynapseDynamicsSTDP.get_weight_variance"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.get_weight_variance">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractPlasticSynapseDynamics</span><span class="o">.</span><span class="n">get_weight_variance</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_weight_variance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connector</span><span class="p">,</span> <span class="n">weights</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_weight_variance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connector</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="c1"># Because the weights could all be changed to the maximum, the variance</span>
         <span class="c1"># has to be given as no variance</span>
         <span class="k">return</span> <span class="mf">0.0</span></div>
