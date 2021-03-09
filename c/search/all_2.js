@@ -60,14 +60,13 @@ var searchData=
   ['buffer_5fbeing_5fread_136',['buffer_being_read',['../spike__processing_8c.html#a4f91d051c76c3a6e81e61a7707c277b4',1,'spike_processing.c']]],
   ['buffer_5fregion_5fsize_137',['buffer_region_size',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/reverse__iptag__multicast__source_8c.html#a6b1585986533aa1a0fe88032c9fa856d',1,'config']]],
   ['buffer_5fsize_138',['buffer_size',['http://spinnakermanchester.github.io/spinn_common/circular__buffer_8h.html#a6d1bf4f20c1c5a4775a958cb5d481aa4',1,'_circular_buffer']]],
-  ['buffer_5fsize_5fbefore_5frequest_139',['buffer_size_before_request',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/recording_8c.html#a85c4f257d220b3fdc78293b6de4de401',1,'recording_data_t']]],
-  ['buffered_5feieio_5fdefs_2eh_140',['buffered_eieio_defs.h',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/buffered__eieio__defs_8h.html',1,'']]],
-  ['buffered_5fin_5fsdp_5fport_141',['buffered_in_sdp_port',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/reverse__iptag__multicast__source_8c.html#a6cfd54be953745e79da0b57251ad1f4f',1,'config']]],
-  ['build_5ffixed_5fplastic_5fhalf_5fword_142',['build_fixed_plastic_half_word',['../matrix__generator__stdp_8h.html#a011bc952ba061982959d524e9fbd68cc',1,'matrix_generator_stdp.h']]],
-  ['build_5fstatic_5fword_143',['build_static_word',['../matrix__generator__static_8h.html#abef0ba0fc1675b818c5385bb2e99aafa',1,'matrix_generator_static.h']]],
-  ['builder_5fregion_5fstruct_144',['builder_region_struct',['../bit__field__expander_8c.html#structbuilder__region__struct',1,'']]],
-  ['burst_145',['burst',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/spinn__extra_8h.html#a25ab63b9ff8678c0c60d87153cabd9d1',1,'sdram_ram_config_t::burst()'],['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/spinn__extra_8h.html#afcbea77a791817bde1ef612eead3700c',1,'dma_description_t::burst()']]],
-  ['busy_146',['busy',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/spinn__extra_8h.html#a32196b6892711def2e5a1a74913c127b',1,'router_status_t']]],
-  ['byte_5fto_5fword_5fconversion_147',['BYTE_TO_WORD_CONVERSION',['../bit__field__expander_8c.html#ac9b2b86329da8040e6c2257d65b0a251',1,'bit_field_expander.c']]],
-  ['byte_5fto_5fword_5fconverter_148',['BYTE_TO_WORD_CONVERTER',['../spike__source__poisson_8c.html#a60ccdb9b7cf99da446d1b7a8a27a55a2',1,'spike_source_poisson.c']]]
+  ['buffered_5feieio_5fdefs_2eh_139',['buffered_eieio_defs.h',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/buffered__eieio__defs_8h.html',1,'']]],
+  ['buffered_5fin_5fsdp_5fport_140',['buffered_in_sdp_port',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/reverse__iptag__multicast__source_8c.html#a6cfd54be953745e79da0b57251ad1f4f',1,'config']]],
+  ['build_5ffixed_5fplastic_5fhalf_5fword_141',['build_fixed_plastic_half_word',['../matrix__generator__stdp_8h.html#a011bc952ba061982959d524e9fbd68cc',1,'matrix_generator_stdp.h']]],
+  ['build_5fstatic_5fword_142',['build_static_word',['../matrix__generator__static_8h.html#abef0ba0fc1675b818c5385bb2e99aafa',1,'matrix_generator_static.h']]],
+  ['builder_5fregion_5fstruct_143',['builder_region_struct',['../bit__field__expander_8c.html#structbuilder__region__struct',1,'']]],
+  ['burst_144',['burst',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/spinn__extra_8h.html#a25ab63b9ff8678c0c60d87153cabd9d1',1,'sdram_ram_config_t::burst()'],['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/spinn__extra_8h.html#afcbea77a791817bde1ef612eead3700c',1,'dma_description_t::burst()']]],
+  ['busy_145',['busy',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/spinn__extra_8h.html#a32196b6892711def2e5a1a74913c127b',1,'router_status_t']]],
+  ['byte_5fto_5fword_5fconversion_146',['BYTE_TO_WORD_CONVERSION',['../bit__field__expander_8c.html#ac9b2b86329da8040e6c2257d65b0a251',1,'bit_field_expander.c']]],
+  ['byte_5fto_5fword_5fconverter_147',['BYTE_TO_WORD_CONVERTER',['../spike__source__poisson_8c.html#a60ccdb9b7cf99da446d1b7a8a27a55a2',1,'spike_source_poisson.c']]]
 ];

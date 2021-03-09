@@ -964,7 +964,8 @@
 <span class="sd">        NOTE: does not take into account the struct that&#39;s being allocated</span>
 <span class="sd">        by the c code</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">n_record</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="p">)</span>
+        <span class="n">n_record</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__per_timestep_variables</span><span class="p">))</span>
         <span class="n">sdram</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">get_recording_header_size</span><span class="p">(</span><span class="n">n_record</span><span class="p">)</span> <span class="o">+</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">get_sdram_usage_in_bytes</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">))</span>
@@ -975,7 +976,8 @@
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">n_record</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="p">)</span>
+        <span class="n">n_record</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__per_timestep_variables</span><span class="p">))</span>
         <span class="n">sdram</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">get_recording_header_size</span><span class="p">(</span><span class="n">n_record</span><span class="p">)</span> <span class="o">+</span>
             <span class="n">get_recording_data_constant_size</span><span class="p">(</span><span class="n">n_record</span><span class="p">)</span> <span class="o">+</span>
@@ -1150,7 +1152,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.2.
     </div>
   </body>
 </html>

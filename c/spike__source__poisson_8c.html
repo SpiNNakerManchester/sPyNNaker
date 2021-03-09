@@ -222,10 +222,6 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <tr class="memitem:a285c14edf54c74a6fe624e2968964a12"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a285c14edf54c74a6fe624e2968964a12">mark_spike</a> (uint32_t neuron_id, uint32_t <a class="el" href="last__neuron__selection__impl_8h.html#a3517ef59d8e5a261be447e890013b160">n_spikes</a>)</td></tr>
 <tr class="memdesc:a285c14edf54c74a6fe624e2968964a12"><td class="mdescLeft">&#160;</td><td class="mdescRight">records spikes as needed  <a href="spike__source__poisson_8c.html#a285c14edf54c74a6fe624e2968964a12">More...</a><br /></td></tr>
 <tr class="separator:a285c14edf54c74a6fe624e2968964a12"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aef76853af3707b8ab86a141b0742623f"><td class="memItemLeft" align="right" valign="top"><a id="aef76853af3707b8ab86a141b0742623f"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#aef76853af3707b8ab86a141b0742623f">recording_complete_callback</a> (void)</td></tr>
-<tr class="memdesc:aef76853af3707b8ab86a141b0742623f"><td class="mdescLeft">&#160;</td><td class="mdescRight">callback for completed recording <br /></td></tr>
-<tr class="separator:aef76853af3707b8ab86a141b0742623f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6383f32ff6d54333f83d681ff919d4d0"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a6383f32ff6d54333f83d681ff919d4d0">record_spikes</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>)</td></tr>
 <tr class="memdesc:a6383f32ff6d54333f83d681ff919d4d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">writing spikes to SDRAM  <a href="spike__source__poisson_8c.html#a6383f32ff6d54333f83d681ff919d4d0">More...</a><br /></td></tr>
 <tr class="separator:a6383f32ff6d54333f83d681ff919d4d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -297,10 +293,6 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
 static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#afdae215608627a97110d1cd913398563">spike_buffer_size</a></td></tr>
 <tr class="memdesc:afdae215608627a97110d1cd913398563"><td class="mdescLeft">&#160;</td><td class="mdescRight">The size of each spike buffer in bytes. <br /></td></tr>
 <tr class="separator:afdae215608627a97110d1cd913398563"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a73b0389f0c75011bb1e3873ca01cd996"><td class="memItemLeft" align="right" valign="top"><a id="a73b0389f0c75011bb1e3873ca01cd996"></a>
-static volatile bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a73b0389f0c75011bb1e3873ca01cd996">recording_in_progress</a> = false</td></tr>
-<tr class="memdesc:a73b0389f0c75011bb1e3873ca01cd996"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if DMA recording is currently in progress. <br /></td></tr>
-<tr class="separator:a73b0389f0c75011bb1e3873ca01cd996"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac0c27301e134af3ce80814a553601074"><td class="memItemLeft" align="right" valign="top"><a id="ac0c27301e134af3ce80814a553601074"></a>
 static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#ac0c27301e134af3ce80814a553601074">timer_period</a></td></tr>
 <tr class="memdesc:ac0c27301e134af3ce80814a553601074"><td class="mdescLeft">&#160;</td><td class="mdescRight">The timer period. <br /></td></tr>
@@ -657,7 +649,7 @@ Array of rate descriptors. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00197">197</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00194">194</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
@@ -694,7 +686,7 @@ Array of rate descriptors. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Its current rate descriptor, in SDRAM </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00209">209</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00206">206</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
@@ -731,7 +723,7 @@ Array of rate descriptors. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>bit field at the location n </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00216">216</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00213">213</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
@@ -768,7 +760,7 @@ Array of rate descriptors. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>"time" in timer ticks * ISI_SCALE_FACTOR until the next spike occurs </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00233">233</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00230">230</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
@@ -805,7 +797,7 @@ Array of rate descriptors. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the number of spikes to transmit this timer tick </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00252">252</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00249">249</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
@@ -842,7 +834,7 @@ Array of rate descriptors. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The number of spikes to transmit this timer tick </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00269">269</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00266">266</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
@@ -878,7 +870,7 @@ Array of rate descriptors. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00282">282</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00279">279</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
@@ -915,7 +907,7 @@ Array of rate descriptors. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Whether the parameters were read successfully. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00306">306</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00303">303</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
@@ -951,7 +943,7 @@ Array of rate descriptors. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00333">333</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00330">330</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
@@ -988,7 +980,7 @@ Array of rate descriptors. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Whether the rates were read successfully. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00347">347</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00344">344</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
@@ -1025,7 +1017,7 @@ Array of rate descriptors. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Whether recording initialisation is successful </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00393">393</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00390">390</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
@@ -1056,7 +1048,7 @@ Array of rate descriptors. </td></tr>
 <p>Initialise the model by reading in the regions and checking recording data. </p>
 <dl class="section return"><dt>Returns</dt><dd>Whether it successfully read all the regions and set up all its internal data structures. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00408">408</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00405">405</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
@@ -1087,7 +1079,7 @@ Array of rate descriptors. </td></tr>
 <p>Store the Poisson parameters back into SDRAM for reading by the host when needed. </p>
 <dl class="section return"><dt>Returns</dt><dd>True if successful </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00513">513</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00510">510</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
@@ -1123,7 +1115,7 @@ Array of rate descriptors. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00535">535</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00532">532</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
@@ -1170,7 +1162,7 @@ Array of rate descriptors. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00563">563</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00560">560</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
@@ -1206,7 +1198,7 @@ Array of rate descriptors. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00584">584</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00576">576</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
@@ -1260,7 +1252,7 @@ Array of rate descriptors. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00602">602</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00588">588</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
@@ -1314,7 +1306,7 @@ Array of rate descriptors. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00649">649</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00635">635</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
@@ -1361,7 +1353,7 @@ Array of rate descriptors. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00690">690</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00676">676</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
@@ -1400,7 +1392,7 @@ Array of rate descriptors. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00758">758</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00743">743</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
@@ -1447,7 +1439,7 @@ Array of rate descriptors. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00794">794</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00779">779</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
@@ -1480,7 +1472,7 @@ Array of rate descriptors. </td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Mar 3 2021 16:05:42 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Tue Mar 9 2021 13:56:18 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

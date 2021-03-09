@@ -3413,13 +3413,6 @@
     <class kind="struct">bitfield_info_t</class>
     <member kind="function" static="yes">
       <type>static void</type>
-      <name>recording_done_callback</name>
-      <anchorfile>neuron__recording_8h.html</anchorfile>
-      <anchor>a4bbf0859d5fe0bbd7d4b3f63c0683608</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static void</type>
       <name>neuron_recording_record_value</name>
       <anchorfile>neuron__recording_8h.html</anchorfile>
       <anchor>a468a6544643c4df074d84a33f982f96a</anchor>
@@ -3507,13 +3500,6 @@
       <name>bitfield_recording_indexes</name>
       <anchorfile>neuron__recording_8h.html</anchorfile>
       <anchor>a2edd162fb9940477e5363386ba417f9e</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>volatile uint32_t</type>
-      <name>n_recordings_outstanding</name>
-      <anchorfile>neuron__recording_8h.html</anchorfile>
-      <anchor>a629e0fd3d865713eb4c4ec5c0f0c5352</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
@@ -8472,13 +8458,6 @@
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
-      <name>recording_complete_callback</name>
-      <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>aef76853af3707b8ab86a141b0742623f</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static void</type>
       <name>record_spikes</name>
       <anchorfile>spike__source__poisson_8c.html</anchorfile>
       <anchor>a6383f32ff6d54333f83d681ff919d4d0</anchor>
@@ -8608,13 +8587,6 @@
       <name>spike_buffer_size</name>
       <anchorfile>spike__source__poisson_8c.html</anchorfile>
       <anchor>afdae215608627a97110d1cd913398563</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" static="yes">
-      <type>static volatile bool</type>
-      <name>recording_in_progress</name>
-      <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>a73b0389f0c75011bb1e3873ca01cd996</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable" static="yes">
