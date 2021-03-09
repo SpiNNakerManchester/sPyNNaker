@@ -24,14 +24,13 @@
 #include "implementations/neuron_impl.h"
 #include "plasticity/synapse_dynamics.h"
 #include <debug.h>
-#include <tdma_processing.h>
 
 //! The key to be used for this core (will be ORed with neuron ID)
-static key_t key;
+key_t key;
 
 //! A checker that says if this model should be transmitting. If set to false
 //! by the data region, then this model should not have a key.
-static bool use_key;
+bool use_key;
 
 //! The number of neurons on the core
 static uint32_t n_neurons;
@@ -151,39 +150,12 @@ void neuron_do_timestep_update(timer_t time, uint timer_count) { // EXPORTED
     // Prepare recording for the next timestep
     neuron_recording_setup_for_next_recording();
 
-    // update each neuron individually
-    for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
-
-        // call the implementation function (boolean for spike)
-        bool spike = neuron_impl_do_timestep_update(neuron_index, 0);
-
-        // If the neuron has spiked
-        if (spike) {
-            log_debug("neuron %u spiked at time %u", neuron_index, time);
-
-            // Do any required synapse processing
-            synapse_dynamics_process_post_synaptic_event(time, neuron_index);
-
-            if (use_key) {
-                tdma_processing_send_packet(
-                    (key | neuron_index), 0, NO_PAYLOAD, timer_count);
-            }
-        } else {
-            log_debug("the neuron %d has been determined to not spike",
-                      neuron_index);
-         }
-    }
+    neuron_impl_do_timestep_update(timer_count, time, n_neurons);
 
     log_debug("time left of the timer after tdma is %d", tc[T1_COUNT]);
 
-    // Disable interrupts to avoid possible concurrent access
-    uint cpsr = spin1_int_disable();
-
     // Record the recorded variables
     neuron_recording_record(time);
-
-    // Re-enable interrupts
-    spin1_mode_restore(cpsr);
 }
 
 void neuron_add_inputs( // EXPORTED

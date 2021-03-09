@@ -39,11 +39,17 @@ typedef struct global_neuron_params_t global_neuron_params_t;
 //! pointer to global neuron parameters
 typedef global_neuron_params_t* global_neuron_params_pointer_t;
 
+#ifndef SOMETIMES_UNUSED
+#define SOMETIMES_UNUSED __attribute__((unused))
+#endif // !SOMETIMES_UNUSED
+
+SOMETIMES_UNUSED // Marked unused as only used sometimes
 //! \brief set the global neuron parameters
 //! \param[in] params: The parameters to set
 static void neuron_model_set_global_neuron_params(
         const global_neuron_params_t *params);
 
+SOMETIMES_UNUSED // Marked unused as only used sometimes
 //! \brief primary function called in timer loop after synaptic updates
 //! \param[in] num_excitatory_inputs: Number of excitatory receptor types.
 //! \param[in] exc_input: Pointer to array of inputs per receptor type received
@@ -64,11 +70,13 @@ static state_t neuron_model_state_update(
         uint16_t num_inhibitory_inputs, const input_t *inh_input,
         input_t external_bias, neuron_t *restrict neuron);
 
+SOMETIMES_UNUSED // Marked unused as only used sometimes
 //! \brief Indicates that the neuron has spiked
 //! \param[in, out] neuron pointer to a neuron parameter struct which contains
 //!     all the parameters for a specific neuron
 static void neuron_model_has_spiked(neuron_t *restrict neuron);
 
+SOMETIMES_UNUSED // Marked unused as only used sometimes
 //! \brief get the neuron membrane voltage for a given neuron parameter set
 //! \param[in] neuron: a pointer to a neuron parameter struct which contains
 //!     all the parameters for a specific neuron
