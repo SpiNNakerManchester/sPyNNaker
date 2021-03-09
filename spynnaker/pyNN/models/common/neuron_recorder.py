@@ -926,7 +926,8 @@ class NeuronRecorder(object):
         NOTE: does not take into account the struct that's being allocated
         by the c code
         """
-        n_record = len(self.__sampling_rates)
+        n_record = (
+            len(self.__sampling_rates) + len(self.__per_timestep_variables))
         sdram = (
             get_recording_header_size(n_record) +
             self.get_sdram_usage_in_bytes(vertex_slice))
@@ -937,7 +938,8 @@ class NeuronRecorder(object):
         :param ~pacman.model.graphs.common.Slice vertex_slice:
         :rtype: int
         """
-        n_record = len(self.__sampling_rates)
+        n_record = (
+            len(self.__sampling_rates) + len(self.__per_timestep_variables))
         sdram = (
             get_recording_header_size(n_record) +
             get_recording_data_constant_size(n_record) +
