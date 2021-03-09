@@ -27,7 +27,7 @@
 #include <data_specification.h>
 #include <recording.h>
 #include <debug.h>
-#include <random.h>
+#include <normal.h>
 #include <simulation.h>
 #include <spin1_api.h>
 #include <bit_field.h>
@@ -44,9 +44,6 @@
 #endif
 
 // ----------------------------------------------------------------------
-
-//! Spin1 API ticks, to know when the timer wraps
-extern uint ticks;
 
 //! data structure for Poisson sources
 typedef struct spike_source_t {
@@ -110,6 +107,13 @@ typedef enum ssp_callback_priorities {
     TIMER = 2
 } callback_priorities;
 
+typedef struct {
+    uint32_t x;
+    uint32_t y;
+    uint32_t z;
+    uint32_t c;
+} rng_seed_t;
+
 //! Parameters of the SpikeSourcePoisson
 typedef struct global_parameters {
     //! True if there is a key to transmit, False otherwise
@@ -130,8 +134,10 @@ typedef struct global_parameters {
     uint32_t first_source_id;
     //! The number of sources in this sub-population
     uint32_t n_spike_sources;
+    //! Maximum expected spikes per tick (for recording)
+    uint32_t max_spikes_per_tick;
     //! The seed for the Poisson generation process
-    mars_kiss64_seed_t spike_source_seed;
+    rng_seed_t spike_source_seed;
 } global_parameters;
 
 //! Structure of the provenance data
@@ -207,6 +213,53 @@ static struct sdram_config *sdram_inputs;
 //! The inputs to be sent at the end of this timestep
 static uint16_t *input_this_timestep;
 
+static inline uint32_t rng(void) {
+    ssp_params.spike_source_seed.x = 314527869 * ssp_params.spike_source_seed.x + 1234567;
+    ssp_params.spike_source_seed.y ^= ssp_params.spike_source_seed.y << 5;
+    ssp_params.spike_source_seed.y ^= ssp_params.spike_source_seed.y >> 7;
+    ssp_params.spike_source_seed.y ^= ssp_params.spike_source_seed.y << 22;
+    uint64_t t = 4294584393ULL * ssp_params.spike_source_seed.z + ssp_params.spike_source_seed.c;
+    ssp_params.spike_source_seed.c = t >> 32;
+    ssp_params.spike_source_seed.z = t;
+
+    return (uint32_t) ssp_params.spike_source_seed.x
+            + ssp_params.spike_source_seed.y + ssp_params.spike_source_seed.z;
+}
+
+static inline uint32_t n_spikes_poisson_fast(UFRACT exp_minus_lambda) {
+    UFRACT p = UFRACT_CONST(1.0);
+    uint32_t k = 0;
+
+    do {
+        k++;
+        //  p = p * ulrbits(uni_rng(seed_arg));
+        // Possibly faster multiplication by using DRL's routines
+        p = ulrbits(__stdfix_smul_ulr(bitsulr(p), rng()));
+    } while (bitsulr(p) > bitsulr(exp_minus_lambda));
+    return k - 1;
+}
+
+static inline REAL n_steps_until_next(void) {
+    REAL A = REAL_CONST(0.0);
+    uint32_t U, U0, USTAR;
+
+    while (true) {
+        U = rng();
+        U0 = U;
+
+        do {
+            USTAR = rng();
+            if (U < USTAR) {
+                return A + (REAL) ulrbits(U0);
+            }
+
+            U = rng();
+        } while (U < USTAR);
+
+        A += 1.0k;
+    }
+}
+
 // ----------------------------------------------------------------------
 
 //! \brief Writes the provenance data
@@ -250,11 +303,8 @@ static inline void reset_spikes(void) {
 static inline uint32_t slow_spike_source_get_time_to_spike(
         uint32_t mean_inter_spike_interval_in_ticks) {
     // Round (dist variate * ISI_SCALE_FACTOR), convert to uint32
-    int nbits = 15;
     uint32_t value = (uint32_t) roundk(
-            exponential_dist_variate(
-                    mars_kiss64_seed, ssp_params.spike_source_seed)
-            * ISI_SCALE_FACTOR, nbits);
+            n_steps_until_next() * ISI_SCALE_FACTOR, (15));
     // Now multiply by the mean ISI
     uint32_t exp_variate = value * mean_inter_spike_interval_in_ticks;
     // Note that this will be compared to ISI_SCALE_FACTOR in the main loop!
@@ -273,8 +323,7 @@ static inline uint32_t fast_spike_source_get_num_spikes(
     if (bitsulr(exp_minus_lambda) == bitsulr(UFRACT_CONST(0.0))) {
         return 0;
     }
-    return poisson_dist_variate_exp_minus_lambda(
-            mars_kiss64_seed, ssp_params.spike_source_seed, exp_minus_lambda);
+    return n_spikes_poisson_fast(exp_minus_lambda);
 }
 
 //! \brief Determine how many spikes to transmit this timer tick, for a faster
@@ -286,11 +335,10 @@ static inline uint32_t fast_spike_source_get_num_spikes(
 static inline uint32_t faster_spike_source_get_num_spikes(
         REAL sqrt_lambda) {
     // First we do x = (inv_gauss_cdf(U(0, 1)) * 0.5) + sqrt(lambda)
-    REAL x = (gaussian_dist_variate(mars_kiss64_seed, ssp_params.spike_source_seed)
-            * HALF) + sqrt_lambda;
+    uint32_t U = rng();
+    REAL x = (norminv_urt(U) * HALF) + sqrt_lambda;
     // Then we return int(roundk(x * x))
-    int nbits = 15;
-    return (uint32_t) roundk(x * x, nbits);
+    return (uint32_t) roundk(x * x, 15);
 }
 
 #if LOG_LEVEL >= LOG_DEBUG
@@ -327,10 +375,10 @@ static bool read_global_parameters(global_parameters *sdram_globals) {
 
     log_info("\tkey = %08x, set rate mask = %08x",
             ssp_params.key, ssp_params.set_rate_neuron_id_mask);
-    log_info("\tseed = %u %u %u %u", ssp_params.spike_source_seed[0],
-            ssp_params.spike_source_seed[1],
-            ssp_params.spike_source_seed[2],
-            ssp_params.spike_source_seed[3]);
+    log_info("\tseed = %u %u %u %u", ssp_params.spike_source_seed.c,
+            ssp_params.spike_source_seed.x,
+            ssp_params.spike_source_seed.y,
+            ssp_params.spike_source_seed.z);
 
     log_info("\tspike sources = %u, starting at %u",
             ssp_params.n_spike_sources, ssp_params.first_source_id);
@@ -418,6 +466,33 @@ static bool initialise_recording(data_specification_metadata_t *ds_regions) {
     return success;
 }
 
+//! \brief Expand the space for recording spikes.
+//! \param[in] n_spikes: New number of spikes to hold
+static inline void expand_spike_recording_buffer(uint32_t n_spikes) {
+    uint32_t new_size = 8 + (n_spikes * spike_buffer_size);
+    timed_out_spikes *new_spikes = spin1_malloc(new_size);
+    if (new_spikes == NULL) {
+        log_error("Cannot reallocate spike buffer");
+        rt_error(RTE_SWERR);
+    }
+
+    // bzero the new buffer
+    uint32_t *data = (uint32_t *) new_spikes;
+    for (uint32_t n = new_size >> 2; n > 0; n--) {
+        data[n - 1] = 0;
+    }
+
+    // Copy over old buffer if we have it
+    if (spikes != NULL) {
+        spin1_memcpy(new_spikes, spikes,
+                8 + n_spike_buffers_allocated * spike_buffer_size);
+        sark_free(spikes);
+    }
+
+    spikes = new_spikes;
+    n_spike_buffers_allocated = n_spikes;
+}
+
 //! \brief Initialise the model by reading in the regions and checking
 //!     recording data.
 //! \return Whether it successfully read all the regions and set up
@@ -477,6 +552,7 @@ static bool initialize(void) {
     n_spike_buffers_allocated = 0;
     n_spike_buffer_words = get_bit_field_size(ssp_params.n_spike_sources);
     spike_buffer_size = n_spike_buffer_words * sizeof(uint32_t);
+    expand_spike_recording_buffer(ssp_params.max_spikes_per_tick);
 
     // Setup profiler
     profiler_init(
@@ -571,33 +647,6 @@ static bool store_poisson_parameters(void) {
 
     log_info("store_parameters: completed successfully");
     return true;
-}
-
-//! \brief Expand the space for recording spikes.
-//! \param[in] n_spikes: New number of spikes to hold
-static inline void expand_spike_recording_buffer(uint32_t n_spikes) {
-    uint32_t new_size = 8 + (n_spikes * spike_buffer_size);
-    timed_out_spikes *new_spikes = spin1_malloc(new_size);
-    if (new_spikes == NULL) {
-        log_error("Cannot reallocate spike buffer");
-        rt_error(RTE_SWERR);
-    }
-
-    // bzero the new buffer
-    uint32_t *data = (uint32_t *) new_spikes;
-    for (uint32_t n = new_size >> 2; n > 0; n--) {
-        data[n - 1] = 0;
-    }
-
-    // Copy over old buffer if we have it
-    if (spikes != NULL) {
-        spin1_memcpy(new_spikes, spikes,
-                8 + n_spike_buffers_allocated * spike_buffer_size);
-        sark_free(spikes);
-    }
-
-    spikes = new_spikes;
-    n_spike_buffers_allocated = n_spikes;
 }
 
 //! \brief records spikes as needed

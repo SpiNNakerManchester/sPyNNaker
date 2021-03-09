@@ -164,8 +164,9 @@ class SpikeSourcePoissonMachineVertex(
     # 4. UFRACT seconds_per_tick; 5. REAL ticks_per_second;
     # 6. REAL slow_rate_per_tick_cutoff; 7. REAL fast_rate_per_tick_cutoff;
     # 8. uint32_t first_source_id; 9. uint32_t n_spike_sources;
-    # 10,11,12,13 mars_kiss64_seed_t (uint[4]) spike_source_seed;
-    PARAMS_BASE_WORDS = 13
+    # 10. uint32_t max_spikes_per_timestep;
+    # 11,12,13,14 mars_kiss64_seed_t (uint[4]) spike_source_seed;
+    PARAMS_BASE_WORDS = 14
 
     # Seed offset in parameters and size on bytes
     SEED_OFFSET_BYTES = 9 * 4
@@ -603,6 +604,9 @@ class SpikeSourcePoissonMachineVertex(
 
         # Write the number of sources
         spec.write_value(data=self.vertex_slice.n_atoms)
+
+        # Write the maximum spikes per tick
+        spec.write_value(data=self.max_spikes_per_ts(machine_time_step))
 
         # Write the random seed (4 words), generated randomly!
         for value in self._app_vertex.kiss_seed(self.vertex_slice):
