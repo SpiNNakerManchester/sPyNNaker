@@ -498,12 +498,13 @@ class SynapticManager(object):
                 connector.get_n_connections_to_post_vertex_maximum(
                     synapse_info)
             weight_variance = synapse_dynamics.get_weight_variance(
-                connector, synapse_info.weights) * weight_scale_squared
+                connector, synapse_info.weights,
+                synapse_info) * weight_scale_squared
             running_totals[synapse_type].add_items(
                 weight_mean, weight_variance, n_connections)
 
             delay_variance = synapse_dynamics.get_delay_variance(
-                connector, synapse_info.delays)
+                connector, synapse_info.delays, synapse_info)
             delay_running_totals[synapse_type].add_items(
                 0.0, delay_variance, n_connections)
 
