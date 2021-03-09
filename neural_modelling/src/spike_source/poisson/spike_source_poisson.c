@@ -184,9 +184,6 @@ static uint32_t n_spike_buffer_words;
 //! The size of each spike buffer in bytes
 static uint32_t spike_buffer_size;
 
-//! True if DMA recording is currently in progress
-static volatile bool recording_in_progress = false;
-
 //! The timer period
 static uint32_t timer_period;
 
@@ -574,23 +571,12 @@ static inline void mark_spike(uint32_t neuron_id, uint32_t n_spikes) {
     }
 }
 
-//! \brief callback for completed recording
-static void recording_complete_callback(void) {
-    recording_in_progress = false;
-}
-
 //! \brief writing spikes to SDRAM
 //! \param[in] time: the time to which these spikes are being recorded
 static inline void record_spikes(uint32_t time) {
-    while (recording_in_progress) {
-        wait_for_interrupt();
-    }
     if ((spikes != NULL) && (spikes->n_buffers > 0)) {
-        recording_in_progress = true;
         spikes->time = time;
-        recording_record_and_notify(
-                0, spikes, 8 + (spikes->n_buffers * spike_buffer_size),
-                recording_complete_callback);
+        recording_record(0, spikes, 8 + (spikes->n_buffers * spike_buffer_size));
         reset_spikes();
     }
 }
@@ -650,17 +636,10 @@ static void process_slow_source(
         index_t s_id, spike_source_t *source, uint timer_count) {
     if ((time >= source->start_ticks) && (time < source->end_ticks)
             && (source->mean_isi_ticks != 0)) {
+        uint32_t count = 0;
         // Mark a spike while the "timer" is below the scale factor value
         while (source->time_to_spike_ticks < ISI_SCALE_FACTOR) {
-            // Write spike to out_spikes
-            mark_spike(s_id, 1);
-
-            // if no key has been given, do not send spike to fabric.
-            if (ssp_params.has_key) {
-                // Send package
-                tdma_processing_send_packet(
-                    ssp_params.key | s_id, 0, NO_PAYLOAD, timer_count);
-            }
+            count++;
 
             // Update time to spike (note, this might not get us back above
             // the scale factor, particularly if the mean_isi is smaller)
@@ -670,6 +649,17 @@ static void process_slow_source(
                     slow_spike_source_get_time_to_spike(source->mean_isi_ticks);
             profiler_write_entry_disable_irq_fiq(
                     PROFILER_EXIT | PROFILER_PROB_FUNC);
+        }
+        if (count) {
+            // Write spike to out_spikes
+            mark_spike(s_id, count);
+
+            // if no key has been given, do not send spike to fabric.
+            if (ssp_params.has_key) {
+                // Send package
+                tdma_processing_send_packet(
+                    ssp_params.key | s_id, count, WITH_PAYLOAD, timer_count);
+            }
         }
 
         // Now we have finished for this tick, subtract the scale factor
@@ -743,7 +733,6 @@ static void timer_callback(uint timer_count, UNUSED uint unused) {
     // Record output spikes if required
     if (recording_flags > 0) {
         record_spikes(time);
-        recording_do_timestep_update(time);
     }
 }
 

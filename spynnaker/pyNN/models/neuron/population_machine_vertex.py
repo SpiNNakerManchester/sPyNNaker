@@ -90,6 +90,10 @@ class PopulationMachineVertex(
         INPUT_BUFFER_FILLED_SIZE = 13
         #: The number of TDMA misses
         TDMA_MISSES = 14
+        # the maxmimum number of background tasks queued
+        MAX_BACKGROUND_QUEUED = 15
+        # the number of times the background queue overloaded
+        N_BACKGROUND_OVERLOADS = 16
 
     SATURATION_COUNT_NAME = "Times_synaptic_weights_have_saturated"
     _SATURATION_COUNT_MESSAGE = (
@@ -151,8 +155,18 @@ class PopulationMachineVertex(
         "extra bytes of DTCM (assuming cores have at most 255 neurons). Try "
         "reducing neurons per core, or size of buffers, or neuron params per "
         "neuron, etc.")
+    _BACKGROUND_OVERLOADS_MESSAGE = (
+        "On {} on {}, {}, {}, the background queue overloaded {} times.  "
+        "Try increasing the time_scale_factor located within the "
+        ".spynnaker.cfg file or in the pynn.setup() method.")
+    _BACKGROUND_MAX_QUEUED_MESSAGE = (
+        "A maximum of {} background tasks were queued on {} on {}, {}, {}.  "
+        "Try increasing the time_scale_factor located within the "
+        ".spynnaker.cfg file or in the pynn.setup() method.")
 
     _MAX_FILLED_SIZE_OF_INPUT_BUFFER_NAME = "Max_filled_size_input_buffer"
+    _BACKGROUND_OVERLOADS_NAME = "Times_the_background_queue_overloaded"
+    _BACKGROUND_MAX_QUEUED_NAME = "Max_backgrounds_queued"
 
     _PROFILE_TAG_LABELS = {
         0: "TIMER",
@@ -281,18 +295,19 @@ class PopulationMachineVertex(
          last_timer_tick, n_plastic_saturations, n_ghost_searches,
          failed_to_read_bit_fields, dma_completes, spike_processing_count,
          invalid_master_pop_hits, n_packets_filtered, n_rewires,
-         n_late_packets, input_buffer_max_filled_size, tdma_misses) = \
+         n_late_packets, input_buffer_max_filled_size, tdma_misses,
+         max_background_queued, n_background_overloads) = \
             self._get_remaining_provenance_data_items(provenance_data)
 
         # translate into provenance data items
         yield ProvenanceDataItem(
             self._add_name(names, self.SATURATION_COUNT_NAME),
-            n_saturations, report=n_saturations > 0,
+            n_saturations, report=(n_saturations > 0),
             message=self._SATURATION_COUNT_MESSAGE.format(
                 label, x, y, p, n_saturations))
         yield ProvenanceDataItem(
             self._add_name(names, self.INPUT_BUFFER_FULL_NAME),
-            n_buffer_overflows, report=n_buffer_overflows > 0,
+            n_buffer_overflows, report=(n_buffer_overflows > 0),
             message=self._INPUT_BUFFER_FULL_MESSAGE.format(
                 label, x, y, p, n_buffer_overflows))
         yield ProvenanceDataItem(
@@ -302,14 +317,14 @@ class PopulationMachineVertex(
             self._add_name(names, self.LAST_TIMER_TICK_NAME), last_timer_tick)
         yield ProvenanceDataItem(
             self._add_name(names, self.SATURATED_PLASTIC_WEIGHTS_NAME),
-            n_plastic_saturations, report=n_plastic_saturations > 0,
+            n_plastic_saturations, report=(n_plastic_saturations > 0),
             message=self._SATURATED_PLASTIC_WEIGHTS_MESSAGE.format(
                 label, x, y, p, n_plastic_saturations))
         yield ProvenanceDataItem(
             self._add_name(names, self.N_RE_WIRES_NAME), n_rewires)
         yield ProvenanceDataItem(
             self._add_name(names, self.GHOST_SEARCHES), n_ghost_searches,
-            report=n_ghost_searches > 0,
+            report=(n_ghost_searches > 0),
             message=self._GHOST_SEARCH_MESSAGE.format(
                 label, x, y, p, n_ghost_searches))
         yield ProvenanceDataItem(
@@ -325,7 +340,7 @@ class PopulationMachineVertex(
             spike_processing_count)
         yield ProvenanceDataItem(
             self._add_name(names, self.INVALID_MASTER_POP_HITS),
-            invalid_master_pop_hits, report=invalid_master_pop_hits > 0,
+            invalid_master_pop_hits, report=(invalid_master_pop_hits > 0),
             message=self._INVALID_POP_MESSAGE.format(
                 invalid_master_pop_hits, x, y, p))
         yield ProvenanceDataItem(
@@ -340,14 +355,26 @@ class PopulationMachineVertex(
             else self._N_LATE_SPIKES_MESSAGE_NO_DROP)
         yield ProvenanceDataItem(
             self._add_name(names, self._N_LATE_SPIKES_NAME),
-            n_late_packets, report=n_late_packets > 0,
+            n_late_packets, report=(n_late_packets > 0),
             message=late_message.format(n_late_packets, label, x, y, p))
 
         yield ProvenanceDataItem(
             self._add_name(names, self._MAX_FILLED_SIZE_OF_INPUT_BUFFER_NAME),
-            input_buffer_max_filled_size)
+            input_buffer_max_filled_size, report=False)
+
         yield self._app_vertex.get_tdma_provenance_item(
             names, x, y, p, tdma_misses)
+
+        yield ProvenanceDataItem(
+            self._add_name(names, self._BACKGROUND_MAX_QUEUED_NAME),
+            max_background_queued, report=(max_background_queued > 1),
+            message=self._BACKGROUND_MAX_QUEUED_MESSAGE.format(
+                max_background_queued, label, x, y, p))
+        yield ProvenanceDataItem(
+            self._add_name(names, self._BACKGROUND_OVERLOADS_NAME),
+            n_background_overloads, report=(n_background_overloads > 0),
+            message=self._BACKGROUND_OVERLOADS_MESSAGE.format(
+                label, x, y, p, n_background_overloads))
 
     @overrides(AbstractReceiveBuffersToHost.get_recorded_region_ids)
     def get_recorded_region_ids(self):

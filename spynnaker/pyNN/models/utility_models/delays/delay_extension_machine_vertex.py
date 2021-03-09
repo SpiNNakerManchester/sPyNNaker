@@ -32,7 +32,7 @@ from spinn_front_end_common.utilities.utility_objs import ExecutableType
 #  6. n_delay_stages, 7. the number of delay supported by each delay stage
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
-_DELAY_PARAM_HEADER_WORDS = 7
+_DELAY_PARAM_HEADER_WORDS = 8
 
 _EXPANDER_BASE_PARAMS_SIZE = 3 * BYTES_PER_WORD
 
@@ -44,7 +44,8 @@ class DelayExtensionMachineVertex(
         AbstractHasAssociatedBinary, AbstractGeneratesDataSpecification):
 
     __slots__ = [
-        "__resources"]
+        "__resources",
+        "__drop_late_spikes"]
 
     class _DELAY_EXTENSION_REGIONS(Enum):
         SYSTEM = 0
@@ -64,6 +65,9 @@ class DelayExtensionMachineVertex(
         N_PACKETS_LOST_DUE_TO_COUNT_SATURATION = 7
         N_PACKETS_WITH_INVALID_NEURON_IDS = 8
         N_PACKETS_DROPPED_DUE_TO_INVALID_KEY = 9
+        N_LATE_SPIKES = 10
+        MAX_BACKGROUND_QUEUED = 11
+        N_BACKGROUND_OVERLOADS = 12
 
     N_EXTRA_PROVENANCE_DATA_ENTRIES = len(EXTRA_PROVENANCE_DATA_ENTRIES)
 
@@ -116,7 +120,29 @@ class DelayExtensionMachineVertex(
         "increase the timer_tic or time_scale_factor or decrease the "
         "number of neurons per core.")
 
+    N_LATE_SPIKES_NAME = "Number_of_late_spikes"
+    N_LATE_SPIKES_MESSAGE_DROP = (
+        "{} packets from {} on {}, {}, {} were dropped from the input buffer, "
+        "because they arrived too late to be processed in a given time step. "
+        "Try increasing the time_scale_factor located within the "
+        ".spynnaker.cfg file or in the pynn.setup() method.")
+    N_LATE_SPIKES_MESSAGE_NO_DROP = (
+        "{} packets from {} on {}, {}, {} arrived too late to be processed in"
+        " a given time step. "
+        "Try increasing the time_scale_factor located within the "
+        ".spynnaker.cfg file or in the pynn.setup() method.")
+
     DELAYED_FOR_TRAFFIC_NAME = "Number_of_times_delayed_to_spread_traffic"
+    BACKGROUND_OVERLOADS_NAME = "Times_the_background_queue_overloaded"
+    _BACKGROUND_OVERLOADS_MESSAGE = (
+        "On {} on {}, {}, {}, the background queue overloaded {} times.  "
+        "Try increasing the time_scale_factor located within the "
+        ".spynnaker.cfg file or in the pynn.setup() method.")
+    BACKGROUND_MAX_QUEUED_NAME = "Max_backgrounds_queued"
+    _BACKGROUND_MAX_QUEUED_MESSAGE = (
+        "A maximum of {} background tasks were queued on {} on {}, {}, {}.  "
+        "Try increasing the time_scale_factor located within the "
+        ".spynnaker.cfg file or in the pynn.setup() method.")
 
     def __init__(self, resources_required, label, constraints=None,
                  app_vertex=None, vertex_slice=None):
@@ -160,7 +186,8 @@ class DelayExtensionMachineVertex(
     def _get_extra_provenance_items(
             self, label, location, names, provenance_data):
         (n_received, n_processed, n_added, n_sent, n_overflows, n_delays,
-         n_tdma_behind, n_sat, n_bad_neuron, n_bad_keys) = provenance_data
+         n_tdma_behind, n_sat, n_bad_neuron, n_bad_keys, n_late_spikes,
+         max_bg, n_bg_overloads) = provenance_data
 
         x, y, p = location
 
@@ -203,6 +230,26 @@ class DelayExtensionMachineVertex(
             self._add_name(names, self.DELAYED_FOR_TRAFFIC_NAME), n_delays)
         yield self._app_vertex.get_tdma_provenance_item(
             names, x, y, p, n_tdma_behind)
+
+        late_message = (
+            self.N_LATE_SPIKES_MESSAGE_DROP
+            if self._app_vertex.drop_late_spikes
+            else self.N_LATE_SPIKES_MESSAGE_NO_DROP)
+        yield ProvenanceDataItem(
+            self._add_name(names, self.N_LATE_SPIKES_NAME),
+            n_late_spikes, report=(n_late_spikes > 0),
+            message=late_message.format(n_late_spikes, label, x, y, p))
+
+        yield ProvenanceDataItem(
+            self._add_name(names, self.BACKGROUND_MAX_QUEUED_NAME),
+            max_bg, report=(max_bg > 1),
+            message=self._BACKGROUND_MAX_QUEUED_MESSAGE.format(
+                max_bg, label, x, y, p))
+        yield ProvenanceDataItem(
+            self._add_name(names, self.BACKGROUND_OVERLOADS_NAME),
+            n_bg_overloads, report=(n_bg_overloads > 0),
+            message=self._BACKGROUND_OVERLOADS_MESSAGE.format(
+                label, x, y, p, n_bg_overloads))
 
     @overrides(MachineVertex.get_n_keys_for_partition)
     def get_n_keys_for_partition(self, _partition):
@@ -368,6 +415,9 @@ class DelayExtensionMachineVertex(
 
         # write the delay per delay stage
         spec.write_value(data=self._app_vertex.delay_per_stage)
+
+        # write whether to throw away spikes
+        spec.write_value(data=int(self._app_vertex.drop_late_spikes))
 
         # Write the actual delay blocks (create a new one if it doesn't exist)
         spec.write_array(array_values=self._app_vertex.delay_blocks_for(
