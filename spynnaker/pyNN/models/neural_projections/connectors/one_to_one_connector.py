@@ -60,13 +60,15 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
     def get_delay_maximum(self, synapse_info):
         return self._get_delay_maximum(
             synapse_info.delays,
-            max(synapse_info.n_pre_neurons, synapse_info.n_post_neurons))
+            max(synapse_info.n_pre_neurons, synapse_info.n_post_neurons),
+            synapse_info)
 
     @overrides(AbstractConnector.get_delay_minimum)
     def get_delay_minimum(self, synapse_info):
         return self._get_delay_minimum(
             synapse_info.delays,
-            max(synapse_info.n_pre_neurons, synapse_info.n_post_neurons))
+            max(synapse_info.n_pre_neurons, synapse_info.n_post_neurons),
+            synapse_info)
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
@@ -79,19 +81,7 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
         delays = synapse_info.delays
 
         if isinstance(delays, str):
-            if self.__space is None:
-                raise Exception(
-                    "No space object specified in projection {}-{}".format(
-                        self.__synapse_info.pre_population,
-                        self.__synapse_info.post_population))
-
-            expand_distances = self._expand_distances(delays)
-
-            d = self.__space.distances(
-                self.__synapse_info.pre_population.positions,
-                self.__synapse_info.post_population.positions,
-                expand_distances)
-
+            d = self._get_distances(delays, synapse_info)
             delays = _expr_context.eval(delays, d=d)
             if ((min_delay <= min(delays) <= max_delay) and (
                     min_delay <= max(delays) <= max_delay)):
@@ -119,7 +109,8 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
     def get_weight_maximum(self, synapse_info):
         return self._get_weight_maximum(
             synapse_info.weights,
-            max(synapse_info.n_pre_neurons, synapse_info.n_post_neurons))
+            max(synapse_info.n_pre_neurons, synapse_info.n_post_neurons),
+            synapse_info)
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(

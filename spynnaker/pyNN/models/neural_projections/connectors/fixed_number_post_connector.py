@@ -101,12 +101,14 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
         n_connections = synapse_info.n_pre_neurons * self.__n_post
-        return self._get_delay_maximum(synapse_info.delays, n_connections)
+        return self._get_delay_maximum(
+            synapse_info.delays, n_connections, synapse_info)
 
     @overrides(AbstractConnector.get_delay_minimum)
     def get_delay_minimum(self, synapse_info):
         n_connections = synapse_info.n_pre_neurons * self.__n_post
-        return self._get_delay_minimum(synapse_info.delays, n_connections)
+        return self._get_delay_minimum(
+            synapse_info.delays, n_connections, synapse_info)
 
     def _get_post_neurons(self, synapse_info):
         """
@@ -220,7 +222,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
             synapse_info.delays,
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
-            n_connections, min_delay, max_delay)
+            n_connections, min_delay, max_delay, synapse_info)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):
@@ -235,7 +237,8 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, synapse_info):
         n_connections = synapse_info.n_pre_neurons * self.__n_post
-        return self._get_weight_maximum(synapse_info.weights, n_connections)
+        return self._get_weight_maximum(
+            synapse_info.weights, n_connections, synapse_info)
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(

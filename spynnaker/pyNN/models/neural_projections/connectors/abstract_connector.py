@@ -98,7 +98,6 @@ class AbstractConnector(object, metaclass=AbstractBase):
         """
         self._rng = (self._rng or NumpyRNG())
         self.__min_delay = machine_time_step / MICRO_TO_MILLISECOND_CONVERSION
-        self.__synapse_info = synapse_info
 
     def _check_parameter(self, values, name, allow_lists):
         """ Check that the types of the values is supported.
@@ -134,7 +133,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         self._check_parameter(weights, "weights", allow_lists)
         self._check_parameter(delays, "delays", allow_lists)
 
-    def _get_delay_minimum(self, delays, n_connections):
+    def _get_delay_minimum(self, delays, n_connections, synapse_info):
         """ Get the minimum delay given a float, RandomDistribution or list of\
             delays.
 
@@ -153,7 +152,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
             # The minimum is the maximum of the possible maximums
             return max(low_estimated_delay, low, 1)
         elif isinstance(delays, str):
-            d = self._get_distances(delays)
+            d = self._get_distances(delays, synapse_info)
             return numpy.min(_expr_context.eval(delays, d=d))
         elif numpy.isscalar(delays):
             return delays
@@ -162,7 +161,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         raise SpynnakerException("Unrecognised delay format: {:s}".format(
             type(delays)))
 
-    def _get_delay_maximum(self, delays, n_connections):
+    def _get_delay_maximum(self, delays, n_connections, synapse_info):
         """ Get the maximum delay given a float, RandomDistribution or list of\
             delays.
 
@@ -181,7 +180,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
             # The maximum is the minimum of the possible maximums
             return min(max_estimated_delay, high)
         elif isinstance(delays, str):
-            d = self._get_distances(delays)
+            d = self._get_distances(delays, synapse_info)
             return numpy.max(_expr_context.eval(delays, d=d))
         elif numpy.isscalar(delays):
             return delays
@@ -208,7 +207,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         :rtype: int or None
         """
 
-    def get_delay_variance(self, delays):
+    def get_delay_variance(self, delays, synapse_info):
         """ Get the variance of the delays.
 
         :param delays:
@@ -219,7 +218,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         if isinstance(delays, RandomDistribution):
             return utility_calls.get_variance(delays)
         elif isinstance(delays, str):
-            d = self._get_distances(delays)
+            d = self._get_distances(delays, synapse_info)
             return numpy.var(_expr_context.eval(delays, d=d))
         elif numpy.isscalar(delays):
             return 0.0
@@ -229,7 +228,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
 
     def _get_n_connections_from_pre_vertex_with_delay_maximum(
             self, delays, n_total_connections, n_connections,
-            min_delay, max_delay):
+            min_delay, max_delay, synapse_info):
         """ Get the expected number of delays that will fall within min_delay
             and max_delay given given a float, RandomDistribution or list of
             delays.
@@ -249,7 +248,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return int(math.ceil(utility_calls.get_probable_maximum_selected(
                 n_total_connections, n_connections, prob_in_range)))
         elif isinstance(delays, str):
-            d = self._get_distances(delays)
+            d = self._get_distances(delays, synapse_info)
             delays = _expr_context.eval(delays, d=d)
             n_delayed = sum([len([
                 delay for delay in delays
@@ -306,7 +305,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         :rtype: int
         """
 
-    def get_weight_mean(self, weights):
+    def get_weight_mean(self, weights, synapse_info):
         """ Get the mean of the weights.
 
         :param weights:
@@ -317,7 +316,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         if isinstance(weights, RandomDistribution):
             return abs(utility_calls.get_mean(weights))
         elif isinstance(weights, str):
-            d = self._get_distances(weights)
+            d = self._get_distances(weights, synapse_info)
             return numpy.mean(_expr_context.eval(weights, d=d))
         elif numpy.isscalar(weights):
             return abs(weights)
@@ -325,7 +324,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return numpy.mean(weights)
         raise SpynnakerException("Unrecognised weight format")
 
-    def _get_weight_maximum(self, weights, n_connections):
+    def _get_weight_maximum(self, weights, n_connections, synapse_info):
         """ Get the maximum of the weights.
 
         :param weights:
@@ -351,7 +350,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
                     return abs(max_weight)
                 return abs(min(max_weight, high))
         elif isinstance(weights, str):
-            d = self._get_distances(weights)
+            d = self._get_distances(weights, synapse_info)
             return numpy.max(_expr_context.eval(weights, d=d))
         elif numpy.isscalar(weights):
             return abs(weights)
@@ -367,7 +366,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         :rtype: float
         """
 
-    def get_weight_variance(self, weights):
+    def get_weight_variance(self, weights, synapse_info):
         """ Get the variance of the weights.
 
         :param weights:
@@ -378,7 +377,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         if isinstance(weights, RandomDistribution):
             return utility_calls.get_variance(weights)
         elif isinstance(weights, str):
-            d = self._get_distances(weights)
+            d = self._get_distances(weights, synapse_info)
             return numpy.var(_expr_context.eval(weights, d=d))
         elif numpy.isscalar(weights):
             return 0.0
@@ -399,19 +398,19 @@ class AbstractConnector(object, metaclass=AbstractBase):
         regexpr = re.compile(r'.*d\[\d*\].*')
         return regexpr.match(d_expression)
 
-    def _get_distances(self, values):
+    def _get_distances(self, values, synapse_info):
         if self.__space is None:
             raise Exception(
                 "Weights or delays are distance-dependent but no space object"
                 "was specified in projection {}-{}".format(
-                    self.__synapse_info.pre_population,
-                    self.__synapse_info.post_population))
+                    synapse_info.pre_population,
+                    synapse_info.post_population))
 
         expand_distances = self._expand_distances(values)
 
         return self.__space.distances(
-            self.__synapse_info.pre_population.positions,
-            self.__synapse_info.post_population.positions,
+            synapse_info.pre_population.positions,
+            synapse_info.post_population.positions,
             expand_distances)
 
     def _generate_random_values(

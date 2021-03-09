@@ -259,7 +259,7 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
         return self.get_weight_maximum(connector, synapse_info)
 
     @overrides(SynapseDynamicsStatic.get_weight_variance)
-    def get_weight_variance(self, connector, weights):
+    def get_weight_variance(self, connector, weights, synapse_info):
         return 0.0
 
     @overrides(SynapseDynamicsStatic.get_weight_maximum)
