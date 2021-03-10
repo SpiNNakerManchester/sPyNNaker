@@ -554,7 +554,6 @@ class SpikeSourcePoissonMachineVertex(
             the data specification writer
         :param ~pacman.model.placements.Placement placement:
             the location this vertex resides on in the machine
-        :return: None
         """
         spec.comment("\nReserving memory space for data regions:\n\n")
 
@@ -591,7 +590,6 @@ class SpikeSourcePoissonMachineVertex(
         :param ~pacman.models.placements.Placement placement:
             the location on machine for this vertex
         :param ~data_specification.DataSpecification spec: the DSG writer
-        :return: None
         """
         spec.reserve_memory_region(
             region=(

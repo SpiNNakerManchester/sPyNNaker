@@ -25,7 +25,6 @@ def compare_spiketrain(spiketrain1, spiketrain2, same_length=True):
         held, i.e., all spikes up to the same time. If False allows one trains
         to have additional spikes after the first ends. This is used to
         compare data extracted part way with data extracted at the end.
-    :rtype: None
     :raises AssertionError: If the spiketrains are not equal
     """
     id1 = spiketrain1.annotations['source_index']
@@ -36,7 +35,7 @@ def compare_spiketrain(spiketrain1, spiketrain2, same_length=True):
                 id1, id2))
     if same_length and len(spiketrain1) != len(spiketrain2):
         raise AssertionError(
-            "spiketrains1 has {} spikes while spiketrains2 as {} for ID {}"
+            "spiketrain1 has {} spikes while spiketrain2 has {} for ID {}"
             .format(len(spiketrain1), len(spiketrain2), id1))
     for spike1, spike2 in zip(spiketrain1, spiketrain2):
         if spike1 != spike2:

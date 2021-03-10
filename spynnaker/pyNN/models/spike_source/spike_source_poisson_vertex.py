@@ -522,6 +522,10 @@ class SpikeSourcePoissonVertex(
         return 0
 
     def kiss_seed(self, vertex_slice):
+        """
+        :param Slice vertex_slice: the vertex slice to get seed of
+        :rtype: list(int)
+        """
         if vertex_slice not in self.__kiss_seed:
             self.__kiss_seed[vertex_slice] = create_mars_kiss_seeds(
                 self.__rng, self.__seed)
@@ -530,9 +534,8 @@ class SpikeSourcePoissonVertex(
     def update_kiss_seed(self, vertex_slice, seed):
         """ updates a kiss seed from the machine
 
-        :param vertex_slice: the vertex slice to update seed of
-        :param seed: the seed
-        :rtype: None
+        :param Slice vertex_slice: the vertex slice to update seed of
+        :param list(int) seed: the seed (4 words)
         """
         self.__kiss_seed[vertex_slice] = seed
 

@@ -31,12 +31,7 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class DelaySupportAdder(object):
-    """ adds delay extension vertices into the APP graph as needed
-
-    :param ApplicationGraph app_graph: the app graph
-    :param int machine_time_step: the machine time step
-    :param int user_max_delay: the user defined max delay
-    :rtype: None
+    """ Algorithm to add delay extension vertices into the APP graph as needed
     """
 
     __slots__ = [
@@ -127,7 +122,6 @@ class DelaySupportAdder(object):
             iterated over previously.
 
         :param ApplicationGraph app_graph: app graph
-        :rtype: None
         """
         for key in self._delay_post_edge_map:
             delay_edge = self._delay_post_edge_map[key]
@@ -139,9 +133,10 @@ class DelaySupportAdder(object):
         """ creates the edge between delay extension and post vertex. stores\
             for future loading to the app graph when safe to do so.
 
-        :param ApplicationVertex delay_app_vertex: delay extension vertex
-        :param app_edge: the undelayed app edge this is associated with.
-        :rtype: None
+        :param ApplicationVertex delay_app_vertex:
+            delay extension vertex
+        :param ProjectionApplicationEdge app_edge:
+            the undelayed app edge this is associated with.
         """
         # check for post edge
         delayed_edge = self._delay_post_edge_map.get(
@@ -208,7 +203,8 @@ class DelaySupportAdder(object):
         :param int user_max_delay: user max delay of the sim.
         :param int machine_time_step: machine time step of the sim.
         :param iterable[SynapseInfo] synapse_infos: iterable of synapse infos
-        :return:tuple of max_delay_needed, post_vertex_max_delay, bool.
+        :return: max_delay_needed, post_vertex_max_delay, whether_needed.
+        :rtype: tuple(int,int,bool)
         """
 
         # get max delay required

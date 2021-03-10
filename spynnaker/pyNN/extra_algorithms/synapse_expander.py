@@ -82,7 +82,7 @@ def _plan_expansion(placements, synapse_expander_bin,
                     synapse_expander_bin,
                     placement.x, placement.y, placement.p,
                     executable_type=ExecutableType.SYSTEM)
-                expanded_pop_vertices.append((vertex, placement))
+                expanded_pop_vertices.append(placement)
         elif isinstance(vertex, DelayExtensionMachineVertex):
             if vertex.gen_on_machine():
                 expander_cores.add_processor(
@@ -96,7 +96,9 @@ def _plan_expansion(placements, synapse_expander_bin,
 def _fill_in_connection_data(expanded_pop_vertices, transceiver):
     """ Once expander has run, fill in the connection data
 
-    :rtype: None
+    :param list(Placement) expanded_pop_vertices:
+    :param Transceiver transceiver:
     """
-    for vertex, placement in expanded_pop_vertices:
-        vertex.read_generated_connection_holders(transceiver, placement)
+    for placement in expanded_pop_vertices:
+        placement.vertex.read_generated_connection_holders(
+            transceiver, placement)

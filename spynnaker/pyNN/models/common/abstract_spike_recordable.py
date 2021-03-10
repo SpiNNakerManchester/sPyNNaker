@@ -58,7 +58,6 @@ class AbstractSpikeRecordable(object, metaclass=AbstractBase):
             ~spinn_front_end_common.interface.buffer_management.BufferManager
         :param ~pacman.model.placements.Placements placements:
             the placements object
-        :rtype: None
         """
 
     @abstractmethod

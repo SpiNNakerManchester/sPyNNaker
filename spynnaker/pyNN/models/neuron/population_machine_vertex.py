@@ -546,7 +546,6 @@ class PopulationMachineVertex(
             the spec to write the DSG region to
         :param ~.MachineGraph machine_graph: machine graph
         :param n_key_map: n key map
-        :return: None
         """
         spec.comment("\nReserving memory space for data regions:\n\n")
 
@@ -588,7 +587,6 @@ class PopulationMachineVertex(
 
         :param ~data_specification.DataSpecificationGenerator spec:
             the spec to write the DSG region to
-        :return: None
         """
         params_size = self._app_vertex.get_sdram_usage_for_neuron_params(
             self.vertex_slice)

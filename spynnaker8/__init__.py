@@ -467,7 +467,6 @@ def record_v(source, filename):
     :type source: ~spynnaker.pyNN.models.populations.Population or
         ~spynnaker.pyNN.models.populations.PopulationView
     :param str filename: the neo file to write to
-    :rtype: None
     """
     logger.warning(
         "Using record_v is deprecated.  Use record('v') function instead")
@@ -680,7 +679,6 @@ def reset(annotations=None):
 
     :param annotations: the annotations to the data objects
     :type annotations: dict(str, ...)
-    :rtype: None
     """
     if annotations is None:
         annotations = {}

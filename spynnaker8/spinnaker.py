@@ -86,7 +86,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
         front_end_versions.append(("lazyarray_version", lazyarray_version))
 
         # SpiNNaker setup
-        super(SpiNNaker, self).__init__(
+        super().__init__(
             database_socket_addresses=database_socket_addresses,
             user_extra_algorithm_xml_path=built_in_extra_xml_paths,
             user_extra_mapping_inputs=built_in_extra_mapping_inputs,
@@ -105,7 +105,8 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
         """ Run the simulation for a span of simulation time.
 
         :param run_time: the time to run for, in milliseconds
-        :return: None
+        :type run_time: int or float
+        :param float sync_time:
         """
 
         self._run_wait(run_time, sync_time)
@@ -114,6 +115,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
         """ Run the simulation until the given simulation time.
 
         :param tstop: when to run until in milliseconds
+        :type tstop: int or float
         """
         # Build data
         self._run_wait(tstop - self.t)
@@ -147,7 +149,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
         :type duration_ms: int or float
         """
 
-        super(SpiNNaker, self).run(duration_ms, sync_time)
+        super().run(duration_ms, sync_time)
 
     @property
     def state(self):
@@ -314,7 +316,7 @@ class Spynnaker8FailedState(SpynnakerFailedState):
     __slots__ = ()
 
     def __init__(self):
-        super(Spynnaker8FailedState, self).__init__(_NAME)
+        super().__init__(_NAME)
 
 
 # At import time change the default FailedState

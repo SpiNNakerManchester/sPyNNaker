@@ -756,7 +756,6 @@ class NeuronRecorder(object):
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             the vertex slice
         :param int data_n_time_steps: how many time steps to run this time
-        :rtype: None
         """
         spec.switch_write_focus(neuron_recording_region)
         spec.write_array(get_recording_header_array(
@@ -776,7 +775,7 @@ class NeuronRecorder(object):
 
         :param str variable: PyNN variable name
         :param ~pacman.model.graphs.common.Slice vertex_slice:
-        :return:
+        :return: Space required per recording
         :rtype: int
         """
         if variable in self.__per_timestep_variables:

@@ -206,8 +206,6 @@ class AbstractPopulationVertex(
 
     def set_has_run(self):
         """ Set the flag has run so initialize only affects state variables
-
-        :rtype: None
         """
         self.__has_run = True
 
@@ -465,7 +463,6 @@ class AbstractPopulationVertex(
         :param buffer_manager: the buffer manager object
         :param placements: the placements object
         :param recording_region_id: the recorded region ID for clearing
-        :rtype: None
         """
         for machine_vertex in self.machine_vertices:
             placement = placements.get_placement_of_vertex(machine_vertex)

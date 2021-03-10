@@ -193,8 +193,6 @@ class SynapseDynamicsStructuralCommon(
             the vertex for which data specs are being prepared
         :param int machine_time_step: the duration of a machine time step (ms)
         :param int n_pre_pops: the number of pre-populations
-        :return: None
-        :rtype: None
         """
         if (self.p_rew * MICRO_TO_MILLISECOND_CONVERSION <
                 machine_time_step / MICRO_TO_MILLISECOND_CONVERSION):
@@ -250,6 +248,7 @@ class SynapseDynamicsStructuralCommon(
         :param dict(AbstractSynapseType,float) weight_scales:
         :param SynapticMatrices synaptic_matrices:
         :param int machine_time_step:
+        :return: Description of what indices were used for populations
         :rtype: dict(tuple(AbstractPopulationVertex,SynapseInformation),int)
         """
         pop_index = dict()

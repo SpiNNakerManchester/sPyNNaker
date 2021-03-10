@@ -50,6 +50,5 @@ class ExtractedData(object):
         :type attribute: list(int) or tuple(int) or None
         :param ConnectionHolder data:
             attribute data in a connection holder
-        :rtype: None
         """
         self.__data[projection][attribute] = data
