@@ -181,6 +181,9 @@ static inline void sum(weight_t *syns) {
     }
 }
 
+extern uint32_t earliest_send_time;
+extern uint32_t latest_send_time;
+
 //! \brief Timer interrupt callback
 //! \param[in] timer_count: the number of times this call back has been
 //!            executed since start of simulation
@@ -216,7 +219,7 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
         // run
         time--;
 
-        log_info("TDMA waits: %u, TDMA Latest Send: %u", tdma_waits, tdma_latest_send);
+        log_info("Earliest send time %u, latest_send_time %u", earliest_send_time, latest_send_time);
 
         simulation_ready_to_read();
         return;

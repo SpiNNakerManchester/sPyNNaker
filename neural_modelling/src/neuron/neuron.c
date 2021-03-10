@@ -23,6 +23,7 @@
 #include "neuron_recording.h"
 #include "implementations/neuron_impl.h"
 #include "plasticity/synapse_dynamics.h"
+#include "tdma_processing.h"
 #include <debug.h>
 
 //! The key to be used for this core (will be ORed with neuron ID)
@@ -31,6 +32,10 @@ key_t key;
 //! A checker that says if this model should be transmitting. If set to false
 //! by the data region, then this model should not have a key.
 bool use_key;
+
+uint32_t latest_send_time = 0xFFFFFFFF;
+
+uint32_t earliest_send_time = 0;
 
 //! The number of neurons on the core
 static uint32_t n_neurons;
@@ -145,7 +150,7 @@ void neuron_pause(void) { // EXPORTED
 void neuron_do_timestep_update(timer_t time, uint timer_count) { // EXPORTED
 
     // the phase in this timer tick im in (not tied to neuron index)
-    tdma_processing_reset_phase();
+    // tdma_processing_reset_phase();
 
     // Prepare recording for the next timestep
     neuron_recording_setup_for_next_recording();
