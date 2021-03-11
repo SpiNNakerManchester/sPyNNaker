@@ -47,6 +47,53 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
             time_scale_factor, min_delay, max_delay, graph_label,
             n_chips_required=None, n_boards_required=None, timestep=0.1,
             hostname=None):
+        """
+        :param database_socket_addresses:
+        :type database_socket_addresses:
+            ~collections.abc.Iterable(~spinn_utilities.socket_address.SocketAddress)
+        :param extra_algorithm_xml_paths:
+            Where to find extra algorithm descriptors
+        :type extra_algorithm_xml_paths: ~collections.abc.Iterable(str) or None
+        :param extra_mapping_inputs:
+            Any extra inputs to algorithms
+        :type extra_mapping_inputs:
+            ~collections.abc.Mapping(str,object) or None
+        :param extra_mapping_algorithms:
+            Extra algorithms to run during mapping
+        :type extra_mapping_algorithms: ~collections.abc.Iterable(str) or None
+        :param extra_pre_run_algorithms:
+            Extra algorithms to run immediately prior to running the sim
+        :type extra_pre_run_algorithms: ~collections.abc.Iterable(str) or None
+        :param extra_post_run_algorithms:
+            Extra algorithms to run immediately after running the sim
+        :type extra_post_run_algorithms: ~collections.abc.Iterable(str) or None
+        :param extra_load_algorithms:
+            Extra algorithms to run to load data onto the machine
+        :type extra_load_algorithms: ~collections.abc.Iterable(str) or None
+        :param time_scale_factor:
+            The time-scaling factor. Affects numerical accuracy
+        :type time_scale_factor: float or None
+        :param min_delay:
+            Minimum intersomatic delay
+        :type min_delay: float or str
+        :param float max_delay:
+            Maximum intersomatic delay
+        :param str graph_label:
+            A label for the overall graph
+        :param n_chips_required: *Deprecated.*
+        :type n_chips_required: int or None
+        :param n_boards_required:
+            How many boards to request for the simulation. If omitted, will
+            either estimate how many (when reserving via spalloc) or will use
+            all available (when using a direct board address).
+        :type n_boards_required: int or None
+        :param float timestep:
+            The size of time step
+        :param hostname:
+            Specify to use an explicit board;
+            leave as default to use value from config file
+        :type hostname: str or None
+        """
         # pylint: disable=too-many-arguments, too-many-locals
 
         # change min delay auto to be the min delay supported by simulator
@@ -108,7 +155,6 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
         :type run_time: int or float
         :param float sync_time:
         """
-
         self._run_wait(run_time, sync_time)
 
     def run_until(self, tstop):
