@@ -75,7 +75,7 @@ enum word_recording_indices {
     //! Gsyn_inh (excitatory synaptic conductance/current) recording index
     GSYN_INH_RECORDING_INDEX = 2,
     //! Structural plasticity (removal/addition of synapses) recording index
-    STRUCT_PL_RECORDING_INDEX = 3,
+    REWIRING_RECORDING_INDEX = 3,
     //! Number of recorded word-sized state variables
     N_RECORDED_VARS = 4
 };
@@ -469,7 +469,7 @@ SOMETIMES_UNUSED // Marked unused as only used sometimes
 //! \param[in] rec_value: the value to record
 static void neuron_impl_record_structural(
         uint32_t neuron_index, int32_t rec_value) {
-    neuron_recording_record_int32(STRUCT_PL_RECORDING_INDEX, neuron_index, rec_value);
+    neuron_recording_record_int32(REWIRING_RECORDING_INDEX, neuron_index, rec_value);
 }
 
 SOMETIMES_UNUSED // Marked unused as only used sometimes

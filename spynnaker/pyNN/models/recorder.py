@@ -25,7 +25,7 @@ from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, AbstractNeuronRecordable)
 from spynnaker.pyNN.utilities.constants import (
-    SPIKES, MEMBRANE_POTENTIAL, GSYN_EXCIT, GSYN_INHIB)
+    SPIKES, MEMBRANE_POTENTIAL, GSYN_EXCIT, GSYN_INHIB, REWIRING)
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.utilities.data_cache import DataCache
 
@@ -34,7 +34,8 @@ _DEFAULT_UNITS = {
     SPIKES: "spikes",
     MEMBRANE_POTENTIAL: "mV",
     GSYN_EXCIT: "uS",
-    GSYN_INHIB: "uS"}
+    GSYN_INHIB: "uS",
+    REWIRING: "ms"}
 
 
 class Recorder(object):
@@ -440,6 +441,19 @@ class Recorder(object):
                     sampling_interval=self.__spike_sampling_interval,
                     indexes=view_indexes,
                     label=self.__population.label)
+            elif variable == REWIRING:
+                (data, data_indexes, sampling_interval) = \
+                    self.get_recorded_matrix(variable)
+                self.__read_in_event(
+                    segment=segment,
+                    block=block,
+                    event_array=data,
+                    data_indexes=data_indexes,
+                    view_indexes=view_indexes,
+                    variable=variable,
+                    recording_start_time=self._recording_start_time,
+                    sampling_interval=sampling_interval,
+                    label=self.__population.label)
             else:
                 (data, data_indexes, sampling_interval) = \
                     self.get_recorded_matrix(variable)
@@ -496,6 +510,17 @@ class Recorder(object):
                     sampling_interval=variable_cache.sampling_interval,
                     indexes=view_indexes,
                     label=data_cache.label)
+            elif variable == REWIRING:
+                self.__read_in_event(
+                    segment=segment,
+                    block=block,
+                    event_array=variable_cache.data,
+                    data_indexes=variable_cache.indexes,
+                    view_indexes=view_indexes,
+                    variable=variable,
+                    recording_start_time=data_cache.recording_start_time,
+                    sampling_interval=variable_cache.sampling_interval,
+                    label=self.__population.label)
             else:
                 self.__read_in_signal(
                     segment=segment,
@@ -668,6 +693,96 @@ class Recorder(object):
         data_array.shape = (data_array.shape[0], data_array.shape[1])
         segment.analogsignals.append(data_array)
         channel_index.analogsignals.append(data_array)
+
+    def __read_in_event(
+            self, segment, block, event_array, data_indexes, view_indexes,
+            variable, recording_start_time, sampling_interval, label):
+        """ Reads in a data item that is an event (i.e. rewiring form/elim)\
+            and saves this data to the segment.
+
+        :param ~neo.core.Segment segment: Segment to add data to
+        :param ~neo.core.Block block: neo block
+        :param ~numpy.ndarray signal_array: the raw "event" data
+        :param list(int) data_indexes: The indexes for the recorded data
+        :param view_indexes: The indexes for which data should be returned.
+            If ``None``, all data (view_index = data_indexes)
+        :type view_indexes: list(int) or None
+        :param str variable: the variable name
+        :param recording_start_time: when recording started
+        :type recording_start_time: float or int
+        :param sampling_interval: how often a neuron is recorded
+        :type sampling_interval: float or int
+        :param str label: human readable label
+        """
+        # pylint: disable=too-many-arguments, no-member
+        t_start = recording_start_time * quantities.ms
+        sampling_period = sampling_interval * quantities.ms
+        if view_indexes is None:
+            if len(data_indexes) != self.__population.size:
+                warn_once(logger, self._SELECTIVE_RECORDED_MSG)
+            indexes = numpy.array(data_indexes)
+        elif view_indexes == data_indexes:
+            indexes = numpy.array(data_indexes)
+        else:
+            # keep just the view indexes in the data
+            indexes = [i for i in view_indexes if i in data_indexes]
+            # keep just data columns in the view
+            map_indexes = [data_indexes.index(i) for i in indexes]
+            event_array = event_array[:, map_indexes]
+
+        formation_times = []
+        formation_labels = []
+        elimination_times = []
+        elimination_labels = []
+
+        for n_event in range(len(event_array)):
+            events = event_array[n_event]
+            for n_atom in range(len(events)):
+                if events[n_atom] != -1:
+                    bin_val = bin(int(events[n_atom]))[2:]  # take the "0b" off
+                    # front-pad with zeros to size 32
+                    len_bin = len(bin_val)
+                    for n in range(32-len_bin):
+                        bin_val = "0"+bin_val
+
+                    # final bit contains rewire status; remaining is preid
+                    rewire_status = int(bin_val[-1], 2)
+                    preid = int("0b"+(bin_val[:31]), 2)
+                    postid = n_atom
+
+                    if rewire_status == 1:
+                        # formation
+                        formation_times.append(
+                            t_start + (n_event * quantities.ms))
+                        formation_labels.append([preid, postid, "formation"])
+                    else:
+                        # elimination
+                        elimination_times.append(
+                            t_start + (n_event * quantities.ms))
+                        elimination_labels.append(
+                            [preid, postid, "elimination"])
+
+        formation_event_array = neo.Event(
+            times=formation_times,
+            labels=formation_labels,
+            units="ms",
+            name=variable+"_form",
+            description="Synapse formation events")
+
+        elimination_event_array = neo.Event(
+            times=elimination_times,
+            labels=elimination_labels,
+            units="ms",
+            name=variable+"_elim",
+            description="Synapse elimination events")
+
+        channel_index = self.__get_channel_index(indexes, block)
+
+        formation_event_array.channel_index = channel_index
+        segment.events.append(formation_event_array)
+
+        elimination_event_array.channel_index = channel_index
+        segment.events.append(elimination_event_array)
 
     @staticmethod
     def __get_channel_index(ids, block):
