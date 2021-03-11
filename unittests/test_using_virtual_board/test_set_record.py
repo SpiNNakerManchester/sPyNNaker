@@ -69,7 +69,8 @@ class TestSetRecord(BaseTestCase):
                              additional_parameters={"seed": 1})
         if_curr.record("all")
         self.assertCountEqual(
-            ["spikes", "v", "gsyn_inh", "gsyn_exc", "packets-per-timestep"],
+            ["spikes", "v", "gsyn_inh", "gsyn_exc", "packets-per-timestep",
+             "rewiring"],
             if_curr._recorder.get_all_recording_variables())
         ssa.record("all")
         self.assertCountEqual(
