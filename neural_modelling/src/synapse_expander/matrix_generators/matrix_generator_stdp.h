@@ -178,7 +178,7 @@ void matrix_generator_stdp_write_row(
     }
 
     // Get the plastic-plastic position at the start of each row and keep track
-    // of the number of half-words per row (to allow padding later)
+    // of the number of words per row (to allow padding later)
     uint32_t *pp_address[max_stage];
     uint16_t n_words_per_row[max_stage];
     for (uint32_t i = 0; i < max_stage; i++) {

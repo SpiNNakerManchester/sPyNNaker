@@ -189,9 +189,9 @@ static inline uint16_t rescale_delay(accum delay, accum timestep_per_delay) {
 static inline accum rescale_weight(accum weight, uint32_t weight_scale) {
 
     // DOES THIS NEED TO DISAPPEAR SINCE WE HAVE SIGNED WEIGHTS?
-    if (weight < 0) {
-        weight = -weight;
-    }
+    // if (weight < 0) {
+    //     weight = -weight;
+    // }
 
     return weight * weight_scale;
 }

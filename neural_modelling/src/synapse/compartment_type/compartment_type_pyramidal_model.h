@@ -20,7 +20,8 @@ static inline input_t convert_rate_to_input(uint32_t rate) {
 static inline REAL compute_input_rate(uint32_t rate) {
 
     REAL r = convert_rate_to_input(rate);
-    if(r > 2.0k)
+     
+    if (r > 2.0k)
         r = 2.0k;
     else if (r < 0.0k)
         r = 0.0k;

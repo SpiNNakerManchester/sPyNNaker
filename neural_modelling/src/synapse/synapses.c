@@ -257,8 +257,6 @@ static inline void process_fixed_synapses(
 
     num_fixed_pre_synaptic_events += fixed_synapse;
 
-    //s1615 r = convert_rate_to_input(somatic_voltage);
-    //r = r > 0.0k ? r : 0.0k;
     REAL rate = compute_input_rate(somatic_voltage);
 
     for (; fixed_synapse > 0; fixed_synapse--) {
@@ -274,24 +272,15 @@ static inline void process_fixed_synapses(
                 synaptic_info);
 
         // Convert into ring buffer offset. The time & 1 mask is used to write in the safe ring buffer
-        // THE FUNCTION SHFITS TO INCLUDE THE DELAY. MAYBE STRIP OFF FOR US MODEL EXTREME PERFORMANCE GAIN
         uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
                 0, combined_synapse_neuron_index & synapse_index_mask,
                 synapse_type_index_bits);
 
         // Add weight to current ring buffer value
-        REAL accumulation = ring_buffers[ring_buffer_index] + get_input_current(rate, synaptic_weight);
-
-        // Saturation check, MAYBE WE SHOULD CAP THE MAX INCOMING VALUES?
-//        s3231 sat_test = accumulation & 0x100000000;
-//        if (sat_test) {
-//            accumulation = sat_test - 1;
-//            saturation_count++;
-//        }
+        REAL curr = get_input_current(rate, synaptic_weight);
+        REAL accumulation = ring_buffers[ring_buffer_index] + curr;
 
         ring_buffers[ring_buffer_index] = accumulation;
-
-        //io_printf(IO_BUF,"acc %k, t%d\n", accumulation, time);
     }
 }
 
@@ -352,7 +341,7 @@ bool synapses_initialise(
 
     //SYN MATRIX TEST! Print syn mat uint32 by uint32
     // for(uint32_t i = 0; i < synaptic_matrix_size; i++) {
-    //     io_printf(IO_BUF, "M %u\n", synaptic_matrix[i]);
+    //     io_printf(IO_BUF, "M %d\n", synaptic_matrix[i]);
     // }
 
     // io_printf(IO_BUF, "Finished \n");

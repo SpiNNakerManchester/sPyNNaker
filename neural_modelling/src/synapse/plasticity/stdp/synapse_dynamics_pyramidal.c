@@ -275,6 +275,8 @@ bool synapse_dynamics_process_plastic_synapses(
     size_t plastic_synapse =
             synapse_row_num_plastic_controls(fixed_region_address);
 
+    io_printf(IO_BUF, "Plastic region %u synapses\n", plastic_synapse);
+
     num_plastic_pre_synaptic_events += plastic_synapse;
 
     // Get event history from synaptic row
@@ -288,7 +290,8 @@ bool synapse_dynamics_process_plastic_synapses(
     //io_printf(IO_BUF, "t %d prev %k\n", time, last_pre_rate);
 
     REAL real_rate = convert_rate_to_input(rate);
-    if(real_rate > 2.0k)
+
+    if (real_rate > 2.0k)
         real_rate = 2.0k;
     else if (real_rate < 0.0k)
         real_rate = 0.0k;
@@ -312,17 +315,10 @@ bool synapse_dynamics_process_plastic_synapses(
         // Neuron index
         uint32_t index =
                 synapse_row_sparse_index(control_word, synapse_index_mask);
-        // Neuron index and Synapse type combined
-        uint32_t type_index = synapse_row_sparse_type_index(
-                control_word);
-
-        //io_printf(IO_BUF, "index %d\n", index);
-
-        //io_printf(IO_BUF, "plast in row %k\n", *plastic_words);
         
         // Create update state from the plastic synaptic word
         update_state_t current_state =
-                synapse_structure_get_update_state(*plastic_words, 0);
+                synapse_structure_get_update_state(plastic_words, 0);
 
         //  Determine the type of synapse ans update the state
         // Type = 2 is apical inh, type = 1 basal exc
@@ -346,41 +342,23 @@ bool synapse_dynamics_process_plastic_synapses(
             return false;
         }
 
-        // THE FUNCTION SHFITS TO INCLUDE THE DELAY. MAYBE STRIP OFF FOR US MODEL EXTREME PERFORMANCE GAIN
-        uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
-                0, type_index & synapse_index_mask, synapse_type_index_bits);
+        // Avoid the multiplication with rounding if the presyn value has input rate = 0
+        if(real_rate != 0) {
+            // MAYBE EDIT THIS TO BE *plastic_words ONCE THE WEIGHT UPDATE IS ADAPTED
+            REAL curr_weight = synapse_structure_get_final_weight(final_state);
 
-        // EDIT THIS TO BE *plastic_words ONCE THE WEIGHT UPDATE IS ADAPTED
-        REAL curr_weight = synapse_structure_get_final_weight(final_state);
-
-        // Add the current rate contribution with the new rate
-        REAL accumulation = ring_buffers[ring_buffer_index] +
-                MULT_ROUND_STOCHASTIC_ACCUM(real_rate, curr_weight);
-
-        // Update the old rate contribution with the new weight
-        //accumulation += MULT_ROUND_STOCHASTIC_ACCUM((curr_weight - old_weight), last_pre_rate);
-
-//        uint64_t sat_test = accumulation & 0x100000000;
-//        if (sat_test) {
-//            accumulation = sat_test - 1;
-//            plastic_saturation_count++;
-//        }
-
-        //io_printf(IO_BUF, "right shift %d\n", weight_get_shift(current_state));
-//        io_printf(IO_BUF, "weight %k, rate %k\n", synapses_convert_weight_to_input(
-//                        synapse_structure_get_final_weight(final_state),
-//                        weight_get_shift(current_state)), real_rate);
-        //io_printf(IO_BUF, "adding %k ", accumulation);
-
-        ring_buffers[ring_buffer_index] = accumulation;
-
-        //io_printf(IO_BUF, "plast acc %k index %d\n", accumulation, ring_buffer_index);
-
-        //io_printf(IO_BUF, "weight %k\n", synapse_structure_get_final_weight(final_state));
+            // Add the current rate contribution with the new rate
+            REAL mul = MULT_ROUND_STOCHASTIC_ACCUM(real_rate, curr_weight);
+            REAL accumulation = ring_buffers[index] + mul;
+            
+            ring_buffers[index] = accumulation;
+        }
 
         // Write back updated synaptic word to plastic region REMOVE THIS WHEN WEIGHT UPDATE IS ADAPTED
         *plastic_words++ =
                 synapse_structure_get_final_synaptic_word(final_state);
+        *plastic_words++ =
+                synapse_structure_get_final_synaptic_delta(final_state);
     }
     return true;
 }

@@ -40,11 +40,12 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
         "_n_syn_types",
         "_neurons_partition",
         "_n_outgoing_partitions",
-        "_n_incoming_partitions"]
+        "_n_incoming_partitions",
+        "_packet_compressor"]
 
     def __init__(self, n_neurons, label, constraints, max_atoms_neuron_core, spikes_per_second,
                  ring_buffer_sigma, neuron_model, pynn_model, incoming_spike_buffer_size,
-                 incoming_partitions, outgoing_partitions):
+                 incoming_partitions, outgoing_partitions, packet_compressor = None):
 
         self._n_atoms = n_neurons
 
@@ -52,6 +53,8 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
 
         self._n_outgoing_partitions = 1 if self._n_atoms <= DEFAULT_MAX_ATOMS_PER_NEURON_CORE else outgoing_partitions #int(math.ceil(float(self._n_atoms) / DEFAULT_MAX_ATOMS_PER_NEURON_CORE))
 
+        self._packet_compressor = packet_compressor
+        
         self._neuron_vertices = list()
         self._synapse_vertices = list()
         self._n_syn_types = neuron_model.get_n_synapse_types()
@@ -59,6 +62,14 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
         if len(self._n_incoming_partitions) < self._n_syn_types:
             raise Exception("Incorrect number of incoming partitions."
                             " Each synapse type must have at least 1 incoming partition.")
+
+        if self._packet_compressor is not None and len(self._packet_compressor) < self._n_syn_types:
+            raise Exception("Incorrect specification for the packet compressors."
+                            " If you add the compressors you need to specify whether you want to"
+                            "use it or not for each synapse type.")
+
+        if self._packet_compressor is None:
+            self._packet_compressor = [False for _ in range(self._n_syn_types)]
 
         self._neurons_partition = self._compute_partition_and_offset_size()
 
@@ -97,7 +108,7 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
                                             label + "_p" + str(i) + "_v" + str(j) + "_syn_type_" + str(index),
                                             max_atoms_neuron_core, neuron_model.get_global_weight_scale(),
                                             ring_buffer_sigma, spikes_per_second, incoming_spike_buffer_size,
-                                            self._n_syn_types, mem_offset)
+                                            self._n_syn_types, mem_offset, self._packet_compressor[index])
 
                     vertex.connected_app_vertices = [self._neuron_vertices[i]]
                     syn_vertices.append(vertex)

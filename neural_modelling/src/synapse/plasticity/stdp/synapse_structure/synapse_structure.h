@@ -21,7 +21,7 @@
 #include <synapse/plasticity/stdp/weight_dependence/weight.h>
 
 static update_state_t synapse_structure_get_update_state(
-        plastic_synapse_t synaptic_word, index_t synapse_type);
+        plastic_synapse_t *synaptic_word, index_t synapse_type);
 
 static final_state_t synapse_structure_get_final_state(
         update_state_t state);

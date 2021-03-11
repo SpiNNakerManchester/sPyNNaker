@@ -64,7 +64,7 @@ class WeightDependenceMultiplicativeMulticompBern(AbstractWeightDependence):
             raise NotImplementedError(
                 "Multiplicative weight dependence only supports single terms")
 
-        #3 is for min weight, max weight and learning rate
+        # 3 is for min weight, max weight and learning rate
         return (4 * 3) * n_synapse_types
 
     @overrides(AbstractWeightDependence.write_parameters)

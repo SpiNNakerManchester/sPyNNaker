@@ -67,7 +67,7 @@ class PyNNPopulationCommon(object):
     def __init__(
             self, spinnaker_control, size, label, constraints, model,
             structure, initial_values, additional_parameters=None,
-            in_partitions=None, out_partitions=None):
+            in_partitions=None, out_partitions=None, packet_compressor=None):
         # pylint: disable=too-many-arguments
         size = self._roundsize(size, label)
 
@@ -86,6 +86,8 @@ class PyNNPopulationCommon(object):
             if in_partitions is not None and out_partitions is not None:
                 population_parameters["in_partitions"] = in_partitions
                 population_parameters["out_partitions"] = out_partitions
+            if packet_compressor is not None:
+                population_parameters["packet_compressor"] = packet_compressor
             vertex = model.create_vertex(
                 size, label, constraints, **population_parameters)
 

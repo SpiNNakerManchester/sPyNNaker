@@ -19,7 +19,7 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
     plasticity_helpers)
 from .abstract_timing_dependence import AbstractTimingDependence
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
-    SynapseStructureWeightOnly)
+    SynapseStructureMulticompBern)
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +41,7 @@ class TimingDependenceMulticompBern(AbstractTimingDependence):
         self.__tau_plus = tau_plus
         self.__tau_minus = tau_minus
 
-        self.__synapse_structure = SynapseStructureWeightOnly()
+        self.__synapse_structure = SynapseStructureMulticompBern()
 
         # provenance data
         self.__tau_plus_last_entry = None

@@ -184,7 +184,7 @@ class SynapseDynamicsSTDP(
 
     def get_n_words_for_plastic_connections(self, n_connections):
         # Adapted for syn matrix in DTCM
-        # pp region has 1 word per connection for the weights, plus 1 word per row
+        # pp region has 2 words per connection for the weights and delta, plus 1 word per row
         # for the pre_syn buffer; fp region has 1 byte per connection to
         # store neuron ID and synapse ID
 
@@ -194,7 +194,8 @@ class SynapseDynamicsSTDP(
         if n_connections == 0:
             return 0
         fp_size_words = int(math.ceil(float(n_connections) / 4.0))
-        pp_size_words = n_connections + 1
+        # 2 * is  for the prev_delta in US model
+        pp_size_words = (2 * n_connections) + 1
 
         return fp_size_words + pp_size_words
 
@@ -404,7 +405,7 @@ class SynapseDynamicsSTDP(
     def gen_matrix_params(self):
         synapse_struct = self.__timing_dependence.synaptic_structure
         return numpy.array([
-            # For US model syn matrix in DTCM, pp part of the matrix is in words, inst5ead of half words
+            # For US model syn matrix in DTCM, pp part of the matrix is in words, instead of half words
             # So n_header_bytes is divided by 4 to get the words, instead of by 2
             # for half words. If we want to generalise to other models we need to think about this bit
             self._n_header_bytes // 4,

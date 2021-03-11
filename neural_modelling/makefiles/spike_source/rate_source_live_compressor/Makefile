@@ -13,17 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-MODELS = poisson \
-		rate_live_injector \
-		rate_source \
-		rate_source_live \
-		rate_source_live_compressor \
-		rate_live_teacher
-		 
+APP = rate_source_live_compressor
+SOURCES = spike_source/rate_source/rate_source_live_compressor.c
 
-
-all:
-	for d in $(MODELS); do $(MAKE) -C $$d || exit $$?; done
-
-clean:
-	for d in $(MODELS); do $(MAKE) -C $$d clean || exit $$?; done
+include ../../neural_support.mk

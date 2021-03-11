@@ -41,7 +41,7 @@ typedef struct {
 typedef struct {
 
     weight_t weight;
-
+    REAL prev_delta;
     uint32_t weight_shift;
     const plasticity_weight_region_data_t *weight_region;
 
@@ -59,9 +59,10 @@ extern uint32_t *weight_shift;
 // Weight dependance functions
 //---------------------------------------
 static inline weight_state_t weight_get_initial(
-        weight_t weight, index_t synapse_type) {
+        weight_t *row, index_t synapse_type) {
     return (weight_state_t ) {
-        .weight = weight,
+        .weight = *row,
+        .prev_delta = *(row+1),
         .weight_shift =
                 weight_shift[synapse_type],
         .weight_region = &plasticity_weight_region_data[synapse_type]
@@ -72,6 +73,11 @@ static inline weight_t weight_get_final(weight_state_t new_state) {
     log_debug("\tnew_weight:%d\n", new_state.weight);
 
     return (weight_t) new_state.weight;
+}
+
+static inline REAL weight_get_delta(weight_state_t new_state) {
+
+    return (REAL) new_state.prev_delta;
 }
 
 // static inline int32_t convert_real_to_int(REAL value) {
@@ -90,13 +96,14 @@ static inline weight_t weight_get_final(weight_state_t new_state) {
 //---------------------------------------
 static inline weight_state_t weight_one_term_apply_update(weight_state_t state, REAL total_rate) {
 
-    REAL delta = state.weight_region->learning_rate * total_rate;
+    REAL delta = (total_rate - state.prev_delta) * 0.03333k;
 
     // LP tmp manual truncation to 2^-13 to avoid drifting caused by fixed point truncation. Possibly move to 2-15
     if(delta < 0 && delta >= -0.000122k)
         delta = 0;
 
-    state.weight = state.weight + delta;
+    state.weight = state.weight + (delta * state.weight_region->learning_rate);
+    state.prev_delta += delta;
 
     //MORE EFFICIENT WAY TO DO THIS?
     if(state.weight < state.weight_region->min_weight) {

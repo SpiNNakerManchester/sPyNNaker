@@ -138,12 +138,18 @@ SYNAPTOGENESIS_DYNAMICS_O := $(BUILD_DIR)$(SYNAPTOGENESIS_DYNAMICS:%.c=%.o)
 
 OTHER_SOURCES_CONVERTED := $(call strip_source_dirs,$(OTHER_SOURCES))
 
+ifndef PACKET_COMPRESSOR
+    SPIKE_PROCESSING := synapse/spike_processing.c
+else
+    SPIKE_PROCESSING := synapse/spike_processing_compressor.c
+endif
+
 # List all the sources relative to one of SOURCE_DIRS
 SOURCES = common/rate_buffer.c \
         common/out_spikes.c \
 		synapse/c_main.c \
 		synapse/synapses.c \
-		synapse/spike_processing.c \
+		$(SPIKE_PROCESSING) \
 		synapse/population_table/population_table_$(POPULATION_TABLE_IMPL)_impl.c \
 		$(SYNAPSE_DYNAMICS) $(WEIGHT_DEPENDENCE) \
 		$(TIMING_DEPENDENCE) $(SYNAPTOGENESIS_DYNAMICS) $(OTHER_SOURCES_CONVERTED)
@@ -165,7 +171,7 @@ $(BUILD_DIR)synapse/synapses.o: $(MODIFIED_DIR)synapse/synapses.c
 	-mkdir -p $(dir $@)
 	$(SYNAPSE_TYPE_COMPILE) $(SYNAPSE_INCLUDES) -o $@ $<
 
-$(BUILD_DIR)synapse/spike_processing.o: $(MODIFIED_DIR)synapse/spike_processing.c
+$(BUILD_DIR)synapse/spike_processing.o: $(MODIFIED_DIR)$(SPIKE_PROCESSING)
 	#spike_processing.c
 	-mkdir -p $(dir $@)
 	$(SYNAPSE_TYPE_COMPILE) -o $@ $<

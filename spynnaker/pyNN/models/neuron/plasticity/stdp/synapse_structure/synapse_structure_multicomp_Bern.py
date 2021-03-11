@@ -13,17 +13,20 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-MODELS = poisson \
-		rate_live_injector \
-		rate_source \
-		rate_source_live \
-		rate_source_live_compressor \
-		rate_live_teacher
-		 
+from spinn_utilities.overrides import overrides
+from .abstract_synapse_structure import AbstractSynapseStructure
 
 
-all:
-	for d in $(MODELS); do $(MAKE) -C $$d || exit $$?; done
+class SynapseStructureMulticompBern(AbstractSynapseStructure):
+    __slots__ = ()
 
-clean:
-	for d in $(MODELS); do $(MAKE) -C $$d clean || exit $$?; done
+    @overrides(AbstractSynapseStructure.get_n_half_words_per_connection)
+    def get_n_half_words_per_connection(self):
+        # This returns the number of words instead of half-words.
+        # The synapse expander has been configured properlydatetime A combination of a date and a time.
+        # # 2 is because we have the weight and the delta
+        return 2
+
+    @overrides(AbstractSynapseStructure.get_weight_half_word)
+    def get_weight_half_word(self):
+        return 0

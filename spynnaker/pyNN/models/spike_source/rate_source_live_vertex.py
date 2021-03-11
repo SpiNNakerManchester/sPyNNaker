@@ -82,7 +82,8 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
         "__injector_vertex",
         "__vertex_offset",
         "__partitioned_atoms",
-        "__starting_slices"
+        "__starting_slices",
+        "__packet_compressor"
     ]
 
     RATE_RECORDING_REGION_ID = 0
@@ -91,7 +92,8 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
 
     def __init__(self, sources, constraints, max_atoms_per_core, 
             label, model, machine_vertices, refresh_rate,
-            injector_vertex, vertex_offset, starting_slices):
+            injector_vertex, vertex_offset, starting_slices,
+            packet_compressor):
         # pylint: disable=too-many-arguments
         self.__model_name = "RateSourceLive"
         self.__model = model
@@ -112,6 +114,8 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
 
         # The values each mahcine vertex will send at timestep 0
         self.__starting_slices = starting_slices
+
+        self.__packet_compressor = packet_compressor
 
         super(RateSourceLiveVertex, self).__init__(
             label=label, constraints=constraints,
@@ -292,7 +296,12 @@ class RateSourceLiveVertex(ApplicationVertex, AbstractGeneratesDataSpecification
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
     def get_binary_file_name(self):
-        return "rate_source_live.aplx"
+
+        binary_name = "rate_source_live"
+        extension = ".aplx"
+        compressor = "_compressor" if self.__packet_compressor else ""
+
+        return (binary_name + compressor + extension)
 
     @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
     def get_binary_start_type(self):

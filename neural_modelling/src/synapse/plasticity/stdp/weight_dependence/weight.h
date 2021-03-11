@@ -52,7 +52,7 @@ address_t weight_initialise(
 /*!
  * \brief
  */
-static weight_state_t weight_get_initial(weight_t weight, index_t synapse_type);
+static weight_state_t weight_get_initial(weight_t *weight, index_t synapse_type);
 
 static weight_t weight_get_final(weight_state_t new_state);
 
