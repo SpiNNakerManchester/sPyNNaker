@@ -452,7 +452,6 @@ class Recorder(object):
                     view_indexes=view_indexes,
                     variable=variable,
                     recording_start_time=self._recording_start_time,
-                    sampling_interval=sampling_interval,
                     label=self.__population.label)
             else:
                 (data, data_indexes, sampling_interval) = \
@@ -519,7 +518,6 @@ class Recorder(object):
                     view_indexes=view_indexes,
                     variable=variable,
                     recording_start_time=data_cache.recording_start_time,
-                    sampling_interval=variable_cache.sampling_interval,
                     label=self.__population.label)
             else:
                 self.__read_in_signal(
@@ -696,7 +694,7 @@ class Recorder(object):
 
     def __read_in_event(
             self, segment, block, event_array, data_indexes, view_indexes,
-            variable, recording_start_time, sampling_interval, label):
+            variable, recording_start_time, label):
         """ Reads in a data item that is an event (i.e. rewiring form/elim)\
             and saves this data to the segment.
 
@@ -710,13 +708,10 @@ class Recorder(object):
         :param str variable: the variable name
         :param recording_start_time: when recording started
         :type recording_start_time: float or int
-        :param sampling_interval: how often a neuron is recorded
-        :type sampling_interval: float or int
         :param str label: human readable label
         """
         # pylint: disable=too-many-arguments, no-member
         t_start = recording_start_time * quantities.ms
-        sampling_period = sampling_interval * quantities.ms
         if view_indexes is None:
             if len(data_indexes) != self.__population.size:
                 warn_once(logger, self._SELECTIVE_RECORDED_MSG)

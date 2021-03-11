@@ -53,12 +53,15 @@ def structural_without_stdp():
     num_forms = len(formation_events.times)
     num_elims = len(elimination_events.times)
 
+    first_elim = elimination_events.labels[0]
+
     p.end()
 
     # These should have no connections since all should be eliminated
     assert(len(conns) == 0)
     assert(num_elims == 81)
     assert(num_forms == 0)
+    assert(first_elim == [7, 5, 'elimination'])
 
 
 class TestStructuralWithoutSTDP(BaseTestCase):
