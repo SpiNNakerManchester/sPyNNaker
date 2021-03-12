@@ -21,7 +21,7 @@ class RateSourceLive(AbstractPyNNModel):
 
     default_population_parameters = {}
 
-    def __init__(self, sources, refresh_rate, dataset, partitions=1):
+    def __init__(self, sources, refresh_rate, dataset, partitions=1, packet_compressor=False):
 
         self.__sources = sources
         self.__partitions = partitions
@@ -30,6 +30,7 @@ class RateSourceLive(AbstractPyNNModel):
         # Numer of timesteps we want to keep each rate fixed
         self.__refresh_rate = refresh_rate
         self.__dataset = dataset
+        self.__packet_compressor = packet_compressor
 
     @overrides(AbstractPyNNModel.create_vertex)
     def create_vertex(
@@ -37,7 +38,8 @@ class RateSourceLive(AbstractPyNNModel):
         return RateSourceLivePartition(
             self.__sources, constraints, label,
             self, self.__partitions,
-            self.__refresh_rate, self.__dataset)
+            self.__refresh_rate, self.__dataset,
+            self.__packet_compressor)
 
     @property
     def _sources(self):

@@ -142,7 +142,8 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
         "_slice_list",
         "__change_requires_mapping",
         "_recordables",
-        "__mem_offset"]
+        "__mem_offset",
+        "__packet_compressor"]
 
     BASIC_MALLOC_USAGE = 2
 
@@ -154,7 +155,8 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
     def __init__(self, n_synapse_types, synapse_index, n_neurons, atoms_offset,
                  constraints, label, max_atoms_per_core, weight_scale, ring_buffer_sigma,
                  spikes_per_second, incoming_spike_buffer_size, model_syn_types, mem_offset,
-                 population_table_type=None, synapse_io=None, synapse_rescale = False):
+                 packet_compressor, population_table_type=None, synapse_io=None,
+                 synapse_rescale = False):
 
         self._implemented_synapse_types = n_synapse_types
         self.__ring_buffer_sigma = ring_buffer_sigma
@@ -171,6 +173,7 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
         self._ring_buffer_shifts = [7]
         self._slice_list = None
         self.__mem_offset = mem_offset
+        self.__packet_compressor = packet_compressor
 
         # get config from simulator
         config = globals_variables.get_simulator().config
@@ -368,7 +371,8 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
         synapse_suffix = self.__synapse_dynamics.get_vertex_executable_suffix()
         neuron_suffix, extension = os.path.splitext(
             self._connected_app_vertices[0].get_binary_file_name())
-        return dynamics + neuron_suffix + synapse_suffix + extension
+        compressor = "_compressor" if self.__packet_compressor else ""
+        return (dynamics + neuron_suffix + synapse_suffix + compressor + extension)
 
     @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
     def get_binary_start_type(self):
