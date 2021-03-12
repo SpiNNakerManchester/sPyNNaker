@@ -296,6 +296,9 @@ bool synapses_initialise(
     synapse_delay_bits = log_max_delay;
     synapse_delay_mask = (1 << synapse_delay_bits) - 1;
 
+    log_info("Synapse delay bits = %u, mask = 0x%08x", synapse_delay_bits, synapse_delay_mask);
+    log_info("Synapse type index bits = %u, mask = 0x%08x", synapse_type_index_bits, synapse_type_index_mask);
+
     uint32_t n_ring_buffer_bits =
             log_n_neurons + log_n_synapse_types + synapse_delay_bits;
     ring_buffer_size = 1 << (n_ring_buffer_bits);

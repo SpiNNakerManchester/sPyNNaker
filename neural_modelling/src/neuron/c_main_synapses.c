@@ -39,7 +39,7 @@
 
 //! values for the priority for each callback
 typedef enum callback_priorities {
-    MC = -1, DMA = 0, USER = 0, TIMER = 0, SDP = 1
+    MC = -1, DMA = 0, USER = 0, TIMER = 0, SDP = 0
 } callback_priorities;
 
 enum regions {
@@ -95,11 +95,14 @@ struct sdram_config {
     uint32_t time_for_transfer;
 };
 
-//! The inverse of the number of clock cycles per ms (note assumes 200Mhz clock)
-#define INVERSE_CLOCK_CYCLES 0.005k
+static const uint32_t DMA_FLAGS = DMA_WIDTH << 24 | DMA_BURST_SIZE << 21
+        | DMA_WRITE << 19;
 
 //! A tag to indicate that the DMA of synaptic inputs is complete
 #define DMA_COMPLETE_TAG 10
+
+//! The number of clock cycles of overhead for the callback
+#define CALLBACK_OVERHEAD_CLOCKS 20
 
 // Globals
 
@@ -125,6 +128,22 @@ static struct sdram_config sdram_inputs;
 // The ring buffers to use
 static weight_t *ring_buffers;
 
+// The time to transfer
+static uint32_t clocks_to_transfer;
+
+// The number of words in the ring buffer to skip to get to the next time
+static uint32_t ring_buffer_skip_words;
+
+static inline void write(weight_t *tcm_address, uint32_t *system_address,
+        uint32_t length) {
+    dma[DMA_CTRL] = 0x1f;
+    dma[DMA_CTRL] = 0x0d;
+    uint32_t desc = DMA_FLAGS | length;
+    dma[DMA_ADRS] = (uint32_t) system_address;
+    dma[DMA_ADRT] = (uint32_t) tcm_address;
+    dma[DMA_DESC] = desc;
+}
+
 //! \brief Callback to store provenance data (format: neuron_provenance).
 //! \param[out] provenance_region: Where to write the provenance data
 static void store_provenance_data(address_t provenance_region) {
@@ -143,24 +162,51 @@ void resume_callback(void) {
     synapses_resume(time + 1);
 }
 
-static inline void process_ring_buffers(void) {
+extern cback_t callback[NUM_EVENTS];
+
+static inline void process_ring_buffers(uint32_t local_time) {
     // Get the index of the first ring buffer for the next time step
-    uint32_t first_ring_buffer = synapse_row_get_ring_buffer_index(time + 1,
-            0, 0, synapse_type_index_bits, synapse_index_bits, synapse_delay_mask);
+    uint32_t first_ring_buffer = synapse_row_get_first_ring_buffer_index(local_time,
+            synapse_type_index_bits, synapse_delay_mask);
+    // Make sure we don't do a DMA complete callback for this bit
+    cback_t cback = callback[DMA_TRANSFER_DONE];
+    spin1_callback_off(DMA_TRANSFER_DONE);
     // Do the DMA transfer
     log_debug("Writing %d bytes to 0x%08x from ring buffer %d",
              sdram_inputs.size_in_bytes, sdram_inputs.address, first_ring_buffer);
-    spin1_dma_transfer(DMA_COMPLETE_TAG, sdram_inputs.address,
-            &ring_buffers[first_ring_buffer], DMA_WRITE,
+    write(&ring_buffers[first_ring_buffer], sdram_inputs.address,
             sdram_inputs.size_in_bytes);
+    // Wait for completion of DMAs and then restore the callback
+    while (!(dma[DMA_STAT] & (1 << 10))) {
+        continue;
+    }
+    dma[DMA_CTRL] = 0x1f;
+    dma[DMA_CTRL] = 0x0d;
+    spin1_callback_on(DMA_TRANSFER_DONE, cback.cback, cback.priority);
+}
+
+static inline void write_contributions(uint32_t local_time) {
+    // Clear any outstanding spikes
+    spike_processing_clear_input_buffer(local_time);
+    // Copy things out of DTCM
+    process_ring_buffers(local_time + 1);
+    // Now clear the ring buffers
+    synapses_flush_ring_buffers(local_time);
 }
 
 //! \brief writes synaptic inputs to SDRAM
-INT_HANDLER write_contributions(void) {
-    tc[T2_INT_CLR] = (uint) tc;         // Clear interrupt in timer
-    // Copy things out of DTCM
-    process_ring_buffers();
-    vic[VIC_VADDR] = (uint) vic;        // Ack the VIC
+INT_HANDLER timer2_callback(void) {
+    // Disable interrupts to stop DMAs and MC getting in the way of this bit
+    uint32_t state = spin1_int_disable();
+    // Clear interrupt in timer and ACK the vic (safe as interrupts off anyway)
+    tc[T2_INT_CLR] = (uint) tc;
+    vic[VIC_VADDR] = (uint) vic;
+
+    // Write the contributions
+    write_contributions(time);
+
+    // Restore interrupts
+    spin1_mode_restore(state);
 }
 
 //! \brief Timer interrupt callback
@@ -168,16 +214,8 @@ INT_HANDLER write_contributions(void) {
 //!            executed since start of simulation
 //! \param[in] unused: unused parameter kept for API consistency
 void timer_callback(UNUSED uint timer_count, UNUSED uint unused) {
-    // Disable interrupts to stop DMAs and MC getting in the way of this bit
-    uint32_t state = spin1_int_disable();
-
     time++;
-
-    // Clear any outstanding spikes
-    spike_processing_clear_input_buffer(time);
-
-    spin1_mode_restore(state);
-    state = spin1_irq_disable();
+    uint32_t state = spin1_int_disable();
 
     /* if a fixed number of simulation ticks that were specified at startup
      * then do reporting for finishing */
@@ -201,14 +239,10 @@ void timer_callback(UNUSED uint timer_count, UNUSED uint unused) {
 
     // Setup to call back enough before the end of the timestep to transfer
     // synapses to SDRAM for the next timestep
-    uint32_t cspr = spin1_int_disable();
-    uint32_t timer = tc[T1_COUNT];
-    uint32_t time_to_transfer = timer - (sdram_inputs.time_for_transfer * 200);
-    tc[T2_LOAD] = time_to_transfer;
+    tc[T2_CONTROL] = 0;
+    uint32_t time_to_wait = tc[T1_COUNT] - clocks_to_transfer;
+    tc[T2_LOAD] = time_to_wait;
     tc[T2_CONTROL] = 0xe3;
-    spin1_mode_restore(cspr);
-
-    synapses_flush_ring_buffers(time);
 
     // Do rewiring as needed
     synaptogenesis_do_timestep_update();
@@ -244,15 +278,31 @@ static bool initialise(void) {
             SDRAM_PARAMS_REGION, ds_regions);
     spin1_memcpy(&sdram_inputs, sdram_config, sizeof(struct sdram_config));
 
+    // Measure the time to do an upload
+    tc[T2_LOAD] = 0xFFFFFFFF;
+    tc[T2_CONTROL] = 0x82;
+    write_contributions(0);
+    clocks_to_transfer = (0xFFFFFFFF - tc[T2_COUNT]) + CALLBACK_OVERHEAD_CLOCKS;
+    log_info("Transfer of %u bytes took %u cycles", sdram_inputs.size_in_bytes,
+            clocks_to_transfer);
+    recording_reset();
+
+    // Prepare to receive the timer (disable timer then enable VIC entry)
+    tc[T2_CONTROL] = 0;
+    sark_vic_set(TIMER2_PRIORITY, TIMER2_INT, 1, timer2_callback);
+
     // Wipe the inputs using word writes
     for (uint32_t i = 0; i < sdram_inputs.size_in_bytes >> 2; i++) {
         sdram_inputs.address[i] = 0;
     }
 
-    // Prepare to receive the timer
-    tc[T2_CONTROL] = 0;                     // Disable timer
-    event.vic_enable |= 1 << TIMER2_INT;    // Disabled by event_stop
-    sark_vic_set(TIMER2_PRIORITY, TIMER2_INT, 1, write_contributions);
+    // Work out how many ring buffer entries between time steps.
+    // Take the number of ring buffer entries per time step which is
+    // identified by the number of bits needed by all the synapse types and
+    // neuron indicies.  The number of words is this divided by 2 (the size
+    // of each ring buffer entry) which is the same as shifting by 1 less.
+    ring_buffer_skip_words = 1 << (synapse_type_index_bits - 1);
+
 
     log_debug("Initialise: finished");
     return true;
