@@ -18,7 +18,8 @@ import numpy
 import os
 import random
 import sys
-from spynnaker.pyNN.utilities.recorder_database import RecorderDatabase, DEFAULT_NAME
+from spynnaker.pyNN.utilities.recorder_database import (
+    RecorderDatabase, DEFAULT_NAME)
 from spinnaker_testbase import BaseTestCase
 
 

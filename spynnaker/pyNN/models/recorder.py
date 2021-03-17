@@ -518,7 +518,8 @@ class Recorder(object):
             assert data_cache.t == v_data["end_timestamp"]
             assert variable_cache.n_neurons == v_data["n_neurons"]
             assert data_cache.recording_start_time == v_data["start_timestamp"]
-            assert variable_cache.sampling_interval == v_data["sampling_interval"]
+            assert variable_cache.sampling_interval == \
+                   v_data["sampling_interval"]
             if variable == SPIKES:
                 s_data = recorder_database.get_events_data(
                     self.__population.label, variable, segment_number)

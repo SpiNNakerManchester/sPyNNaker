@@ -104,16 +104,14 @@ class RecorderDatabase(object):
         """ Clear all saved data
         """
         with self._db:
-            names = [row["name"]
-                            for row in self._db.execute(
-                    "SELECT name FROM sqlite_master WHERE type='table'")]
+            names = [row["name"] for row in self._db.execute(
+                "SELECT name FROM sqlite_master WHERE type='table'")]
             for name in self.META_TABLES:
                 names.remove(name)
             for name in names:
                 self._db.execute("DROP TABLE " + name)
-            names = [row["name"]
-                            for row in self._db.execute(
-                    "SELECT name FROM sqlite_master WHERE type='view'")]
+            names = [row["name"] for row in self._db.execute(
+                "SELECT name FROM sqlite_master WHERE type='view'")]
             for name in names:
                 self._db.execute("DROP VIEW " + name)
             for name in self.META_TABLES:
@@ -144,7 +142,7 @@ class RecorderDatabase(object):
             for row in self._db.execute(
                     """
                     SELECT source, variable, table_type
-                    FROM metadata 
+                    FROM metadata
                     WHERE segment = ?
                     GROUP BY source, variable, table_type
                     """):
@@ -188,7 +186,7 @@ class RecorderDatabase(object):
             An Exception if an existing Table does not have the exected type
             An Expcetion if the table does not exists an create_table is False
         """
-        data_table, _  = self._find_data_table(
+        data_table, _ = self._find_data_table(
             source, variable, segment, table_type)
 
         if data_table:
@@ -207,8 +205,8 @@ class RecorderDatabase(object):
         self._db.execute(
             """
             INSERT OR IGNORE INTO metadata(
-                source, variable, segment, data_table, table_type, n_ids,  
-                sampling_interval) 
+                source, variable, segment, data_table, table_type, n_ids,
+                sampling_interval)
             VALUES(?,?,?,?,?,0,?)
             """,
             (source, variable, segment, data_table, table_type.value,
@@ -222,13 +220,13 @@ class RecorderDatabase(object):
         with self._db:
             segment = self._clean_segment(segment)
             for row in self._db.execute(
-                """
-                SELECT sampling_interval, description, unit, n_neurons, 
-                       table_type
-                FROM metadata
-                WHERE source = ? AND variable = ? and segment = ?
-                LIMIT 1
-                """, (source, variable, segment)):
+                    """
+                    SELECT sampling_interval, description, unit, n_neurons,
+                           table_type
+                    FROM metadata
+                    WHERE source = ? AND variable = ? and segment = ?
+                    LIMIT 1
+                    """, (source, variable, segment)):
                 assert (sampling_interval == row["sampling_interva"])
                 assert (description == row["description"])
                 assert (unit == row["unit"])
@@ -239,9 +237,11 @@ class RecorderDatabase(object):
             if table_type == TABLE_TYPES.MATRIX:
                 data_table = None  # data_table done later if at all
             elif table_type == TABLE_TYPES.SINGLE:
-                data_table = self._create_single_table(source, variable, segment)
+                data_table = self._create_single_table(
+                    source, variable, segment)
             elif table_type == TABLE_TYPES.EVENT:
-                data_table = self._create_event_table(source, variable, segment)
+                data_table = self._create_event_table(
+                    source, variable, segment)
             else:
                 raise NotImplementedError(
                     "No create table for datatype {}".format(table_type))
@@ -249,8 +249,8 @@ class RecorderDatabase(object):
             self._db.execute(
                 """
                 INSERT INTO metadata(
-                    source, variable,  segment, sampling_interval,description, 
-                    unit, n_neurons,  data_table, table_type, n_ids) 
+                    source, variable,  segment, sampling_interval,description,
+                    unit, n_neurons,  data_table, table_type, n_ids)
                 VALUES(?,?,?,?,?,?,?,?,?,0)
                 """,
                 (source, variable, segment, sampling_interval, description,
@@ -337,7 +337,6 @@ class RecorderDatabase(object):
                 assert(table_type.value == row["table_type"])
             return row["data_table"], row["table_type"]
         return None, None
-
 
     def x_tables_and_views__by_segment(self, segment):
         tables = set()
@@ -463,7 +462,7 @@ class RecorderDatabase(object):
 
         The timestamps are converted to a list of list as that is what
         sqllite expects
-        
+
         :param timestamps: The Timestamps of the data.
             May be None or empty in which case the first column of data will
             be treated as the timestamps
@@ -486,12 +485,12 @@ class RecorderDatabase(object):
                 data.reshape(data.shape[0], 1)
                 data = data[:, None]
             if isinstance(timestamps, numpy.ndarray):
-               data = numpy.hstack((timestamps, data))
-               if len(timestamps) > 1:
-                   sampling_interval = timestamps[1][0] - timestamps[0][0]
-               else:
-                   sampling_interval = 0
-               return timestamps.tolist(), data.tolist(), sampling_interval
+                data = numpy.hstack((timestamps, data))
+                if len(timestamps) > 1:
+                    sampling_interval = timestamps[1][0] - timestamps[0][0]
+                else:
+                    sampling_interval = 0
+                return timestamps.tolist(), data.tolist(), sampling_interval
             data = data.tolist()
         else:
             data = list(data)
@@ -525,10 +524,9 @@ class RecorderDatabase(object):
         cutoff = 0
         while cutoff < len(data[0]):
             data_block = list(
-                map(lambda x:  x[0:1] + x[cutoff + 1:cutoff + _MAX_COLUMNS + 1], data))
+                map(lambda x:
+                    x[0:1] + x[cutoff + 1:cutoff + _MAX_COLUMNS + 1], data))
             ids_block = ids[cutoff:cutoff + _MAX_COLUMNS]
-            a = len(data_block[0])
-            b = len(ids_block)
             yield data_block, ids_block
             cutoff += _MAX_COLUMNS
 
@@ -552,7 +550,7 @@ class RecorderDatabase(object):
         if use_segment in segments:
             return use_segment
         raise Exception(
-            "Segment {} not found. Known segments are"
+            "Segment {} not found. Known segments are {}"
             "".format(segment, segments.keys))
 
     # matrix data
@@ -589,7 +587,8 @@ class RecorderDatabase(object):
        """
         if len(data) == 0:
             return
-        timestamps, data, sampling_interval = self._clean_data(timestamps, data, ids)
+        timestamps, data, sampling_interval = self._clean_data(
+            timestamps, data, ids)
         segment = self._clean_segment(segment)
         with self._db:
             if len(data[0]) < _MAX_COLUMNS:
@@ -644,7 +643,6 @@ class RecorderDatabase(object):
         cursor.executemany(query, data)
 
         query = "INSERT OR IGNORE INTO {} VALUES(?)".format(index_table)
-        #indexes = [[row[0]] for row in data]
         self._db.executemany(query, timestamps)
 
     def _get_matrix_raw_table(
@@ -706,7 +704,7 @@ class RecorderDatabase(object):
 
         # create full view
         ddl_statement = """
-            CREATE VIEW {} 
+            CREATE VIEW {}
             AS SELECT * FROM {} LEFT JOIN {} USING (timestamp)
             """
         ddl_statement = ddl_statement.format(full_view, index_table, raw_table)
@@ -715,11 +713,12 @@ class RecorderDatabase(object):
         self._db.execute(
             """
             INSERT OR IGNORE INTO local_matrix_metadata(
-                source, variable, segment, raw_table, full_view, index_table, 
-                first_id) 
+                source, variable, segment, raw_table, full_view, index_table,
+                first_id)
             VALUES(?,?,?,?,?,?, ?)
             """,
-            (source, variable, segment, raw_table, full_view, index_table, ids[0]))
+            (source, variable, segment, raw_table, full_view, index_table,
+             ids[0]))
 
         self._update_global_matrix_view(
             source, variable, segment, raw_table, len(ids))
@@ -738,7 +737,7 @@ class RecorderDatabase(object):
         """
         index_table = self._table_name(source, variable, segment) + "_indexes"
         ddl_statement = """
-            CREATE TABLE IF NOT EXISTS {} 
+            CREATE TABLE IF NOT EXISTS {}
             (timestamp FLOAT PRIMARY KEY ASC)
             """.format(index_table)
         self._db.execute(ddl_statement)
@@ -767,18 +766,18 @@ class RecorderDatabase(object):
         """
         self._db.execute(
             """
-            UPDATE metadata 
+            UPDATE metadata
             SET n_ids = n_ids + ?
             WHERE source = ? and variable = ? and segment = ?
             """,
             (n_ids, source, variable, segment))
 
         for row in self._db.execute(
-            """
-            SELECT n_ids FROM metadata
-            WHERE source = ? AND variable = ? and segment = ?
-            LIMIT 1
-            """, (source, variable, segment)):
+                """
+                SELECT n_ids FROM metadata
+                WHERE source = ? AND variable = ? and segment = ?
+                LIMIT 1
+                """, (source, variable, segment)):
             new_n_ids = row["n_ids"]
 
         if new_n_ids == n_ids:
@@ -798,7 +797,7 @@ class RecorderDatabase(object):
 
         self._db.execute(
             """
-            UPDATE metadata 
+            UPDATE metadata
             SET data_table = ?
             WHERE source = ? and variable = ?
             """,
@@ -922,7 +921,7 @@ class RecorderDatabase(object):
         data_table = self._table_name(source, variable, segment)
         ddl_statement = """
             CREATE TABLE IF NOT EXISTS {} (
-            timestamp FLOAT NOT NULL, 
+            timestamp FLOAT NOT NULL,
             id INTEGER NOT NULL)
             """.format(data_table)
         self._db.execute(ddl_statement)
@@ -1053,23 +1052,23 @@ class RecorderDatabase(object):
     def update_segment(self, segment, start_timestamp, end_timestamp):
         with self._db:
             if self._db.execute(
-                """
-                INSERT OR IGNORE INTO segment_info(
-                    segment, start_timestamp, end_timestamp) 
-                VALUES(?,?,?)
-                """, (segment, start_timestamp, end_timestamp)).rowcount == 1:
+                    """
+                    INSERT OR IGNORE INTO segment_info(
+                        segment, start_timestamp, end_timestamp)
+                    VALUES(?,?,?)
+                    """, (segment, start_timestamp, end_timestamp)).rowcount == 1:
                 return
             for row in self._db.execute(
                     "SELECT * FROM segment_info WHERE segment = ?",
                     (segment, )):
-                assert(start_timestamp, row["start_timestamp"])
+                assert start_timestamp == row["start_timestamp"]
                 if end_timestamp > row["end_timestamp"]:
                     self._db.execute(
-                    """
-                        UPDATE segment_info	
-                        SET end_timestamp = ?
-                        WHERE segment = ?
-                    """, (end_timestamp, segment))
+                        """
+                            UPDATE segment_info	
+                            SET end_timestamp = ?
+                            WHERE segment = ?
+                        """, (end_timestamp, segment))
                     self._clear_segment(segment)
                 elif end_timestamp < row["end_timestamp"]:
                     raise Exception(
@@ -1095,11 +1094,11 @@ class RecorderDatabase(object):
         with self._db:
             for row in self._db.execute(
                     """
-                    SELECT variable, sampling_interval, description, unit, 
-                           n_neurons, table_type, start_timestamp, 
+                    SELECT variable, sampling_interval, description, unit,
+                           n_neurons, table_type, start_timestamp,
                            end_timestamp
                     FROM metadata, segment_info
-                    WHERE source = ? and metadata.segment = ? and 
+                    WHERE source = ? and metadata.segment = ? and
                            segment_info.segment = ?""",
                     (source, segment, segment)):
                 v_data = {}
