@@ -166,54 +166,6 @@ class RecorderDatabase(object):
             return True
         return False
 
-    def x_get_or_create_data_table(
-            self, source, variable, segment, sampling_interval, table_type):
-        """
-        Finds or if allowed creates a data table based on source and variable
-
-        :param str source: Name of the source for example the population
-        :param str variable: Name of the variable
-        :param int segment: Number of the segment / reset group
-        :param table_type: Type of table to find or create
-        :type table_type: TABLE_TYPES or None
-        :param bool create_table:
-        :return:
-            The name and type of the Table.
-            Name could be None if the data is too complex to get from a
-            single table.
-        type: (str, TABLE_TYPES) or (None, TABLE_TYPES)
-        :raises:
-            An Exception if an existing Table does not have the exected type
-            An Expcetion if the table does not exists an create_table is False
-        """
-        data_table, _ = self._find_data_table(
-            source, variable, segment, table_type)
-
-        if data_table:
-            return data_table
-
-        if table_type == TABLE_TYPES.MATRIX:
-            data_table = None  # data_table done later if at all
-        elif table_type == TABLE_TYPES.SINGLE:
-            data_table = self._create_single_table(source, variable, segment)
-        elif table_type == TABLE_TYPES.EVENT:
-            data_table = self._create_event_table(source, variable, segment)
-        else:
-            raise NotImplementedError(
-                "No create table for datatype {}".format(table_type))
-
-        self._db.execute(
-            """
-            INSERT OR IGNORE INTO metadata(
-                source, variable, segment, data_table, table_type, n_ids,
-                sampling_interval)
-            VALUES(?,?,?,?,?,0,?)
-            """,
-            (source, variable, segment, data_table, table_type.value,
-             sampling_interval))
-
-        return data_table
-
     def register_data_source(
             self, source, variable, sampling_interval, description, unit,
             n_neurons, table_type, segment=-1):
@@ -476,21 +428,14 @@ class RecorderDatabase(object):
                 timestamps.reshape(timestamps.shape[0], 1)
                 timestamps = timestamps[:, None]
         if isinstance(timestamps, (int, float)):
-            sampling_interval = timestamps
             timestamps = [x * timestamps for x in range(len(data))]
-        else:
-            sampling_interval = None
         if isinstance(data, numpy.ndarray):
             if len(data.shape) == 1:
                 data.reshape(data.shape[0], 1)
                 data = data[:, None]
             if isinstance(timestamps, numpy.ndarray):
                 data = numpy.hstack((timestamps, data))
-                if len(timestamps) > 1:
-                    sampling_interval = timestamps[1][0] - timestamps[0][0]
-                else:
-                    sampling_interval = 0
-                return timestamps.tolist(), data.tolist(), sampling_interval
+                return timestamps.tolist(), data.tolist()
             data = data.tolist()
         else:
             data = list(data)
@@ -513,12 +458,7 @@ class RecorderDatabase(object):
                 else:
                     assert (len(data[0]) == 2)
             timestamps = [[row[0]] for row in data]
-        if sampling_interval is None:
-            if len(timestamps) > 1:
-                sampling_interval = timestamps[1][0] - timestamps[0][0]
-            else:
-                sampling_interval = 0
-        return timestamps, data, sampling_interval
+        return timestamps, data
 
     def _split_data(self, data, ids):
         cutoff = 0
@@ -556,7 +496,7 @@ class RecorderDatabase(object):
     # matrix data
 
     def insert_matrix(self, source, variable, data, ids=None, timestamps=None,
-                      sampling_interval=None, segment=-1):
+                      segment=-1):
         """
         Inserts matrix data into the database
 
@@ -587,22 +527,21 @@ class RecorderDatabase(object):
        """
         if len(data) == 0:
             return
-        timestamps, data, sampling_interval = self._clean_data(
+        timestamps, data = self._clean_data(
             timestamps, data, ids)
         segment = self._clean_segment(segment)
         with self._db:
             if len(data[0]) < _MAX_COLUMNS:
                 self._insert_matrix(source, variable, data, ids, timestamps,
-                                    segment, sampling_interval)
+                                    segment)
             else:
                 for data_block, ids_block in self._split_data(data, ids):
                     self._insert_matrix(
                         source, variable, data_block, ids_block, timestamps,
-                        segment, sampling_interval)
+                        segment)
 
     def _insert_matrix(
-            self, source, variable, data, ids, timestamps, segment,
-            sampling_interval):
+            self, source, variable, data, ids, timestamps, segment):
         """
         Inserts matrix data into the database
 
@@ -632,7 +571,7 @@ class RecorderDatabase(object):
         :param int segment: Number of the segment / reset group
        """
         raw_table, index_table = self._get_matrix_raw_table(
-            source, variable, segment, sampling_interval, ids)
+            source, variable, segment, ids)
 
         cursor = self._db.cursor()
         # Get the number of columns
@@ -646,7 +585,7 @@ class RecorderDatabase(object):
         self._db.executemany(query, timestamps)
 
     def _get_matrix_raw_table(
-            self, source, variable, segment, sampling_interval, ids):
+            self, source, variable, segment, ids):
         """
         Get or create a raw table to store local/core matrix data in
 
@@ -671,11 +610,10 @@ class RecorderDatabase(object):
             assert(check_ids == list(ids))
             return (table_name, index_table)
 
-        return self._create_matrix_raw_table(
-            source, variable, segment, sampling_interval, ids)
+        return self._create_matrix_raw_table(source, variable, segment, ids)
 
     def _create_matrix_raw_table(
-            self,  source, variable, segment, sampling_interval, ids):
+            self,  source, variable, segment, ids):
         """
         Creates the raw table to store local/core matrix data in
 
@@ -899,7 +837,7 @@ class RecorderDatabase(object):
             numpy.ndarray or None
         :param int segment: Number of the segment / reset group
         """
-        _, data, sampling_interval = self._clean_data(timestamps, data)
+        _, data = self._clean_data(timestamps, data)
         segment = self._clean_segment(segment)
         with self._db:
             data_table, _ = self._get_data_table(
@@ -980,7 +918,7 @@ class RecorderDatabase(object):
         :param int id:
         :param int segment: Number of the segment / reset group
         """
-        timestamps, data, sampling_interval = self._clean_data(
+        timestamps, data = self._clean_data(
             timestamps, data)
         segment = self._clean_segment(segment)
         with self._db:
