@@ -68,10 +68,10 @@ state_t neuron_model_state_update(
         v_mem_error = neuron->V_membrane - 9.k;
 //        io_printf(IO_BUF, "> %k = %k - %k\n", v_mem_error, neuron->V_membrane, neuron->B);
     }
-    else if (neuron->V_membrane < -9.k){
-        v_mem_error = neuron->V_membrane + 9.k;
+//    else if (neuron->V_membrane < -9.k){
+//        v_mem_error = neuron->V_membrane + 9.k;
 //        io_printf(IO_BUF, "< %k = %k - %k\n", v_mem_error, -neuron->V_membrane, neuron->B);
-    }
+//    }
     else{
         v_mem_error = 0.k;
     }

@@ -87,6 +87,8 @@ typedef struct neuron_t {
     uint32_t input_synapses;
     uint32_t rec_synapses;
     REAL neuron_rate;
+    REAL v_mem_lr;
+    REAL firing_lr;
     REAL w_fb[10]; // feedback weight
 
     // array of synaptic states - peak fan-in of 250 for this case

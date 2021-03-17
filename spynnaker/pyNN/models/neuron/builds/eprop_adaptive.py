@@ -54,6 +54,8 @@ class EPropAdaptive(AbstractPyNNNeuronModelStandard):
             input_synapses=100,
             rec_synapses=100,
             neuron_rate=10,
+            v_mem_lr=0.0,
+            firing_lr=0.01,
             w_fb=[0.5]
 
             ):
@@ -74,6 +76,8 @@ class EPropAdaptive(AbstractPyNNNeuronModelStandard):
             input_synapses,
             rec_synapses,
             neuron_rate,
+            v_mem_lr,
+            firing_lr,
             w_fb
             )
 

@@ -50,6 +50,8 @@ NUMBER_OF_CUES = "number_of_cues"
 INPUT_SYNAPSES = "input_synapses"
 REC_SYNAPSES = "rec_synapses"
 NEURON_RATE = "neuron_rate"
+V_MEM_LR = "v_mem_lr"
+FIRING_LR = "firing_lr"
 
 DELTA_W = "delta_w"
 Z_BAR_OLD = "z_bar_old"
@@ -111,7 +113,9 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
         "__number_of_cues",
         "__input_synapses",
         "__rec_synapses",
-        "__neuron_rate"
+        "__neuron_rate",
+        "__v_mem_lr",
+        "__firing_lr"
         ]
 
     def __init__(
@@ -143,6 +147,8 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
             input_synapses,
             rec_synapses,
             neuron_rate,
+            v_mem_lr,
+            firing_lr,
             w_fb
             ):
 
@@ -174,6 +180,8 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
             DataType.UINT32,   #  input_synapses
             DataType.UINT32,   #  rec_synapses
             DataType.S1615,   #  neuron_rate
+            DataType.S1615,   #  v_mem_lr
+            DataType.S1615,   #  firing_lr
             # DataType.S1615,   #  w_fb
             ]
         datatype_list.extend([DataType.S1615] * 10)  # w_fb
@@ -232,6 +240,8 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
         self.__input_synapses = input_synapses
         self.__rec_synapses = rec_synapses
         self.__neuron_rate = self.__target_rate
+        self.__v_mem_lr = v_mem_lr
+        self.__firing_lr = firing_lr
 
 
     @overrides(AbstractNeuronModel.get_n_cpu_cycles)
@@ -257,6 +267,8 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
         parameters[INPUT_SYNAPSES] = self.__input_synapses
         parameters[REC_SYNAPSES] = self.__rec_synapses
         parameters[NEURON_RATE] = self.__neuron_rate
+        parameters[V_MEM_LR] = self.__v_mem_lr
+        parameters[FIRING_LR] = self.__firing_lr
 #         print('w_fb: ', self.__w_fb)
         for n in range(10):
             parameters[W_FB+str(n)] = self.__w_fb[n]#.next()
@@ -329,7 +341,9 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
                 parameters[NUMBER_OF_CUES],
                 parameters[INPUT_SYNAPSES],
                 parameters[REC_SYNAPSES],
-                parameters[NEURON_RATE]
+                parameters[NEURON_RATE],
+                parameters[V_MEM_LR],
+                parameters[FIRING_LR]
                 ]
         for n in range(10):
             feedback_weight = [parameters[W_FB+str(n)]]
@@ -380,7 +394,7 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
         (v, _v_rest, _r_membrane, _exp_tc, _i_offset, count_refrac,
          _v_reset, _tau_refrac, psi,
          big_b, small_b, _small_b_0, _e_to_dt_on_tau_a, _beta, _adpt, _scalar,
-         l, __w_fb, window_size, number_of_cues, input_synapses, rec_synapses, neuron_rate,
+         l, __w_fb, window_size, number_of_cues, input_synapses, rec_synapses, neuron_rate, v_mem_lr, firing_lr,
          delta_w, z_bar_old, z_bar, ep_a, e_bar, update_ready) = values
 
         # Not sure this will work with the new array of synapse!!!
@@ -551,3 +565,19 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
     @neuron_rate.setter
     def neuron_rate(self, new_value):
         self.__neuron_rate = new_value
+
+    @property
+    def v_mem_lr(self):
+        return self.__v_mem_lr
+
+    @v_mem_lr.setter
+    def v_mem_lr(self, new_value):
+        self.__v_mem_lr = new_value
+
+    @property
+    def firing_lr(self):
+        return self.__firing_lr
+
+    @firing_lr.setter
+    def firing_lr(self, new_value):
+        self.__firing_lr = new_value

@@ -286,11 +286,12 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
                 NUM_INHIBITORY_RECEPTORS, inh_input_values,
                 external_bias, neuron, neuron_index);
 
-    if (result > 8.75k){
+    REAL mem_downscale = 20.k;
+    if (result / mem_downscale > 8.75k){
         output_errors[neuron_index] = expk(8.75k);
     }
     else{
-        output_errors[neuron_index] = expk(result);
+        output_errors[neuron_index] = expk(result / mem_downscale);
     }
     if (neuron_index == 0){
         accumulated_softmax = 0.k;
@@ -300,6 +301,11 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 //        io_printf(IO_BUF, "out:%d, vmem:%k, res:%k\n", neuron_index, voltage, result);
 //    }
 
+
+//    if (time % 100 == 0){
+//        io_printf(IO_BUF, "%u n_ind:%u, [%u]target:%u\n", time, neuron_index, target_ind,
+//                                                            global_parameters->target_V[target_ind]);
+//    }
 //    recorded_variable_values[V_RECORDING_INDEX] = voltage;
     if (neuron_index == 9){
 //        if (!printed_values){
@@ -314,10 +320,6 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
                 output_errors[n_ind] /= accumulated_softmax;
             }
             REAL correct_output = 0.k;
-
-//            if (time % 1000 == 0){
-//                io_printf(IO_BUF, "n_ind:%u, target:%u\n", n_ind, global_parameters->target_V[target_ind]);
-//            }
 
             if (n_ind == global_parameters->target_V[target_ind]){
 
@@ -342,7 +344,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 //            io_printf(IO_BUF, "\n");
 //            printed_values = false;
 //        }
-        if (time % 1000 == 0){ // after every test is finished
+        if (time % 1000 == 0 && time != 0){ // after every test is finished
             target_ind += 1;
 //            io_printf(IO_BUF, "tar idx %u\n", target_ind);
 //            for (uint32_t n_ind=0; n_ind < 10; n_ind++){
@@ -362,7 +364,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 //    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[neuron_index*20].z_bar;
     recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
                                     learning_signal[global_parameters->target_V[target_ind]];
-//                                    neuron->syn_state[neuron_index*5].z_bar;
+//                                    neuron->syn_state[neuron_index*25].z_bar;
 //                                    neuron->L;
 //                                    *exc_input_values;
 //                                    neuron->syn_state[neuron_index*5].delta_w;
@@ -372,7 +374,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] =
 //        			global_parameters->target_V[target_ind];
 //                    learning_signal[neuron_index];
-                    neuron->syn_state[neuron_index*5].delta_w;
+                    neuron->syn_state[neuron_index*25].delta_w;
 //        			neuron->syn_state[neuron_index*20].delta_w;
 //        			exc_input_values[0];
 
