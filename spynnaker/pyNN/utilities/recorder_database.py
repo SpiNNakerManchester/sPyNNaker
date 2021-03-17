@@ -1056,7 +1056,8 @@ class RecorderDatabase(object):
                     INSERT OR IGNORE INTO segment_info(
                         segment, start_timestamp, end_timestamp)
                     VALUES(?,?,?)
-                    """, (segment, start_timestamp, end_timestamp)).rowcount == 1:
+                    """,
+                    (segment, start_timestamp, end_timestamp)).rowcount == 1:
                 return
             for row in self._db.execute(
                     "SELECT * FROM segment_info WHERE segment = ?",
@@ -1065,7 +1066,7 @@ class RecorderDatabase(object):
                 if end_timestamp > row["end_timestamp"]:
                     self._db.execute(
                         """
-                            UPDATE segment_info	
+                            UPDATE segment_info
                             SET end_timestamp = ?
                             WHERE segment = ?
                         """, (end_timestamp, segment))
