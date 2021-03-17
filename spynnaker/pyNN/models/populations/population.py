@@ -1040,10 +1040,10 @@ class Population(PopulationBase):
         raise ConfigurationException(
             "This population does not support describing its units")
 
-    def _cache_data(self):
+    def _cache_data(self, recorder_database):
         """ Store data for later extraction
         """
-        self._recorder.cache_data()
+        self._recorder.cache_data(recorder_database)
 
     @staticmethod
     def __create_model(cellclass, cellparams):

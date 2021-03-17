@@ -24,6 +24,7 @@ from spinn_front_end_common.utilities.constants import (
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
     AbstractSpinnakerBase)
 from spynnaker.pyNN.abstract_spinnaker_common import AbstractSpiNNakerCommon
+from spynnaker.pyNN.utilities.recorder_database import RecorderDatabase
 from spynnaker.pyNN.utilities.spynnaker_failed_state import (
     SpynnakerFailedState)
 from spynnaker.pyNN.spynnaker_simulator_interface import (
@@ -129,11 +130,14 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
         # Stop any currently running SpiNNaker application
         self.stop()
 
+
     def reset(self):
         """ Reset the state of the current network to time t = 0.
         """
+        recorder_database = RecorderDatabase(self._report_simulation_top_directory)
+        recorder_database.update_segment(self.__segment_counter, 0, self.t)
         for population in self._populations:
-            population._cache_data()
+            population._cache_data(recorder_database)
 
         self.__segment_counter += 1
 
