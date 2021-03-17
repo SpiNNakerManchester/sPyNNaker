@@ -170,10 +170,12 @@ class TestRecorderDatabase(BaseTestCase):
         data_out = self.db.get_events_data(
             source, variable)
         self.assertEqual(len(combined), len(data_out))
+        print(data_out)
+        print(spike_ids)
+        print(spike_times)
         for i in range(len(combined)):
-            self.assertEqual(data_out[i, 0], spike_ids[i])
-            print(data_out[i, 1], spike_times[i])
-            self.assertEqual(data_out[i, 1], spike_times[i])
+            self.assertEqual(data_out[i, 0], spike_times[i])
+            self.assertEqual(data_out[i, 1], spike_ids[i])
 
     def test_event_timestamps_in_data_list(self):
         self.events(True, False)
