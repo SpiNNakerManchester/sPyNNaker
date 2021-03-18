@@ -33,8 +33,10 @@ key_t key;
 //! by the data region, then this model should not have a key.
 bool use_key;
 
+//! Earliest time in a timestep that any neuron has sent a spike
 uint32_t latest_send_time = 0xFFFFFFFF;
 
+//! Latest time in a timestep that any neuron has sent a spike
 uint32_t earliest_send_time = 0;
 
 //! The number of neurons on the core

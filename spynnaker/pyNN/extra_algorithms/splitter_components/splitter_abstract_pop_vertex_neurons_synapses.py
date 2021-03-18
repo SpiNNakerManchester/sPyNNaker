@@ -28,7 +28,7 @@ from spynnaker.pyNN.models.neuron import (
     PopulationNeuronsMachineVertex, PopulationSynapsesMachineVertex,
     NeuronProvenance, SynapseProvenance, AbstractPopulationVertex)
 from spynnaker.pyNN.models.neuron.population_neurons_machine_vertex import (
-    SDRAM_PARAMS_SIZE as NEURONS_SDRAM_PARAMS_SIZE)
+    SDRAM_PARAMS_SIZE as NEURONS_SDRAM_PARAMS_SIZE, NeuronMainProvenance)
 from spynnaker.pyNN.models.neuron.population_synapses_machine_vertex import (
     SDRAM_PARAMS_SIZE as SYNAPSES_SDRAM_PARAMS_SIZE)
 from spynnaker.pyNN.utilities.constants import SYNAPSE_SDRAM_PARTITION_ID
@@ -326,7 +326,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             vertex_slice)
         sdram = MultiRegionSDRAM()
         sdram.merge(self._governed_app_vertex.get_common_constant_sdram(
-            n_record, NeuronProvenance.N_ITEMS,
+            n_record, NeuronProvenance.N_ITEMS + NeuronMainProvenance.N_ITEMS,
             PopulationNeuronsMachineVertex.COMMON_REGIONS))
         sdram.merge(self._governed_app_vertex.get_neuron_constant_sdram(
             vertex_slice, PopulationNeuronsMachineVertex.NEURON_REGIONS))

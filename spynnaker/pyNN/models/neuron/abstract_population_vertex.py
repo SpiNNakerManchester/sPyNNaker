@@ -21,6 +21,7 @@ from scipy import special  # @UnresolvedImport
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinn_utilities.progress_bar import ProgressBar
+from data_specification.enums.data_type import DataType
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
 from pacman.model.resources import MultiRegionSDRAM
@@ -1044,7 +1045,8 @@ class AbstractPopulationVertex(
         # If anything generates data, also add some base information
         if size:
             size += SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES
-            size += self.__neuron_impl.get_n_synapse_types() * BYTES_PER_WORD
+            size += (self.__neuron_impl.get_n_synapse_types() *
+                     DataType.U3232.size)
         self.__synapse_expander_size = size
         return size
 

@@ -126,6 +126,7 @@ static weight_t *synaptic_contributions[N_SYNAPTIC_BUFFERS];
 //! The timer overruns
 static uint32_t timer_overruns = 0;
 
+//! All the synaptic contributions for adding up in 2 formats
 static union {
     uint32_t *as_int;
     weight_t *as_weight;
@@ -166,6 +167,8 @@ static inline void read(uint8_t *system_address, weight_t *tcm_address,
     dma[DMA_DESC] = desc;
 }
 
+//! \brief Add up all the synaptic contributions into a global buffer
+//! \param[in] syns The weights to be added
 static inline void sum(weight_t *syns) {
     uint32_t n_words = sdram_inputs.size_in_bytes >> 2;
     const uint32_t *src = (const uint32_t *) syns;

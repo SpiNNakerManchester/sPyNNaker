@@ -28,6 +28,10 @@ struct neuron_provenance {
     uint32_t current_timer_tick;
     //! The number of times a TDMA slot was missed
     uint32_t n_tdma_mises;
+    //! Earliest send time within any time step
+    uint32_t earliest_send;
+    //! Latest send time within any time step
+    uint32_t latest_send;
 };
 
 //! The region IDs used by the neuron processing
@@ -41,11 +45,19 @@ struct neuron_regions {
 //! Declare that time exists
 extern uint32_t time;
 
+//! Earliest time in a timestep that any neuron has sent a spike
+extern uint32_t latest_send_time;
+
+//! Latest time in a timestep that any neuron has sent a spike
+extern uint32_t earliest_send_time;
+
 //! \brief Callback to store neuron provenance data (format: neuron_provenance).
 //! \param[out] prov: The data structure to store provenance data in
 static inline void store_neuron_provenance(struct neuron_provenance *prov) {
     prov->current_timer_tick = time;
     prov->n_tdma_mises = tdma_processing_times_behind();
+    prov->earliest_send = earliest_send_time;
+    prov->latest_send = latest_send_time;
 }
 
 //! \brief Read data to set up neuron processing

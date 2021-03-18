@@ -40,7 +40,11 @@ class NeuronProvenance(ctypes.LittleEndianStructure):
         # The timer tick at the end of simulation
         ("current_timer_tick", ctypes.c_uint32),
         # The number of misses of TDMA time slots
-        ("n_tdma_misses", ctypes.c_uint32)
+        ("n_tdma_misses", ctypes.c_uint32),
+        # The earliest send time within any time step
+        ("earliest_send", ctypes.c_uint32),
+        # The latest send time within any time step
+        ("latest_send", ctypes.c_uint32)
     ]
 
     N_ITEMS = len(_fields_)
@@ -132,6 +136,10 @@ class PopulationMachineNeurons(
             neuron_prov.current_timer_tick))
         provenance_items.append(self._app_vertex.get_tdma_provenance_item(
             names, x, y, p, neuron_prov.n_tdma_misses))
+        provenance_items.append(ProvenanceDataItem(
+            add_name(names, "Earliest_send_time"), neuron_prov.earliest_send))
+        provenance_items.append(ProvenanceDataItem(
+            add_name(names, "Latest_Send_time"), neuron_prov.latest_send))
 
         return NeuronProvenance.N_ITEMS
 

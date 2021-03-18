@@ -19,30 +19,47 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-// #include <tdma_processing.h>
 #include <spin1_api_params.h>
 #include "plasticity/synapse_dynamics.h"
 
+//! Key from neruon.c
+extern uint32_t key;
+
+//! Whether to use key from neuron.c
+extern bool use_key;
+
+//! Earliest time from neuron.c
+extern uint32_t earliest_send_time;
+
+//! Latest time from neuron.c
+extern uint32_t latest_send_time;
+
+//! \brief Perform direct spike sending with hardware for speed
+//! \param[in] key The key to send
 static inline void send_spike_mc(uint32_t key) {
+    // Wait for there to be space to send
     while (cc[CC_TCR] & TX_FULL_MASK) {
         spin1_delay_us(1);
     }
+
+    // Do the send
     cc[CC_TCR] = PKT_MC;
     cc[CC_TXKEY]  = key;
 }
 
-extern uint32_t key;
-extern bool use_key;
-extern uint32_t earliest_send_time;
-extern uint32_t latest_send_time;
-static inline void send_spike(uint32_t timer_count, uint32_t time, uint32_t neuron_index) {
+//! \brief Performs the sending of a spike.  Inlined for speed.
+//! \param[in] timer_count The global timer count when the time step started
+//! \param[in] time The current time step
+//! \param[in] The neuron index to send
+static inline void send_spike(UNUSED uint32_t timer_count, uint32_t time,
+        uint32_t neuron_index) {
     // Do any required synapse processing
     synapse_dynamics_process_post_synaptic_event(time, neuron_index);
 
     if (use_key) {
-//        tdma_processing_send_packet(
-//            (key | neuron_index), 0, NO_PAYLOAD, timer_count);
         send_spike_mc(key | neuron_index);
+
+        // Keep track of provenance data
         uint32_t clocks = tc[T1_COUNT];
         if (clocks > earliest_send_time) {
             earliest_send_time = clocks;
