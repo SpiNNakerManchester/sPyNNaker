@@ -132,9 +132,6 @@ static union {
     weight_t *as_weight;
 } all_synaptic_contributions;
 
-//! timer count for TDMA of certain models; exported
-uint global_timer_count;
-
 
 //! \brief Callback to store provenance data (format: neuron_provenance).
 //! \param[out] provenance_region: Where to write the provenance data
@@ -187,8 +184,6 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
     profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
 
     uint32_t start_time = tc[T1_COUNT];
-
-    global_timer_count = timer_count;
 
     time++;
 

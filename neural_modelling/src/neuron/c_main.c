@@ -123,9 +123,6 @@ static uint32_t n_synapse_types;
 //! The ring buffers to be used in the simulation
 static weight_t *ring_buffers;
 
-//! timer count for TDMA of certain models; exported
-uint global_timer_count;
-
 //! \brief Callback to store provenance data (format: neuron_provenance).
 //! \param[out] provenance_region: Where to write the provenance data
 static void c_main_store_provenance_data(address_t provenance_region) {
@@ -154,28 +151,9 @@ void resume_callback(void) {
 }
 
 static inline void process_ring_buffers(void) {
-    // Transfer the input from the ring buffers into the input buffers
-    for (uint32_t neuron_index = 0; neuron_index < n_neurons;
-            neuron_index++) {
-        // Loop through all synapse types
-        for (uint32_t synapse_type_index = 0;
-                synapse_type_index < n_synapse_types; synapse_type_index++) {
-            // Get index in the ring buffers for the current time slot for
-            // this synapse type and neuron
-            uint32_t ring_buffer_index = synapse_row_get_ring_buffer_index(
-                    time, synapse_type_index, neuron_index,
-                    synapse_type_index_bits, synapse_index_bits, synapse_delay_mask);
-
-            // Convert ring-buffer entry to input and add on to correct
-            // input for this synapse type and neuron
-            neuron_add_inputs(
-                    synapse_type_index, neuron_index,
-                    ring_buffers[ring_buffer_index]);
-
-            // Clear ring buffer
-            ring_buffers[ring_buffer_index] = 0;
-        }
-    }
+    uint32_t first_index = synapse_row_get_first_ring_buffer_index(
+            time, synapse_type_index_bits, synapse_delay_mask);
+    neuron_transfer(&ring_buffers[first_index]);
 
     // Print the neuron inputs.
     #if LOG_LEVEL >= LOG_DEBUG
@@ -209,9 +187,6 @@ void background_callback(uint timer_count, uint local_time) {
 void timer_callback(uint timer_count, UNUSED uint unused) {
     // Disable interrupts to stop DMAs and MC getting in the way of this bit
     uint32_t state = spin1_int_disable();
-
-    // Store timer count globally for external usage
-    global_timer_count = timer_count;
 
     // Increment time step
     time++;

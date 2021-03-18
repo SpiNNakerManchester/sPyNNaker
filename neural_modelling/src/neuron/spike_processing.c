@@ -116,8 +116,6 @@ static struct {
 //! the region to record the packets per timestep in
 static uint32_t p_per_ts_region;
 
-static bool dma_direct = false;
-
 /* PRIVATE FUNCTIONS - static for inlining */
 
 static uint DESC = DMA_WIDTH << 24 | DMA_BURST_SIZE << 21 | DMA_READ << 19;
@@ -145,14 +143,10 @@ static inline void do_dma_read(
     // Start a DMA transfer to fetch this synaptic row into current
     // buffer
     buffer_being_read = next_buffer_to_fill;
-    if (dma_direct) {
-        do_dma_read_direct(row, next_buffer->row, n_bytes_to_transfer);
-    } else {
-        while (!spin1_dma_transfer(
-                    DMA_TAG_READ_SYNAPTIC_ROW, row, next_buffer->row, DMA_READ,
-                    n_bytes_to_transfer)) {
-            // Do Nothing
-        }
+    while (!spin1_dma_transfer(
+                DMA_TAG_READ_SYNAPTIC_ROW, row, next_buffer->row, DMA_READ,
+                n_bytes_to_transfer)) {
+        // Do Nothing
     }
     next_buffer_to_fill = (next_buffer_to_fill + 1) % N_DMA_BUFFERS;
 }
@@ -361,9 +355,7 @@ static void dma_complete_callback(UNUSED uint unused, uint tag) {
         // If a DMA was started, ack the DMA now, and remove from the DMA queue
         if (dma_started) {
             dma[DMA_CTRL] = 0x8;
-            if (!dma_direct) {
-                dma_queue.start = (dma_queue.start + 1) % DMA_QUEUE_SIZE;
-            }
+            dma_queue.start = (dma_queue.start + 1) % DMA_QUEUE_SIZE;
         }
 
         // Get pointer to current buffer
@@ -428,10 +420,6 @@ static void dma_complete_callback(UNUSED uint unused, uint tag) {
         }
 
         if (write_back) {
-            if (dma_direct) {
-                log_error("Cannot write back when DMA is direct!");
-                rt_error(RTE_SWERR);
-            }
             setup_synaptic_dma_write(current_buffer_index, plastic_only);
         }
     } while (dma_started && (dma[DMA_STAT] & (1 << 10)));
@@ -456,14 +444,6 @@ void user_event_callback(UNUSED uint unused0, UNUSED uint unused1) {
         // If the DMA buffer is invalid, just do the first transfer possible
         setup_synaptic_dma_read(NULL, NULL, NULL);
     }
-}
-
-INT_HANDLER dma_vic_callback() {
-    // Clear transfer done interrupt in DMAC
-    dma[DMA_CTRL] = 0x8;
-    dma_complete_callback(0, DMA_TAG_READ_SYNAPTIC_ROW);
-    // Ack VIC
-    vic[VIC_VADDR] = 1;
 }
 
 /* INTERFACE FUNCTIONS - cannot be static */
@@ -517,12 +497,8 @@ bool spike_processing_initialise( // EXPORTED
             multicast_packet_received_callback, mc_packet_callback_priority);
     spin1_callback_on(MCPL_PACKET_RECEIVED,
             multicast_packet_received_callback, mc_packet_callback_priority);
-    if (dma_direct) {
-        sark_vic_set(DMA_DONE_PRIORITY, DMA_DONE_INT, 1, dma_vic_callback);
-    } else {
-        simulation_dma_transfer_done_callback_on(
-                DMA_TAG_READ_SYNAPTIC_ROW, dma_complete_callback);
-    }
+    simulation_dma_transfer_done_callback_on(
+            DMA_TAG_READ_SYNAPTIC_ROW, dma_complete_callback);
     spin1_callback_on(USER_EVENT, user_event_callback, user_event_priority);
 
     return true;

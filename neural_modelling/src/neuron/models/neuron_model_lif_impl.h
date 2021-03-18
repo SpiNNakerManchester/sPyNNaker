@@ -68,11 +68,6 @@ static inline void lif_neuron_closed_form(
     neuron->V_membrane = alpha - (neuron->exp_TC * (alpha - V_prev));
 }
 
-static void neuron_model_set_global_neuron_params(
-        UNUSED const global_neuron_params_t *params) {
-    // Does Nothing - no params
-}
-
 static state_t neuron_model_state_update(
         uint16_t num_excitatory_inputs, const input_t *exc_input,
         uint16_t num_inhibitory_inputs, const input_t *inh_input,

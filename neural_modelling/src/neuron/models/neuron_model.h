@@ -46,7 +46,7 @@ typedef global_neuron_params_t* global_neuron_params_pointer_t;
 SOMETIMES_UNUSED // Marked unused as only used sometimes
 //! \brief set the global neuron parameters
 //! \param[in] params: The parameters to set
-static void neuron_model_set_global_neuron_params(
+void neuron_model_set_global_neuron_params(
         const global_neuron_params_t *params);
 
 SOMETIMES_UNUSED // Marked unused as only used sometimes

@@ -19,6 +19,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <spin1_api.h>
 #include <spin1_api_params.h>
 #include "plasticity/synapse_dynamics.h"
 

@@ -21,6 +21,11 @@
 
 #include <debug.h>
 
+void neuron_model_set_global_neuron_params(
+        UNUSED const global_neuron_params_t *params) {
+    // Does Nothing - no params
+}
+
 void neuron_model_print_state_variables(const neuron_t *neuron) {
     log_debug("V membrane    = %11.4k mv", neuron->V_membrane);
 }
