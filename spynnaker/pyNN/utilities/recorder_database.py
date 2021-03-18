@@ -345,8 +345,6 @@ class RecorderDatabase(object):
         raise Exception("No Data for {}:{}:{}".format(
             source, variable, segment))
 
-        return data_table, table_type
-
     def _tables_by_segment(self, segment):
         """
         List the tables known for this segment
