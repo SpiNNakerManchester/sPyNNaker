@@ -172,17 +172,7 @@ void neuron_do_timestep_update(timer_t time, uint timer_count) { // EXPORTED
     neuron_recording_record(time);
 }
 
-void neuron_add_inputs( // EXPORTED
-        index_t synapse_type_index, index_t neuron_index,
-        weight_t weights_this_timestep) {
-    neuron_impl_add_inputs(
-            synapse_type_index, neuron_index,
-            synapse_row_convert_weight_to_input(
-                    weights_this_timestep,
-                    ring_buffer_to_input_left_shifts[synapse_type_index]));
-}
-
-void neuron_transfer(weight_t *syns) {
+void neuron_transfer(weight_t *syns) { // EXPORTED
     uint32_t synapse_index = 0;
     uint32_t ring_buffer_index = 0;
     for (uint32_t s_i = n_synapse_types; s_i > 0; s_i--) {

@@ -62,10 +62,9 @@ bool neuron_resume(void);
 //! \details Stores neuron parameters back into SDRAM.
 void neuron_pause(void);
 
-//! \brief Add inputs to the neuron
-//! \param[in] synapse_type_index the synapse type (e.g. exc. or inh.)
-//! \param[in] neuron_index the index of the neuron
-//! \param[in] weights_this_timestep weight to be added (unscaled)
+//! \brief Add inputs to the neurons
+//! \param[in] syns The inputs to be added; this is an array of size
+//!                 n_synapse_types * 2^ceil(log_2(n_neurons)).
 void neuron_transfer(weight_t *syns);
 
 #if LOG_LEVEL >= LOG_DEBUG

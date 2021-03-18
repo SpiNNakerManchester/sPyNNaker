@@ -88,6 +88,11 @@ struct sdram_config {
     uint32_t synapse_index_bits;
 };
 
+//! Provenance for this specific core
+struct neurons_provenance {
+    uint32_t n_timer_overruns;
+};
+
 static const uint32_t DMA_FLAGS = DMA_WIDTH << 24 | DMA_BURST_SIZE << 21
         | DMA_READ << 19;
 
@@ -118,6 +123,9 @@ static struct sdram_config sdram_inputs;
 //! The inputs from the various synapse cores
 static weight_t *synaptic_contributions[N_SYNAPTIC_BUFFERS];
 
+//! The timer overruns
+static uint32_t timer_overruns = 0;
+
 static union {
     uint32_t *as_int;
     weight_t *as_weight;
@@ -132,6 +140,9 @@ uint global_timer_count;
 static void store_provenance_data(address_t provenance_region) {
     struct neuron_provenance *prov = (void *) provenance_region;
     store_neuron_provenance(prov);
+    struct neurons_provenance *n_prov = (void *) &prov[1];
+    n_prov->n_timer_overruns = timer_overruns;
+
 }
 
 //! \brief the function to call when resuming a simulation
@@ -155,23 +166,6 @@ static inline void read(uint8_t *system_address, weight_t *tcm_address,
     dma[DMA_DESC] = desc;
 }
 
-static inline void transfer(weight_t *syns) {
-    uint32_t n_neurons_peak = 1 << sdram_inputs.synapse_index_bits;
-    uint32_t synapse_index = 0;
-    uint32_t ring_buffer_index = 0;
-    for (uint32_t s_i = sdram_inputs.n_synapse_types; s_i > 0; s_i--) {
-        uint32_t neuron_index = 0;
-        for (uint32_t n_i = n_neurons_peak; n_i > 0; n_i--) {
-            weight_t value = syns[ring_buffer_index];
-            syns[ring_buffer_index] = 0;
-            ring_buffer_index++;
-            neuron_add_inputs(synapse_index, neuron_index, value);
-            neuron_index++;
-        }
-        synapse_index++;
-    }
-}
-
 static inline void sum(weight_t *syns) {
     uint32_t n_words = sdram_inputs.size_in_bytes >> 2;
     const uint32_t *src = (const uint32_t *) syns;
@@ -180,9 +174,6 @@ static inline void sum(weight_t *syns) {
         *tgt++ += *src++;
     }
 }
-
-extern uint32_t earliest_send_time;
-extern uint32_t latest_send_time;
 
 //! \brief Timer interrupt callback
 //! \param[in] timer_count: the number of times this call back has been
@@ -218,8 +209,6 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
         // Subtract 1 from the time so this tick gets done again on the next
         // run
         time--;
-
-        log_info("Earliest send time %u, latest_send_time %u", earliest_send_time, latest_send_time);
 
         simulation_ready_to_read();
         return;
@@ -261,7 +250,7 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
 
     uint32_t end_time = tc[T1_COUNT];
     if (end_time > start_time) {
-        log_info("%u: Time taken in timer = %u (start = %u, end = %u)", time, start_time - end_time, start_time, end_time);
+        timer_overruns += 1;
     }
 
     profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
