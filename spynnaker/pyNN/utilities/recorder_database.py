@@ -150,7 +150,7 @@ class RecorderDatabase(object):
                     FROM metadata
                     WHERE segment = ?
                     GROUP BY source, variable, table_type
-                    """):
+                    """, segment):
                 variables[row["source"]].append("{}:{}".format(
                     row["variable"], row["table_type"]))
             return variables
@@ -664,7 +664,7 @@ class RecorderDatabase(object):
             return
         segment = self._clean_segment(segment)
         timestamps = self._generate_timestamps(
-            source, variable, start_time, segment, data)
+            source, variable, segment, start_time, data)
         data = self._prepend_timestamps_to_data(data, timestamps)
         self._insert_matrix(
             source, variable, data, ids, timestamps, segment)
@@ -890,7 +890,7 @@ class RecorderDatabase(object):
             ddl_statement = "DROP VIEW IF EXISTS {}".format(global_view)
             self._db.execute(ddl_statement)
             if new_n_ids < _MAX_COLUMNS:
-                local_views = self._get_local_views(source, variable)
+                local_views = self._get_local_views(source, variable, segment)
                 ddl_statement = "CREATE VIEW {} AS SELECT * FROM {}".format(
                     global_view, " NATURAL JOIN ".join(local_views))
                 print(ddl_statement)
@@ -1067,7 +1067,7 @@ class RecorderDatabase(object):
 
     # single data
 
-    def insert_single(self, source, variable, data, id, timestamps=None,
+    def insert_single(self, source, variable, data, an_id, timestamps=None,
                       segment=-1):
         """
         Inserts data where there is only a single column of local data for
@@ -1087,7 +1087,7 @@ class RecorderDatabase(object):
             be treated as the timestamps
         :type timestamps: iterable(float) or iterable(int) or
             numpy.ndarray or None
-        :param int id:
+        :param int an_id: The id for this data
         :param int segment: Number of the segment / reset group
         """
         data, timestamps = self._clean_data(data, timestamps)
@@ -1099,8 +1099,9 @@ class RecorderDatabase(object):
             # Make sure a column exists for this id
             # Different cores will have different ids so no safetly needed
             ids_in_table = self._get_table_ids(data_table)
-            if id not in ids_in_table:
-                ddl = "ALTER TABLE {} ADD '{}' INTEGER".format(data_table, id)
+            if an_id not in ids_in_table:
+                ddl = "ALTER TABLE {} ADD '{}' INTEGER".format(
+                    data_table, an_id)
                 print(ddl)
                 self._db.execute(ddl)
 
@@ -1113,7 +1114,7 @@ class RecorderDatabase(object):
 
             # update the rows with the data
             query = "UPDATE {} SET '{}' = ? where timestamp = ?"
-            query = query.format(data_table, id)
+            query = query.format(data_table, an_id)
             print(query)
             values = [[row[1], row[0]] for row in data]
             self._db.executemany(query, values)

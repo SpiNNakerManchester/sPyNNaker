@@ -537,7 +537,7 @@ class Recorder(object):
                     indexes=view_indexes,
                     label=data_cache.label)
             else:
-                ids, timestamps, s_data = recorder_database.get_matrix_data(
+                ids, _, s_data = recorder_database.get_matrix_data(
                     self.__population.label, variable, segment_number)
                 assert len(variable_cache.data) == len(s_data)
                 for i in range(len(s_data)):
