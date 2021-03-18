@@ -14,10 +14,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from lazyarray import __version__ as lazyarray_version
+import logging
 from quantities import __version__ as quantities_version
 from neo import __version__ as neo_version
 from pyNN.common import control as pynn_control
 from pyNN import __version__ as pynn_version
+from spinn_utilities.log import FormatAdapter
+from spinn_utilities.logger_utils import warn_once
 from spinn_front_end_common.utilities.globals_variables import set_failed_state
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION)
@@ -33,6 +36,8 @@ from spynnaker import _version
 
 _NAME = "SpiNNaker_under_version({}-{})".format(
     _version.__version__, _version.__version_name__)
+
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
@@ -133,16 +138,34 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
 
     def reset(self):
         """ Reset the state of the current network to time t = 0.
-        """
-        recorder_database = RecorderDatabase(self._report_simulation_top_directory)
-        recorder_database.update_segment(self.__segment_counter, 0, self.t)
-        for population in self._populations:
-            population._cache_data(recorder_database)
 
+        Also caches the data for this run
+        """
+        self._cache_data()
         self.__segment_counter += 1
 
         # Call superclass implementation
         AbstractSpinnakerBase.reset(self)
+
+    def _cache_data(self):
+        recorder_database = RecorderDatabase(self._report_simulation_top_directory)
+        recorder_database.update_segment(self.__segment_counter, 0, self.t)
+        for population in self._populations:
+            population._cache_data(recorder_database)
+        return recorder_database.path
+
+    def cache_data(self):
+        """
+        Reads all recorded data and caches it to a database
+
+        :return: Path to the database. Typically in the top report folder
+        :type: str
+        """
+        warn_once(
+            logger,
+            "cache_data is not standard PyNN "
+            "so will not work with other simulators.")
+        return self._cache_data()
 
     def _run_wait(self, duration_ms, sync_time=0.0):
         """ Run the simulation for a length of simulation time.

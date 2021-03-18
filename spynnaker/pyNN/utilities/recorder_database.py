@@ -51,6 +51,8 @@ class RecorderDatabase(object):
     __slots__ = [
         # the database holding the data to store
         "_db",
+        # path to the file holding the database
+        "_path"
     ]
 
     META_TABLES = ["metadata", "local_matrix_metadata", "segment_info"]
@@ -65,10 +67,12 @@ class RecorderDatabase(object):
         """
         self._db = None
         if database_file is None:
-            database_file = ":memory:"  # Magic name!
+            self._path = ":memory:"  # Magic name!
         elif os.listdir(database_file):
-            database_file = os.path.join(database_file, DEFAULT_NAME)
-        self._db = sqlite3.connect(database_file)
+            self._path = os.path.join(database_file, DEFAULT_NAME)
+        else:
+            self._path = database_file
+        self._db = sqlite3.connect(self._path)
         self.__init_db()
 
     def __del__(self):
@@ -103,6 +107,15 @@ class RecorderDatabase(object):
         with open(_DDL_FILE) as f:
             sql = f.read()
         self._db.executescript(sql)
+
+    @property
+    def path(self):
+        """
+        The path to the database file
+
+        :rtype: str
+        """
+        return self._path
 
     def clear_ds(self):
         """ Clear all saved data but does not rerun the DDL file
