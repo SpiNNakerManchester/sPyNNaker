@@ -67,7 +67,7 @@ jobs:
         tests: unittests
         coverage: ${{ matrix.python-version == 3.8 }}
         cover-packages: spynnaker
-        coveralls-token: ${{ secrets.COVERALLS_REPO_TOKEN }}
+        coveralls-token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Lint with flake8
       run: flake8 spynnaker unittests
