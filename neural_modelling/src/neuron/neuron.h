@@ -66,9 +66,7 @@ void neuron_pause(void);
 //! \param[in] synapse_type_index the synapse type (e.g. exc. or inh.)
 //! \param[in] neuron_index the index of the neuron
 //! \param[in] weights_this_timestep weight to be added (unscaled)
-void neuron_add_inputs(
-        index_t synapse_type_index, index_t neuron_index,
-        weight_t weights_this_timestep);
+void neuron_transfer(weight_t *syns);
 
 #if LOG_LEVEL >= LOG_DEBUG
 //! \brief Print the inputs to the neurons.

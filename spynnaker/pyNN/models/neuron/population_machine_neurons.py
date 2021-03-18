@@ -21,10 +21,11 @@ from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 from spinn_front_end_common.interface.provenance import (
     ProvidesProvenanceDataFromMachineImpl)
+from spinn_front_end_common.utilities import helpful_functions
 from spynnaker.pyNN.models.abstract_models import (
     AbstractReadParametersBeforeSet)
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
-from spinn_front_end_common.utilities import helpful_functions
+from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 
 
 get_placement_details = \
@@ -198,6 +199,7 @@ class PopulationMachineNeurons(
 
         # Write the number of neurons in the block:
         spec.write_value(data=n_atoms)
+        spec.write_value(data=2**get_n_bits(n_atoms))
 
         # Write the ring bugger data
         n_synapse_types = self._app_vertex.neuron_impl.get_n_synapse_types()

@@ -190,22 +190,22 @@ static inline void process_fixed_synapses(
 
     num_fixed_pre_synaptic_events += fixed_synapse;
 
+    // Get the ring buffer mask
+    uint32_t rbi_mask = (1 << (synapse_type_index_bits + synapse_delay_bits)) - 1;
+    // Pre-mask the time
+    uint32_t masked_time = (time & synapse_delay_mask) << synapse_type_index_bits;
+
     for (; fixed_synapse > 0; fixed_synapse--) {
         // Get the next 32 bit word from the synaptic_row
         // (should auto increment pointer in single instruction)
         uint32_t synaptic_word = *synaptic_words++;
 
-        // Extract components from this word
-        uint32_t delay = synapse_row_sparse_delay(synaptic_word, synapse_type_index_bits,
-                synapse_delay_mask);
-        uint32_t combined_synapse_neuron_index = synapse_row_sparse_type_index(
-                synaptic_word, synapse_type_index_mask);
+        // The ring buffer index can be found by adding on the time to the delay
+        // in the synaptic word directly, and then masking off the whole index.
+        // The addition of the masked time to the delay even with the mask might
+        // overflow into the weight at worst but can't affect the lower bits.
+        uint32_t ring_buffer_index = (synaptic_word + masked_time) & rbi_mask;
         uint32_t weight = synapse_row_sparse_weight(synaptic_word);
-
-        // Convert into ring buffer offset
-        uint32_t ring_buffer_index = synapse_row_get_ring_buffer_index_combined(
-                delay + time, combined_synapse_neuron_index,
-                synapse_type_index_bits, synapse_delay_mask);
 
         // Add weight to current ring buffer value
         uint32_t accumulation = ring_buffers[ring_buffer_index] + weight;

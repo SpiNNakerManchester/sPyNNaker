@@ -40,6 +40,12 @@ uint32_t earliest_send_time = 0;
 //! The number of neurons on the core
 static uint32_t n_neurons;
 
+//! The closest power of 2 >= n_neurons
+static uint32_t n_neurons_peak;
+
+//! The number of synapse types
+static uint32_t n_synapse_types;
+
 //! Amount to left shift the ring buffer by to make it an input
 static uint32_t *ring_buffer_to_input_left_shifts;
 
@@ -51,6 +57,7 @@ struct neuron_parameters {
     uint32_t has_key;
     uint32_t transmission_key;
     uint32_t n_neurons_to_simulate;
+    uint32_t n_neurons_peak;
     uint32_t n_synapse_types;
     uint32_t ring_buffer_shifts[];
 };
@@ -103,9 +110,11 @@ bool neuron_initialise(
 
     // Read the neuron details
     n_neurons = params->n_neurons_to_simulate;
+    n_neurons_peak = params->n_neurons_peak;
+    n_synapse_types = params->n_synapse_types;
 
     // Set up ring buffer left shifts
-    uint32_t ring_buffer_bytes = params->n_synapse_types * sizeof(uint32_t);
+    uint32_t ring_buffer_bytes = n_synapse_types * sizeof(uint32_t);
     ring_buffer_to_input_left_shifts = spin1_malloc(ring_buffer_bytes);
     if (ring_buffer_to_input_left_shifts == NULL) {
         log_error("Not enough memory to allocate ring buffer");
@@ -118,9 +127,9 @@ bool neuron_initialise(
             ring_buffer_bytes);
 
     // Store where the actual neuron parameters start
-    saved_params_address = &params->ring_buffer_shifts[params->n_synapse_types];
+    saved_params_address = &params->ring_buffer_shifts[n_synapse_types];
 
-    log_debug("\t n_neurons = %u", n_neurons);
+    log_info("\t n_neurons = %u, peak %u", n_neurons, n_neurons_peak);
 
     // Call the neuron implementation initialise function to setup DTCM etc.
     if (!neuron_impl_initialise(n_neurons)) {
@@ -171,6 +180,27 @@ void neuron_add_inputs( // EXPORTED
             synapse_row_convert_weight_to_input(
                     weights_this_timestep,
                     ring_buffer_to_input_left_shifts[synapse_type_index]));
+}
+
+void neuron_transfer(weight_t *syns) {
+    uint32_t synapse_index = 0;
+    uint32_t ring_buffer_index = 0;
+    for (uint32_t s_i = n_synapse_types; s_i > 0; s_i--) {
+        uint32_t rb_shift = ring_buffer_to_input_left_shifts[synapse_index];
+        uint32_t neuron_index = 0;
+        for (uint32_t n_i = n_neurons_peak; n_i > 0; n_i--) {
+            weight_t value = syns[ring_buffer_index];
+            if (value > 0) {
+                input_t val_to_add = synapse_row_convert_weight_to_input(
+                        value, rb_shift);
+                neuron_impl_add_inputs(synapse_index, neuron_index, val_to_add);
+            }
+            syns[ring_buffer_index] = 0;
+            ring_buffer_index++;
+            neuron_index++;
+        }
+        synapse_index++;
+    }
 }
 
 #if LOG_LEVEL >= LOG_DEBUG

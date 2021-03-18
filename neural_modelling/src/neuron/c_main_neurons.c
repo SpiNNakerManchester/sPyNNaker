@@ -158,9 +158,9 @@ static inline void read(uint8_t *system_address, weight_t *tcm_address,
 static inline void transfer(weight_t *syns) {
     uint32_t n_neurons_peak = 1 << sdram_inputs.synapse_index_bits;
     uint32_t synapse_index = 0;
-    uint32_t neuron_index = 0;
     uint32_t ring_buffer_index = 0;
     for (uint32_t s_i = sdram_inputs.n_synapse_types; s_i > 0; s_i--) {
+        uint32_t neuron_index = 0;
         for (uint32_t n_i = n_neurons_peak; n_i > 0; n_i--) {
             weight_t value = syns[ring_buffer_index];
             syns[ring_buffer_index] = 0;
@@ -254,7 +254,7 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
         read_index = !read_index;
     }
 
-    transfer(all_synaptic_contributions.as_weight);
+    neuron_transfer(all_synaptic_contributions.as_weight);
 
     // Now do neuron time step update
     neuron_do_timestep_update(time, timer_count);
@@ -293,7 +293,7 @@ static bool initialise(void) {
             SDRAM_PARAMS_REGION, ds_regions);
     spin1_memcpy(&sdram_inputs, sdram_config, sizeof(struct sdram_config));
 
-    log_debug("Transferring ring buffers from 0x%08x for %d neurons (%d bits) "
+    log_info("Transferring ring buffers from 0x%08x for %d neurons (%d bits) "
             "and %d synapse types from %d cores using %d bytes per core",
             sdram_inputs.address, sdram_inputs.n_neurons,
             sdram_inputs.synapse_index_bits, sdram_inputs.n_synapse_types,

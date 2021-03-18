@@ -190,8 +190,6 @@ static inline void write_contributions(uint32_t local_time) {
     spike_processing_clear_input_buffer(local_time);
     // Copy things out of DTCM
     process_ring_buffers(local_time + 1);
-    // Now clear the ring buffers
-    synapses_flush_ring_buffers(local_time);
 }
 
 //! \brief writes synaptic inputs to SDRAM
@@ -236,6 +234,9 @@ void timer_callback(UNUSED uint timer_count, UNUSED uint unused) {
         spin1_mode_restore(state);
         return;
     }
+
+    // Now clear the ring buffers
+    synapses_flush_ring_buffers(time - 1);
 
     // Setup to call back enough before the end of the timestep to transfer
     // synapses to SDRAM for the next timestep

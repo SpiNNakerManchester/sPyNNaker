@@ -131,8 +131,8 @@ class AbstractPopulationVertex(
     _SYNAPSE_BASE_N_CPU_CYCLES = 10
 
     # 5 elements before the start of global parameters
-    # 1. has key, 2. key, 3. n atoms, 4. n_synapse_types
-    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 4 * BYTES_PER_WORD
+    # 1. has key, 2. key, 3. n atoms, 4. n_atoms_peak 5. n_synapse_types
+    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 5 * BYTES_PER_WORD
 
     def __init__(
             self, n_neurons, label, constraints, max_atoms_per_core,
