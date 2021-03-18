@@ -21,15 +21,18 @@ import sqlite3
 from spinn_utilities.helpful_functions import is_singleton
 
 
-class TABLE_TYPES(Enum):
+class TableTypes(Enum):
+    """
+    Distinguish the type of table to be used
+    """
     EVENT = 0
     SINGLE = 1
     MATRIX = 2
 
 
-_DDL_FILE = os.path.join(os.path.dirname(__file__),
-                         "recorder.sql")
+_DDL_FILE = os.path.join(os.path.dirname(__file__),  "recorder.sql")
 DEFAULT_NAME = "recorder.sqlite3"
+
 _MAX_COLUMNS = 1990  # test as 1999 but with safety
 
 
@@ -54,9 +57,10 @@ class RecorderDatabase(object):
 
     def __init__(self, database_file=None):
         """
-        :param str database_file: The name of a file that contains (or will\
-            contain) an SQLite database holding the data. If omitted, an\
-            unshared in-memory database will be used.
+        :param str database_file: The name of a file or directory path that
+            contains (or will contain) an SQLite database holding the data.
+            If a directory the DEFAULT_NAME is used.
+            If omitted, an unshared in-memory database will be used.
         :type database_file: str
         """
         self._db = None
@@ -71,7 +75,7 @@ class RecorderDatabase(object):
         self.close()
 
     def __enter__(self):
-        """ Start method is use in a ``with`` statement
+        """ Start method if use in a ``with`` statement
         """
         return self
 
@@ -101,7 +105,7 @@ class RecorderDatabase(object):
         self._db.executescript(sql)
 
     def clear_ds(self):
-        """ Clear all saved data
+        """ Clear all saved data but does not rerun the DDL file
         """
         with self._db:
             names = [row["name"] for row in self._db.execute(
@@ -135,6 +139,7 @@ class RecorderDatabase(object):
         """
         Gets a map of sources to a list of variables:table_type
 
+        :param int segment: Number of the segment / reset group
         :rtype: dict(list(str))
         """
         with self._db:
@@ -155,7 +160,7 @@ class RecorderDatabase(object):
         Support function to see if a table already exists
 
         :param str table_name: name of a Table
-        :return: True if and l=only if the table exists
+        :return: True if and only if the table exists
         :type: bool
         """
         for _ in self._db.execute(
@@ -166,9 +171,29 @@ class RecorderDatabase(object):
             return True
         return False
 
-    def register_data_source(
+    def register_metadata(
             self, source, variable, sampling_interval, description, unit,
             n_neurons, table_type, segment=-1):
+        """
+        Inserts the metadata for a source, variable segment combination
+
+        MUST be called after update_segment
+
+        MUST be called before an insert with the same combination.
+
+        :param str source: Name of the source for example the population
+        :param str variable: Name of the variable
+        :param float sampling_interval:
+            The time between timestamps. Used in the _with_interval methods
+            but not checked in the with_timestamp ones
+        :param str description: A description of the data source
+        :param str unit:  The unit of the data
+        :param int n_neurons: The total number of neurons in your source.
+            No check is done between n_neurons and ids
+        :param TableTypes table_type: The type of table being registered
+        :param int segment: Number of the segment / reset group
+        :return:
+        """
         with self._db:
             segment = self._clean_segment(segment)
             for row in self._db.execute(
@@ -186,12 +211,12 @@ class RecorderDatabase(object):
                 assert (table_type.value == row["table_type"])
                 return
 
-            if table_type == TABLE_TYPES.MATRIX:
+            if table_type == TableTypes.MATRIX:
                 data_table = None  # data_table done later if at all
-            elif table_type == TABLE_TYPES.SINGLE:
+            elif table_type == TableTypes.SINGLE:
                 data_table = self._create_single_table(
                     source, variable, segment)
-            elif table_type == TABLE_TYPES.EVENT:
+            elif table_type == TableTypes.EVENT:
                 data_table = self._create_event_table(
                     source, variable, segment)
             else:
@@ -211,72 +236,100 @@ class RecorderDatabase(object):
     def register_event_source(
             self, source, variable, sampling_interval, description, unit,
             n_neurons, segment=-1):
-        self.register_data_source(
+        """
+        Inserts the metadata for source, variable segment combination
+
+        MUST be called after update_segment
+
+        MUST be called before an insert with the same combination.
+
+        :param str source: Name of the source for example the population
+        :param str variable: Name of the variable
+        :param float sampling_interval:
+            The time between timestamps. Used in the _with_interval methods
+            but not checked in the with_timestamp ones
+        :param str description: A description of the data source
+        :param str unit:  The unit of the data
+        :param int n_neurons: The total number of neurons in your source.
+            No check is done between n_neurons and ids
+        :param int segment: Number of the segment / reset group
+        :return:
+        """
+        self.register_metadata(
             source, variable, sampling_interval, description, unit,
-            n_neurons, TABLE_TYPES.EVENT, segment)
+            n_neurons, TableTypes.EVENT, segment)
 
     def register_matrix_source(
             self, source, variable, sampling_interval, description, unit,
             n_neurons, segment=-1):
-        self.register_data_source(
+        """
+        Inserts the metadata for a source, variable segment combination
+
+        MUST be called after update_segment
+
+        MUST be called before an insert with the same combination.
+
+        :param str source: Name of the source for example the population
+        :param str variable: Name of the variable
+        :param float sampling_interval:
+            The time between timestamps. Used in the _with_interval methods
+            but not checked in the with_timestamp ones
+        :param str description: A description of the data source
+        :param str unit:  The unit of the data
+        :param int n_neurons: The total number of neurons in your source.
+            No check is done between n_neurons and ids
+        :param int segment: Number of the segment / reset group
+        :return:
+        """
+        self.register_metadata(
             source, variable, sampling_interval, description, unit,
-            n_neurons, TABLE_TYPES.MATRIX, segment)
+            n_neurons, TableTypes.MATRIX, segment)
 
     def register_single_source(
             self, source, variable, sampling_interval, description, unit,
             n_neurons, segment=-1):
-        self.register_data_source(
+        """
+        Inserts the metadata for a source, variable segment combination
+
+        MUST be called after update_segment
+
+        MUST be called before an insert with the same combination.
+
+        :param str source: Name of the source for example the population
+        :param str variable: Name of the variable
+        :param float sampling_interval:
+            The time between timestamps. Used in the _with_interval methods
+            but not checked in the with_timestamp ones
+        :param str description: A description of the data source
+        :param str unit:  The unit of the data
+        :param int n_neurons: The total number of neurons in your source.
+            No check is done between n_neurons and ids
+        :param TableTypes table_type: The type of table being registered
+        :param int segment: Number of the segment / reset group
+        :return:
+        """
+        self.register_metadata(
             source, variable, sampling_interval, description, unit,
-            n_neurons, TABLE_TYPES.SINGLE, segment)
+            n_neurons, TableTypes.SINGLE, segment)
 
     def _get_data_table(
             self, source, variable, segment, table_type):
         """
-        Finds or if allowed creates a data table based on source and variable
+        Finds a data table based on source, variable and segment
 
         :param str source: Name of the source for example the population
         :param str variable: Name of the variable
         :param int segment: Number of the segment / reset group
         :param table_type: Type of table to find or create
-        :type table_type: TABLE_TYPES or None
+        :type table_type: TableTypes or None
         :return:
             The name and type of the Table.
             Name could be None if the data is too complex to get from a
             single table.
-        type: (str, TABLE_TYPES) or (None, TABLE_TYPES)
+        type: (str, TableTypes) or (None, TableTypes)
         :raises:
-            An Exception if an existing Table does not have the exected type
-            An Expcetion if the table does not exists an create_table is False
-        """
-        data_table, table_type = self._find_data_table(
-            source, variable, segment, table_type)
-
-        # data_table may be None if data too big
-        if table_type is None:
-            raise Exception("No Data for {}:{}:{}".format(
-                source, variable, segment))
-
-        return data_table, table_type
-
-    def _find_data_table(
-            self, source, variable, segment, table_type):
-        """
-        Finds or if allowed creates a data table based on source and variable
-
-        :param str source: Name of the source for example the population
-        :param str variable: Name of the variable
-        :param int segment: Number of the segment / reset group
-        :param table_type: Type of table to find or create
-        :type table_type: TABLE_TYPES or None
-        :param bool create_table:
-        :return:
-            The name and type of the Table.
-            Name could be None if the data is too complex to get from a
-            single table.
-        type: (str, TABLE_TYPES) or (None, TABLE_TYPES)
-        :raises:
-            An Exception if an existing Table does not have the exected type
-            An Expcetion if the table does not exists an create_table is False
+            An Exception if an existing Table does not have the expected type
+            An Exception if the table does not exists
         """
         for row in self._db.execute(
                 """
@@ -288,33 +341,20 @@ class RecorderDatabase(object):
             if table_type:
                 assert(table_type.value == row["table_type"])
             return row["data_table"], row["table_type"]
-        return None, None
 
-    def x_tables_and_views__by_segment(self, segment):
-        tables = set()
-        views = set()
-        for row in self._db.execute(
-                """
-                SELECT raw_table, full_view, index_table
-                FROM local_matrix_metadata
-                WHERE segment = ?
-                """, (segment, )):
-            tables.add(row["data_table"])
-            views.add(row["full_view"])
-            tables.add(row["index_table"])
-        for row in self._db.execute(
-                """
-                SELECT data_table
-                FROM metadata
-                WHERE segment = ?
-                """, (segment, )):
-            table = row["data_table"]
-            if table not in views:
-                tables.add(table)
+        raise Exception("No Data for {}:{}:{}".format(
+            source, variable, segment))
 
-        return tables, views
+        return data_table, table_type
 
     def _tables_by_segment(self, segment):
+        """
+        List the tables known for this segment
+
+        :param int segment: Number of the segment / reset group
+        :return: table names
+        :type: iterable(str)
+        """
         tables = set()
         views = set()
         for row in self._db.execute(
@@ -391,15 +431,15 @@ class RecorderDatabase(object):
         with self._db:
             data_table, table_type = self._get_data_table(
                 source, variable, segment, None)
-            if table_type == TABLE_TYPES.MATRIX:
+            if table_type == TableTypes.MATRIX:
                 return self._get_matrix_data(
                     source, variable, segment, table_type)
-            if table_type == TABLE_TYPES.SINGLE:
+            if table_type == TableTypes.SINGLE:
                 return self._get_column_data(data_table)
-            if table_type == TABLE_TYPES.EVENT:
+            if table_type == TableTypes.EVENT:
                 return self._get_events_data(data_table)
 
-    def _clean_data(self, timestamps, data, ids=None):
+    def _clean_data(self, data, timestamps):
         """
         Does any cleaning of the input timestamps and data to the expected
         format.
@@ -412,8 +452,8 @@ class RecorderDatabase(object):
         It timestamps is not empty they are added as the first column of the
         data.
 
-        The timestamps are converted to a list of list as that is what
-        sqllite expects
+        The data and timestamps are converted to lists of lists as that is
+        what sqllite expects
 
         :param timestamps: The Timestamps of the data.
             May be None or empty in which case the first column of data will
@@ -421,44 +461,106 @@ class RecorderDatabase(object):
         :type timestamps: iterable(float) or iterable(int) or
             numpy.ndarray or None
         :param data: the input data
+        :type data: iterable or numpy.ndarray
         :return: The data as lists that can be used in queries
         """
-        if isinstance(timestamps, numpy.ndarray):
-            if len(timestamps.shape) == 1:
-                timestamps.reshape(timestamps.shape[0], 1)
-                timestamps = timestamps[:, None]
-        if isinstance(timestamps, (int, float)):
-            timestamps = [x * timestamps for x in range(len(data))]
-        if isinstance(data, numpy.ndarray):
-            if len(data.shape) == 1:
-                data.reshape(data.shape[0], 1)
-                data = data[:, None]
-            if isinstance(timestamps, numpy.ndarray):
-                data = numpy.hstack((timestamps, data))
-                return timestamps.tolist(), data.tolist()
-            data = data.tolist()
+        if timestamps:
+            timestamps = self._make_verticle(timestamps)
+            data = self._make_verticle(data)
+            data = self._prepend_timestamps_to_data(data, timestamps)
+            timestamps = self._to_list(timestamps)
         else:
-            data = list(data)
-        if timestamps is not None and len(timestamps) > 0:
-            if isinstance(timestamps, numpy.ndarray):
-                timestamps = timestamps.tolist()
-            elif is_singleton(timestamps[0]):
-                timestamps = list(map(lambda x: [x], timestamps))
-            if is_singleton(data[0]):
-                data = list(map(lambda x: [x], data))
-            if ids:
-                assert(len(data[0]) == len(ids))
-            else:
-                assert (len(data[0]) == 1)
-            data = list(map(lambda x, y: x + y, timestamps, data))
-        else:
-            if len(data) > 0:
-                if ids:
-                    assert(len(data[0]) == len(ids) + 1)
-                else:
-                    assert (len(data[0]) == 2)
+            data = self._to_list(data)
             timestamps = [[row[0]] for row in data]
-        return timestamps, data
+        return data, timestamps
+
+    def _to_list(self, array):
+        """
+        Converts the array to a list
+
+        :param array: a array to be converted
+        :type array: iterable or numpy.ndarray
+        :rtype: list
+        """
+        if isinstance(array, numpy.ndarray):
+            return array.tolist()
+        else:
+            return array
+
+    def _make_verticle(self, array):
+        """
+        Makes sure the array is 2 dimensional covering 1 dimensional arrays
+
+        A list of single values is converted into a list of lists each with a
+        single values.
+
+        A 1d numpy array is is similarly converted but kept as a numpy array
+
+        :param array: An array to be made 2D
+        :type array: iterable or numpy.ndarray
+        :rtpye: list or numpy.ndarray
+        """
+        if len(array) > 0:
+            if isinstance(array, numpy.ndarray):
+                if len(array.shape) == 1:
+                    array.reshape(array.shape[0], 1)
+                    array = array[:, None]
+            else:
+                array = list(array)
+                if is_singleton(array[0]):
+                    array = list(map(lambda x: [x], array))
+        return array
+
+    def _prepend_timestamps_to_data(self, data, timestamps):
+        """
+        Added the timestamps to the front of the data
+
+        :param data: the data ar
+        :type data: iterable or numpy.ndarray
+        :param timestamps: The Timestamps of the data.
+        :type timestamps: iterable or numpy.ndarray
+        :return: list(list)
+        """
+        data = self._make_verticle(data)
+        timestamps = self._make_verticle(timestamps)
+        if isinstance(timestamps, numpy.ndarray):
+            if not isinstance(data, numpy.ndarray):
+                data = numpy.array(data)
+            return numpy.hstack((timestamps, data)).tolist()
+        return list(map(lambda x, y: x + y, timestamps, data))
+
+    def _generate_timestamps(
+            self, source, variable, segment, start_time, data):
+        """
+        Generates the timestamps based on the start_time, registered
+            sampling_interval and the data
+
+        The timestamps will be the same length and type as the data
+
+        :param str source: Name of the source for example the population
+        :param str variable: Name of the variable
+        :param data: 2d array of shape (X, len(ids)+1)
+        :type data: iterable(iterable(int) or numpty.ndarray
+        :param float start_time: The timestamp of the first row of data
+        :param iterable(int) ids: The ids for the data.
+        :param int segment: Number of the segment / reset group
+        :rtype: list of numpy.array
+        """
+        with self._db:
+            for row in self._db.execute(
+                    """
+                    SELECT sampling_interval
+                    FROM metadata
+                    WHERE source = ? and variable = ? and segment = ? """,
+                    (source, variable, segment)):
+                sampling_interval = row["sampling_interval"]
+        if isinstance(data, numpy.ndarray):
+            timestamps = numpy.arange(
+                start_time,  start_time + len(data) * sampling_interval,
+                sampling_interval)
+        else:
+            timestamps = [x * sampling_interval for x in range(len(data))]
+        return self._make_verticle(timestamps)
 
     def _split_data(self, data, ids):
         cutoff = 0
@@ -495,8 +597,8 @@ class RecorderDatabase(object):
 
     # matrix data
 
-    def insert_matrix(self, source, variable, data, ids=None, timestamps=None,
-                      segment=-1):
+    def insert_matrix_with_timestamps(
+            self, source, variable, data, ids, timestamps=None, segment=-1):
         """
         Inserts matrix data into the database
 
@@ -505,13 +607,17 @@ class RecorderDatabase(object):
         id will be in more than one of these distinct lists,
         and that the lists will be in the same order each time.
 
-        The data will be a 2D array where the first column is the timestamp
+        The data will be a 2D array.
+        If timtsamps is None: The first column is the timestamp
         and the one column for each id.
+        Otherwise: One column for each id
 
         There can ever only be a single value per timestamp, id pair.
 
         The get methods deal with missing data so there is not requirement
         that every timestamp has data for all ids lists.
+
+        MUST be called after the register method
 
         :param str source: Name of the source for example the population
         :param str variable: Name of the variable
@@ -527,18 +633,43 @@ class RecorderDatabase(object):
        """
         if len(data) == 0:
             return
-        timestamps, data = self._clean_data(
-            timestamps, data, ids)
+        data, timestamps = self._clean_data(data, timestamps)
         segment = self._clean_segment(segment)
-        with self._db:
-            if len(data[0]) < _MAX_COLUMNS:
-                self._insert_matrix(source, variable, data, ids, timestamps,
-                                    segment)
-            else:
-                for data_block, ids_block in self._split_data(data, ids):
-                    self._insert_matrix(
-                        source, variable, data_block, ids_block, timestamps,
-                        segment)
+        self._insert_matrix(
+            source, variable, data, ids, timestamps, segment)
+
+    def insert_matrix_using_interval(
+            self, source, variable, data, ids, start_time=0, segment=-1):
+        """
+        Inserts matrix data into the database
+
+        This method can be called multiple times with the same source and
+        variable, and multiple distinct ids lists. The assumption is that no
+        id will be in more than one of these distinct lists,
+        and that the lists will be in the same order each time.
+
+        The data will be a 2D array with one column for each id.
+
+        There can ever only be a single value per timestamp, id pair.
+
+        MUST be called after the register method
+
+        :param str source: Name of the source for example the population
+        :param str variable: Name of the variable
+        :param data: 2d array of shape (X, len(ids)+1)
+        :type data: iterable(iterable) or numpy.ndarray
+        :param float start_time: The timestamp of the first row of data
+        :param iterable(int) ids: The ids for the data.
+        :param int segment: Number of the segment / reset group
+       """
+        if len(data) == 0:
+            return
+        segment = self._clean_segment(segment)
+        timestamps = self._generate_timestamps(
+            source, variable, start_time, segment, data)
+        data = self._prepend_timestamps_to_data(data, timestamps)
+        self._insert_matrix(
+            source, variable, data, ids, timestamps, segment)
 
     def _insert_matrix(
             self, source, variable, data, ids, timestamps, segment):
@@ -560,8 +691,44 @@ class RecorderDatabase(object):
 
         :param str source: Name of the source for example the population
         :param str variable: Name of the variable
-        :param data: 2d array of shape (X, len(ids)+1)
-        :type data: iterable(iterable(int) or numpty.ndarray
+        :param list(list) data: 2d array of shape (X, len(ids)+1)
+        :param timestamps: The Timestamps of the data.
+            May be None or empty in which case the first column of data will
+            be treated as the timestamps
+        :param iterable(int) ids: The ids for the data.
+        :param int segment: Number of the segment / reset group
+       """
+        with self._db:
+            if len(data[0]) < _MAX_COLUMNS:
+                self._insert_a_matrix(source, variable, data, ids, timestamps,
+                                      segment)
+            else:
+                for data_block, ids_block in self._split_data(data, ids):
+                    self._insert_a_matrix(
+                        source, variable, data_block, ids_block, timestamps,
+                        segment)
+
+    def _insert_a_matrix(
+            self, source, variable, data, ids, timestamps, segment):
+        """
+        Inserts matrix data into the database
+
+        This method can be called multiple times with the same source and
+        variable, and multiple distinct ids lists. The assumption is that no
+        id will be in more than one of these distinct lists,
+        and that the lists will be in the same order each time.
+
+        The data will be a 2D array where the first column is the timestamp
+        and the one column for each id.
+
+        There can ever only be a single value per timestamp, id pair.
+
+        The get methods deal with missing data so there is not requirement
+        that every timestamp has data for all ids lists.
+
+        :param str source: Name of the source for example the population
+        :param str variable: Name of the variable
+        :param list(list) data: 2d array of shape (X, len(ids)+1)
         :param timestamps: The Timestamps of the data.
             May be None or empty in which case the first column of data will
             be treated as the timestamps
@@ -782,7 +949,7 @@ class RecorderDatabase(object):
         segment = self._clean_segment(segment)
         with self._db:
             data_table, _ = self._get_data_table(
-                source, variable, segment, TABLE_TYPES.MATRIX)
+                source, variable, segment, TableTypes.MATRIX)
             return self._get_matrix_data(
                 source, variable, segment, data_table)
 
@@ -826,10 +993,12 @@ class RecorderDatabase(object):
 
         There can be more than one evet/spike for a timestamp, id pair
 
+        MUST be called after the register method
+
         :param str source: Name of the source for example the population
         :param str variable: Name of the variable
         :param data: Data to store in the format timestamp, id or just id
-        :type data: iterable((int, int) oriterable(int) or  numpy.ndarray
+        :type data: iterable((int, int) or iterable(int) or numpy.ndarray
         :param timestamps: The Timestamps of the data.
             May be None or empty in which case the first column of data will
             be treated as the timestamps
@@ -837,11 +1006,14 @@ class RecorderDatabase(object):
             numpy.ndarray or None
         :param int segment: Number of the segment / reset group
         """
-        _, data = self._clean_data(timestamps, data)
+        if timestamps is None:
+            data = self._to_list(data)
+        else:
+            data = self._prepend_timestamps_to_data(data, timestamps)
         segment = self._clean_segment(segment)
         with self._db:
             data_table, _ = self._get_data_table(
-                source, variable, segment, TABLE_TYPES.EVENT)
+                source, variable, segment, TableTypes.EVENT)
             query = "INSERT INTO {} VALUES (?, ?)".format(data_table)
             print(query)
             self._db.executemany(query, data)
@@ -879,7 +1051,7 @@ class RecorderDatabase(object):
         segment = self._clean_segment(segment)
         with self._db:
             data_table, _ = self._get_data_table(
-                source, variable, segment, TABLE_TYPES.EVENT)
+                source, variable, segment, TableTypes.EVENT)
             return self._get_events_data(data_table)
 
     def _get_events_data(self, data_table):
@@ -905,11 +1077,13 @@ class RecorderDatabase(object):
 
         Will add columns to the table as need.
 
+        MUST be called after the register method
+
         :param str source: Name of the source for example the population
         :param str variable: Name of the variable
         :param data: Data in the shape (x, 2) where the columns are
         timestamp, value
-        :type data: iterable((int, int)) or numpy.ndarray
+        :type data: iterable((int, int) or iterable(int) or numpy.ndarray
         :param timestamps: The Timestamps of the data.
             May be None or empty in which case the first column of data will
             be treated as the timestamps
@@ -918,12 +1092,11 @@ class RecorderDatabase(object):
         :param int id:
         :param int segment: Number of the segment / reset group
         """
-        timestamps, data = self._clean_data(
-            timestamps, data)
+        data, timestamps = self._clean_data(data, timestamps)
         segment = self._clean_segment(segment)
         with self._db:
             data_table, _ = self._get_data_table(
-                source, variable, segment, TABLE_TYPES.SINGLE)
+                source, variable, segment, TableTypes.SINGLE)
 
             # Make sure a column exists for this id
             # Different cores will have different ids so no safetly needed
@@ -984,10 +1157,21 @@ class RecorderDatabase(object):
         segment = self._clean_segment(segment)
         with self._db:
             data_table, _ = self._get_data_table(
-                source, variable, segment, TABLE_TYPES.SINGLE)
+                source, variable, segment, TableTypes.SINGLE)
             return self._get_column_data(data_table)
 
     def update_segment(self, segment, start_timestamp, end_timestamp):
+        """
+        Adds or update the information on a segment.
+
+        If the segment was already unkown the start_timestamp must be the same.
+        if the end timestamp changes all previously inserted data for this
+            segment is deleted, however registered info is maintained.
+
+        :param int segment: Number of the segment / reset group
+        :param float  start_timestamp: The time of the first data row
+        :param float end_timestamp: The time the simulation ran to
+        """
         with self._db:
             if self._db.execute(
                     """
@@ -1016,11 +1200,23 @@ class RecorderDatabase(object):
                             segment, row["end_timestamp"], end_timestamp))
 
     def _clear_segment(self, segment):
+        """
+        Deletes all data inserted for the segment but keeps registered metadata
+
+        :param int segment: Number of the segment / reset group
+        """
         tables = self._tables_by_segment(segment)
         for table in tables:
             self._db.execute("DELETE FROM {}".format(table))
 
     def get_segments(self):
+        """
+        Gets the info for all known segments
+
+        :return: A dict of segment number to a tuple of
+        (start_timestamp, end_timestamp)
+        :rtype: dict(int, (float, float))
+        """
         with self._db:
             segments = dict()
             for row in self._db.execute("SELECT * FROM segment_info"):
@@ -1029,8 +1225,18 @@ class RecorderDatabase(object):
         return segments
 
     def get_source_segment_data(self, source, segment):
+        """
+        Gets the info for this source and segment
+
+        :param str source: Name of the source for example the population
+        :param int segment: Number of the segment / reset group
+        :return:
+            A dict of variable name to a dict of metadata for that variable
+        :rtype: dict(str, dict(str, object))
+        """
         variables = {}
         with self._db:
+            segment = self._clean_segment(segment)
             for row in self._db.execute(
                     """
                     SELECT variable, sampling_interval, description, unit,
@@ -1045,13 +1251,19 @@ class RecorderDatabase(object):
                 v_data["description"] = row["description"]
                 v_data["unit"] = row["unit"]
                 v_data["n_neurons"] = row["n_neurons"]
-                v_data["table_type"] = TABLE_TYPES(row["table_type"])
+                v_data["table_type"] = TableTypes(row["table_type"])
                 v_data["start_timestamp"] = row["start_timestamp"]
                 v_data["end_timestamp"] = row["end_timestamp"]
                 variables[row["variable"]] = v_data
         return variables
 
     def current_segment(self):
+        """
+        Gets the current segment, assumed to be the highest known segment
+
+        :return: The max known segment number
+        :type: int or None
+        """
         with self._db:
             for row in self._db.execute(
                     "SELECT MAX(segment) AS max FROM segment_info"):

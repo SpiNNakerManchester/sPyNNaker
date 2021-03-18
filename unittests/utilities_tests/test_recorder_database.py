@@ -92,12 +92,14 @@ class TestRecorderDatabase(BaseTestCase):
         timestamps = [x * sampling_interval for x in range(0, 10)]
         data_in = self.random_matrix_data(timestamps, ids, timestamps_in_data)
         if timestamps_in_data == TimeStepType.TIMESTEP:
-            ts = sampling_interval
+            self.db.insert_matrix_using_interval(
+                source, variable, data_in, ids)
         elif timestamps_in_data == TimeStepType.IN_DATA:
-            ts = None
+            self.db.insert_matrix_with_timestamps(
+                source, variable, data_in, ids, None)
         else:
-            ts = timestamps
-        self.db.insert_matrix(source, variable, data_in, ids, ts)
+            self.db.insert_matrix_with_timestamps(
+                source, variable, data_in, ids, timestamps)
         ids_out, timestamps_out, data_out = self.db.get_matrix_data(
             source, variable)
         if timestamps_in_data == TimeStepType.IN_DATA:
