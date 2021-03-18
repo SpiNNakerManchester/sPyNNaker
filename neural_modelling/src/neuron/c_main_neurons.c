@@ -286,6 +286,7 @@ static bool initialise(void) {
             sdram_inputs.synapse_index_bits, sdram_inputs.n_synapse_types,
             sdram_inputs.n_synapse_cores, sdram_inputs.size_in_bytes);
 
+    uint32_t n_words = sdram_inputs.size_in_bytes >> 2;
     for (uint32_t i = 0; i < N_SYNAPTIC_BUFFERS; i++) {
         synaptic_contributions[i] = spin1_malloc(sdram_inputs.size_in_bytes);
         if (synaptic_contributions == NULL) {
@@ -293,12 +294,24 @@ static bool initialise(void) {
                     sdram_inputs.size_in_bytes, i);
             return false;
         }
+        for (uint32_t j = 0; j < n_words; j++) {
+            synaptic_contributions[i][j] = 0;
+        }
     }
     all_synaptic_contributions.as_int = spin1_malloc(sdram_inputs.size_in_bytes);
     if (all_synaptic_contributions.as_int == NULL) {
         log_error("Could not allocate %d bytes for all synaptic contributions",
                 sdram_inputs.size_in_bytes);
         return false;
+    }
+    for (uint32_t j = 0; j < n_words; j++) {
+        all_synaptic_contributions.as_int[j] = 0;
+    }
+    uint32_t *sdram_word = (void *) sdram_inputs.address;
+    for (uint32_t i = 0; i < sdram_inputs.n_synapse_cores; i++) {
+        for (uint32_t j = 0; j < n_words; j++) {
+            *(sdram_word++) = 0;
+        }
     }
 
     log_debug("Initialise: finished");
