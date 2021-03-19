@@ -322,10 +322,10 @@ static void multicast_packet_received_callback(uint key, uint payload) {
     // NOTE: locking is not used here because this is assumed to be FIQ
     if (!dma_busy) {
         log_debug("Sending user event for new spike");
+        // Only set busy if successful.
+        // NOTE: Counts when unsuccessful are handled by the API
         if (spin1_trigger_user_event(0, 0)) {
             dma_busy = true;
-        } else {
-            log_warning("Could not trigger user event\n");
         }
     }
 }
