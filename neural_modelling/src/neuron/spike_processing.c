@@ -118,15 +118,6 @@ static uint32_t p_per_ts_region;
 
 /* PRIVATE FUNCTIONS - static for inlining */
 
-static uint DESC = DMA_WIDTH << 24 | DMA_BURST_SIZE << 21 | DMA_READ << 19;
-
-static inline void do_dma_read_direct(void *system_address, void *tcm_address,
-        size_t n_bytes_to_transfer) {
-    dma[DMA_ADRS] = (uint) system_address;
-    dma[DMA_ADRT] = (uint) tcm_address;
-    dma[DMA_DESC] = DESC | n_bytes_to_transfer;
-}
-
 //! \brief Perform a DMA read of a synaptic row
 //! \param[in] row: Where in SDRAM to read the row from
 //! \param[in] n_bytes_to_transfer: The size of the synaptic row
