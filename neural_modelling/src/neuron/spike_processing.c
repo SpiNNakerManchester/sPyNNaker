@@ -341,18 +341,18 @@ static void dma_complete_callback(UNUSED uint unused, uint tag) {
     // Disable DMA callback to allow us to check manually
     bool dma_started = false;
     bool write_back = false;
-    //cback_t cback = callback[DMA_TRANSFER_DONE];
-    //spin1_callback_off(DMA_TRANSFER_DONE);
-    //do {
+    cback_t cback = callback[DMA_TRANSFER_DONE];
+    spin1_callback_off(DMA_TRANSFER_DONE);
+    do {
         // If a DMA was started, ack the DMA now, and re-clear the DMA queue.
         // As we control the DMA at this point, this is safe.  Note that we
         // allow the queue to be populated in case we need to exit this
         // loop with a DMA in progress and then handle that in the normal
         // interrupt handler in the API.
-        //if (dma_started) {
-        //    dma[DMA_CTRL] = 0x8;
-        //    dma_queue.start = dma_queue.end;
-        //}
+        if (dma_started) {
+            dma[DMA_CTRL] = 0x8;
+            dma_queue.start = dma_queue.end;
+        }
 
         // Get pointer to current buffer
         uint32_t current_buffer_index = buffer_being_read;
@@ -418,9 +418,9 @@ static void dma_complete_callback(UNUSED uint unused, uint tag) {
         if (write_back) {
             setup_synaptic_dma_write(current_buffer_index, plastic_only);
         }
-    //} while (!write_back && dma_started && (dma[DMA_STAT] & (1 << 10)));
+    } while (!write_back && dma_started && (dma[DMA_STAT] & (1 << 10)));
 
-    //spin1_callback_on(DMA_TRANSFER_DONE, cback.cback, cback.priority);
+    spin1_callback_on(DMA_TRANSFER_DONE, cback.cback, cback.priority);
 }
 
 //! \brief Called when a user event is received
