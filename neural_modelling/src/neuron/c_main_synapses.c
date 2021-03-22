@@ -177,8 +177,13 @@ static inline void process_ring_buffers(uint32_t local_time) {
     write(&ring_buffers[first_ring_buffer], sdram_inputs.address,
             sdram_inputs.size_in_bytes);
     // Wait for completion of DMAs and then restore the callback
-    while (!(dma[DMA_STAT] & (1 << 10))) {
+    uint32_t n_loops = 0;
+    while (!(dma[DMA_STAT] & (1 << 10)) && n_loops < 1000) {
         continue;
+    }
+    if (!(dma[DMA_STAT] & (1 << 10))) {
+        log_error("Timeout on DMA loop!");
+        rt_error(RTE_SWERR);
     }
     dma[DMA_CTRL] = 0x1f;
     dma[DMA_CTRL] = 0x0d;
