@@ -47,7 +47,6 @@ class AbstractSpiNNakerCommon(
         "__id_counter",
         "__live_spike_recorder",
         "__min_delay",
-        "__max_delay",
         "__neurons_per_core_set",
         "_populations",
         "_projections"]
@@ -63,7 +62,7 @@ class AbstractSpiNNakerCommon(
 
     def __init__(
             self, graph_label, database_socket_addresses, n_chips_required,
-            n_boards_required, timestep, max_delay, min_delay, hostname,
+            n_boards_required, timestep, min_delay, hostname,
             user_extra_algorithm_xml_path=None, user_extra_mapping_inputs=None,
             user_extra_algorithms_pre_run=None, time_scale_factor=None,
             extra_post_run_algorithms=None, extra_mapping_algorithms=None,
@@ -78,7 +77,6 @@ class AbstractSpiNNakerCommon(
         :param n_boards_required:
         :type n_boards_required: int or None
         :param int timestep:
-        :param float max_delay:
         :param float min_delay:
         :param str hostname:
         :param user_extra_algorithm_xml_path:
@@ -126,7 +124,6 @@ class AbstractSpiNNakerCommon(
 
         # timing parameters
         self.__min_delay = None
-        self.__max_delay = max_delay
 
         self.__neurons_per_core_set = set()
 
@@ -144,9 +141,6 @@ class AbstractSpiNNakerCommon(
             n_boards_required=n_boards_required,
             default_config_paths=[self.extended_config_path()],
             front_end_versions=versions)
-
-        # update inputs needed by the machine level calls.
-        self.update_extra_inputs({'UserDefinedMaxDelay': self.__max_delay})
 
         extra_mapping_inputs = dict()
         extra_mapping_inputs['CreateAtomToEventIdMapping'] = \

@@ -327,6 +327,7 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
         ``n_boards_required`` are used.
     """
     # Check for "auto" values
+    a = _pynn_control
     if timestep == "auto":
         timestep = SPYNNAKER_AUTO_TIMESTEP
     if min_delay == "auto":
@@ -363,7 +364,7 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
         extra_post_run_algorithms=extra_post_run_algorithms,
         extra_load_algorithms=extra_load_algorithms,
         time_scale_factor=time_scale_factor, timestep=timestep,
-        min_delay=min_delay, max_delay=max_delay, graph_label=graph_label,
+        min_delay=min_delay, graph_label=graph_label,
         n_chips_required=n_chips_required,
         n_boards_required=n_boards_required)
 
