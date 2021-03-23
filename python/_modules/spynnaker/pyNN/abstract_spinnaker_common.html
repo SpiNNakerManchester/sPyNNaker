@@ -415,7 +415,9 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">extend_extra_post_run_algorithms</span><span class="p">(</span>
                 <span class="p">[</span><span class="s2">&quot;RedundantPacketCountReport&quot;</span><span class="p">])</span>
 
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">run_time</span><span class="p">,</span> <span class="n">sync_time</span><span class="p">)</span></div>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">run_time</span><span class="p">,</span> <span class="n">sync_time</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">projection</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_projections</span><span class="p">:</span>
+            <span class="n">projection</span><span class="o">.</span><span class="n">_clear_cache</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="AbstractSpiNNakerCommon.register_binary_search_path"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.register_binary_search_path">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">register_binary_search_path</span><span class="p">(</span><span class="n">search_path</span><span class="p">):</span>

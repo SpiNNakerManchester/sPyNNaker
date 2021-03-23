@@ -724,7 +724,8 @@
             <span class="k">if</span> <span class="n">connections</span><span class="p">:</span>
                 <span class="n">connections</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">connections</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">holder</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_info</span><span class="o">.</span><span class="n">pre_run_connection_holders</span><span class="p">:</span>
-                    <span class="n">holder</span><span class="o">.</span><span class="n">add_connections</span><span class="p">(</span><span class="n">connections</span><span class="p">)</span></div>
+                    <span class="n">holder</span><span class="o">.</span><span class="n">add_connections</span><span class="p">(</span><span class="n">connections</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clear_connection_cache</span><span class="p">()</span></div>
 
     <span class="k">def</span> <span class="nf">__read_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">synapses_address</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Read connections from an address on the machine</span>
