@@ -361,8 +361,8 @@ class AbstractSpiNNakerCommon(
         """
         with open(filename, "w") as f:
             progress = ProgressBar(
-                "Describing Final Simulation Graph",
-                len(self._projections) + len(self._projections))
+                len(self._projections) + len(self._projections),
+                "Describing Final Simulation Graph")
 
             # Invert the relations to pop->proj(info)
             incoming_projections = defaultdict(list)
