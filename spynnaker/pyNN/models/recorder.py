@@ -396,9 +396,9 @@ class Recorder(object):
                         description=self.__population.describe(),
                         unit=self._get_units(variable),
                         n_neurons=self.__population.size)
-                    recorder_database.insert_matrix(
+                    recorder_database.insert_matrix_using_interval(
                         source=self.__population.label, variable=variable,
-                        data=data, ids=indexes, timestamps=sampling_interval)
+                        data=data, ids=indexes)
                 data_cache.save_data(
                     variable=variable, data=data, indexes=indexes,
                     n_neurons=self.__population.size,
@@ -541,8 +541,9 @@ class Recorder(object):
                     self.__population.label, variable, segment_number)
                 assert len(variable_cache.data) == len(s_data)
                 for i in range(len(s_data)):
-                    assert variable_cache.data[i][0] == s_data[i][0]
-                    assert variable_cache.data[i][1] == s_data[i][1]
+                    assert len(variable_cache.data[i]) == len(s_data[i])
+                    for j in range(len(s_data[i])):
+                        assert variable_cache.data[i][j] == s_data[i][j]
                 assert len(variable_cache.indexes) == len(ids)
                 for i in range(len(ids)):
                     assert variable_cache.indexes[i] == ids[i]
