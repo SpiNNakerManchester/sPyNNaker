@@ -227,7 +227,7 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
         while (!(dma[DMA_STAT] & (1 << 10))) {
             continue;
         }
-        dma[DMA_CTRL] = 0x0;
+        dma[DMA_CTRL] = 0x08;
 
         // Start the next DMA if not finished
         if (i + 1 < sdram_inputs.n_synapse_cores) {
