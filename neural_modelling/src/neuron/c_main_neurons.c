@@ -41,7 +41,7 @@
 
 //! values for the priority for each callback
 typedef enum callback_priorities {
-    DMA = -2, SDP = -1, TIMER = 0
+    DMA = -2, SDP = 0, TIMER = 0
 } callback_priorities;
 
 enum regions {
@@ -230,6 +230,7 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
         }
         if (!(dma[DMA_STAT] & (1 << 10))) {
             log_error("DMA Wait timed out - stat = 0x%08x", dma[DMA_STAT]);
+            rt_error(RTE_SWERR);
         }
         dma[DMA_CTRL] = 0x08;
 
