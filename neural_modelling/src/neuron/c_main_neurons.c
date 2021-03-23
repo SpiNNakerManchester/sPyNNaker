@@ -41,7 +41,7 @@
 
 //! values for the priority for each callback
 typedef enum callback_priorities {
-    DMA = -2, SDP = 0, TIMER = 0
+    DMA = -2, SDP = -1, TIMER = 0
 } callback_priorities;
 
 enum regions {
