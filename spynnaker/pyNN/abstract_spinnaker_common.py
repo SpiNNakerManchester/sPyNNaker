@@ -412,6 +412,8 @@ class AbstractSpiNNakerCommon(
                 ["RedundantPacketCountReport"])
 
         super().run(run_time, sync_time)
+        for projection in self._projections:
+            projection._clear_cache()
 
     @staticmethod
     def register_binary_search_path(search_path):
