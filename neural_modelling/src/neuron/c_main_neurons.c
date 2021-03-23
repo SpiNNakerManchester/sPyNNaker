@@ -41,7 +41,7 @@
 
 //! values for the priority for each callback
 typedef enum callback_priorities {
-    DMA = -2, USER = 0, SDP = 0, TIMER = 0
+    DMA = -2, SDP = 0, TIMER = 0
 } callback_priorities;
 
 enum regions {
@@ -224,8 +224,12 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
 
     for (uint32_t i = 0; i < sdram_inputs.n_synapse_cores; i++) {
         // Wait for the last DMA to complete
-        while (!(dma[DMA_STAT] & (1 << 10))) {
-            continue;
+        uint32_t n_loops = 0;
+        while (!(dma[DMA_STAT] & (1 << 10)) && n_loops < 10000) {
+            n_loops++;
+        }
+        if (!(dma[DMA_STAT] & (1 << 10))) {
+            log_error("DMA Wait timed out - stat = 0x%08x", dma[DMA_STAT]);
         }
         dma[DMA_CTRL] = 0x08;
 
