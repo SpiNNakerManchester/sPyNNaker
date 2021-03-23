@@ -71,11 +71,11 @@
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SynapticConfigurationException</span>
 
 <span class="c1">#: Default value for frequency of rewiring</span>
-<span class="n">DEFAULT_F_REW</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">**</span> <span class="mi">4</span>
+<span class="n">DEFAULT_F_REW</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">**</span> <span class="mf">4.0</span>
 <span class="c1">#: Default value for initial weight on connection formation</span>
-<span class="n">DEFAULT_INITIAL_WEIGHT</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">DEFAULT_INITIAL_WEIGHT</span> <span class="o">=</span> <span class="mf">0.0</span>
 <span class="c1">#: Default value for initial delay on connection formation</span>
-<span class="n">DEFAULT_INITIAL_DELAY</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">DEFAULT_INITIAL_DELAY</span> <span class="o">=</span> <span class="mf">1.0</span>
 <span class="c1">#: Default value for maximum fan-in per target layer neuron</span>
 <span class="n">DEFAULT_S_MAX</span> <span class="o">=</span> <span class="mi">32</span>
 
@@ -122,7 +122,7 @@
         <span class="sd">&quot;&quot;&quot; The period of rewiring.</span>
 
 <span class="sd">        :return: The period of rewiring</span>
-<span class="sd">        :rtype: int</span>
+<span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="mf">1.</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_rew</span>
 
@@ -489,7 +489,7 @@
 <div class="viewcode-block" id="SynapseDynamicsStructuralCommon.check_initial_delay"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.check_initial_delay">[docs]</a>    <span class="k">def</span> <span class="nf">check_initial_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_delay_ms</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Check that delays can be done without delay extensions</span>
 
-<span class="sd">        :param int max_delay_ms: The maximum delay supported, in milliseconds</span>
+<span class="sd">        :param float max_delay_ms: The maximum delay supported, in milliseconds</span>
 <span class="sd">        :raises Exception: if the delay is out of range</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">initial_delay</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">Iterable</span><span class="p">):</span>

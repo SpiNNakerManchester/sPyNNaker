@@ -247,11 +247,8 @@
     <span class="k">def</span> <span class="nf">backprop_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">backprop_delay</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__backprop_delay</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">backprop_delay</span><span class="p">)</span>
 
-<div class="viewcode-block" id="SynapseDynamicsSTDP.is_same_as"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.is_same_as">[docs]</a>    <span class="k">def</span> <span class="nf">is_same_as</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_dynamics</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param AbstractSynapseDynamics synapse_dynamics:</span>
-<span class="sd">        :rtype: bool</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="SynapseDynamicsSTDP.is_same_as"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.is_same_as">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractPlasticSynapseDynamics</span><span class="o">.</span><span class="n">is_same_as</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">is_same_as</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_dynamics</span><span class="p">):</span>
         <span class="c1"># pylint: disable=protected-access</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">synapse_dynamics</span><span class="p">,</span> <span class="n">SynapseDynamicsSTDP</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span>
