@@ -254,6 +254,8 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
     uint32_t end_time = tc[T1_COUNT];
     if (end_time > start_time) {
         timer_overruns += 1;
+        log_error("Timer overrun");
+        rt_error(RTE_SWERR);
     }
 
     profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
