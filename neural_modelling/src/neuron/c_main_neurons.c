@@ -218,7 +218,7 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
     uint32_t read_index = 0;
 
     // Reset DMA
-    dma[DMA_CTRL] = 0x0d;
+    dma[DMA_CTRL] = 0x08;
     read(sdram, synaptic_contributions[write_index], sdram_inputs.size_in_bytes);
     write_index = !write_index;
 
@@ -227,7 +227,7 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
         while (!(dma[DMA_STAT] & (1 << 10))) {
             continue;
         }
-        dma[DMA_CTRL] = 0x0d;
+        dma[DMA_CTRL] = 0x0;
 
         // Start the next DMA if not finished
         if (i + 1 < sdram_inputs.n_synapse_cores) {

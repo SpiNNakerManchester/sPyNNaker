@@ -136,12 +136,21 @@ static uint32_t ring_buffer_skip_words;
 
 static inline void write(weight_t *tcm_address, uint32_t *system_address,
         uint32_t length) {
-    dma[DMA_CTRL] = 0x1f;
-    dma[DMA_CTRL] = 0x0d;
     uint32_t desc = DMA_FLAGS | length;
     dma[DMA_ADRS] = (uint32_t) system_address;
     dma[DMA_ADRT] = (uint32_t) tcm_address;
     dma[DMA_DESC] = desc;
+
+    // Wait for completion of DMA
+    uint32_t n_loops = 0;
+    while (!(dma[DMA_STAT] & (1 << 10)) && n_loops < 10000) {
+        n_loops++;
+    }
+    if (!(dma[DMA_STAT] & (1 << 10))) {
+        log_error("Timeout on DMA loop: DMA stat = 0x%08x!", dma[DMA_STAT]);
+        rt_error(RTE_SWERR);
+    }
+    dma[DMA_CTRL] = 0x8;
 }
 
 //! \brief Callback to store provenance data (format: neuron_provenance).
@@ -163,6 +172,7 @@ void resume_callback(void) {
 }
 
 extern cback_t callback[NUM_EVENTS];
+extern bool dma_cycle_in_progress;
 
 static inline void process_ring_buffers(uint32_t local_time) {
     // Get the index of the first ring buffer for the next time step
@@ -170,24 +180,17 @@ static inline void process_ring_buffers(uint32_t local_time) {
             synapse_type_index_bits, synapse_delay_mask);
     // Make sure we don't do a DMA complete callback for this bit
     cback_t cback = callback[DMA_TRANSFER_DONE];
-    spin1_callback_off(DMA_TRANSFER_DONE);
+    if (!dma_cycle_in_progress) {
+        spin1_callback_off(DMA_TRANSFER_DONE);
+    }
     // Do the DMA transfer
     log_debug("Writing %d bytes to 0x%08x from ring buffer %d",
              sdram_inputs.size_in_bytes, sdram_inputs.address, first_ring_buffer);
     write(&ring_buffers[first_ring_buffer], sdram_inputs.address,
             sdram_inputs.size_in_bytes);
-    // Wait for completion of DMAs and then restore the callback
-    uint32_t n_loops = 0;
-    while (!(dma[DMA_STAT] & (1 << 10)) && n_loops < 1000) {
-        n_loops++;
+    if (!dma_cycle_in_progress) {
+        spin1_callback_on(DMA_TRANSFER_DONE, cback.cback, cback.priority);
     }
-    if (!(dma[DMA_STAT] & (1 << 10))) {
-        log_error("Timeout on DMA loop!");
-        rt_error(RTE_SWERR);
-    }
-    dma[DMA_CTRL] = 0x1f;
-    dma[DMA_CTRL] = 0x0d;
-    spin1_callback_on(DMA_TRANSFER_DONE, cback.cback, cback.priority);
 }
 
 static inline void write_contributions(uint32_t local_time) {

@@ -116,6 +116,9 @@ static struct {
 //! the region to record the packets per timestep in
 static uint32_t p_per_ts_region;
 
+//! Indicate whether the DMA cycle is in progress
+bool dma_cycle_in_progress = false;
+
 /* PRIVATE FUNCTIONS - static for inlining */
 
 //! \brief Perform a DMA read of a synaptic row
@@ -341,8 +344,10 @@ static void dma_complete_callback(UNUSED uint unused, uint tag) {
     // Disable DMA callback to allow us to check manually
     bool dma_started = false;
     bool write_back = false;
+    uint32_t state = spin1_irq_disable();
     cback_t cback = callback[DMA_TRANSFER_DONE];
     spin1_callback_off(DMA_TRANSFER_DONE);
+    dma_cycle_in_progress = true;
     do {
         // If a DMA was started, ack the DMA now, and re-clear the DMA queue.
         // As we control the DMA at this point, this is safe.  Note that we
@@ -350,9 +355,11 @@ static void dma_complete_callback(UNUSED uint unused, uint tag) {
         // loop with a DMA in progress and then handle that in the normal
         // interrupt handler in the API.
         if (dma_started) {
-            dma[DMA_CTRL] = 0x8;
+            dma[DMA_CTRL] = 0x1f;
+            dma[DMA_CTRL] = 0x0d;
             dma_queue.start = dma_queue.end;
         }
+        spin1_mode_restore(state);
 
         // Get pointer to current buffer
         uint32_t current_buffer_index = buffer_being_read;
@@ -418,9 +425,13 @@ static void dma_complete_callback(UNUSED uint unused, uint tag) {
         if (write_back) {
             setup_synaptic_dma_write(current_buffer_index, plastic_only);
         }
+        state = spin1_irq_disable();
     } while (!write_back && dma_started && (dma[DMA_STAT] & (1 << 10)));
 
+    state = spin1_irq_disable();
     spin1_callback_on(DMA_TRANSFER_DONE, cback.cback, cback.priority);
+    dma_cycle_in_progress = false;
+    spin1_mode_restore(state);
 }
 
 //! \brief Called when a user event is received
