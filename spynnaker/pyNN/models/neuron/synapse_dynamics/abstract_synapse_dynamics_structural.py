@@ -109,7 +109,7 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
     def initial_delay(self):
         """ The delay of a formed connection
 
-        :rtype: float
+        :rtype: float or (float, float)
         """
 
     @abstractproperty

@@ -83,7 +83,7 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
             The partner selection rule
         :param AbstractFormation formation: The formation rule
         :param AbstractElimination elimination: The elimination rule
-        :param int f_rew: How many rewiring attempts will be done per second.
+        :param float f_rew: How many rewiring attempts will be done per second.
         :param float initial_weight:
             Weight assigned to a newly formed connection
         :param initial_delay:
