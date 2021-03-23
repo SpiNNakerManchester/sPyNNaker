@@ -1,9 +1,21 @@
-# spynnaker imports
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+import numpy
 from .spike_source_array import SpikeSourceArray
 from spynnaker.pyNN.utilities import utility_calls
-
-# general imports
-import numpy
 
 
 class SpikeSourceFromFile(SpikeSourceArray):
@@ -17,7 +29,7 @@ class SpikeSourceFromFile(SpikeSourceArray):
         spike_times = utility_calls.read_spikes_from_file(
             spike_time_file, min_atom, max_atom, min_time, max_time,
             split_value)
-        super(SpikeSourceFromFile, self).__init__(spike_times)
+        super().__init__(spike_times)
 
     @staticmethod
     def _subsample_spikes_by_time(spike_array, start, stop, step):

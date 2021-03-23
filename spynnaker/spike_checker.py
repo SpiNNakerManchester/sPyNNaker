@@ -1,7 +1,28 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import numpy
 
 
 def synfire_spike_checker(spikes, nNeurons):
+    """
+    :param spikes: The spike data to check.
+    :type spikes: ~numpy.ndarray or list(~numpy.ndarray)
+    :param int nNeurons: The number of neurons.
+    :raises Exception: If there is a problem with the data
+    """
     if isinstance(spikes, numpy.ndarray):
         sorted_spikes = spikes[spikes[:, 1].argsort()]
         print(len(sorted_spikes))
@@ -19,16 +40,18 @@ def synfire_spike_checker(spikes, nNeurons):
             synfire_spike_checker(single, nNeurons)
 
 
-def synfire_multiple_lines_spike_checker(spikes, nNeurons, lines,
-                                         wrap_around=True):
+def synfire_multiple_lines_spike_checker(
+        spikes, nNeurons, lines, wrap_around=True):
     """
     Checks that there are the expected number of spike lines
 
     :param spikes: The spikes
-    :param nNeurons: Number of neurons
-    :param lines: Expected number of lines
-    :param wrap_around: If True the lines will wrap around when reaching the
-        last neuron
+    :type spikes: ~numpy.ndarray or list(~numpy.ndarray)
+    :param int nNeurons: The number of neurons.
+    :param int lines: Expected number of lines
+    :param bool wrap_around:
+        If True the lines will wrap around when reaching the last neuron.
+    :raises Exception: If there is a problem with the data
     """
     sorted_spikes = spikes[spikes[:, 1].argsort()]
     nums = [0] * lines
@@ -56,6 +79,6 @@ def synfire_multiple_lines_spike_checker(spikes, nNeurons, lines,
 
 
 if __name__ == '__main__':
-    spikes = numpy.loadtxt("sorted_spikes.csv", delimiter=',')
-    synfire_multiple_lines_spike_checker(spikes, 200, 10, wrap_around=False)
-    # synfire_spike_checker(spikes, 20)
+    _spikes = numpy.loadtxt("sorted_spikes.csv", delimiter=',')
+    synfire_multiple_lines_spike_checker(_spikes, 200, 10, wrap_around=False)
+    # synfire_spike_checker(_spikes, 20)

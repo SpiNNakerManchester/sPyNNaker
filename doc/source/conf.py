@@ -1,5 +1,20 @@
 # -*- coding: utf-8 -*-
 #
+# Copyright (c) 2017-2021 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 # data_allocation documentation build configuration file, created by
 # sphinx-quickstart on Tue Jun 17 08:56:46 2014.
 #
@@ -12,10 +27,9 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import mock
 import os
 import sys
-from sphinx import apidoc
+from sphinx.ext import apidoc
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -23,6 +37,8 @@ from sphinx import apidoc
 # sys.path.insert(0, os.path.abspath('.'))
 
 # -- General configuration ------------------------------------------------
+
+_on_rtd = os.environ.get('READTHEDOCS', 'False') == 'True'
 
 # If your documentation needs a minimal Sphinx version, state it here.
 # needs_sphinx = '1.0'
@@ -34,26 +50,26 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
     'sphinx.ext.autosummary',
-    'sphinx.ext.intersphinx'
+    'sphinx.ext.intersphinx',
+    'sphinx.ext.mathjax'
 ]
 
-ds_link = 'http://dataspecification.readthedocs.io/en/latest/'
-fe_link = 'http://spinnfrontendcommon.readthedocs.io/en/latest/'
-
-intersphinx_mapping = {'spinn_machine':
-                       ('http://spinnmachine.readthedocs.io/en/latest/',
-                           None),
-                       'spinn_storage_handlers':
-                           ('http://spinnmachine.readthedocs.io/en/latest/',
-                            None),
-                       'spinnman':
-                           ('http://spinnman.readthedocs.io/en/latest/',
-                            None),
-                       'pacman': ('http://pacman.readthedocs.io/en/latest/',
-                                  None),
-                       'data_specification': (ds_link, None),
-                       'spinn_front_end_common': (fe_link, None)
-                       }
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/3.8', None),
+    'numpy': ("https://numpy.org/doc/1.20/", None),
+    'matplotlib': ('https://matplotlib.org', None),
+    'pynn': ("http://neuralensemble.org/docs/PyNN/", None),
+    'neo': ('https://neo.readthedocs.io/en/stable/', None),
+    # We don't link to quantities; their docs are too awful
+    'spinn_utilities': ('https://spinnutils.readthedocs.io/en/latest/', None),
+    'spinn_machine': ('https://spinnmachine.readthedocs.io/en/latest/', None),
+    'spinnman': ('https://spinnman.readthedocs.io/en/latest/', None),
+    'pacman': ('https://pacman.readthedocs.io/en/latest/', None),
+    'data_specification': (
+        'https://dataspecification.readthedocs.io/en/latest/', None),
+    'spinn_front_end_common': (
+        'https://spinnfrontendcommon.readthedocs.io/en/latest/', None)
+}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -69,7 +85,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'sPyNNaker'
-copyright = u'2014-2017'
+copyright = u'2014-2021'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -203,6 +219,7 @@ html_static_path = ['_static']
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'sPyNNakerdoc'
 
+mathjax_path = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -356,15 +373,47 @@ epub_exclude_files = ['search.html']
 
 autoclass_content = 'both'
 
-MOCK_MODULES = ['scipy', 'scipy.stats']
-for mod_name in MOCK_MODULES:
-    sys.modules[mod_name] = mock.Mock()
+# We want to document __call__ when encountered
+autodoc_default_options = {
+    "members": None,
+    "special-members": "__call__"
+}
+
+if _on_rtd:
+    # Some packages need mocking
+    autodoc_mock_imports = [
+        '_tkinter', 'scipy', 'scipy.stats', 'matplotlib',
+        'pyNN', 'pyNN.random', 'pyNN.common', 'neo', 'quantities', 'lazyarray']
+
+
+def filtered_files(base, unfiltered_files_filename):
+    with open(unfiltered_files_filename) as f:
+        lines = [line.rstrip() for line in f]
+    # Skip comments and empty lines to get list of files we DON'T want to
+    # filter out; this is definitely complicated
+    unfiltered = set(
+        line for line in lines if not line.startswith("#") and line != "")
+    for root, _dirs, files in os.walk(base):
+        for filename in files:
+            if filename.endswith(".py") and not filename.startswith("_"):
+                full = root + "/" + filename
+                if full not in unfiltered:
+                    yield full
+
 
 sys.path.append(os.path.abspath('../..'))
+_output_dir = os.path.abspath(".")
+_unfiltered_files = os.path.abspath("../unfiltered-files.txt")
 
-# Do the rst generation
-for f in os.listdir("."):
-    if (os.path.isfile(f) and f.endswith(
-            ".rst") and f != "index.rst" and f != "modules.rst"):
-        os.remove(f)
-apidoc.main([None, '-o', ".", "../../spynnaker"])
+# Do the rst generation; remove files which aren't in git first!
+for fl in os.listdir("."):
+    if (os.path.isfile(fl) and fl.endswith(".rst") and
+            fl not in ("index.rst", "modules.rst")):
+        os.remove(fl)
+os.chdir("../..")  # WARNING! RELATIVE FILENAMES CHANGE MEANING HERE!
+apidoc.main([
+    '-o', _output_dir, ".",
+    # Exclude test and setup code
+    "spynnaker_integration_tests/*", "unittests/*", "setup.py",
+    *filtered_files("spynnaker", _unfiltered_files),
+    *filtered_files("spynnaker8", _unfiltered_files)])

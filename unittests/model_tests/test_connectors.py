@@ -1,12 +1,27 @@
-from __future__ import print_function
-from pacman.model.graphs.common.slice import Slice
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+import functools
 import numpy
 import pytest
-import functools
-from spynnaker.pyNN.models.neural_projections.connectors \
-    import FixedNumberPreConnector, FixedNumberPostConnector, \
-    FixedProbabilityConnector, IndexBasedProbabilityConnector
-from unittests.mocks import MockSimulator, MockPopulation
+import random
+from pacman.model.graphs.common import Slice
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    FixedNumberPreConnector, FixedNumberPostConnector,
+    FixedProbabilityConnector, IndexBasedProbabilityConnector)
+from unittests.mocks import MockSimulator, MockPopulation, MockSynapseInfo
 
 
 @pytest.fixture(scope="module", params=[10, 100])
@@ -73,14 +88,16 @@ def test_connectors(
 
     max_target = 0
     max_source = 0
-    for seed in range(1000):
-        numpy.random.seed(seed)
+    max_row_length = None
+    max_col_length = None
+    for seed in range(10):
+        numpy.random.seed(random.randint(0, 1000))
         connector = create_connector()
+        mock_synapse_info = MockSynapseInfo(MockPopulation(n_pre, "Pre"),
+                                            MockPopulation(n_post, "Post"),
+                                            weight, delay)
         connector.set_projection_information(
-            pre_population=MockPopulation(n_pre, "Pre"),
-            post_population=MockPopulation(n_post, "Post"),
-            rng=None, machine_time_step=1000)
-        connector.set_weights_and_delays(weight, delay)
+            machine_time_step=1000, synapse_info=mock_synapse_info)
 
         pre_slices = [
             Slice(i, i + n_in_slice - 1) for i in range(0, n_pre, n_in_slice)]
@@ -96,14 +113,25 @@ def test_connectors(
         pre_range = numpy.arange(pre_slice.lo_atom, pre_slice.hi_atom + 2)
         post_range = numpy.arange(post_slice.lo_atom, post_slice.hi_atom + 2)
 
-        max_delay = connector.get_delay_maximum()
-        max_weight = connector.get_weight_maximum()
-        max_row_length = connector.get_n_connections_from_pre_vertex_maximum(
-            post_vertex_slice)
-        max_col_length = connector.get_n_connections_to_post_vertex_maximum()
+        max_delay = connector.get_delay_maximum(mock_synapse_info)
+        max_weight = connector.get_weight_maximum(mock_synapse_info)
+        if max_row_length is None:
+            max_row_length = connector.\
+                get_n_connections_from_pre_vertex_maximum(
+                    post_vertex_slice, mock_synapse_info)
+        else:
+            assert(max_row_length == connector.
+                   get_n_connections_from_pre_vertex_maximum(
+                        post_vertex_slice, mock_synapse_info))
+        if max_col_length is None:
+            max_col_length = connector.\
+                get_n_connections_to_post_vertex_maximum(mock_synapse_info)
+        else:
+            assert(max_col_length == connector.
+                   get_n_connections_to_post_vertex_maximum(mock_synapse_info))
         synaptic_block = connector.create_synaptic_block(
-            pre_slices, pre_slice_index, post_slices, post_slice_index,
-            pre_vertex_slice, post_vertex_slice, synapse_type)
+            pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
+            synapse_type, mock_synapse_info)
         source_histogram = numpy.histogram(
             synaptic_block["source"], pre_range)[0]
         target_histogram = numpy.histogram(
@@ -119,16 +147,16 @@ def test_connectors(
         if len(post_slices) > post_slice_index + 1:
             test_post_slice = post_slices[post_slice_index + 1]
             test_synaptic_block = connector.create_synaptic_block(
-                pre_slices, pre_slice_index, post_slices, post_slice_index + 1,
-                pre_vertex_slice, test_post_slice, synapse_type)
+                pre_slices, post_slices, pre_vertex_slice, test_post_slice,
+                synapse_type, mock_synapse_info)
             if len(test_synaptic_block) > 0:
                 assert not numpy.array_equal(
                     test_synaptic_block, synaptic_block)
         if len(pre_slices) > pre_slice_index + 1:
             test_pre_slice = pre_slices[pre_slice_index + 1]
             test_synaptic_block = connector.create_synaptic_block(
-                pre_slices, pre_slice_index + 1, post_slices, post_slice_index,
-                test_pre_slice, post_vertex_slice, synapse_type)
+                pre_slices, post_slices, test_pre_slice, post_vertex_slice,
+                synapse_type, mock_synapse_info)
             if len(test_synaptic_block) > 0:
                 assert not numpy.array_equal(
                     test_synaptic_block, synaptic_block)
@@ -144,6 +172,5 @@ def test_connectors(
             print(max_col_length, max(target_histogram), target_histogram)
             print(max_weight, matrix_max_weight, synaptic_block["weight"])
             print(max_delay, matrix_max_delay, synaptic_block["delay"])
-            raise
     print(connector, n_pre, n_post, n_in_slice, max_row_length,
           max_source, max_col_length, max_target)

@@ -1,20 +1,33 @@
-import pytest
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
-from unittests.mocks import MockSimulator
-from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModelStandard
+import pytest
 import numpy
+from spynnaker.pyNN.models.neuron import (
+    AbstractPopulationVertex, AbstractPyNNNeuronModelStandard)
 from spynnaker.pyNN.models.neuron.synapse_types import AbstractSynapseType
 from spynnaker.pyNN.models.neuron.neuron_models import AbstractNeuronModel
-from spynnaker.pyNN.models.defaults import default_initial_values
-from spynnaker.pyNN.models.neuron.implementations \
-    import AbstractStandardNeuronComponent
+from spynnaker.pyNN.models.defaults import default_initial_values, defaults
+from spynnaker.pyNN.models.neuron.implementations import (
+    AbstractStandardNeuronComponent)
+from unittests.mocks import MockSimulator
 
 
 class EmptyNeuronComponent(AbstractStandardNeuronComponent):
-
     def __init__(self):
-        AbstractStandardNeuronComponent.__init__(self, [])
+        super().__init__([])
 
     def get_n_cpu_cycles(self, n_neurons):
         return 0
@@ -25,7 +38,7 @@ class EmptyNeuronComponent(AbstractStandardNeuronComponent):
     def add_state_variables(self, state_variables):
         pass
 
-    def get_values(self, parameters, state_variables, vertex_slice):
+    def get_values(self, parameters, state_variables, vertex_slice, ts):
         return numpy.zeros(dtype="uint32")
 
     def update_values(self, values, parameters, state_variables):
@@ -39,7 +52,6 @@ class EmptyNeuronComponent(AbstractStandardNeuronComponent):
 
 
 class EmptySynapseType(AbstractSynapseType, EmptyNeuronComponent):
-
     def get_n_synapse_types(self):
         return 0
 
@@ -51,9 +63,8 @@ class EmptySynapseType(AbstractSynapseType, EmptyNeuronComponent):
 
 
 class _MyNeuronModel(AbstractNeuronModel):
-
     def __init__(self, foo, bar):
-        AbstractNeuronModel.__init__(self, [], [])
+        super().__init__([], [])
         self._foo = foo
         self._bar = bar
 
@@ -67,7 +78,7 @@ class _MyNeuronModel(AbstractNeuronModel):
         state_variables["foo"] = self._foo
         state_variables["bar"] = self._bar
 
-    def get_values(self, parameters, state_variables, vertex_slice):
+    def get_values(self, parameters, state_variables, vertex_slice, ts):
         return numpy.zeros(dtype="uint32")
 
     def update_values(self, values, parameters, state_variables):
@@ -80,11 +91,11 @@ class _MyNeuronModel(AbstractNeuronModel):
         return None
 
 
+@defaults
 class FooBar(AbstractPyNNNeuronModelStandard):
-
     @default_initial_values({"foo", "bar"})
     def __init__(self, foo=1, bar=11):
-        super(FooBar, self).__init__(
+        super().__init__(
             "FooBar", "foobar.aplx", _MyNeuronModel(foo, bar),
             EmptyNeuronComponent(), EmptySynapseType(), EmptyNeuronComponent())
 
@@ -94,15 +105,14 @@ class FooBar(AbstractPyNNNeuronModelStandard):
 
 
 class MockNeuron(AbstractPopulationVertex):
-
     def __init__(self):
         foo_bar = FooBar()
-
-        super(MockNeuron, self).__init__(
+        super().__init__(
             n_neurons=5, label="Mock", constraints=None,
             max_atoms_per_core=None, spikes_per_second=None,
             ring_buffer_sigma=None, incoming_spike_buffer_size=None,
-            neuron_impl=foo_bar.model, pynn_model=foo_bar)
+            neuron_impl=foo_bar.model, pynn_model=foo_bar,
+            drop_late_spikes=True, splitter=None)
 
 
 def test_initializable():
@@ -119,9 +129,9 @@ def test_init_by_in():
     MockSimulator.setup()
     neuron = MockNeuron()
     assert [1, 1, 1, 1, 1] == neuron.get_initial_value("foo")
-    neuron.set_initial_value(variable="foo", value=11, selector=1)
+    neuron.initialize(variable="foo", value=11, selector=1)
     assert [1, 11, 1, 1, 1] == neuron.get_initial_value("foo")
-    neuron.set_initial_value(variable="foo", value=12, selector=2)
+    neuron.initialize(variable="foo", value=12, selector=2)
     assert [1, 11, 12, 1, 1] == neuron.get_initial_value("foo")
     assert [11] == neuron.get_initial_value("bar", selector=1)
     assert [12] == neuron.get_initial_value("foo", selector=2)

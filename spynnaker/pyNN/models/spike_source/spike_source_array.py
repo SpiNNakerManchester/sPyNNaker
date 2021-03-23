@@ -1,38 +1,43 @@
-from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
-from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.utilities import constants
-from .spike_source_array_vertex import SpikeSourceArrayVertex
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-_population_parameters = {
-        'port': None, 'tag': None, 'ip_address': None, 'board_address': None,
-        'max_on_chip_memory_usage_for_spikes_in_bytes': (
-            constants.SPIKE_BUFFER_SIZE_BUFFERING_IN),
-        'space_before_notification': 640,
-        'spike_recorder_buffer_size': (
-            constants.EIEIO_SPIKE_BUFFER_SIZE_BUFFERING_OUT),
-        'buffer_size_before_receive': (
-            constants.EIEIO_BUFFER_SIZE_BEFORE_RECEIVE)
-    }
+from spinn_utilities.overrides import overrides
+from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
+from .spike_source_array_vertex import SpikeSourceArrayVertex
 
 
 class SpikeSourceArray(AbstractPyNNModel):
 
-    default_population_parameters = _population_parameters
+    default_population_parameters = {
+        "splitter": None}
 
-    def __init__(self, spike_times=[]):
-        self._spike_times = spike_times
+    def __init__(self, spike_times=None):
+        if spike_times is None:
+            spike_times = []
+        self.__spike_times = spike_times
 
     @overrides(AbstractPyNNModel.create_vertex,
-               additional_arguments=_population_parameters.keys())
+               additional_arguments=default_population_parameters.keys())
     def create_vertex(
-            self, n_neurons, label, constraints, port, tag, ip_address,
-            board_address, max_on_chip_memory_usage_for_spikes_in_bytes,
-            space_before_notification, spike_recorder_buffer_size,
-            buffer_size_before_receive):
+            self, n_neurons, label, constraints, splitter):
+        # pylint: disable=arguments-differ
         max_atoms = self.get_max_atoms_per_core()
         return SpikeSourceArrayVertex(
-            n_neurons, self._spike_times, port, tag, ip_address, board_address,
-            max_on_chip_memory_usage_for_spikes_in_bytes,
-            space_before_notification, constraints, label,
-            spike_recorder_buffer_size, buffer_size_before_receive, max_atoms,
-            self)
+            n_neurons, self.__spike_times, constraints, label, max_atoms, self,
+            splitter)
+
+    @property
+    def _spike_times(self):
+        return self.__spike_times
