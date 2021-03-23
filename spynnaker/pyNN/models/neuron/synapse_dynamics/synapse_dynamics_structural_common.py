@@ -33,7 +33,7 @@ from .abstract_synapse_dynamics_structural import (
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 
 #: Default value for frequency of rewiring
-DEFAULT_F_REW = 10 ** 4
+DEFAULT_F_REW = 10 ** 4.0
 #: Default value for initial weight on connection formation
 DEFAULT_INITIAL_WEIGHT = 0.0
 #: Default value for initial delay on connection formation
@@ -84,7 +84,7 @@ class SynapseDynamicsStructuralCommon(
         """ The period of rewiring.
 
         :return: The period of rewiring
-        :rtype: int
+        :rtype: float
         """
         return 1. / self.f_rew
 
