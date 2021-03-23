@@ -356,9 +356,9 @@ class AbstractSpiNNakerCommon(
         incoming_projections = defaultdict(list)
         outgoing_projections = defaultdict(list)
         for projection in self._projections:
-            connector = projection._synapse_information.connector
-            incoming_projections[connector._post_population].append(projection)
-            outgoing_projections[connector._pre_population].append(projection)
+            info = projection._synapse_information
+            incoming_projections[info.post_population].append(projection)
+            outgoing_projections[info.pre_population].append(projection)
 
         filename = os.path.join(
             self._report_default_directory, _PYNN_NETWORK_REPORT)
