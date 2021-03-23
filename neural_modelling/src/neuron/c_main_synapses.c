@@ -179,7 +179,7 @@ static inline void process_ring_buffers(uint32_t local_time) {
     // Wait for completion of DMAs and then restore the callback
     uint32_t n_loops = 0;
     while (!(dma[DMA_STAT] & (1 << 10)) && n_loops < 1000) {
-        continue;
+        n_loops++;
     }
     if (!(dma[DMA_STAT] & (1 << 10))) {
         log_error("Timeout on DMA loop!");
