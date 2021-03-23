@@ -33,6 +33,7 @@ from spynnaker.pyNN.spynnaker_simulator_interface import (
     SpynnakerSimulatorInterface)
 from spynnaker.pyNN.utilities.extracted_data import ExtractedData
 from spynnaker import __version__ as version
+from spinn_utilities.progress_bar import ProgressBar
 
 logger = FormatAdapter(logging.getLogger(__name__))
 _PYNN_NETWORK_REPORT = "pynn_network.txt"
@@ -352,35 +353,48 @@ class AbstractSpiNNakerCommon(
         self.reset_number_of_neurons_per_core()
         unset_simulator(self)
 
-    def _write_report(self):
-        incoming_projections = defaultdict(list)
-        outgoing_projections = defaultdict(list)
-        for projection in self._projections:
-            info = projection._synapse_information
-            incoming_projections[info.post_population].append(projection)
-            outgoing_projections[info.pre_population].append(projection)
+    def __write_population_graph_report(self, filename):
+        """ Report the pyNN population/projection-level graph.
 
-        filename = os.path.join(
-            self._report_default_directory, _PYNN_NETWORK_REPORT)
+        :param str filename: What file to write the report to.
+        :raises IOError: If the file isn't writable.
+        """
         with open(filename, "w") as f:
+            progress = ProgressBar(
+                "Describing Final Simulation Graph",
+                len(self._projections) + len(self._projections))
+
+            # Invert the relations to pop->proj(info)
+            incoming_projections = defaultdict(list)
+            outgoing_projections = defaultdict(list)
+            for projection in progress.over(
+                    self._projections, finish_at_end=False):
+                info = projection._synapse_information
+                incoming_projections[info.post_population].append(info)
+                outgoing_projections[info.pre_population].append(info)
+
             f.write("*** Populations:\n")
-            for population in self._populations:
+            for population in progress.over(self._populations):
                 f.write("Population {}, Model {}\n".format(
                     population.label, population.celltype))
+
+                # NB: getting a defaulted empty list is fine here
                 outgoing = outgoing_projections[population]
-                f.write("    {} Outgoing Projections:\n".format(len(outgoing)))
-                for projection in outgoing:
-                    connector = projection._synapse_information.connector
-                    post = connector._post_population
-                    f.write("        Projection to {}, connector {}\n".format(
-                        post.label, str(connector)))
+                f.write("    {} Outgoing Projections:\n".format(
+                    len(outgoing)))
+                for info in outgoing:
+                    f.write(
+                        "        Projection to {}, connector {}\n".format(
+                            info.post_population.label, str(info.connector)))
+
+                # NB: getting a defaulted empty list is fine here
                 incoming = incoming_projections[population]
-                f.write("    {} Incoming Projections:\n".format(len(incoming)))
-                for projection in incoming:
-                    connector = projection._synapse_information.connector
-                    pre = connector._pre_population
-                    f.write("        Projection from {}, connector {}\n"
-                            .format(pre.label, str(connector)))
+                f.write("    {} Incoming Projections:\n".format(
+                    len(incoming)))
+                for info in incoming:
+                    f.write(
+                        "        Projection from {}, connector {}\n".format(
+                            info.pre_population.label, str(info.connector)))
                 f.write("\n")
 
     def run(self, run_time, sync_time=0.0):
@@ -395,7 +409,8 @@ class AbstractSpiNNakerCommon(
         :rtype: None
         """
         # pylint: disable=protected-access
-        self._write_report()
+        self.__write_population_graph_report(os.path.join(
+            self._report_default_directory, _PYNN_NETWORK_REPORT))
 
         # extra post run algorithms
         self._dsg_algorithm = "SpynnakerDataSpecificationWriter"
