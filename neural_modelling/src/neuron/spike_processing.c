@@ -354,10 +354,10 @@ static void dma_complete_callback(UNUSED uint unused, uint tag) {
         // allow the queue to be populated in case we need to exit this
         // loop with a DMA in progress and then handle that in the normal
         // interrupt handler in the API.
-        if (dma_started) {
+        /*if (dma_started) {
             dma[DMA_CTRL] = 0x8;
             dma_queue.start = dma_queue.end;
-        }
+        } */
         // spin1_mode_restore(state);
 
         // Get pointer to current buffer

@@ -179,18 +179,18 @@ static inline void process_ring_buffers(uint32_t local_time) {
     uint32_t first_ring_buffer = synapse_row_get_first_ring_buffer_index(local_time,
             synapse_type_index_bits, synapse_delay_mask);
     // Make sure we don't do a DMA complete callback for this bit
-    cback_t cback = callback[DMA_TRANSFER_DONE];
-    if (!dma_cycle_in_progress) {
-        spin1_callback_off(DMA_TRANSFER_DONE);
-    }
+//    cback_t cback = callback[DMA_TRANSFER_DONE];
+//    if (!dma_cycle_in_progress) {
+//        spin1_callback_off(DMA_TRANSFER_DONE);
+//    }
     // Do the DMA transfer
     log_debug("Writing %d bytes to 0x%08x from ring buffer %d",
              sdram_inputs.size_in_bytes, sdram_inputs.address, first_ring_buffer);
     write(&ring_buffers[first_ring_buffer], sdram_inputs.address,
             sdram_inputs.size_in_bytes);
-    if (!dma_cycle_in_progress) {
-        spin1_callback_on(DMA_TRANSFER_DONE, cback.cback, cback.priority);
-    }
+//    if (!dma_cycle_in_progress) {
+//        spin1_callback_on(DMA_TRANSFER_DONE, cback.cback, cback.priority);
+//    }
 }
 
 static inline void write_contributions(uint32_t local_time) {
