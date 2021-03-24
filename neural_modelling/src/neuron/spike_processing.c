@@ -116,9 +116,6 @@ static struct {
 //! the region to record the packets per timestep in
 static uint32_t p_per_ts_region;
 
-//! Indicate whether the DMA cycle is in progress
-bool dma_cycle_in_progress = false;
-
 /* PRIVATE FUNCTIONS - static for inlining */
 
 //! \brief Perform a DMA read of a synaptic row
@@ -347,7 +344,6 @@ static void dma_complete_callback(UNUSED uint unused, uint tag) {
 //    uint32_t state = spin1_irq_disable();
 //    cback_t cback = callback[DMA_TRANSFER_DONE];
 //    spin1_callback_off(DMA_TRANSFER_DONE);
-//    dma_cycle_in_progress = true;
     //do {
         // If a DMA was started, ack the DMA now, and re-clear the DMA queue.
         // As we control the DMA at this point, this is safe.  Note that we
@@ -428,7 +424,6 @@ static void dma_complete_callback(UNUSED uint unused, uint tag) {
     /*} while (!write_back && dma_started && (dma[DMA_STAT] & (1 << 10)));
 
     spin1_callback_on(DMA_TRANSFER_DONE, cback.cback, cback.priority);
-    dma_cycle_in_progress = false;
     spin1_mode_restore(state); */
 }
 

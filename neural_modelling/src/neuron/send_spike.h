@@ -39,8 +39,14 @@ extern uint32_t latest_send_time;
 //! \param[in] key The key to send
 static inline void send_spike_mc(uint32_t key) {
     // Wait for there to be space to send
-    while (cc[CC_TCR] & TX_FULL_MASK) {
+    uint32_t n_loops = 0;
+    while ((cc[CC_TCR] & TX_FULL_MASK) && (n_loops < 10000)) {
         spin1_delay_us(1);
+        n_loops++;
+    }
+    if (cc[CC_TCR] & TX_FULL_MASK) {
+        log_error("Couldn't send spike because full: %u", cc[CC_TCR]);
+        rt_error(RTE_SWERR);
     }
 
     // Do the send
