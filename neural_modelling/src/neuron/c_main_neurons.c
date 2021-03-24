@@ -187,7 +187,7 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
 
     time++;
 
-    log_info("Timer tick %u \n", time);
+    log_debug("Timer tick %u \n", time);
 
     /* if a fixed number of simulation ticks that were specified at startup
      * then do reporting for finishing */
@@ -222,7 +222,6 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
     read(sdram, synaptic_contributions[write_index], sdram_inputs.size_in_bytes);
     write_index = !write_index;
 
-    log_info("Reading from %u synapse cores", sdram_inputs.n_synapse_cores);
     for (uint32_t i = 0; i < sdram_inputs.n_synapse_cores; i++) {
         // Wait for the last DMA to complete
         uint32_t n_loops = 0;
@@ -246,12 +245,11 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
         sum(synaptic_contributions[read_index]);
         read_index = !read_index;
     }
-    log_info("Transferring to neurons");
 
     neuron_transfer(all_synaptic_contributions.as_weight);
 
     // Now do neuron time step update
-    log_info("Timestep update");
+    log_info("Timestep update %u", time);
     neuron_do_timestep_update(time, timer_count);
 
     uint32_t end_time = tc[T1_COUNT];

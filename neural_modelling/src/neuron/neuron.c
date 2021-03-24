@@ -164,14 +164,18 @@ void neuron_do_timestep_update(timer_t time, uint timer_count) { // EXPORTED
     // tdma_processing_reset_phase();
 
     // Prepare recording for the next timestep
+    log_info("Setup recording");
     neuron_recording_setup_for_next_recording();
 
+    log_info("Updating %u neurons", n_neurons);
     neuron_impl_do_timestep_update(timer_count, time, n_neurons);
 
     log_debug("time left of the timer after tdma is %d", tc[T1_COUNT]);
 
     // Record the recorded variables
+    log_info("Recording variables");
     neuron_recording_record(time);
+    log_info("TS Update done");
 }
 
 void neuron_transfer(weight_t *syns) { // EXPORTED
