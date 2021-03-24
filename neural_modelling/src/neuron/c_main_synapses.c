@@ -171,26 +171,15 @@ void resume_callback(void) {
     synapses_resume(time + 1);
 }
 
-extern cback_t callback[NUM_EVENTS];
-extern bool dma_cycle_in_progress;
-
 static inline void process_ring_buffers(uint32_t local_time) {
     // Get the index of the first ring buffer for the next time step
     uint32_t first_ring_buffer = synapse_row_get_first_ring_buffer_index(local_time,
             synapse_type_index_bits, synapse_delay_mask);
-    // Make sure we don't do a DMA complete callback for this bit
-//    cback_t cback = callback[DMA_TRANSFER_DONE];
-//    if (!dma_cycle_in_progress) {
-//        spin1_callback_off(DMA_TRANSFER_DONE);
-//    }
-    // Do the DMA transfer
+    // Do the DMA transfer; note this won't be interrupted by the callback.
     log_debug("Writing %d bytes to 0x%08x from ring buffer %d",
              sdram_inputs.size_in_bytes, sdram_inputs.address, first_ring_buffer);
     write(&ring_buffers[first_ring_buffer], sdram_inputs.address,
             sdram_inputs.size_in_bytes);
-//    if (!dma_cycle_in_progress) {
-//        spin1_callback_on(DMA_TRANSFER_DONE, cback.cback, cback.priority);
-//    }
 }
 
 static inline void write_contributions(uint32_t local_time) {
@@ -292,8 +281,8 @@ static bool initialise(void) {
     tc[T2_CONTROL] = 0x82;
     write_contributions(0);
     clocks_to_transfer = (0xFFFFFFFF - tc[T2_COUNT]) + CALLBACK_OVERHEAD_CLOCKS;
-    log_info("Transfer of %u bytes took %u cycles", sdram_inputs.size_in_bytes,
-            clocks_to_transfer);
+    log_info("Transfer of %u bytes to 0x%08x took %u cycles",
+            sdram_inputs.size_in_bytes, sdram_inputs.address, clocks_to_transfer);
     recording_reset();
 
     // Prepare to receive the timer (disable timer then enable VIC entry)
