@@ -453,9 +453,7 @@ void spike_processing_clear_input_buffer(timer_t time) {
     if (clear_input_buffers_of_late_packets) {
         spin1_dma_flush();
         in_spikes_clear();
-        if (!dma_cycle_in_progress) {
-            dma_busy = false;
-        }
+        dma_busy = false;
     }
 
     // Record the number of packets received last timer tick
