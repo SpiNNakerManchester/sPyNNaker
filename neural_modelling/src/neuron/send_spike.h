@@ -45,7 +45,7 @@ static inline void send_spike_mc(uint32_t key) {
         n_loops++;
     }
     if (cc[CC_TCR] & TX_FULL_MASK) {
-        log_error("Couldn't send spike because full: %u", cc[CC_TCR]);
+        io_printf(IO_BUF, "[ERROR] Couldn't send spike because full: %u", cc[CC_TCR]);
         rt_error(RTE_SWERR);
     }
 
