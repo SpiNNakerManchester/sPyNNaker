@@ -412,7 +412,7 @@ static void dma_complete_callback(UNUSED uint unused, uint tag) {
                 address_t row = (address_t) current_buffer->row;
                 for (uint32_t i = 0;
                         i < (current_buffer->n_bytes_transferred >> 2); i++) {
-                    log_error("%u: 0x%.8x", i, row[i]);
+                    log_error("%u: 0x%08x", i, row[i]);
                 }
                 rt_error(RTE_SWERR);
             }
@@ -458,7 +458,9 @@ void spike_processing_clear_input_buffer(timer_t time) {
     if (clear_input_buffers_of_late_packets) {
         spin1_dma_flush();
         in_spikes_clear();
-        dma_busy = false;
+        if (!dma_cycle_in_progress) {
+            dma_busy = false;
+        }
     }
 
     // Record the number of packets received last timer tick
