@@ -355,8 +355,7 @@ static void dma_complete_callback(UNUSED uint unused, uint tag) {
         // loop with a DMA in progress and then handle that in the normal
         // interrupt handler in the API.
         if (dma_started) {
-            dma[DMA_CTRL] = 0x1f;
-            dma[DMA_CTRL] = 0x0d;
+            dma[DMA_CTRL] = 0x8;
             dma_queue.start = dma_queue.end;
         }
         spin1_mode_restore(state);
@@ -428,7 +427,6 @@ static void dma_complete_callback(UNUSED uint unused, uint tag) {
         state = spin1_irq_disable();
     } while (!write_back && dma_started && (dma[DMA_STAT] & (1 << 10)));
 
-    state = spin1_irq_disable();
     spin1_callback_on(DMA_TRANSFER_DONE, cback.cback, cback.priority);
     dma_cycle_in_progress = false;
     spin1_mode_restore(state);
