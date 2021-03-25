@@ -14,11 +14,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import configparser
-import numpy
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities import globals_variables
 from spynnaker8.spinnaker import Spynnaker8FailedState
 from spynnaker.pyNN.models.populations import Population
+from spynnaker.pyNN.abstract_spinnaker_common import AbstractSpiNNakerCommon
 
 
 class MockPopulation(object):
@@ -41,18 +41,6 @@ class MockPopulation(object):
         return "Population {}".format(self._label)
 
 
-class MockRNG(object):
-
-    def __init__(self):
-        self._rng = numpy.random.RandomState()
-
-    def next(self, n):
-        return self._rng.uniform(size=n)
-
-    def __getattr__(self, name):
-        return getattr(self._rng, name)
-
-
 class MockSimulator(object):
 
     def __init__(self):
@@ -63,44 +51,41 @@ class MockSimulator(object):
              "ring_buffer_sigma": "5",
              "one_to_one_connection_dtcm_max_bytes": "0",
              "drop_late_spikes": True,
-             "app_machine_quantity": 10,
-             "time_between_cores": 1.2,
-             "fraction_of_time_spike_sending": 0.5,
-             "fraction_of_time_before_sending": 0.01
              }
-        self.config["Buffers"] = {"time_between_requests": "10",
-                                  "minimum_buffer_sdram": "10",
-                                  "use_auto_pause_and_resume": "True",
-                                  "receive_buffer_host": "None",
-                                  "receive_buffer_port": "None",
-                                  "enable_buffered_recording": "False"}
-        self.config["MasterPopTable"] = {"generator": "BinarySearch"}
         self.config["Reports"] = {"n_profile_samples": 0}
 
-    def add_population(self, pop):
+    @overrides(AbstractSpiNNakerCommon.add_population)
+    def add_population(self, population):
         pass
 
+    @overrides(AbstractSpiNNakerCommon.add_application_vertex)
     def add_application_vertex(self, vertex):
         pass
 
+    @overrides(AbstractSpiNNakerCommon.verify_not_running)
     def verify_not_running(self):
         pass
 
+    @overrides(AbstractSpiNNakerCommon.has_ran)
     def has_ran(self):
         return False
 
+    @overrides(AbstractSpiNNakerCommon.has_reset_last)
     def has_reset_last(self):
         return False
 
     @property
+    @overrides(AbstractSpiNNakerCommon.machine_time_step)
     def machine_time_step(self):
         return 1000
 
     @property
+    @overrides(AbstractSpiNNakerCommon.id_counter)
     def id_counter(self):
-        return 1
+       return 1
 
     @id_counter.setter
+    #overrides(AbstractSpiNNakerCommon.id_counter)
     def id_counter(self, value):
         pass
 
@@ -113,13 +98,11 @@ class MockSimulator(object):
         return simulator
 
     @property
-    def use_virtual_board(self):
-        return True
-
-    @property
+    @overrides(AbstractSpiNNakerCommon.min_delay)
     def min_delay(self):
-        return 1
+       return 1
 
     @property
+    @overrides(AbstractSpiNNakerCommon.t)
     def t(self):
         return 0
