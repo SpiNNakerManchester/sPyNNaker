@@ -166,9 +166,7 @@ void neuron_do_timestep_update(timer_t time, uint timer_count) { // EXPORTED
     // Prepare recording for the next timestep
     neuron_recording_setup_for_next_recording();
 
-    log_info("Updating %u neurons", n_neurons);
     neuron_impl_do_timestep_update(timer_count, time, n_neurons);
-    log_info("TS Update done");
 
     log_debug("time left of the timer after tdma is %d", tc[T1_COUNT]);
 

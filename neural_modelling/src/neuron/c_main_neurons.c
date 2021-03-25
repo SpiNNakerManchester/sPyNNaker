@@ -249,7 +249,6 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
     neuron_transfer(all_synaptic_contributions.as_weight);
 
     // Now do neuron time step update
-    log_info("Timestep update %u", time);
     neuron_do_timestep_update(time, timer_count);
 
     uint32_t end_time = tc[T1_COUNT];
@@ -258,7 +257,6 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
     }
 
     profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
-    log_info("Done timer");
 }
 
 //! \brief Initialises the model by reading in the regions and checking
