@@ -194,11 +194,12 @@ static inline void write_contributions(uint32_t local_time) {
 
 //! \brief writes synaptic inputs to SDRAM
 INT_HANDLER timer2_callback(void) {
+    log_info("t2 callback");
     // Disable interrupts to stop DMAs and MC getting in the way of this bit
     uint32_t state = spin1_int_disable();
     // Clear interrupt in timer and ACK the vic (safe as interrupts off anyway)
-    tc[T2_INT_CLR] = (uint) tc;
-    vic[VIC_VADDR] = (uint) vic;
+    tc[T2_INT_CLR] = 1;
+    vic[VIC_VADDR] = 1;
 
     // Write the contributions
     write_contributions(time);
@@ -246,6 +247,7 @@ void timer_callback(UNUSED uint timer_count, UNUSED uint unused) {
     uint32_t time_to_wait = tc[T1_COUNT] - clocks_to_transfer;
     tc[T2_LOAD] = time_to_wait;
     tc[T2_CONTROL] = 0xe3;
+    log_info("Starting t2 at %u", time_to_wait);
 
     // Do rewiring as needed
     synaptogenesis_do_timestep_update();
