@@ -184,9 +184,12 @@ static inline void process_ring_buffers(uint32_t local_time) {
 
 static inline void write_contributions(uint32_t local_time) {
     // Clear any outstanding spikes
+    log_info("Clear buffers");
     spike_processing_clear_input_buffer(local_time);
     // Copy things out of DTCM
+    log_info("Process buffers");
     process_ring_buffers(local_time + 1);
+    log_info("Done");
 }
 
 //! \brief writes synaptic inputs to SDRAM
@@ -211,6 +214,7 @@ INT_HANDLER timer2_callback(void) {
 void timer_callback(UNUSED uint timer_count, UNUSED uint unused) {
     time++;
     uint32_t state = spin1_int_disable();
+    log_info("Time %u", time);
 
     /* if a fixed number of simulation ticks that were specified at startup
      * then do reporting for finishing */
@@ -233,6 +237,7 @@ void timer_callback(UNUSED uint timer_count, UNUSED uint unused) {
     }
 
     // Now clear the ring buffers
+    log_info("Flush ring buffers");
     synapses_flush_ring_buffers(time - 1);
 
     // Setup to call back enough before the end of the timestep to transfer
@@ -245,6 +250,7 @@ void timer_callback(UNUSED uint timer_count, UNUSED uint unused) {
     // Do rewiring as needed
     synaptogenesis_do_timestep_update();
 
+    log_info("TS Done");
     spin1_mode_restore(state);
 }
 
