@@ -173,8 +173,6 @@ static bool read_rate_parameters(address_t address, address_t starting_values) {
 
     pool_size = elements * sizeof(uint8_t);
 
-    io_printf(IO_BUF, "elements %d, sim ticks %d, pool size %d\n", elements, simulation_ticks, pool_size);
-
     rate_values = spin1_malloc(pool_size);
     if (rate_values == NULL) {
         log_error("Could not allocate space for the rate values");
@@ -318,19 +316,14 @@ static void timer_callback(uint timer_count, uint unused) {
             while (!spin1_send_mc_packet(key | i, teaching_signal, WITH_PAYLOAD)) {
                     spin1_delay_us(2);
                 }
-
-            io_printf(IO_BUF, "%k ", teaching_signal);
         }
         else {
             while (!spin1_send_mc_packet(key | i, 0, WITH_PAYLOAD)) {
                     spin1_delay_us(2);
                 }
-            io_printf(IO_BUF, "0 ");
         }
         spin1_delay_us(2);
     }
-
-    io_printf(IO_BUF, "\n");
 
     if(refresh_timer > refresh) {
         read_rate_values();

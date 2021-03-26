@@ -280,7 +280,7 @@ static inline void process_fixed_synapses(
                 synapse_type_index_bits);
 
         // Add weight to current ring buffer value
-        REAL accumulation = ring_buffers[ring_buffer_index] + get_input_current(rate, synaptic_weight);
+        // REAL accumulation = ring_buffers[ring_buffer_index] + get_input_current(rate, synaptic_weight);
 
         // Saturation check, MAYBE WE SHOULD CAP THE MAX INCOMING VALUES?
 //        s3231 sat_test = accumulation & 0x100000000;
@@ -289,7 +289,11 @@ static inline void process_fixed_synapses(
 //            saturation_count++;
 //        }
 
-        ring_buffers[ring_buffer_index] = accumulation;
+        ring_buffers[ring_buffer_index] =
+            sat_accum_sum(ring_buffers[ring_buffer_index],
+                          get_input_current(rate, synaptic_weight));
+
+        // ring_buffers[ring_buffer_index] = accumulation;
 
         //io_printf(IO_BUF,"acc %k, t%d\n", accumulation, time);
     }

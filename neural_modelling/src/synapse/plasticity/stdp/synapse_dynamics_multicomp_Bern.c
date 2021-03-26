@@ -291,8 +291,6 @@ bool synapse_dynamics_process_plastic_synapses(
                 control_word, synapse_index_bits);
         uint32_t index =
                 synapse_row_sparse_index(control_word, synapse_index_mask);
-        uint32_t type_index = synapse_row_sparse_type_index(
-                control_word);
 
         // Create update state from the plastic synaptic word
         update_state_t current_state =
@@ -302,36 +300,39 @@ bool synapse_dynamics_process_plastic_synapses(
         final_state_t final_state = plasticity_update_synapse(
                 time, last_pre_rate, current_state, &post_event_history[index]);
 
-        // THE FUNCTION SHFITS TO INCLUDE THE DELAY. MAYBE STRIP OFF FOR US MODEL EXTREME PERFORMANCE GAIN
-        uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
-                0, type_index & synapse_index_mask, synapse_type_index_bits);
+         // Avoid the mul when input rate = 0
+        if(real_rate) {
 
-        // EDIT THIS TO BE *plastic_words ONCE THE WEIGHT UPDATE IS ADAPTED
-        REAL curr_weight = synapse_structure_get_final_weight(final_state);
+            // EDIT THIS TO BE *plastic_words ONCE THE WEIGHT UPDATE IS ADAPTED
+            REAL curr_weight = synapse_structure_get_final_weight(final_state);
 
-        // Add the current rate contribution with the new rate
-        REAL accumulation = ring_buffers[ring_buffer_index] +
-                MULT_ROUND_STOCHASTIC_ACCUM(real_rate, curr_weight);
+            // Add the current rate contribution with the new rate
+            // REAL accumulation = ring_buffers[index] +
+            //         MULT_ROUND_STOCHASTIC_ACCUM(real_rate, curr_weight);
 
 
-        //io_printf(IO_BUF,"rate %k, weight %k\n", real_rate, curr_weight);
+            //io_printf(IO_BUF,"rate %k, weight %k\n", real_rate, curr_weight);
 
-        // Update the old rate contribution with the new weight
-        //accumulation += MULT_ROUND_STOCHASTIC_ACCUM((curr_weight - old_weight), last_pre_rate);
+            // Update the old rate contribution with the new weight
+            //accumulation += MULT_ROUND_STOCHASTIC_ACCUM((curr_weight - old_weight), last_pre_rate);
 
-//        uint64_t sat_test = accumulation & 0x100000000;
-//        if (sat_test) {
-//            accumulation = sat_test - 1;
-//            plastic_saturation_count++;
-//        }
+    //        uint64_t sat_test = accumulation & 0x100000000;
+    //        if (sat_test) {
+    //            accumulation = sat_test - 1;
+    //            plastic_saturation_count++;
+    //        }
 
-        //io_printf(IO_BUF, "right shift %d\n", weight_get_shift(current_state));
-        //io_printf(IO_BUF, "weight %k, rate %k\n", synapses_convert_weight_to_input(
-        //                synapse_structure_get_final_weight(final_state),
-        //                weight_get_shift(current_state)), real_rate);
-        //io_printf(IO_BUF, "adding %k ", accumulation);
+            //io_printf(IO_BUF, "right shift %d\n", weight_get_shift(current_state));
+            //io_printf(IO_BUF, "weight %k, rate %k\n", synapses_convert_weight_to_input(
+            //                synapse_structure_get_final_weight(final_state),
+            //                weight_get_shift(current_state)), real_rate);
+            //io_printf(IO_BUF, "adding %k ", accumulation);
 
-        ring_buffers[ring_buffer_index] = accumulation;
+            // ring_buffers[index] = accumulation;
+            ring_buffers[index] =
+                sat_accum_sum(ring_buffers[index],
+                              MULT_ROUND_STOCHASTIC_ACCUM(real_rate, curr_weight));
+        }
 
         //io_printf(IO_BUF, "weight %k\n", synapse_structure_get_final_weight(final_state));
 

@@ -126,7 +126,8 @@ void matrix_generator_stdp_write_row(
         uint32_t synapse_type_bits, uint32_t synapse_index_bits,
         uint32_t synapse_type, uint32_t n_synapses,
         uint16_t *indices, uint16_t *delays, uint32_t *weights,
-        uint32_t max_stage) {
+        uint32_t max_stage, uint32_t post_slice_start,
+        uint32_t random_weight_matrix) {
     struct matrix_generator_stdp *obj = data;
 
     // Row address for each possible delay stage (including no delay stage)
@@ -222,7 +223,14 @@ void matrix_generator_stdp_write_row(
             weight_words[i] = 0;
         }
 
+        if(random_weight_matrix) {
+            weight = (int32_t) ((weight + (post_slice_start << 15)) *
+                                (int32_t) sark_rand()) >> 16;
+        }
+
+
         weight_words[obj->weight_word] = weight;
+
         n_words_per_row[delay.stage] +=
                 obj->n_words_per_pp_synapse;
         space_words[delay.stage] -= obj->n_words_per_pp_synapse;

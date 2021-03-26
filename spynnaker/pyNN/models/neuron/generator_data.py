@@ -38,7 +38,7 @@ class GeneratorData(object):
         "__synapse_information",
         "__synaptic_matrix_offset"]
 
-    BASE_SIZE = 17 * 4
+    BASE_SIZE = 18 * 4
 
     def __init__(
             self, synaptic_matrix_offset, delayed_synaptic_matrix_offset,
@@ -104,7 +104,8 @@ class GeneratorData(object):
             synapse_dynamics.gen_matrix_id,
             connector.gen_connector_id,
             connector.gen_weights_id(self.__synapse_information.weight),
-            connector.gen_delays_id(self.__synapse_information.delay)],
+            connector.gen_delays_id(self.__synapse_information.delay),
+            connector.random_weight_matrix()],
             dtype="uint32"))
         items.append(synapse_dynamics.gen_matrix_params)
         items.append(connector.gen_connector_params(

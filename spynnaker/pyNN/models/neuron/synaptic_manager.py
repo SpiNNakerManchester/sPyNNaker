@@ -147,7 +147,7 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
 
     BASIC_MALLOC_USAGE = 2
 
-    # 36 + 4 for syn matrix size????
+    # 36 + 4 for syn matrix size
     BYTES_FOR_SYNAPSE_PARAMS = 40
 
     _n_vertices = 0

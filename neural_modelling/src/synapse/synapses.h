@@ -133,4 +133,22 @@ void synapses_set_contribution_region();
 
 void synapses_flush_ring_buffer(uint32_t timestep);
 
+// DEFINED IN NEURON.H
+//! \brief This function adds two s1615 values, saturating the result.
+//!        It uses the ARM assembly instruction QADD for efficiency.
+//! \param[in] x first argument.
+//! \param[in] y second argument.
+//! \return x+y.
+//
+// static inline s1615 sat_accum_sum(
+// 	s1615 x,
+// 	s1615 y)
+// {
+//     register s1615 r;
+
+//     asm volatile("qadd %[r], %[x], %[y]"
+// 	    : [r] "=r" (r) : [x] "r" (x), [y] "r" (y) : );
+//     return r;
+// }
+
 #endif // _SYNAPSES_H_

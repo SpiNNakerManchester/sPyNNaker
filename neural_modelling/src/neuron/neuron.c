@@ -474,7 +474,7 @@ void neuron_do_timestep_update( // EXPORTED
 
             for (index_t i = 0; i < incoming_partitions[synapse_type_index]; i++) {
 
-                sum += synaptic_contributions[buff_index];
+                sum = sat_accum_sum(sum, synaptic_contributions[buff_index]);
                 buff_index += n_neurons_power_2;
 
             }
