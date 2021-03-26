@@ -25,6 +25,8 @@ import pytest
 from spinn_utilities.overrides import overrides
 from spinn_utilities.conf_loader import load_config
 from spinn_machine import SDRAM
+from spinnman.model import CPUInfo
+from spinnman.transceiver import Transceiver
 from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
 from pacman.model.placements import Placement, Placements
 from pacman.model.resources import ResourceContainer
@@ -71,37 +73,20 @@ from spynnaker.pyNN.extra_algorithms.splitter_components import (
 from unittests.mocks import MockSimulator, MockPopulation
 
 
-# pylint: disable=unused-argument
-class MockSynapseIO(object):
-    def get_block_n_bytes(self, max_row_length, n_rows):
-        return 4
-
-
-class MockMasterPopulationTable(object):
-    def __init__(self, key_to_entry_map):
-        self._key_to_entry_map = key_to_entry_map
-
-    def extract_synaptic_matrix_data_location(
-            self, key, master_pop_table_address, transceiver, x, y):
-        return self._key_to_entry_map[key]
-
-
-class MockCPUInfo(object):
-    @property
-    def user(self):
-        return [0, 0, 0, 0]
-
-
 class MockTransceiverRawData(object):
     def __init__(self, data_to_read):
         self._data_to_read = data_to_read
 
+    @overrides(Transceiver.get_cpu_information_from_core())
     def get_cpu_information_from_core(self, x, y, p):
-        return MockCPUInfo()
+        bs = bytearray(128)
+        return CPUInfo(x=1, y=2, p=3, cpu_data=bytes(bs), offset=0)
 
+    @overrides(Transceiver.read_memory)
     def read_memory(self, x, y, base_address, length):
         return self._data_to_read[base_address:base_address + length]
 
+    @overrides(Transceiver.read_word)
     def read_word(self, x, y, base_address):
         datum, = struct.unpack("<I", self.read_memory(x, y, base_address, 4))
         return datum
