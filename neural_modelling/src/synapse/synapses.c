@@ -276,11 +276,9 @@ static inline void process_fixed_synapses(
                 0, combined_synapse_neuron_index & synapse_index_mask,
                 synapse_type_index_bits);
 
-        // Add weight to current ring buffer value
-        REAL curr = get_input_current(rate, synaptic_weight);
-        REAL accumulation = ring_buffers[ring_buffer_index] + curr;
-
-        ring_buffers[ring_buffer_index] = accumulation;
+        ring_buffers[ring_buffer_index] =
+             sat_accum_sum(ring_buffers[ring_buffer_index],
+                           get_input_current(rate, synaptic_weight));
     }
 }
 

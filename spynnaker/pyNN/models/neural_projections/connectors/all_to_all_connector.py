@@ -29,9 +29,12 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
     """
 
     __slots__ = [
-        "__allow_self_connections"]
+        "__allow_self_connections",
+        "__random_weight_matrix"]
 
-    def __init__(self, allow_self_connections=True, safe=True, verbose=None):
+    def __init__(
+            self, allow_self_connections=True, safe=True,
+            verbose=None, random_weight_matrix=False):
         """
         :param allow_self_connections:
             if the connector is used to connect a\
@@ -42,6 +45,7 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
         """
         super(AllToAllConnector, self).__init__(safe, verbose)
         self.__allow_self_connections = allow_self_connections
+        self.__random_weight_matrix = random_weight_matrix
 
     def _connection_slices(self, pre_vertex_slice, post_vertex_slice):
         """ Get a slice of the overall set of connections.
@@ -158,3 +162,9 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
                gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
         return 4
+
+    @overrides(AbstractConnector.random_weight_matrix)
+    def random_weight_matrix(self):
+        if self.__random_weight_matrix:
+            return 1
+        return 0

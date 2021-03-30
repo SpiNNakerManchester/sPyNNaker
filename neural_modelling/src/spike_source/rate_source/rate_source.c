@@ -30,6 +30,8 @@
 
 #include <profiler.h>
 
+#define DMA_READ_TAG 0
+
 // Declare spin1_wfi
 extern void spin1_wfi(void);
 
@@ -88,6 +90,7 @@ struct source_provenance {
 
 //! global variable which contains all the data for neurons
 static rate_value *rates = NULL;
+static rate_value *mem_region;
 
 //! the time interval parameter TODO this variable could be removed and use the
 //! timer tick callback timer value.
@@ -103,6 +106,9 @@ static uint32_t infinite_run;
 static uint32_t timer_period;
 
 static uint32_t index;
+static uint32_t mem_index;
+ static size_t size;
+ static size_t region_size;
 
 static uint32_t looping;
 static uint32_t n_rates;
@@ -123,12 +129,13 @@ static bool read_rate_parameters(struct config *config) {
 
     spin1_memcpy(&params, &config->globals, sizeof(params));
 
-    io_printf(IO_BUF, "key %d, elems %d\n", params.key, params.elements);
     if (params.elements > 0) {
         // the first time around, the array is set to NULL, afterwards,
         // assuming all goes well, there's an address here.
+        size = params.elements > 1000 ? 1000 : params.elements;
+        region_size = size * sizeof(rate_value);
         if (rates == NULL) {
-            rates = spin1_malloc(params.elements * sizeof(rate_value));
+            rates = spin1_malloc(region_size);
             // if failed to alloc memory, report and fail.
             if (rates == NULL) {
                 log_error("Failed to allocate rates");
@@ -136,9 +143,12 @@ static bool read_rate_parameters(struct config *config) {
             }
         }
 
+        mem_region = config->rates;
+
         // store spike source data into DTCM
-        spin1_memcpy(rates, config->rates,
-                params.elements * sizeof(rate_value));
+        spin1_memcpy(rates, mem_region, region_size);
+
+        mem_index = size;
 
         looping = config->loop;
         n_rates = params.elements;
@@ -223,6 +233,15 @@ static void resume_callback(void) {
     log_info("Successfully resumed rate source at time: %u", time);
 
 }
+
+static void refresh(void) {
+
+    spin1_dma_transfer(DMA_READ_TAG, mem_region + mem_index,
+            rates, DMA_READ, region_size);
+
+    mem_index += size;
+    index = 0;
+ }
 
 
 //! \brief Timer interrupt callback
@@ -316,6 +335,10 @@ static void timer_callback(uint timer_count, uint unused) {
         }
 
         index++;
+
+        if(looping >= 4 && index >= 1000) {
+            refresh();
+        }
     }
     else if (looping < 4){
 

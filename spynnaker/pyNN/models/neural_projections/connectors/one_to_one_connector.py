@@ -28,13 +28,16 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
         connect cell i in the presynaptic pynn_population.py to cell i in the\
         postsynaptic pynn_population.py for all i.
     """
-    __slots__ = ["__random_number_class"]
+    __slots__ = ["__random_number_class",
+                 "__random_weight_matrix"]
 
     def __init__(
-            self, random_number_class, safe=True, verbose=False):
+            self, random_number_class, safe=True,
+            verbose=False, random_weight_matrix=False):
         """
         """
         self.__random_number_class = random_number_class
+        self.__random_weight_matrix = random_weight_matrix
         super(OneToOneConnector, self).__init__(safe, verbose)
 
     @overrides(AbstractConnector.get_delay_maximum)
@@ -106,3 +109,9 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)
     def gen_connector_id(self):
         return ConnectorIDs.ONE_TO_ONE_CONNECTOR.value
+
+    @overrides(AbstractConnector.random_weight_matrix)
+    def random_weight_matrix(self):
+        if self.__random_weight_matrix:
+            return 1
+        return 0

@@ -275,8 +275,6 @@ bool synapse_dynamics_process_plastic_synapses(
     size_t plastic_synapse =
             synapse_row_num_plastic_controls(fixed_region_address);
 
-    io_printf(IO_BUF, "Plastic region %u synapses\n", plastic_synapse);
-
     num_plastic_pre_synaptic_events += plastic_synapse;
 
     // Get event history from synaptic row
@@ -343,15 +341,13 @@ bool synapse_dynamics_process_plastic_synapses(
         }
 
         // Avoid the multiplication with rounding if the presyn value has input rate = 0
-        if(real_rate != 0) {
+        if(real_rate) {
             // MAYBE EDIT THIS TO BE *plastic_words ONCE THE WEIGHT UPDATE IS ADAPTED
             REAL curr_weight = synapse_structure_get_final_weight(final_state);
-
-            // Add the current rate contribution with the new rate
-            REAL mul = MULT_ROUND_STOCHASTIC_ACCUM(real_rate, curr_weight);
-            REAL accumulation = ring_buffers[index] + mul;
             
-            ring_buffers[index] = accumulation;
+            ring_buffers[index] =
+                sat_accum_sum(ring_buffers[index],
+                              MULT_ROUND_STOCHASTIC_ACCUM(real_rate, curr_weight));
         }
 
         // Write back updated synaptic word to plastic region REMOVE THIS WHEN WEIGHT UPDATE IS ADAPTED

@@ -373,6 +373,9 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
                     self.__post_population.label, self.__min_delay,
                     self.__n_clipped_delays)))]
 
+    def random_weight_matrix(self):
+        return 0
+    
     @property
     def safe(self):
         return self.__safe

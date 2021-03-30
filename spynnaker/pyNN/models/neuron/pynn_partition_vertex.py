@@ -23,9 +23,10 @@ from pacman.model.graphs.application.application_edge \
 from spinn_utilities.overrides import overrides
 
 
-DEFAULT_MAX_ATOMS_PER_SYN_CORE = 8
-SYN_CORES_PER_NEURON_CORE = 1
-DEFAULT_MAX_ATOMS_PER_NEURON_CORE = DEFAULT_MAX_ATOMS_PER_SYN_CORE * SYN_CORES_PER_NEURON_CORE
+# Exported for higher level control:
+# DEFAULT_MAX_ATOMS_PER_SYN_CORE = 8
+# SYN_CORES_PER_NEURON_CORE = 1
+# DEFAULT_MAX_ATOMS_PER_NEURON_CORE = DEFAULT_MAX_ATOMS_PER_SYN_CORE * SYN_CORES_PER_NEURON_CORE
 
 
 class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSettable,
@@ -41,7 +42,8 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
         "_neurons_partition",
         "_n_outgoing_partitions",
         "_n_incoming_partitions",
-        "_packet_compressor"]
+        "_packet_compressor",
+        "_max_atoms_neuron_core"]
 
     def __init__(self, n_neurons, label, constraints, max_atoms_neuron_core, spikes_per_second,
                  ring_buffer_sigma, neuron_model, pynn_model, incoming_spike_buffer_size,
@@ -50,8 +52,9 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
         self._n_atoms = n_neurons
 
         self._n_incoming_partitions = incoming_partitions
+        self._max_atoms_neuron_core = max_atoms_neuron_core
 
-        self._n_outgoing_partitions = 1 if self._n_atoms <= DEFAULT_MAX_ATOMS_PER_NEURON_CORE else outgoing_partitions #int(math.ceil(float(self._n_atoms) / DEFAULT_MAX_ATOMS_PER_NEURON_CORE))
+        self._n_outgoing_partitions = 1 if self._n_atoms <= self._max_atoms_neuron_core else outgoing_partitions #int(math.ceil(float(self._n_atoms) / DEFAULT_MAX_ATOMS_PER_NEURON_CORE))
 
         self._packet_compressor = packet_compressor
         
@@ -142,19 +145,19 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
             self._neuron_vertices[i].slice_list = self._neuron_vertices
 
     def _compute_outgoing_partitions(self):
-        return int(math.ceil(float(self._n_atoms) / DEFAULT_MAX_ATOMS_PER_NEURON_CORE))
+        return int(math.ceil(float(self._n_atoms) / self._max_atoms_neuron_core))
 
     def _compute_partition_and_offset_size(self):
 
-        min_neurons_per_partition = int(math.floor((self._n_atoms / self._n_outgoing_partitions) / DEFAULT_MAX_ATOMS_PER_NEURON_CORE) * DEFAULT_MAX_ATOMS_PER_NEURON_CORE)
+        min_neurons_per_partition = int(math.floor((self._n_atoms / self._n_outgoing_partitions) / self._max_atoms_neuron_core) * self._max_atoms_neuron_core)
 
         remaining_neurons = self._n_atoms - (min_neurons_per_partition * self._n_outgoing_partitions)
 
         contents = [min_neurons_per_partition for i in range(self._n_outgoing_partitions)]
         for i in range(self._n_outgoing_partitions):
-            if remaining_neurons - DEFAULT_MAX_ATOMS_PER_NEURON_CORE >= 0:
-                remaining_neurons -= DEFAULT_MAX_ATOMS_PER_NEURON_CORE
-                contents[i] += DEFAULT_MAX_ATOMS_PER_NEURON_CORE
+            if remaining_neurons - self._max_atoms_neuron_core >= 0:
+                remaining_neurons -= self._max_atoms_neuron_core
+                contents[i] += self._max_atoms_neuron_core
             else:
                 contents[self._n_outgoing_partitions - 1] += remaining_neurons
                 break
@@ -304,7 +307,7 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
                 vertex.clear_connection_cache()
 
     def get_max_atoms_per_core(self):
-        return DEFAULT_MAX_ATOMS_PER_NEURON_CORE
+        return self._max_atoms_neuron_core
 
     def describe(self):
         # Correct??

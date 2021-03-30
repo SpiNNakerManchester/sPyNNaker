@@ -301,16 +301,13 @@ bool synapse_dynamics_process_plastic_synapses(
                 time, last_pre_rate, current_state, &post_event_history[index]);
 
         // Avoid the multiplication with rounding if the presyn value has input rate = 0
-        if(real_rate != 0) {
+        if(real_rate) {
         
             // EDIT THIS TO BE *plastic_words ONCE THE WEIGHT UPDATE IS ADAPTED
             REAL curr_weight = synapse_structure_get_final_weight(final_state);
 
-            // Add the current rate contribution with the new rate
-            REAL mul = MULT_ROUND_STOCHASTIC_ACCUM(real_rate, curr_weight);
-            REAL accumulation = ring_buffers[index] + mul;
-
-            ring_buffers[index] = accumulation;
+            ring_buffers[index] = sat_accum_sum(ring_buffers[index],
+                               MULT_ROUND_STOCHASTIC_ACCUM(real_rate, curr_weight));
         }
         // io_printf(IO_BUF, " curr weight %k, input %k\n", curr_weight, real_rate);
 
