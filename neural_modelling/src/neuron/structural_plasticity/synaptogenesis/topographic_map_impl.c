@@ -327,7 +327,8 @@ static inline bool row_restructure(
                         formation_params[current_state->post_to_pre.pop_index], time, row)) {
                     // Create recorded value
                     // (bottom bit: added/removed, remainder: pre-neuron global id)
-                    uint32_t pre_id = current_state->key_atom_info->lo_atom + current_state->pre_syn_id;
+                    uint32_t pre_id = current_state->key_atom_info->lo_atom
+                            + current_state->pre_syn_id;
                     uint32_t id = current_state->post_syn_id;
                     structural_rec_array[id].recorded_val = (1 << 0) | (pre_id << 1);
                     return true;
@@ -344,7 +345,8 @@ static inline bool row_restructure(
                             formation_params[current_state->post_to_pre.pop_index], time, row)) {
                         // Create recorded value
                         // (bottom bit: added/removed, remainder: pre-neuron global id)
-                        uint32_t pre_id = current_state->key_atom_info->lo_atom + current_state->pre_syn_id;
+                        uint32_t pre_id = current_state->key_atom_info->lo_atom
+                                + current_state->pre_syn_id;
                         uint32_t id = current_state->post_syn_id;
                         structural_rec_array[id].recorded_val = (1 << 0) | (pre_id << 1);
                         return true;
