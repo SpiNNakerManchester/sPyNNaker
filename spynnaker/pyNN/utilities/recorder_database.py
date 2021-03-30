@@ -110,7 +110,7 @@ class RecorderDatabase(SQLiteDB):
         """
         name = source + "_" + variable
         if segment > 0:
-            name = "s{}_".format(segment) + name
+            name = f"s{segment}_" + name
         return name
 
     def get_variable_map(self, segment=-1):
@@ -129,26 +129,9 @@ class RecorderDatabase(SQLiteDB):
                     WHERE segment = ?
                     GROUP BY source, variable, table_type
                     """, segment):
-                variables[row["source"]].append("{}:{}".format(
-                    row["variable"], row["table_type"]))
+                variables[row["source"]].append(
+                    f"{row['variable']}:{row['table_type']}")
             return variables
-
-    def _check_table_existX(self, table_name):
-        """
-        Support function to see if a table already exists
-
-        :param str table_name: name of a Table
-        :return: True if and only if the table exists
-        :type: bool
-        """
-        with self.transaction() as cursor:
-            for _ in cursor.execute(
-                    """
-                    SELECT name FROM sqlite_master WHERE type='table' AND name=?
-                    LIMIT 1
-                    """, [table_name]):
-                return True
-            return False
 
     def register_metadata(
             self, source, variable, sampling_interval, description, unit,
@@ -200,7 +183,7 @@ class RecorderDatabase(SQLiteDB):
                     source, variable, segment)
             else:
                 raise NotImplementedError(
-                    "No create table for datatype {}".format(table_type))
+                    f"No create table for datatype {table_type}")
 
             cursor.execute(
                 """
@@ -322,8 +305,7 @@ class RecorderDatabase(SQLiteDB):
                     assert(table_type.value == row["table_type"])
                 return row["data_table"], row["table_type"]
 
-        raise Exception("No Data for {}:{}:{}".format(
-            source, variable, segment))
+        raise Exception(f"No Data for {source}:{variable}:{segment}")
 
     def _tables_by_segment(self, segment):
         """
@@ -368,7 +350,7 @@ class RecorderDatabase(SQLiteDB):
         """
         with self.transaction() as cursor:
             # Get the column names
-            cursor.execute("SELECT * FROM {} LIMIT 1".format(table_name))
+            cursor.execute(f"SELECT * FROM {table_name} LIMIT 1")
             ids = [int(description[0])
                    for description in cursor.description[1:]]
             return ids
@@ -388,7 +370,7 @@ class RecorderDatabase(SQLiteDB):
         :rtype: (numpy.ndarray, numpy.ndarray, numpy.ndarray)
         """
         with self.transaction() as cursor:
-            cursor.execute("SELECT * FROM {}".format(table_name))
+            cursor.execute(f"SELECT * FROM {table_name}")
             names = [description[0] for description in cursor.description]
             ids = numpy.array(names[1:], dtype=numpy.integer)
             values = numpy.array(cursor.fetchall())
@@ -571,8 +553,7 @@ class RecorderDatabase(SQLiteDB):
         if use_segment in segments:
             return use_segment
         raise Exception(
-            "Segment {} not found. Known segments are {}"
-            "".format(segment, segments.keys))
+            f"Segment {segment} not found. Known segments are {segments.key}")
 
     # matrix data
 
@@ -720,13 +701,12 @@ class RecorderDatabase(SQLiteDB):
 
         with self.transaction() as cursor:
             # Get the number of columns
-            cursor.execute("SELECT * FROM {} LIMIT 1".format(raw_table))
-            query = "INSERT INTO {} VALUES ({})".format(
-                raw_table, ",".join("?" for _ in cursor.description))
-            print(query)
+            cursor.execute(f"SELECT * FROM {raw_table} LIMIT 1")
+            wildcards = ','.join('?' for _ in cursor.description)
+            query = f"INSERT INTO {raw_table} VALUES ({wildcards})"
             cursor.executemany(query, data)
 
-            query = "INSERT OR IGNORE INTO {} VALUES(?)".format(index_table)
+            query = f"INSERT OR IGNORE INTO {index_table} VALUES(?)"
             cursor.executemany(query, timestamps)
 
     def _get_matrix_raw_table(
@@ -778,21 +758,23 @@ class RecorderDatabase(SQLiteDB):
         raw_table = full_view + "_raw"
 
         # Create the raw table
-        timestamp = "timestamp FLOAT NOT NULL"
         ids_str = ",".join(["'" + str(id) + "' INTEGER" for id in ids])
-        ddl_statement = "CREATE TABLE IF NOT EXISTS {} ({}, {})".format(
-            raw_table, timestamp, ids_str)
+        ddl_statement = f"""
+            CREATE TABLE IF NOT EXISTS {raw_table} 
+            (timestamp FLOAT NOT NULL, 
+            {ids_str})
+            """
         with self.transaction() as cursor:
             cursor.execute(ddl_statement)
 
         index_table = self._get_matix_index_table(source, variable, segment)
 
         # create full view
-        ddl_statement = """
-            CREATE VIEW {}
-            AS SELECT * FROM {} LEFT JOIN {} USING (timestamp)
+        ddl_statement = f"""
+            CREATE VIEW {full_view}
+            AS SELECT * FROM {index_table} LEFT JOIN {raw_table} 
+            USING (timestamp)
             """
-        ddl_statement = ddl_statement.format(full_view, index_table, raw_table)
         with self.transaction() as cursor:
             cursor.execute(ddl_statement)
 
@@ -822,10 +804,10 @@ class RecorderDatabase(SQLiteDB):
         :rtype: str
         """
         index_table = self._table_name(source, variable, segment) + "_indexes"
-        ddl_statement = """
-            CREATE TABLE IF NOT EXISTS {}
+        ddl_statement = f"""
+            CREATE TABLE IF NOT EXISTS {index_table}
             (timestamp FLOAT PRIMARY KEY ASC)
-            """.format(index_table)
+            """
         with self.transaction() as cursor:
             cursor.execute(ddl_statement)
 
@@ -873,14 +855,14 @@ class RecorderDatabase(SQLiteDB):
             else:
                 global_view = \
                     self._table_name(source, variable, segment) + "_all"
-                ddl_statement = "DROP VIEW IF EXISTS {}".format(global_view)
+                ddl_statement = f"DROP VIEW IF EXISTS {global_view}"
                 cursor.execute(ddl_statement)
                 if new_n_ids < _MAX_COLUMNS:
                     local_views = self._get_local_views(
                         source, variable, segment)
-                    ddl_statement = """
-                        CREATE VIEW {} AS SELECT * FROM {}""".format(
-                        global_view, " NATURAL JOIN ".join(local_views))
+                    ddl_statement = f"""
+                        CREATE VIEW {global_view} AS SELECT * 
+                        FROM {" NATURAL JOIN ".join(local_views)}"""
                     print(ddl_statement)
                     cursor.execute(ddl_statement)
                 else:
@@ -999,7 +981,7 @@ class RecorderDatabase(SQLiteDB):
         segment = self._clean_segment(segment)
         data_table, _ = self._get_data_table(
             source, variable, segment, TableTypes.EVENT)
-        query = "INSERT INTO {} VALUES (?, ?)".format(data_table)
+        query = f"INSERT INTO {data_table} VALUES (?, ?)"
         with self.transaction() as cursor:
             cursor.executemany(query, data)
 
@@ -1014,11 +996,11 @@ class RecorderDatabase(SQLiteDB):
         :rtype: str
         """
         data_table = self._table_name(source, variable, segment)
-        ddl_statement = """
-            CREATE TABLE IF NOT EXISTS {} (
+        ddl_statement = f"""
+            CREATE TABLE IF NOT EXISTS {data_table} (
             timestamp FLOAT NOT NULL,
             id INTEGER NOT NULL)
-            """.format(data_table)
+            """
         with self.transaction() as cursor:
             cursor.execute(ddl_statement)
         return data_table
@@ -1049,7 +1031,7 @@ class RecorderDatabase(SQLiteDB):
         :rtype: numpy.ndarray
         """
         with self.transaction() as cursor:
-            cursor.execute("SELECT timestamp, id FROM {}".format(data_table))
+            cursor.execute(f"SELECT timestamp, id FROM {data_table}")
             return numpy.array(cursor.fetchall())
 
     # single data
@@ -1088,21 +1070,19 @@ class RecorderDatabase(SQLiteDB):
 
         with self.transaction() as cursor:
             if an_id not in ids_in_table:
-                ddl = "ALTER TABLE {} ADD '{}' INTEGER".format(
-                    data_table, an_id)
+                ddl = f"ALTER TABLE {data_table} ADD '{an_id}' INTEGER"
                 cursor.execute(ddl)
 
             # make sure rows exist for each timestamp
-            query = "INSERT or IGNORE INTO {}(timestamp) VALUES (?)"
-            query = query.format(data_table)
-            print(query)
+            query = f"""
+                INSERT or IGNORE INTO {data_table}(timestamp) 
+                VALUES (?)"""
             timestamps = [[row[0]] for row in data]
             cursor.executemany(query, timestamps)
 
             # update the rows with the data
-            query = "UPDATE {} SET '{}' = ? where timestamp = ?"
-            query = query.format(data_table, an_id)
-            print(query)
+            query = f"""
+                UPDATE {data_table} SET '{an_id}' = ? where timestamp = ?"""
             values = [[row[1], row[0]] for row in data]
             cursor.executemany(query, values)
 
@@ -1119,10 +1099,10 @@ class RecorderDatabase(SQLiteDB):
         :return:
         """
         data_table = self._table_name(source, variable, segment)
-        ddl_statement = """
-            CREATE TABLE  IF NOT EXISTS {} (
+        ddl_statement = f"""
+            CREATE TABLE  IF NOT EXISTS {data_table} (
             timestamp FLOAT NOTE NONE)
-            """.format(data_table)
+            """
         with self.transaction() as cursor:
             cursor.execute(ddl_statement)
         return data_table
@@ -1181,9 +1161,9 @@ class RecorderDatabase(SQLiteDB):
                     self._clear_segment(segment)
                 elif end_timestamp < row["end_timestamp"]:
                     raise Exception(
-                        "Segment {} was already has an end_timestamp of {} "
-                        "so new value of {} does not make sense".format(
-                            segment, row["end_timestamp"], end_timestamp))
+                        f"Segment {segment} was already has an end_timestamp "
+                        "of {row['end_timestamp']} so new value of "
+                        "{end_timestamp} does not make sense")
 
     def _clear_segment(self, segment):
         """
@@ -1194,7 +1174,7 @@ class RecorderDatabase(SQLiteDB):
         tables = self._tables_by_segment(segment)
         with self.transaction() as cursor:
             for table in tables:
-                cursor.execute("DELETE FROM {}".format(table))
+                cursor.execute(f"DELETE FROM {table}")
 
     def get_segments(self):
         """
