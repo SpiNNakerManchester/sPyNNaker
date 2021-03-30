@@ -19,6 +19,7 @@ import numpy
 import os
 import sqlite3
 from spinn_utilities.helpful_functions import is_singleton
+from spinn_front_end_common.utilities.sqlite_db import (Isolation, SQLiteDB)
 
 
 class TableTypes(Enum):
@@ -36,7 +37,7 @@ DEFAULT_NAME = "recorder.sqlite3"
 _MAX_COLUMNS = 1990  # test as 1999 but with safety
 
 
-class RecorderDatabase(object):
+class RecorderDatabase(SQLiteDB):
     """ Specific implementation of the Database for SQLite 3.
 
     .. note::
@@ -49,8 +50,6 @@ class RecorderDatabase(object):
     """
 
     __slots__ = [
-        # the database holding the data to store
-        "_db",
         # path to the file holding the database
         "_path"
     ]
@@ -65,48 +64,13 @@ class RecorderDatabase(object):
             If omitted, an unshared in-memory database will be used.
         :type database_file: str
         """
-        self._db = None
-        if database_file is None:
-            self._path = ":memory:"  # Magic name!
-        elif os.listdir(database_file):
+        if database_file is not None and os.listdir(database_file):
             self._path = os.path.join(database_file, DEFAULT_NAME)
         else:
             self._path = database_file
-        self._db = sqlite3.connect(self._path)
-        self.__init_db()
-
-    def __del__(self):
-        self.close()
-
-    def __enter__(self):
-        """ Start method if use in a ``with`` statement
-        """
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        """ End method if used in a ``with`` statement.
-
-        :param exc_type:
-        :param exc_val:
-        :param exc_tb:
-        :return:
-        """
-        self.close()
-
-    def close(self):
-        """ Finalises and closes the database.
-        """
-        if self._db is not None:
-            self._db.close()
-            self._db = None
-
-    def __init_db(self):
-        """ Set up the database if required.
-        """
-        self._db.row_factory = sqlite3.Row
-        with open(_DDL_FILE) as f:
-            sql = f.read()
-        self._db.executescript(sql)
+        super().__init__(
+            self._path, ddl_file=_DDL_FILE, row_factory=sqlite3.Row,
+            text_factory=str, case_insensitive_like=True)
 
     @property
     def path(self):
@@ -120,19 +84,20 @@ class RecorderDatabase(object):
     def clear_ds(self):
         """ Clear all saved data but does not rerun the DDL file
         """
-        with self._db:
-            names = [row["name"] for row in self._db.execute(
+        with self.transaction(Isolation.EXCLUSIVE) as cursor:
+            names = [row["name"] for row in cursor.execute(
                 "SELECT name FROM sqlite_master WHERE type='table'")]
             for name in self.META_TABLES:
-                names.remove(name)
+                if name in names:
+                    names.remove(name)
             for name in names:
-                self._db.execute("DROP TABLE " + name)
-            names = [row["name"] for row in self._db.execute(
+                cursor.execute("DROP TABLE " + name)
+            names = [row["name"] for row in cursor.execute(
                 "SELECT name FROM sqlite_master WHERE type='view'")]
             for name in names:
-                self._db.execute("DROP VIEW " + name)
+                cursor.execute("DROP VIEW " + name)
             for name in self.META_TABLES:
-                self._db.execute("DELETE FROM " + name)
+                cursor.execute("DELETE FROM " + name)
 
     def _table_name(self, source, variable, segment):
         """
@@ -155,9 +120,9 @@ class RecorderDatabase(object):
         :param int segment: Number of the segment / reset group
         :rtype: dict(list(str))
         """
-        with self._db:
+        with self.transaction() as cursor:
             variables = defaultdict(list)
-            for row in self._db.execute(
+            for row in cursor.execute(
                     """
                     SELECT source, variable, table_type
                     FROM metadata
@@ -168,7 +133,7 @@ class RecorderDatabase(object):
                     row["variable"], row["table_type"]))
             return variables
 
-    def _check_table_exist(self, table_name):
+    def _check_table_existX(self, table_name):
         """
         Support function to see if a table already exists
 
@@ -176,13 +141,14 @@ class RecorderDatabase(object):
         :return: True if and only if the table exists
         :type: bool
         """
-        for _ in self._db.execute(
-                """
-                SELECT name FROM sqlite_master WHERE type='table' AND name=?
-                LIMIT 1
-                """, [table_name]):
-            return True
-        return False
+        with self.transaction() as cursor:
+            for _ in cursor.execute(
+                    """
+                    SELECT name FROM sqlite_master WHERE type='table' AND name=?
+                    LIMIT 1
+                    """, [table_name]):
+                return True
+            return False
 
     def register_metadata(
             self, source, variable, sampling_interval, description, unit,
@@ -207,9 +173,9 @@ class RecorderDatabase(object):
         :param int segment: Number of the segment / reset group
         :return:
         """
-        with self._db:
+        with self.transaction() as cursor:
             segment = self._clean_segment(segment)
-            for row in self._db.execute(
+            for row in cursor.execute(
                     """
                     SELECT sampling_interval, description, unit, n_neurons,
                            table_type
@@ -236,7 +202,7 @@ class RecorderDatabase(object):
                 raise NotImplementedError(
                     "No create table for datatype {}".format(table_type))
 
-            self._db.execute(
+            cursor.execute(
                 """
                 INSERT INTO metadata(
                     source, variable,  segment, sampling_interval,description,
@@ -344,16 +310,17 @@ class RecorderDatabase(object):
             An Exception if an existing Table does not have the expected type
             An Exception if the table does not exists
         """
-        for row in self._db.execute(
-                """
-                SELECT data_table, table_type
-                FROM metadata
-                WHERE source = ? AND variable = ? and segment = ?
-                LIMIT 1
-                """, (source, variable, segment)):
-            if table_type:
-                assert(table_type.value == row["table_type"])
-            return row["data_table"], row["table_type"]
+        with self.transaction() as cursor:
+            for row in cursor.execute(
+                    """
+                    SELECT data_table, table_type
+                    FROM metadata
+                    WHERE source = ? AND variable = ? and segment = ?
+                    LIMIT 1
+                    """, (source, variable, segment)):
+                if table_type:
+                    assert(table_type.value == row["table_type"])
+                return row["data_table"], row["table_type"]
 
         raise Exception("No Data for {}:{}:{}".format(
             source, variable, segment))
@@ -368,23 +335,24 @@ class RecorderDatabase(object):
         """
         tables = set()
         views = set()
-        for row in self._db.execute(
-                """
-                SELECT raw_table, full_view, index_table
-                FROM local_matrix_metadata
-                WHERE segment = ?
-                """, (segment, )):
-            tables.add(row["data_table"])
-            views.add(row["full_view"])
-        for row in self._db.execute(
-                """
-                SELECT data_table
-                FROM metadata
-                WHERE segment = ?
-                """, (segment, )):
-            table = row["data_table"]
-            if table not in views:
-                tables.add(table)
+        with self.transaction() as cursor:
+            for row in cursor.execute(
+                    """
+                    SELECT raw_table, full_view, index_table
+                    FROM local_matrix_metadata
+                    WHERE segment = ?
+                    """, (segment, )):
+                tables.add(row["data_table"])
+                views.add(row["full_view"])
+            for row in cursor.execute(
+                    """
+                    SELECT data_table
+                    FROM metadata
+                    WHERE segment = ?
+                    """, (segment, )):
+                table = row["data_table"]
+                if table not in views:
+                    tables.add(table)
 
         return tables
 
@@ -398,11 +366,12 @@ class RecorderDatabase(object):
         :param str table_name: Name of the table to check
         :rype: list(int)
         """
-        cursor = self._db.cursor()
-        # Get the column names
-        cursor.execute("SELECT * FROM {} LIMIT 1".format(table_name))
-        ids = [int(description[0]) for description in cursor.description[1:]]
-        return ids
+        with self.transaction() as cursor:
+            # Get the column names
+            cursor.execute("SELECT * FROM {} LIMIT 1".format(table_name))
+            ids = [int(description[0])
+                   for description in cursor.description[1:]]
+            return ids
 
     def _get_column_data(self, table_name):
         """
@@ -418,12 +387,12 @@ class RecorderDatabase(object):
             - The data with shape len(timestamp), len(ids)
         :rtype: (numpy.ndarray, numpy.ndarray, numpy.ndarray)
         """
-        cursor = self._db.cursor()
-        cursor.execute("SELECT * FROM {}".format(table_name))
-        names = [description[0] for description in cursor.description]
-        ids = numpy.array(names[1:], dtype=numpy.integer)
-        values = numpy.array(cursor.fetchall())
-        return ids, values[:, 0], values[:, 1:]
+        with self.transaction() as cursor:
+            cursor.execute("SELECT * FROM {}".format(table_name))
+            names = [description[0] for description in cursor.description]
+            ids = numpy.array(names[1:], dtype=numpy.integer)
+            values = numpy.array(cursor.fetchall())
+            return ids, values[:, 0], values[:, 1:]
 
     def get_data(self, source, variable, segment=-1):
         """
@@ -439,16 +408,15 @@ class RecorderDatabase(object):
             or shape (2, X) id, timestamp
         :rtype: (numpy.ndarray, numpy.ndarray, numpy.ndarray) or numpy.ndarray
         """
-        with self._db:
-            data_table, table_type = self._get_data_table(
-                source, variable, segment, None)
-            if table_type == TableTypes.MATRIX:
-                return self._get_matrix_data(
-                    source, variable, segment, table_type)
-            if table_type == TableTypes.SINGLE:
-                return self._get_column_data(data_table)
-            if table_type == TableTypes.EVENT:
-                return self._get_events_data(data_table)
+        data_table, table_type = self._get_data_table(
+            source, variable, segment, None)
+        if table_type == TableTypes.MATRIX:
+            return self._get_matrix_data(
+                source, variable, segment, table_type)
+        if table_type == TableTypes.SINGLE:
+            return self._get_column_data(data_table)
+        if table_type == TableTypes.EVENT:
+            return self._get_events_data(data_table)
 
     def _clean_data(self, data, timestamps):
         """
@@ -557,8 +525,8 @@ class RecorderDatabase(object):
         :param int segment: Number of the segment / reset group
         :rtype: list of numpy.array
         """
-        with self._db:
-            for row in self._db.execute(
+        with self.transaction() as cursor:
+            for row in cursor.execute(
                     """
                     SELECT sampling_interval
                     FROM metadata
@@ -709,15 +677,14 @@ class RecorderDatabase(object):
         :param iterable(int) ids: The ids for the data.
         :param int segment: Number of the segment / reset group
        """
-        with self._db:
-            if len(data[0]) < _MAX_COLUMNS:
-                self._insert_a_matrix(source, variable, data, ids, timestamps,
-                                      segment)
-            else:
-                for data_block, ids_block in self._split_data(data, ids):
-                    self._insert_a_matrix(
-                        source, variable, data_block, ids_block, timestamps,
-                        segment)
+        if len(data[0]) < _MAX_COLUMNS:
+            self._insert_a_matrix(source, variable, data, ids, timestamps,
+                                  segment)
+        else:
+            for data_block, ids_block in self._split_data(data, ids):
+                self._insert_a_matrix(
+                    source, variable, data_block, ids_block, timestamps,
+                    segment)
 
     def _insert_a_matrix(
             self, source, variable, data, ids, timestamps, segment):
@@ -751,16 +718,16 @@ class RecorderDatabase(object):
         raw_table, index_table = self._get_matrix_raw_table(
             source, variable, segment, ids)
 
-        cursor = self._db.cursor()
-        # Get the number of columns
-        cursor.execute("SELECT * FROM {} LIMIT 1".format(raw_table))
-        query = "INSERT INTO {} VALUES ({})".format(
-            raw_table, ",".join("?" for _ in cursor.description))
-        print(query)
-        cursor.executemany(query, data)
+        with self.transaction() as cursor:
+            # Get the number of columns
+            cursor.execute("SELECT * FROM {} LIMIT 1".format(raw_table))
+            query = "INSERT INTO {} VALUES ({})".format(
+                raw_table, ",".join("?" for _ in cursor.description))
+            print(query)
+            cursor.executemany(query, data)
 
-        query = "INSERT OR IGNORE INTO {} VALUES(?)".format(index_table)
-        self._db.executemany(query, timestamps)
+            query = "INSERT OR IGNORE INTO {} VALUES(?)".format(index_table)
+            cursor.executemany(query, timestamps)
 
     def _get_matrix_raw_table(
             self, source, variable, segment, ids):
@@ -774,19 +741,20 @@ class RecorderDatabase(object):
         :return: name of raw data table
         :rtype: str
         """
-        for row in self._db.execute(
-                """
-                SELECT raw_table, index_table
-                FROM local_matrix_metadata
-                WHERE source = ? AND variable = ? AND segment = ?
-                    AND first_id = ?
-                LIMIT 1
-                """, (source, variable, segment, ids[0])):
-            table_name = row["raw_table"]
-            index_table = row["index_table"]
-            check_ids = self._get_table_ids(table_name)
-            assert(check_ids == list(ids))
-            return (table_name, index_table)
+        with self.transaction() as cursor:
+            for row in cursor.execute(
+                    """
+                    SELECT raw_table, index_table
+                    FROM local_matrix_metadata
+                    WHERE source = ? AND variable = ? AND segment = ?
+                        AND first_id = ?
+                    LIMIT 1
+                    """, (source, variable, segment, ids[0])):
+                table_name = row["raw_table"]
+                index_table = row["index_table"]
+                check_ids = self._get_table_ids(table_name)
+                assert(check_ids == list(ids))
+                return (table_name, index_table)
 
         return self._create_matrix_raw_table(source, variable, segment, ids)
 
@@ -814,7 +782,8 @@ class RecorderDatabase(object):
         ids_str = ",".join(["'" + str(id) + "' INTEGER" for id in ids])
         ddl_statement = "CREATE TABLE IF NOT EXISTS {} ({}, {})".format(
             raw_table, timestamp, ids_str)
-        self._db.execute(ddl_statement)
+        with self.transaction() as cursor:
+            cursor.execute(ddl_statement)
 
         index_table = self._get_matix_index_table(source, variable, segment)
 
@@ -824,17 +793,18 @@ class RecorderDatabase(object):
             AS SELECT * FROM {} LEFT JOIN {} USING (timestamp)
             """
         ddl_statement = ddl_statement.format(full_view, index_table, raw_table)
-        self._db.execute(ddl_statement)
+        with self.transaction() as cursor:
+            cursor.execute(ddl_statement)
 
-        self._db.execute(
-            """
-            INSERT OR IGNORE INTO local_matrix_metadata(
-                source, variable, segment, raw_table, full_view, index_table,
-                first_id)
-            VALUES(?,?,?,?,?,?, ?)
-            """,
-            (source, variable, segment, raw_table, full_view, index_table,
-             ids[0]))
+            cursor.execute(
+                """
+                INSERT OR IGNORE INTO local_matrix_metadata(
+                    source, variable, segment, raw_table, full_view, index_table,
+                    first_id)
+                VALUES(?,?,?,?,?,?, ?)
+                """,
+                (source, variable, segment, raw_table, full_view, index_table,
+                 ids[0]))
 
         self._update_global_matrix_view(
             source, variable, segment, raw_table, len(ids))
@@ -856,7 +826,8 @@ class RecorderDatabase(object):
             CREATE TABLE IF NOT EXISTS {}
             (timestamp FLOAT PRIMARY KEY ASC)
             """.format(index_table)
-        self._db.execute(ddl_statement)
+        with self.transaction() as cursor:
+            cursor.execute(ddl_statement)
 
         return index_table
 
@@ -880,44 +851,48 @@ class RecorderDatabase(object):
         :param str raw_table: Name of the raw table just created
         :param n_ids: Number of ids of the local tables just added
         """
-        self._db.execute(
-            """
-            UPDATE metadata
-            SET n_ids = n_ids + ?
-            WHERE source = ? and variable = ? and segment = ?
-            """,
-            (n_ids, source, variable, segment))
-
-        for row in self._db.execute(
+        with self.transaction() as cursor:
+            cursor.execute(
                 """
-                SELECT n_ids FROM metadata
-                WHERE source = ? AND variable = ? and segment = ?
-                LIMIT 1
-                """, (source, variable, segment)):
-            new_n_ids = row["n_ids"]
+                UPDATE metadata
+                SET n_ids = n_ids + ?
+                WHERE source = ? and variable = ? and segment = ?
+                """,
+                (n_ids, source, variable, segment))
 
-        if new_n_ids == n_ids:
-            global_view = raw_table
-        else:
-            global_view = self._table_name(source, variable, segment) + "_all"
-            ddl_statement = "DROP VIEW IF EXISTS {}".format(global_view)
-            self._db.execute(ddl_statement)
-            if new_n_ids < _MAX_COLUMNS:
-                local_views = self._get_local_views(source, variable, segment)
-                ddl_statement = "CREATE VIEW {} AS SELECT * FROM {}".format(
-                    global_view, " NATURAL JOIN ".join(local_views))
-                print(ddl_statement)
-                self._db.execute(ddl_statement)
+            for row in cursor.execute(
+                    """
+                    SELECT n_ids FROM metadata
+                    WHERE source = ? AND variable = ? and segment = ?
+                    LIMIT 1
+                    """, (source, variable, segment)):
+                new_n_ids = row["n_ids"]
+
+            if new_n_ids == n_ids:
+                global_view = raw_table
             else:
-                global_view = None
+                global_view = \
+                    self._table_name(source, variable, segment) + "_all"
+                ddl_statement = "DROP VIEW IF EXISTS {}".format(global_view)
+                cursor.execute(ddl_statement)
+                if new_n_ids < _MAX_COLUMNS:
+                    local_views = self._get_local_views(
+                        source, variable, segment)
+                    ddl_statement = """
+                        CREATE VIEW {} AS SELECT * FROM {}""".format(
+                        global_view, " NATURAL JOIN ".join(local_views))
+                    print(ddl_statement)
+                    cursor.execute(ddl_statement)
+                else:
+                    global_view = None
 
-        self._db.execute(
-            """
-            UPDATE metadata
-            SET data_table = ?
-            WHERE source = ? and variable = ?
-            """,
-            (global_view, source, variable))
+            cursor.execute(
+                """
+                UPDATE metadata
+                SET data_table = ?
+                WHERE source = ? and variable = ?
+                """,
+                (global_view, source, variable))
 
     def _get_local_views(self, source, variable, segment):
         """
@@ -929,14 +904,15 @@ class RecorderDatabase(object):
         :rtype: list(str)
         """
         local_views = []
-        for row in self._db.execute(
-                """
-                SELECT full_view
-                FROM local_matrix_metadata
-                WHERE source = ? AND variable = ? and segment = ?
-                ORDER BY first_id
-                """, (source, variable, segment)):
-            local_views.append(row["full_view"])
+        with self.transaction() as cursor:
+            for row in cursor.execute(
+                    """
+                    SELECT full_view
+                    FROM local_matrix_metadata
+                    WHERE source = ? AND variable = ? and segment = ?
+                    ORDER BY first_id
+                    """, (source, variable, segment)):
+                local_views.append(row["full_view"])
         return local_views
 
     def get_matrix_data(self, source, variable, segment=-1):
@@ -958,11 +934,10 @@ class RecorderDatabase(object):
         :rtype: (numpy.ndarray, numpy.ndarray, numpy.ndarray)
         """
         segment = self._clean_segment(segment)
-        with self._db:
-            data_table, _ = self._get_data_table(
-                source, variable, segment, TableTypes.MATRIX)
-            return self._get_matrix_data(
-                source, variable, segment, data_table)
+        data_table, _ = self._get_data_table(
+            source, variable, segment, TableTypes.MATRIX)
+        return self._get_matrix_data(
+            source, variable, segment, data_table)
 
     def _get_matrix_data(self, source, variable, segment, data_table):
         """
@@ -1022,12 +997,11 @@ class RecorderDatabase(object):
         else:
             data = self._prepend_timestamps_to_data(data, timestamps)
         segment = self._clean_segment(segment)
-        with self._db:
-            data_table, _ = self._get_data_table(
-                source, variable, segment, TableTypes.EVENT)
-            query = "INSERT INTO {} VALUES (?, ?)".format(data_table)
-            print(query)
-            self._db.executemany(query, data)
+        data_table, _ = self._get_data_table(
+            source, variable, segment, TableTypes.EVENT)
+        query = "INSERT INTO {} VALUES (?, ?)".format(data_table)
+        with self.transaction() as cursor:
+            cursor.executemany(query, data)
 
     def _create_event_table(self, source, variable, segment):
         """
@@ -1045,7 +1019,8 @@ class RecorderDatabase(object):
             timestamp FLOAT NOT NULL,
             id INTEGER NOT NULL)
             """.format(data_table)
-        self._db.execute(ddl_statement)
+        with self.transaction() as cursor:
+            cursor.execute(ddl_statement)
         return data_table
 
     def get_events_data(self, source, variable, segment=-1):
@@ -1060,10 +1035,9 @@ class RecorderDatabase(object):
         :rtype: numpy.ndarray
         """
         segment = self._clean_segment(segment)
-        with self._db:
-            data_table, _ = self._get_data_table(
-                source, variable, segment, TableTypes.EVENT)
-            return self._get_events_data(data_table)
+        data_table, _ = self._get_data_table(
+            source, variable, segment, TableTypes.EVENT)
+        return self._get_events_data(data_table)
 
     def _get_events_data(self, data_table):
         """
@@ -1074,9 +1048,9 @@ class RecorderDatabase(object):
             timestamp, id
         :rtype: numpy.ndarray
         """
-        cursor = self._db.cursor()
-        cursor.execute("SELECT timestamp, id FROM {}".format(data_table))
-        return numpy.array(cursor.fetchall())
+        with self.transaction() as cursor:
+            cursor.execute("SELECT timestamp, id FROM {}".format(data_table))
+            return numpy.array(cursor.fetchall())
 
     # single data
 
@@ -1105,32 +1079,32 @@ class RecorderDatabase(object):
         """
         data, timestamps = self._clean_data(data, timestamps)
         segment = self._clean_segment(segment)
-        with self._db:
-            data_table, _ = self._get_data_table(
-                source, variable, segment, TableTypes.SINGLE)
+        data_table, _ = self._get_data_table(
+            source, variable, segment, TableTypes.SINGLE)
 
-            # Make sure a column exists for this id
-            # Different cores will have different ids so no safetly needed
-            ids_in_table = self._get_table_ids(data_table)
+        # Make sure a column exists for this id
+        # Different cores will have different ids so no safetly needed
+        ids_in_table = self._get_table_ids(data_table)
+
+        with self.transaction() as cursor:
             if an_id not in ids_in_table:
                 ddl = "ALTER TABLE {} ADD '{}' INTEGER".format(
                     data_table, an_id)
-                print(ddl)
-                self._db.execute(ddl)
+                cursor.execute(ddl)
 
             # make sure rows exist for each timestamp
             query = "INSERT or IGNORE INTO {}(timestamp) VALUES (?)"
             query = query.format(data_table)
             print(query)
             timestamps = [[row[0]] for row in data]
-            self._db.executemany(query, timestamps)
+            cursor.executemany(query, timestamps)
 
             # update the rows with the data
             query = "UPDATE {} SET '{}' = ? where timestamp = ?"
             query = query.format(data_table, an_id)
             print(query)
             values = [[row[1], row[0]] for row in data]
-            self._db.executemany(query, values)
+            cursor.executemany(query, values)
 
     def _create_single_table(self, source, variable, segment):
         """
@@ -1149,7 +1123,8 @@ class RecorderDatabase(object):
             CREATE TABLE  IF NOT EXISTS {} (
             timestamp FLOAT NOTE NONE)
             """.format(data_table)
-        self._db.execute(ddl_statement)
+        with self.transaction() as cursor:
+            cursor.execute(ddl_statement)
         return data_table
 
     def get_single_data(self, source, variable, segment=-1):
@@ -1167,10 +1142,9 @@ class RecorderDatabase(object):
         :rtype: (numpy.ndarray, numpy.ndarray, numpy.ndarray)
         """
         segment = self._clean_segment(segment)
-        with self._db:
-            data_table, _ = self._get_data_table(
-                source, variable, segment, TableTypes.SINGLE)
-            return self._get_column_data(data_table)
+        data_table, _ = self._get_data_table(
+            source, variable, segment, TableTypes.SINGLE)
+        return self._get_column_data(data_table)
 
     def update_segment(self, segment, start_timestamp, end_timestamp):
         """
@@ -1184,8 +1158,8 @@ class RecorderDatabase(object):
         :param float  start_timestamp: The time of the first data row
         :param float end_timestamp: The time the simulation ran to
         """
-        with self._db:
-            if self._db.execute(
+        with self.transaction() as cursor:
+            if cursor.execute(
                     """
                     INSERT OR IGNORE INTO segment_info(
                         segment, start_timestamp, end_timestamp)
@@ -1193,12 +1167,12 @@ class RecorderDatabase(object):
                     """,
                     (segment, start_timestamp, end_timestamp)).rowcount == 1:
                 return
-            for row in self._db.execute(
+            for row in cursor.execute(
                     "SELECT * FROM segment_info WHERE segment = ?",
                     (segment, )):
                 assert start_timestamp == row["start_timestamp"]
                 if end_timestamp > row["end_timestamp"]:
-                    self._db.execute(
+                    cursor.execute(
                         """
                             UPDATE segment_info
                             SET end_timestamp = ?
@@ -1218,8 +1192,9 @@ class RecorderDatabase(object):
         :param int segment: Number of the segment / reset group
         """
         tables = self._tables_by_segment(segment)
-        for table in tables:
-            self._db.execute("DELETE FROM {}".format(table))
+        with self.transaction() as cursor:
+            for table in tables:
+                cursor.execute("DELETE FROM {}".format(table))
 
     def get_segments(self):
         """
@@ -1229,9 +1204,9 @@ class RecorderDatabase(object):
         (start_timestamp, end_timestamp)
         :rtype: dict(int, (float, float))
         """
-        with self._db:
+        with self.transaction() as cursor:
             segments = dict()
-            for row in self._db.execute("SELECT * FROM segment_info"):
+            for row in cursor.execute("SELECT * FROM segment_info"):
                 segments[row["segment"]] = (
                     row["start_timestamp"], row["end_timestamp"])
         return segments
@@ -1247,9 +1222,9 @@ class RecorderDatabase(object):
         :rtype: dict(str, dict(str, object))
         """
         variables = {}
-        with self._db:
+        with self.transaction() as cursor:
             segment = self._clean_segment(segment)
-            for row in self._db.execute(
+            for row in cursor.execute(
                     """
                     SELECT variable, sampling_interval, description, unit,
                            n_neurons, table_type, start_timestamp,
@@ -1276,7 +1251,7 @@ class RecorderDatabase(object):
         :return: The max known segment number
         :type: int or None
         """
-        with self._db:
-            for row in self._db.execute(
+        with self.transaction() as cursor:
+            for row in cursor.execute(
                     "SELECT MAX(segment) AS max FROM segment_info"):
                 return row["max"]
