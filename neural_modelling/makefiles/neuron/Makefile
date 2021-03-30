@@ -50,7 +50,7 @@ MODELS = IF_curr_exp \
          IF_cond_exp_stdp_izhikevich_neuromodulation \
          IZK_curr_exp_stdp_izhikevich_neuromodulation \
          IZK_cond_exp_stdp_izhikevich_neuromodulation \
-#         IF_curr_exp_stdp_izhikevich_neuromodulation_structural_random_distance_weight
+         IF_curr_exp_stdp_izhikevich_neuromodulation_structural_random_distance_weight
 
 all:
 	for d in $(MODELS); do $(MAKE) -C $$d || exit $$?; done
