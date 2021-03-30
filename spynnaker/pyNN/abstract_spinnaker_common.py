@@ -52,9 +52,14 @@ class AbstractSpiNNakerCommon(
         "_populations",
         "_projections"]
 
+    __EXECUTABLE_FINDER = ExecutableFinder()
+
     CONFIG_FILE_NAME = "spynnaker.cfg"
 
-    __EXECUTABLE_FINDER = ExecutableFinder()
+    @classmethod
+    def extended_config_path(cls):
+        return os.path.join(os.path.dirname(__file__),
+                            cls.CONFIG_FILE_NAME)
 
     def __init__(
             self, graph_label, database_socket_addresses, n_chips_required,
@@ -137,9 +142,7 @@ class AbstractSpiNNakerCommon(
             extra_algorithm_xml_paths=extra_algorithm_xml_path,
             n_chips_required=n_chips_required,
             n_boards_required=n_boards_required,
-            default_config_paths=[
-                os.path.join(os.path.dirname(__file__),
-                             self.CONFIG_FILE_NAME)],
+            default_config_paths=[self.extended_config_path()],
             front_end_versions=versions)
 
         # update inputs needed by the machine level calls.
@@ -375,6 +378,8 @@ class AbstractSpiNNakerCommon(
                 ["RedundantPacketCountReport"])
 
         super().run(run_time, sync_time)
+        for projection in self._projections:
+            projection._clear_cache()
 
     @staticmethod
     def register_binary_search_path(search_path):

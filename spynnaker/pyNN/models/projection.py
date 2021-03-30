@@ -142,7 +142,8 @@ class Projection(object):
 
         # round the delays to multiples of full timesteps
         # (otherwise SDRAM estimation calculations can go wrong)
-        if not isinstance(synapse_dynamics.delay, RandomDistribution):
+        if ((not isinstance(synapse_dynamics.delay, RandomDistribution))
+                and (not isinstance(synapse_dynamics.delay, str))):
             synapse_dynamics.set_delay(
                 numpy.rint(
                     numpy.array(synapse_dynamics.delay) *

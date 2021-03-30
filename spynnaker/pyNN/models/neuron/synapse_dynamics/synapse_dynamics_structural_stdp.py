@@ -96,7 +96,7 @@ class SynapseDynamicsStructuralSTDP(
             The STDP voltage dependence (unsupported)
         :param float dendritic_delay_fraction:
             The STDP dendritic delay fraction
-        :param int f_rew:
+        :param float f_rew:
             How many rewiring attempts will be done per second.
         :param float initial_weight:
             Weight assigned to a newly formed connection

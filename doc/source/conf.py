@@ -373,14 +373,6 @@ epub_exclude_files = ['search.html']
 
 autoclass_content = 'both'
 
-sys.path.append(os.path.abspath('../..'))
-
-# Do the rst generation
-for f in os.listdir("."):
-    if (os.path.isfile(f) and f.endswith(
-            ".rst") and f != "index.rst" and f != "modules.rst"):
-        os.remove(f)
-
 # We want to document __call__ when encountered
 autodoc_default_options = {
     "members": None,
@@ -394,62 +386,34 @@ if _on_rtd:
         'pyNN', 'pyNN.random', 'pyNN.common', 'neo', 'quantities', 'lazyarray']
 
 
-def filtered_files(base, excludes=()):
-    excludes = set(base + "/" + e for e in excludes)
+def filtered_files(base, unfiltered_files_filename):
+    with open(unfiltered_files_filename) as f:
+        lines = [line.rstrip() for line in f]
+    # Skip comments and empty lines to get list of files we DON'T want to
+    # filter out; this is definitely complicated
+    unfiltered = set(
+        line for line in lines if not line.startswith("#") and line != "")
     for root, _dirs, files in os.walk(base):
         for filename in files:
-            full = root + "/" + filename
             if filename.endswith(".py") and not filename.startswith("_"):
-                if full not in excludes:
+                full = root + "/" + filename
+                if full not in unfiltered:
                     yield full
 
 
-# UGH!
-output_dir = os.path.abspath(".")
-os.chdir("../..")
+sys.path.append(os.path.abspath('../..'))
+_output_dir = os.path.abspath(".")
+_unfiltered_files = os.path.abspath("../unfiltered-files.txt")
 
-# We only document __init__.py files... except for these special cases.
-# Use the unix full pathname from the root of the checked out repo
-explicit_wanted_files = [
-    "spynnaker/gsyn_tools.py",
-    "spynnaker/spike_checker.py",
-    "spynnaker/plot_utils.py",
-    "spynnaker/pyNN/abstract_spinnaker_common.py",
-    "spynnaker/pyNN/exceptions.py",
-    "spynnaker/pyNN/spynnaker_simulator_interface.py",
-    "spynnaker/pyNN/spynnaker_external_device_plugin_manager.py",
-    "spynnaker/pyNN/models/abstract_pynn_model.py",
-    "spynnaker/pyNN/models/projection.py",
-    "spynnaker/pyNN/models/defaults.py",
-    "spynnaker/pyNN/models/recorder.py",
-    "spynnaker/pyNN/models/neuron/key_space_tracker.py",
-    "spynnaker/pyNN/models/neuron/synaptic_matrices.py",
-    "spynnaker/pyNN/models/neuron/master_pop_table.py",
-    "spynnaker/pyNN/models/neuron/synaptic_matrix.py",
-    "spynnaker/pyNN/models/neuron/synapse_io.py",
-    "spynnaker/pyNN/models/neuron/synaptic_matrix_app.py",
-    "spynnaker/pyNN/models/neuron/plasticity/stdp/common.py",
-    "spynnaker/pyNN/models/spike_source/spike_source_array_vertex.py",
-    "spynnaker/pyNN/models/spike_source/spike_source_poisson_vertex.py",
-    "spynnaker/pyNN/models/spike_source/spike_source_poisson_machine_vertex.py",
-    "spynnaker/pyNN/models/common/recording_utils.py",
-    "spynnaker/pyNN/utilities/bit_field_utilities.py",
-    "spynnaker/pyNN/utilities/spynnaker_failed_state.py",
-    "spynnaker/pyNN/utilities/constants.py",
-    "spynnaker/pyNN/utilities/data_cache.py",
-    "spynnaker/pyNN/utilities/extracted_data.py",
-    "spynnaker/pyNN/utilities/fake_HBP_Portal_machine_provider.py",
-    "spynnaker/pyNN/utilities/running_stats.py",
-    "spynnaker/pyNN/utilities/utility_calls.py",
-    "spynnaker/pyNN/utilities/struct.py",
-    "spynnaker/pyNN/utilities/variable_cache.py",
-    "spynnaker8/spynnaker8_simulator_interface.py",
-    "spynnaker8/spynnaker_plotting.py",
-    "spynnaker8/utilities/neo_convertor.py",
-    "spynnaker8/utilities/neo_compare.py"]
-options = ['-o', output_dir, ".",
-           # Exclude test and setup code
-           "p8_integration_tests/*", "unittests/*", "setup.py"]
-options.extend(filtered_files("spynnaker", explicit_wanted_files))
-options.extend(filtered_files("spynnaker8", explicit_wanted_files))
-apidoc.main(options)
+# Do the rst generation; remove files which aren't in git first!
+for fl in os.listdir("."):
+    if (os.path.isfile(fl) and fl.endswith(".rst") and
+            fl not in ("index.rst", "modules.rst")):
+        os.remove(fl)
+os.chdir("../..")  # WARNING! RELATIVE FILENAMES CHANGE MEANING HERE!
+apidoc.main([
+    '-o', _output_dir, ".",
+    # Exclude test and setup code
+    "spynnaker_integration_tests/*", "unittests/*", "setup.py",
+    *filtered_files("spynnaker", _unfiltered_files),
+    *filtered_files("spynnaker8", _unfiltered_files)])

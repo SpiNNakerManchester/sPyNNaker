@@ -13,9 +13,7 @@
 **/*.jpg
 **/*.elf
 **/DataSpecification/**
-**/IntroLab/**
 **/PACMAN/**
-**/PyNN8Examples/**
 **/spalloc/**
 **/spinnaker_tools/**
 **/SpiNNFrontEndCommon/**
