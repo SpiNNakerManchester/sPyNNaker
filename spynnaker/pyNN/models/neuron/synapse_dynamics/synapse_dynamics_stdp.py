@@ -209,11 +209,8 @@ class SynapseDynamicsSTDP(
     def backprop_delay(self, backprop_delay):
         self.__backprop_delay = bool(backprop_delay)
 
+    @overrides(AbstractPlasticSynapseDynamics.is_same_as)
     def is_same_as(self, synapse_dynamics):
-        """
-        :param AbstractSynapseDynamics synapse_dynamics:
-        :rtype: bool
-        """
         # pylint: disable=protected-access
         if not isinstance(synapse_dynamics, SynapseDynamicsSTDP):
             return False
