@@ -33,11 +33,11 @@ from .abstract_synapse_dynamics_structural import (
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 
 #: Default value for frequency of rewiring
-DEFAULT_F_REW = 10 ** 4
+DEFAULT_F_REW = 10 ** 4.0
 #: Default value for initial weight on connection formation
-DEFAULT_INITIAL_WEIGHT = 0
+DEFAULT_INITIAL_WEIGHT = 0.0
 #: Default value for initial delay on connection formation
-DEFAULT_INITIAL_DELAY = 1
+DEFAULT_INITIAL_DELAY = 1.0
 #: Default value for maximum fan-in per target layer neuron
 DEFAULT_S_MAX = 32
 
@@ -84,7 +84,7 @@ class SynapseDynamicsStructuralCommon(
         """ The period of rewiring.
 
         :return: The period of rewiring
-        :rtype: int
+        :rtype: float
         """
         return 1. / self.f_rew
 
@@ -451,7 +451,7 @@ class SynapseDynamicsStructuralCommon(
     def check_initial_delay(self, max_delay_ms):
         """ Check that delays can be done without delay extensions
 
-        :param int max_delay_ms: The maximum delay supported, in milliseconds
+        :param float max_delay_ms: The maximum delay supported, in milliseconds
         :raises Exception: if the delay is out of range
         """
         if isinstance(self.initial_delay, collections.Iterable):

@@ -151,14 +151,14 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
         return connector.get_delay_minimum(synapse_info)
 
-    def get_delay_variance(self, connector, delays):
+    def get_delay_variance(self, connector, delays, synapse_info):
         """ Get the variance in delay for the synapses
 
         :param AbstractConnector connector:
         :param SynapseInformation synapse_info:
         """
         # pylint: disable=too-many-arguments
-        return connector.get_delay_variance(delays)
+        return connector.get_delay_variance(delays, synapse_info)
 
     def get_weight_mean(self, connector, synapse_info):
         """ Get the mean weight for the synapses
@@ -167,7 +167,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         :param SynapseInformation synapse_info:
         """
         # pylint: disable=too-many-arguments
-        return connector.get_weight_mean(synapse_info.weights)
+        return connector.get_weight_mean(synapse_info.weights, synapse_info)
 
     def get_weight_maximum(self, connector, synapse_info):
         """ Get the maximum weight for the synapses
@@ -178,14 +178,14 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         # pylint: disable=too-many-arguments
         return connector.get_weight_maximum(synapse_info)
 
-    def get_weight_variance(self, connector, weights):
+    def get_weight_variance(self, connector, weights, synapse_info):
         """ Get the variance in weight for the synapses
 
         :param AbstractConnector connector:
         :param ~numpy.ndarray weights:
         """
         # pylint: disable=too-many-arguments
-        return connector.get_weight_variance(weights)
+        return connector.get_weight_variance(weights, synapse_info)
 
     def convert_per_connection_data_to_rows(
             self, connection_row_indices, n_rows, data, max_n_synapses):

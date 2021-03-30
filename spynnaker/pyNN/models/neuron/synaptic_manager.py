@@ -472,7 +472,7 @@ class SynapticManager(object):
             synapse_dynamics = synapse_info.synapse_dynamics
 
             weight_min = connector.get_weight_minimum(
-                synapse_info.weights, self.__weight_random_sigma)
+                synapse_info.weights, self.__weight_random_sigma, synapse_info)
             weight_min *= weight_scale
             if weight_min != 0 and not numpy.isnan(weight_min):
                 weight_min = float_gcd(min_weights[synapse_type], weight_min)

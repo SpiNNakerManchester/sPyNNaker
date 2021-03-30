@@ -99,7 +99,7 @@ class FromListConnector(AbstractConnector):
     def get_delay_maximum(self, synapse_info):
         if self.__delays is None:
             return self._get_delay_maximum(
-                synapse_info.delays, len(self.__targets))
+                synapse_info.delays, len(self.__targets), synapse_info)
         else:
             return numpy.max(self.__delays)
 
@@ -107,14 +107,15 @@ class FromListConnector(AbstractConnector):
     def get_delay_minimum(self, synapse_info):
         if self.__delays is None:
             return self._get_delay_minimum(
-                synapse_info.delays, len(self.__targets))
+                synapse_info.delays, len(self.__targets), synapse_info)
         else:
             return numpy.min(self.__delays)
 
     @overrides(AbstractConnector.get_delay_variance)
-    def get_delay_variance(self, delays):
+    def get_delay_variance(self, delays, synapse_info):
         if self.__delays is None:
-            return AbstractConnector.get_delay_variance(self, delays)
+            return AbstractConnector.get_delay_variance(
+                self, delays, synapse_info)
         else:
             return numpy.var(self.__delays)
 
@@ -211,7 +212,7 @@ class FromListConnector(AbstractConnector):
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
             synapse_info.delays,
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
-            max_targets, min_delay, max_delay)
+            max_targets, min_delay, max_delay, synapse_info)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):
@@ -222,9 +223,10 @@ class FromListConnector(AbstractConnector):
             self.__targets.astype('int64', copy=False)))
 
     @overrides(AbstractConnector.get_weight_mean)
-    def get_weight_mean(self, weights):
+    def get_weight_mean(self, weights, synapse_info):
         if self.__weights is None:
-            return AbstractConnector.get_weight_mean(self, weights)
+            return AbstractConnector.get_weight_mean(
+                self, weights, synapse_info)
         else:
             return numpy.mean(numpy.abs(self.__weights))
 
@@ -233,25 +235,26 @@ class FromListConnector(AbstractConnector):
         # pylint: disable=too-many-arguments
         if self.__weights is None:
             return self._get_weight_maximum(
-                synapse_info.weights, len(self.__targets))
+                synapse_info.weights, len(self.__targets), synapse_info)
         else:
             return numpy.amax(numpy.abs(self.__weights))
 
     @overrides(AbstractConnector.get_weight_variance)
-    def get_weight_variance(self, weights):
+    def get_weight_variance(self, weights, synapse_info):
         # pylint: disable=too-many-arguments
         if self.__weights is None:
-            return AbstractConnector.get_weight_variance(self, weights)
+            return AbstractConnector.get_weight_variance(
+                self, weights, synapse_info)
         else:
             return numpy.var(numpy.abs(self.__weights))
 
     @overrides(AbstractConnector.get_weight_minimum)
-    def get_weight_minimum(self, weights, weight_random_sigma):
+    def get_weight_minimum(self, weights, weight_random_sigma, synapse_info):
         if self.__weights is None:
             return super(FromListConnector, self).get_weight_minimum(
-                weights, weight_random_sigma)
+                weights, weight_random_sigma, synapse_info)
         return super(FromListConnector, self).get_weight_minimum(
-            self.__weights, weight_random_sigma)
+            self.__weights, weight_random_sigma, synapse_info)
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
@@ -272,8 +275,8 @@ class FromListConnector(AbstractConnector):
                 block["weight"] = numpy.array(synapse_info.weights)[indices]
             else:
                 block["weight"] = self._generate_weights(
-                    len(indices), None, pre_vertex_slice,
-                    post_vertex_slice, synapse_info)
+                    block["source"], block["target"], len(indices), None,
+                    pre_vertex_slice, post_vertex_slice, synapse_info)
         else:
             block["weight"] = self.__weights[indices]
         # check that conn_list has delays, if not then use the value passed in
@@ -282,8 +285,8 @@ class FromListConnector(AbstractConnector):
                 block["delay"] = numpy.array(synapse_info.delays)[indices]
             else:
                 block["delay"] = self._generate_delays(
-                    len(indices), None, pre_vertex_slice,
-                    post_vertex_slice, synapse_info)
+                    block["source"], block["target"], len(indices), None,
+                    pre_vertex_slice, post_vertex_slice, synapse_info)
         else:
             block["delay"] = self._clip_delays(self.__delays[indices])
         block["synapse_type"] = synapse_type
