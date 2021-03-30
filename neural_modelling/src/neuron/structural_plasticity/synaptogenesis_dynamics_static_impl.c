@@ -23,7 +23,8 @@
 #include "synaptogenesis_dynamics.h"
 #include <debug.h>
 
-bool synaptogenesis_dynamics_initialise(UNUSED address_t sdram_sp_address) {
+bool synaptogenesis_dynamics_initialise(
+        UNUSED address_t sdram_sp_address, UNUSED uint32_t n_neurons) {
     return true;
 }
 
@@ -47,6 +48,10 @@ bool synaptogenesis_is_fast(void) {
 }
 
 void synaptogenesis_spike_received(UNUSED uint32_t time, UNUSED spike_t spike) {
+}
+
+void synaptogenesis_dynamics_set_recording_values(
+        UNUSED uint32_t n_neurons, UNUSED int32_t* rec_values) {
 }
 
 void print_post_to_pre_entry(void) {

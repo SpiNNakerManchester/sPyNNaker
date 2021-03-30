@@ -246,7 +246,7 @@ static bool initialise(void) {
 
     // Set up structural plasticity dynamics
     if (!synaptogenesis_dynamics_initialise(data_specification_get_region(
-            STRUCTURAL_DYNAMICS_REGION, ds_regions))) {
+            STRUCTURAL_DYNAMICS_REGION, ds_regions), n_neurons)) {
         return false;
     }
 
@@ -323,20 +323,12 @@ void background_callback(uint timer_count, uint local_time) {
             spike_processing_do_rewiring(1);
         }
         count_rewire_attempts++;
-    }
 
-    // Does this happen here or can it be combined with the above?
-    if (rewiring) {
         // Update to record additions / removals
-//      uint32_t neurons_changed[n_neurons];
         int32_t rec_values[n_neurons];
-//      synapse_dynamics_changes(n_neurons, neurons_changed);
-        synapse_dynamics_recording_values(n_neurons, rec_values);
+        synaptogenesis_dynamics_set_recording_values(n_neurons, rec_values);
         for (uint32_t i = 0; i < n_neurons; i++) {
-//          io_printf(IO_BUF, "time %u ", time);
-//          if (neurons_changed[i] == 1) {
             neuron_record_structural(i, rec_values[i]);
-//          }
         }
     }
 

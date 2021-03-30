@@ -34,6 +34,10 @@ struct formation_params;
 //! Flag: Is connection lateral?
 #define IS_CONNECTION_LAT 1
 
+#ifndef SOMETIMES_UNUSED
+#define SOMETIMES_UNUSED __attribute__((unused))
+#endif // !SOMETIMES_UNUSED
+
 //! Entry of map from post-connection to pre-connection neural indices
 typedef struct post_to_pre_entry {
     uint8_t pop_index;
@@ -190,11 +194,10 @@ static inline bool sp_structs_get_sub_pop_info(
 //! \return True if the synapse was removed
 static inline bool sp_structs_remove_synapse(
         current_state_t *restrict current_state, synaptic_row_t restrict row) {
-    if (!synapse_dynamics_remove_neuron(
-    		current_state->key_atom_info->lo_atom + current_state->pre_syn_id,
-    		current_state->post_syn_id, current_state->offset, row)) {
+    if (!synapse_dynamics_remove_neuron(current_state->offset, row)) {
         return false;
     }
+
     current_state->post_to_pre_table_entry->neuron_index = 0xFFFF;
     return true;
 }
@@ -214,7 +217,6 @@ static inline bool sp_structs_add_synapse(
             current_state->pre_population_info->delay_lo;
 
     if (!synapse_dynamics_add_neuron(
-            current_state->key_atom_info->lo_atom + current_state->pre_syn_id,
             current_state->post_syn_id, row, appr_scaled_weight, actual_delay,
 			current_state->pre_population_info->connection_type)) {
         return false;
@@ -231,6 +233,7 @@ static inline bool sp_structs_add_synapse(
 
 //! \brief Common code for structural plasticity initialisation.
 //! \param[in] sdram_sp_address: Address of the configuration region.
+//! \param[in] n_neurons: The number of neurons on this core.
 //! \param[in,out] rewiring_data:
 //!     Address of the rewiring information structure to fill out.
 //! \param[in,out] pre_info:
@@ -242,8 +245,7 @@ static inline bool sp_structs_add_synapse(
 //!     configuration region.
 static inline uint8_t *sp_structs_read_in_common(
         address_t sdram_sp_address, rewiring_data_t *rewiring_data,
-        pre_pop_info_table_t *pre_info,
-        post_to_pre_entry **post_to_pre_table) {
+        pre_pop_info_table_t *pre_info, post_to_pre_entry **post_to_pre_table) {
     uint8_t *data = (uint8_t *) sdram_sp_address;
     spin1_memcpy(rewiring_data, data, sizeof(rewiring_data_t));
     data += sizeof(rewiring_data_t);

@@ -33,7 +33,7 @@
 //!     which contains synaptic rewiring params.
 //! \return Whether we were successful.
 bool synaptogenesis_dynamics_initialise(
-        address_t sdram_sp_address);
+        address_t sdram_sp_address, uint32_t n_neurons);
 
 //! \brief Trigger the process of synaptic rewiring
 //! \details Usually called on a timer registered in c_main()
@@ -67,6 +67,12 @@ bool synaptogenesis_is_fast(void);
 //! \param[in] time: The time that the spike was received at
 //! \param[in] spike: The received spike
 void synaptogenesis_spike_received(uint32_t time, spike_t spike);
+
+//! \brief Set the values to be recorded during structural plasticity
+//! \param[in] n_neurons: the number of neurons
+//! \param[in] rec_values: the array to be recorded
+void synaptogenesis_dynamics_set_recording_values(
+        uint32_t n_neurons, int32_t* rec_values);
 
 //! Print a certain data object
 void print_post_to_pre_entry(void);

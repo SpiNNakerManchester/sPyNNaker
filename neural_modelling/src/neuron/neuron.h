@@ -80,6 +80,9 @@ void neuron_add_inputs(
         index_t synapse_type_index, index_t neuron_index,
         input_t weights_this_timestep);
 
+//! \brief Record structural plasticity
+//! \param[in] neuron_index the index of the neuron
+//! \param[in] rec_value the value to be recorded
 void neuron_record_structural(uint32_t neuron_index, int32_t rec_value);
 
 #if LOG_LEVEL >= LOG_DEBUG

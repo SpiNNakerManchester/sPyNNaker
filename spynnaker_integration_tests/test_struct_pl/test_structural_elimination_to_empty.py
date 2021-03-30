@@ -19,7 +19,7 @@ from spinnaker_testbase import BaseTestCase
 import spynnaker8 as p
 
 
-def structural_without_stdp():
+def structural_eliminate_to_empty():
     p.setup(1.0)
     stim = p.Population(9, p.SpikeSourceArray(range(10)), label="stim")
 
@@ -64,11 +64,11 @@ def structural_without_stdp():
     assert(first_elim == [7, 5, 'elimination'])
 
 
-class TestStructuralWithoutSTDP(BaseTestCase):
+class TestStructuralEliminateToEmpty(BaseTestCase):
 
-    def test_structural_without_stdp(self):
-        self.runsafe(structural_without_stdp)
+    def test_structural_eliminate_to_empty(self):
+        self.runsafe(structural_eliminate_to_empty)
 
 
 if __name__ == "__main__":
-    structural_without_stdp()
+    structural_eliminate_to_empty()
