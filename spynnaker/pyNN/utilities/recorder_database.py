@@ -760,8 +760,8 @@ class RecorderDatabase(SQLiteDB):
         # Create the raw table
         ids_str = ",".join(["'" + str(id) + "' INTEGER" for id in ids])
         ddl_statement = f"""
-            CREATE TABLE IF NOT EXISTS {raw_table} 
-            (timestamp FLOAT NOT NULL, 
+            CREATE TABLE IF NOT EXISTS {raw_table}
+            (timestamp FLOAT NOT NULL,
             {ids_str})
             """
         with self.transaction() as cursor:
@@ -772,7 +772,7 @@ class RecorderDatabase(SQLiteDB):
         # create full view
         ddl_statement = f"""
             CREATE VIEW {full_view}
-            AS SELECT * FROM {index_table} LEFT JOIN {raw_table} 
+            AS SELECT * FROM {index_table} LEFT JOIN {raw_table}
             USING (timestamp)
             """
         with self.transaction() as cursor:
@@ -781,8 +781,8 @@ class RecorderDatabase(SQLiteDB):
             cursor.execute(
                 """
                 INSERT OR IGNORE INTO local_matrix_metadata(
-                    source, variable, segment, raw_table, full_view, index_table,
-                    first_id)
+                    source, variable, segment, raw_table, full_view, 
+                    index_table, first_id)
                 VALUES(?,?,?,?,?,?, ?)
                 """,
                 (source, variable, segment, raw_table, full_view, index_table,
@@ -861,7 +861,7 @@ class RecorderDatabase(SQLiteDB):
                     local_views = self._get_local_views(
                         source, variable, segment)
                     ddl_statement = f"""
-                        CREATE VIEW {global_view} AS SELECT * 
+                        CREATE VIEW {global_view} AS SELECT *
                         FROM {" NATURAL JOIN ".join(local_views)}"""
                     print(ddl_statement)
                     cursor.execute(ddl_statement)
@@ -1075,7 +1075,7 @@ class RecorderDatabase(SQLiteDB):
 
             # make sure rows exist for each timestamp
             query = f"""
-                INSERT or IGNORE INTO {data_table}(timestamp) 
+                INSERT or IGNORE INTO {data_table}(timestamp)
                 VALUES (?)"""
             timestamps = [[row[0]] for row in data]
             cursor.executemany(query, timestamps)
