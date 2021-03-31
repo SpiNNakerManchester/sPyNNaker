@@ -383,7 +383,7 @@ class Recorder(object):
                         source=self.__population.label, variable=variable,
                         sampling_interval=sampling_interval,
                         description=self.__population.describe(),
-                        unit="", n_neurons=self.__population.size)
+                        units="", n_neurons=self.__population.size)
                     recorder_database.insert_events(
                         source=self.__population.label, variable=variable,
                         data=data)
@@ -394,7 +394,7 @@ class Recorder(object):
                         source=self.__population.label, variable=variable,
                         sampling_interval=sampling_interval,
                         description=self.__population.describe(),
-                        unit=self._get_units(variable),
+                        units=self._get_units(variable),
                         n_neurons=self.__population.size)
                     recorder_database.insert_matrix_using_interval(
                         source=self.__population.label, variable=variable,
@@ -496,7 +496,7 @@ class Recorder(object):
 
         data_cache = self._data_cache[segment_number]
 
-        for v_meta in v_all_data.items():
+        for v_meta in v_all_data.values():
             assert(v_meta["description"] == data_cache.description)
             assert(v_meta["end_timestamp"] == data_cache.rec_datetime)
 
