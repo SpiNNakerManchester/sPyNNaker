@@ -42,6 +42,7 @@ CREATE TABLE IF NOT EXISTS metadata(
 CREATE TABLE IF NOT EXISTS segment_info(
     segment INTEGER PRIMARY KEY ASC,
     start_timestamp FLOAT NOT NULL,
-    end_timestamp FLOAT NOT NULL);
+    end_timestamp FLOAT NOT NULL,
+    rec_datetime STRING NOT NULL);
 
 

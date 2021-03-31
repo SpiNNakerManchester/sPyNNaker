@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import defaultdict
+from datetime import datetime
 from enum import Enum
 import numpy
 import os
@@ -71,7 +72,8 @@ class RecorderDatabase(SQLiteDB):
             self._path = database_file
         super().__init__(
             self._path, ddl_file=_DDL_FILE, row_factory=sqlite3.Row,
-            text_factory=str, case_insensitive_like=True)
+            text_factory=str, case_insensitive_like=True,
+            detect_types=sqlite3.PARSE_COLNAMES)
 
     @property
     def path(self):
@@ -1147,10 +1149,11 @@ class RecorderDatabase(SQLiteDB):
             if cursor.execute(
                     """
                     INSERT OR IGNORE INTO segment_info(
-                        segment, start_timestamp, end_timestamp)
-                    VALUES(?,?,?)
+                        segment, start_timestamp, end_timestamp, rec_datetime)
+                    VALUES(?,?,?,?)
                     """,
-                    (segment, start_timestamp, end_timestamp)).rowcount == 1:
+                    (segment, start_timestamp, end_timestamp,
+                     datetime.now())).rowcount == 1:
                 return
             for row in cursor.execute(
                     "SELECT * FROM segment_info WHERE segment = ?",
@@ -1213,7 +1216,8 @@ class RecorderDatabase(SQLiteDB):
                     """
                     SELECT variable, sampling_interval, description, units,
                            n_neurons, table_type, start_timestamp,
-                           end_timestamp
+                           end_timestamp, 
+                           rec_datetime as "rec_datetime [timestamp]"
                     FROM metadata, segment_info
                     WHERE source = ? and metadata.segment = ? and
                            segment_info.segment = ?""",
@@ -1226,6 +1230,7 @@ class RecorderDatabase(SQLiteDB):
                 v_data["table_type"] = TableTypes(row["table_type"])
                 v_data["start_timestamp"] = row["start_timestamp"]
                 v_data["end_timestamp"] = row["end_timestamp"]
+                v_data["rec_datetime"] = row["rec_datetime"]
                 variables[row["variable"]] = v_data
         return variables
 

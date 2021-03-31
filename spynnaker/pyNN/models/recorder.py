@@ -498,7 +498,6 @@ class Recorder(object):
 
         for v_meta in v_all_data.values():
             assert(v_meta["description"] == data_cache.description)
-            assert(v_meta["end_timestamp"] == data_cache.rec_datetime)
 
         a_meta = v_all_data.items().next()
 
