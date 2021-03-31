@@ -85,3 +85,9 @@ class SynapseRowTooBigException(SpynnakerException):
         """ The maximum size allowed.
         """
         return self._max_size
+
+
+class RecorderDatabaseException(SpynnakerException):
+    """
+    Riased when the RecorderDatabase is asked to do something unexpected
+    """

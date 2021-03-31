@@ -20,6 +20,7 @@ import os
 import sqlite3
 from spinn_utilities.helpful_functions import is_singleton
 from spinn_front_end_common.utilities.sqlite_db import (Isolation, SQLiteDB)
+from spynnaker.pyNN.exceptions import RecorderDatabaseException
 
 
 class TableTypes(Enum):
@@ -305,7 +306,8 @@ class RecorderDatabase(SQLiteDB):
                     assert(table_type.value == row["table_type"])
                 return row["data_table"], row["table_type"]
 
-        raise Exception(f"No Data for {source}:{variable}:{segment}")
+        raise RecorderDatabaseException(
+            f"No Data for {source}:{variable}:{segment}")
 
     def _tables_by_segment(self, segment):
         """
@@ -545,6 +547,8 @@ class RecorderDatabase(SQLiteDB):
         """
         if segment < 0:
             current = self.current_segment()
+            if current is None:
+                raise RecorderDatabaseException("No known segments")
             use_segment = segment + current + 1
         else:
             use_segment = segment
@@ -552,8 +556,9 @@ class RecorderDatabase(SQLiteDB):
         segments = self.get_segments()
         if use_segment in segments:
             return use_segment
-        raise Exception(
-            f"Segment {segment} not found. Known segments are {segments.key}")
+        keys = list(segments.keys())
+        raise RecorderDatabaseException(
+            f"Segment {segment} not found. Known segments are {keys}")
 
     # matrix data
 
@@ -1160,10 +1165,10 @@ class RecorderDatabase(SQLiteDB):
                         """, (end_timestamp, segment))
                     self._clear_segment(segment)
                 elif end_timestamp < row["end_timestamp"]:
-                    raise Exception(
+                    raise RecorderDatabaseException(
                         f"Segment {segment} was already has an end_timestamp "
-                        "of {row['end_timestamp']} so new value of "
-                        "{end_timestamp} does not make sense")
+                        f"of {row['end_timestamp']} so new value of "
+                        f"{end_timestamp} does not make sense")
 
     def _clear_segment(self, segment):
         """

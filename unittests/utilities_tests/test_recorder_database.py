@@ -21,6 +21,7 @@ import sys
 from spynnaker.pyNN.utilities.recorder_database import (
     RecorderDatabase, DEFAULT_NAME)
 from spinnaker_testbase import BaseTestCase
+from spynnaker.pyNN.exceptions import RecorderDatabaseException
 
 
 class TimeStepType(Enum):
@@ -249,3 +250,23 @@ class TestRecorderDatabase(BaseTestCase):
         self.assertEqual((0, 200), segments[0])
         self.assertEqual((0, 150), segments[1])
         self.assertEqual(1, self.db.current_segment())
+
+    def test_no_segment(self):
+        with self.assertRaises(RecorderDatabaseException):
+            self.db.get_single_data("foo", "bar")
+
+    def test_no_data(self):
+        self.db.update_segment(0, 0, 100)
+        with self.assertRaises(RecorderDatabaseException):
+            self.db.get_single_data("foo", "bar")
+
+    def test_wrong_segment(self):
+        self.db.update_segment(0, 0, 100)
+        with self.assertRaises(RecorderDatabaseException):
+            self.db.get_single_data("foo", "bar", segment=-2)
+
+    def test_bad_segment_update(self):
+        self.db.update_segment(0, 0, 100)
+        self.db.update_segment(0, 0, 200)
+        with self.assertRaises(RecorderDatabaseException):
+            self.db.update_segment(0, 0, 150)
