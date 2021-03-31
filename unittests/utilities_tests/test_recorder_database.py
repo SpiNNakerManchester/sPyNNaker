@@ -88,7 +88,7 @@ class TestRecorderDatabase(BaseTestCase):
         variable = "voltage"
         self.db.register_matrix_source(
             source, variable, sampling_interval, description="foo",
-            unit="v", n_neurons=n_neurons)
+            units="v", n_neurons=n_neurons)
         ids = range(n_neurons)
         timestamps = [x * sampling_interval for x in range(0, 10)]
         data_in = self.random_matrix_data(timestamps, ids, timestamps_in_data)
@@ -133,7 +133,7 @@ class TestRecorderDatabase(BaseTestCase):
         n_neurons = 4
         self.db.register_event_source(
             source, variable, sampling_interval, description="foo",
-            unit="count", n_neurons=n_neurons)
+            units="count", n_neurons=n_neurons)
         ids = range(n_neurons)
         timestamps1 = [x * sampling_interval for x in range(10)]
         spike_times1, spike_ids1, combined1 = self.random_spike_data(
@@ -199,7 +199,7 @@ class TestRecorderDatabase(BaseTestCase):
         variable = "spikes"
         self.db.register_event_source(
             source, variable, sampling_interval=1, description="foo",
-            unit="count", n_neurons=33)
+            units="count", n_neurons=33)
         self.db.insert_events(source, variable, [])
         data_out = self.db.get_events_data(
             source, variable)
@@ -214,7 +214,7 @@ class TestRecorderDatabase(BaseTestCase):
         sampling_interval = 0.5
         self.db.register_single_source(
             source, variable, sampling_interval, description="foo",
-            unit="v", n_neurons=n_neurons)
+            units="v", n_neurons=n_neurons)
         timestamps = [row * sampling_interval for row in range(1, 10)]
         data_in = self.random_matrix_data(timestamps, [id], timestamps_in_data)
         if timestamps_in_data == TimeStepType.TIMESTEP:

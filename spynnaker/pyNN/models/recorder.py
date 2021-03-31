@@ -485,18 +485,22 @@ class Recorder(object):
         v_all_data = recorder_database.get_source_segment_data(
             self.__population.label, segment_number)
 
-        if segment_number not in self._data_cache:
-            assert len(v_all_data) == 0
+        if len(v_all_data) == 0:
+            assert(segment_number not in self._data_cache)
             logger.warning("No Data available for Segment {}", segment_number)
             segment = neo.Segment(
                 name="segment{}".format(segment_number),
                 description="Empty",
                 rec_datetime=datetime.now())
             return segment
-        else:
-            assert len(v_all_data) > 0
 
         data_cache = self._data_cache[segment_number]
+
+        for v_meta in v_all_data.items():
+            assert(v_meta["description"] == data_cache.description)
+            assert(v_meta["end_timestamp"] == data_cache.rec_datetime)
+
+        a_meta = v_all_data.items().next()
 
         # sort out variables
         variables = self._clean_variables(variables)
@@ -504,8 +508,8 @@ class Recorder(object):
         # build segment for the previous data to be gathered in
         segment = neo.Segment(
             name="segment{}".format(segment_number),
-            description=data_cache.description,
-            rec_datetime=data_cache.rec_datetime)
+            description=a_meta["description"],
+            rec_datetime=a_meta["rec_datetime"])
 
         for variable in variables:
             v_data = v_all_data[variable]
@@ -516,6 +520,7 @@ class Recorder(object):
                 continue
             variable_cache = data_cache.get_data(variable)
             assert data_cache.t == v_data["end_timestamp"]
+            assert data_cache.units == v_data["units"]
             assert variable_cache.n_neurons == v_data["n_neurons"]
             assert data_cache.recording_start_time == v_data["start_timestamp"]
             assert variable_cache.sampling_interval == \
@@ -529,13 +534,13 @@ class Recorder(object):
                     assert variable_cache.data[i][1] == s_data[i][1]
                 self.__read_in_spikes(
                     segment=segment,
-                    spikes=variable_cache.data,
-                    t=data_cache.t,
-                    n_neurons=variable_cache.n_neurons,
-                    recording_start_time=data_cache.recording_start_time,
-                    sampling_interval=variable_cache.sampling_interval,
+                    spikes=s_data,
+                    t=v_data["end_timestamp"],
+                    n_neurons=v_data["n_neurons"],
+                    recording_start_time=v_data["start_timestamp"],
+                    sampling_interval=v_data["sampling_interval"],
                     indexes=view_indexes,
-                    label=data_cache.label)
+                    label=self.__population.label)
             else:
                 ids, _, s_data = recorder_database.get_matrix_data(
                     self.__population.label, variable, segment_number)
@@ -550,14 +555,14 @@ class Recorder(object):
                 self.__read_in_signal(
                     segment=segment,
                     block=block,
-                    signal_array=variable_cache.data,
-                    data_indexes=variable_cache.indexes,
+                    signal_array=s_data,
+                    data_indexes=ids,
                     view_indexes=view_indexes,
                     variable=variable,
-                    recording_start_time=data_cache.recording_start_time,
-                    sampling_interval=variable_cache.sampling_interval,
-                    units=variable_cache.units,
-                    label=data_cache.label)
+                    recording_start_time=v_data["start_timestamp"],
+                    sampling_interval=v_data["sampling_interval"],
+                    units=v_data["units"],
+                    label=self.__population.label)
 
         block.segments.append(segment)
 

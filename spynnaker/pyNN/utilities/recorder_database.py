@@ -134,7 +134,7 @@ class RecorderDatabase(SQLiteDB):
             return variables
 
     def register_metadata(
-            self, source, variable, sampling_interval, description, unit,
+            self, source, variable, sampling_interval, description, units,
             n_neurons, table_type, segment=-1):
         """
         Inserts the metadata for a source, variable segment combination
@@ -149,7 +149,7 @@ class RecorderDatabase(SQLiteDB):
             The time between timestamps. Used in the _with_interval methods
             but not checked in the with_timestamp ones
         :param str description: A description of the data source
-        :param str unit:  The unit of the data
+        :param str units:  The units of the data
         :param int n_neurons: The total number of neurons in your source.
             No check is done between n_neurons and ids
         :param TableTypes table_type: The type of table being registered
@@ -160,7 +160,7 @@ class RecorderDatabase(SQLiteDB):
             segment = self._clean_segment(segment)
             for row in cursor.execute(
                     """
-                    SELECT sampling_interval, description, unit, n_neurons,
+                    SELECT sampling_interval, description, units, n_neurons,
                            table_type
                     FROM metadata
                     WHERE source = ? AND variable = ? and segment = ?
@@ -168,7 +168,7 @@ class RecorderDatabase(SQLiteDB):
                     """, (source, variable, segment)):
                 assert (sampling_interval == row["sampling_interva"])
                 assert (description == row["description"])
-                assert (unit == row["unit"])
+                assert (units == row["units"])
                 assert (n_neurons == row["n_neurons"])
                 assert (table_type.value == row["table_type"])
                 return
@@ -189,14 +189,14 @@ class RecorderDatabase(SQLiteDB):
                 """
                 INSERT INTO metadata(
                     source, variable,  segment, sampling_interval,description,
-                    unit, n_neurons,  data_table, table_type, n_ids)
+                    units, n_neurons,  data_table, table_type, n_ids)
                 VALUES(?,?,?,?,?,?,?,?,?,0)
                 """,
                 (source, variable, segment, sampling_interval, description,
-                    unit, n_neurons, data_table, table_type.value))
+                    units, n_neurons, data_table, table_type.value))
 
     def register_event_source(
-            self, source, variable, sampling_interval, description, unit,
+            self, source, variable, sampling_interval, description, units,
             n_neurons, segment=-1):
         """
         Inserts the metadata for source, variable segment combination
@@ -211,18 +211,18 @@ class RecorderDatabase(SQLiteDB):
             The time between timestamps. Used in the _with_interval methods
             but not checked in the with_timestamp ones
         :param str description: A description of the data source
-        :param str unit:  The unit of the data
+        :param str units:  The units of the data
         :param int n_neurons: The total number of neurons in your source.
             No check is done between n_neurons and ids
         :param int segment: Number of the segment / reset group
         :return:
         """
         self.register_metadata(
-            source, variable, sampling_interval, description, unit,
+            source, variable, sampling_interval, description, units,
             n_neurons, TableTypes.EVENT, segment)
 
     def register_matrix_source(
-            self, source, variable, sampling_interval, description, unit,
+            self, source, variable, sampling_interval, description, units,
             n_neurons, segment=-1):
         """
         Inserts the metadata for a source, variable segment combination
@@ -237,18 +237,18 @@ class RecorderDatabase(SQLiteDB):
             The time between timestamps. Used in the _with_interval methods
             but not checked in the with_timestamp ones
         :param str description: A description of the data source
-        :param str unit:  The unit of the data
+        :param str units:  The units of the data
         :param int n_neurons: The total number of neurons in your source.
             No check is done between n_neurons and ids
         :param int segment: Number of the segment / reset group
         :return:
         """
         self.register_metadata(
-            source, variable, sampling_interval, description, unit,
+            source, variable, sampling_interval, description, units,
             n_neurons, TableTypes.MATRIX, segment)
 
     def register_single_source(
-            self, source, variable, sampling_interval, description, unit,
+            self, source, variable, sampling_interval, description, units,
             n_neurons, segment=-1):
         """
         Inserts the metadata for a source, variable segment combination
@@ -263,7 +263,7 @@ class RecorderDatabase(SQLiteDB):
             The time between timestamps. Used in the _with_interval methods
             but not checked in the with_timestamp ones
         :param str description: A description of the data source
-        :param str unit:  The unit of the data
+        :param str units:  The units of the data
         :param int n_neurons: The total number of neurons in your source.
             No check is done between n_neurons and ids
         :param TableTypes table_type: The type of table being registered
@@ -271,7 +271,7 @@ class RecorderDatabase(SQLiteDB):
         :return:
         """
         self.register_metadata(
-            source, variable, sampling_interval, description, unit,
+            source, variable, sampling_interval, description, units,
             n_neurons, TableTypes.SINGLE, segment)
 
     def _get_data_table(
@@ -1206,7 +1206,7 @@ class RecorderDatabase(SQLiteDB):
             segment = self._clean_segment(segment)
             for row in cursor.execute(
                     """
-                    SELECT variable, sampling_interval, description, unit,
+                    SELECT variable, sampling_interval, description, units,
                            n_neurons, table_type, start_timestamp,
                            end_timestamp
                     FROM metadata, segment_info
@@ -1216,7 +1216,7 @@ class RecorderDatabase(SQLiteDB):
                 v_data = {}
                 v_data["sampling_interval"] = row["sampling_interval"]
                 v_data["description"] = row["description"]
-                v_data["unit"] = row["unit"]
+                v_data["units"] = row["units"]
                 v_data["n_neurons"] = row["n_neurons"]
                 v_data["table_type"] = TableTypes(row["table_type"])
                 v_data["start_timestamp"] = row["start_timestamp"]

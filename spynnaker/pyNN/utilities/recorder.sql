@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS metadata(
 	sampling_interval FLOAT NOT NULL,
 	n_neurons INTEGER NOT NULL,
 	description STRING NOT NULL,
-	unit STRING NOT NULL,
+	units STRING NOT NULL,
 	data_table STRING NULL,
 	table_type INTEGER NOT NULL,
 	n_ids INTEGER NOT NULL);
