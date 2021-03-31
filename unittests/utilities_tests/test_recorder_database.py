@@ -41,7 +41,7 @@ class TestRecorderDatabase(BaseTestCase):
 
     def setUp(self):
         super().setUp()
-        #self.db = RecorderDatabase(os.getcwd())
+        # self.db = RecorderDatabase(os.getcwd())
         self.db = RecorderDatabase()
         self.db.clear_ds()
 

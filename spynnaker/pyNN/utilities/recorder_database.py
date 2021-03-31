@@ -781,7 +781,7 @@ class RecorderDatabase(SQLiteDB):
             cursor.execute(
                 """
                 INSERT OR IGNORE INTO local_matrix_metadata(
-                    source, variable, segment, raw_table, full_view, 
+                    source, variable, segment, raw_table, full_view,
                     index_table, first_id)
                 VALUES(?,?,?,?,?,?, ?)
                 """,
