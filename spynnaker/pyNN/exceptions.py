@@ -89,5 +89,5 @@ class SynapseRowTooBigException(SpynnakerException):
 
 class RecorderDatabaseException(SpynnakerException):
     """
-    Riased when the RecorderDatabase is asked to do something unexpected
+    Raised when the RecorderDatabase is asked to do something unexpected
     """
