@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2021 The University of Manchester
+# Copyright (c) 2017-2019 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,4 +18,3 @@ __version_month__ = "April"
 __version_year__ = "2021"
 __version_day__ = "9"
 __version_name__ = "Now We Try It My Way"
-__version_type__ = "production"  # or "beta" or "production"
