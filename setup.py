@@ -25,14 +25,6 @@ __version_type__ = None
 exec(open("spynnaker/_version.py").read())
 assert __version__
 
-# Classifiers: https://pypi.org/classifiers/
-_status_map = {
-    "alpha": "Development Status :: 3 - Alpha",
-    "beta": "Development Status :: 4 - Beta",
-    "production": "Development Status :: 5 - Production/Stable",
-}
-assert __version_type__ in _status_map
-
 long_description = {}
 this_directory = os.path.abspath(os.path.dirname(__file__))
 try:
@@ -97,7 +89,7 @@ setup(
                 "PyNN 0.9 on the SpiNNaker platform",
     url="https://github.com/SpiNNakerManchester/SpyNNaker",
     classifiers=[
-        _status_map[__version_type__],
+        "Development Status :: 3 - Alpha",
 
         "Environment :: Console",
 
