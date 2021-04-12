@@ -112,7 +112,6 @@ setup(
         "Programming Language :: Python :: 3.9",
 
         "Topic :: Scientific/Engineering",
-        "Topic :: Scientific/Engineering :: Neuroscience",
     ],
     keywords=["spinnaker", "pynn0.9", "neural simulation"],
     packages=packages,
