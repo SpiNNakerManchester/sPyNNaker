@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from collections import defaultdict
-import numpy
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.resources import (
@@ -64,7 +63,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         "__neuron_vertices",
         "__synapse_vertices",
         "__synapse_verts_by_neuron",
-        "__synapse_verts_for_edge",
+        "__synapse_verts_by_incoming"
         "__n_synapse_vertices",
         "__poisson_edges",
         "__max_delay",
@@ -116,57 +115,29 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 "more of these values.".format(
                     atoms_per_core, n_synapse_types, self.__max_delay))
 
-        label = self._governed_app_vertex.label
-        self.__poisson_edges = set()
-
-        # Go through the incoming projections and find Poisson sources with
-        # splitters that work with us, and one-to-one connections that will
-        # then work with SDRAM
-        incoming_direct_poisson = defaultdict(list)
-        for proj in self._governed_app_vertex.incoming_projections:
-            pre_vertex = proj._projection_edge.pre_vertex
-            connector = proj._synapse_information.connector
-            if (isinstance(pre_vertex, SpikeSourcePoissonVertex) and
-                isinstance(pre_vertex.splitter, SplitterPoissonDelegate) and
-                    len(pre_vertex.outgoing_projections) == 1 and
-                    isinstance(connector, OneToOneConnector)):
-
-                # Create the direct Poisson vertices here; the splitter
-                # for the Poisson will create any others as needed
-                for vertex_slice in self.__get_fixed_slices():
-                    resources = pre_vertex.get_resources_used_by_atoms(
-                        vertex_slice)
-                    poisson_label = "{}_Poisson:{}-{}".format(
-                        label, vertex_slice.lo_atom, vertex_slice.hi_atom)
-                    poisson_m_vertex = pre_vertex.create_machine_vertex(
-                        vertex_slice, resources, label=poisson_label)
-                    machine_graph.add_vertex(poisson_m_vertex)
-                    incoming_direct_poisson[vertex_slice].append(
-                        poisson_m_vertex)
-
-                # Keep track of edges that have been used for this
-                self.__poisson_edges.add(proj._projection_edge)
-
-        # Distribute the projections between each synapse core
-        projections_by_index = self.distribute_projections()
-
-        # Work out the maximum shift for each synapse type and use that
-        # everywhere for consistency
-        app_vertex = self._governed_app_vertex
-        rb_shift_by_index = [app_vertex.get_ring_buffer_shifts(projs)
-                             for projs in projections_by_index]
-        max_rb_shifts = numpy.amax(rb_shift_by_index, axis=0)
-        weight_scales = app_vertex.get_weight_scales(max_rb_shifts)
-
-        # Get resources for synapses
-        independent_sdram = self.__independent_synapse_sdram()
-        proj_dependent_sdram = [self.__proj_dependent_synapse_sdram(projs)
-                                for projs in projections_by_index]
-
         self.__neuron_vertices = list()
         self.__synapse_vertices = list()
         self.__synapse_verts_by_neuron = defaultdict(list)
         self.__synapse_verts_for_edge = defaultdict(list)
+        self.__synapse_verts_by_incoming = defaultdict(list)
+
+        label = self._governed_app_vertex.label
+
+        incoming_direct_poisson = self.__handle_poisson_sources(
+            label, machine_graph)
+        incoming_by_synapse = self.divide_incoming_projections()
+
+        # Work out the ring buffer shifts based on all incoming things
+        app_vertex = self._governed_app_vertex
+        rb_shifts = app_vertex.get_ring_buffer_shifts(
+            app_vertex.incoming_projections)
+        weight_scales = app_vertex.get_weight_scales(rb_shifts)
+
+        # Get resources for synapses
+        independent_sdram = self.__independent_synapse_sdram()
+        one_synapse_core_only_sdram = self.__proj_dependent_synapse_sdram(
+            app_vertex.incoming_projections)
+
         for index, vertex_slice in enumerate(self.__get_fixed_slices()):
 
             # Create the neuron an synapse vertices
@@ -175,7 +146,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 label, vertex_slice.lo_atom, vertex_slice.hi_atom)
             neuron_vertex = PopulationNeuronsMachineVertex(
                 neuron_resources, neuron_label, None, app_vertex, vertex_slice,
-                index, max_rb_shifts, weight_scales)
+                index, rb_shifts, weight_scales)
             machine_graph.add_vertex(neuron_vertex)
             self.__neuron_vertices.append(neuron_vertex)
             synapse_vertices = list()
@@ -195,7 +166,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                     structural_sz, vertex_slice)
                 synapse_vertex = PopulationSynapsesMachineVertex(
                     synapse_resources, synapse_label, None, app_vertex,
-                    vertex_slice, max_rb_shifts, weight_scales,
+                    vertex_slice, rb_shifts, weight_scales,
                     all_syn_block_sz, structural_sz)
                 all_resources.append(synapse_resources)
                 machine_graph.add_vertex(synapse_vertex)
@@ -249,20 +220,56 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
         return True
 
-    def distribute_projections(self):
-        """ Distribute the projections between the synapse vertices.  Allows
-            for overriding of just this method to get different behaviour.
-            The default is to distribute between synapse cores in round-robin.
-
-        :return: A list of projections for each of n_synapse_vertices
-        :rtype: list(list(PyNNProjectionCommon))
+    def __handle_poisson_sources(self, label, machine_graph):
+        """ Go through the incoming projections and find Poisson sources with
+            splitters that work with us, and one-to-one connections that will
+            then work with SDRAM
         """
-        projections_by_index = [[] for _ in range(self.__n_synapse_vertices)]
-        index = 0
+        self.__poisson_edges = set()
+        incoming_direct_poisson = defaultdict(list)
         for proj in self._governed_app_vertex.incoming_projections:
-            projections_by_index[index].append(proj)
-            index = (index + 1) % self.__n_synapse_vertices
-        return projections_by_index
+            pre_vertex = proj._projection_edge.pre_vertex
+            connector = proj._synapse_information.connector
+            if self.__is_direct_poisson_source(pre_vertex, connector):
+                # Create the direct Poisson vertices here; the splitter
+                # for the Poisson will create any others as needed
+                for vertex_slice in self.__get_fixed_slices():
+                    resources = pre_vertex.get_resources_used_by_atoms(
+                        vertex_slice)
+                    poisson_label = "{}_Poisson:{}-{}".format(
+                        label, vertex_slice.lo_atom, vertex_slice.hi_atom)
+                    poisson_m_vertex = pre_vertex.create_machine_vertex(
+                        vertex_slice, resources, label=poisson_label)
+                    machine_graph.add_vertex(poisson_m_vertex)
+                    incoming_direct_poisson[vertex_slice].append(
+                        poisson_m_vertex)
+
+                # Keep track of edges that have been used for this
+                self.__poisson_edges.add(proj._projection_edge)
+        return incoming_direct_poisson
+
+    def __is_direct_poisson_source(self, pre_vertex, connector):
+        return (isinstance(pre_vertex, SpikeSourcePoissonVertex) and
+                isinstance(pre_vertex.splitter, SplitterPoissonDelegate) and
+                len(pre_vertex.outgoing_projections) == 1 and
+                isinstance(connector, OneToOneConnector))
+
+    def divide_incoming_projections(self):
+        """ Split the incoming projections up into the bits that will be
+            handled by each synapse vertex
+
+        :return: A list of dicts of projection to list of slices
+        """
+        index = 0
+        incoming = [defaultdict(list) for _ in self.__n_synapse_vertices]
+        for proj in self._governed_app_vertex.incoming_projections:
+            pre_vertex = proj._projection_edge.pre_vertex
+            connector = proj._synapse_information.connector
+            if not self.__is_direct_poisson_source(pre_vertex, connector):
+                for slce in pre_vertex.splitter.get_out_going_slices()[0]:
+                    incoming[index][proj].append(slce)
+                    index = (index + 1) % self.__n_synapse_vertices
+        return incoming
 
     def __get_fixed_slices(self):
         if self.__slices is not None:
@@ -313,6 +320,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         self.__neuron_vertices = None
         self.__synapse_vertices = None
         self.__synapse_verts_by_neuron = None
+        self.__synapse_verts_by_incoming = None
 
     def __get_neuron_resources(self, vertex_slice):
         """  Gets the resources of the neurons of a slice of atoms from a given

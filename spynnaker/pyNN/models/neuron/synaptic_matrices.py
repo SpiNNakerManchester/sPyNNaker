@@ -22,8 +22,6 @@ from pacman.model.routing_info import BaseKeyAndMask
 from data_specification.enums.data_type import DataType
 
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from spynnaker.pyNN.models.neural_projections import (
-    ProjectionApplicationEdge, DelayedApplicationEdge)
 from spynnaker.pyNN.models.neuron.master_pop_table import (
     MasterPopTableAsBinarySearch)
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
@@ -72,13 +70,20 @@ class SynapticMatrices(object):
         # generated matrix will be written
         "__on_chip_generated_block_addr",
         # Determine if any of the matrices can be generated on the machine
-        "__gen_on_machine"
+        "__gen_on_machine",
+        # Reference to give the synaptic matrix
+        "__synaptic_matrix_ref",
+        # Reference to give the direct matrix
+        "__direct_matrix_ref",
+        # Reference to give the master population table
+        "__poptable_ref"
     ]
 
     def __init__(
             self, post_vertex_slice, n_synapse_types, all_single_syn_sz,
             synaptic_matrix_region, direct_matrix_region, poptable_region,
-            connection_builder_region):
+            connection_builder_region, synaptic_matrix_ref=None,
+            direct_matrix_ref=None, poptable_ref=None):
         """
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
             The slice of the post vertex that these matrices are for
@@ -93,6 +98,18 @@ class SynapticMatrices(object):
             The region where the population table is stored
         :param int connection_builder_region:
             The region where the synapse generator information is stored
+        :param synaptic_matrix_ref:
+            The reference to the synaptic matrix region, or None if not
+            referenced or referenceable
+        :type synaptic_matrix_ref: int or None
+        :param direct_matrix_ref:
+            The reference to the direct matrix region, or None if not
+            referenced or referenceable
+        :type direct_matrix_ref: int or None
+        :param poptable_ref:
+            The reference to the pop table region, or None if not
+            referenced or referenceable
+        :type poptable_ref: int or None
         """
         self.__post_vertex_slice = post_vertex_slice
         self.__n_synapse_types = n_synapse_types
@@ -101,6 +118,9 @@ class SynapticMatrices(object):
         self.__direct_matrix_region = direct_matrix_region
         self.__poptable_region = poptable_region
         self.__connection_builder_region = connection_builder_region
+        self.__synaptic_matrix_ref = synaptic_matrix_ref
+        self.__direct_matrix_ref = direct_matrix_ref
+        self.__poptable_ref = poptable_ref
 
         # Set up the master population table
         self.__poptable = MasterPopTableAsBinarySearch()
@@ -159,15 +179,14 @@ class SynapticMatrices(object):
         return matrix
 
     def write_synaptic_data(
-            self, spec, machine_vertex, all_syn_block_sz, weight_scales,
-            routing_info, machine_graph):
-        """ Simultaneously generates both the master population table and
-            the synaptic matrix, as well as any synapse generator data
+            self, spec, incoming_projections, all_syn_block_sz, weight_scales,
+            routing_info):
+        """ Write the synaptic data for all incoming projections
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The spec to write to
-        :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:
-            The machine vertex to write for
+        :param list(Projection) incoming_projection:
+            The projections to generate data for
         :param int all_syn_block_sz:
             The size in bytes of the space reserved for synapses
         :param list(float) weight_scales: The weight scale of each synapse
@@ -185,17 +204,16 @@ class SynapticMatrices(object):
             "\nWriting Synaptic Matrix and Master Population Table:\n")
         spec.reserve_memory_region(
             region=self.__synaptic_matrix_region,
-            size=all_syn_block_sz, label='SynBlocks')
+            size=all_syn_block_sz, label='SynBlocks',
+            reference=self.__synaptic_matrix_ref)
 
         # Track writes inside the synaptic matrix region:
         block_addr = 0
         self.__poptable.initialise_table()
 
-        # Get the application projection edges incoming to this machine vertex
-        in_machine_edges = machine_graph.get_edges_ending_at_vertex(
-            machine_vertex)
+        # Convert the data for convenience
         in_edges_by_app_edge, key_space_tracker = self.__in_edges_by_app_edge(
-            in_machine_edges, routing_info)
+            incoming_projections, routing_info)
 
         # Set up for single synapses
         # The list is seeded with an empty array so we can just concatenate
@@ -246,7 +264,7 @@ class SynapticMatrices(object):
 
         # Finish the master population table
         self.__poptable.finish_master_pop_table(
-            spec, self.__poptable_region)
+            spec, self.__poptable_region, self.__poptable_ref)
 
         # Write the size and data of single synapses to the direct region
         single_data = numpy.concatenate(single_synapses)
@@ -256,7 +274,8 @@ class SynapticMatrices(object):
             size=(
                 single_data_words * BYTES_PER_WORD +
                 DIRECT_MATRIX_HEADER_COST_BYTES),
-            label='DirectMatrix')
+            label='DirectMatrix',
+            reference=self.__direct_matrix_ref)
         spec.switch_write_focus(self.__direct_matrix_region)
         spec.write_value(single_data_words * BYTES_PER_WORD)
         if single_data_words:
@@ -310,31 +329,49 @@ class SynapticMatrices(object):
             items.extend(data.gen_data)
         spec.write_array(numpy.concatenate(items))
 
-    def __in_edges_by_app_edge(self, in_machine_edges, routing_info):
-        """ Convert a list of machine edges to a dict of
+    def __in_edges_by_app_edge(self, incoming_projections, routing_info):
+        """ Convert a list of incoming projections to a dict of
             application edge -> list of machine edges, and a key tracker
 
-        :param list(~pacman.model.graphs.machine.MachineEdge) in_machine_edges:
-            The incoming machine edges
+        :param list(Projection) incoming_projections:
+            The incoming projections
         :param RoutingInfo routing_info: Routing information for all edges
         :rtype: tuple(dict, KeySpaceTracker)
         """
         in_edges_by_app_edge = defaultdict(OrderedSet)
         key_space_tracker = KeySpaceTracker()
-        for machine_edge in in_machine_edges:
-            rinfo = routing_info.get_routing_info_for_edge(machine_edge)
-            key_space_tracker.allocate_keys(rinfo)
-            app_edge = machine_edge.app_edge
-            if isinstance(app_edge, ProjectionApplicationEdge):
-                in_edges_by_app_edge[app_edge].add(machine_edge)
-            elif isinstance(app_edge, DelayedApplicationEdge):
-                # We need to make sure that if an undelayed edge is filtered
-                # but a delayed one is not, we still pick it up
-                undelayed_machine_edge = (
-                    machine_edge.app_edge.undelayed_edge.get_machine_edge(
-                        machine_edge.pre_vertex, machine_edge.post_vertex))
-                in_edges_by_app_edge[app_edge.undelayed_edge].add(
-                    undelayed_machine_edge)
+        for proj in incoming_projections:
+            app_edge = proj._projection_edge
+
+            # Skip if already done
+            if app_edge in in_edges_by_app_edge:
+                continue
+
+            # Add all incoming machine edges for this slice
+            for machine_edge in app_edge.machine_edges:
+                if (machine_edge.post_vertex.vertex_slice ==
+                        self.__post_vertex_slice):
+                    rinfo = routing_info.get_routing_info_for_edge(
+                        machine_edge)
+                    key_space_tracker.allocate_keys(rinfo)
+                    in_edges_by_app_edge[app_edge].add(machine_edge)
+
+            # Also go through the delay edges in case an undelayed edge
+            # was filtered
+            delay_edge = app_edge.delay_edge
+            if delay_edge is not None:
+                for machine_edge in delay_edge.machine_edges:
+                    if (machine_edge.post_vertex.vertex_slice ==
+                            self.__post_vertex_slice):
+                        rinfo = routing_info.get_routing_info_for_edge(
+                            machine_edge)
+                        key_space_tracker.allocate_keys(rinfo)
+                        undelayed_machine_edge = (
+                            app_edge.get_machine_edge(
+                                machine_edge.pre_vertex,
+                                machine_edge.post_vertex))
+                        in_edges_by_app_edge[app_edge].add(
+                            undelayed_machine_edge)
         return in_edges_by_app_edge, key_space_tracker
 
     @staticmethod

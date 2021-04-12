@@ -85,6 +85,11 @@ SynapseRegions = namedtuple(
      "synapse_dynamics", "structural_dynamics", "bitfield_builder",
      "bitfield_key_map", "bitfield_filter", "connection_builder"])
 
+SynapseReferences = namedtuple(
+    "SynapseReferences",
+    ["direct_matrix_ref", "pop_table_ref", "synaptic_matrix_ref",
+     "bitfield_filter_ref"])
+
 
 class PopulationMachineSynapses(
         AbstractSupportsBitFieldGeneration,
@@ -372,8 +377,8 @@ class PopulationMachineSynapses(
 
         # Write the synaptic matrices
         self._synaptic_matrices.write_synaptic_data(
-            spec, self, all_syn_block_sz, weight_scales, routing_info,
-            machine_graph)
+            spec, self._app_vertex.incoming_projections, all_syn_block_sz,
+            weight_scales, routing_info)
 
         # Write any synapse dynamics
         synapse_dynamics = self._app_vertex.synapse_dynamics

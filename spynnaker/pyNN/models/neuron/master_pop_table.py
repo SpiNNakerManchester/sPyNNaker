@@ -333,11 +333,13 @@ class MasterPopTableAsBinarySearch(object):
     """
     __slots__ = [
         "__entries",
-        "__n_addresses"]
+        "__n_addresses",
+        "__generated"]
 
     def __init__(self):
         self.__entries = None
         self.__n_addresses = 0
+        self.__generated = False
 
     @staticmethod
     def get_master_population_table_size(incoming_projections):
@@ -415,6 +417,7 @@ class MasterPopTableAsBinarySearch(object):
         """
         self.__entries = dict()
         self.__n_addresses = 0
+        self.__generated = False
 
     def add_machine_entry(
             self, block_start_addr, row_length, key_and_mask, is_single=False):
@@ -616,13 +619,15 @@ class MasterPopTableAsBinarySearch(object):
                     core_mask, core_shift, n_neurons))
         return entry
 
-    def finish_master_pop_table(self, spec, master_pop_table_region):
+    def finish_master_pop_table(self, spec, region, ref):
         """ Complete the master pop table in the data specification.
 
         :param ~data_specification.DataSpecificationGenerator spec:
             the data specification to write the master pop entry to
-        :param int master_pop_table_region:
+        :param int region:
             the region to which the master pop table is being stored
+        :param ref:
+            the reference to use for the region, or None if not referenceable
         """
         # sort entries by key
         entries = sorted(
@@ -636,9 +641,9 @@ class MasterPopTableAsBinarySearch(object):
             n_entries * _MASTER_POP_ENTRY_SIZE_BYTES +
             self.__n_addresses * _ADDRESS_LIST_ENTRY_SIZE_BYTES)
         spec.reserve_memory_region(
-            region=master_pop_table_region,
-            size=master_pop_table_sz, label='PopTable')
-        spec.switch_write_focus(region=master_pop_table_region)
+            region=region, size=master_pop_table_sz, label='PopTable',
+            reference=ref)
+        spec.switch_write_focus(region=region)
 
         # write no master pop entries and the address list size
         spec.write_value(n_entries)
@@ -654,11 +659,7 @@ class MasterPopTableAsBinarySearch(object):
         # Write the arrays
         spec.write_array(_to_numpy(pop_table))
         spec.write_array(_to_numpy(address_list))
-
-        self.__entries.clear()
-        del self.__entries
-        self.__entries = None
-        self.__n_addresses = 0
+        self.__generated = True
 
     @property
     def max_n_neurons_per_core(self):
@@ -707,3 +708,9 @@ class MasterPopTableAsBinarySearch(object):
                 numpy.array(_PADDING_BYTE, dtype="uint8"), padding).view(
                     "uint32"))
         return next_allowed
+
+    @property
+    def generated(self):
+        """ Indicates if the table has been finished
+        """
+        return self.__generated
