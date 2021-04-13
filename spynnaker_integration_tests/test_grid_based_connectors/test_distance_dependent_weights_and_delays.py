@@ -119,7 +119,7 @@ class DistanceDependentWeightsAndDelaysTest(BaseTestCase):
     def check_inh_weights(self, inh_weights_delays):
         for conn in inh_weights_delays:
             # weights are constant
-            self.assertEqual(1.5, conn[2])
+            self.assertAlmostEqual(1.5, conn[2], places=3)
             source_pos = self.POSITIONS[conn[0]]
             target_pos = self.POSITIONS[conn[1]]
             dist = math.sqrt((source_pos[0]-target_pos[0])**2 +

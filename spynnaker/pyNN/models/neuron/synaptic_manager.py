@@ -530,15 +530,16 @@ class SynapticManager(object):
                     weights = synapse_info.weights
                     synapse_type = synapse_info.synapse_type
                     min_weight = min_weights[synapse_type]
-                    if numpy.isscalar(weights):
-                        self.__check_weight(
-                            min_weight, weights, weight_scale,
-                            app_edge, synapse_info)
-                    elif hasattr(weights, "__getitem__"):
-                        for w in weights:
+                    if not isinstance(weights, str):
+                        if numpy.isscalar(weights):
                             self.__check_weight(
-                                min_weight, w, weight_scale,
+                                min_weight, weights, weight_scale,
                                 app_edge, synapse_info)
+                        elif hasattr(weights, "__getitem__"):
+                            for w in weights:
+                                self.__check_weight(
+                                    min_weight, w, weight_scale,
+                                    app_edge, synapse_info)
 
     def __check_weight(
             self, min_weight, weight, weight_scale, app_edge,
