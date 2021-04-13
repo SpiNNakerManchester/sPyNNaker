@@ -89,7 +89,7 @@ setup(
                 "PyNN 0.9 on the SpiNNaker platform",
     url="https://github.com/SpiNNakerManchester/SpyNNaker",
     classifiers=[
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 5 - Production/Stable",
 
         "Environment :: Console",
 
@@ -112,6 +112,7 @@ setup(
         "Programming Language :: Python :: 3.9",
 
         "Topic :: Scientific/Engineering",
+        "Topic :: Scientific/Engineering :: Neuroscience",
     ],
     keywords=["spinnaker", "pynn0.9", "neural simulation"],
     packages=packages,
