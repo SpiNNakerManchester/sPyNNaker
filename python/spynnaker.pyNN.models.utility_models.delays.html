@@ -4,9 +4,8 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
-
-    <title>spynnaker.pyNN.models.utility_models.delays package &#8212; sPyNNaker  documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>spynnaker.pyNN.models.utility_models.delays package &#8212; sPyNNaker 6.0.1 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -33,7 +32,7 @@
         <li class="right" >
           <a href="spynnaker.pyNN.models.utility_models.html" title="spynnaker.pyNN.models.utility_models package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >spynnaker</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
           <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
@@ -48,9 +47,9 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="spynnaker-pynn-models-utility-models-delays-package">
+  <div class="section" id="spynnaker-pynn-models-utility-models-delays-package">
 <h1>spynnaker.pyNN.models.utility_models.delays package<a class="headerlink" href="#spynnaker-pynn-models-utility-models-delays-package" title="Permalink to this headline">¶</a></h1>
-<section id="module-spynnaker.pyNN.models.utility_models.delays">
+<div class="section" id="module-spynnaker.pyNN.models.utility_models.delays">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.models.utility_models.delays" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="spynnaker.pyNN.models.utility_models.delays.DelayBlock">
@@ -62,7 +61,7 @@
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>n_delay_stages</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
 <li><p><strong>delay_per_stage</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
-<li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN)"><em>Slice</em></a>) – </p></li>
+<li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – </p></li>
 </ul>
 </dd>
 </dl>
@@ -98,12 +97,12 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>resources_required</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.resources/#pacman.model.resources.ResourceContainer" title="(in PACMAN)"><em>ResourceContainer</em></a>) – The resources required by the vertex</p></li>
+<li><p><strong>resources_required</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.resources/#pacman.model.resources.ResourceContainer" title="(in PACMAN v6.0)"><em>ResourceContainer</em></a>) – The resources required by the vertex</p></li>
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The optional name of the vertex</p></li>
-<li><p><strong>constraints</strong> (<em>iterable</em><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN)"><em>AbstractConstraint</em></a><em>)</em>) – The optional initial constraints of the vertex</p></li>
-<li><p><strong>app_vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN)"><em>ApplicationVertex</em></a>) – The application vertex that caused this machine vertex to be
+<li><p><strong>constraints</strong> (<em>iterable</em><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v6.0)"><em>AbstractConstraint</em></a><em>)</em>) – The optional initial constraints of the vertex</p></li>
+<li><p><strong>app_vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)"><em>ApplicationVertex</em></a>) – The application vertex that caused this machine vertex to be
 created. If None, there is no such application vertex.</p></li>
-<li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN)"><em>Slice</em></a>) – The slice of the application vertex that this machine vertex
+<li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – The slice of the application vertex that this machine vertex
 implements.</p></li>
 </ul>
 </dd>
@@ -291,7 +290,7 @@ implements.</p></li>
 <dd><p>Determine if the given slice needs to be generated on the machine</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN)"><em>Slice</em></a>) – </p>
+<dd class="field-odd"><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – </p>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
@@ -306,10 +305,10 @@ implements.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification)"><em>DataSpecificationGenerator</em></a>) – The data specification to write to</p></li>
-<li><p><strong>placement</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placement" title="(in PACMAN)"><em>Placement</em></a>) – The placement the vertex is located at</p></li>
-<li><p><strong>machine_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineGraph" title="(in PACMAN)"><em>MachineGraph</em></a>) – </p></li>
-<li><p><strong>routing_infos</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.routing_info/#pacman.model.routing_info.RoutingInfo" title="(in PACMAN)"><em>RoutingInfo</em></a>) – </p></li>
+<li><p><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v6.0)"><em>DataSpecificationGenerator</em></a>) – The data specification to write to</p></li>
+<li><p><strong>placement</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placement" title="(in PACMAN v6.0)"><em>Placement</em></a>) – The placement the vertex is located at</p></li>
+<li><p><strong>machine_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineGraph" title="(in PACMAN v6.0)"><em>MachineGraph</em></a>) – </p></li>
+<li><p><strong>routing_infos</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.routing_info/#pacman.model.routing_info.RoutingInfo" title="(in PACMAN v6.0)"><em>RoutingInfo</em></a>) – </p></li>
 <li><p><strong>machine_time_step</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – machine time step of the sim.</p></li>
 <li><p><strong>time_scale_factor</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the time scale factor of the sim.</p></li>
 </ul>
@@ -366,8 +365,8 @@ implements.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan)"><em>Transceiver</em></a>) – How to talk to the machine</p></li>
-<li><p><strong>placement</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placement" title="(in PACMAN)"><em>Placement</em></a>) – Which vertex are we retrieving from, and where was it</p></li>
+<li><p><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan v6.0)"><em>Transceiver</em></a>) – How to talk to the machine</p></li>
+<li><p><strong>placement</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placement" title="(in PACMAN v6.0)"><em>Placement</em></a>) – Which vertex are we retrieving from, and where was it</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
@@ -382,7 +381,7 @@ implements.</p></li>
 <dd><p>The resources required by the vertex</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.resources/#pacman.model.resources.ResourceContainer" title="(in PACMAN)">ResourceContainer</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.resources/#pacman.model.resources.ResourceContainer" title="(in PACMAN v6.0)">ResourceContainer</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -394,8 +393,8 @@ implements.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification)"><em>DataSpecificationGenerator</em></a>) – </p></li>
-<li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN)"><em>Slice</em></a>) – </p></li>
+<li><p><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v6.0)"><em>DataSpecificationGenerator</em></a>) – </p></li>
+<li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – </p></li>
 <li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
 <li><p><strong>incoming_key</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
 <li><p><strong>incoming_mask</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
@@ -417,8 +416,8 @@ implements.</p></li>
 <li><p><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the number of neurons</p></li>
 <li><p><strong>delay_per_stage</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the delay per stage</p></li>
 <li><p><strong>max_delay_to_support</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the max delay this will cover</p></li>
-<li><p><strong>source_vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN)"><em>ApplicationVertex</em></a>) – where messages are coming from</p></li>
-<li><p><strong>constraints</strong> (<em>iterable</em><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN)"><em>AbstractConstraint</em></a><em>)</em>) – the vertex constraints</p></li>
+<li><p><strong>source_vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)"><em>ApplicationVertex</em></a>) – where messages are coming from</p></li>
+<li><p><strong>constraints</strong> (<em>iterable</em><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v6.0)"><em>AbstractConstraint</em></a><em>)</em>) – the vertex constraints</p></li>
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – the vertex label</p></li>
 </ul>
 </dd>
@@ -450,7 +449,7 @@ implements.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN)"><em>Slice</em></a>) – </p></li>
+<li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – </p></li>
 <li><p><strong>source_ids</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – </p></li>
 <li><p><strong>stages</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – </p></li>
 </ul>
@@ -467,11 +466,11 @@ implements.</p></li>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>max_row_n_synapses</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The maximum number of synapses in a row</p></li>
 <li><p><strong>max_delayed_row_n_synapses</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The maximum number of synapses in a delay row</p></li>
-<li><p><strong>pre_slices</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN)"><em>Slice</em></a><em>)</em>) – The list of slices of the pre application vertex</p></li>
-<li><p><strong>post_slices</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN)"><em>Slice</em></a><em>)</em>) – The list of slices of the post application vertex</p></li>
-<li><p><strong>pre_vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN)"><em>Slice</em></a>) – The slice of the pre applcation vertex currently being
+<li><p><strong>pre_slices</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a><em>)</em>) – The list of slices of the pre application vertex</p></li>
+<li><p><strong>post_slices</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a><em>)</em>) – The list of slices of the post application vertex</p></li>
+<li><p><strong>pre_vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – The slice of the pre applcation vertex currently being
 considered</p></li>
-<li><p><strong>post_vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN)"><em>Slice</em></a>) – The slice of the post application vertex currently being
+<li><p><strong>post_vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – The slice of the post application vertex currently being
 considered</p></li>
 <li><p><strong>synapse_information</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) – The synapse information of the connection</p></li>
 <li><p><strong>synapse_information</strong> – </p></li>
@@ -509,7 +508,7 @@ considered</p></li>
 <dd><p>Determine if the given slice needs to be generated on the machine</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN)"><em>Slice</em></a>) – </p>
+<dd class="field-odd"><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – </p>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
@@ -534,7 +533,7 @@ considered</p></li>
 <dd class="field-even"><p>A list of constraints</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN)">AbstractConstraint</a>)</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v6.0)">AbstractConstraint</a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -575,15 +574,15 @@ The maximum number of delay stages required by any connection            out of 
 <em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">source_vertex</span></code><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.source_vertex" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN)">ApplicationVertex</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)">ApplicationVertex</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 </dd></dl>
 
-</section>
-</section>
+</div>
+</div>
 
 
             <div class="clearer"></div>
@@ -642,7 +641,7 @@ The maximum number of delay stages required by any connection            out of 
         <li class="right" >
           <a href="spynnaker.pyNN.models.utility_models.html" title="spynnaker.pyNN.models.utility_models package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >spynnaker</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
           <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
@@ -653,7 +652,7 @@ The maximum number of delay stages required by any connection            out of 
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.4.
     </div>
   </body>
 </html>

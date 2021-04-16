@@ -4,9 +4,8 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
-
-    <title>spynnaker.pyNN.models.abstract_models package &#8212; sPyNNaker  documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>spynnaker.pyNN.models.abstract_models package &#8212; sPyNNaker 6.0.1 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -33,7 +32,7 @@
         <li class="right" >
           <a href="spynnaker.pyNN.models.html" title="spynnaker.pyNN.models package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >spynnaker</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
           <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
@@ -47,9 +46,9 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="spynnaker-pynn-models-abstract-models-package">
+  <div class="section" id="spynnaker-pynn-models-abstract-models-package">
 <h1>spynnaker.pyNN.models.abstract_models package<a class="headerlink" href="#spynnaker-pynn-models-abstract-models-package" title="Permalink to this headline">¶</a></h1>
-<section id="module-spynnaker.pyNN.models.abstract_models">
+<div class="section" id="module-spynnaker.pyNN.models.abstract_models">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.models.abstract_models" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses">
@@ -73,8 +72,8 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan)"><em>Transceiver</em></a>) – How to read the connection data</p></li>
-<li><p><strong>placements</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placements" title="(in PACMAN)"><em>Placements</em></a>) – Where the connection data is on the machine</p></li>
+<li><p><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan v6.0)"><em>Transceiver</em></a>) – How to read the connection data</p></li>
+<li><p><strong>placements</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placements" title="(in PACMAN v6.0)"><em>Placements</em></a>) – Where the connection data is on the machine</p></li>
 <li><p><strong>app_edge</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge" title="spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge"><em>ProjectionApplicationEdge</em></a>) – The edge for which the data is being read</p></li>
 <li><p><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) – The specific projection within the edge</p></li>
 </ul>
@@ -172,7 +171,7 @@ instance of AbstractSpynnakerSplitterDelay</p>
 <dt id="spynnaker.pyNN.models.abstract_models.AbstractMaxSpikes">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.abstract_models.</span></code><code class="sig-name descname"><span class="pre">AbstractMaxSpikes</span></code><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_max_spikes.html#AbstractMaxSpikes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractMaxSpikes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<p>Indicates a class (a         <a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineVertex" title="(in PACMAN)"><code class="xref py py-class docutils literal notranslate"><span class="pre">MachineVertex</span></code></a>)         that can describe the maximum rate that it sends spikes.</p>
+<p>Indicates a class (a         <a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineVertex" title="(in PACMAN v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">MachineVertex</span></code></a>)         that can describe the maximum rate that it sends spikes.</p>
 <p>The <a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.SynapticManager" title="spynnaker.pyNN.models.neuron.SynapticManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">SynapticManager</span></code></a> assumes that all machine vertexes
 share the same synapse_information will have the same rates.</p>
 <dl class="py method">
@@ -226,7 +225,7 @@ ideally also with <code class="docutils literal notranslate"><span class="pre">_
 <li><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – variable name with or without <code class="docutils literal notranslate"><span class="pre">_init</span></code></p></li>
 <li><p><strong>selector</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#slice" title="(in Python v3.8)"><em>slice</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – a description of the subrange to accept, or None for
 all. See:
-<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.AbstractSized.selector_to_ids" title="(in SpiNNUtils)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">selector_to_ids()</span></code></a></p></li>
+<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.AbstractSized.selector_to_ids" title="(in SpiNNUtils v6.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">selector_to_ids()</span></code></a></p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -246,7 +245,7 @@ all. See:
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>selector</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#slice" title="(in Python v3.8)"><em>slice</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – a description of the subrange to accept, or <code class="docutils literal notranslate"><span class="pre">None</span></code>
 for all. See:
-<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.AbstractSized.selector_to_ids" title="(in SpiNNUtils)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">selector_to_ids()</span></code></a></p>
+<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.AbstractSized.selector_to_ids" title="(in SpiNNUtils v6.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">selector_to_ids()</span></code></a></p>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a>(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a>,Any)</p>
@@ -334,7 +333,7 @@ as this is just a pass through method</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>selector</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#slice" title="(in Python v3.8)"><em>slice</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – See             <a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangedList" title="(in SpiNNUtils)"><code class="xref py py-class docutils literal notranslate"><span class="pre">RangedList</span></code></a>.set_value_by_selector            as this is just a pass through method</p></li>
+<li><p><strong>selector</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#slice" title="(in Python v3.8)"><em>slice</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – See             <a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangedList" title="(in SpiNNUtils v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">RangedList</span></code></a>.set_value_by_selector            as this is just a pass through method</p></li>
 <li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – the name of the parameter to change</p></li>
 <li><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – the new value of the parameter to assign</p></li>
 </ul>
@@ -356,9 +355,9 @@ as this is just a pass through method</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan)"><em>Transceiver</em></a>) – the SpinnMan interface</p></li>
-<li><p><strong>placement</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placement" title="(in PACMAN)"><em>Placement</em></a>) – the placement of a vertex</p></li>
-<li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN)"><em>Slice</em></a>) – the slice of atoms for this vertex</p></li>
+<li><p><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan v6.0)"><em>Transceiver</em></a>) – the SpinnMan interface</p></li>
+<li><p><strong>placement</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placement" title="(in PACMAN v6.0)"><em>Placement</em></a>) – the placement of a vertex</p></li>
+<li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – the slice of atoms for this vertex</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
@@ -408,7 +407,7 @@ as this is just a pass through method</p></li>
 <dt id="spynnaker.pyNN.models.abstract_models.AbstractSynapseExpandable">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.abstract_models.</span></code><code class="sig-name descname"><span class="pre">AbstractSynapseExpandable</span></code><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_synapse_expandable.html#AbstractSynapseExpandable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractSynapseExpandable" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<p>Indicates a class (a         <a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineVertex" title="(in PACMAN)"><code class="xref py py-class docutils literal notranslate"><span class="pre">MachineVertex</span></code></a>)         that has may need to run the SYNAPSE_EXPANDER aplx</p>
+<p>Indicates a class (a         <a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineVertex" title="(in PACMAN v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">MachineVertex</span></code></a>)         that has may need to run the SYNAPSE_EXPANDER aplx</p>
 <p>Cores that do not use the synapse_manager should not implement this
 API even though their app vertex may hold a synapse_manager.</p>
 <div class="admonition note">
@@ -445,8 +444,8 @@ app_vertex’s synapse_manager</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan)"><em>Transceiver</em></a>) – How the data is to be read</p></li>
-<li><p><strong>placement</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placement" title="(in PACMAN)"><em>Placement</em></a>) – Where the data is on the machine</p></li>
+<li><p><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan v6.0)"><em>Transceiver</em></a>) – How the data is to be read</p></li>
+<li><p><strong>placement</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placement" title="(in PACMAN v6.0)"><em>Placement</em></a>) – Where the data is on the machine</p></li>
 </ul>
 </dd>
 </dl>
@@ -467,8 +466,8 @@ app_vertex’s synapse_manager</p>
 
 </dd></dl>
 
-</section>
-</section>
+</div>
+</div>
 
 
             <div class="clearer"></div>
@@ -527,7 +526,7 @@ app_vertex’s synapse_manager</p>
         <li class="right" >
           <a href="spynnaker.pyNN.models.html" title="spynnaker.pyNN.models package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >spynnaker</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
           <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
@@ -537,7 +536,7 @@ app_vertex’s synapse_manager</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.4.
     </div>
   </body>
 </html>

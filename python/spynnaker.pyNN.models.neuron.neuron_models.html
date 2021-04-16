@@ -4,9 +4,8 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
-
-    <title>spynnaker.pyNN.models.neuron.neuron_models package &#8212; sPyNNaker  documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>spynnaker.pyNN.models.neuron.neuron_models package &#8212; sPyNNaker 6.0.1 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -34,7 +33,7 @@
         <li class="right" >
           <a href="spynnaker.pyNN.models.neuron.input_types.html" title="spynnaker.pyNN.models.neuron.input_types package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >spynnaker</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
           <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
@@ -49,9 +48,9 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="spynnaker-pynn-models-neuron-neuron-models-package">
+  <div class="section" id="spynnaker-pynn-models-neuron-neuron-models-package">
 <h1>spynnaker.pyNN.models.neuron.neuron_models package<a class="headerlink" href="#spynnaker-pynn-models-neuron-neuron-models-package" title="Permalink to this headline">¶</a></h1>
-<section id="module-spynnaker.pyNN.models.neuron.neuron_models">
+<div class="section" id="module-spynnaker.pyNN.models.neuron.neuron_models">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.models.neuron.neuron_models" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel">
@@ -61,9 +60,9 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>data_types</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification)"><em>DataType</em></a><em>)</em>) – A list of data types in the neuron structure, in the order that
+<li><p><strong>data_types</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification v6.0)"><em>DataType</em></a><em>)</em>) – A list of data types in the neuron structure, in the order that
 they appear</p></li>
-<li><p><strong>global_data_types</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification)"><em>DataType</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – A list of data types in the neuron global structure, in the order
+<li><p><strong>global_data_types</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification v6.0)"><em>DataType</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – A list of data types in the neuron global structure, in the order
 that they appear</p></li>
 </ul>
 </dd>
@@ -75,9 +74,9 @@ that they appear</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – The holder of the parameters</p></li>
-<li><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – The holder of the state variables</p></li>
-<li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN)"><em>Slice</em></a>) – The slice of the vertex to generate parameters for</p></li>
+<li><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – The holder of the parameters</p></li>
+<li><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – The holder of the state variables</p></li>
+<li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – The slice of the vertex to generate parameters for</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
@@ -151,9 +150,9 @@ that they appear</p></li>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#bytes" title="(in Python v3.8)"><em>bytes</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#bytearray" title="(in Python v3.8)"><em>bytearray</em></a>) – The data to be read</p></li>
 <li><p><strong>offset</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The offset where the data should be read from</p></li>
-<li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN)"><em>Slice</em></a>) – The slice of the vertex to read parameters for</p></li>
-<li><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – The holder of the parameters to update</p></li>
-<li><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – The holder of the state variables to update</p></li>
+<li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – The slice of the vertex to read parameters for</p></li>
+<li><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – The holder of the parameters to update</p></li>
+<li><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – The holder of the state variables to update</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -209,7 +208,7 @@ that they appear</p></li>
 <dd><p>Add the initial values of the parameters to the parameter holder</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – A holder of the parameters</p>
+<dd class="field-odd"><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – A holder of the parameters</p>
 </dd>
 </dl>
 </dd></dl>
@@ -220,7 +219,7 @@ that they appear</p></li>
 <dd><p>Add the initial values of the state variables to the state            variables holder</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – A holder of the state variables</p>
+<dd class="field-odd"><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – A holder of the state variables</p>
 </dd>
 </dl>
 </dd></dl>
@@ -307,9 +306,9 @@ that they appear</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – The holder of the parameters</p></li>
-<li><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – The holder of the state variables</p></li>
-<li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN)"><em>Slice</em></a>) – The slice of variables being retrieved</p></li>
+<li><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – The holder of the parameters</p></li>
+<li><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – The holder of the state variables</p></li>
+<li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – The slice of variables being retrieved</p></li>
 <li><p><strong>ts</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – The time to be advanced in one call to the update of this component</p></li>
 <li><p><strong>ts</strong> – machine time step</p></li>
 </ul>
@@ -319,7 +318,7 @@ that they appear</p></li>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a> or <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a> or <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>) or <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a>) or
-<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangedList" title="(in SpiNNUtils)">RangedList</a>)</p>
+<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangedList" title="(in SpiNNUtils v6.0)">RangedList</a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -368,8 +367,8 @@ that they appear</p></li>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>values</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>)</em>) – The values read from the machine, one for each struct element</p></li>
-<li><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – The holder of the parameters to update</p></li>
-<li><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – The holder of the state variables to update</p></li>
+<li><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – The holder of the parameters to update</p></li>
+<li><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – The holder of the state variables to update</p></li>
 </ul>
 </dd>
 </dl>
@@ -419,7 +418,7 @@ that they appear</p></li>
 <dd><p>Add the initial values of the parameters to the parameter holder</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – A holder of the parameters</p>
+<dd class="field-odd"><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – A holder of the parameters</p>
 </dd>
 </dl>
 </dd></dl>
@@ -430,7 +429,7 @@ that they appear</p></li>
 <dd><p>Add the initial values of the state variables to the state            variables holder</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – A holder of the state variables</p>
+<dd class="field-odd"><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – A holder of the state variables</p>
 </dd>
 </dl>
 </dd></dl>
@@ -478,9 +477,9 @@ that they appear</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – The holder of the parameters</p></li>
-<li><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – The holder of the state variables</p></li>
-<li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN)"><em>Slice</em></a>) – The slice of variables being retrieved</p></li>
+<li><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – The holder of the parameters</p></li>
+<li><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – The holder of the state variables</p></li>
+<li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – The slice of variables being retrieved</p></li>
 <li><p><strong>ts</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The time to be advanced in one call to the update of this component</p></li>
 <li><p><strong>ts</strong> – machine time step</p></li>
 </ul>
@@ -490,7 +489,7 @@ that they appear</p></li>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a> or <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a> or <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>) or <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a>) or
-<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangedList" title="(in SpiNNUtils)">RangedList</a>)</p>
+<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangedList" title="(in SpiNNUtils v6.0)">RangedList</a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -550,8 +549,8 @@ that they appear</p></li>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>values</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>)</em>) – The values read from the machine, one for each struct element</p></li>
-<li><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – The holder of the parameters to update</p></li>
-<li><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils)"><em>RangeDictionary</em></a>) – The holder of the state variables to update</p></li>
+<li><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – The holder of the parameters to update</p></li>
+<li><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – The holder of the state variables to update</p></li>
 </ul>
 </dd>
 </dl>
@@ -592,8 +591,8 @@ that they appear</p></li>
 
 </dd></dl>
 
-</section>
-</section>
+</div>
+</div>
 
 
             <div class="clearer"></div>
@@ -652,7 +651,7 @@ that they appear</p></li>
         <li class="right" >
           <a href="spynnaker.pyNN.models.neuron.input_types.html" title="spynnaker.pyNN.models.neuron.input_types package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >spynnaker</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
           <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
@@ -663,7 +662,7 @@ that they appear</p></li>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.4.
     </div>
   </body>
 </html>
