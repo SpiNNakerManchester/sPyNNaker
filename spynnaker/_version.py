@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2021 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,8 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-__version__ = "1!5.1.1"
-__version_month__ = "November"
-__version_year__ = "2019"
-__version_day__ = "15"
-__version_name__ = "Liveware Problem"
+__version__ = "1!6.0.1"
+__version_month__ = "May"
+__version_year__ = "2021"
+__version_day__ = "TBD"
+__version_name__ = "Not yet released"
