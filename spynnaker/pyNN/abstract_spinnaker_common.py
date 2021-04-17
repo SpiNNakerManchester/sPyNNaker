@@ -13,11 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from collections import defaultdict
 import logging
 import math
 import os
 from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.log import FormatAdapter
+from spinn_utilities.progress_bar import ProgressBar
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
     AbstractSpinnakerBase)
 from spinn_front_end_common.utilities.constants import (
@@ -34,6 +36,7 @@ from spynnaker.pyNN.utilities.extracted_data import ExtractedData
 from spynnaker import __version__ as version
 
 logger = FormatAdapter(logging.getLogger(__name__))
+_PYNN_NETWORK_REPORT = "pynn_network.txt"
 
 
 class AbstractSpiNNakerCommon(
@@ -350,6 +353,50 @@ class AbstractSpiNNakerCommon(
         self.reset_number_of_neurons_per_core()
         unset_simulator(self)
 
+    def __write_population_graph_report(self, filename):
+        """ Report the pyNN population/projection-level graph.
+
+        :param str filename: What file to write the report to.
+        :raises IOError: If the file isn't writable.
+        """
+        with open(filename, "w") as f:
+            progress = ProgressBar(
+                len(self._projections) + len(self._projections),
+                "Describing Final Simulation Graph")
+
+            # Invert the relations to pop->proj(info)
+            incoming_projections = defaultdict(list)
+            outgoing_projections = defaultdict(list)
+            for projection in progress.over(
+                    self._projections, finish_at_end=False):
+                info = projection._synapse_information
+                incoming_projections[info.post_population].append(info)
+                outgoing_projections[info.pre_population].append(info)
+
+            f.write("*** Populations:\n")
+            for population in progress.over(self._populations):
+                f.write("Population {}, Model {}\n".format(
+                    population.label, population.celltype))
+
+                # NB: getting a defaulted empty list is fine here
+                outgoing = outgoing_projections[population]
+                f.write("    {} Outgoing Projections:\n".format(
+                    len(outgoing)))
+                for info in outgoing:
+                    f.write(
+                        "        Projection to {}, connector {}\n".format(
+                            info.post_population.label, str(info.connector)))
+
+                # NB: getting a defaulted empty list is fine here
+                incoming = incoming_projections[population]
+                f.write("    {} Incoming Projections:\n".format(
+                    len(incoming)))
+                for info in incoming:
+                    f.write(
+                        "        Projection from {}, connector {}\n".format(
+                            info.pre_population.label, str(info.connector)))
+                f.write("\n")
+
     def run(self, run_time, sync_time=0.0):
         """ Run the model created.
 
@@ -362,6 +409,8 @@ class AbstractSpiNNakerCommon(
         :rtype: None
         """
         # pylint: disable=protected-access
+        self.__write_population_graph_report(os.path.join(
+            self._report_default_directory, _PYNN_NETWORK_REPORT))
 
         # extra post run algorithms
         self._dsg_algorithm = "SpynnakerDataSpecificationWriter"
