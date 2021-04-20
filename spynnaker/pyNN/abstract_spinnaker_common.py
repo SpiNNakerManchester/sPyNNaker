@@ -18,8 +18,7 @@ import math
 import os
 from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.log import FormatAdapter
-from pacman.utilities.config_holder import (
-    get_config_bool, get_config_int, get_config_str, get_config_str_list)
+from pacman.utilities.config_holder import get_config_bool
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
     AbstractSpinnakerBase)
 from spinn_front_end_common.utilities.constants import (

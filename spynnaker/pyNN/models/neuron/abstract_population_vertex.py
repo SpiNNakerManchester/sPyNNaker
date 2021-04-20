@@ -24,8 +24,6 @@ from spinn_front_end_common.abstract_models import (
     AbstractCanReset, AbstractRewritesDataSpecification)
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl, TDMAAwareApplicationVertex)
-from spinn_front_end_common.utilities import (
-    helpful_functions)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, AbstractNeuronRecordable, NeuronRecorder)
