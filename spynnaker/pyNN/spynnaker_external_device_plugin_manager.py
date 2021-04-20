@@ -52,7 +52,7 @@ class SpynnakerExternalDevicePluginManager(object):
             database_notify_port_num = get_config_int(
                 "Database", "notify_port")
         if database_notify_host is None:
-            database_notify_host = get_config_int(
+            database_notify_host = get_config_str(
                 "Database", "notify_hostname")
         elif database_notify_host == "0.0.0.0":
             database_notify_host = "localhost"
