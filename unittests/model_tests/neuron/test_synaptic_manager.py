@@ -23,7 +23,6 @@ import numpy
 import pytest
 
 from spinn_utilities.overrides import overrides
-from spinn_utilities.conf_loader import load_config
 from spinn_machine import SDRAM
 from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
 from pacman.model.placements import Placement, Placements
@@ -35,6 +34,7 @@ from pacman.model.routing_info import (
     RoutingInfo, PartitionRoutingInfo, BaseKeyAndMask)
 from pacman.model.graphs.application import ApplicationVertex, ApplicationGraph
 from pacman.model.partitioner_splitters import SplitterSliceLegacy
+from pacman.utilities.config_holder import (load_cfgs, set_config)
 from data_specification import (
     DataSpecificationGenerator, DataSpecificationExecutor)
 from data_specification.constants import MAX_MEM_REGIONS
@@ -156,9 +156,9 @@ def test_write_data_spec():
         os.path.dirname(abstract_spinnaker_common.__file__),
         AbstractSpiNNakerCommon.CONFIG_FILE_NAME)
 
-    config = load_config(
+    load_cfgs(
         AbstractSpiNNakerCommon.CONFIG_FILE_NAME, default_config_paths)
-    config.set("Simulation", "one_to_one_connection_dtcm_max_bytes", 40)
+    set_config("Simulation", "one_to_one_connection_dtcm_max_bytes", 40)
 
     machine_time_step = 1000.0
 
@@ -267,7 +267,7 @@ def test_write_data_spec():
 
     synaptic_manager = SynapticManager(
         n_synapse_types=2, ring_buffer_sigma=5.0,
-        spikes_per_second=100.0, config=config, drop_late_spikes=True)
+        spikes_per_second=100.0, drop_late_spikes=True)
     synaptic_manager.write_data_spec(
         spec, post_app_vertex, post_vertex_slice, post_vertex,
         graph, app_graph, routing_info, 1.0, machine_time_step)
@@ -334,11 +334,11 @@ def test_set_synapse_dynamics():
     default_config_paths = os.path.join(
         os.path.dirname(abstract_spinnaker_common.__file__),
         AbstractSpiNNakerCommon.CONFIG_FILE_NAME)
-    config = load_config(
+    load_cfgs(
         AbstractSpiNNakerCommon.CONFIG_FILE_NAME, default_config_paths)
     synaptic_manager = SynapticManager(
         n_synapse_types=2, ring_buffer_sigma=5.0,
-        spikes_per_second=100.0, config=config, drop_late_spikes=True)
+        spikes_per_second=100.0, drop_late_spikes=True)
 
     static = SynapseDynamicsStatic()
     stdp = SynapseDynamicsSTDP(
@@ -430,7 +430,7 @@ def test_set_synapse_dynamics():
     # Try starting again to get a couple more combinations
     synaptic_manager = SynapticManager(
         n_synapse_types=2, ring_buffer_sigma=5.0,
-        spikes_per_second=100.0, config=config, drop_late_spikes=True)
+        spikes_per_second=100.0, drop_late_spikes=True)
 
     # STDP followed by structural STDP should result in Structural STDP
     synaptic_manager.synapse_dynamics = stdp
@@ -451,7 +451,7 @@ def test_set_synapse_dynamics():
     # One more time!
     synaptic_manager = SynapticManager(
         n_synapse_types=2, ring_buffer_sigma=5.0,
-        spikes_per_second=100.0, config=config, drop_late_spikes=True)
+        spikes_per_second=100.0, drop_late_spikes=True)
 
     # Static followed by static structural should result in static
     # structural
@@ -487,7 +487,7 @@ def test_set_synapse_dynamics():
     # OK, just one more, honest
     synaptic_manager = SynapticManager(
         n_synapse_types=2, ring_buffer_sigma=5.0,
-        spikes_per_second=100.0, config=config, drop_late_spikes=True)
+        spikes_per_second=100.0, drop_late_spikes=True)
     synaptic_manager.synapse_dynamics = static_struct
     synaptic_manager.synapse_dynamics = stdp_struct
 
@@ -519,7 +519,7 @@ def test_pop_based_master_pop_table_standard(
     default_config_paths = os.path.join(
         os.path.dirname(abstract_spinnaker_common.__file__),
         AbstractSpiNNakerCommon.CONFIG_FILE_NAME)
-    config = load_config(
+    load_cfgs(
         AbstractSpiNNakerCommon.CONFIG_FILE_NAME, default_config_paths)
 
     # Make simple source and target, where the source has 1000 atoms
@@ -623,7 +623,7 @@ def test_pop_based_master_pop_table_standard(
     spec = DataSpecificationGenerator(io.FileIO(temp_spec, "wb"), None)
     synaptic_manager = SynapticManager(
         n_synapse_types=2, ring_buffer_sigma=5.0,
-        spikes_per_second=100.0, config=config, drop_late_spikes=True)
+        spikes_per_second=100.0, drop_late_spikes=True)
     synaptic_manager.write_data_spec(
         spec, post_app_vertex, post_vertex_slice, post_mac_vertex,
         mac_graph, app_graph, routing_info, 1.0, 1000.0)

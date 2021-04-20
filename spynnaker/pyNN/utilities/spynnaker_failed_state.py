@@ -87,14 +87,3 @@ class SpynnakerFailedState(
     @property
     def name(self):
         return self._name
-
-    @property
-    @overrides(FailedState.config)
-    def config(self):
-        logger.warning(
-            "Accessing config before setup is not recommended as setup could"
-            " change some config values. ")
-        handler = ConfigHandler(
-            AbstractSpiNNakerCommon.CONFIG_FILE_NAME,
-            [AbstractSpiNNakerCommon.extended_config_path()], [])
-        return handler.config

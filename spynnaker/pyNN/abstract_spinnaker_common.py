@@ -18,6 +18,8 @@ import math
 import os
 from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.log import FormatAdapter
+from pacman.utilities.config_holder import (
+    get_config_bool, get_config_int, get_config_str, get_config_str_list)
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
     AbstractSpinnakerBase)
 from spinn_front_end_common.utilities.constants import (
@@ -150,17 +152,17 @@ class AbstractSpiNNakerCommon(
 
         extra_mapping_inputs = dict()
         extra_mapping_inputs['CreateAtomToEventIdMapping'] = \
-            self.config.getboolean(
+            get_config_bool(
                 "Database", "create_routing_info_to_neuron_id_mapping")
         extra_mapping_inputs["WriteBitFieldGeneratorIOBUF"] = \
-            self.config.getboolean("Reports", "write_bit_field_iobuf")
+            get_config_bool("Reports", "write_bit_field_iobuf")
         extra_mapping_inputs["GenerateBitFieldReport"] = \
-            self.config.getboolean("Reports", "generate_bit_field_report")
+            get_config_bool("Reports", "generate_bit_field_report")
         extra_mapping_inputs["GenerateBitFieldSummaryReport"] = \
-            self.config.getboolean(
+            get_config_bool(
                 "Reports", "generate_bit_field_summary_report")
         extra_mapping_inputs["SynapticExpanderReadIOBuf"] = \
-            self.config.getboolean("Reports", "write_expander_iobuf")
+            get_config_bool("Reports", "write_expander_iobuf")
         if user_extra_mapping_inputs is not None:
             extra_mapping_inputs.update(user_extra_mapping_inputs)
 
@@ -175,7 +177,7 @@ class AbstractSpiNNakerCommon(
         extra_load_algorithms.append("FinishConnectionHolders")
         extra_algorithms_pre_run = []
 
-        if self.config.getboolean("Reports", "draw_network_graph"):
+        if get_config_bool("Reports", "draw_network_graph"):
             extra_mapping_algorithms.append(
                 "SpYNNakerConnectionHolderGenerator")
             extra_mapping_algorithms.append(
@@ -183,8 +185,8 @@ class AbstractSpiNNakerCommon(
             extra_load_algorithms.append(
                 "SpYNNakerNeuronGraphNetworkSpecificationReport")
 
-        if self.config.getboolean("Reports", "reports_enabled"):
-            if self.config.getboolean("Reports", "write_synaptic_report"):
+        if get_config_bool("Reports", "reports_enabled"):
+            if get_config_bool("Reports", "write_synaptic_report"):
                 extra_algorithms_pre_run.append("SynapticMatrixReport")
         if user_extra_algorithms_pre_run is not None:
             extra_algorithms_pre_run.extend(user_extra_algorithms_pre_run)
@@ -196,8 +198,7 @@ class AbstractSpiNNakerCommon(
         self.extend_extra_load_algorithms(extra_load_algorithms)
 
         # set up machine targeted data
-        self._set_up_timings(
-            timestep, min_delay, self.config, time_scale_factor)
+        self._set_up_timings(timestep, min_delay, time_scale_factor)
         self.set_up_machine_specifics(hostname)
 
         logger.info("Setting time scale factor to {}.",
@@ -207,12 +208,11 @@ class AbstractSpiNNakerCommon(
         logger.info("Setting machine time step to {} micro-seconds.",
                     self.machine_time_step)
 
-    def _set_up_timings(self, timestep, min_delay, config, time_scale_factor):
+    def _set_up_timings(self, timestep, min_delay, time_scale_factor):
         """
         :param float timestep:
         :param int min_delay:
-        :param configparser.ConfigParser config:
-        :param float time_scale_factor:
+       :param float time_scale_factor:
         """
 
         # Get the standard values
@@ -254,7 +254,7 @@ class AbstractSpiNNakerCommon(
         # Check the combination of machine time step and time scale factor
         if (self.machine_time_step * self.time_scale_factor <
                 MICRO_TO_MILLISECOND_CONVERSION):
-            if not config.getboolean(
+            if not get_config_bool(
                     "Mode", "violate_1ms_wall_clock_restriction"):
                 raise ConfigurationException(
                     "The combination of simulation time step and the machine "
@@ -368,11 +368,11 @@ class AbstractSpiNNakerCommon(
         for projection in self._projections:
             projection._clear_cache()
 
-        if (self.config.getboolean("Reports", "reports_enabled") and
-                self.config.getboolean(
+        if (get_config_bool("Reports", "reports_enabled") and
+                get_config_bool(
                     "Reports", "write_redundant_packet_count_report") and
                 not self._use_virtual_board and run_time is not None and
-                not self._has_ran and self._config.getboolean(
+                not self._has_ran and get_config_bool(
                     "Reports", "writeProvenanceData")):
             self.extend_extra_post_run_algorithms(
                 ["RedundantPacketCountReport"])
