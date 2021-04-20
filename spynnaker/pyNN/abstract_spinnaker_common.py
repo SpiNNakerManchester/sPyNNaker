@@ -18,7 +18,7 @@ import math
 import os
 from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.log import FormatAdapter
-from pacman.config_holder import get_config_bool
+from pacman.config_holder import add_default_cfg, get_config_bool
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
     AbstractSpinnakerBase)
 from spinn_front_end_common.utilities.constants import (
@@ -35,6 +35,8 @@ from spynnaker.pyNN.utilities.extracted_data import ExtractedData
 from spynnaker import __version__ as version
 
 logger = FormatAdapter(logging.getLogger(__name__))
+
+CONFIG_FILE_NAME = "spynnaker.cfg"
 
 
 class AbstractSpiNNakerCommon(
@@ -55,12 +57,9 @@ class AbstractSpiNNakerCommon(
 
     __EXECUTABLE_FINDER = ExecutableFinder()
 
-    CONFIG_FILE_NAME = "spynnaker.cfg"
-
     @classmethod
     def extended_config_path(cls):
-        return os.path.join(os.path.dirname(__file__),
-                            cls.CONFIG_FILE_NAME)
+        return os.path.join(os.path.dirname(__file__), CONFIG_FILE_NAME)
 
     def __init__(
             self, graph_label, database_socket_addresses, n_chips_required,
@@ -136,14 +135,13 @@ class AbstractSpiNNakerCommon(
             versions.extend(front_end_versions)
 
         super().__init__(
-            configfile=self.CONFIG_FILE_NAME,
+            configfile=CONFIG_FILE_NAME,
             executable_finder=self.__EXECUTABLE_FINDER,
             graph_label=graph_label,
             database_socket_addresses=database_socket_addresses,
             extra_algorithm_xml_paths=extra_algorithm_xml_path,
             n_chips_required=n_chips_required,
             n_boards_required=n_boards_required,
-            default_config_paths=[self.extended_config_path()],
             front_end_versions=versions)
 
         # update inputs needed by the machine level calls.
@@ -523,3 +521,6 @@ class AbstractSpiNNakerCommon(
         :param int new_value: new value for id_counter
         """
         self.__id_counter = new_value
+
+# add the default at import time
+add_default_cfg(os.path.join(os.path.dirname(__file__), CONFIG_FILE_NAME))

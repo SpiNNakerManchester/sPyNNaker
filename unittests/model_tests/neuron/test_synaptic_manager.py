@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import io
 import math
-import os
 import shutil
 import struct
 import tempfile
@@ -34,13 +33,11 @@ from pacman.model.routing_info import (
     RoutingInfo, PartitionRoutingInfo, BaseKeyAndMask)
 from pacman.model.graphs.application import ApplicationVertex, ApplicationGraph
 from pacman.model.partitioner_splitters import SplitterSliceLegacy
-from pacman.config_holder import (load_cfgs, set_config)
+from pacman.config_holder import (load_default_configs, set_config)
 from data_specification import (
     DataSpecificationGenerator, DataSpecificationExecutor)
 from data_specification.constants import MAX_MEM_REGIONS
 from spynnaker.pyNN.models.neuron import SynapticManager
-from spynnaker.pyNN.abstract_spinnaker_common import AbstractSpiNNakerCommon
-import spynnaker.pyNN.abstract_spinnaker_common as abstract_spinnaker_common
 from spynnaker.pyNN.models.neural_projections import (
     ProjectionApplicationEdge, SynapseInformation, DelayedApplicationEdge)
 from spynnaker.pyNN.models.neural_projections.connectors import (
@@ -152,12 +149,6 @@ def test_write_data_spec():
 
     # UGLY but the mock transceiver NEED generate_on_machine to be False
     AbstractGenerateConnectorOnMachine.generate_on_machine = say_false
-    default_config_paths = os.path.join(
-        os.path.dirname(abstract_spinnaker_common.__file__),
-        AbstractSpiNNakerCommon.CONFIG_FILE_NAME)
-
-    load_cfgs(
-        AbstractSpiNNakerCommon.CONFIG_FILE_NAME, default_config_paths)
     set_config("Simulation", "one_to_one_connection_dtcm_max_bytes", 40)
 
     machine_time_step = 1000.0
@@ -327,15 +318,11 @@ def test_write_data_spec():
         assert all(list_delays == connections_4["delay"])
     finally:
         shutil.rmtree(report_folder, ignore_errors=True)
+        load_default_configs()
 
 
 def test_set_synapse_dynamics():
     MockSimulator.setup()
-    default_config_paths = os.path.join(
-        os.path.dirname(abstract_spinnaker_common.__file__),
-        AbstractSpiNNakerCommon.CONFIG_FILE_NAME)
-    load_cfgs(
-        AbstractSpiNNakerCommon.CONFIG_FILE_NAME, default_config_paths)
     synaptic_manager = SynapticManager(
         n_synapse_types=2, ring_buffer_sigma=5.0,
         spikes_per_second=100.0, drop_late_spikes=True)
@@ -515,12 +502,6 @@ def test_pop_based_master_pop_table_standard(
     MockSimulator.setup()
     # Add an sdram so max SDRAM is high enough
     SDRAM(4000000)
-
-    default_config_paths = os.path.join(
-        os.path.dirname(abstract_spinnaker_common.__file__),
-        AbstractSpiNNakerCommon.CONFIG_FILE_NAME)
-    load_cfgs(
-        AbstractSpiNNakerCommon.CONFIG_FILE_NAME, default_config_paths)
 
     # Make simple source and target, where the source has 1000 atoms
     # split into 10 vertices (100 each) and the target has 100 atoms in
