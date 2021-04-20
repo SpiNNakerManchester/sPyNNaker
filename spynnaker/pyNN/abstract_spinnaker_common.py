@@ -18,7 +18,7 @@ import math
 import os
 from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.log import FormatAdapter
-from pacman.config_holder import add_default_cfg, get_config_bool
+from pacman.config_holder import get_config_bool, set_cfg_files
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
     AbstractSpinnakerBase)
 from spinn_front_end_common.utilities.constants import (
@@ -135,7 +135,6 @@ class AbstractSpiNNakerCommon(
             versions.extend(front_end_versions)
 
         super().__init__(
-            configfile=CONFIG_FILE_NAME,
             executable_finder=self.__EXECUTABLE_FINDER,
             graph_label=graph_label,
             database_socket_addresses=database_socket_addresses,
@@ -523,5 +522,7 @@ class AbstractSpiNNakerCommon(
         self.__id_counter = new_value
 
 
-# add the default at import time
-add_default_cfg(os.path.join(os.path.dirname(__file__), CONFIG_FILE_NAME))
+# add the default at import time in case needed before setup
+set_cfg_files(
+    configfile=CONFIG_FILE_NAME,
+    default=os.path.join(os.path.dirname(__file__), CONFIG_FILE_NAME))

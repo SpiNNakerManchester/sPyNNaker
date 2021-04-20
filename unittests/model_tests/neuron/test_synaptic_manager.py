@@ -33,7 +33,7 @@ from pacman.model.routing_info import (
     RoutingInfo, PartitionRoutingInfo, BaseKeyAndMask)
 from pacman.model.graphs.application import ApplicationVertex, ApplicationGraph
 from pacman.model.partitioner_splitters import SplitterSliceLegacy
-from pacman.config_holder import (load_default_configs, set_config)
+from pacman.config_holder import (load_config_cfgs, set_config)
 from data_specification import (
     DataSpecificationGenerator, DataSpecificationExecutor)
 from data_specification.constants import MAX_MEM_REGIONS
@@ -149,7 +149,7 @@ def test_write_data_spec():
 
     # UGLY but the mock transceiver NEED generate_on_machine to be False
     AbstractGenerateConnectorOnMachine.generate_on_machine = say_false
-    load_default_configs()
+    load_config_cfgs()
     set_config("Simulation", "one_to_one_connection_dtcm_max_bytes", 40)
 
     machine_time_step = 1000.0
@@ -319,7 +319,7 @@ def test_write_data_spec():
         assert all(list_delays == connections_4["delay"])
     finally:
         shutil.rmtree(report_folder, ignore_errors=True)
-        load_default_configs()
+        load_config_cfgs()
 
 
 def test_set_synapse_dynamics():
