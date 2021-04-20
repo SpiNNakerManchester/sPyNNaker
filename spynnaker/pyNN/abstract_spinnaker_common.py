@@ -246,7 +246,7 @@ class AbstractSpiNNakerCommon(
                     "automatically slow the simulation down from real time "
                     "by a factor of {}. To remove this automatic behaviour, "
                     "please enter a timescaleFactor value in your .{}",
-                    self.time_scale_factor, self.CONFIG_FILE_NAME)
+                    self.time_scale_factor, CONFIG_FILE_NAME)
 
         # Check the combination of machine time step and time scale factor
         if (self.machine_time_step * self.time_scale_factor <
@@ -260,7 +260,7 @@ class AbstractSpiNNakerCommon(
                     "SpiNNaker machine.  If you would like to override this"
                     "behaviour (at your own risk), please add "
                     "violate_1ms_wall_clock_restriction = True to the [Mode] "
-                    "section of your .{} file".format(self.CONFIG_FILE_NAME))
+                    "section of your .{} file".format(CONFIG_FILE_NAME))
             logger.warning(
                 "****************************************************")
             logger.warning(

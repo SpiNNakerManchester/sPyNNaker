@@ -149,6 +149,7 @@ def test_write_data_spec():
 
     # UGLY but the mock transceiver NEED generate_on_machine to be False
     AbstractGenerateConnectorOnMachine.generate_on_machine = say_false
+    load_default_configs()
     set_config("Simulation", "one_to_one_connection_dtcm_max_bytes", 40)
 
     machine_time_step = 1000.0
