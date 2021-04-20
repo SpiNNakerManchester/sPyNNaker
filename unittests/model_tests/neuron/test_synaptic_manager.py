@@ -34,7 +34,7 @@ from pacman.model.routing_info import (
     RoutingInfo, PartitionRoutingInfo, BaseKeyAndMask)
 from pacman.model.graphs.application import ApplicationVertex, ApplicationGraph
 from pacman.model.partitioner_splitters import SplitterSliceLegacy
-from pacman.utilities.config_holder import (load_cfgs, set_config)
+from pacman.config_holder import (load_cfgs, set_config)
 from data_specification import (
     DataSpecificationGenerator, DataSpecificationExecutor)
 from data_specification.constants import MAX_MEM_REGIONS
