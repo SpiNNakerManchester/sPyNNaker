@@ -29,6 +29,7 @@
 #include <debug.h>
 #include <stdfix-full-iso.h>
 #include <circular_buffer.h>
+#include <recording.h>
 
 #include <neuron/synapse_row.h>
 
@@ -71,17 +72,6 @@ static circular_buffer current_state_queue;
 //! synaptogenesis_dynamics_rewire() moves states from here to
 //! ::current_state_queue
 static circular_buffer free_states;
-
-//! Structural rewiring recording values
-typedef struct structural_rec_t {
-    int32_t recorded_val;
-//    uint32_t changed;
-} structural_rec_t;
-
-typedef struct structural_rec_t* structural_rec_pointer_t;
-
-//! Array of data for structural recording
-static structural_rec_pointer_t structural_rec_array;
 
 void print_post_to_pre_entry(void) {
     uint32_t n_elements =
@@ -141,19 +131,6 @@ static inline current_state_t *_alloc_state(void) {
 
 bool synaptogenesis_dynamics_initialise(address_t sdram_sp_address, uint32_t n_neurons) {
     log_debug("SR init.");
-
-    // Set up array for structural plasticity recording
-    if (sizeof(structural_rec_t)) {
-        structural_rec_array = spin1_malloc(n_neurons * sizeof(structural_rec_t));
-        if (structural_rec_array == NULL) {
-            log_error("Unable to allocate structural recording array"
-                    "- Out of DTCM");
-            return false;
-        }
-        for (uint32_t i = 0; i < n_neurons; i++) {
-            structural_rec_array[i].recorded_val = -1;
-        }
-    }
 
     uint8_t *data = sp_structs_read_in_common(
             sdram_sp_address, &rewiring_data, &pre_info, &post_to_pre_table);
@@ -291,6 +268,10 @@ static inline bool row_restructure(
         uint32_t time, synaptic_row_t restrict row,
         current_state_t *restrict current_state) {
     // the selected pre- and postsynaptic IDs are in current_state
+
+    // hard code recording region for now
+    uint32_t rewiring_recording_index = 3;
+
     if (current_state->element_exists) {
         // find the offset of the neuron in the current row
         if (!synapse_dynamics_find_neuron(
@@ -300,14 +281,18 @@ static inline bool row_restructure(
             log_debug("Post neuron %u not in row", current_state->post_syn_id);
             return false;
         }
+
         if (synaptogenesis_elimination_rule(current_state,
                 elimination_params[current_state->post_to_pre.pop_index],
                 time, row)) {
             // Create recorded value
-            // (bottom bit: added/removed, remainder: pre-neuron global id)
+            // (bottom bit: add/remove, next 8: local id, remainder: pre-neuron global id)
             uint32_t pre_id = current_state->key_atom_info->lo_atom + current_state->pre_syn_id;
             uint32_t id = current_state->post_syn_id;
-            structural_rec_array[id].recorded_val = (0 << 0) | (pre_id << 1);
+            uint32_t record_value = (0 << 0) | (id << 1) | (pre_id << 9);
+            recording_record(rewiring_recording_index, &time, sizeof(uint32_t));
+            recording_record(rewiring_recording_index, &record_value, sizeof(uint32_t));
+
             return true;
         } else {
             return false;
@@ -326,11 +311,14 @@ static inline bool row_restructure(
                 if (synaptogenesis_formation_rule(current_state,
                         formation_params[current_state->post_to_pre.pop_index], time, row)) {
                     // Create recorded value
-                    // (bottom bit: added/removed, remainder: pre-neuron global id)
+                    // (bottom bit: add/remove, next 8: local id, remainder: pre-neuron global id)
                     uint32_t pre_id = current_state->key_atom_info->lo_atom
                             + current_state->pre_syn_id;
                     uint32_t id = current_state->post_syn_id;
-                    structural_rec_array[id].recorded_val = (1 << 0) | (pre_id << 1);
+                    uint32_t record_value = (1 << 0) | (id << 1) | (pre_id << 9);
+                    recording_record(rewiring_recording_index, &time, sizeof(uint32_t));
+                    recording_record(rewiring_recording_index, &record_value, sizeof(uint32_t));
+
                     return true;
                 } else {
                     return false;
@@ -344,11 +332,14 @@ static inline bool row_restructure(
                     if (synaptogenesis_formation_rule(current_state,
                             formation_params[current_state->post_to_pre.pop_index], time, row)) {
                         // Create recorded value
-                        // (bottom bit: added/removed, remainder: pre-neuron global id)
+                        // (bottom bit: add/remove, next 8: local id, remainder: pre-neuron global id)
                         uint32_t pre_id = current_state->key_atom_info->lo_atom
                                 + current_state->pre_syn_id;
                         uint32_t id = current_state->post_syn_id;
-                        structural_rec_array[id].recorded_val = (1 << 0) | (pre_id << 1);
+                        uint32_t record_value = (1 << 0) | (id << 1) | (pre_id << 9);
+                        recording_record(rewiring_recording_index, &time, sizeof(uint32_t));
+                        recording_record(rewiring_recording_index, &record_value, sizeof(uint32_t));
+
                         return true;
                     } else {
                         return false;
@@ -379,12 +370,4 @@ bool synaptogenesis_is_fast(void) {
 
 void synaptogenesis_spike_received(uint32_t time, spike_t spike) {
     partner_spike_received(time, spike);
-}
-
-void synaptogenesis_dynamics_set_recording_values(uint32_t n_neurons, int32_t* rec_values) {
-    for (uint32_t i=0; i < n_neurons; i++) {
-        rec_values[i] = structural_rec_array[i].recorded_val;
-        // reset value
-        structural_rec_array[i].recorded_val = -1;
-    }
 }

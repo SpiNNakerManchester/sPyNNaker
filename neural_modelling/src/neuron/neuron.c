@@ -199,11 +199,6 @@ void neuron_add_inputs( // EXPORTED
             synapse_type_index, neuron_index, weights_this_timestep);
 }
 
-void neuron_record_structural( // EXPORTED
-		uint32_t neuron_index, int32_t rec_value) {
-	neuron_impl_record_structural(neuron_index, rec_value);
-}
-
 #if LOG_LEVEL >= LOG_DEBUG
 void neuron_print_inputs(void) { // EXPORTED
     neuron_impl_print_inputs(n_neurons);

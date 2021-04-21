@@ -34,6 +34,8 @@ from spynnaker.pyNN.models.abstract_models import (
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.utilities.ranged import (
     SpynnakerRangeDictionary)
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    AbstractSynapseDynamicsStructural)
 from .synaptic_manager import SynapticManager
 
 # TODO: Make sure these values are correct (particularly CPU cycles)
@@ -257,6 +259,13 @@ class AbstractPopulationVertex(
         return self.__neuron_recorder.get_spikes(
             self.label, buffer_manager, placements, self,
             NeuronRecorder.SPIKES, machine_time_step)
+
+    @overrides(AbstractNeuronRecordable.get_rewires)
+    def get_rewires(
+            self, placements, buffer_manager, machine_time_step):
+        return self.__neuron_recorder.get_rewires(
+            self.label, buffer_manager, placements, self,
+            NeuronRecorder.REWIRING, machine_time_step)
 
     @overrides(AbstractNeuronRecordable.get_recordable_variables)
     def get_recordable_variables(self):

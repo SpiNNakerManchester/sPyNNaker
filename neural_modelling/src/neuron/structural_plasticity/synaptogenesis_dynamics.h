@@ -68,11 +68,14 @@ bool synaptogenesis_is_fast(void);
 //! \param[in] spike: The received spike
 void synaptogenesis_spike_received(uint32_t time, spike_t spike);
 
-//! \brief Set the values to be recorded during structural plasticity
-//! \param[in] n_neurons: the number of neurons
-//! \param[in] rec_values: the array to be recorded
-void synaptogenesis_dynamics_set_recording_values(
-        uint32_t n_neurons, int32_t* rec_values);
+////! \brief Set the values to be recorded during structural plasticity
+////! \param[in] n_neurons: the number of neurons
+////! \return the array to be recorded
+//int32_t** synaptogenesis_dynamics_recording_values(void);
+//
+//void synaptogenesis_dynamics_reset_recording_array(uint32_t n_neurons);
+//
+//uint32_t synaptogenesis_n_states(void);
 
 //! Print a certain data object
 void print_post_to_pre_entry(void);

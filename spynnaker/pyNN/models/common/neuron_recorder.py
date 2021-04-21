@@ -24,11 +24,14 @@ from data_specification.enums import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, MICRO_TO_MILLISECOND_CONVERSION, BITS_PER_WORD)
+    BYTES_PER_WORD, MICRO_TO_MILLISECOND_CONVERSION, BITS_PER_WORD,
+    MICRO_TO_SECOND_CONVERSION)
 from spinn_front_end_common.interface.buffer_management.recording_utilities \
     import (
         get_recording_header_array, get_recording_header_size,
         get_recording_data_constant_size)
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    AbstractSynapseDynamicsStructural)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -105,6 +108,9 @@ class NeuronRecorder(object):
     #: packets-per-timestep data type
     PACKETS_TYPE = DataType.UINT32
 
+    #: rewiring
+    REWIRING = "rewiring"
+
     _MAX_RATE = 2 ** 32 - 1  # To allow a unit32_t to be used to store the rate
 
     def __init__(
@@ -135,7 +141,8 @@ class NeuronRecorder(object):
                 per_timestep_variables, start=region_id + 1):
             self.__region_ids[variable] = ts_region_id
 
-    def _count_recording_per_slice(self, variable, vertex_slice):
+    def _count_recording_per_slice(
+            self, variable, vertex_slice, rewires_per_ts):
         """
         :param str variable:
         :param ~pacman.model.graphs.common.Slice vertex_slice:
@@ -144,7 +151,10 @@ class NeuronRecorder(object):
         if self.__sampling_rates[variable] == 0:
             return 0
         if self.__indexes[variable] is None:
-            return vertex_slice.n_atoms
+            if variable == self.REWIRING:
+                return rewires_per_ts
+            else:
+                return vertex_slice.n_atoms
         return sum(vertex_slice.lo_atom <= index <= vertex_slice.hi_atom
                    for index in self.__indexes[variable])
 
@@ -451,6 +461,96 @@ class NeuronRecorder(object):
         result = numpy.column_stack((spike_ids, spike_times))
         return result[numpy.lexsort((spike_times, spike_ids))]
 
+    def get_rewires(
+            self, label, buffer_manager, placements,
+            application_vertex, variable, machine_time_step):
+        """ Read rewires mapped to time and neuron IDs from the SpiNNaker\
+            machine.
+
+        :param str label: vertex label
+        :param buffer_manager: the manager for buffered data
+        :type buffer_manager:
+            ~spinn_front_end_common.interface.buffer_management.BufferManager
+        :param ~pacman.model.placements.Placements placements:
+            the placements object
+        :param application_vertex:
+        :type application_vertex:
+            ~pacman.model.graphs.application.ApplicationVertex
+        :param str variable:
+        :param int machine_time_step: microseconds
+        :return:
+        :rtype: ~numpy.ndarray(tuple(int,int,int,int))
+        """
+        rewire_times = list()
+        rewire_values = list()
+        rewire_postids = list()
+        rewire_preids = list()
+
+        vertices = (
+            application_vertex.splitter.machine_vertices_for_recording(
+                variable))
+        missing_str = ""
+        progress = ProgressBar(
+            vertices, "Getting rewires for {}".format(label))
+        for vertex in progress.over(vertices):
+            placement = placements.get_placement_of_vertex(vertex)
+            vertex_slice = vertex.vertex_slice
+
+            ms_per_tick = machine_time_step / MICRO_TO_MILLISECOND_CONVERSION
+            neurons = list(self._neurons_recording(variable, vertex_slice))
+            neurons_recording = len(neurons)
+            if neurons_recording == 0:
+                continue
+
+            # Read the rewiring data
+            n_words = int(math.ceil(neurons_recording / BITS_PER_WORD))
+            n_bytes = n_words * BYTES_PER_WORD
+            n_words_with_timestamp = n_words + 1
+
+            # for buffering output info is taken form the buffer manager
+            region = self.__region_ids[variable]
+            record_raw, data_missing = buffer_manager.get_data_by_placement(
+                    placement, region)
+            if data_missing:
+                missing_str += "({}, {}, {}); ".format(
+                    placement.x, placement.y, placement.p)
+            if len(record_raw) > 0:
+                raw_data = (
+                    numpy.asarray(record_raw, dtype="uint8").view(
+                        dtype="<i4")).reshape([-1, n_words_with_timestamp])
+            else:
+                raw_data = record_raw
+            if len(raw_data) > 0:
+                record_time = raw_data[:, 0] * float(ms_per_tick)
+                rewires_raw = raw_data[:, 1:]
+                rew_length = len(rewires_raw)
+                rewires = [rewires_raw[i][0] & 1 for i in range(rew_length)]
+                post_ids = [((int(rewires_raw[i]) >> 1) % 256) +
+                             vertex_slice.lo_atom for i in range(rew_length)]
+                pre_ids = [int(rewires_raw[i]) >> 9 for i in range(rew_length)]
+                if self.__indexes[variable] is None:
+                    rewire_values.extend(rewires)
+                    rewire_postids.extend(post_ids)
+                    rewire_preids.extend(pre_ids)
+                    rewire_times.extend(record_time)
+                else:
+                    # Need to work out how to do this using the neurons array
+                    msg = "Recording rewires selectively not yet supported"
+                    raise ConfigurationException(msg)
+
+        if len(missing_str) > 0:
+            logger.warning(
+                "Population {} is missing rewiring data in region {} from the"
+                " following cores: {}", label, region, missing_str)
+
+        if len(rewire_values) == 0:
+            return numpy.zeros((0, 4), dtype="float")
+
+        result = numpy.column_stack(
+            (rewire_times, rewire_preids, rewire_postids, rewire_values))
+        return result[numpy.lexsort(
+            (rewire_values, rewire_postids, rewire_preids, rewire_times))]
+
     def get_recordable_variables(self):
         """
         :rtype: iterable(str)
@@ -733,7 +833,8 @@ class NeuronRecorder(object):
             raise ConfigurationException("Variable {} is not supported".format(
                 variable))
 
-    def _get_buffered_sdram(self, vertex_slice, n_machine_time_steps):
+    def _get_buffered_sdram(
+            self, vertex_slice, n_machine_time_steps, rewires_per_ts):
         """
         :param ~pacman.model.graphs.commmon.Slice vertex_slice:
         :param int n_machine_time_steps:
@@ -743,12 +844,12 @@ class NeuronRecorder(object):
         for variable in itertools.chain(
                 self.__sampling_rates, self.__per_timestep_variables):
             values.append(self.get_buffered_sdram(
-                variable, vertex_slice, n_machine_time_steps))
+                variable, vertex_slice, n_machine_time_steps, rewires_per_ts))
         return values
 
     def write_neuron_recording_region(
             self, spec, neuron_recording_region, vertex_slice,
-            data_n_time_steps):
+            data_n_time_steps, rewires_per_ts):
         """ recording data specification
 
         :param ~data_specification.DataSpecificationGenerator spec: dsg spec
@@ -756,11 +857,14 @@ class NeuronRecorder(object):
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             the vertex slice
         :param int data_n_time_steps: how many time steps to run this time
+        :param float machine_time_step: the machine time step
+        :param
         :rtype: None
         """
         spec.switch_write_focus(neuron_recording_region)
         spec.write_array(get_recording_header_array(
-            self._get_buffered_sdram(vertex_slice, data_n_time_steps)))
+            self._get_buffered_sdram(
+                vertex_slice, data_n_time_steps, rewires_per_ts)))
 
         # Write the number of variables and bitfields (ignore per-timestep)
         n_vars = len(self.__sampling_rates) - len(self.__bitfield_variables)
@@ -768,10 +872,11 @@ class NeuronRecorder(object):
         spec.write_value(data=len(self.__bitfield_variables))
 
         # Write the recording data
-        recording_data = self._get_data(vertex_slice)
+        recording_data = self._get_data(vertex_slice, rewires_per_ts)
         spec.write_array(recording_data)
 
-    def get_buffered_sdram_per_record(self, variable, vertex_slice):
+    def get_buffered_sdram_per_record(
+            self, variable, vertex_slice, rewires_per_ts):
         """ Return the SDRAM used per record
 
         :param str variable: PyNN variable name
@@ -784,7 +889,8 @@ class NeuronRecorder(object):
                 return 0
             size = self.__per_timestep_datatypes[variable].size
             return self._N_BYTES_FOR_TIMESTAMP + size
-        n_neurons = self._count_recording_per_slice(variable, vertex_slice)
+        n_neurons = self._count_recording_per_slice(
+            variable, vertex_slice, rewires_per_ts)
         if n_neurons == 0:
             return 0
         if variable in self.__bitfield_variables:
@@ -796,7 +902,8 @@ class NeuronRecorder(object):
             size = self.__data_types[variable].size
             return self._N_BYTES_FOR_TIMESTAMP + (n_neurons * size)
 
-    def get_buffered_sdram_per_timestep(self, variable, vertex_slice):
+    def get_buffered_sdram_per_timestep(
+            self, variable, vertex_slice, rewires_per_ts):
         """ Return the SDRAM used per timestep.
 
         In the case where sampling is used it returns the average\
@@ -816,7 +923,8 @@ class NeuronRecorder(object):
             if rate == 0:
                 return 0
 
-        data_size = self.get_buffered_sdram_per_record(variable, vertex_slice)
+        data_size = self.get_buffered_sdram_per_record(
+            variable, vertex_slice, rewires_per_ts)
         if rate == 1:
             return data_size
         else:
@@ -849,7 +957,9 @@ class NeuronRecorder(object):
                 overflow += data_size // rate * (rate - 1)
         return overflow
 
-    def get_buffered_sdram(self, variable, vertex_slice, n_machine_time_steps):
+    def get_buffered_sdram(
+            self, variable, vertex_slice, n_machine_time_steps,
+            rewires_per_ts):
         """ Returns the SDRAM used for this may time steps
 
         If required the total is rounded up so the space will always fit
@@ -863,13 +973,15 @@ class NeuronRecorder(object):
         """
         # Per timestep variables can't be done at a specific rate
         if variable in self.__per_timestep_variables:
-            item = self.get_buffered_sdram_per_record(variable, vertex_slice)
+            item = self.get_buffered_sdram_per_record(
+                variable, vertex_slice, rewires_per_ts)
             return item * n_machine_time_steps
 
         rate = self.__sampling_rates[variable]
         if rate == 0:
             return 0
-        data_size = self.get_buffered_sdram_per_record(variable, vertex_slice)
+        data_size = self.get_buffered_sdram_per_record(
+            variable, vertex_slice, rewires_per_ts)
         records = n_machine_time_steps // rate
         if n_machine_time_steps % rate > 0:
             records = records + 1
@@ -946,7 +1058,7 @@ class NeuronRecorder(object):
             self.get_sdram_usage_in_bytes(vertex_slice))
         return int(sdram)
 
-    def get_variable_sdram_usage(self, vertex_slice):
+    def get_variable_sdram_usage(self, vertex_slice, rewires_per_ts):
         """
         :param ~pacman.model.graphs.common.Slice vertex_slice:
         :rtype: ~pacman.model.resources.VariableSDRAM
@@ -959,7 +1071,7 @@ class NeuronRecorder(object):
             if rate > 0:
                 fixed_sdram += self._SARK_BLOCK_SIZE
                 per_record = self.get_buffered_sdram_per_record(
-                    variable, vertex_slice)
+                    variable, vertex_slice, rewires_per_ts)
                 if rate == 1:
                     # Add size for one record as recording every timestep
                     per_timestep_sdram += per_record
@@ -971,7 +1083,7 @@ class NeuronRecorder(object):
                     fixed_sdram += (per_record - average_per_timestep)
         for variable in self.__per_timestep_recording:
             per_timestep_sdram += self.get_buffered_sdram_per_record(
-                variable, vertex_slice)
+                variable, vertex_slice, rewires_per_ts)
         return VariableSDRAM(fixed_sdram, per_timestep_sdram)
 
     def get_dtcm_usage_in_bytes(self, vertex_slice):
@@ -1045,7 +1157,7 @@ class NeuronRecorder(object):
             data.append(
                 numpy.array(local_indexes, dtype="uint8").view("uint32"))
 
-    def _get_data(self, vertex_slice):
+    def _get_data(self, vertex_slice, rewires_per_ts):
         """
         :param ~pacman.model.graphs.common.Slice vertex_slice:
         :rtype: ~numpy.ndarray
@@ -1058,7 +1170,7 @@ class NeuronRecorder(object):
                 continue
             rate = self.__sampling_rates[variable]
             n_recording = self._count_recording_per_slice(
-                variable, vertex_slice)
+                variable, vertex_slice, rewires_per_ts)
             dtype = self.__data_types[variable]
             data.append(numpy.array(
                 [rate, n_recording, dtype.size], dtype="uint32"))
@@ -1067,11 +1179,24 @@ class NeuronRecorder(object):
         for variable in self.__bitfield_variables:
             rate = self.__sampling_rates[variable]
             n_recording = self._count_recording_per_slice(
-                variable, vertex_slice)
+                variable, vertex_slice, rewires_per_ts)
             data.append(numpy.array([rate, n_recording], dtype="uint32"))
             self.__add_indices(data, variable, rate, n_recording, vertex_slice)
 
         return numpy.concatenate(data)
+
+    def get_rewires_per_ts(self, synapse_dynamics):
+        rewires_per_ts = 1
+        if isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural):
+            p_rew = synapse_dynamics.p_rew
+            machine_ts = globals_variables.get_simulator().machine_time_step
+            if (p_rew * MICRO_TO_MILLISECOND_CONVERSION <
+                    machine_ts / MICRO_TO_MILLISECOND_CONVERSION):
+                # fast rewiring, so need to set rewires_per_ts appropriately
+                rewires_per_ts = int(machine_ts / (
+                    p_rew * MICRO_TO_SECOND_CONVERSION))
+
+        return rewires_per_ts
 
     @property
     def _indexes(self):  # for testing only

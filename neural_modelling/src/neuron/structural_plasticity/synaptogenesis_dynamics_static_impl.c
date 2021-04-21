@@ -50,9 +50,16 @@ bool synaptogenesis_is_fast(void) {
 void synaptogenesis_spike_received(UNUSED uint32_t time, UNUSED spike_t spike) {
 }
 
-void synaptogenesis_dynamics_set_recording_values(
-        UNUSED uint32_t n_neurons, UNUSED int32_t* rec_values) {
-}
+//int32_t** synaptogenesis_dynamics_recording_values(void) {
+//    return 0;
+//}
+//
+//void synaptogenesis_dynamics_reset_recording_array(UNUSED uint32_t n_neurons) {
+//}
+//
+//uint32_t synaptogenesis_n_states(void) {
+//    return 0;
+//}
 
 void print_post_to_pre_entry(void) {
     return;

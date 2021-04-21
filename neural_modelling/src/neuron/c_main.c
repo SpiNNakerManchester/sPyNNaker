@@ -95,7 +95,7 @@ typedef enum callback_priorities {
 } callback_priorities;
 
 //! The number of regions that are to be used for recording
-#define NUMBER_OF_REGIONS_TO_RECORD 4
+#define NUMBER_OF_REGIONS_TO_RECORD 5
 
 // Globals
 
@@ -323,13 +323,6 @@ void background_callback(uint timer_count, uint local_time) {
             spike_processing_do_rewiring(1);
         }
         count_rewire_attempts++;
-
-        // Update to record additions / removals
-        int32_t rec_values[n_neurons];
-        synaptogenesis_dynamics_set_recording_values(n_neurons, rec_values);
-        for (uint32_t i = 0; i < n_neurons; i++) {
-            neuron_record_structural(i, rec_values[i]);
-        }
     }
 
     // Now do neuron time step update

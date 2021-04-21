@@ -153,7 +153,7 @@ static inline void neuron_recording_record_bit(
 //! \param[in] time: the time to put into the recording stamps.
 static inline void neuron_recording_record(uint32_t time) {
     // go through all recordings
-    for (uint32_t i = N_RECORDED_VARS; i > 0; i--) {
+    for (uint32_t i = N_RECORDED_VARS - 1; i > 0; i--) {
         recording_info_t *rec_info = &recording_info[i - 1];
         // if the rate says record, record now
         if (rec_info->count == rec_info->rate) {
