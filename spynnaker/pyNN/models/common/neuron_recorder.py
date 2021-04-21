@@ -504,7 +504,6 @@ class NeuronRecorder(object):
 
             # Read the rewiring data
             n_words = int(math.ceil(neurons_recording / BITS_PER_WORD))
-            n_bytes = n_words * BYTES_PER_WORD
             n_words_with_timestamp = n_words + 1
 
             # for buffering output info is taken form the buffer manager
@@ -526,7 +525,7 @@ class NeuronRecorder(object):
                 rew_length = len(rewires_raw)
                 rewires = [rewires_raw[i][0] & 1 for i in range(rew_length)]
                 post_ids = [((int(rewires_raw[i]) >> 1) % 256) +
-                             vertex_slice.lo_atom for i in range(rew_length)]
+                            vertex_slice.lo_atom for i in range(rew_length)]
                 pre_ids = [int(rewires_raw[i]) >> 9 for i in range(rew_length)]
                 if self.__indexes[variable] is None:
                     rewire_values.extend(rewires)

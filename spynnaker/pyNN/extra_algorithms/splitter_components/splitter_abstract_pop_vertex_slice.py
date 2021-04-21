@@ -33,8 +33,6 @@ from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
 from spynnaker.pyNN.models.neuron import (
     AbstractPopulationVertex, PopulationMachineVertex)
 from spynnaker.pyNN.utilities import bit_field_utilities
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractSynapseDynamicsStructural)
 
 
 class SplitterAbstractPopulationVertexSlice(

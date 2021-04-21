@@ -34,8 +34,6 @@ from spynnaker.pyNN.models.abstract_models import (
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.utilities.ranged import (
     SpynnakerRangeDictionary)
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractSynapseDynamicsStructural)
 from .synaptic_manager import SynapticManager
 
 # TODO: Make sure these values are correct (particularly CPU cycles)
