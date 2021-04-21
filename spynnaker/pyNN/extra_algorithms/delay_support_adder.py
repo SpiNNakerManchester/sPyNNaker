@@ -237,7 +237,8 @@ class DelaySupportAdder(object):
              (machine_time_step / MICRO_TO_MILLISECOND_CONVERSION)))
         if total_supported_delay < max_delay_needed:
             raise DelayExtensionException(
-                f"Edge:{app_edge.label} has a max delay of {max_delay_needed}. "
+                f"Edge:{app_edge.label} "
+                f"has a max delay of {max_delay_needed}. "
                 f"But at a timestep of "
                 f"{machine_time_step / MICRO_TO_MILLISECOND_CONVERSION} "
                 f"the max delay supported is {total_supported_delay}")
