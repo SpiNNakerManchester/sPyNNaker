@@ -50,7 +50,7 @@ jobs:
         with:
           repositories: >
             spinnaker_tools SpiNNUtils SpiNNMachine SpiNNMan PACMAN
-            DataSpecification spalloc SpiNNFrontEndCommon
+            DataSpecification spalloc SpiNNFrontEndCommon TestBase
           install: true
       - name: Install matplotlib
         uses: ./support/actions/install-matplotlib
