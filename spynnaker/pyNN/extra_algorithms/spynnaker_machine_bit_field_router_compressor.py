@@ -51,7 +51,7 @@ class AbstractMachineBitFieldRouterCompressor(object, metaclass=AbstractBase):
             routing_infos, time_to_try_for_each_iteration, use_timer_cut_off,
             machine_time_step, time_scale_factor, threshold_percentage,
             retry_count, executable_targets, read_expander_iobuf,
-            compress_as_much_as_possible=False, provenance_data_objects=None):
+            provenance_data_objects=None):
         """ entrance for routing table compression with bit field
 
         :param routing_tables: routing tables
@@ -81,8 +81,6 @@ class AbstractMachineBitFieldRouterCompressor(object, metaclass=AbstractBase):
             again. None for as much as needed
         :type retry_count: int or None
         :param bool read_algorithm_iobuf: flag saying if read iobuf
-        :param bool compress_as_much_as_possible:
-            flag asking if should compress as much as possible
         :param bool read_expander_iobuf: reads the synaptic expander iobuf.
         :rtype:
             list(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)
@@ -107,7 +105,6 @@ class AbstractMachineBitFieldRouterCompressor(object, metaclass=AbstractBase):
                 time_scale_factor=time_scale_factor,
                 threshold_percentage=threshold_percentage,
                 retry_count=retry_count,
-                compress_as_much_as_possible=compress_as_much_as_possible,
                 executable_targets=executable_targets,
                 provenance_data_objects=provenance_data_objects)
 

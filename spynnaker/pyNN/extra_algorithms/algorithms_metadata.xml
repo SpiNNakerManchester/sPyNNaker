@@ -119,10 +119,6 @@
                 <param_type>SystemProvenanceFilePath</param_type>
             </parameter>
             <parameter>
-                <param_name>compress_as_much_as_possible</param_name>
-                <param_type>CompressionAsFarAsPos</param_type>
-            </parameter>
-            <parameter>
                 <param_name>executable_finder</param_name>
                 <param_type>ExecutableFinder</param_type>
             </parameter>
@@ -248,10 +244,6 @@
             <parameter>
                 <param_name>provenance_file_path</param_name>
                 <param_type>SystemProvenanceFilePath</param_type>
-            </parameter>
-            <parameter>
-                <param_name>compress_as_much_as_possible</param_name>
-                <param_type>CompressionAsFarAsPos</param_type>
             </parameter>
             <parameter>
                 <param_name>executable_finder</param_name>
@@ -382,10 +374,6 @@
             <parameter>
                 <param_name>provenance_file_path</param_name>
                 <param_type>SystemProvenanceFilePath</param_type>
-            </parameter>
-            <parameter>
-                <param_name>compress_as_much_as_possible</param_name>
-                <param_type>CompressionAsFarAsPos</param_type>
             </parameter>
             <parameter>
                 <param_name>executable_finder</param_name>
