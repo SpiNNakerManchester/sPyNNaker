@@ -286,7 +286,7 @@ static inline bool row_restructure(
                 elimination_params[current_state->post_to_pre.pop_index],
                 time, row)) {
             // Create recorded value
-            // (bottom bit: add/remove, next 8: local id, remainder: pre-neuron global id)
+            // (bottom bit: add/remove, next 8: local id, remainder: pre global id)
             uint32_t pre_id = current_state->key_atom_info->lo_atom + current_state->pre_syn_id;
             uint32_t id = current_state->post_syn_id;
             uint32_t record_value = (0 << 0) | (id << 1) | (pre_id << 9);
@@ -311,7 +311,7 @@ static inline bool row_restructure(
                 if (synaptogenesis_formation_rule(current_state,
                         formation_params[current_state->post_to_pre.pop_index], time, row)) {
                     // Create recorded value
-                    // (bottom bit: add/remove, next 8: local id, remainder: pre-neuron global id)
+                    // (bottom bit: add/remove, next 8: local id, remainder: pre global id)
                     uint32_t pre_id = current_state->key_atom_info->lo_atom
                             + current_state->pre_syn_id;
                     uint32_t id = current_state->post_syn_id;
@@ -332,7 +332,7 @@ static inline bool row_restructure(
                     if (synaptogenesis_formation_rule(current_state,
                             formation_params[current_state->post_to_pre.pop_index], time, row)) {
                         // Create recorded value
-                        // (bottom bit: add/remove, next 8: local id, remainder: pre-neuron global id)
+                        // (bottom bit: add/remove, next 8: local id, remainder: pre global id)
                         uint32_t pre_id = current_state->key_atom_info->lo_atom
                                 + current_state->pre_syn_id;
                         uint32_t id = current_state->post_syn_id;
