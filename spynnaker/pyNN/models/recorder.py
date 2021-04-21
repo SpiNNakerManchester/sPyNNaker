@@ -524,8 +524,6 @@ class Recorder(object):
                     segment=segment,
                     block=block,
                     event_array=variable_cache.data,
-                    data_indexes=variable_cache.indexes,
-                    view_indexes=view_indexes,
                     variable=variable,
                     recording_start_time=data_cache.recording_start_time,
                     label=self.__population.label)

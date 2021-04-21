@@ -951,8 +951,9 @@ class NeuronRecorder(object):
             # If rate is 0 no recording so no overflow
             # If rate is 1 there is no overflow as average is exact
             if rate > 1:
+                rewires_per_ts = 1
                 data_size = self.get_buffered_sdram_per_record(
-                    variable,  vertex_slice)
+                    variable, vertex_slice, rewires_per_ts)
                 overflow += data_size // rate * (rate - 1)
         return overflow
 
