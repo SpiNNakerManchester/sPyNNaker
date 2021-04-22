@@ -95,10 +95,6 @@
                 <param_type>ExecutableTargets</param_type>
             </parameter>
             <parameter>
-                <param_name>threshold_percentage</param_name>
-                <param_type>RouterCompressorBitFieldPercentageThreshold</param_type>
-            </parameter>
-            <parameter>
                 <param_name>retry_count</param_name>
                 <param_type>RouterCompressorBitFieldRetryCount</param_type>
             </parameter>
@@ -190,7 +186,6 @@
             <param_name>default_report_folder</param_name>
             <param_name>target_length</param_name>
             <param_name>routing_infos</param_name>
-            <param_name>threshold_percentage</param_name>
             <param_name>retry_count</param_name>
             <param_name>time_to_try_for_each_iteration</param_name>
             <param_name>use_timer_cut_off</param_name>
@@ -222,10 +217,6 @@
                 <param_type>ExecutableTargets</param_type>
             </parameter>
             <parameter>
-                <param_name>threshold_percentage</param_name>
-                <param_type>RouterCompressorBitFieldPercentageThreshold</param_type>
-            </parameter>
-            <parameter>
                 <param_name>retry_count</param_name>
                 <param_type>RouterCompressorBitFieldRetryCount</param_type>
             </parameter>
@@ -317,7 +308,6 @@
             <param_name>default_report_folder</param_name>
             <param_name>target_length</param_name>
             <param_name>routing_infos</param_name>
-            <param_name>threshold_percentage</param_name>
             <param_name>retry_count</param_name>
             <param_name>time_to_try_for_each_iteration</param_name>
             <param_name>use_timer_cut_off</param_name>
@@ -352,10 +342,6 @@
                 <param_type>ExecutableTargets</param_type>
             </parameter>
             <parameter>
-                <param_name>threshold_percentage</param_name>
-                <param_type>RouterCompressorBitFieldPercentageThreshold</param_type>
-            </parameter>
-            <parameter>
                 <param_name>retry_count</param_name>
                 <param_type>RouterCompressorBitFieldRetryCount</param_type>
             </parameter>
@@ -442,7 +428,6 @@
             <param_name>default_report_folder</param_name>
             <param_name>target_length</param_name>
             <param_name>routing_infos</param_name>
-            <param_name>threshold_percentage</param_name>
             <param_name>retry_count</param_name>
             <param_name>time_to_try_for_each_iteration</param_name>
             <param_name>use_timer_cut_off</param_name>

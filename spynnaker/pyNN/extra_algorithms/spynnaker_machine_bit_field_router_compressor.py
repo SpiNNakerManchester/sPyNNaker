@@ -49,7 +49,7 @@ class AbstractMachineBitFieldRouterCompressor(object, metaclass=AbstractBase):
             placements, executable_finder, write_compressor_iobuf,
             produce_report, default_report_folder, target_length,
             routing_infos, time_to_try_for_each_iteration, use_timer_cut_off,
-            machine_time_step, time_scale_factor, threshold_percentage,
+            machine_time_step, time_scale_factor,
             retry_count, executable_targets, read_expander_iobuf,
             provenance_data_objects=None):
         """ entrance for routing table compression with bit field
@@ -73,9 +73,6 @@ class AbstractMachineBitFieldRouterCompressor(object, metaclass=AbstractBase):
         :param str default_report_folder:
         :param int target_length:
         :param ~pacman.model.routing_info.RoutingInfo routing_infos:
-        :param int threshold_percentage:
-            the percentage of bitfields to do on chip before its considered
-            a success
         :param retry_count:
             Number of times that the sorters should set of the compressions
             again. None for as much as needed
@@ -103,7 +100,6 @@ class AbstractMachineBitFieldRouterCompressor(object, metaclass=AbstractBase):
                 use_timer_cut_off=use_timer_cut_off,
                 machine_time_step=machine_time_step,
                 time_scale_factor=time_scale_factor,
-                threshold_percentage=threshold_percentage,
                 retry_count=retry_count,
                 executable_targets=executable_targets,
                 provenance_data_objects=provenance_data_objects)
