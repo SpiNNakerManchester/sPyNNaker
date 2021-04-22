@@ -115,10 +115,6 @@
                 <param_type>ExecutableFinder</param_type>
             </parameter>
             <parameter>
-                <param_name>write_compressor_iobuf</param_name>
-                <param_type>WriteCompressorIobuf</param_type>
-            </parameter>
-            <parameter>
                 <param_name>machine_graph</param_name>
                 <param_type>MemoryMachineGraph</param_type>
             </parameter>
@@ -170,7 +166,6 @@
         <required_inputs>
             <param_name>read_expander_iobuf</param_name>
             <param_name>executable_finder</param_name>
-            <param_name>write_compressor_iobuf</param_name>
             <param_name>routing_tables</param_name>
             <param_name>transceiver</param_name>
             <param_name>machine</param_name>
@@ -231,10 +226,6 @@
                 <param_type>ExecutableFinder</param_type>
             </parameter>
             <parameter>
-                <param_name>write_compressor_iobuf</param_name>
-                <param_type>WriteCompressorIobuf</param_type>
-            </parameter>
-            <parameter>
                 <param_name>machine_graph</param_name>
                 <param_type>MemoryMachineGraph</param_type>
             </parameter>
@@ -286,7 +277,6 @@
         <required_inputs>
             <param_name>read_expander_iobuf</param_name>
             <param_name>executable_finder</param_name>
-            <param_name>write_compressor_iobuf</param_name>
             <param_name>routing_tables</param_name>
             <param_name>transceiver</param_name>
             <param_name>machine</param_name>
@@ -350,10 +340,6 @@
                 <param_type>ExecutableFinder</param_type>
             </parameter>
             <parameter>
-                <param_name>write_compressor_iobuf</param_name>
-                <param_type>WriteCompressorIobuf</param_type>
-            </parameter>
-            <parameter>
                 <param_name>machine_graph</param_name>
                 <param_type>MemoryMachineGraph</param_type>
             </parameter>
@@ -400,7 +386,6 @@
         </input_definitions>
         <required_inputs>
             <param_name>executable_finder</param_name>
-            <param_name>write_compressor_iobuf</param_name>
             <param_name>routing_tables</param_name>
             <param_name>transceiver</param_name>
             <param_name>machine</param_name>
