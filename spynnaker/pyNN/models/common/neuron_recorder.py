@@ -845,7 +845,8 @@ class NeuronRecorder(object):
         for variable in itertools.chain(
                 self.__sampling_rates, self.__per_timestep_variables):
             values.append(self.get_buffered_sdram(
-                variable, vertex_slice, n_machine_time_steps, max_rewires_per_ts))
+                variable, vertex_slice, n_machine_time_steps,
+                max_rewires_per_ts))
         return values
 
     def write_neuron_recording_region(
@@ -1202,7 +1203,7 @@ class NeuronRecorder(object):
             machine_ts = globals_variables.get_simulator().machine_time_step
             if (p_rew * MICRO_TO_MILLISECOND_CONVERSION <
                     machine_ts / MICRO_TO_MILLISECOND_CONVERSION):
-                # fast rewiring, so need to set max_rewires_per_ts appropriately
+                # fast rewiring, so need to set max_rewires_per_ts
                 max_rewires_per_ts = int(machine_ts / (
                     p_rew * MICRO_TO_SECOND_CONVERSION))
 
