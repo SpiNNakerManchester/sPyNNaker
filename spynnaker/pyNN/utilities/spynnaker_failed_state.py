@@ -16,12 +16,9 @@
 import logging
 from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.log import FormatAdapter
-from spinn_utilities.overrides import overrides
-from spinn_front_end_common.interface.config_handler import ConfigHandler
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.failed_state import (
     FailedState, FAILED_STATE_MSG)
-from spynnaker.pyNN.abstract_spinnaker_common import AbstractSpiNNakerCommon
 from spynnaker.pyNN.spynnaker_simulator_interface import (
     SpynnakerSimulatorInterface)
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -87,14 +84,3 @@ class SpynnakerFailedState(
     @property
     def name(self):
         return self._name
-
-    @property
-    @overrides(FailedState.config)
-    def config(self):
-        logger.warning(
-            "Accessing config before setup is not recommended as setup could"
-            " change some config values. ")
-        handler = ConfigHandler(
-            AbstractSpiNNakerCommon.CONFIG_FILE_NAME,
-            [AbstractSpiNNakerCommon.extended_config_path()], [])
-        return handler.config
