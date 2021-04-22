@@ -70,7 +70,7 @@ jobs:
         coveralls-token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Lint with flake8
-      run: flake8 spynnaker unittests
+      run: flake8 spynnaker spynnaker8 unittests spynnaker_integration_tests
 
     - name: Lint with pylint
       uses: ./support/actions/pylint

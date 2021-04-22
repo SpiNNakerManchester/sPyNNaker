@@ -26,14 +26,10 @@ class TestSampling(BaseTestCase):
         simtime = 1000
         spike_rate = 5
         n_neurons = 320
-        spike_rec_indexes = list(range(0, 100, 2)) \
-                            + list(range(100, 200, 3)) \
-                            + list(range(200, 300, 1)) \
-                            + list(range(300, 320, 4))
-        v_rec_indexes = list(range(0, 100, 1)) \
-                        + list(range(100, 200, 3)) \
-                        + list(range(200, 300, 4)) \
-                        + list(range(300, 320, 2))
+        spike_rec_indexes = list(range(0, 100, 2)) + list(range(100, 200, 3)) \
+            + list(range(200, 300, 1)) + list(range(300, 320, 4))
+        v_rec_indexes = list(range(0, 100, 1)) + list(range(100, 200, 3)) \
+            + list(range(200, 300, 4)) + list(range(300, 320, 2))
         v_rate = 3
         pop = ps.create_population(sim, n_neurons=n_neurons, label="test",
                                    spike_rate=spike_rate,

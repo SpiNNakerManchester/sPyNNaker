@@ -78,7 +78,6 @@ class ManyBoards(BaseTestCase):
         return "{}_n_boards={}_n_neurons={}_simtime={}".format(
             style, self.n_boards, self.n_neurons, self.simtime)
 
-
     def do_run(self):
         report_file = self.report_file()
         t_before = time.time()
