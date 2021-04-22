@@ -56,13 +56,12 @@
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">pacman.model.constraints.key_allocator_constraints</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ContiguousKeyRangeContraint</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">pacman.config_holder</span> <span class="kn">import</span> <span class="n">get_config_int</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractChangableAfterRun</span><span class="p">,</span> <span class="n">AbstractProvidesOutgoingPartitionConstraints</span><span class="p">,</span>
     <span class="n">AbstractCanReset</span><span class="p">,</span> <span class="n">AbstractRewritesDataSpecification</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models.impl</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ProvidesKeyToAtomMappingImpl</span><span class="p">,</span> <span class="n">TDMAAwareApplicationVertex</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">helpful_functions</span><span class="p">,</span> <span class="n">globals_variables</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.common</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractSpikeRecordable</span><span class="p">,</span> <span class="n">AbstractNeuronRecordable</span><span class="p">,</span> <span class="n">NeuronRecorder</span><span class="p">)</span>
@@ -164,11 +163,8 @@
         <span class="c1"># buffer data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__incoming_spike_buffer_size</span> <span class="o">=</span> <span class="n">incoming_spike_buffer_size</span>
 
-        <span class="c1"># get config from simulator</span>
-        <span class="n">config</span> <span class="o">=</span> <span class="n">globals_variables</span><span class="o">.</span><span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">config</span>
-
         <span class="k">if</span> <span class="n">incoming_spike_buffer_size</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__incoming_spike_buffer_size</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">getint</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__incoming_spike_buffer_size</span> <span class="o">=</span> <span class="n">get_config_int</span><span class="p">(</span>
                 <span class="s2">&quot;Simulation&quot;</span><span class="p">,</span> <span class="s2">&quot;incoming_spike_buffer_size&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_impl</span> <span class="o">=</span> <span class="n">neuron_impl</span>
@@ -192,7 +188,7 @@
         <span class="c1"># Set up synapse handling</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_manager</span> <span class="o">=</span> <span class="n">SynapticManager</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_impl</span><span class="o">.</span><span class="n">get_n_synapse_types</span><span class="p">(),</span> <span class="n">ring_buffer_sigma</span><span class="p">,</span>
-            <span class="n">spikes_per_second</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">drop_late_spikes</span><span class="p">)</span>
+            <span class="n">spikes_per_second</span><span class="p">,</span> <span class="n">drop_late_spikes</span><span class="p">)</span>
 
         <span class="c1"># bool for if state has changed.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_mapping</span> <span class="o">=</span> <span class="kc">True</span>
@@ -200,8 +196,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__has_run</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="c1"># Set up for profiling</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__n_profile_samples</span> <span class="o">=</span> <span class="n">helpful_functions</span><span class="o">.</span><span class="n">read_config_int</span><span class="p">(</span>
-            <span class="n">config</span><span class="p">,</span> <span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;n_profile_samples&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__n_profile_samples</span> <span class="o">=</span> <span class="n">get_config_int</span><span class="p">(</span>
+            <span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;n_profile_samples&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.get_expected_n_rows"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_expected_n_rows">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractNeuronRecordable</span><span class="o">.</span><span class="n">get_expected_n_rows</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_expected_n_rows</span><span class="p">(</span>

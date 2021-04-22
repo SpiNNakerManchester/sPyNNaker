@@ -56,6 +56,7 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.abstract_base</span> <span class="kn">import</span> <span class="n">AbstractBase</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
+<span class="kn">from</span> <span class="nn">pacman.config_holder</span> <span class="kn">import</span> <span class="n">get_config_bool</span><span class="p">,</span> <span class="n">set_cfg_files</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.abstract_spinnaker_base</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractSpinnakerBase</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
@@ -72,6 +73,8 @@
 <span class="kn">from</span> <span class="nn">spynnaker</span> <span class="kn">import</span> <span class="n">__version__</span> <span class="k">as</span> <span class="n">version</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
+
+<span class="n">CONFIG_FILE_NAME</span> <span class="o">=</span> <span class="s2">&quot;spynnaker.cfg&quot;</span>
 
 
 <div class="viewcode-block" id="AbstractSpiNNakerCommon"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon">[docs]</a><span class="k">class</span> <span class="nc">AbstractSpiNNakerCommon</span><span class="p">(</span>
@@ -92,12 +95,9 @@
 
     <span class="n">__EXECUTABLE_FINDER</span> <span class="o">=</span> <span class="n">ExecutableFinder</span><span class="p">()</span>
 
-    <span class="n">CONFIG_FILE_NAME</span> <span class="o">=</span> <span class="s2">&quot;spynnaker.cfg&quot;</span>
-
 <div class="viewcode-block" id="AbstractSpiNNakerCommon.extended_config_path"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.extended_config_path">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">extended_config_path</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span>
-                            <span class="bp">cls</span><span class="o">.</span><span class="n">CONFIG_FILE_NAME</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="n">CONFIG_FILE_NAME</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">graph_label</span><span class="p">,</span> <span class="n">database_socket_addresses</span><span class="p">,</span> <span class="n">n_chips_required</span><span class="p">,</span>
@@ -173,14 +173,12 @@
             <span class="n">versions</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">front_end_versions</span><span class="p">)</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">configfile</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">CONFIG_FILE_NAME</span><span class="p">,</span>
             <span class="n">executable_finder</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__EXECUTABLE_FINDER</span><span class="p">,</span>
             <span class="n">graph_label</span><span class="o">=</span><span class="n">graph_label</span><span class="p">,</span>
             <span class="n">database_socket_addresses</span><span class="o">=</span><span class="n">database_socket_addresses</span><span class="p">,</span>
             <span class="n">extra_algorithm_xml_paths</span><span class="o">=</span><span class="n">extra_algorithm_xml_path</span><span class="p">,</span>
             <span class="n">n_chips_required</span><span class="o">=</span><span class="n">n_chips_required</span><span class="p">,</span>
             <span class="n">n_boards_required</span><span class="o">=</span><span class="n">n_boards_required</span><span class="p">,</span>
-            <span class="n">default_config_paths</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">extended_config_path</span><span class="p">()],</span>
             <span class="n">front_end_versions</span><span class="o">=</span><span class="n">versions</span><span class="p">)</span>
 
         <span class="c1"># update inputs needed by the machine level calls.</span>
@@ -188,17 +186,17 @@
 
         <span class="n">extra_mapping_inputs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="n">extra_mapping_inputs</span><span class="p">[</span><span class="s1">&#39;CreateAtomToEventIdMapping&#39;</span><span class="p">]</span> <span class="o">=</span> \
-            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getboolean</span><span class="p">(</span>
+            <span class="n">get_config_bool</span><span class="p">(</span>
                 <span class="s2">&quot;Database&quot;</span><span class="p">,</span> <span class="s2">&quot;create_routing_info_to_neuron_id_mapping&quot;</span><span class="p">)</span>
         <span class="n">extra_mapping_inputs</span><span class="p">[</span><span class="s2">&quot;WriteBitFieldGeneratorIOBUF&quot;</span><span class="p">]</span> <span class="o">=</span> \
-            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getboolean</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;write_bit_field_iobuf&quot;</span><span class="p">)</span>
+            <span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;write_bit_field_iobuf&quot;</span><span class="p">)</span>
         <span class="n">extra_mapping_inputs</span><span class="p">[</span><span class="s2">&quot;GenerateBitFieldReport&quot;</span><span class="p">]</span> <span class="o">=</span> \
-            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getboolean</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;generate_bit_field_report&quot;</span><span class="p">)</span>
+            <span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;generate_bit_field_report&quot;</span><span class="p">)</span>
         <span class="n">extra_mapping_inputs</span><span class="p">[</span><span class="s2">&quot;GenerateBitFieldSummaryReport&quot;</span><span class="p">]</span> <span class="o">=</span> \
-            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getboolean</span><span class="p">(</span>
+            <span class="n">get_config_bool</span><span class="p">(</span>
                 <span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;generate_bit_field_summary_report&quot;</span><span class="p">)</span>
         <span class="n">extra_mapping_inputs</span><span class="p">[</span><span class="s2">&quot;SynapticExpanderReadIOBuf&quot;</span><span class="p">]</span> <span class="o">=</span> \
-            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getboolean</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;write_expander_iobuf&quot;</span><span class="p">)</span>
+            <span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;write_expander_iobuf&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">user_extra_mapping_inputs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">extra_mapping_inputs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">user_extra_mapping_inputs</span><span class="p">)</span>
 
@@ -213,7 +211,7 @@
         <span class="n">extra_load_algorithms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;FinishConnectionHolders&quot;</span><span class="p">)</span>
         <span class="n">extra_algorithms_pre_run</span> <span class="o">=</span> <span class="p">[]</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getboolean</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;draw_network_graph&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;draw_network_graph&quot;</span><span class="p">):</span>
             <span class="n">extra_mapping_algorithms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="s2">&quot;SpYNNakerConnectionHolderGenerator&quot;</span><span class="p">)</span>
             <span class="n">extra_mapping_algorithms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
@@ -221,8 +219,8 @@
             <span class="n">extra_load_algorithms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="s2">&quot;SpYNNakerNeuronGraphNetworkSpecificationReport&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getboolean</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;reports_enabled&quot;</span><span class="p">):</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getboolean</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;write_synaptic_report&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;reports_enabled&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;write_synaptic_report&quot;</span><span class="p">):</span>
                 <span class="n">extra_algorithms_pre_run</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;SynapticMatrixReport&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">user_extra_algorithms_pre_run</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">extra_algorithms_pre_run</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">user_extra_algorithms_pre_run</span><span class="p">)</span>
@@ -234,8 +232,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">extend_extra_load_algorithms</span><span class="p">(</span><span class="n">extra_load_algorithms</span><span class="p">)</span>
 
         <span class="c1"># set up machine targeted data</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_set_up_timings</span><span class="p">(</span>
-            <span class="n">timestep</span><span class="p">,</span> <span class="n">min_delay</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_up_timings</span><span class="p">(</span><span class="n">timestep</span><span class="p">,</span> <span class="n">min_delay</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_up_machine_specifics</span><span class="p">(</span><span class="n">hostname</span><span class="p">)</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Setting time scale factor to </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="p">,</span>
@@ -245,12 +242,11 @@
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Setting machine time step to </span><span class="si">{}</span><span class="s2"> micro-seconds.&quot;</span><span class="p">,</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">machine_time_step</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_set_up_timings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timestep</span><span class="p">,</span> <span class="n">min_delay</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_set_up_timings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timestep</span><span class="p">,</span> <span class="n">min_delay</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param float timestep:</span>
 <span class="sd">        :param int min_delay:</span>
-<span class="sd">        :param configparser.ConfigParser config:</span>
-<span class="sd">        :param float time_scale_factor:</span>
+<span class="sd">       :param float time_scale_factor:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># Get the standard values</span>
@@ -287,12 +283,12 @@
                     <span class="s2">&quot;automatically slow the simulation down from real time &quot;</span>
                     <span class="s2">&quot;by a factor of </span><span class="si">{}</span><span class="s2">. To remove this automatic behaviour, &quot;</span>
                     <span class="s2">&quot;please enter a timescaleFactor value in your .</span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">time_scale_factor</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">CONFIG_FILE_NAME</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">time_scale_factor</span><span class="p">,</span> <span class="n">CONFIG_FILE_NAME</span><span class="p">)</span>
 
         <span class="c1"># Check the combination of machine time step and time scale factor</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">machine_time_step</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_scale_factor</span> <span class="o">&lt;</span>
                 <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">):</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="o">.</span><span class="n">getboolean</span><span class="p">(</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">get_config_bool</span><span class="p">(</span>
                     <span class="s2">&quot;Mode&quot;</span><span class="p">,</span> <span class="s2">&quot;violate_1ms_wall_clock_restriction&quot;</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
                     <span class="s2">&quot;The combination of simulation time step and the machine &quot;</span>
@@ -301,7 +297,7 @@
                     <span class="s2">&quot;SpiNNaker machine.  If you would like to override this&quot;</span>
                     <span class="s2">&quot;behaviour (at your own risk), please add &quot;</span>
                     <span class="s2">&quot;violate_1ms_wall_clock_restriction = True to the [Mode] &quot;</span>
-                    <span class="s2">&quot;section of your .</span><span class="si">{}</span><span class="s2"> file&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CONFIG_FILE_NAME</span><span class="p">))</span>
+                    <span class="s2">&quot;section of your .</span><span class="si">{}</span><span class="s2"> file&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">CONFIG_FILE_NAME</span><span class="p">))</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                 <span class="s2">&quot;****************************************************&quot;</span><span class="p">)</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
@@ -406,11 +402,11 @@
         <span class="k">for</span> <span class="n">projection</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_projections</span><span class="p">:</span>
             <span class="n">projection</span><span class="o">.</span><span class="n">_clear_cache</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getboolean</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;reports_enabled&quot;</span><span class="p">)</span> <span class="ow">and</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getboolean</span><span class="p">(</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;reports_enabled&quot;</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="n">get_config_bool</span><span class="p">(</span>
                     <span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;write_redundant_packet_count_report&quot;</span><span class="p">)</span> <span class="ow">and</span>
                 <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_virtual_board</span> <span class="ow">and</span> <span class="n">run_time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span>
-                <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_ran</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">getboolean</span><span class="p">(</span>
+                <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_ran</span> <span class="ow">and</span> <span class="n">get_config_bool</span><span class="p">(</span>
                     <span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;writeProvenanceData&quot;</span><span class="p">)):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">extend_extra_post_run_algorithms</span><span class="p">(</span>
                 <span class="p">[</span><span class="s2">&quot;RedundantPacketCountReport&quot;</span><span class="p">])</span>
@@ -562,6 +558,12 @@
 <span class="sd">        :param int new_value: new value for id_counter</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__id_counter</span> <span class="o">=</span> <span class="n">new_value</span></div>
+
+
+<span class="c1"># add the default at import time in case needed before setup</span>
+<span class="n">set_cfg_files</span><span class="p">(</span>
+    <span class="n">configfile</span><span class="o">=</span><span class="n">CONFIG_FILE_NAME</span><span class="p">,</span>
+    <span class="n">default</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="n">CONFIG_FILE_NAME</span><span class="p">))</span>
 </pre></div>
 
             <div class="clearer"></div>

@@ -53,8 +53,8 @@
 
 <span class="kn">from</span> <span class="nn">spinn_utilities.socket_address</span> <span class="kn">import</span> <span class="n">SocketAddress</span>
 <span class="kn">from</span> <span class="nn">pacman.model.graphs.application</span> <span class="kn">import</span> <span class="n">ApplicationEdge</span>
+<span class="kn">from</span> <span class="nn">pacman.config_holder</span> <span class="kn">import</span> <span class="p">(</span><span class="n">get_config_int</span><span class="p">,</span> <span class="n">get_config_str</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinnman.messages.eieio</span> <span class="kn">import</span> <span class="n">EIEIOType</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities</span> <span class="kn">import</span> <span class="n">helpful_functions</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="n">get_simulator</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utility_models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ReverseIpTagMultiCastSource</span><span class="p">)</span>
@@ -86,18 +86,16 @@
 <span class="sd">            simulation should start.</span>
 <span class="sd">        :type database_ack_port_num: int or None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">config</span> <span class="o">=</span> <span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">config</span>
         <span class="k">if</span> <span class="n">database_notify_port_num</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">database_notify_port_num</span> <span class="o">=</span> <span class="n">helpful_functions</span><span class="o">.</span><span class="n">read_config_int</span><span class="p">(</span>
-                <span class="n">config</span><span class="p">,</span> <span class="s2">&quot;Database&quot;</span><span class="p">,</span> <span class="s2">&quot;notify_port&quot;</span><span class="p">)</span>
+            <span class="n">database_notify_port_num</span> <span class="o">=</span> <span class="n">get_config_int</span><span class="p">(</span>
+                <span class="s2">&quot;Database&quot;</span><span class="p">,</span> <span class="s2">&quot;notify_port&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">database_notify_host</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">database_notify_host</span> <span class="o">=</span> <span class="n">helpful_functions</span><span class="o">.</span><span class="n">read_config</span><span class="p">(</span>
-                <span class="n">config</span><span class="p">,</span> <span class="s2">&quot;Database&quot;</span><span class="p">,</span> <span class="s2">&quot;notify_hostname&quot;</span><span class="p">)</span>
+            <span class="n">database_notify_host</span> <span class="o">=</span> <span class="n">get_config_str</span><span class="p">(</span>
+                <span class="s2">&quot;Database&quot;</span><span class="p">,</span> <span class="s2">&quot;notify_hostname&quot;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">database_notify_host</span> <span class="o">==</span> <span class="s2">&quot;0.0.0.0&quot;</span><span class="p">:</span>
             <span class="n">database_notify_host</span> <span class="o">=</span> <span class="s2">&quot;localhost&quot;</span>
         <span class="k">if</span> <span class="n">database_ack_port_num</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">database_ack_port_num</span> <span class="o">=</span> <span class="n">helpful_functions</span><span class="o">.</span><span class="n">read_config_int</span><span class="p">(</span>
-                <span class="n">config</span><span class="p">,</span> <span class="s2">&quot;Database&quot;</span><span class="p">,</span> <span class="s2">&quot;listen_port&quot;</span><span class="p">)</span>
+            <span class="n">database_ack_port_num</span> <span class="o">=</span> <span class="n">get_config_int</span><span class="p">(</span><span class="s2">&quot;Database&quot;</span><span class="p">,</span> <span class="s2">&quot;listen_port&quot;</span><span class="p">)</span>
 
         <span class="c1"># build the database socket address used by the notification interface</span>
         <span class="n">database_socket</span> <span class="o">=</span> <span class="n">SocketAddress</span><span class="p">(</span>
@@ -177,12 +175,11 @@
 <span class="sd">            The names of the partitions to create edges for</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=too-many-arguments, too-many-locals, protected-access</span>
-        <span class="n">config</span> <span class="o">=</span> <span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">config</span>
         <span class="c1"># get default params if none set</span>
         <span class="k">if</span> <span class="n">port</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">port</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">getint</span><span class="p">(</span><span class="s2">&quot;Recording&quot;</span><span class="p">,</span> <span class="s2">&quot;live_spike_port&quot;</span><span class="p">)</span>
+            <span class="n">port</span> <span class="o">=</span> <span class="n">get_config_int</span><span class="p">(</span><span class="s2">&quot;Recording&quot;</span><span class="p">,</span> <span class="s2">&quot;live_spike_port&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">host</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">host</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Recording&quot;</span><span class="p">,</span> <span class="s2">&quot;live_spike_host&quot;</span><span class="p">))</span>
+            <span class="n">host</span> <span class="o">=</span> <span class="n">get_config_str</span><span class="p">(</span><span class="s2">&quot;Recording&quot;</span><span class="p">,</span> <span class="s2">&quot;live_spike_host&quot;</span><span class="p">)</span>
 
         <span class="c1"># add new edge and vertex if required to SpiNNaker graph</span>
         <span class="n">SpynnakerExternalDevicePluginManager</span><span class="o">.</span><span class="n">update_live_packet_gather_tracker</span><span class="p">(</span>

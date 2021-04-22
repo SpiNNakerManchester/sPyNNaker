@@ -54,12 +54,9 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.abstract_base</span> <span class="kn">import</span> <span class="n">AbstractBase</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
-<span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.config_handler</span> <span class="kn">import</span> <span class="n">ConfigHandler</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.exceptions</span> <span class="kn">import</span> <span class="n">ConfigurationException</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.failed_state</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">FailedState</span><span class="p">,</span> <span class="n">FAILED_STATE_MSG</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.abstract_spinnaker_common</span> <span class="kn">import</span> <span class="n">AbstractSpiNNakerCommon</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.spynnaker_simulator_interface</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">SpynnakerSimulatorInterface</span><span class="p">)</span>
 <span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
@@ -124,18 +121,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
-
-    <span class="nd">@property</span>
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">FailedState</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-            <span class="s2">&quot;Accessing config before setup is not recommended as setup could&quot;</span>
-            <span class="s2">&quot; change some config values. &quot;</span><span class="p">)</span>
-        <span class="n">handler</span> <span class="o">=</span> <span class="n">ConfigHandler</span><span class="p">(</span>
-            <span class="n">AbstractSpiNNakerCommon</span><span class="o">.</span><span class="n">CONFIG_FILE_NAME</span><span class="p">,</span>
-            <span class="p">[</span><span class="n">AbstractSpiNNakerCommon</span><span class="o">.</span><span class="n">extended_config_path</span><span class="p">()],</span> <span class="p">[])</span>
-        <span class="k">return</span> <span class="n">handler</span><span class="o">.</span><span class="n">config</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span></div>
 </pre></div>
 
             <div class="clearer"></div>

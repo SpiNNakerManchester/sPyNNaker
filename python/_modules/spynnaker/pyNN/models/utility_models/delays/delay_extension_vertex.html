@@ -56,11 +56,11 @@
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">pacman.model.constraints.key_allocator_constraints</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ContiguousKeyRangeContraint</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">pacman.config_holder</span> <span class="kn">import</span> <span class="n">get_config_bool</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractProvidesOutgoingPartitionConstraints</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models.impl</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">TDMAAwareApplicationVertex</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities</span> <span class="kn">import</span> <span class="n">globals_variables</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">DelayExtensionException</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="n">AbstractHasDelayStages</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
@@ -129,9 +129,7 @@
         <span class="c1"># Dictionary of vertex_slice -&gt; delay block for data specification</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__delay_blocks</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
-        <span class="c1"># Read the config for dropping late spikes</span>
-        <span class="n">config</span> <span class="o">=</span> <span class="n">globals_variables</span><span class="o">.</span><span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">config</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__drop_late_spikes</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">getboolean</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__drop_late_spikes</span> <span class="o">=</span> <span class="n">get_config_bool</span><span class="p">(</span>
             <span class="s2">&quot;Simulation&quot;</span><span class="p">,</span> <span class="s2">&quot;drop_late_spikes&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
