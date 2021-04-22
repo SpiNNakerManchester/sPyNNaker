@@ -47,7 +47,7 @@ class AbstractMachineBitFieldRouterCompressor(object, metaclass=AbstractBase):
             self, routing_tables, transceiver, machine, app_id,
             provenance_file_path, machine_graph,
             placements, executable_finder,
-            produce_report, default_report_folder, target_length,
+            default_report_folder, target_length,
             routing_infos, time_to_try_for_each_iteration, use_timer_cut_off,
             machine_time_step, time_scale_factor,
             executable_targets, read_expander_iobuf,
@@ -68,7 +68,6 @@ class AbstractMachineBitFieldRouterCompressor(object, metaclass=AbstractBase):
         :param executable_finder: where are binaries are located
         :type executable_finder:
             ~spinn_front_end_common.utilities.utility_objs.ExecutableFinder
-        :param bool produce_report:
         :param str default_report_folder:
         :param int target_length:
         :param ~pacman.model.routing_info.RoutingInfo routing_infos:
@@ -88,7 +87,6 @@ class AbstractMachineBitFieldRouterCompressor(object, metaclass=AbstractBase):
                 provenance_file_path=provenance_file_path,
                 machine_graph=machine_graph,
                 placements=placements, executable_finder=executable_finder,
-                produce_report=produce_report,
                 default_report_folder=default_report_folder,
                 target_length=target_length, routing_infos=routing_infos,
                 time_to_try_for_each_iteration=time_to_try_for_each_iteration,
