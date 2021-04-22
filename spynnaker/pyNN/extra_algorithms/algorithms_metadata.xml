@@ -195,7 +195,6 @@
             <token part="BitFieldData">DataLoaded</token>
         </required_inputs>
         <optional_inputs>
-            <param_name>compress_as_much_as_possible</param_name>
             <param_name>provenance_data_objects</param_name>
         </optional_inputs>
         <outputs>
@@ -317,7 +316,6 @@
             <token part="BitFieldData">DataLoaded</token>
         </required_inputs>
         <optional_inputs>
-            <param_name>compress_as_much_as_possible</param_name>
             <param_name>provenance_data_objects</param_name>
         </optional_inputs>
         <outputs>
@@ -438,7 +436,6 @@
             <token part="BitFieldData">DataLoaded</token>
         </required_inputs>
         <optional_inputs>
-            <param_name>compress_as_much_as_possible</param_name>
             <param_name>provenance_data_objects</param_name>
         </optional_inputs>
         <outputs>
