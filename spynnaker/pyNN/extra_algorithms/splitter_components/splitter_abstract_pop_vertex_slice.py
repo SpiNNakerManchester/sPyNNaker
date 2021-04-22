@@ -34,6 +34,8 @@ from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
 from spynnaker.pyNN.models.neuron import (
     AbstractPopulationVertex, PopulationMachineVertex)
 from spynnaker.pyNN.utilities import bit_field_utilities
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    AbstractSynapseDynamicsStructural)
 
 
 class SplitterAbstractPopulationVertexSlice(
@@ -120,8 +122,10 @@ class SplitterAbstractPopulationVertexSlice(
         :rtype: VariableSDRAM
         """
         s_dynamics = self._governed_app_vertex.synapse_manager.synapse_dynamics
-        machine_ts = get_simulator().machine_time_step
-        max_rewires_per_ts = s_dynamics.get_max_rewires_per_ts(machine_ts)
+        max_rewires_per_ts = 1
+        if isinstance(s_dynamics, AbstractSynapseDynamicsStructural):
+            machine_ts = get_simulator().machine_time_step
+            max_rewires_per_ts = s_dynamics.get_max_rewires_per_ts(machine_ts)
 
         return self._governed_app_vertex.neuron_recorder.\
             get_variable_sdram_usage(vertex_slice, max_rewires_per_ts)
