@@ -468,12 +468,12 @@ class PopulationMachineVertex(
             self.__binary_file_name, machine_time_step, time_scale_factor))
 
         s_dynamics = self._app_vertex.synapse_manager.synapse_dynamics
-        rewires_per_ts = self._app_vertex.neuron_recorder.get_rewires_per_ts(
-            s_dynamics)
+        max_rewires_per_ts = self._app_vertex.neuron_recorder.\
+            get_max_rewires_per_ts(s_dynamics)
         # Write the neuron recording region
         self._app_vertex.neuron_recorder.write_neuron_recording_region(
             spec, POPULATION_BASED_REGIONS.NEURON_RECORDING.value,
-            self.vertex_slice, data_n_time_steps, rewires_per_ts)
+            self.vertex_slice, data_n_time_steps, max_rewires_per_ts)
 
         # Write the neuron parameters
         self._write_neuron_parameters(

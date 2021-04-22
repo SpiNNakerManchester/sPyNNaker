@@ -279,7 +279,7 @@ class Recorder(object):
         if sim.use_virtual_board:
             logger.warning(
                 "The simulation is using a virtual machine and so has not "
-                "truly ran, hence the list will be empty")
+                "truly ran, hence the spike list will be empty")
             return numpy.zeros((0, 2))
 
         # assuming we got here, everything is OK, so we should go get the
@@ -294,9 +294,25 @@ class Recorder(object):
         :rtype: ~numpy.ndarray
         """
 
-        # are there checks that could go here?
+        # check we're in a state where we can get rewires
+        if not isinstance(self.__vertex, AbstractNeuronRecordable):
+            raise ConfigurationException(
+                "This population has not got the capability to record rewires")
+        if not self.__vertex.is_recording(REWIRING):
+            raise ConfigurationException(
+                "This population has not been set to record rewires")
 
         sim = get_simulator()
+        if not sim.has_ran:
+            logger.warning(
+                "The simulation has not yet run, therefore rewires cannot "
+                "be retrieved, hence the list will be empty")
+            return numpy.zeros((0, 4))
+        if sim.use_virtual_board:
+            logger.warning(
+                "The simulation is using a virtual machine and so has not "
+                "truly ran, hence the rewires list will be empty")
+            return numpy.zeros((0, 4))
 
         return self.__vertex.get_rewires(
             sim.placements, sim.buffer_manager, sim.machine_time_step)
