@@ -12,9 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import os
-import sqlite3
-from spinn_front_end_common.utilities import globals_variables
 from spinnaker_testbase import BaseTestCase
 import spynnaker8 as p
 

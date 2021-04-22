@@ -29,6 +29,7 @@ from pacman.utilities import utility_calls
 from spinn_front_end_common.interface.profiling import profile_utils
 from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT)
+from spinn_front_end_common.utilities.globals_variables import get_simulator
 from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
 from spynnaker.pyNN.models.neuron import (
     AbstractPopulationVertex, PopulationMachineVertex)
@@ -119,8 +120,8 @@ class SplitterAbstractPopulationVertexSlice(
         :rtype: VariableSDRAM
         """
         s_dynamics = self._governed_app_vertex.synapse_manager.synapse_dynamics
-        max_rewires_per_ts = self._governed_app_vertex.neuron_recorder.\
-            get_max_rewires_per_ts(s_dynamics)
+        machine_ts = get_simulator().machine_time_step
+        max_rewires_per_ts = s_dynamics.get_max_rewires_per_ts(machine_ts)
 
         return self._governed_app_vertex.neuron_recorder.\
             get_variable_sdram_usage(vertex_slice, max_rewires_per_ts)

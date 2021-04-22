@@ -24,14 +24,11 @@ from data_specification.enums import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, MICRO_TO_MILLISECOND_CONVERSION, BITS_PER_WORD,
-    MICRO_TO_SECOND_CONVERSION)
+    BYTES_PER_WORD, MICRO_TO_MILLISECOND_CONVERSION, BITS_PER_WORD)
 from spinn_front_end_common.interface.buffer_management.recording_utilities \
     import (
         get_recording_header_array, get_recording_header_size,
         get_recording_data_constant_size)
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractSynapseDynamicsStructural)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -1191,23 +1188,6 @@ class NeuronRecorder(object):
             self.__add_indices(data, variable, rate, n_recording, vertex_slice)
 
         return numpy.concatenate(data)
-
-    def get_max_rewires_per_ts(self, synapse_dynamics):
-        """
-        :param synapse_dynamics: the synapse dynamics
-        :rtype int
-        """
-        max_rewires_per_ts = 1
-        if isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural):
-            p_rew = synapse_dynamics.p_rew
-            machine_ts = globals_variables.get_simulator().machine_time_step
-            if (p_rew * MICRO_TO_MILLISECOND_CONVERSION <
-                    machine_ts / MICRO_TO_MILLISECOND_CONVERSION):
-                # fast rewiring, so need to set max_rewires_per_ts
-                max_rewires_per_ts = int(machine_ts / (
-                    p_rew * MICRO_TO_SECOND_CONVERSION))
-
-        return max_rewires_per_ts
 
     @property
     def _indexes(self):  # for testing only

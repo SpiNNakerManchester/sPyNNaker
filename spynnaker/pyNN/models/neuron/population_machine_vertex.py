@@ -467,9 +467,11 @@ class PopulationMachineVertex(
         spec.write_array(simulation_utilities.get_simulation_header_array(
             self.__binary_file_name, machine_time_step, time_scale_factor))
 
+        max_rewires_per_ts = 1
         s_dynamics = self._app_vertex.synapse_manager.synapse_dynamics
-        max_rewires_per_ts = self._app_vertex.neuron_recorder.\
-            get_max_rewires_per_ts(s_dynamics)
+        if isinstance(s_dynamics, AbstractSynapseDynamicsStructural):
+            max_rewires_per_ts = s_dynamics.get_max_rewires_per_ts(
+                machine_time_step)
         # Write the neuron recording region
         self._app_vertex.neuron_recorder.write_neuron_recording_region(
             spec, POPULATION_BASED_REGIONS.NEURON_RECORDING.value,
