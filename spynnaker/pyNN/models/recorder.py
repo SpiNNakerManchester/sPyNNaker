@@ -719,36 +719,39 @@ class Recorder(object):
 
         formation_times = []
         formation_labels = []
+        formation_annotations = dict()
         elimination_times = []
         elimination_labels = []
+        elimination_annotations = dict()
 
         for i in range(len(event_array)):
+            event_time = t_start + event_array[i][0] * quantities.ms
+            pre_id = int(event_array[i][1])
+            post_id = int(event_array[i][2])
             if event_array[i][3] == 1:
-                formation_times.append(
-                    t_start + event_array[i][0] * quantities.ms)
+                formation_times.append(event_time)
                 formation_labels.append(
-                    [int(event_array[i][1]), int(event_array[i][2]),
-                     "formation"])
+                    str(pre_id)+"_"+str(post_id)+"_formation")
             else:
-                elimination_times.append(
-                    t_start + event_array[i][0] * quantities.ms)
+                elimination_times.append(event_time)
                 elimination_labels.append(
-                    [int(event_array[i][1]), int(event_array[i][2]),
-                     "elimination"])
+                    str(pre_id)+"_"+str(post_id)+"_elimination")
 
         formation_event_array = neo.Event(
             times=formation_times,
             labels=formation_labels,
             units="ms",
             name=variable+"_form",
-            description="Synapse formation events")
+            description="Synapse formation events",
+            array_annotations=formation_annotations)
 
         elimination_event_array = neo.Event(
             times=elimination_times,
             labels=elimination_labels,
             units="ms",
             name=variable+"_elim",
-            description="Synapse elimination events")
+            description="Synapse elimination events",
+            array_annotations=elimination_annotations)
 
         segment.events.append(formation_event_array)
 

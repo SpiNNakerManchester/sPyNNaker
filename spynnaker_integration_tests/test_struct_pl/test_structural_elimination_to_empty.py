@@ -61,7 +61,7 @@ def structural_eliminate_to_empty():
     assert(len(conns) == 0)
     assert(num_elims == 81)
     assert(num_forms == 0)
-    assert(first_elim == [7, 5, 'elimination'])
+    assert(first_elim == "7_5_elimination")
 
 
 class TestStructuralEliminateToEmpty(BaseTestCase):
