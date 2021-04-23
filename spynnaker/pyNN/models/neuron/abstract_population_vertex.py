@@ -24,14 +24,14 @@ from spinn_utilities.progress_bar import ProgressBar
 from data_specification.enums.data_type import DataType
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
+from pacman.config_holder import (
+    get_config_int, get_config_float, get_config_bool)
 from pacman.model.resources import MultiRegionSDRAM
 from spinn_front_end_common.abstract_models import (
     AbstractChangableAfterRun, AbstractProvidesOutgoingPartitionConstraints,
     AbstractCanReset, AbstractRewritesDataSpecification)
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl, TDMAAwareApplicationVertex)
-from spinn_front_end_common.utilities import (
-    helpful_functions, globals_variables)
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, MICRO_TO_SECOND_CONVERSION, SYSTEM_BYTES_REQUIREMENT)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
@@ -42,6 +42,7 @@ from spinn_front_end_common.interface.buffer_management\
        get_recording_header_size, get_recording_data_constant_size)
 from spinn_front_end_common.interface.provenance import (
     ProvidesProvenanceDataFromMachineImpl)
+from spinn_front_end_common.utilities import globals_variables
 
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, AbstractNeuronRecordable, NeuronRecorder)
@@ -174,30 +175,27 @@ class AbstractPopulationVertex(
         # buffer data
         self.__incoming_spike_buffer_size = incoming_spike_buffer_size
 
-        # get config from simulator
-        config = globals_variables.get_simulator().config
-
         if incoming_spike_buffer_size is None:
-            self.__incoming_spike_buffer_size = config.getint(
+            self.__incoming_spike_buffer_size = get_config_int(
                 "Simulation", "incoming_spike_buffer_size")
 
         # Limit the DTCM used by one-to-one connections
-        self.__all_single_syn_sz = config.getint(
+        self.__all_single_syn_sz = get_config_int(
             "Simulation", "one_to_one_connection_dtcm_max_bytes")
 
         self.__ring_buffer_sigma = ring_buffer_sigma
         if self.__ring_buffer_sigma is None:
-            self.__ring_buffer_sigma = config.getfloat(
+            self.__ring_buffer_sigma = get_config_float(
                 "Simulation", "ring_buffer_sigma")
 
         self.__spikes_per_second = spikes_per_second
         if self.__spikes_per_second is None:
-            self.__spikes_per_second = config.getfloat(
+            self.__spikes_per_second = get_config_float(
                 "Simulation", "spikes_per_second")
 
         self.__drop_late_spikes = drop_late_spikes
         if self.__drop_late_spikes is None:
-            self.__drop_late_spikes = config.getboolean(
+            self.__drop_late_spikes = get_config_bool(
                 "Simulation", "drop_late_spikes")
 
         self.__neuron_impl = neuron_impl
@@ -228,8 +226,8 @@ class AbstractPopulationVertex(
         self.__has_run = False
 
         # Set up for profiling
-        self.__n_profile_samples = helpful_functions.read_config_int(
-            config, "Reports", "n_profile_samples")
+        self.__n_profile_samples = get_config_int(
+            "Reports", "n_profile_samples")
 
         # Set up for incoming
         self.__incoming_projections = list()

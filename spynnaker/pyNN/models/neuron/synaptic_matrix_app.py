@@ -746,6 +746,7 @@ class SynapticMatrixApp(object):
                 connections = numpy.concatenate(connections)
                 for holder in self.__synapse_info.pre_run_connection_holders:
                     holder.add_connections(connections)
+            self.clear_connection_cache()
 
     def __read_connections(self, transceiver, placement, synapses_address):
         """ Read connections from an address on the machine
