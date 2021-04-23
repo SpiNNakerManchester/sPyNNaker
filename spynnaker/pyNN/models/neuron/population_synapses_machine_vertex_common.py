@@ -14,46 +14,32 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from enum import Enum
 
-from pacman.executor.injection_decorator import inject_items
 from spinn_utilities.overrides import overrides
-from spinn_front_end_common.abstract_models import (
-    AbstractGeneratesDataSpecification)
-from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, BYTES_PER_SHORT)
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.abstract_models import (
     ReceivesSynapticInputsOverSDRAM, SendsSynapticInputsOverSDRAM)
 from spynnaker.pyNN.utilities.utility_calls import get_time_to_write_us
 from .population_machine_common import CommonRegions, PopulationMachineCommon
-from .population_machine_synapses import (
-    SynapseRegions, PopulationMachineSynapses, SynapseProvenance)
+from .population_machine_synapses import SynapseRegions
+from .population_machine_synapses_provenance import SynapseProvenance
 
 # Size of SDRAM params = 1 word for address + 1 word for size
 #  + 1 word for time to send
 SDRAM_PARAMS_SIZE = 3 * BYTES_PER_WORD
 
-# Number of bytes per synaptic input
-SYNAPTIC_INPUT_BYTES = BYTES_PER_SHORT
-
 # Overhead in time to write, which includes the clearing of input spikes
 TIME_TO_CLEAR_SPIKES = 50
 
 
-class PopulationSynapsesMachineVertex(
+class PopulationSynapsesMachineVertexCommon(
         PopulationMachineCommon,
-        PopulationMachineSynapses,
-        AbstractGeneratesDataSpecification,
         SendsSynapticInputsOverSDRAM):
-    """ A machine vertex for PyNN Populations
+    """ Common parts of a machine vertex for the synapses of a Population
     """
 
     __slots__ = [
-        "__synaptic_matrices",
-        "__sdram_partition",
-        "__ring_buffer_shifts",
-        "__weight_scales",
-        "__all_syn_block_sz",
-        "__structural_sz"]
+        "__sdram_partition"]
 
     class REGIONS(Enum):
         """Regions for populations."""
@@ -103,8 +89,7 @@ class PopulationSynapsesMachineVertex(
 
     def __init__(
             self, resources_required, label, constraints, app_vertex,
-            vertex_slice, ring_buffer_shifts, weight_scales, all_syn_block_sz,
-            structural_sz):
+            vertex_slice):
         """
         :param ~pacman.model.resources.ResourceContainer resources_required:
             The resources used by the vertex
@@ -116,27 +101,12 @@ class PopulationSynapsesMachineVertex(
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of the population that this implements
         """
-        super(PopulationSynapsesMachineVertex, self).__init__(
+        super(PopulationSynapsesMachineVertexCommon, self).__init__(
             label, constraints, app_vertex, vertex_slice, resources_required,
             self.COMMON_REGIONS,
             SynapseProvenance.N_ITEMS,
             self._PROFILE_TAG_LABELS, self.__get_binary_file_name(app_vertex))
-        self.__synaptic_matrices = self._create_synaptic_matrices()
         self.__sdram_partition = None
-        self.__ring_buffer_shifts = ring_buffer_shifts
-        self.__weight_scales = weight_scales
-        self.__all_syn_block_sz = all_syn_block_sz
-        self.__structural_sz = structural_sz
-
-    @property
-    @overrides(PopulationMachineSynapses._synapse_regions)
-    def _synapse_regions(self):
-        return self.SYNAPSE_REGIONS
-
-    @property
-    @overrides(PopulationMachineSynapses._synaptic_matrices)
-    def _synaptic_matrices(self):
-        return self.__synaptic_matrices
 
     def set_sdram_partition(self, sdram_partition):
         """ Set the SDRAM partition.  Must only be called once per instance
@@ -176,43 +146,12 @@ class PopulationSynapsesMachineVertex(
             self.vertex_slice)
         return ids
 
-    @inject_items({
-        "machine_time_step": "MachineTimeStep",
-        "time_scale_factor": "TimeScaleFactor",
-        "machine_graph": "MemoryMachineGraph",
-        "routing_info": "MemoryRoutingInfos",
-        "data_n_time_steps": "DataNTimeSteps",
-        "n_key_map": "MemoryMachinePartitionNKeysMap"
-    })
-    @overrides(
-        AbstractGeneratesDataSpecification.generate_data_specification,
-        additional_arguments={
-            "machine_time_step", "time_scale_factor", "machine_graph",
-            "routing_info", "data_n_time_steps", "n_key_map"
-        })
-    def generate_data_specification(
-            self, spec, placement, machine_time_step, time_scale_factor,
-            machine_graph, routing_info, data_n_time_steps, n_key_map):
-        """
-        :param machine_time_step: (injected)
-        :param time_scale_factor: (injected)
-        :param machine_graph: (injected)
-        :param routing_info: (injected)
-        :param data_n_time_steps: (injected)
-        :param n_key_map: (injected)
-        """
-        # pylint: disable=arguments-differ
-        rec_regions = self._app_vertex.synapse_recorder.get_region_sizes(
-            self.vertex_slice, data_n_time_steps)
-        self._write_common_data_spec(
-            spec, machine_time_step, time_scale_factor, rec_regions)
+    def _write_sdram_edge_spec(self, spec):
+        """ Write information about SDRAM Edge
 
-        self._write_synapse_data_spec(
-            spec, machine_time_step, routing_info, machine_graph, n_key_map,
-            self.__ring_buffer_shifts, self.__weight_scales,
-            self.__all_syn_block_sz, self.__structural_sz)
-
-        # Write information about SDRAM
+        :param DataSpecificationGenerator spec:
+            The generator of the specification to write
+        """
         send_size = self.__sdram_partition.get_sdram_size_of_region_for(self)
         n_send_cores = len(self.__sdram_partition.pre_vertices)
         spec.reserve_memory_region(
@@ -224,9 +163,6 @@ class PopulationSynapsesMachineVertex(
         spec.write_value(send_size)
         spec.write_value(TIME_TO_CLEAR_SPIKES +
                          get_time_to_write_us(send_size, n_send_cores))
-
-        # End the writing of this specification:
-        spec.end_specification()
 
     @overrides(SendsSynapticInputsOverSDRAM.sdram_requirement)
     def sdram_requirement(self, sdram_machine_edge):

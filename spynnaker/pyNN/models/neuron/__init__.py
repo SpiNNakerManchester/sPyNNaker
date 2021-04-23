@@ -18,8 +18,11 @@ from .connection_holder import ConnectionHolder
 from .population_machine_vertex import PopulationMachineVertex
 from .population_neurons_machine_vertex import PopulationNeuronsMachineVertex
 from .population_machine_neurons import NeuronProvenance
-from .population_synapses_machine_vertex import PopulationSynapsesMachineVertex
-from .population_machine_synapses import SynapseProvenance
+from .population_synapses_machine_vertex_lead import (
+    PopulationSynapsesMachineVertexLead)
+from .population_synapses_machine_vertex_shared import (
+    PopulationSynapsesMachineVertexShared)
+from .population_machine_synapses_provenance import SynapseProvenance
 from .abstract_pynn_neuron_model import AbstractPyNNNeuronModel
 from .abstract_pynn_neuron_model_standard import (
     AbstractPyNNNeuronModelStandard)
@@ -27,5 +30,5 @@ from .abstract_pynn_neuron_model_standard import (
 __all__ = ["AbstractPopulationVertex", "AbstractPyNNNeuronModel",
            "AbstractPyNNNeuronModelStandard", "ConnectionHolder",
            "PopulationMachineVertex", "PopulationNeuronsMachineVertex",
-           "NeuronProvenance", "PopulationSynapsesMachineVertex",
-           "SynapseProvenance"]
+           "NeuronProvenance", "PopulationSynapsesMachineVertexLead",
+           "PopulationSynapsesMachineVertexShared", "SynapseProvenance"]

@@ -27,7 +27,8 @@ from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .population_machine_neurons import (
     NeuronRegions, PopulationMachineNeurons, NeuronProvenance)
 from .population_machine_synapses import (
-    SynapseRegions, PopulationMachineSynapses, SynapseProvenance)
+    SynapseRegions, PopulationMachineSynapses)
+from .population_machine_synapses_provenance import SynapseProvenance
 
 
 get_placement_details = \

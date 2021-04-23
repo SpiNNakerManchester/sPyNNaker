@@ -153,7 +153,9 @@ def _exact_sdram_for_bit_field_key_region(machine_graph, vertex):
 
 def reserve_bit_field_regions(
         spec, machine_graph, n_key_map, vertex, bit_field_builder_region,
-        bit_filter_region, bit_field_key_region):
+        bit_filter_region, bit_field_key_region,
+        bit_field_builder_region_ref=None, bit_filter_region_ref=None,
+        bit_field_key_region_ref=None):
     """ reserves the regions for the bitfields
 
     :param ~data_specification.DataSpecificationGenerator spec:
@@ -167,6 +169,15 @@ def reserve_bit_field_regions(
     :param int bit_field_builder_region: region id for the builder region
     :param int bit_filter_region: region id for the bitfield region
     :param int bit_field_key_region: region id for the key map
+    :param bit_field_builder_region_ref:
+        Reference to give the region, or None if not referencable
+    :type bit_field_builder_region_ref: int or None
+    :param bit_filter_region_ref:
+        Reference to give the region, or None if not referencable
+    :type bit_filter_region_ref: int or None
+    :param bit_field_key_region_ref:
+        Reference to give the region, or None if not referencable
+    :type bit_field_key_region_ref: int or None
     """
 
     # reserve the final destination for the bitfields
@@ -174,19 +185,22 @@ def reserve_bit_field_regions(
         region=bit_filter_region,
         size=_exact_sdram_for_bit_field_region(
             machine_graph, vertex, n_key_map),
-        label="bit_field region")
+        label="bit_field region",
+        reference=bit_filter_region_ref)
 
     # reserve region for the bitfield builder
     spec.reserve_memory_region(
         region=bit_field_builder_region,
         size=exact_sdram_for_bit_field_builder_region(),
-        label="bit field builder region")
+        label="bit field builder region",
+        reference=bit_field_builder_region_ref)
 
     # reserve memory region for the key region
     spec.reserve_memory_region(
         region=bit_field_key_region,
         size=_exact_sdram_for_bit_field_key_region(machine_graph, vertex),
-        label="bit field key data")
+        label="bit field key data",
+        reference=bit_field_key_region_ref)
 
 
 def write_bitfield_init_data(

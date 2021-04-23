@@ -76,14 +76,17 @@ class SynapticMatrices(object):
         # Reference to give the direct matrix
         "__direct_matrix_ref",
         # Reference to give the master population table
-        "__poptable_ref"
+        "__poptable_ref",
+        # Reference to give the connection builder
+        "__connection_builder_ref"
     ]
 
     def __init__(
             self, post_vertex_slice, n_synapse_types, all_single_syn_sz,
             synaptic_matrix_region, direct_matrix_region, poptable_region,
             connection_builder_region, synaptic_matrix_ref=None,
-            direct_matrix_ref=None, poptable_ref=None):
+            direct_matrix_ref=None, poptable_ref=None,
+            connection_builder_ref=None):
         """
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
             The slice of the post vertex that these matrices are for
@@ -100,16 +103,20 @@ class SynapticMatrices(object):
             The region where the synapse generator information is stored
         :param synaptic_matrix_ref:
             The reference to the synaptic matrix region, or None if not
-            referenced or referenceable
+            referenceable
         :type synaptic_matrix_ref: int or None
         :param direct_matrix_ref:
             The reference to the direct matrix region, or None if not
-            referenced or referenceable
+            referenceable
         :type direct_matrix_ref: int or None
         :param poptable_ref:
             The reference to the pop table region, or None if not
-            referenced or referenceable
+            referenceable
         :type poptable_ref: int or None
+        :param connection_builder_ref:
+            The reference to the connection builder region, or None if not
+            referenceable
+        :type connection_builder_ref: int or None
         """
         self.__post_vertex_slice = post_vertex_slice
         self.__n_synapse_types = n_synapse_types
@@ -121,6 +128,7 @@ class SynapticMatrices(object):
         self.__synaptic_matrix_ref = synaptic_matrix_ref
         self.__direct_matrix_ref = direct_matrix_ref
         self.__poptable_ref = poptable_ref
+        self.__connection_builder_ref = connection_builder_ref
 
         # Set up the master population table
         self.__poptable = MasterPopTableAsBinarySearch()
@@ -295,6 +303,12 @@ class SynapticMatrices(object):
         :type weight_scales: list(int or float)
         """
         if not generator_data:
+            if self.__connection_builder_ref is not None:
+                # If there is a reference, we still need a region to create
+                spec.reserve_memory_region(
+                    region=self.__connection_builder_region,
+                    size=4, label="ConnectorBuilderRegion",
+                    reference=self.__connection_builder_ref)
             return
 
         n_bytes = (
@@ -305,7 +319,8 @@ class SynapticMatrices(object):
 
         spec.reserve_memory_region(
             region=self.__connection_builder_region,
-            size=n_bytes, label="ConnectorBuilderRegion")
+            size=n_bytes, label="ConnectorBuilderRegion",
+            reference=self.__connection_builder_ref)
         spec.switch_write_focus(self.__connection_builder_region)
 
         spec.write_value(self.__synaptic_matrix_region)
