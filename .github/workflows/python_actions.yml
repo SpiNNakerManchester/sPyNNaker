@@ -75,7 +75,7 @@ jobs:
     - name: Lint with pylint
       uses: ./support/actions/pylint
       with:
-        package: spynnaker
+        package: spynnaker spynnaker8
 
     - name: Run rat copyright enforcement
       if: matrix.python-version == 3.8
