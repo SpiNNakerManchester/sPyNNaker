@@ -464,15 +464,6 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 }
 
 SOMETIMES_UNUSED // Marked unused as only used sometimes
-//! \brief Record structural parameters
-//! \param[in] neuron_index: the index of the neuron
-//! \param[in] rec_value: the value to record
-static void neuron_impl_record_structural(
-        uint32_t neuron_index, int32_t rec_value) {
-    neuron_recording_record_int32(REWIRING_RECORDING_INDEX, neuron_index, rec_value);
-}
-
-SOMETIMES_UNUSED // Marked unused as only used sometimes
 //! \brief Stores neuron parameters back into SDRAM
 //! \param[out] address: the address in SDRAM to start the store
 //! \param[in] next: Offset of next address in store

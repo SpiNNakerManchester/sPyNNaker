@@ -153,7 +153,13 @@ static inline void neuron_recording_record_bit(
 //! \param[in] time: the time to put into the recording stamps.
 static inline void neuron_recording_record(uint32_t time) {
     // go through all recordings
-    for (uint32_t i = N_RECORDED_VARS - 1; i > 0; i--) {
+    uint32_t n_vars = N_RECORDED_VARS;
+    // ignore the "standard" structural case which is done separately;
+    // this needs to be done as otherwise cases where N_RECORDED_VARS isn't
+    // standard (e.g. my_full_neuron_impl.h) don't work
+    // I'm sure there's a better way of doing this...
+    if (n_vars == 4) { n_vars = 3; }
+    for (uint32_t i = n_vars; i > 0; i--) {
         recording_info_t *rec_info = &recording_info[i - 1];
         // if the rate says record, record now
         if (rec_info->count == rec_info->rate) {
