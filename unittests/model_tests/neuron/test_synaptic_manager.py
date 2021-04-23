@@ -26,7 +26,7 @@ from pacman.model.placements import Placement
 from pacman.executor.injection_decorator import injection_context
 from pacman.operations.routing_info_allocator_algorithms import (
     ZonedRoutingInfoAllocator)
-from pacman.config_holder import set_config
+from pacman.config_holder import load_config_cfgs, set_config
 from data_specification import (
     DataSpecificationGenerator, DataSpecificationExecutor)
 from data_specification.constants import MAX_MEM_REGIONS
@@ -88,6 +88,7 @@ def test_write_data_spec():
     AbstractGenerateConnectorOnMachine.generate_on_machine = say_false
     machine = virtual_machine(2, 2)
     p.setup(1.0)
+    load_config_cfgs()
     set_config("Simulation", "one_to_one_connection_dtcm_max_bytes", 40)
     p.set_number_of_neurons_per_core(p.IF_curr_exp, 100)
     pre_pop = p.Population(
@@ -204,6 +205,7 @@ def test_write_data_spec():
         assert all(list_delays == connections_4["delay"])
     finally:
         shutil.rmtree(report_folder, ignore_errors=True)
+        load_config_cfgs()
 
 
 def test_set_synapse_dynamics():

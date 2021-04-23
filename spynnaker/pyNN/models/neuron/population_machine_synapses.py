@@ -36,11 +36,12 @@ from .population_machine_synapses_provenance import (
 
 
 # Identifiers for synapse regions
+SYNAPSE_FIELDS = [
+    "synapse_params", "direct_matrix", "pop_table", "synaptic_matrix",
+    "synapse_dynamics", "structural_dynamics", "bitfield_builder",
+    "bitfield_key_map", "bitfield_filter", "connection_builder"]
 SynapseRegions = namedtuple(
-    "SynapseRegions",
-    ["synapse_params", "direct_matrix", "pop_table", "synaptic_matrix",
-     "synapse_dynamics", "structural_dynamics", "bitfield_builder",
-     "bitfield_key_map", "bitfield_filter", "connection_builder"])
+    "SynapseRegions", SYNAPSE_FIELDS)
 
 SynapseReferences = namedtuple(
     "SynapseReferences",
@@ -101,7 +102,7 @@ class PopulationMachineSynapses(
 
         :rtype: .SynapseRegions
         """
-        return SynapseRegions(*[None for _ in len(SynapseRegions)])
+        return SynapseRegions(*[None for _ in range(len(SYNAPSE_FIELDS))])
 
     def _create_synaptic_matrices(self):
         """ Creates the synaptic matrices object.
