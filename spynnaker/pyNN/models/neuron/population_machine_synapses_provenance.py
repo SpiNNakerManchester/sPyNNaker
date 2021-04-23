@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import ctypes
 
+from spinn_utilities.abstract_base import abstractproperty
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 from spinn_front_end_common.interface.provenance import (
     ProvidesProvenanceDataFromMachineImpl)
@@ -119,6 +120,15 @@ class PopulationMachineSynapsesProvenance(object):
     LAST_TIMER_TICK = "Last_timer_tic_the_core_ran_to"
     TOTAL_PRE_SYNAPTIC_EVENTS = "Total_pre_synaptic_events"
     LOST_INPUT_BUFFER_PACKETS = "Times_the_input_buffer_lost_packets"
+
+    @abstractproperty
+    def _app_vertex(self):
+        """ The application vertex of the machine vertex.
+
+        :note: This is likely to be available via the MachineVertex.
+
+        :rtype: AbstractPopulationVertex
+        """
 
     def _append_synapse_provenance(
             self, provenance_items, prov_list_from_machine, offset, placement):

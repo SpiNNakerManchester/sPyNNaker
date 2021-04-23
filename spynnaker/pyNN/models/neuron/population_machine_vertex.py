@@ -281,11 +281,9 @@ class PopulationMachineVertex(
         # End the writing of this specification:
         spec.end_specification()
 
-    @inject_items({"routing_info": "MemoryRoutingInfos"})
     @overrides(
-        AbstractRewritesDataSpecification.regenerate_data_specification,
-        additional_arguments={"routing_info"})
-    def regenerate_data_specification(self, spec, placement, routing_info):
+        AbstractRewritesDataSpecification.regenerate_data_specification)
+    def regenerate_data_specification(self, spec, placement):
         # pylint: disable=too-many-arguments, arguments-differ
 
         # write the neuron params into the new DSG region

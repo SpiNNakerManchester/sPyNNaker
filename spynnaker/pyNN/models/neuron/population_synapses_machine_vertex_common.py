@@ -15,6 +15,7 @@
 from enum import Enum
 
 from spinn_utilities.overrides import overrides
+from spinn_utilities.abstract_base import abstractmethod
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.abstract_models import (
@@ -139,6 +140,23 @@ class PopulationSynapsesMachineVertexCommon(
         # translate into provenance data items
         self._append_synapse_provenance(
             provenance_items, prov_list_from_machine, 0, placement)
+
+    @abstractmethod
+    def _append_synapse_provenance(
+            self, provenance_items, prov_list_from_machine, offset, placement):
+        """ Extract and add synapse provenance to the list of provenance items
+
+        :param
+            list(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)\
+            provenance_items: The items already read, to append to
+        :param list(int) prov_list_from_machine:
+            The values read from the machine to be decoded
+        :param int offset: Where in the list from the machine to start reading
+        :param ~pacman.model.placements.Placement placement:
+            Which vertex are we retrieving from, and where was it
+        :return: The number of items read from prov_list_from_machine
+        :rtype: int
+        """
 
     @overrides(PopulationMachineCommon.get_recorded_region_ids)
     def get_recorded_region_ids(self):
