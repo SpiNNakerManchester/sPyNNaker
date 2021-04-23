@@ -327,9 +327,18 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
     def get_in_coming_vertices(
             self, edge, outgoing_edge_partition, src_machine_vertex):
+        # If the edge is delayed, get the real edge
+        if isinstance(edge, DelayedApplicationEdge):
+            edge = edge.undelayed_edge
+
+        # Filter out edges from Poisson sources being done using SDRAM
+        if edge in self.__poisson_edges:
+            return {}
+
         # Pick the same synapse vertex index for each neuron vertex
         index = self.__next_synapse_index
-        self.__next_synapse_index += 1
+        self.__next_synapse_index = (
+            self.__next_synapse_index + 1 % self.__n_synapse_vertices)
         return {self.__synapse_verts_by_neuron[neuron][index]: [MachineEdge]
                 for neuron in self.__neuron_vertices}
 
