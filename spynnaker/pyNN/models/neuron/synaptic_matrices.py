@@ -193,7 +193,7 @@ class SynapticMatrices(object):
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The spec to write to
-        :param list(Projection) incoming_projection:
+        :param list(~spynnaker8.models.Projection) incoming_projection:
             The projections to generate data for
         :param int all_syn_block_sz:
             The size in bytes of the space reserved for synapses
@@ -348,7 +348,7 @@ class SynapticMatrices(object):
         """ Convert a list of incoming projections to a dict of
             application edge -> list of machine edges, and a key tracker
 
-        :param list(Projection) incoming_projections:
+        :param list(~spynnaker8.models.Projection) incoming_projections:
             The incoming projections
         :param RoutingInfo routing_info: Routing information for all edges
         :rtype: tuple(dict, KeySpaceTracker)
