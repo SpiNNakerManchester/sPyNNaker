@@ -87,3 +87,9 @@ class PopulationSynapsesMachineVertexShared(
 
         # End the writing of this specification:
         spec.end_specification()
+
+    @overrides(PopulationMachineSynapsesProvenance._append_synapse_provenance)
+    def _append_synapse_provenance(
+            self, provenance_items, prov_list_from_machine, offset, placement):
+        PopulationMachineSynapsesProvenance._append_synapse_provenance(
+            self, provenance_items, prov_list_from_machine, offset, placement)
