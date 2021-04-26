@@ -166,6 +166,9 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                     syn_label, i, vertex_slice, synapse_references,
                     all_resources, machine_graph, synapse_vertices)
 
+            print("{} synapse vertices for slice {}".format(
+                len(synapse_vertices), vertex_slice))
+
             # Add resources for Poisson vertices
             poisson_vertices = incoming_direct_poisson[vertex_slice]
             for poisson_vertex in poisson_vertices:
@@ -339,6 +342,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         index = self.__next_synapse_index
         self.__next_synapse_index = (
             self.__next_synapse_index + 1 % self.__n_synapse_vertices)
+        print("Using synapses with index {}".format(index))
         return {self.__synapse_verts_by_neuron[neuron][index]: [MachineEdge]
                 for neuron in self.__neuron_vertices}
 
