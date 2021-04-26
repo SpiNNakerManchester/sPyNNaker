@@ -427,10 +427,6 @@
                 <param_type>WriteBitFieldGeneratorIOBUF</param_type>
             </parameter>
             <parameter>
-                <param_name>generating_bitfield_report</param_name>
-                <param_type>GenerateBitFieldReport</param_type>
-            </parameter>
-            <parameter>
                 <param_name>default_report_folder</param_name>
                 <param_type>ReportFolder</param_type>
             </parameter>
@@ -450,8 +446,7 @@
             <param_name>provenance_file_path</param_name>
             <param_name>transceiver</param_name>
             <param_name>write_bit_field_generator_iobuf</param_name>
-            <param_name>generating_bitfield_report</param_name>
-             <param_name>default_report_folder</param_name>
+            <param_name>default_report_folder</param_name>
             <param_name>machine_graph</param_name>
             <param_name>routing_infos</param_name>
             <token part="SynapseDataExpanded">DataLoaded</token>

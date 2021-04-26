@@ -91,7 +91,7 @@ class OnChipBitFieldGenerator(object):
     def __call__(
             self, placements, app_graph, executable_finder,
             provenance_file_path, transceiver, write_bit_field_generator_iobuf,
-            generating_bitfield_report, default_report_folder, machine_graph,
+            default_report_folder, machine_graph,
             routing_infos):
         """ Loads and runs the bit field generator on chip.
 
@@ -106,7 +106,6 @@ class OnChipBitFieldGenerator(object):
         :param ~spinnman.transceiver.Transceiver transceiver:
             the SpiNNMan instance
         :param bool write_bit_field_generator_iobuf: flag for report
-        :param bool generating_bitfield_report: flag for report
         :param str default_report_folder: the file path for reports
         :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
             the machine graph
@@ -141,7 +140,7 @@ class OnChipBitFieldGenerator(object):
         progress.end()
 
         # read in bit fields for debugging purposes
-        if generating_bitfield_report:
+        if get_config_bool("Reports", "write_bit_field_report"):
             self._full_report_bit_fields(app_graph, os.path.join(
                 default_report_folder, self._BIT_FIELD_REPORT_FILENAME))
         if get_config_bool("Reports", "write_bit_field_summary_report"):

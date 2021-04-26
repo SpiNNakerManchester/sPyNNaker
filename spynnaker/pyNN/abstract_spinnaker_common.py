@@ -152,8 +152,6 @@ class AbstractSpiNNakerCommon(
                 "Database", "create_routing_info_to_neuron_id_mapping")
         extra_mapping_inputs["WriteBitFieldGeneratorIOBUF"] = \
             get_config_bool("Reports", "write_bit_field_iobuf")
-        extra_mapping_inputs["GenerateBitFieldReport"] = \
-            get_config_bool("Reports", "generate_bit_field_report")
         extra_mapping_inputs["SynapticExpanderReadIOBuf"] = \
             get_config_bool("Reports", "write_expander_iobuf")
         if user_extra_mapping_inputs is not None:
