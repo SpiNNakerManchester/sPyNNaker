@@ -246,7 +246,7 @@ static bool initialise(void) {
 
     // Set up structural plasticity dynamics
     if (!synaptogenesis_dynamics_initialise(data_specification_get_region(
-            STRUCTURAL_DYNAMICS_REGION, ds_regions), n_neurons)) {
+            STRUCTURAL_DYNAMICS_REGION, ds_regions), &n_regions_used)) {
         return false;
     }
 

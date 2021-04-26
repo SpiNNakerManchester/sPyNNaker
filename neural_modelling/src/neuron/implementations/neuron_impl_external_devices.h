@@ -74,10 +74,8 @@ enum word_recording_indices {
     GSYN_EXC_RECORDING_INDEX = 1,
     //! Gsyn_inh (excitatory synaptic conductance/current) recording index
     GSYN_INH_RECORDING_INDEX = 2,
-    //! Structural plasticity (removal/addition of synapses) recording index
-    REWIRING_RECORDING_INDEX = 3,
     //! Number of recorded word-sized state variables
-    N_RECORDED_VARS = 4
+    N_RECORDED_VARS = 3
 };
 
 //! Indices for recording of bitfields

@@ -122,13 +122,14 @@ class SplitterAbstractPopulationVertexSlice(
         :rtype: VariableSDRAM
         """
         s_dynamics = self._governed_app_vertex.synapse_manager.synapse_dynamics
-        max_rewires_per_ts = 1
         if isinstance(s_dynamics, AbstractSynapseDynamicsStructural):
             machine_ts = get_simulator().machine_time_step
             max_rewires_per_ts = s_dynamics.get_max_rewires_per_ts(machine_ts)
+            self._governed_app_vertex.neuron_recorder.set_max_rewires_per_ts(
+                max_rewires_per_ts)
 
         return self._governed_app_vertex.neuron_recorder.\
-            get_variable_sdram_usage(vertex_slice, max_rewires_per_ts)
+            get_variable_sdram_usage(vertex_slice)
 
     def constant_sdram(self, vertex_slice,  graph):
         """ returns the constant sdram used by the vertex slice.

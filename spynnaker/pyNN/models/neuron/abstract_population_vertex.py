@@ -145,7 +145,9 @@ class AbstractPopulationVertex(
         self.__neuron_recorder = NeuronRecorder(
             recordable_variables, record_data_types, [NeuronRecorder.SPIKES],
             n_neurons, [NeuronRecorder.PACKETS],
-            {NeuronRecorder.PACKETS: NeuronRecorder.PACKETS_TYPE})
+            {NeuronRecorder.PACKETS: NeuronRecorder.PACKETS_TYPE},
+            [NeuronRecorder.REWIRING],
+            {NeuronRecorder.REWIRING: NeuronRecorder.REWIRING_TYPE})
 
         # Set up synapse handling
         self.__synapse_manager = SynapticManager(
@@ -272,9 +274,9 @@ class AbstractPopulationVertex(
     @overrides(AbstractNeuronRecordable.set_recording)
     def set_recording(self, variable, new_state=True, sampling_interval=None,
                       indexes=None):
-        self.__change_requires_mapping = not self.is_recording(variable)
         self.__neuron_recorder.set_recording(
             variable, new_state, sampling_interval, indexes)
+        self.__change_requires_mapping = not self.is_recording(variable)
 
     @overrides(AbstractNeuronRecordable.get_data)
     def get_data(self, variable, n_machine_time_steps, placements,
