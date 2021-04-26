@@ -20,7 +20,8 @@ from .population_machine_common import PopulationMachineCommon
 from .population_machine_synapses import PopulationMachineSynapses
 from .population_synapses_machine_vertex_common import (
     PopulationSynapsesMachineVertexCommon)
-from spynnaker.pyNN.models.neuron.population_machine_synapses_provenance import PopulationMachineSynapsesProvenance
+from .population_machine_synapses_provenance import (
+    PopulationMachineSynapsesProvenance)
 
 
 class PopulationSynapsesMachineVertexLead(
