@@ -147,9 +147,6 @@ class AbstractSpiNNakerCommon(
         self.update_extra_inputs({'UserDefinedMaxDelay': self.__max_delay})
 
         extra_mapping_inputs = dict()
-        extra_mapping_inputs['CreateAtomToEventIdMapping'] = \
-            get_config_bool(
-                "Database", "create_routing_info_to_neuron_id_mapping")
         extra_mapping_inputs["WriteBitFieldGeneratorIOBUF"] = \
             get_config_bool("Reports", "write_bit_field_iobuf")
         extra_mapping_inputs["SynapticExpanderReadIOBuf"] = \
