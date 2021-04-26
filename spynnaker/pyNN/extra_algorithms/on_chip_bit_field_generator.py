@@ -19,6 +19,7 @@ import struct
 from spinn_utilities.progress_bar import ProgressBar
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
+from pacman.config_holder import get_config_bool
 from spinn_front_end_common.abstract_models import (
     AbstractSupportsBitFieldGeneration)
 from spinn_front_end_common.utilities import system_control_logic
@@ -91,7 +92,7 @@ class OnChipBitFieldGenerator(object):
             self, placements, app_graph, executable_finder,
             provenance_file_path, transceiver, write_bit_field_generator_iobuf,
             generating_bitfield_report, default_report_folder, machine_graph,
-            routing_infos, generating_bit_field_summary_report):
+            routing_infos):
         """ Loads and runs the bit field generator on chip.
 
         :param ~pacman.model.placements.Placements placements: placements
@@ -111,8 +112,6 @@ class OnChipBitFieldGenerator(object):
             the machine graph
         :param ~pacman.model.routing_info.RoutingInfo routing_infos:
             the key to edge map
-        :param bool generating_bit_field_summary_report:
-            whether to make summary report
         """
         self.__txrx = transceiver
         self.__placements = placements
@@ -145,7 +144,7 @@ class OnChipBitFieldGenerator(object):
         if generating_bitfield_report:
             self._full_report_bit_fields(app_graph, os.path.join(
                 default_report_folder, self._BIT_FIELD_REPORT_FILENAME))
-        if generating_bit_field_summary_report:
+        if get_config_bool("Reports", "write_bit_field_summary_report"):
             self._summary_report_bit_fields(app_graph, os.path.join(
                 default_report_folder,
                 self._BIT_FIELD_SUMMARY_REPORT_FILENAME))
