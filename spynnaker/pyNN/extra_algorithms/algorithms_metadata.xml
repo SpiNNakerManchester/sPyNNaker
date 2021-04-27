@@ -127,16 +127,8 @@
                 <param_type>ReportFolder</param_type>
             </parameter>
             <parameter>
-                <param_name>target_length</param_name>
-                <param_type>CompressionTargetSize</param_type>
-            </parameter>
-            <parameter>
                 <param_name>routing_infos</param_name>
                 <param_type>MemoryRoutingInfos</param_type>
-            </parameter>
-            <parameter>
-                <param_name>use_timer_cut_off</param_name>
-                <param_type>RouterCompressorBitFieldUseCutOff</param_type>
             </parameter>
             <parameter>
                 <param_name>machine_time_step</param_name>
@@ -166,9 +158,7 @@
             <param_name>machine_graph</param_name>
             <param_name>placements</param_name>
             <param_name>default_report_folder</param_name>
-            <param_name>target_length</param_name>
             <param_name>routing_infos</param_name>
-            <param_name>use_timer_cut_off</param_name>
             <param_name>machine_time_step</param_name>
             <param_name>time_scale_factor</param_name>
             <param_name>executable_targets</param_name>
@@ -228,16 +218,8 @@
                 <param_type>ReportFolder</param_type>
             </parameter>
             <parameter>
-                <param_name>target_length</param_name>
-                <param_type>CompressionTargetSize</param_type>
-            </parameter>
-            <parameter>
                 <param_name>routing_infos</param_name>
                 <param_type>MemoryRoutingInfos</param_type>
-            </parameter>
-            <parameter>
-                <param_name>use_timer_cut_off</param_name>
-                <param_type>RouterCompressorBitFieldUseCutOff</param_type>
             </parameter>
             <parameter>
                 <param_name>machine_time_step</param_name>
@@ -267,9 +249,7 @@
             <param_name>machine_graph</param_name>
             <param_name>placements</param_name>
             <param_name>default_report_folder</param_name>
-            <param_name>target_length</param_name>
             <param_name>routing_infos</param_name>
-            <param_name>use_timer_cut_off</param_name>
             <param_name>machine_time_step</param_name>
             <param_name>time_scale_factor</param_name>
             <param_name>executable_targets</param_name>
@@ -332,16 +312,8 @@
                 <param_type>ReportFolder</param_type>
             </parameter>
             <parameter>
-                <param_name>target_length</param_name>
-                <param_type>CompressionTargetSize</param_type>
-            </parameter>
-            <parameter>
                 <param_name>routing_infos</param_name>
                 <param_type>MemoryRoutingInfos</param_type>
-            </parameter>
-            <parameter>
-                <param_name>use_timer_cut_off</param_name>
-                <param_type>RouterCompressorBitFieldUseCutOff</param_type>
             </parameter>
             <parameter>
                 <param_name>machine_time_step</param_name>
@@ -366,9 +338,7 @@
             <param_name>machine_graph</param_name>
             <param_name>placements</param_name>
             <param_name>default_report_folder</param_name>
-            <param_name>target_length</param_name>
             <param_name>routing_infos</param_name>
-            <param_name>use_timer_cut_off</param_name>
             <param_name>machine_time_step</param_name>
             <param_name>time_scale_factor</param_name>
             <param_name>executable_targets</param_name>
