@@ -20,7 +20,7 @@ from pacman.config_holder import check_python_file
 
 class TestCfgChecker(unittest.TestCase):
 
-    def test_import_all(self):
+    def test_cfg_check(self):
         # This imports AbstractSpiNNakerCommon which calls set_cfg_files
         module = __import__("spynnaker8")
         module = __import__("spynnaker")
