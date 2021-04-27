@@ -155,6 +155,7 @@ class NeuronRecorder(object):
             self.__sampling_rates[variable] = 0
             self.__indexes[variable] = None
             self.__region_ids[variable] = region_id
+        event_region_id = region_id + 1
         for event_region_id, variable in enumerate(
                 events_per_core_variables, start=region_id + 1):
             self.__region_ids[variable] = event_region_id
@@ -598,8 +599,8 @@ class NeuronRecorder(object):
                 return True
             elif variable in self.__events_per_core_recording:
                 return True
-            elif variable not in self.__per_timestep_variables or \
-                    self.__events_per_core_variables:
+            elif variable not in self.__per_timestep_variables and\
+                    variable not in self.__events_per_core_variables:
                 msg = ("Variable {} is not supported. Supported variables are"
                        "{}".format(variable, self.get_recordable_variables()))
                 raise ConfigurationException(msg) from e
