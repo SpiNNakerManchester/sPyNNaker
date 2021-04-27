@@ -554,8 +554,8 @@ class NeuronRecorder(object):
                            for i in range(rew_length)]
                 # the post-neuron ID is stored in the next 8 bytes
                 post_ids = [((int(rewires_raw[i]) >> self._POST_ID_SHIFT) %
-                             self._POST_ID_FACTOR) + vertex_slice.lo_atom
-                             for i in range(rew_length)]
+                            self._POST_ID_FACTOR) + vertex_slice.lo_atom
+                            for i in range(rew_length)]
                 # the pre-neuron ID is stored in the remaining 23 bytes
                 pre_ids = [int(rewires_raw[i]) >> self._PRE_ID_SHIFT
                            for i in range(rew_length)]
@@ -1180,7 +1180,7 @@ class NeuronRecorder(object):
         for variable in self.__events_per_core_recording:
             per_timestep_sdram += self.get_buffered_sdram_per_record(
                 variable, vertex_slice)
-        return VariableSDRAM(fixed_sdram, per_timestep_sdram) # ??
+        return VariableSDRAM(fixed_sdram, per_timestep_sdram)
 
     def get_dtcm_usage_in_bytes(self, vertex_slice):
         """
