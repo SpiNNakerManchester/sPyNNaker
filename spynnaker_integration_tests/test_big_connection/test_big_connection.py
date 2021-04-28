@@ -15,7 +15,7 @@
 
 import random
 import time
-from pacman.config_holder import get_config_bool
+from spinn_utilities.config_holder import get_config_bool
 import spynnaker8 as sim
 from spinnaker_testbase import BaseTestCase
 

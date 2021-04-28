@@ -15,7 +15,7 @@
 
 import os
 import unittest
-from pacman.config_holder import check_python_file
+from spinn_utilities.config_holder import check_python_file
 
 
 class TestCfgChecker(unittest.TestCase):
