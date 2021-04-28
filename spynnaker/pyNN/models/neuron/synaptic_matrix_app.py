@@ -24,7 +24,7 @@ from .generator_data import GeneratorData, SYN_REGION_UNUSED
 from .synapse_io import read_all_synapses, convert_to_connections
 
 # The most pre-atoms that the generator can handle at once
-MAX_GENERATED_ATOMS = 8192
+MAX_GENERATED_ATOMS = 1024
 
 
 class SynapticMatrixApp(object):
