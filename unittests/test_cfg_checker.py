@@ -13,25 +13,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-SpiNNUtilities == 1!6.0.1
-SpiNNMachine == 1!6.0.1
-SpiNNMan == 1!6.0.1
-SpiNNaker_PACMAN == 1!6.0.1
-SpiNNaker_DataSpecification == 1!6.0.1
-spalloc == 1!6.0.1
-SpiNNFrontEndCommon == 1!6.0.1
-numpy > 1.13, < 1.20; python_version == '3.6'
-numpy > 1.13, < 1.21; python_version == '3.7'
-numpy; python_version >= '3.8'
-scipy
-lxml
-statistics
-matplotlib < 3.4; python_version == '3.6'
-matplotlib; python_version >= '3.7'
-quantities >= 0.12.1
-pynn >= 0.9.1, < 0.10
-lazyarray >= 0.2.9, <= 0.4.0
-appdirs >= 1.4.2 , < 2.0.0
-neo >= 0.5.2, < 0.10.0
-# csa  # needed but excluded due to readthedocs
-# spinnaker_tools
+import os
+import unittest
+from pacman.config_holder import check_python_file
+
+
+class TestCfgChecker(unittest.TestCase):
+
+    def test_import_all(self):
+        # This imports AbstractSpiNNakerCommon which calls set_cfg_files
+        module = __import__("spynnaker8")
+        module = __import__("spynnaker")
+        path = module.__file__
+        directory = os.path.dirname(path)
+        for root, dirs, files in os.walk(directory):
+            for file_name in files:
+                if file_name.endswith(".py"):
+                    py_path = os.path.join(root, file_name)
+                    check_python_file(py_path)

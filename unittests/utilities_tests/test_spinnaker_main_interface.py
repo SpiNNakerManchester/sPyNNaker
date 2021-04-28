@@ -16,7 +16,6 @@
 import os
 import sys
 import unittest
-from spinn_front_end_common.interface.config_handler import CONFIG_FILE
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
     AbstractSpinnakerBase)
 from spinn_front_end_common.utilities import globals_variables
@@ -52,14 +51,14 @@ class TestSpinnakerMainInterface(unittest.TestCase):
         path = os.path.dirname(os.path.abspath(class_file))
         os.chdir(path)
         print(path)
-        AbstractSpinnakerBase(CONFIG_FILE, ExecutableFinder())
+        AbstractSpinnakerBase(ExecutableFinder())
 
     def test_stop_init(self):
         class_file = sys.modules[self.__module__].__file__
         path = os.path.dirname(os.path.abspath(class_file))
         os.chdir(path)
 
-        interface = AbstractSpinnakerBase(CONFIG_FILE, ExecutableFinder())
+        interface = AbstractSpinnakerBase(ExecutableFinder())
         mock_contoller = Close_Once()
         interface._machine_allocation_controller = mock_contoller
         self.assertFalse(mock_contoller.closed)
