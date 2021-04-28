@@ -24,7 +24,10 @@
 #include <debug.h>
 
 bool synaptogenesis_dynamics_initialise(
-        UNUSED address_t sdram_sp_address, UNUSED uint32_t *recording_regions_used) {
+        UNUSED address_t sdram_sp_address, uint32_t *recording_regions_used) {
+    // The recording region is defined even if unused, so this value needs to
+    // be incremented in order for the recording region IDs to match up
+    *recording_regions_used += 1;
     return true;
 }
 
