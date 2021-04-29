@@ -155,8 +155,8 @@ class PopulationMachineSynapses(
             self._synaptic_matrices.on_chip_generated_matrix_size)]
 
     def _write_synapse_data_spec(
-            self, spec, machine_time_step, routing_info, machine_graph,
-            n_key_map, ring_buffer_shifts, weight_scales, all_syn_block_sz,
+            self, spec, machine_time_step, routing_info,
+            ring_buffer_shifts, weight_scales, all_syn_block_sz,
             structural_sz):
         """ Write the data specification for the synapse data
 
@@ -165,19 +165,16 @@ class PopulationMachineSynapses(
         :param int machine_time_step: The time step of the simulation
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
             The routing information to read the key from
-        :param ~pacman.model.graphs.MachineGraph machine_graph:
-            The machine graph containing this vertex
-        :param ~pacman.model.routing_info.AbstractMachinePartitionNKeysMap\
-            n_keys_map: The map of partitions to number of keys sent
         """
+        # Get incoming projections
+        incoming = self._app_vertex.incoming_projections
 
         # Write the synapse parameters
         self._write_synapse_parameters(spec, ring_buffer_shifts)
 
         # Write the synaptic matrices
         self._synaptic_matrices.write_synaptic_data(
-            spec, self._app_vertex.incoming_projections, all_syn_block_sz,
-            weight_scales, routing_info)
+            spec, incoming, all_syn_block_sz, weight_scales, routing_info)
 
         # Write any synapse dynamics
         synapse_dynamics = self._app_vertex.synapse_dynamics
@@ -204,8 +201,8 @@ class PopulationMachineSynapses(
                 reference=self._synapse_references.structural_dynamics)
             synapse_dynamics.write_structural_parameters(
                 spec, self._synapse_regions.structural_dynamics,
-                machine_time_step, weight_scales, machine_graph, self,
-                routing_info, self._synaptic_matrices)
+                machine_time_step, weight_scales, self._app_vertex,
+                self._vertex_slice, routing_info, self._synaptic_matrices)
         elif self._synapse_references.structural_dynamics is not None:
             # If there is a reference for this region, we have to create it!
             spec.reserve_memory_region(
@@ -216,16 +213,15 @@ class PopulationMachineSynapses(
         # write up the bitfield builder data
         # reserve bit field region
         bit_field_utilities.reserve_bit_field_regions(
-            spec, machine_graph, n_key_map, self,
-            self._synapse_regions.bitfield_builder,
+            spec, incoming, self._synapse_regions.bitfield_builder,
             self._synapse_regions.bitfield_filter,
             self._synapse_regions.bitfield_key_map,
             self._synapse_references.bitfield_builder,
             self._synapse_references.bitfield_filter,
             self._synapse_references.bitfield_key_map)
         bit_field_utilities.write_bitfield_init_data(
-            spec, self, machine_graph, routing_info,
-            n_key_map, self._synapse_regions.bitfield_builder,
+            spec, incoming, self._vertex_slice, routing_info,
+            self._synapse_regions.bitfield_builder,
             self._synapse_regions.pop_table,
             self._synapse_regions.synaptic_matrix,
             self._synapse_regions.direct_matrix,

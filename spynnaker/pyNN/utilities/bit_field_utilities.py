@@ -100,33 +100,6 @@ def get_estimated_sdram_for_key_region(incoming_projections):
     return sdram
 
 
-def _exact_sdram_for_bit_field_region(
-        machine_graph, vertex, n_key_map):
-    """ calculates the correct SDRAM for the bitfield region based off \
-        the machine graph
-
-    :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
-        machine graph
-    :param ~pacman.model.graphs.machine.MachineVertex vertex:
-        the machine vertex
-    :param ~pacman.model.routing_info.AbstractMachinePartitionNKeysMap \
-            n_key_map:
-        n keys map
-    :return: SDRAM in bytes
-    :rtype: int
-    """
-    sdram = ELEMENTS_USED_IN_BIT_FIELD_HEADER * BYTES_PER_WORD
-    for incoming_edge in machine_graph.get_edges_ending_at_vertex(vertex):
-        n_keys = n_key_map.n_keys_for_partition(
-            machine_graph.get_outgoing_partition_for_edge(incoming_edge))
-        n_words_for_atoms = int(math.ceil(n_keys / BIT_IN_A_WORD))
-
-        sdram += (
-            (ELEMENTS_USED_IN_EACH_BIT_FIELD + n_words_for_atoms) *
-            BYTES_PER_WORD)
-    return sdram
-
-
 def exact_sdram_for_bit_field_builder_region():
     """ Gets the SDRAM requirement for the builder region
 
@@ -136,23 +109,8 @@ def exact_sdram_for_bit_field_builder_region():
     return N_REGIONS_ADDRESSES * BYTES_PER_WORD
 
 
-def _exact_sdram_for_bit_field_key_region(machine_graph, vertex):
-    """ Calculates the exact SDRAM for the bitfield key region
-
-    :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
-        machine graph
-    :param ~pacman.model.graphs.machine.MachineVertex vertex: machine vertex
-    :return: bytes
-    :rtype: int
-    """
-    return (
-        N_KEYS_DATA_SET_IN_WORDS +
-        len(machine_graph.get_edges_ending_at_vertex(vertex)) *
-        N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP) * BYTES_PER_WORD
-
-
 def reserve_bit_field_regions(
-        spec, machine_graph, n_key_map, vertex, bit_field_builder_region,
+        spec, incoming_projections, bit_field_builder_region,
         bit_filter_region, bit_field_key_region,
         bit_field_builder_region_ref=None, bit_filter_region_ref=None,
         bit_field_key_region_ref=None):
@@ -160,12 +118,8 @@ def reserve_bit_field_regions(
 
     :param ~data_specification.DataSpecificationGenerator spec:
         dsg spec writer
-    :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
-        machine graph
-    :param ~pacman.model.routing_info.AbstractMachinePartitionNKeysMap \
-            n_key_map:
-        map between partitions and n keys
-    :param ~pacman.model.graphs.machine.MachineVertex vertex: machine vertex
+    :param list(Projection) incoming_projections:
+        The projections to generate bitfields for
     :param int bit_field_builder_region: region id for the builder region
     :param int bit_filter_region: region id for the bitfield region
     :param int bit_field_key_region: region id for the key map
@@ -183,8 +137,7 @@ def reserve_bit_field_regions(
     # reserve the final destination for the bitfields
     spec.reserve_memory_region(
         region=bit_filter_region,
-        size=_exact_sdram_for_bit_field_region(
-            machine_graph, vertex, n_key_map),
+        size=get_estimated_sdram_for_bit_field_region(incoming_projections),
         label="bit_field region",
         reference=bit_filter_region_ref)
 
@@ -198,13 +151,13 @@ def reserve_bit_field_regions(
     # reserve memory region for the key region
     spec.reserve_memory_region(
         region=bit_field_key_region,
-        size=_exact_sdram_for_bit_field_key_region(machine_graph, vertex),
+        size=get_estimated_sdram_for_key_region(incoming_projections),
         label="bit field key data",
         reference=bit_field_key_region_ref)
 
 
 def write_bitfield_init_data(
-        spec, machine_vertex, machine_graph, routing_info, n_key_map,
+        spec, incoming_projections, vertex_slice, routing_info,
         bit_field_builder_region, master_pop_region_id,
         synaptic_matrix_region_id, direct_matrix_region_id,
         bit_field_region_id, bit_field_key_map_region_id,
@@ -218,9 +171,6 @@ def write_bitfield_init_data(
     :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
         machine graph
     :param ~pacman.model.routing_info.RoutingInfo routing_info: keys
-    :param ~pacman.model.routing_info.AbstractMachinePartitionNKeysMap \
-            n_key_map:
-        map for edge to n keys
     :param int bit_field_builder_region: the region id for the bitfield builder
     :param int master_pop_region_id: the region id for the master pop table
     :param int synaptic_matrix_region_id: the region id for the synaptic matrix
@@ -248,17 +198,24 @@ def write_bitfield_init_data(
 
     spec.switch_write_focus(bit_field_key_map_region_id)
 
+    # Gather the machine edges that target this core
+    machine_edges = list()
+    seen_app_edges = set()
+    for proj in incoming_projections:
+        in_edge = proj._projection_edge
+        if in_edge not in seen_app_edges:
+            seen_app_edges.add(in_edge)
+            for machine_edge in in_edge.machine_edges:
+                if machine_edge.post_vertex.vertex_slice == vertex_slice:
+                    machine_edges.append(machine_edge)
+
     # write n keys max atom map
-    spec.write_value(
-        len(machine_graph.get_edges_ending_at_vertex(machine_vertex)))
+    spec.write_value(len(machine_edges))
 
     # load in key to max atoms map
-    for out_going_partition in machine_graph.\
-            get_multicast_edge_partitions_ending_at_vertex(machine_vertex):
-        spec.write_value(
-            routing_info.get_first_key_from_partition(out_going_partition))
-        spec.write_value(
-            n_key_map.n_keys_for_partition(out_going_partition))
+    for machine_edge in machine_edges:
+        spec.write_value(routing_info.get_first_key_for_edge(machine_edge))
+        spec.write_value(machine_edge.pre_vertex.vertex_slice.n_atoms)
 
     # ensure if nothing else that n bitfields in bitfield region set to 0
     spec.switch_write_focus(bit_field_region_id)

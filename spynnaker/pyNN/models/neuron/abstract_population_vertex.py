@@ -1230,6 +1230,6 @@ class AbstractPopulationVertex(
     def incoming_projections(self):
         """ The projections that target this population vertex
 
-        :rtype: list(PyNNProjectionCommon)
+        :rtype: list(~spynnaker.pyNN.models.projection.Projection)
         """
         return self.__incoming_projections

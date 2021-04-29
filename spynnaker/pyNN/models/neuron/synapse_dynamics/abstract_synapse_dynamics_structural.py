@@ -38,7 +38,7 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
     @abstractmethod
     def write_structural_parameters(
             self, spec, region, machine_time_step, weight_scales,
-            machine_graph, machine_vertex, routing_info, synaptic_matrices):
+            app_vertex, vertex_slice, routing_info, synaptic_matrices):
         """ Write structural plasticity parameters
 
         :param ~data_specification.DataSpecificationGenerator spec:
@@ -46,10 +46,10 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
         :param int region: region ID
         :param float machine_time_step: The simulation time step
         :param list(float) weight_scales: Weight scaling for each synapse type
-        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
-            The machine graph
-        :param AbstractPopulationVertex machine_vertex:
-            The machine vertex
+        :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
+            The target application vertex
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The slice of the target vertex to generate for
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
             Routing information for all edges
         :param SynapticMatrices synaptic_matrices:

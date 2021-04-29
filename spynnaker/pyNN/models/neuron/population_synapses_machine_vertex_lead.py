@@ -90,27 +90,23 @@ class PopulationSynapsesMachineVertexLead(
     @inject_items({
         "machine_time_step": "MachineTimeStep",
         "time_scale_factor": "TimeScaleFactor",
-        "machine_graph": "MemoryMachineGraph",
         "routing_info": "MemoryRoutingInfos",
-        "data_n_time_steps": "DataNTimeSteps",
-        "n_key_map": "MemoryMachinePartitionNKeysMap"
+        "data_n_time_steps": "DataNTimeSteps"
     })
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={
-            "machine_time_step", "time_scale_factor", "machine_graph",
-            "routing_info", "data_n_time_steps", "n_key_map"
+            "machine_time_step", "time_scale_factor", "routing_info",
+            "data_n_time_steps"
         })
     def generate_data_specification(
             self, spec, placement, machine_time_step, time_scale_factor,
-            machine_graph, routing_info, data_n_time_steps, n_key_map):
+            routing_info, data_n_time_steps):
         """
         :param machine_time_step: (injected)
         :param time_scale_factor: (injected)
-        :param machine_graph: (injected)
         :param routing_info: (injected)
         :param data_n_time_steps: (injected)
-        :param n_key_map: (injected)
         """
         # pylint: disable=arguments-differ
         rec_regions = self._app_vertex.synapse_recorder.get_region_sizes(
@@ -119,7 +115,7 @@ class PopulationSynapsesMachineVertexLead(
             spec, machine_time_step, time_scale_factor, rec_regions)
 
         self._write_synapse_data_spec(
-            spec, machine_time_step, routing_info, machine_graph, n_key_map,
+            spec, machine_time_step, routing_info,
             self.__ring_buffer_shifts, self.__weight_scales,
             self.__all_syn_block_sz, self.__structural_sz)
 
