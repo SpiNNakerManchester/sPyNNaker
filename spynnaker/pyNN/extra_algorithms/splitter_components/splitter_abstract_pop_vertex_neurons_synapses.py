@@ -232,11 +232,18 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         app_vertex = self._governed_app_vertex
         structural_sz = app_vertex.get_structural_dynamics_size(
                 vertex_slice, app_vertex.incoming_projections)
+        dynamics_sz = self._governed_app_vertex.get_synapse_dynamics_size(
+            vertex_slice)
+        # Need a minimum size to make it possible to reference
+        if structural_sz == 0:
+            structural_sz = 4
+        if dynamics_sz == 0:
+            dynamics_sz = 4
         all_syn_block_sz = app_vertex.get_synapses_size(
                     vertex_slice, app_vertex.incoming_projections)
         shared_sdram = self.__shared_synapse_sdram(
             independent_synapse_sdram, proj_dependent_sdram,
-            all_syn_block_sz, structural_sz, vertex_slice)
+            all_syn_block_sz, structural_sz, dynamics_sz)
         synapse_references = self.__synapse_references
         syn_label = "{}_Synapses:{}-{}".format(
             label, vertex_slice.lo_atom, vertex_slice.hi_atom)
@@ -402,10 +409,9 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
     def __shared_synapse_sdram(
             self, independent_synapse_sdram, proj_dependent_sdram,
-            all_syn_block_sz, structural_sz, vertex_slice):
+            all_syn_block_sz, structural_sz, dynamics_sz):
         """ Get the resources shared between synapse cores
 
-        :param ~pacman.model.graphs.common.Slice vertex_slice: the slice
         :rtype: ~pacman.model.resources.ResourceContainer
         """
         sdram = MultiRegionSDRAM()
@@ -422,8 +428,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             .structural_dynamics, structural_sz)
         sdram.add_cost(
             PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS
-            .synapse_dynamics,
-            self._governed_app_vertex.get_synapse_dynamics_size(vertex_slice))
+            .synapse_dynamics, dynamics_sz)
         return sdram
 
     def __get_synapse_resources(self, vertex_slice, shared_sdram=None):
