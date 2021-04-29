@@ -34,4 +34,8 @@ class TestCfgChecker(unittest.TestCase):
                     check_python_file(py_path)
 
     def test_double_defaults(self):
-        find_double_defaults()
+        find_double_defaults(repeaters=[
+            "application_to_machine_graph_algorithms",
+            "machine_graph_to_machine_algorithms",
+            "machine_graph_to_virtual_machine_algorithms",
+            "loading_algorithms"])
