@@ -56,7 +56,7 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.abstract_base</span> <span class="kn">import</span> <span class="n">AbstractBase</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
-<span class="kn">from</span> <span class="nn">pacman.config_holder</span> <span class="kn">import</span> <span class="n">get_config_bool</span><span class="p">,</span> <span class="n">set_cfg_files</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.config_holder</span> <span class="kn">import</span> <span class="n">get_config_bool</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.abstract_spinnaker_base</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractSpinnakerBase</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
@@ -66,6 +66,7 @@
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.utility_objs</span> <span class="kn">import</span> <span class="n">ExecutableFinder</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="n">unset_simulator</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN</span> <span class="kn">import</span> <span class="n">extra_algorithms</span><span class="p">,</span> <span class="n">model_binaries</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.config_setup</span> <span class="kn">import</span> <span class="n">CONFIG_FILE_NAME</span><span class="p">,</span> <span class="n">reset_configs</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities</span> <span class="kn">import</span> <span class="n">constants</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.spynnaker_simulator_interface</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">SpynnakerSimulatorInterface</span><span class="p">)</span>
@@ -73,8 +74,6 @@
 <span class="kn">from</span> <span class="nn">spynnaker</span> <span class="kn">import</span> <span class="n">__version__</span> <span class="k">as</span> <span class="n">version</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
-
-<span class="n">CONFIG_FILE_NAME</span> <span class="o">=</span> <span class="s2">&quot;spynnaker.cfg&quot;</span>
 
 
 <div class="viewcode-block" id="AbstractSpiNNakerCommon"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon">[docs]</a><span class="k">class</span> <span class="nc">AbstractSpiNNakerCommon</span><span class="p">(</span>
@@ -560,10 +559,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__id_counter</span> <span class="o">=</span> <span class="n">new_value</span></div>
 
 
-<span class="c1"># add the default at import time in case needed before setup</span>
-<span class="n">set_cfg_files</span><span class="p">(</span>
-    <span class="n">configfile</span><span class="o">=</span><span class="n">CONFIG_FILE_NAME</span><span class="p">,</span>
-    <span class="n">default</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="n">CONFIG_FILE_NAME</span><span class="p">))</span>
+<span class="n">reset_configs</span><span class="p">()</span>
 </pre></div>
 
             <div class="clearer"></div>
