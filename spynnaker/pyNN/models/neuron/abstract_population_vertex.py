@@ -162,7 +162,7 @@ class AbstractPopulationVertex(
         self.__synapse_manager = SynapticManager(
             self.__neuron_impl.get_n_synapse_types(), ring_buffer_sigma,
             spikes_per_second, min_weights, weight_random_sigma,
-            max_stdp_spike_delta, config, drop_late_spikes)
+            max_stdp_spike_delta, drop_late_spikes)
 
         # bool for if state has changed.
         self.__change_requires_mapping = True
