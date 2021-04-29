@@ -19,6 +19,8 @@ from scipy import special  # @UnresolvedImport
 
 from spinn_utilities.progress_bar import ProgressBar
 from data_specification.enums import DataType
+from spinn_utilities.config_holder import (
+    get_config_float, get_config_int, get_config_bool)
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, MICRO_TO_SECOND_CONVERSION)
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
@@ -103,7 +105,7 @@ class SynapticManager(object):
         "Found delayed source IDs but no delay machine edge for {}")
 
     def __init__(self, n_synapse_types, ring_buffer_sigma, spikes_per_second,
-                 config, drop_late_spikes):
+                 drop_late_spikes):
         """
         :param int n_synapse_types:
             number of synapse types on a neuron (e.g., 2 for excitatory and
@@ -115,7 +117,6 @@ class SynapticManager(object):
         :type ring_buffer_sigma: float or None
         :param spikes_per_second: Estimated spikes per second
         :type spikes_per_second: float or None
-        :param ~configparser.RawConfigParser config: The system configuration
         :param bool drop_late_spikes: control flag for dropping late packets.
         """
         self.__n_synapse_types = n_synapse_types
@@ -141,15 +142,15 @@ class SynapticManager(object):
         self.__synapse_io = SynapseIORowBased()
 
         if self.__ring_buffer_sigma is None:
-            self.__ring_buffer_sigma = config.getfloat(
+            self.__ring_buffer_sigma = get_config_float(
                 "Simulation", "ring_buffer_sigma")
 
         if self.__spikes_per_second is None:
-            self.__spikes_per_second = config.getfloat(
+            self.__spikes_per_second = get_config_float(
                 "Simulation", "spikes_per_second")
 
         if self.__drop_late_spikes is None:
-            self.__drop_late_spikes = config.getboolean(
+            self.__drop_late_spikes = get_config_bool(
                 "Simulation", "drop_late_spikes")
 
         # Prepare for dealing with STDP - there can only be one (non-static)
@@ -161,7 +162,7 @@ class SynapticManager(object):
         self.__ring_buffer_shifts = None
 
         # Limit the DTCM used by one-to-one connections
-        self.__all_single_syn_sz = config.getint(
+        self.__all_single_syn_sz = get_config_int(
             "Simulation", "one_to_one_connection_dtcm_max_bytes")
 
         # Post vertex slice to synaptic matrices

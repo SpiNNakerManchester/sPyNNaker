@@ -18,11 +18,11 @@ import math
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
+from spinn_utilities.config_holder import get_config_bool
 from spinn_front_end_common.abstract_models import (
     AbstractProvidesOutgoingPartitionConstraints)
 from spinn_front_end_common.abstract_models.impl import (
     TDMAAwareApplicationVertex)
-from spinn_front_end_common.utilities import globals_variables
 from spynnaker.pyNN.exceptions import DelayExtensionException
 from spynnaker.pyNN.models.abstract_models import AbstractHasDelayStages
 from spynnaker.pyNN.utilities.constants import (
@@ -91,9 +91,7 @@ class DelayExtensionVertex(
         # Dictionary of vertex_slice -> delay block for data specification
         self.__delay_blocks = dict()
 
-        # Read the config for dropping late spikes
-        config = globals_variables.get_simulator().config
-        self.__drop_late_spikes = config.getboolean(
+        self.__drop_late_spikes = get_config_bool(
             "Simulation", "drop_late_spikes")
 
     @property
