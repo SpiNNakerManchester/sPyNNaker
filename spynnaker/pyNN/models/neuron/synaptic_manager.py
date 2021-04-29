@@ -20,7 +20,8 @@ from collections import defaultdict
 from spinn_utilities.progress_bar import ProgressBar
 from data_specification.enums import DataType
 
-from spinn_front_end_common.utilities.helpful_functions import read_config
+from spinn_utilities.config_holder import (
+    get_config_float, get_config_int, get_config_bool)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.utility_objs\
     .provenance_data_item import ProvenanceDataItem
@@ -115,7 +116,7 @@ class SynapticManager(object):
 
     def __init__(
             self, n_synapse_types, ring_buffer_sigma, spikes_per_second,
-            min_weights, weight_random_sigma, max_stdp_spike_delta, config,
+            min_weights, weight_random_sigma, max_stdp_spike_delta,
             drop_late_spikes):
         """
         :param int n_synapse_types:
@@ -134,7 +135,6 @@ class SynapticManager(object):
         :type weight_random_sigma: float or None
         :param max_stdp_spike_delta: delta value to use in min weight STDP calc
         :type max_stdp_spike_delta: float or None
-        :param ~configparser.RawConfigParser config: The system configuration
         :param bool drop_late_spikes: control flag for dropping late packets.
         """
         self.__n_synapse_types = n_synapse_types
@@ -163,18 +163,19 @@ class SynapticManager(object):
         self.__synapse_io = SynapseIORowBased()
 
         if self.__ring_buffer_sigma is None:
-            self.__ring_buffer_sigma = config.getfloat(
+            self.__ring_buffer_sigma = get_config_float(
                 "Simulation", "ring_buffer_sigma")
 
         if self.__spikes_per_second is None:
-            self.__spikes_per_second = config.getfloat(
+            self.__spikes_per_second = get_config_float(
                 "Simulation", "spikes_per_second")
 
         # Read the minimum weight if not set; this might *still* be None,
-        # meaning "auto calculate"
+        # meaning "auto calculate"; the number of weights needs to match
+        # the number of synapse types
         if self.__min_weights is None:
-            config_min_weights = read_config(
-                config, "Simulation", "min_weights")
+            config_min_weights = get_config_str_list(
+                "Simulation", "min_weights")
             if config_min_weights is not None:
                 self.__min_weights = [float(v)
                                       for v in config_min_weights.split(',')]
@@ -197,7 +198,7 @@ class SynapticManager(object):
 
         # Get drop_late_spikes from config if not set
         if self.__drop_late_spikes is None:
-            self.__drop_late_spikes = config.getboolean(
+            self.__drop_late_spikes = get_config_bool(
                 "Simulation", "drop_late_spikes")
 
         # Prepare for dealing with STDP - there can only be one (non-static)
@@ -208,7 +209,7 @@ class SynapticManager(object):
         self.__weight_scales = dict()
 
         # Limit the DTCM used by one-to-one connections
-        self.__all_single_syn_sz = config.getint(
+        self.__all_single_syn_sz = get_config_int(
             "Simulation", "one_to_one_connection_dtcm_max_bytes")
 
         # Post vertex slice to synaptic matrices

@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import io
 import math
-import os
 import shutil
 import struct
 import tempfile
@@ -23,7 +22,6 @@ import numpy
 import pytest
 
 from spinn_utilities.overrides import overrides
-from spinn_utilities.conf_loader import load_config
 from spinn_machine import SDRAM
 from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
 from pacman.model.placements import Placement, Placements
@@ -35,12 +33,12 @@ from pacman.model.routing_info import (
     RoutingInfo, PartitionRoutingInfo, BaseKeyAndMask)
 from pacman.model.graphs.application import ApplicationVertex, ApplicationGraph
 from pacman.model.partitioner_splitters import SplitterSliceLegacy
+from spinn_utilities.config_holder import set_config, load_config
 from data_specification import (
     DataSpecificationGenerator, DataSpecificationExecutor)
 from data_specification.constants import MAX_MEM_REGIONS
+from spynnaker.pyNN.config_setup import reset_configs
 from spynnaker.pyNN.models.neuron import SynapticManager
-from spynnaker.pyNN.abstract_spinnaker_common import AbstractSpiNNakerCommon
-import spynnaker.pyNN.abstract_spinnaker_common as abstract_spinnaker_common
 from spynnaker.pyNN.models.neural_projections import (
     ProjectionApplicationEdge, SynapseInformation, DelayedApplicationEdge)
 from spynnaker.pyNN.models.neural_projections.connectors import (
@@ -152,13 +150,8 @@ def test_write_data_spec():
 
     # UGLY but the mock transceiver NEED generate_on_machine to be False
     AbstractGenerateConnectorOnMachine.generate_on_machine = say_false
-    default_config_paths = os.path.join(
-        os.path.dirname(abstract_spinnaker_common.__file__),
-        AbstractSpiNNakerCommon.CONFIG_FILE_NAME)
-
-    config = load_config(
-        AbstractSpiNNakerCommon.CONFIG_FILE_NAME, default_config_paths)
-    config.set("Simulation", "one_to_one_connection_dtcm_max_bytes", 40)
+    load_config()
+    set_config("Simulation", "one_to_one_connection_dtcm_max_bytes", 40)
 
     machine_time_step = 1000.0
 
@@ -268,7 +261,7 @@ def test_write_data_spec():
     synaptic_manager = SynapticManager(
         n_synapse_types=2, ring_buffer_sigma=5.0,
         spikes_per_second=100.0, min_weights=None, weight_random_sigma=None,
-        max_stdp_spike_delta=None, config=config, drop_late_spikes=True)
+        max_stdp_spike_delta=None, drop_late_spikes=True)
     synaptic_manager.write_data_spec(
         spec, post_app_vertex, post_vertex_slice, post_vertex,
         graph, app_graph, routing_info, 1.0, machine_time_step)
@@ -331,19 +324,15 @@ def test_write_data_spec():
         assert all(list_delays == connections_4["delay"])
     finally:
         shutil.rmtree(report_folder, ignore_errors=True)
+        reset_configs()
 
 
 def test_set_synapse_dynamics():
     MockSimulator.setup()
-    default_config_paths = os.path.join(
-        os.path.dirname(abstract_spinnaker_common.__file__),
-        AbstractSpiNNakerCommon.CONFIG_FILE_NAME)
-    config = load_config(
-        AbstractSpiNNakerCommon.CONFIG_FILE_NAME, default_config_paths)
     synaptic_manager = SynapticManager(
         n_synapse_types=2, ring_buffer_sigma=5.0,
         spikes_per_second=100.0, min_weights=None, weight_random_sigma=None,
-        max_stdp_spike_delta=None, config=config, drop_late_spikes=True)
+        max_stdp_spike_delta=None, drop_late_spikes=True)
 
     static = SynapseDynamicsStatic()
     stdp = SynapseDynamicsSTDP(
@@ -436,7 +425,7 @@ def test_set_synapse_dynamics():
     synaptic_manager = SynapticManager(
         n_synapse_types=2, ring_buffer_sigma=5.0,
         spikes_per_second=100.0, min_weights=None, weight_random_sigma=None,
-        max_stdp_spike_delta=None, config=config, drop_late_spikes=True)
+        max_stdp_spike_delta=None, drop_late_spikes=True)
 
     # STDP followed by structural STDP should result in Structural STDP
     synaptic_manager.synapse_dynamics = stdp
@@ -458,7 +447,7 @@ def test_set_synapse_dynamics():
     synaptic_manager = SynapticManager(
         n_synapse_types=2, ring_buffer_sigma=5.0,
         spikes_per_second=100.0, min_weights=None, weight_random_sigma=None,
-        max_stdp_spike_delta=None, config=config, drop_late_spikes=True)
+        max_stdp_spike_delta=None, drop_late_spikes=True)
 
     # Static followed by static structural should result in static
     # structural
@@ -495,7 +484,7 @@ def test_set_synapse_dynamics():
     synaptic_manager = SynapticManager(
         n_synapse_types=2, ring_buffer_sigma=5.0,
         spikes_per_second=100.0, min_weights=None, weight_random_sigma=None,
-        max_stdp_spike_delta=None, config=config, drop_late_spikes=True)
+        max_stdp_spike_delta=None, drop_late_spikes=True)
     synaptic_manager.synapse_dynamics = static_struct
     synaptic_manager.synapse_dynamics = stdp_struct
 
@@ -523,12 +512,6 @@ def test_pop_based_master_pop_table_standard(
     MockSimulator.setup()
     # Add an sdram so max SDRAM is high enough
     SDRAM(4000000)
-
-    default_config_paths = os.path.join(
-        os.path.dirname(abstract_spinnaker_common.__file__),
-        AbstractSpiNNakerCommon.CONFIG_FILE_NAME)
-    config = load_config(
-        AbstractSpiNNakerCommon.CONFIG_FILE_NAME, default_config_paths)
 
     # Make simple source and target, where the source has 1000 atoms
     # split into 10 vertices (100 each) and the target has 100 atoms in
@@ -632,7 +615,7 @@ def test_pop_based_master_pop_table_standard(
     synaptic_manager = SynapticManager(
         n_synapse_types=2, ring_buffer_sigma=5.0,
         spikes_per_second=100.0, min_weights=None, weight_random_sigma=None,
-        max_stdp_spike_delta=None, config=config, drop_late_spikes=True)
+        max_stdp_spike_delta=None, drop_late_spikes=True)
     synaptic_manager.write_data_spec(
         spec, post_app_vertex, post_vertex_slice, post_mac_vertex,
         mac_graph, app_graph, routing_info, 1.0, 1000.0)

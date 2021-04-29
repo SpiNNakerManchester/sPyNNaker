@@ -13,25 +13,28 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-SpiNNUtilities == 1!6.0.1
-SpiNNMachine == 1!6.0.1
-SpiNNMan == 1!6.0.1
-SpiNNaker_PACMAN == 1!6.0.1
-SpiNNaker_DataSpecification == 1!6.0.1
-spalloc == 1!6.0.1
-SpiNNFrontEndCommon == 1!6.0.1
-numpy > 1.13, < 1.20; python_version == '3.6'
-numpy > 1.13, < 1.21; python_version == '3.7'
-numpy; python_version >= '3.8'
-scipy
-lxml
-statistics
-matplotlib < 3.4; python_version == '3.6'
-matplotlib; python_version >= '3.7'
-quantities >= 0.12.1
-pynn >= 0.9.1, < 0.10
-lazyarray >= 0.2.9, <= 0.4.0
-appdirs >= 1.4.2 , < 2.0.0
-neo >= 0.5.2, < 0.10.0
-# csa  # needed but excluded due to readthedocs
-# spinnaker_tools
+import os
+from spinn_utilities.config_holder import (
+    clear_cfg_files, set_cfg_files)
+from spinn_front_end_common.interface.config_setup import add_spinnaker_cfg
+
+CONFIG_FILE_NAME = "spynnaker.cfg"
+
+
+def reset_configs():
+    """
+    Resets the configs so only the local default config is included.
+
+    """
+    clear_cfg_files()
+    add_spynnaker_cfg()
+
+
+def add_spynnaker_cfg():
+    """
+    Add the local cfg and all dependent cfg files.
+    """
+    add_spinnaker_cfg()  # This add its dependencies too
+    set_cfg_files(
+        configfile=CONFIG_FILE_NAME,
+        default=os.path.join(os.path.dirname(__file__), CONFIG_FILE_NAME))

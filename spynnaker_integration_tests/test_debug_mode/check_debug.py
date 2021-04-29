@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+from spinn_utilities.config_holder import get_config_bool
 import pacman.operations.algorithm_reports.reports as reports_names
 from pacman.operations.algorithm_reports.network_specification import \
     NetworkSpecification
@@ -78,9 +79,8 @@ class CheckDebug(BaseTestCase):
             ]
 
         sim.setup(1.0)
-        configs = globals_variables.config()
-        if (configs.getboolean("Machine", "enable_advanced_monitor_support")
-                and not configs.getboolean("Java", "use_java")):
+        if (get_config_bool("Machine", "enable_advanced_monitor_support")
+                and not get_config_bool("Java", "use_java")):
             # write_data_speed_up_report
             reports.append(
                 DataSpeedUpPacketGatherMachineVertex.OUT_REPORT_NAME)

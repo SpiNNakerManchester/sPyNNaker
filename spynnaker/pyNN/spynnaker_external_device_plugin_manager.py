@@ -15,8 +15,8 @@
 
 from spinn_utilities.socket_address import SocketAddress
 from pacman.model.graphs.application import ApplicationEdge
+from spinn_utilities.config_holder import (get_config_int, get_config_str)
 from spinnman.messages.eieio import EIEIOType
-from spinn_front_end_common.utilities import helpful_functions
 from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spinn_front_end_common.utility_models import (
     ReverseIpTagMultiCastSource)
@@ -48,18 +48,16 @@ class SpynnakerExternalDevicePluginManager(object):
             simulation should start.
         :type database_ack_port_num: int or None
         """
-        config = get_simulator().config
         if database_notify_port_num is None:
-            database_notify_port_num = helpful_functions.read_config_int(
-                config, "Database", "notify_port")
+            database_notify_port_num = get_config_int(
+                "Database", "notify_port")
         if database_notify_host is None:
-            database_notify_host = helpful_functions.read_config(
-                config, "Database", "notify_hostname")
+            database_notify_host = get_config_str(
+                "Database", "notify_hostname")
         elif database_notify_host == "0.0.0.0":
             database_notify_host = "localhost"
         if database_ack_port_num is None:
-            database_ack_port_num = helpful_functions.read_config_int(
-                config, "Database", "listen_port")
+            database_ack_port_num = get_config_int("Database", "listen_port")
 
         # build the database socket address used by the notification interface
         database_socket = SocketAddress(
@@ -139,12 +137,11 @@ class SpynnakerExternalDevicePluginManager(object):
             The names of the partitions to create edges for
         """
         # pylint: disable=too-many-arguments, too-many-locals, protected-access
-        config = get_simulator().config
         # get default params if none set
         if port is None:
-            port = config.getint("Recording", "live_spike_port")
+            port = get_config_int("Recording", "live_spike_port")
         if host is None:
-            host = str(config.get("Recording", "live_spike_host"))
+            host = get_config_str("Recording", "live_spike_host")
 
         # add new edge and vertex if required to SpiNNaker graph
         SpynnakerExternalDevicePluginManager.update_live_packet_gather_tracker(
