@@ -68,10 +68,10 @@ state_t neuron_model_state_update(
         v_mem_error = neuron->V_membrane - 9.k;
 //        io_printf(IO_BUF, "> %k = %k - %k\n", v_mem_error, neuron->V_membrane, neuron->B);
     }
-//    else if (neuron->V_membrane < -9.k){
-//        v_mem_error = neuron->V_membrane + 9.k;
+    else if (neuron->V_membrane < -9.k){
+        v_mem_error = neuron->V_membrane + 9.k;
 //        io_printf(IO_BUF, "< %k = %k - %k\n", v_mem_error, -neuron->V_membrane, neuron->B);
-//    }
+    }
     else{
         v_mem_error = 0.k;
     }
@@ -81,7 +81,7 @@ state_t neuron_model_state_update(
 //    if(v_mem_error < -1.k){
 //        v_mem_error = -1.k;
 //    }
-    neuron->L = 0.k;//v_mem_error*0.01k;
+    neuron->L = v_mem_error*0.01k;
     for (uint32_t n_ind=0; n_ind < 10; n_ind++){
         if (n_ind == (uint32_t)dummy){
             neuron->L += learning_signal[n_ind];// * neuron->w_fb[n_ind];

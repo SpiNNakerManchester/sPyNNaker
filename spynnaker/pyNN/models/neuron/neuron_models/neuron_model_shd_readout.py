@@ -111,7 +111,7 @@ class NeuronModelLeakyIntegrateAndFireSHDReadout(AbstractNeuronModel):
 
         global_data_types=[]
         global_data_types.extend([DataType.S1615])    # eta (learning rate)
-        global_data_types.extend([DataType.UINT8 for i in range(4011)])  # target data
+        global_data_types.extend([DataType.UINT8 for i in range(1002)])  # target data
 
 
         super(NeuronModelLeakyIntegrateAndFireSHDReadout, self).__init__(
@@ -266,7 +266,7 @@ class NeuronModelLeakyIntegrateAndFireSHDReadout(AbstractNeuronModel):
         vals = []
 
         vals.extend([self._eta])
-        vals.extend(numpy.hstack([self._target_data, numpy.zeros(4011-len(self._target_data))]))
+        vals.extend(numpy.hstack([self._target_data, numpy.zeros(1002-len(self._target_data))]))
         return vals
 
     @property

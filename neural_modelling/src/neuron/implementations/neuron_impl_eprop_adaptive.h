@@ -302,7 +302,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     threshold_type_update_threshold(neuron->z, neuron);
 
 //    if(time % 1000 > 100 && time % 1000 < 600){
-    neuron->neuron_rate = neuron->neuron_rate * 0.9999k;//global_parameters->rate_exp_TC;
+    neuron->neuron_rate = neuron->neuron_rate * 0.9998k;//global_parameters->rate_exp_TC;
 //    }
 
 
@@ -340,7 +340,9 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     if(neuron_index % 4 == 0){
 //        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[0+neuron_index].el_a;
         recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[0+neuron_index].delta_w;
-//        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[0+neuron_index].e_bar;
+//        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[600+neuron_index].e_bar;
+//        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[600+neuron_index].z_bar_inp;
+//        recorded_variable_values[V_RECORDING_INDEX] = neuron->syn_state[600+neuron_index].z_bar_inp;
 //        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->L;
 //        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[0+neuron_index].e_bar;
 //        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = *exc_value;
@@ -350,7 +352,9 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     else if(neuron_index % 4 == 1){
 //        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[20+neuron_index].el_a;
         recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[200+neuron_index].delta_w;
-//        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[200+neuron_index].e_bar;
+//        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[590+neuron_index].e_bar;
+//        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[590+neuron_index].z_bar_inp;
+//        recorded_variable_values[V_RECORDING_INDEX] = neuron->syn_state[590+neuron_index].z_bar;
 //        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->L;
 //        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[10+neuron_index].e_bar;
 //        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = *exc_value;
@@ -358,7 +362,9 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     else if(neuron_index % 4 == 2){
 //        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[20+neuron_index].el_a;
         recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[500+neuron_index].delta_w;
-//        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[500+neuron_index].e_bar;
+//        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[500+neuron_index].e_bar;
+//        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[500+neuron_index].z_bar_inp;
+//        recorded_variable_values[V_RECORDING_INDEX] = neuron->syn_state[500+neuron_index].z_bar;
 //        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->L;
 //        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[10+neuron_index].e_bar;
 //        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = *exc_value;
@@ -366,7 +372,9 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     else{
 //        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[10+neuron_index].el_a;
         recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[300+neuron_index].delta_w;
-//        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[300+neuron_index].e_bar;
+//        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[300+neuron_index].e_bar;
+//        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[300+neuron_index].z_bar_inp;
+//        recorded_variable_values[V_RECORDING_INDEX] = neuron->syn_state[300+neuron_index].z_bar;
 //        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->L;
 //        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[0+neuron_index].e_bar;
 //        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = *exc_input_values;
@@ -391,8 +399,8 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 //                                    - global_parameters->core_target_rate;
 //    REAL reg_learning_signal = global_parameters->core_target_rate - (global_parameters->core_pop_rate / syn_dynamics_neurons_in_partition);
 //    REAL reg_learning_signal = (global_parameters->core_pop_rate / syn_dynamics_neurons_in_partition) - global_parameters->core_target_rate;
-    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] =
-                                            neuron->neuron_rate;
+//    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] =
+//                                            neuron->neuron_rate;
 //                                            neuron->L;
 //                                            neuron->syn_state[neuron_index].z_bar;
                                             //reg_learning_signal;//
@@ -415,15 +423,25 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     // Record updated state
     // Record  V (just as cheap to set then to gate later)
     recorded_variable_values[V_RECORDING_INDEX] = voltage; // result;
+//    recorded_variable_values[V_RECORDING_INDEX] = neuron->syn_state[350+neuron_index].z_bar; // result;
+//    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[300+neuron_index].e_bar;
+//    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[300+neuron_index].z_bar_inp;
+//    recorded_variable_values[V_RECORDING_INDEX] = neuron->syn_state[300+neuron_index].z_bar;
+//    recorded_variable_values[V_RECORDING_INDEX] = neuron->syn_state[300+neuron_index].e_bar;
+//    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[300+neuron_index].z_bar_inp;
+//    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[300+neuron_index].z_bar;
+//    recorded_variable_values[V_RECORDING_INDEX] = neuron->syn_state[300].e_bar;
+//    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = voltage;
+//    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[300].z_bar;
 
 
-//    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] =
+    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] =
 //    		neuron->syn_state[0].delta_w;
 //    		neuron->syn_state[0].z_bar;
 //    		exc_input_values[0]; // record input input (signed)
 //    		z_t;
 //    		global_parameters->core_pop_rate;
-//    		neuron->B;
+    		neuron->B;
 //    		neuron->syn_state[0].z_bar;
 
 //    // Record B

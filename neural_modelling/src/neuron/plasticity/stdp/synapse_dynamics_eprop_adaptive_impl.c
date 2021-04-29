@@ -385,8 +385,10 @@ bool synapse_dynamics_process_plastic_synapses(
                 synapse_structure_get_update_state(*plastic_words, type);
 
         neuron_pointer_t neuron = &neuron_array[neuron_ind];
-        neuron->syn_state[syn_ind_from_delay].z_bar_inp = 1024k; // !!!! Check what units this is in - same as weight? !!!!
+        neuron->syn_state[syn_ind_from_delay].z_bar_inp += 1024k; // !!!! Check what units this is in - same as weight? !!!!
 
+//        io_printf(IO_BUF, "%k for %u @ t=%u\n", neuron->syn_state[syn_ind_from_delay].z_bar_inp,
+//                                                syn_ind_from_delay, time);
 //        io_printf(IO_BUF, "initial_weight: d%d, k%k, u%u - ", current_state.initial_weight, current_state.initial_weight, current_state.initial_weight);
 //        if (current_state.initial_weight > 0){
 //            io_printf(IO_BUF, "+ve\n");
@@ -463,11 +465,13 @@ bool synapse_dynamics_process_plastic_synapses(
         if (accumulation < ring_buffers[ring_buffer_index] + synapse_structure_get_final_weight(final_state)
             && ring_buffers[ring_buffer_index] > 0 && synapse_structure_get_final_weight(final_state) > 0){
             accumulation = ring_buffers[ring_buffer_index];
+            plastic_saturation_count++;
         }
         // underflow check
         if (accumulation > ring_buffers[ring_buffer_index] + synapse_structure_get_final_weight(final_state)
             && ring_buffers[ring_buffer_index] < 0 && synapse_structure_get_final_weight(final_state) < 0){
             accumulation = ring_buffers[ring_buffer_index];
+            plastic_saturation_count++;
         }
 
         ring_buffers[ring_buffer_index] = accumulation;
