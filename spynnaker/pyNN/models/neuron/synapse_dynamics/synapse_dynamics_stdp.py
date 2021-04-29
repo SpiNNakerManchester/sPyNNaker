@@ -210,11 +210,8 @@ class SynapseDynamicsSTDP(
     def backprop_delay(self, backprop_delay):
         self.__backprop_delay = bool(backprop_delay)
 
+    @overrides(AbstractPlasticSynapseDynamics.is_same_as)
     def is_same_as(self, synapse_dynamics):
-        """
-        :param AbstractSynapseDynamics synapse_dynamics:
-        :rtype: bool
-        """
         # pylint: disable=protected-access
         if not isinstance(synapse_dynamics, SynapseDynamicsSTDP):
             return False
@@ -468,7 +465,7 @@ class SynapseDynamicsSTDP(
         return self.get_weight_maximum(connector, synapse_info)
 
     @overrides(AbstractPlasticSynapseDynamics.get_weight_variance)
-    def get_weight_variance(self, connector, weights):
+    def get_weight_variance(self, connector, weights, synapse_info):
         # Because the weights could all be changed to the maximum, the variance
         # has to be given as no variance
         return 0.0

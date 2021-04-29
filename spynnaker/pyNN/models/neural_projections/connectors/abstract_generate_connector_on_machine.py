@@ -81,6 +81,9 @@ class AbstractGenerateConnectorOnMachine(
         :type values: int or ~pyNN.random.NumpyRNG
         :rtype: bool
         """
+        # Strings (i.e. for distance-dependent weights/delays) not supported
+        if isinstance(values, str):
+            return False
 
         # Scalars are fine on the machine
         if numpy.isscalar(values):
