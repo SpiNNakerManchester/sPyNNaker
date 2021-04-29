@@ -520,5 +520,5 @@ class AbstractSpiNNakerCommon(
         """
         self.__id_counter = new_value
 
-reset_configs()
 
+reset_configs()
