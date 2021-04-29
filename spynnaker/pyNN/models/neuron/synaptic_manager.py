@@ -21,7 +21,7 @@ from spinn_utilities.progress_bar import ProgressBar
 from data_specification.enums import DataType
 
 from spinn_utilities.config_holder import (
-    get_config_float, get_config_int, get_config_bool)
+    get_config_float, get_config_int, get_config_bool, get_config_str_list)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.utility_objs\
     .provenance_data_item import ProvenanceDataItem
