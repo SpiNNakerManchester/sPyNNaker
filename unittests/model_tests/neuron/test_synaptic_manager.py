@@ -33,10 +33,11 @@ from pacman.model.routing_info import (
     RoutingInfo, PartitionRoutingInfo, BaseKeyAndMask)
 from pacman.model.graphs.application import ApplicationVertex, ApplicationGraph
 from pacman.model.partitioner_splitters import SplitterSliceLegacy
-from spinn_utilities.config_holder import (load_config_cfgs, set_config)
+from spinn_utilities.config_holder import set_config, load_config
 from data_specification import (
     DataSpecificationGenerator, DataSpecificationExecutor)
 from data_specification.constants import MAX_MEM_REGIONS
+from spynnaker.pyNN.config_setup import reset_configs
 from spynnaker.pyNN.models.neuron import SynapticManager
 from spynnaker.pyNN.models.neural_projections import (
     ProjectionApplicationEdge, SynapseInformation, DelayedApplicationEdge)
@@ -149,7 +150,7 @@ def test_write_data_spec():
 
     # UGLY but the mock transceiver NEED generate_on_machine to be False
     AbstractGenerateConnectorOnMachine.generate_on_machine = say_false
-    load_config_cfgs()
+    load_config()
     set_config("Simulation", "one_to_one_connection_dtcm_max_bytes", 40)
 
     machine_time_step = 1000.0
@@ -319,7 +320,7 @@ def test_write_data_spec():
         assert all(list_delays == connections_4["delay"])
     finally:
         shutil.rmtree(report_folder, ignore_errors=True)
-        load_config_cfgs()
+        reset_configs()
 
 
 def test_set_synapse_dynamics():
