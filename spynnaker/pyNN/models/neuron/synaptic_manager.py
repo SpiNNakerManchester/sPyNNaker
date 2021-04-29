@@ -189,10 +189,10 @@ class SynapticManager(object):
 
         # Read the other minimum weight configuration parameters
         if self.__weight_random_sigma is None:
-            self.__weight_random_sigma = config.getfloat(
+            self.__weight_random_sigma = get_config_float(
                 "Simulation", "weight_random_sigma")
         if self.__max_stdp_spike_delta is None:
-            self.__max_stdp_spike_delta = config.getfloat(
+            self.__max_stdp_spike_delta = get_config_float(
                 "Simulation", "max_stdp_spike_delta")
 
         # Get drop_late_spikes from config if not set
