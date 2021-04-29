@@ -16,7 +16,7 @@
 import os
 from spinn_utilities.config_holder import (
     clear_cfg_files, set_cfg_files)
-from spinn_front_end_common.config_setup import add_spinnaker_cfg
+from spinn_front_end_common.interface.config_setup import add_spinnaker_cfg
 
 CONFIG_FILE_NAME = "spynnaker.cfg"
 
