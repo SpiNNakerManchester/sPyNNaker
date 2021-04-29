@@ -21,7 +21,7 @@ from spinn_utilities.progress_bar import ProgressBar
 from data_specification.enums import DataType
 
 from spinn_utilities.config_holder import (
-    get_config_float, get_config_int, get_config_bool, get_config_str_list)
+    get_config_float, get_config_int, get_config_bool, get_config_str)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.utility_objs\
     .provenance_data_item import ProvenanceDataItem
@@ -174,8 +174,7 @@ class SynapticManager(object):
         # meaning "auto calculate"; the number of weights needs to match
         # the number of synapse types
         if self.__min_weights is None:
-            config_min_weights = get_config_str_list(
-                "Simulation", "min_weights")
+            config_min_weights = get_config_str("Simulation", "min_weights")
             if config_min_weights is not None:
                 self.__min_weights = [float(v)
                                       for v in config_min_weights.split(',')]
