@@ -68,12 +68,6 @@ class MachineMunichMotorDevice(
 
     #: The name of the provenance item saying that packets were lost.
     INPUT_BUFFER_FULL_NAME = "Times_the_input_buffer_lost_packets"
-    _INPUT_BUFFER_FULL_MESSAGE = (
-        "The input buffer for {} on {}, {}, {} lost packets on {} "
-        "occasions. This is often a sign that the system is running "
-        "too quickly for the number of neurons per core.  Please "
-        "increase the timer_tic or time_scale_factor or decrease the "
-        "number of neurons per core.")
 
     def __init__(
             self, speed, sample_time, update_time, delay_time,
@@ -130,15 +124,17 @@ class MachineMunichMotorDevice(
     @overrides(
         ProvidesProvenanceDataFromMachineImpl._get_extra_provenance_items)
     def _get_extra_provenance_items(
-            self, label, location, names, provenance_data):
+            self, label, names, provenance_data):
         n_buffer_overflows, = provenance_data
-        x, y, p = location
 
         yield ProvenanceDataItem(
             names + [self.INPUT_BUFFER_FULL_NAME], n_buffer_overflows,
-            report=(n_buffer_overflows > 0),
-            message=self._INPUT_BUFFER_FULL_MESSAGE.format(
-                label, x, y, p, n_buffer_overflows))
+            (n_buffer_overflows > 0),
+            f"The input buffer for {label} lost packets on "
+            f"{n_buffer_overflows} occasions. "
+            "This is often a sign that the system is running too quickly for "
+            "the number of neurons per core.  Please increase the timer_tic "
+            "or time_scale_factor or decrease the number of neurons per core.")
 
     @inject_items({
         "routing_info": "MemoryRoutingInfos",

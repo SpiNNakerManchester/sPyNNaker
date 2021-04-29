@@ -96,74 +96,13 @@ class PopulationMachineVertex(
         N_BACKGROUND_OVERLOADS = 16
 
     SATURATION_COUNT_NAME = "Times_synaptic_weights_have_saturated"
-    _SATURATION_COUNT_MESSAGE = (
-        "The weights from the synapses for {} on {}:{}:{} saturated "
-        "{} times. If this causes issues you can increase the "
-        "spikes_per_second and / or ring_buffer_sigma "
-        "values located within the .spynnaker.cfg file.")
-
     INPUT_BUFFER_FULL_NAME = "Times_the_input_buffer_lost_packets"
-    _INPUT_BUFFER_FULL_MESSAGE = (
-        "The input buffer for {} on {}:{}:{} lost packets on {} "
-        "occasions. This is often a sign that the system is running "
-        "too quickly for the number of neurons per core.  Please "
-        "increase the timer_tic or time_scale_factor or decrease the "
-        "number of neurons per core.")
-
     TOTAL_PRE_SYNAPTIC_EVENT_NAME = "Total_pre_synaptic_events"
     LAST_TIMER_TICK_NAME = "Last_timer_tic_the_core_ran_to"
     N_RE_WIRES_NAME = "Number_of_rewires"
-
     SATURATED_PLASTIC_WEIGHTS_NAME = (
         "Times_plastic_synaptic_weights_have_saturated")
-    _SATURATED_PLASTIC_WEIGHTS_MESSAGE = (
-        "The weights from the plastic synapses for {} on {}:{}:{} "
-        "saturated {} times. If this causes issue increase the "
-        "spikes_per_second and / or ring_buffer_sigma values located "
-        "within the .spynnaker.cfg file.")
-
     _N_LATE_SPIKES_NAME = "Number_of_late_spikes"
-    _N_LATE_SPIKES_MESSAGE_DROP = (
-        "{} packets from {} on {}:{}:{} were dropped from the input buffer, "
-        "because they arrived too late to be processed in a given time step. "
-        "Try increasing the time_scale_factor located within the "
-        ".spynnaker.cfg file or in the pynn.setup() method.")
-    _N_LATE_SPIKES_MESSAGE_NO_DROP = (
-        "{} packets from {} on {}:{}:{} arrived too late to be processed in"
-        " a given time step. "
-        "Try increasing the time_scale_factor located within the "
-        ".spynnaker.cfg file or in the pynn.setup() method.")
-
-    _GHOST_SEARCH_MESSAGE = (
-        "The number of failed population table searches for {} on {}:{}:{} "
-        "was {}. If this number is large relative to the predicted incoming "
-        "spike rate, try increasing source and target neurons per core")
-    _INVALID_POP_MESSAGE = (
-        "There were {} keys which were received by core {}:{}:{} which had no "
-        "master pop entry for it. This is a error, which most likely stems "
-        "from bad routing.")
-    _FILTERED_PACKETS_MESSAGE = (
-        "There were {} packets received by {}:{}:{} that were filtered by "
-        "the Bitfield filterer on the core. These packets were having to be "
-        "stored and processed on core, which means the core may not be "
-        "running as efficiently as it could. Please adjust the network or "
-        "the mapping so that these packets are filtered in the router to "
-        "improve performance.")
-    _BITFIELDS_UNREAD_MESSAGE = (
-        "The filter for stopping redundant DMA's couldn't be fully filled in; "
-        "it failed to read {} entries, which means it required a max of {} "
-        "extra bytes of DTCM (assuming cores have at most 255 neurons). Try "
-        "reducing neurons per core, or size of buffers, or neuron params per "
-        "neuron, etc.")
-    _BACKGROUND_OVERLOADS_MESSAGE = (
-        "On {} on {}, {}, {}, the background queue overloaded {} times.  "
-        "Try increasing the time_scale_factor located within the "
-        ".spynnaker.cfg file or in the pynn.setup() method.")
-    _BACKGROUND_MAX_QUEUED_MESSAGE = (
-        "A maximum of {} background tasks were queued on {} on {}, {}, {}.  "
-        "Try increasing the time_scale_factor located within the "
-        ".spynnaker.cfg file or in the pynn.setup() method.")
-
     _MAX_FILLED_SIZE_OF_INPUT_BUFFER_NAME = "Max_filled_size_input_buffer"
     _BACKGROUND_OVERLOADS_NAME = "Times_the_background_queue_overloaded"
     _BACKGROUND_MAX_QUEUED_NAME = "Max_backgrounds_queued"
@@ -179,8 +118,8 @@ class PopulationMachineVertex(
     _WORDS_TO_COVER_256_ATOMS = 8
 
     # provenance data items
-    BIT_FIELD_FILTERED_PACKETS = \
-        "How many packets were filtered by the bitfield filterer."
+    BIT_FIELD_FILTERED_PACKETS = (
+        "How many packets were filtered by the bitfield filterer.")
     INVALID_MASTER_POP_HITS = "Invalid Master Pop hits"
     SPIKES_PROCESSED = "how many spikes were processed"
     DMA_COMPLETE = "DMA's that were completed"
@@ -269,18 +208,18 @@ class PopulationMachineVertex(
                get_provenance_data_from_machine)
     def get_provenance_data_from_machine(self, transceiver, placement):
         provenance_data = self._read_provenance_data(transceiver, placement)
-        provenance_items = self._read_basic_provenance_items(
-            provenance_data, placement)
+        provenance_items = list(self._read_basic_provenance_items(
+            provenance_data, placement))
 
         # This is why we have to override the superclass public method
-        times_timer_tic_overran = 0
+        tic_overruns = 0
         for item in provenance_items:
             if item.names[-1] == self._TIMER_TICK_OVERRUN:
-                times_timer_tic_overran = item.value
+                tic_overruns = item.value
 
         # translate into provenance data items
         provenance_items.extend(self.__local_prov_items(
-            placement, provenance_data, times_timer_tic_overran))
+            placement, provenance_data, tic_overruns))
         return provenance_items
 
     def __local_prov_items(self, placement, provenance_data, tic_overruns):
@@ -290,7 +229,7 @@ class PopulationMachineVertex(
         :param int tic_overruns:
         :rtype: iterable(ProvenanceDataItem)
         """
-        label, x, y, p, names = self._get_placement_details(placement)
+        label, names = self._get_placement_details(placement)
         (n_pre_synaptic_events, n_saturations, n_buffer_overflows,
          last_timer_tick, n_plastic_saturations, n_ghost_searches,
          failed_to_read_bit_fields, dma_completes, spike_processing_count,
@@ -302,14 +241,19 @@ class PopulationMachineVertex(
         # translate into provenance data items
         yield ProvenanceDataItem(
             self._add_name(names, self.SATURATION_COUNT_NAME),
-            n_saturations, report=(n_saturations > 0),
-            message=self._SATURATION_COUNT_MESSAGE.format(
-                label, x, y, p, n_saturations))
+            n_saturations, (n_saturations > 0),
+            f"The weights from the synapses for {label} saturated "
+            f"{n_saturations} times. If this causes issues you can increase "
+            "the spikes_per_second and / or ring_buffer_sigma values located "
+            "within the .spynnaker.cfg file.")
         yield ProvenanceDataItem(
             self._add_name(names, self.INPUT_BUFFER_FULL_NAME),
-            n_buffer_overflows, report=(n_buffer_overflows > 0),
-            message=self._INPUT_BUFFER_FULL_MESSAGE.format(
-                label, x, y, p, n_buffer_overflows))
+            n_buffer_overflows, (n_buffer_overflows > 0),
+            f"The input buffer for {label} lost packets on "
+            f"{n_buffer_overflows} occasions. This is often a sign that the "
+            "system is running too quickly for the number of neurons per "
+            "core.  Please increase the timer_tic or time_scale_factor or "
+            "decrease the number of neurons per core.")
         yield ProvenanceDataItem(
             self._add_name(names, self.TOTAL_PRE_SYNAPTIC_EVENT_NAME),
             n_pre_synaptic_events)
@@ -317,22 +261,30 @@ class PopulationMachineVertex(
             self._add_name(names, self.LAST_TIMER_TICK_NAME), last_timer_tick)
         yield ProvenanceDataItem(
             self._add_name(names, self.SATURATED_PLASTIC_WEIGHTS_NAME),
-            n_plastic_saturations, report=(n_plastic_saturations > 0),
-            message=self._SATURATED_PLASTIC_WEIGHTS_MESSAGE.format(
-                label, x, y, p, n_plastic_saturations))
+            n_plastic_saturations, (n_plastic_saturations > 0),
+            f"The weights from the plastic synapses for {label} saturated "
+            f"{n_plastic_saturations} times. If this causes issue increase "
+            "the spikes_per_second and / or ring_buffer_sigma values located "
+            "within the .spynnaker.cfg file.")
         yield ProvenanceDataItem(
             self._add_name(names, self.N_RE_WIRES_NAME), n_rewires)
         yield ProvenanceDataItem(
             self._add_name(names, self.GHOST_SEARCHES), n_ghost_searches,
-            report=(n_ghost_searches > 0),
-            message=self._GHOST_SEARCH_MESSAGE.format(
-                label, x, y, p, n_ghost_searches))
+            (n_ghost_searches > 0),
+            f"The number of failed population table searches for {label} was "
+            f"{n_ghost_searches}. If this number is large relative to the "
+            "predicted incoming spike rate, try increasing source and target "
+            "neurons per core")
         yield ProvenanceDataItem(
             self._add_name(names, self.BIT_FIELDS_NOT_READ),
-            failed_to_read_bit_fields, report=False,
-            message=self._BITFIELDS_UNREAD_MESSAGE.format(
-                failed_to_read_bit_fields,
-                failed_to_read_bit_fields * self._WORDS_TO_COVER_256_ATOMS))
+            failed_to_read_bit_fields, False,
+            f"On {label}, the filter for stopping redundant DMAs couldn't be "
+            f"fully filled in; it failed to read {failed_to_read_bit_fields} "
+            "entries, which means it required a max of "
+            f"{failed_to_read_bit_fields * self._WORDS_TO_COVER_256_ATOMS} "
+            "extra bytes of DTCM (assuming cores have at most 255 neurons). "
+            "Try reducing neurons per core, or size of buffers, or neuron "
+            "params per neuron, etc.")
         yield ProvenanceDataItem(
             self._add_name(names, self.DMA_COMPLETE), dma_completes)
         yield ProvenanceDataItem(
@@ -340,41 +292,56 @@ class PopulationMachineVertex(
             spike_processing_count)
         yield ProvenanceDataItem(
             self._add_name(names, self.INVALID_MASTER_POP_HITS),
-            invalid_master_pop_hits, report=(invalid_master_pop_hits > 0),
-            message=self._INVALID_POP_MESSAGE.format(
-                invalid_master_pop_hits, x, y, p))
+            invalid_master_pop_hits, (invalid_master_pop_hits > 0),
+            f"On {label}, there were {invalid_master_pop_hits} keys received "
+            "that had no master pop entry for them. This is an error, which "
+            "most likely stems from bad routing.")
         yield ProvenanceDataItem(
             self._add_name(names, self.BIT_FIELD_FILTERED_PACKETS),
-            n_packets_filtered, report=(n_packets_filtered > 0 and (
+            n_packets_filtered, (n_packets_filtered > 0 and (
                 n_buffer_overflows > 0 or tic_overruns > 0)),
-            message=self._FILTERED_PACKETS_MESSAGE.format(
-                n_packets_filtered, x, y, p))
+            f"On {label}, there were {n_packets_filtered} packets received "
+            "that were filtered by the bit-field filterer on the core. These "
+            "packets were having to be stored and processed on core, which "
+            "means the core may not be running as efficiently as it should. "
+            "Please adjust the network or the mapping so that these packets "
+            "are filtered in the router to improve performance.")
 
         late_message = (
-            self._N_LATE_SPIKES_MESSAGE_DROP if self.__drop_late_spikes
-            else self._N_LATE_SPIKES_MESSAGE_NO_DROP)
+            f"On {label}, {n_late_packets} packets were dropped from the "
+            "input buffer, because they arrived too late to be processed in "
+            "a given time step. Try increasing the time_scale_factor located "
+            "within the .spynnaker.cfg file or in the pynn.setup() method."
+            if self.__drop_late_spikes else
+            f"On {label}, {n_late_packets} packets arrived too late to be "
+            "processed in a given time step. Try increasing the "
+            "time_scale_factor located within the .spynnaker.cfg file or in "
+            "the pynn.setup() method.")
         yield ProvenanceDataItem(
             self._add_name(names, self._N_LATE_SPIKES_NAME),
-            n_late_packets, report=(n_late_packets > 0),
-            message=late_message.format(n_late_packets, label, x, y, p))
+            n_late_packets, (n_late_packets > 0), late_message)
 
         yield ProvenanceDataItem(
             self._add_name(names, self._MAX_FILLED_SIZE_OF_INPUT_BUFFER_NAME),
             input_buffer_max_filled_size, report=False)
 
         yield self._app_vertex.get_tdma_provenance_item(
-            names, x, y, p, tdma_misses)
+            names, label, tdma_misses)
 
         yield ProvenanceDataItem(
             self._add_name(names, self._BACKGROUND_MAX_QUEUED_NAME),
-            max_background_queued, report=(max_background_queued > 1),
-            message=self._BACKGROUND_MAX_QUEUED_MESSAGE.format(
-                max_background_queued, label, x, y, p))
+            max_background_queued, (max_background_queued > 1),
+            f"On {label}, a maximum of {max_background_queued} background "
+            "tasks were queued, which can indicate a core overloading. Try "
+            "increasing the time_scale_factor located within the "
+            ".spynnaker.cfg file or in the pynn.setup() method.")
         yield ProvenanceDataItem(
             self._add_name(names, self._BACKGROUND_OVERLOADS_NAME),
-            n_background_overloads, report=(n_background_overloads > 0),
-            message=self._BACKGROUND_OVERLOADS_MESSAGE.format(
-                label, x, y, p, n_background_overloads))
+            n_background_overloads, (n_background_overloads > 0),
+            f"On {label}, the background queue overloaded "
+            f"{n_background_overloads} times, which can indicate a core "
+            "overloading. Try increasing the time_scale_factor located "
+            "within the .spynnaker.cfg file or in the pynn.setup() method.")
 
     @overrides(AbstractReceiveBuffersToHost.get_recorded_region_ids)
     def get_recorded_region_ids(self):

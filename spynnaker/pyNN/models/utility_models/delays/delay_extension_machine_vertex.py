@@ -71,78 +71,19 @@ class DelayExtensionMachineVertex(
 
     N_EXTRA_PROVENANCE_DATA_ENTRIES = len(EXTRA_PROVENANCE_DATA_ENTRIES)
 
-    _COUNT_SATURATION_MESSAGE = (
-        "The delay extension {} has dropped {} packets because during "
-        "certain time steps a neuron was asked to spike more than 256 times. "
-        "This causes a saturation on the count tracker which is a uint8. "
-        "Reduce the packet rates, or modify the delay extension to have "
-        "larger counters.")
-
     COUNT_SATURATION_NAME = "saturation_count"
-
-    _INVALID_NEURON_IDS_MESSAGE = (
-        "The delay extension {} has dropped {} packets because their "
-        "neuron id was not valid. This is likely a routing issue. "
-        "Please fix and try again")
-
     INVALID_NEURON_ID_COUNT_NAME = "invalid_neuron_count"
-
-    _PACKETS_DROPPED_FROM_INVALID_KEY_MESSAGE = (
-        "The delay extension {} has dropped {} packets due to the packet "
-        "key being invalid. This is likely a routing issue. "
-        "Please fix and try again")
-
     INVALID_KEY_COUNT_NAME = "invalid_key_count"
-
     N_PACKETS_RECEIVED_NAME = "Number_of_packets_received"
-
     N_PACKETS_PROCESSED_NAME = "Number_of_packets_processed"
-
-    _MISMATCH_PROCESSED_FROM_RECEIVED_MESSAGE = (
-        "The delay extension {} on {}, {}, {} only processed {} of {}"
-        " received packets.  This could indicate a fault.")
-
     MISMATCH_ADDED_FROM_PROCESSED_NAME = (
         "Number_of_packets_added_to_delay_slot")
-
-    _MISMATCH_ADDED_FROM_PROCESSED_MESSAGE = (
-        "The delay extension {} on {}, {}, {} only added {} of {} processed "
-        "packets.  This could indicate a routing or filtering fault")
-
     N_PACKETS_SENT_NAME = "Number_of_packets_sent"
-
     INPUT_BUFFER_LOST_NAME = "Times_the_input_buffer_lost_packets"
-
-    _INPUT_BUFFER_LOST_MESSAGE = (
-        "The input buffer for {} on {}, {}, {} lost packets on {} "
-        "occasions. This is often a sign that the system is running "
-        "too quickly for the number of neurons per core.  Please "
-        "increase the timer_tic or time_scale_factor or decrease the "
-        "number of neurons per core.")
-
     N_LATE_SPIKES_NAME = "Number_of_late_spikes"
-    N_LATE_SPIKES_MESSAGE_DROP = (
-        "{} packets from {} on {}, {}, {} were dropped from the input buffer, "
-        "because they arrived too late to be processed in a given time step. "
-        "Try increasing the time_scale_factor located within the "
-        ".spynnaker.cfg file or in the pynn.setup() method.")
-    N_LATE_SPIKES_MESSAGE_NO_DROP = (
-        "{} packets from {} on {}, {}, {} arrived too late to be processed in"
-        " a given time step. "
-        "Try increasing the time_scale_factor located within the "
-        ".spynnaker.cfg file or in the pynn.setup() method.")
-
     DELAYED_FOR_TRAFFIC_NAME = "Number_of_times_delayed_to_spread_traffic"
     BACKGROUND_OVERLOADS_NAME = "Times_the_background_queue_overloaded"
-    _BACKGROUND_OVERLOADS_MESSAGE = (
-        "On {} on {}, {}, {}, the background queue overloaded {} times.  "
-        "Try increasing the time_scale_factor located within the "
-        ".spynnaker.cfg file or in the pynn.setup() method.")
     BACKGROUND_MAX_QUEUED_NAME = "Max_backgrounds_queued"
-    _BACKGROUND_MAX_QUEUED_MESSAGE = (
-        "A maximum of {} background tasks were queued on {} on {}, {}, {}.  "
-        "Try increasing the time_scale_factor located within the "
-        ".spynnaker.cfg file or in the pynn.setup() method.")
 
     def __init__(self, resources_required, label, constraints=None,
                  app_vertex=None, vertex_slice=None):
@@ -183,73 +124,87 @@ class DelayExtensionMachineVertex(
 
     @overrides(ProvidesProvenanceDataFromMachineImpl.
                _get_extra_provenance_items)
-    def _get_extra_provenance_items(
-            self, label, location, names, provenance_data):
+    def _get_extra_provenance_items(self, label, names, provenance_data):
         (n_received, n_processed, n_added, n_sent, n_overflows, n_delays,
          n_tdma_behind, n_sat, n_bad_neuron, n_bad_keys, n_late_spikes,
          max_bg, n_bg_overloads) = provenance_data
 
-        x, y, p = location
-
         # translate into provenance data items
         yield ProvenanceDataItem(
             self._add_name(names, self.COUNT_SATURATION_NAME),
-            n_sat, report=(n_sat != 0),
-            message=self._COUNT_SATURATION_MESSAGE.format(
-                label, n_sat))
+            n_sat, (n_sat != 0),
+            f"The delay extension {label} has dropped {n_sat} packets because "
+            "during certain time steps a neuron was asked to spike more than "
+            "256 times. This causes a saturation on the count tracker which "
+            "is a uint8. Reduce the packet rates, or modify the delay "
+            "extension to have larger counters.")
         yield ProvenanceDataItem(
             self._add_name(names, self.INVALID_NEURON_ID_COUNT_NAME),
-            n_bad_neuron, report=(n_bad_neuron != 0),
-            message=self._INVALID_NEURON_IDS_MESSAGE.format(
-                label, n_bad_neuron))
+            n_bad_neuron, (n_bad_neuron != 0),
+            f"The delay extension {label} has dropped {n_bad_neuron} packets "
+            "because their neuron id was not valid. This is likely a routing "
+            "issue. Please fix and try again")
         yield ProvenanceDataItem(
             self._add_name(names, self.INVALID_KEY_COUNT_NAME),
-            n_bad_keys, report=(n_bad_keys != 0),
-            message=self._PACKETS_DROPPED_FROM_INVALID_KEY_MESSAGE.format(
-                label, n_bad_keys))
+            n_bad_keys, (n_bad_keys != 0),
+            f"The delay extension {label} has dropped {n_bad_keys} packets "
+            "due to the packet key being invalid. This is likely a routing "
+            "issue. Please fix and try again")
         yield ProvenanceDataItem(
             self._add_name(names, self.N_PACKETS_RECEIVED_NAME), n_received)
         yield ProvenanceDataItem(
             self._add_name(names, self.N_PACKETS_PROCESSED_NAME),
-            n_processed, report=(n_received != n_processed),
-            message=self._MISMATCH_PROCESSED_FROM_RECEIVED_MESSAGE.format(
-                label, x, y, p, n_processed, n_received))
+            n_processed, (n_received != n_processed),
+            f"The delay extension {label} only processed {n_processed} of "
+            f"{n_received} received packets.  This could indicate a fault.")
         yield ProvenanceDataItem(
             self._add_name(names, self.MISMATCH_ADDED_FROM_PROCESSED_NAME),
-            n_added, report=(n_added != n_processed),
-            message=self._MISMATCH_ADDED_FROM_PROCESSED_MESSAGE.format(
-                label, x, y, p, n_added, n_processed))
+            n_added, (n_added != n_processed),
+            f"The delay extension {label} only added {n_added} of "
+            f"{n_processed} processed packets.  This could indicate a "
+            "routing or filtering fault")
         yield ProvenanceDataItem(
             self._add_name(names, self.N_PACKETS_SENT_NAME), n_sent)
         yield ProvenanceDataItem(
             self._add_name(names, self.INPUT_BUFFER_LOST_NAME),
-            n_overflows, report=(n_overflows > 0),
-            message=self._INPUT_BUFFER_LOST_MESSAGE.format(
-                label, x, y, p, n_overflows))
+            n_overflows, (n_overflows > 0),
+            f"The input buffer for {label} lost packets on {n_overflows} "
+            "occasions. This is often a sign that the system is running "
+            "too quickly for the number of neurons per core.  Please "
+            "increase the timer_tic or time_scale_factor or decrease the "
+            "number of neurons per core.")
         yield ProvenanceDataItem(
             self._add_name(names, self.DELAYED_FOR_TRAFFIC_NAME), n_delays)
         yield self._app_vertex.get_tdma_provenance_item(
-            names, x, y, p, n_tdma_behind)
+            names, label, n_tdma_behind)
 
         late_message = (
-            self.N_LATE_SPIKES_MESSAGE_DROP
-            if self._app_vertex.drop_late_spikes
-            else self.N_LATE_SPIKES_MESSAGE_NO_DROP)
+            f"On {label}, {n_late_spikes} packets were dropped from the "
+            "input buffer, because they arrived too late to be processed in "
+            "a given time step. Try increasing the time_scale_factor located "
+            "within the .spynnaker.cfg file or in the pynn.setup() method."
+            if self._app_vertex.drop_late_spikes else
+            f"On {label}, {n_late_spikes} packets arrived too late to be "
+            "processed in a given time step. Try increasing the "
+            "time_scale_factor located within the .spynnaker.cfg file or in "
+            "the pynn.setup() method.")
         yield ProvenanceDataItem(
             self._add_name(names, self.N_LATE_SPIKES_NAME),
             n_late_spikes, report=(n_late_spikes > 0),
-            message=late_message.format(n_late_spikes, label, x, y, p))
+            message=late_message)
 
         yield ProvenanceDataItem(
             self._add_name(names, self.BACKGROUND_MAX_QUEUED_NAME),
-            max_bg, report=(max_bg > 1),
-            message=self._BACKGROUND_MAX_QUEUED_MESSAGE.format(
-                max_bg, label, x, y, p))
+            max_bg, (max_bg > 1),
+            f"On {label}, a maximum of {max_bg} background tasks were queued. "
+            "Try increasing the time_scale_factor located within the "
+            ".spynnaker.cfg file or in the pynn.setup() method.")
         yield ProvenanceDataItem(
             self._add_name(names, self.BACKGROUND_OVERLOADS_NAME),
-            n_bg_overloads, report=(n_bg_overloads > 0),
-            message=self._BACKGROUND_OVERLOADS_MESSAGE.format(
-                label, x, y, p, n_bg_overloads))
+            n_bg_overloads, (n_bg_overloads > 0),
+            f"On {label}, the background queue overloaded {n_bg_overloads} "
+            "times. Try increasing the time_scale_factor located within the "
+            ".spynnaker.cfg file or in the pynn.setup() method.")
 
     @overrides(MachineVertex.get_n_keys_for_partition)
     def get_n_keys_for_partition(self, _partition):
