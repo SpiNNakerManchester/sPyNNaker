@@ -123,15 +123,15 @@ class DelayExtensionMachineVertex(
         return self.__resources
 
     @overrides(ProvidesProvenanceDataFromMachineImpl.
-               _get_extra_provenance_items)
-    def _get_extra_provenance_items(self, label, names, provenance_data):
+               parse_extra_provenance_items)
+    def parse_extra_provenance_items(self, label, names, provenance_data):
         (n_received, n_processed, n_added, n_sent, n_overflows, n_delays,
          n_tdma_behind, n_sat, n_bad_neuron, n_bad_keys, n_late_spikes,
          max_bg, n_bg_overloads) = provenance_data
 
         # translate into provenance data items
         yield ProvenanceDataItem(
-            self._add_name(names, self.COUNT_SATURATION_NAME),
+            names + [self.COUNT_SATURATION_NAME],
             n_sat, (n_sat != 0),
             f"The delay extension {label} has dropped {n_sat} packets because "
             "during certain time steps a neuron was asked to spike more than "
@@ -139,34 +139,34 @@ class DelayExtensionMachineVertex(
             "is a uint8. Reduce the packet rates, or modify the delay "
             "extension to have larger counters.")
         yield ProvenanceDataItem(
-            self._add_name(names, self.INVALID_NEURON_ID_COUNT_NAME),
+            names + [self.INVALID_NEURON_ID_COUNT_NAME],
             n_bad_neuron, (n_bad_neuron != 0),
             f"The delay extension {label} has dropped {n_bad_neuron} packets "
             "because their neuron id was not valid. This is likely a routing "
             "issue. Please fix and try again")
         yield ProvenanceDataItem(
-            self._add_name(names, self.INVALID_KEY_COUNT_NAME),
+            names + [self.INVALID_KEY_COUNT_NAME],
             n_bad_keys, (n_bad_keys != 0),
             f"The delay extension {label} has dropped {n_bad_keys} packets "
             "due to the packet key being invalid. This is likely a routing "
             "issue. Please fix and try again")
         yield ProvenanceDataItem(
-            self._add_name(names, self.N_PACKETS_RECEIVED_NAME), n_received)
+            names + [self.N_PACKETS_RECEIVED_NAME], n_received)
         yield ProvenanceDataItem(
-            self._add_name(names, self.N_PACKETS_PROCESSED_NAME),
+            names + [self.N_PACKETS_PROCESSED_NAME],
             n_processed, (n_received != n_processed),
             f"The delay extension {label} only processed {n_processed} of "
             f"{n_received} received packets.  This could indicate a fault.")
         yield ProvenanceDataItem(
-            self._add_name(names, self.MISMATCH_ADDED_FROM_PROCESSED_NAME),
+            names + [self.MISMATCH_ADDED_FROM_PROCESSED_NAME],
             n_added, (n_added != n_processed),
             f"The delay extension {label} only added {n_added} of "
             f"{n_processed} processed packets.  This could indicate a "
             "routing or filtering fault")
         yield ProvenanceDataItem(
-            self._add_name(names, self.N_PACKETS_SENT_NAME), n_sent)
+            names + [self.N_PACKETS_SENT_NAME], n_sent)
         yield ProvenanceDataItem(
-            self._add_name(names, self.INPUT_BUFFER_LOST_NAME),
+            names + [self.INPUT_BUFFER_LOST_NAME],
             n_overflows, (n_overflows > 0),
             f"The input buffer for {label} lost packets on {n_overflows} "
             "occasions. This is often a sign that the system is running "
@@ -174,7 +174,7 @@ class DelayExtensionMachineVertex(
             "increase the timer_tic or time_scale_factor or decrease the "
             "number of neurons per core.")
         yield ProvenanceDataItem(
-            self._add_name(names, self.DELAYED_FOR_TRAFFIC_NAME), n_delays)
+            names + [self.DELAYED_FOR_TRAFFIC_NAME], n_delays)
         yield self._app_vertex.get_tdma_provenance_item(
             names, label, n_tdma_behind)
 
@@ -189,18 +189,18 @@ class DelayExtensionMachineVertex(
             "time_scale_factor located within the .spynnaker.cfg file or in "
             "the pynn.setup() method.")
         yield ProvenanceDataItem(
-            self._add_name(names, self.N_LATE_SPIKES_NAME),
+            names + [self.N_LATE_SPIKES_NAME],
             n_late_spikes, report=(n_late_spikes > 0),
             message=late_message)
 
         yield ProvenanceDataItem(
-            self._add_name(names, self.BACKGROUND_MAX_QUEUED_NAME),
+            names + [self.BACKGROUND_MAX_QUEUED_NAME],
             max_bg, (max_bg > 1),
             f"On {label}, a maximum of {max_bg} background tasks were queued. "
             "Try increasing the time_scale_factor located within the "
             ".spynnaker.cfg file or in the pynn.setup() method.")
         yield ProvenanceDataItem(
-            self._add_name(names, self.BACKGROUND_OVERLOADS_NAME),
+            names + [self.BACKGROUND_OVERLOADS_NAME],
             n_bg_overloads, (n_bg_overloads > 0),
             f"On {label}, the background queue overloaded {n_bg_overloads} "
             "times. Try increasing the time_scale_factor located within the "

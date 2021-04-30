@@ -209,8 +209,8 @@ class SpikeSourcePoissonMachineVertex(
             self.PROFILE_TAG_LABELS, transceiver, placement)
 
     @overrides(ProvidesProvenanceDataFromMachineImpl.
-               _get_extra_provenance_items)
-    def _get_extra_provenance_items(self, label, names, provenance_data):
+               parse_extra_provenance_items)
+    def parse_extra_provenance_items(self, label, names, provenance_data):
         n_times_tdma_fell_behind = provenance_data[
             self.EXTRA_PROVENANCE_DATA_ENTRIES.TDMA_MISSED_SLOTS.value]
 
