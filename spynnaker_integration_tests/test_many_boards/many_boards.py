@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import time
 from unittest import SkipTest
-from pacman.config_holder import get_config_bool
+from spinn_utilities.config_holder import get_config_bool
 from spinn_front_end_common.interface.provenance import ProvenanceReader
 from spynnaker.pyNN.exceptions import ConfigurationException
 import spynnaker8 as sim

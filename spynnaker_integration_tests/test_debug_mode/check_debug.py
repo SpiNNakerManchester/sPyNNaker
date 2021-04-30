@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-from pacman.config_holder import get_config_bool
+from spinn_utilities.config_holder import get_config_bool
 import pacman.operations.algorithm_reports.reports as reports_names
 from pacman.operations.algorithm_reports.network_specification import \
     NetworkSpecification
