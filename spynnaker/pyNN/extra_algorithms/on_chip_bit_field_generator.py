@@ -16,10 +16,10 @@
 from collections import defaultdict
 import os
 import struct
+from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.progress_bar import ProgressBar
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
-from pacman.config_holder import get_config_bool
 from spinn_front_end_common.abstract_models import (
     AbstractSupportsBitFieldGeneration)
 from spinn_front_end_common.utilities import system_control_logic
