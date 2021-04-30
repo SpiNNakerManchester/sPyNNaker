@@ -15,7 +15,7 @@
 
 from spinn_utilities.socket_address import SocketAddress
 from pacman.model.graphs.application import ApplicationEdge
-from pacman.config_holder import (get_config_int, get_config_str)
+from spinn_utilities.config_holder import (get_config_int, get_config_str)
 from spinnman.messages.eieio import EIEIOType
 from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spinn_front_end_common.utility_models import (
