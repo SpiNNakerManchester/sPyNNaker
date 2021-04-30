@@ -18,7 +18,7 @@ import math
 import os
 from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.log import FormatAdapter
-from pacman.config_holder import get_config_bool, set_cfg_files
+from spinn_utilities.config_holder import get_config_bool
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
     AbstractSpinnakerBase)
 from spinn_front_end_common.utilities.constants import (
@@ -28,6 +28,7 @@ from spinn_front_end_common.utility_models import CommandSender
 from spinn_front_end_common.utilities.utility_objs import ExecutableFinder
 from spinn_front_end_common.utilities.globals_variables import unset_simulator
 from spynnaker.pyNN import extra_algorithms, model_binaries
+from spynnaker.pyNN.config_setup import CONFIG_FILE_NAME, reset_configs
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.spynnaker_simulator_interface import (
     SpynnakerSimulatorInterface)
@@ -35,8 +36,6 @@ from spynnaker.pyNN.utilities.extracted_data import ExtractedData
 from spynnaker import __version__ as version
 
 logger = FormatAdapter(logging.getLogger(__name__))
-
-CONFIG_FILE_NAME = "spynnaker.cfg"
 
 
 class AbstractSpiNNakerCommon(
@@ -522,7 +521,4 @@ class AbstractSpiNNakerCommon(
         self.__id_counter = new_value
 
 
-# add the default at import time in case needed before setup
-set_cfg_files(
-    configfile=CONFIG_FILE_NAME,
-    default=os.path.join(os.path.dirname(__file__), CONFIG_FILE_NAME))
+reset_configs()

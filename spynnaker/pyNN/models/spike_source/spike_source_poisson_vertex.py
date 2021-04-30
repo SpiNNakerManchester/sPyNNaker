@@ -25,7 +25,7 @@ from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
-from pacman.config_holder import get_config_int
+from spinn_utilities.config_holder import get_config_int
 from spinn_front_end_common.abstract_models import (
     AbstractChangableAfterRun, AbstractProvidesOutgoingPartitionConstraints,
     AbstractRewritesDataSpecification)
