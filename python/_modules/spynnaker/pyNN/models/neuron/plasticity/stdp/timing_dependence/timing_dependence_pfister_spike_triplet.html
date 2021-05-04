@@ -56,10 +56,10 @@
     <span class="n">BYTES_PER_WORD</span><span class="p">,</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.plasticity.stdp.common</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">get_exp_lut_array</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence</span>\
-    <span class="kn">import</span> <span class="nn">AbstractTimingDependence</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure</span>\
-    <span class="kn">import</span> <span class="nn">SynapseStructureWeightOnly</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AbstractTimingDependence</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">SynapseStructureWeightOnly</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="n">get_simulator</span>
 
 
@@ -82,6 +82,7 @@
         <span class="s2">&quot;__tau_y_data&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__a_plus&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__a_minus&quot;</span><span class="p">]</span>
+    <span class="n">__PARAM_NAMES</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;tau_plus&#39;</span><span class="p">,</span> <span class="s1">&#39;tau_minus&#39;</span><span class="p">,</span> <span class="s1">&#39;tau_x&#39;</span><span class="p">,</span> <span class="s1">&#39;tau_y&#39;</span><span class="p">)</span>
 
     <span class="c1"># noinspection PyPep8Naming</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tau_plus</span><span class="p">,</span> <span class="n">tau_minus</span><span class="p">,</span> <span class="n">tau_x</span><span class="p">,</span> <span class="n">tau_y</span><span class="p">,</span> <span class="n">A_plus</span><span class="p">,</span> <span class="n">A_minus</span><span class="p">):</span>
@@ -227,7 +228,7 @@
 
 <div class="viewcode-block" id="TimingDependencePfisterSpikeTriplet.get_parameter_names"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependencePfisterSpikeTriplet.get_parameter_names">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractTimingDependence</span><span class="o">.</span><span class="n">get_parameter_names</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_parameter_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;tau_plus&#39;</span><span class="p">,</span> <span class="s1">&#39;tau_minus&#39;</span><span class="p">,</span> <span class="s1">&#39;tau_x&#39;</span><span class="p">,</span> <span class="s1">&#39;tau_y&#39;</span><span class="p">]</span></div></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__PARAM_NAMES</span></div></div>
 </pre></div>
 
             <div class="clearer"></div>

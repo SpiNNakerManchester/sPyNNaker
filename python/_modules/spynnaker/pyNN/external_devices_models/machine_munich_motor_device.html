@@ -106,12 +106,6 @@
 
     <span class="c1">#: The name of the provenance item saying that packets were lost.</span>
     <span class="n">INPUT_BUFFER_FULL_NAME</span> <span class="o">=</span> <span class="s2">&quot;Times_the_input_buffer_lost_packets&quot;</span>
-    <span class="n">_INPUT_BUFFER_FULL_MESSAGE</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;The input buffer for </span><span class="si">{}</span><span class="s2"> on </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2"> lost packets on </span><span class="si">{}</span><span class="s2"> &quot;</span>
-        <span class="s2">&quot;occasions. This is often a sign that the system is running &quot;</span>
-        <span class="s2">&quot;too quickly for the number of neurons per core.  Please &quot;</span>
-        <span class="s2">&quot;increase the timer_tic or time_scale_factor or decrease the &quot;</span>
-        <span class="s2">&quot;number of neurons per core.&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">speed</span><span class="p">,</span> <span class="n">sample_time</span><span class="p">,</span> <span class="n">update_time</span><span class="p">,</span> <span class="n">delay_time</span><span class="p">,</span>
@@ -165,30 +159,20 @@
     <span class="k">def</span> <span class="nf">_n_additional_data_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_PROVENANCE_ELEMENTS</span>
 
-<div class="viewcode-block" id="MachineMunichMotorDevice.get_provenance_data_from_machine"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.get_provenance_data_from_machine">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="o">.</span>
-               <span class="n">get_provenance_data_from_machine</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_provenance_data_from_machine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
-        <span class="c1"># get prov data</span>
-        <span class="n">provenance_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_provenance_data</span><span class="p">(</span><span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">)</span>
-        <span class="c1"># get system level prov</span>
-        <span class="n">provenance_items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_basic_provenance_items</span><span class="p">(</span>
-            <span class="n">provenance_data</span><span class="p">,</span> <span class="n">placement</span><span class="p">)</span>
-        <span class="c1"># get left over prov</span>
-        <span class="n">provenance_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_remaining_provenance_data_items</span><span class="p">(</span>
-            <span class="n">provenance_data</span><span class="p">)</span>
-        <span class="c1"># stuff for making prov data items</span>
-        <span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_placement_details</span><span class="p">(</span><span class="n">placement</span><span class="p">)</span>
+<div class="viewcode-block" id="MachineMunichMotorDevice.parse_extra_provenance_items"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.parse_extra_provenance_items">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span>
+        <span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="o">.</span><span class="n">parse_extra_provenance_items</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">parse_extra_provenance_items</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">provenance_data</span><span class="p">):</span>
+        <span class="n">n_buffer_overflows</span><span class="p">,</span> <span class="o">=</span> <span class="n">provenance_data</span>
 
-        <span class="c1"># get the only app level prov item</span>
-        <span class="n">n_buffer_overflows</span> <span class="o">=</span> <span class="n">provenance_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-
-        <span class="c1"># build it</span>
-        <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">INPUT_BUFFER_FULL_NAME</span><span class="p">),</span>
-            <span class="n">n_buffer_overflows</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">n_buffer_overflows</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="n">message</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_INPUT_BUFFER_FULL_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">n_buffer_overflows</span><span class="p">)))</span>
-        <span class="k">return</span> <span class="n">provenance_items</span></div>
+        <span class="k">yield</span> <span class="n">ProvenanceDataItem</span><span class="p">(</span>
+            <span class="n">names</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">INPUT_BUFFER_FULL_NAME</span><span class="p">],</span> <span class="n">n_buffer_overflows</span><span class="p">,</span>
+            <span class="p">(</span><span class="n">n_buffer_overflows</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="sa">f</span><span class="s2">&quot;The input buffer for </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2"> lost packets on &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n_buffer_overflows</span><span class="si">}</span><span class="s2"> occasions. &quot;</span>
+            <span class="s2">&quot;This is often a sign that the system is running too quickly for &quot;</span>
+            <span class="s2">&quot;the number of neurons per core.  Please increase the timer_tic &quot;</span>
+            <span class="s2">&quot;or time_scale_factor or decrease the number of neurons per core.&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MachineMunichMotorDevice.generate_data_specification"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.generate_data_specification">[docs]</a>    <span class="nd">@inject_items</span><span class="p">({</span>
         <span class="s2">&quot;routing_info&quot;</span><span class="p">:</span> <span class="s2">&quot;MemoryRoutingInfos&quot;</span><span class="p">,</span>

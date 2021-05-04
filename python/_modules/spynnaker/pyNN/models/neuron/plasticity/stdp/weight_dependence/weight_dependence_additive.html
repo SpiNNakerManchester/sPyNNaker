@@ -68,6 +68,7 @@
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;__w_max&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__w_min&quot;</span><span class="p">]</span>
+    <span class="n">__PARAM_NAMES</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;w_min&#39;</span><span class="p">,</span> <span class="s1">&#39;w_max&#39;</span><span class="p">,</span> <span class="s1">&#39;A_plus&#39;</span><span class="p">,</span> <span class="s1">&#39;A_minus&#39;</span><span class="p">)</span>
 
     <span class="c1"># noinspection PyPep8Naming</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">w_min</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">w_max</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
@@ -154,7 +155,7 @@
 
 <div class="viewcode-block" id="WeightDependenceAdditive.get_parameter_names"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditive.get_parameter_names">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractWeightDependence</span><span class="o">.</span><span class="n">get_parameter_names</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_parameter_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;w_min&#39;</span><span class="p">,</span> <span class="s1">&#39;w_max&#39;</span><span class="p">,</span> <span class="s1">&#39;A_plus&#39;</span><span class="p">,</span> <span class="s1">&#39;A_minus&#39;</span><span class="p">]</span></div></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__PARAM_NAMES</span></div></div>
 </pre></div>
 
             <div class="clearer"></div>

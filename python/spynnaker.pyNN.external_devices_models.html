@@ -553,18 +553,27 @@
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.get_provenance_data_from_machine">
-<code class="sig-name descname"><span class="pre">get_provenance_data_from_machine</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transceiver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">placement</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/machine_munich_motor_device.html#MachineMunichMotorDevice.get_provenance_data_from_machine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.get_provenance_data_from_machine" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieve the provenance data.</p>
+<dt id="spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.parse_extra_provenance_items">
+<code class="sig-name descname"><span class="pre">parse_extra_provenance_items</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">provenance_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/machine_munich_motor_device.html#MachineMunichMotorDevice.parse_extra_provenance_items"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.parse_extra_provenance_items" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert the remaining provenance words (those not in the standard set)
+into provenance items.</p>
+<p>Called by
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">get_provenance_data_from_machine()</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan v6.0)"><em>Transceiver</em></a>) – How to talk to the machine</p></li>
-<li><p><strong>placement</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placement" title="(in PACMAN v6.0)"><em>Placement</em></a>) – Which vertex are we retrieving from, and where was it</p></li>
+<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – A descriptive label for the vertex (derived from label and placed
+position) to be used for provenance error reporting to the user.</p></li>
+<li><p><strong>names</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>)</em>) – The base names describing the location of the machine vertex
+producing the provenance.</p></li>
+<li><p><strong>provenance_data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – The list of words of raw provenance data.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/collections.abc.html#collections.abc.Iterable" title="(in Python v3.8)">Iterable</a>(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utilities.utility_objs/#spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem" title="(in SpiNNFrontEndCommon v6.0)">ProvenanceDataItem</a>)</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The interpreted provenance items.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utilities.utility_objs/#spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem" title="(in SpiNNFrontEndCommon v6.0)">ProvenanceDataItem</a>)</p>
 </dd>
 </dl>
 </dd></dl>

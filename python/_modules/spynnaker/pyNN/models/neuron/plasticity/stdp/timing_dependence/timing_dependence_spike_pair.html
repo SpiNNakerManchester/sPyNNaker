@@ -73,6 +73,7 @@
         <span class="s2">&quot;__tau_plus_data&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__a_plus&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__a_minus&quot;</span><span class="p">]</span>
+    <span class="n">__PARAM_NAMES</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;tau_plus&#39;</span><span class="p">,</span> <span class="s1">&#39;tau_minus&#39;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">tau_plus</span><span class="o">=</span><span class="mf">20.0</span><span class="p">,</span> <span class="n">tau_minus</span><span class="o">=</span><span class="mf">20.0</span><span class="p">,</span> <span class="n">A_plus</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">A_minus</span><span class="o">=</span><span class="mf">0.01</span><span class="p">):</span>
@@ -190,7 +191,7 @@
 
 <div class="viewcode-block" id="TimingDependenceSpikePair.get_parameter_names"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikePair.get_parameter_names">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractTimingDependence</span><span class="o">.</span><span class="n">get_parameter_names</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_parameter_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;tau_plus&#39;</span><span class="p">,</span> <span class="s1">&#39;tau_minus&#39;</span><span class="p">]</span></div></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__PARAM_NAMES</span></div></div>
 </pre></div>
 
             <div class="clearer"></div>

@@ -118,11 +118,6 @@ implements.</p></li>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.COUNT_SATURATION_ERROR_MESSAGE">
-<code class="sig-name descname"><span class="pre">COUNT_SATURATION_ERROR_MESSAGE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'The</span> <span class="pre">delay</span> <span class="pre">extension</span> <span class="pre">{}</span> <span class="pre">has</span> <span class="pre">dropped</span> <span class="pre">{}</span> <span class="pre">packets</span> <span class="pre">because</span> <span class="pre">during</span> <span class="pre">certain</span> <span class="pre">time</span> <span class="pre">steps</span> <span class="pre">a</span> <span class="pre">neuron</span> <span class="pre">was</span> <span class="pre">asked</span> <span class="pre">to</span> <span class="pre">spike</span> <span class="pre">more</span> <span class="pre">than</span> <span class="pre">256</span> <span class="pre">times.</span> <span class="pre">This</span> <span class="pre">causes</span> <span class="pre">a</span> <span class="pre">saturation</span> <span class="pre">on</span> <span class="pre">the</span> <span class="pre">count</span> <span class="pre">tracker</span> <span class="pre">which</span> <span class="pre">is</span> <span class="pre">a</span> <span class="pre">uint8.</span> <span class="pre">Reduce</span> <span class="pre">the</span> <span class="pre">packet</span> <span class="pre">rates,</span> <span class="pre">or</span> <span class="pre">modify</span> <span class="pre">the</span> <span class="pre">delay</span> <span class="pre">extension</span> <span class="pre">to</span> <span class="pre">have</span> <span class="pre">larger</span> <span class="pre">counters.'</span></em><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.COUNT_SATURATION_ERROR_MESSAGE" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.COUNT_SATURATION_NAME">
 <code class="sig-name descname"><span class="pre">COUNT_SATURATION_NAME</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'saturation_count'</span></em><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.COUNT_SATURATION_NAME" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -205,11 +200,6 @@ implements.</p></li>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.INPUT_BUFFER_LOST_ERROR_MESSAGE">
-<code class="sig-name descname"><span class="pre">INPUT_BUFFER_LOST_ERROR_MESSAGE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'The</span> <span class="pre">input</span> <span class="pre">buffer</span> <span class="pre">for</span> <span class="pre">{}</span> <span class="pre">on</span> <span class="pre">{},</span> <span class="pre">{},</span> <span class="pre">{}</span> <span class="pre">lost</span> <span class="pre">packets</span> <span class="pre">on</span> <span class="pre">{}</span> <span class="pre">occasions.</span> <span class="pre">This</span> <span class="pre">is</span> <span class="pre">often</span> <span class="pre">a</span> <span class="pre">sign</span> <span class="pre">that</span> <span class="pre">the</span> <span class="pre">system</span> <span class="pre">is</span> <span class="pre">running</span> <span class="pre">too</span> <span class="pre">quickly</span> <span class="pre">for</span> <span class="pre">the</span> <span class="pre">number</span> <span class="pre">of</span> <span class="pre">neurons</span> <span class="pre">per</span> <span class="pre">core.</span>&#160; <span class="pre">Please</span> <span class="pre">increase</span> <span class="pre">the</span> <span class="pre">timer_tic</span> <span class="pre">or</span> <span class="pre">time_scale_factor</span> <span class="pre">or</span> <span class="pre">decrease</span> <span class="pre">the</span> <span class="pre">number</span> <span class="pre">of</span> <span class="pre">neurons</span> <span class="pre">per</span> <span class="pre">core.'</span></em><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.INPUT_BUFFER_LOST_ERROR_MESSAGE" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.INPUT_BUFFER_LOST_NAME">
 <code class="sig-name descname"><span class="pre">INPUT_BUFFER_LOST_NAME</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'Times_the_input_buffer_lost_packets'</span></em><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.INPUT_BUFFER_LOST_NAME" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -220,18 +210,8 @@ implements.</p></li>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.INVALID_NEURON_IDS_ERROR_MESSAGE">
-<code class="sig-name descname"><span class="pre">INVALID_NEURON_IDS_ERROR_MESSAGE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'The</span> <span class="pre">delay</span> <span class="pre">extension</span> <span class="pre">{}</span> <span class="pre">has</span> <span class="pre">dropped</span> <span class="pre">{}</span> <span class="pre">packets</span> <span class="pre">because</span> <span class="pre">their</span> <span class="pre">neuron</span> <span class="pre">id</span> <span class="pre">was</span> <span class="pre">not</span> <span class="pre">valid.</span> <span class="pre">This</span> <span class="pre">is</span> <span class="pre">likely</span> <span class="pre">a</span> <span class="pre">routing</span> <span class="pre">issue.</span> <span class="pre">Please</span> <span class="pre">fix</span> <span class="pre">and</span> <span class="pre">try</span> <span class="pre">again'</span></em><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.INVALID_NEURON_IDS_ERROR_MESSAGE" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.INVALID_NEURON_ID_COUNT_NAME">
 <code class="sig-name descname"><span class="pre">INVALID_NEURON_ID_COUNT_NAME</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'invalid_neuron_count'</span></em><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.INVALID_NEURON_ID_COUNT_NAME" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.MISMATCH_ADDED_FROM_PROCESSED_ERROR_MESSAGE">
-<code class="sig-name descname"><span class="pre">MISMATCH_ADDED_FROM_PROCESSED_ERROR_MESSAGE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'The</span> <span class="pre">delay</span> <span class="pre">extension</span> <span class="pre">{}</span> <span class="pre">on</span> <span class="pre">{},</span> <span class="pre">{},</span> <span class="pre">{}</span> <span class="pre">only</span> <span class="pre">added</span> <span class="pre">{}</span> <span class="pre">of</span> <span class="pre">{}</span> <span class="pre">processed</span> <span class="pre">packets.</span>&#160; <span class="pre">This</span> <span class="pre">could</span> <span class="pre">indicate</span> <span class="pre">a</span> <span class="pre">routing</span> <span class="pre">or</span> <span class="pre">filtering</span> <span class="pre">fault'</span></em><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.MISMATCH_ADDED_FROM_PROCESSED_ERROR_MESSAGE" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -240,23 +220,8 @@ implements.</p></li>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.MISMATCH_PROCESSED_FROM_RECEIVED_ERROR_MESSAGE">
-<code class="sig-name descname"><span class="pre">MISMATCH_PROCESSED_FROM_RECEIVED_ERROR_MESSAGE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'The</span> <span class="pre">delay</span> <span class="pre">extension</span> <span class="pre">{}</span> <span class="pre">on</span> <span class="pre">{},</span> <span class="pre">{},</span> <span class="pre">{}</span> <span class="pre">only</span> <span class="pre">processed</span> <span class="pre">{}</span> <span class="pre">of</span> <span class="pre">{}</span> <span class="pre">received</span> <span class="pre">packets.</span>&#160; <span class="pre">This</span> <span class="pre">could</span> <span class="pre">indicate</span> <span class="pre">a</span> <span class="pre">fault.'</span></em><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.MISMATCH_PROCESSED_FROM_RECEIVED_ERROR_MESSAGE" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.N_EXTRA_PROVENANCE_DATA_ENTRIES">
 <code class="sig-name descname"><span class="pre">N_EXTRA_PROVENANCE_DATA_ENTRIES</span></code><em class="property"> <span class="pre">=</span> <span class="pre">13</span></em><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.N_EXTRA_PROVENANCE_DATA_ENTRIES" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.N_LATE_SPIKES_MESSAGE_DROP">
-<code class="sig-name descname"><span class="pre">N_LATE_SPIKES_MESSAGE_DROP</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'{}</span> <span class="pre">packets</span> <span class="pre">from</span> <span class="pre">{}</span> <span class="pre">on</span> <span class="pre">{},</span> <span class="pre">{},</span> <span class="pre">{}</span> <span class="pre">were</span> <span class="pre">dropped</span> <span class="pre">from</span> <span class="pre">the</span> <span class="pre">input</span> <span class="pre">buffer,</span> <span class="pre">because</span> <span class="pre">they</span> <span class="pre">arrived</span> <span class="pre">too</span> <span class="pre">late</span> <span class="pre">to</span> <span class="pre">be</span> <span class="pre">processed</span> <span class="pre">in</span> <span class="pre">a</span> <span class="pre">given</span> <span class="pre">time</span> <span class="pre">step.</span> <span class="pre">Try</span> <span class="pre">increasing</span> <span class="pre">the</span> <span class="pre">time_scale_factor</span> <span class="pre">located</span> <span class="pre">within</span> <span class="pre">the</span> <span class="pre">.spynnaker.cfg</span> <span class="pre">file</span> <span class="pre">or</span> <span class="pre">in</span> <span class="pre">the</span> <span class="pre">pynn.setup()</span> <span class="pre">method.'</span></em><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.N_LATE_SPIKES_MESSAGE_DROP" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.N_LATE_SPIKES_MESSAGE_NO_DROP">
-<code class="sig-name descname"><span class="pre">N_LATE_SPIKES_MESSAGE_NO_DROP</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'{}</span> <span class="pre">packets</span> <span class="pre">from</span> <span class="pre">{}</span> <span class="pre">on</span> <span class="pre">{},</span> <span class="pre">{},</span> <span class="pre">{}</span> <span class="pre">arrived</span> <span class="pre">too</span> <span class="pre">late</span> <span class="pre">to</span> <span class="pre">be</span> <span class="pre">processed</span> <span class="pre">in</span> <span class="pre">a</span> <span class="pre">given</span> <span class="pre">time</span> <span class="pre">step.</span> <span class="pre">Try</span> <span class="pre">increasing</span> <span class="pre">the</span> <span class="pre">time_scale_factor</span> <span class="pre">located</span> <span class="pre">within</span> <span class="pre">the</span> <span class="pre">.spynnaker.cfg</span> <span class="pre">file</span> <span class="pre">or</span> <span class="pre">in</span> <span class="pre">the</span> <span class="pre">pynn.setup()</span> <span class="pre">method.'</span></em><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.N_LATE_SPIKES_MESSAGE_NO_DROP" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -277,11 +242,6 @@ implements.</p></li>
 <dl class="py attribute">
 <dt id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.N_PACKETS_SENT_NAME">
 <code class="sig-name descname"><span class="pre">N_PACKETS_SENT_NAME</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'Number_of_packets_sent'</span></em><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.N_PACKETS_SENT_NAME" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.PACKETS_DROPPED_FROM_INVALID_KEY_ERROR_MESSAGE">
-<code class="sig-name descname"><span class="pre">PACKETS_DROPPED_FROM_INVALID_KEY_ERROR_MESSAGE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'The</span> <span class="pre">delay</span> <span class="pre">extension</span> <span class="pre">{}</span> <span class="pre">has</span> <span class="pre">dropped</span> <span class="pre">{}</span> <span class="pre">packets</span> <span class="pre">due</span> <span class="pre">to</span> <span class="pre">the</span> <span class="pre">packet</span> <span class="pre">key</span> <span class="pre">being</span> <span class="pre">invalid.</span> <span class="pre">This</span> <span class="pre">is</span> <span class="pre">likely</span> <span class="pre">a</span> <span class="pre">routing</span> <span class="pre">issue.</span> <span class="pre">Please</span> <span class="pre">fix</span> <span class="pre">and</span> <span class="pre">try</span> <span class="pre">again'</span></em><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.PACKETS_DROPPED_FROM_INVALID_KEY_ERROR_MESSAGE" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -359,18 +319,27 @@ implements.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.get_provenance_data_from_machine">
-<code class="sig-name descname"><span class="pre">get_provenance_data_from_machine</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transceiver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">placement</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/delays/delay_extension_machine_vertex.html#DelayExtensionMachineVertex.get_provenance_data_from_machine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.get_provenance_data_from_machine" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieve the provenance data.</p>
+<dt id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.parse_extra_provenance_items">
+<code class="sig-name descname"><span class="pre">parse_extra_provenance_items</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">provenance_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/delays/delay_extension_machine_vertex.html#DelayExtensionMachineVertex.parse_extra_provenance_items"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.parse_extra_provenance_items" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert the remaining provenance words (those not in the standard set)
+into provenance items.</p>
+<p>Called by
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">get_provenance_data_from_machine()</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan v6.0)"><em>Transceiver</em></a>) – How to talk to the machine</p></li>
-<li><p><strong>placement</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placement" title="(in PACMAN v6.0)"><em>Placement</em></a>) – Which vertex are we retrieving from, and where was it</p></li>
+<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – A descriptive label for the vertex (derived from label and placed
+position) to be used for provenance error reporting to the user.</p></li>
+<li><p><strong>names</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>)</em>) – The base names describing the location of the machine vertex
+producing the provenance.</p></li>
+<li><p><strong>provenance_data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – The list of words of raw provenance data.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/collections.abc.html#collections.abc.Iterable" title="(in Python v3.8)">Iterable</a>(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utilities.utility_objs/#spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem" title="(in SpiNNFrontEndCommon v6.0)">ProvenanceDataItem</a>)</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The interpreted provenance items.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utilities.utility_objs/#spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem" title="(in SpiNNFrontEndCommon v6.0)">ProvenanceDataItem</a>)</p>
 </dd>
 </dl>
 </dd></dl>

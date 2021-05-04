@@ -109,67 +109,16 @@
 
     <span class="n">N_EXTRA_PROVENANCE_DATA_ENTRIES</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="p">)</span>
 
-    <span class="n">COUNT_SATURATION_ERROR_MESSAGE</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;The delay extension </span><span class="si">{}</span><span class="s2"> has dropped </span><span class="si">{}</span><span class="s2"> packets because during &quot;</span>
-        <span class="s2">&quot;certain time steps a neuron was asked to spike more than 256 times. &quot;</span>
-        <span class="s2">&quot;This causes a saturation on the count tracker which is a uint8. &quot;</span>
-        <span class="s2">&quot;Reduce the packet rates, or modify the delay extension to have &quot;</span>
-        <span class="s2">&quot;larger counters.&quot;</span><span class="p">)</span>
-
     <span class="n">COUNT_SATURATION_NAME</span> <span class="o">=</span> <span class="s2">&quot;saturation_count&quot;</span>
-
-    <span class="n">INVALID_NEURON_IDS_ERROR_MESSAGE</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;The delay extension </span><span class="si">{}</span><span class="s2"> has dropped </span><span class="si">{}</span><span class="s2"> packets because their &quot;</span>
-        <span class="s2">&quot;neuron id was not valid. This is likely a routing issue. &quot;</span>
-        <span class="s2">&quot;Please fix and try again&quot;</span><span class="p">)</span>
-
     <span class="n">INVALID_NEURON_ID_COUNT_NAME</span> <span class="o">=</span> <span class="s2">&quot;invalid_neuron_count&quot;</span>
-
-    <span class="n">PACKETS_DROPPED_FROM_INVALID_KEY_ERROR_MESSAGE</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;The delay extension </span><span class="si">{}</span><span class="s2"> has dropped </span><span class="si">{}</span><span class="s2"> packets due to the packet &quot;</span>
-        <span class="s2">&quot;key being invalid. This is likely a routing issue. &quot;</span>
-        <span class="s2">&quot;Please fix and try again&quot;</span><span class="p">)</span>
-
     <span class="n">INVALID_KEY_COUNT_NAME</span> <span class="o">=</span> <span class="s2">&quot;invalid_key_count&quot;</span>
-
     <span class="n">N_PACKETS_RECEIVED_NAME</span> <span class="o">=</span> <span class="s2">&quot;Number_of_packets_received&quot;</span>
-
     <span class="n">N_PACKETS_PROCESSED_NAME</span> <span class="o">=</span> <span class="s2">&quot;Number_of_packets_processed&quot;</span>
-
-    <span class="n">MISMATCH_PROCESSED_FROM_RECEIVED_ERROR_MESSAGE</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;The delay extension </span><span class="si">{}</span><span class="s2"> on </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2"> only processed </span><span class="si">{}</span><span class="s2"> of </span><span class="si">{}</span><span class="s2">&quot;</span>
-        <span class="s2">&quot; received packets.  This could indicate a fault.&quot;</span><span class="p">)</span>
-
     <span class="n">MISMATCH_ADDED_FROM_PROCESSED_NAME</span> <span class="o">=</span> <span class="p">(</span>
         <span class="s2">&quot;Number_of_packets_added_to_delay_slot&quot;</span><span class="p">)</span>
-
-    <span class="n">MISMATCH_ADDED_FROM_PROCESSED_ERROR_MESSAGE</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;The delay extension </span><span class="si">{}</span><span class="s2"> on </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2"> only added </span><span class="si">{}</span><span class="s2"> of </span><span class="si">{}</span><span class="s2"> processed &quot;</span>
-        <span class="s2">&quot;packets.  This could indicate a routing or filtering fault&quot;</span><span class="p">)</span>
-
     <span class="n">N_PACKETS_SENT_NAME</span> <span class="o">=</span> <span class="s2">&quot;Number_of_packets_sent&quot;</span>
-
     <span class="n">INPUT_BUFFER_LOST_NAME</span> <span class="o">=</span> <span class="s2">&quot;Times_the_input_buffer_lost_packets&quot;</span>
-
-    <span class="n">INPUT_BUFFER_LOST_ERROR_MESSAGE</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;The input buffer for </span><span class="si">{}</span><span class="s2"> on </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2"> lost packets on </span><span class="si">{}</span><span class="s2"> &quot;</span>
-        <span class="s2">&quot;occasions. This is often a sign that the system is running &quot;</span>
-        <span class="s2">&quot;too quickly for the number of neurons per core.  Please &quot;</span>
-        <span class="s2">&quot;increase the timer_tic or time_scale_factor or decrease the &quot;</span>
-        <span class="s2">&quot;number of neurons per core.&quot;</span><span class="p">)</span>
-
     <span class="n">N_LATE_SPIKES_NAME</span> <span class="o">=</span> <span class="s2">&quot;Number_of_late_spikes&quot;</span>
-    <span class="n">N_LATE_SPIKES_MESSAGE_DROP</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> packets from </span><span class="si">{}</span><span class="s2"> on </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2"> were dropped from the input buffer, &quot;</span>
-        <span class="s2">&quot;because they arrived too late to be processed in a given time step. &quot;</span>
-        <span class="s2">&quot;Try increasing the time_scale_factor located within the &quot;</span>
-        <span class="s2">&quot;.spynnaker.cfg file or in the pynn.setup() method.&quot;</span><span class="p">)</span>
-    <span class="n">N_LATE_SPIKES_MESSAGE_NO_DROP</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> packets from </span><span class="si">{}</span><span class="s2"> on </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2"> arrived too late to be processed in&quot;</span>
-        <span class="s2">&quot; a given time step. &quot;</span>
-        <span class="s2">&quot;Try increasing the time_scale_factor located within the &quot;</span>
-        <span class="s2">&quot;.spynnaker.cfg file or in the pynn.setup() method.&quot;</span><span class="p">)</span>
-
     <span class="n">DELAYED_FOR_TRAFFIC_NAME</span> <span class="o">=</span> <span class="s2">&quot;Number_of_times_delayed_to_spread_traffic&quot;</span>
     <span class="n">BACKGROUND_OVERLOADS_NAME</span> <span class="o">=</span> <span class="s2">&quot;Times_the_background_queue_overloaded&quot;</span>
     <span class="n">BACKGROUND_MAX_QUEUED_NAME</span> <span class="o">=</span> <span class="s2">&quot;Max_backgrounds_queued&quot;</span>
@@ -211,115 +160,89 @@
     <span class="k">def</span> <span class="nf">resources_required</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__resources</span>
 
-<div class="viewcode-block" id="DelayExtensionMachineVertex.get_provenance_data_from_machine"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.get_provenance_data_from_machine">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="o">.</span>
-               <span class="n">get_provenance_data_from_machine</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_provenance_data_from_machine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
-        <span class="c1"># pylint: disable=too-many-locals</span>
-        <span class="n">provenance_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_provenance_data</span><span class="p">(</span><span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">)</span>
-        <span class="n">provenance_items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_basic_provenance_items</span><span class="p">(</span>
-            <span class="n">provenance_data</span><span class="p">,</span> <span class="n">placement</span><span class="p">)</span>
-        <span class="n">provenance_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_remaining_provenance_data_items</span><span class="p">(</span>
-            <span class="n">provenance_data</span><span class="p">)</span>
-
-        <span class="n">n_packets_received</span> <span class="o">=</span> <span class="n">provenance_data</span><span class="p">[</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="o">.</span><span class="n">N_PACKETS_RECEIVED</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
-        <span class="n">n_packets_processed</span> <span class="o">=</span> <span class="n">provenance_data</span><span class="p">[</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="o">.</span><span class="n">N_PACKETS_PROCESSED</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
-        <span class="n">n_packets_added</span> <span class="o">=</span> <span class="n">provenance_data</span><span class="p">[</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="o">.</span><span class="n">N_PACKETS_ADDED</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
-        <span class="n">n_packets_sent</span> <span class="o">=</span> <span class="n">provenance_data</span><span class="p">[</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="o">.</span><span class="n">N_PACKETS_SENT</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
-        <span class="n">n_buffer_overflows</span> <span class="o">=</span> <span class="n">provenance_data</span><span class="p">[</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="o">.</span><span class="n">N_BUFFER_OVERFLOWS</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
-        <span class="n">n_delays</span> <span class="o">=</span> <span class="n">provenance_data</span><span class="p">[</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="o">.</span><span class="n">N_DELAYS</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
-        <span class="n">n_times_tdma_fell_behind</span> <span class="o">=</span> <span class="n">provenance_data</span><span class="p">[</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="o">.</span><span class="n">N_TIMES_TDMA_FELL_BEHIND</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
-        <span class="n">n_saturation</span> <span class="o">=</span> <span class="n">provenance_data</span><span class="p">[</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="o">.</span>
-            <span class="n">N_PACKETS_LOST_DUE_TO_COUNT_SATURATION</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
-        <span class="n">n_packets_invalid_neuron</span> <span class="o">=</span> <span class="n">provenance_data</span><span class="p">[</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="o">.</span>
-            <span class="n">N_PACKETS_WITH_INVALID_NEURON_IDS</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
-        <span class="n">n_packets_invalid_keys</span> <span class="o">=</span> <span class="n">provenance_data</span><span class="p">[</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="o">.</span>
-            <span class="n">N_PACKETS_DROPPED_DUE_TO_INVALID_KEY</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
-        <span class="n">n_late_packets</span> <span class="o">=</span> <span class="n">provenance_data</span><span class="p">[</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="o">.</span><span class="n">N_LATE_SPIKES</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
-        <span class="n">max_background_queued</span> <span class="o">=</span> <span class="n">provenance_data</span><span class="p">[</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="o">.</span><span class="n">MAX_BACKGROUND_QUEUED</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
-        <span class="n">n_background_overloads</span> <span class="o">=</span> <span class="n">provenance_data</span><span class="p">[</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="o">.</span><span class="n">N_BACKGROUND_OVERLOADS</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
-
-        <span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_placement_details</span><span class="p">(</span><span class="n">placement</span><span class="p">)</span>
+<div class="viewcode-block" id="DelayExtensionMachineVertex.parse_extra_provenance_items"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.parse_extra_provenance_items">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="o">.</span>
+               <span class="n">parse_extra_provenance_items</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">parse_extra_provenance_items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">provenance_data</span><span class="p">):</span>
+        <span class="p">(</span><span class="n">n_received</span><span class="p">,</span> <span class="n">n_processed</span><span class="p">,</span> <span class="n">n_added</span><span class="p">,</span> <span class="n">n_sent</span><span class="p">,</span> <span class="n">n_overflows</span><span class="p">,</span> <span class="n">n_delays</span><span class="p">,</span>
+         <span class="n">n_tdma_behind</span><span class="p">,</span> <span class="n">n_sat</span><span class="p">,</span> <span class="n">n_bad_neuron</span><span class="p">,</span> <span class="n">n_bad_keys</span><span class="p">,</span> <span class="n">n_late_spikes</span><span class="p">,</span>
+         <span class="n">max_bg</span><span class="p">,</span> <span class="n">n_bg_overloads</span><span class="p">)</span> <span class="o">=</span> <span class="n">provenance_data</span>
 
         <span class="c1"># translate into provenance data items</span>
-        <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">COUNT_SATURATION_NAME</span><span class="p">),</span>
-            <span class="n">n_saturation</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">n_saturation</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="n">message</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">COUNT_SATURATION_ERROR_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">label</span><span class="p">,</span> <span class="n">n_saturation</span><span class="p">)))</span>
-        <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">INVALID_NEURON_ID_COUNT_NAME</span><span class="p">),</span>
-            <span class="n">n_packets_invalid_neuron</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">n_packets_invalid_neuron</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="n">message</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">INVALID_NEURON_IDS_ERROR_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">label</span><span class="p">,</span> <span class="n">n_packets_invalid_neuron</span><span class="p">)))</span>
-        <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">INVALID_NEURON_ID_COUNT_NAME</span><span class="p">),</span>
-            <span class="n">n_packets_invalid_keys</span><span class="p">,</span> <span class="n">n_packets_invalid_keys</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">PACKETS_DROPPED_FROM_INVALID_KEY_ERROR_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">label</span><span class="p">,</span> <span class="n">n_packets_invalid_keys</span><span class="p">)))</span>
-        <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N_PACKETS_RECEIVED_NAME</span><span class="p">),</span>
-            <span class="n">n_packets_received</span><span class="p">))</span>
-        <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N_PACKETS_PROCESSED_NAME</span><span class="p">),</span>
-            <span class="n">n_packets_processed</span><span class="p">,</span> <span class="n">n_packets_received</span> <span class="o">!=</span> <span class="n">n_packets_processed</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">MISMATCH_PROCESSED_FROM_RECEIVED_ERROR_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">n_packets_processed</span><span class="p">,</span> <span class="n">n_packets_received</span><span class="p">)))</span>
-        <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">MISMATCH_ADDED_FROM_PROCESSED_NAME</span><span class="p">),</span>
-            <span class="n">n_packets_added</span><span class="p">,</span> <span class="n">n_packets_added</span> <span class="o">!=</span> <span class="n">n_packets_processed</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">MISMATCH_ADDED_FROM_PROCESSED_ERROR_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">n_packets_added</span><span class="p">,</span> <span class="n">n_packets_processed</span><span class="p">)))</span>
-        <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N_PACKETS_SENT_NAME</span><span class="p">),</span> <span class="n">n_packets_sent</span><span class="p">))</span>
-        <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">INPUT_BUFFER_LOST_NAME</span><span class="p">),</span>
-            <span class="n">n_buffer_overflows</span><span class="p">,</span>
-            <span class="n">report</span><span class="o">=</span><span class="n">n_buffer_overflows</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="n">message</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">INPUT_BUFFER_LOST_ERROR_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">n_buffer_overflows</span><span class="p">)))</span>
-        <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">DELAYED_FOR_TRAFFIC_NAME</span><span class="p">),</span> <span class="n">n_delays</span><span class="p">))</span>
-        <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">get_tdma_provenance_item</span><span class="p">(</span>
-                <span class="n">names</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">n_times_tdma_fell_behind</span><span class="p">))</span>
+        <span class="k">yield</span> <span class="n">ProvenanceDataItem</span><span class="p">(</span>
+            <span class="n">names</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">COUNT_SATURATION_NAME</span><span class="p">],</span>
+            <span class="n">n_sat</span><span class="p">,</span> <span class="p">(</span><span class="n">n_sat</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="sa">f</span><span class="s2">&quot;The delay extension </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2"> has dropped </span><span class="si">{</span><span class="n">n_sat</span><span class="si">}</span><span class="s2"> packets because &quot;</span>
+            <span class="s2">&quot;during certain time steps a neuron was asked to spike more than &quot;</span>
+            <span class="s2">&quot;256 times. This causes a saturation on the count tracker which &quot;</span>
+            <span class="s2">&quot;is a uint8. Reduce the packet rates, or modify the delay &quot;</span>
+            <span class="s2">&quot;extension to have larger counters.&quot;</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">ProvenanceDataItem</span><span class="p">(</span>
+            <span class="n">names</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">INVALID_NEURON_ID_COUNT_NAME</span><span class="p">],</span>
+            <span class="n">n_bad_neuron</span><span class="p">,</span> <span class="p">(</span><span class="n">n_bad_neuron</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="sa">f</span><span class="s2">&quot;The delay extension </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2"> has dropped </span><span class="si">{</span><span class="n">n_bad_neuron</span><span class="si">}</span><span class="s2"> packets &quot;</span>
+            <span class="s2">&quot;because their neuron id was not valid. This is likely a routing &quot;</span>
+            <span class="s2">&quot;issue. Please fix and try again&quot;</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">ProvenanceDataItem</span><span class="p">(</span>
+            <span class="n">names</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">INVALID_KEY_COUNT_NAME</span><span class="p">],</span>
+            <span class="n">n_bad_keys</span><span class="p">,</span> <span class="p">(</span><span class="n">n_bad_keys</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="sa">f</span><span class="s2">&quot;The delay extension </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2"> has dropped </span><span class="si">{</span><span class="n">n_bad_keys</span><span class="si">}</span><span class="s2"> packets &quot;</span>
+            <span class="s2">&quot;due to the packet key being invalid. This is likely a routing &quot;</span>
+            <span class="s2">&quot;issue. Please fix and try again&quot;</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">ProvenanceDataItem</span><span class="p">(</span>
+            <span class="n">names</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">N_PACKETS_RECEIVED_NAME</span><span class="p">],</span> <span class="n">n_received</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">ProvenanceDataItem</span><span class="p">(</span>
+            <span class="n">names</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">N_PACKETS_PROCESSED_NAME</span><span class="p">],</span>
+            <span class="n">n_processed</span><span class="p">,</span> <span class="p">(</span><span class="n">n_received</span> <span class="o">!=</span> <span class="n">n_processed</span><span class="p">),</span>
+            <span class="sa">f</span><span class="s2">&quot;The delay extension </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2"> only processed </span><span class="si">{</span><span class="n">n_processed</span><span class="si">}</span><span class="s2"> of &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n_received</span><span class="si">}</span><span class="s2"> received packets.  This could indicate a fault.&quot;</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">ProvenanceDataItem</span><span class="p">(</span>
+            <span class="n">names</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">MISMATCH_ADDED_FROM_PROCESSED_NAME</span><span class="p">],</span>
+            <span class="n">n_added</span><span class="p">,</span> <span class="p">(</span><span class="n">n_added</span> <span class="o">!=</span> <span class="n">n_processed</span><span class="p">),</span>
+            <span class="sa">f</span><span class="s2">&quot;The delay extension </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2"> only added </span><span class="si">{</span><span class="n">n_added</span><span class="si">}</span><span class="s2"> of &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n_processed</span><span class="si">}</span><span class="s2"> processed packets.  This could indicate a &quot;</span>
+            <span class="s2">&quot;routing or filtering fault&quot;</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">ProvenanceDataItem</span><span class="p">(</span>
+            <span class="n">names</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">N_PACKETS_SENT_NAME</span><span class="p">],</span> <span class="n">n_sent</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">ProvenanceDataItem</span><span class="p">(</span>
+            <span class="n">names</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">INPUT_BUFFER_LOST_NAME</span><span class="p">],</span>
+            <span class="n">n_overflows</span><span class="p">,</span> <span class="p">(</span><span class="n">n_overflows</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="sa">f</span><span class="s2">&quot;The input buffer for </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2"> lost packets on </span><span class="si">{</span><span class="n">n_overflows</span><span class="si">}</span><span class="s2"> &quot;</span>
+            <span class="s2">&quot;occasions. This is often a sign that the system is running &quot;</span>
+            <span class="s2">&quot;too quickly for the number of neurons per core.  Please &quot;</span>
+            <span class="s2">&quot;increase the timer_tic or time_scale_factor or decrease the &quot;</span>
+            <span class="s2">&quot;number of neurons per core.&quot;</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">ProvenanceDataItem</span><span class="p">(</span>
+            <span class="n">names</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">DELAYED_FOR_TRAFFIC_NAME</span><span class="p">],</span> <span class="n">n_delays</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">get_tdma_provenance_item</span><span class="p">(</span>
+            <span class="n">names</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">n_tdma_behind</span><span class="p">)</span>
+
         <span class="n">late_message</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">N_LATE_SPIKES_MESSAGE_DROP</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">drop_late_spikes</span>
-            <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">N_LATE_SPIKES_MESSAGE_NO_DROP</span><span class="p">)</span>
-        <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N_LATE_SPIKES_NAME</span><span class="p">),</span>
-            <span class="n">n_late_packets</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">n_late_packets</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="n">message</span><span class="o">=</span><span class="n">late_message</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n_late_packets</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">)))</span>
-        <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">BACKGROUND_MAX_QUEUED_NAME</span><span class="p">),</span>
-            <span class="n">max_background_queued</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">max_background_queued</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">,</span>
-            <span class="n">message</span><span class="o">=</span><span class="p">(</span>
-                <span class="s2">&quot;A maximum of </span><span class="si">{}</span><span class="s2"> background tasks were queued on </span><span class="si">{}</span><span class="s2"> on&quot;</span>
-                <span class="s2">&quot; </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">.  Try increasing the time_scale_factor located&quot;</span>
-                <span class="s2">&quot; within the .spynnaker.cfg file or in the pynn.setup()&quot;</span>
-                <span class="s2">&quot; method.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">max_background_queued</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">))))</span>
-        <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">BACKGROUND_OVERLOADS_NAME</span><span class="p">),</span>
-            <span class="n">n_background_overloads</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">n_background_overloads</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="n">message</span><span class="o">=</span><span class="p">(</span>
-                <span class="s2">&quot;On </span><span class="si">{}</span><span class="s2"> on </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">, the background queue overloaded </span><span class="si">{}</span><span class="s2">&quot;</span>
-                <span class="s2">&quot; times.  Try increasing the time_scale_factor located within&quot;</span>
-                <span class="s2">&quot; the .spynnaker.cfg file or in the pynn.setup() method.&quot;</span>
-                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">n_background_overloads</span><span class="p">))))</span>
-        <span class="k">return</span> <span class="n">provenance_items</span></div>
+            <span class="sa">f</span><span class="s2">&quot;On </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">n_late_spikes</span><span class="si">}</span><span class="s2"> packets were dropped from the &quot;</span>
+            <span class="s2">&quot;input buffer, because they arrived too late to be processed in &quot;</span>
+            <span class="s2">&quot;a given time step. Try increasing the time_scale_factor located &quot;</span>
+            <span class="s2">&quot;within the .spynnaker.cfg file or in the pynn.setup() method.&quot;</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">drop_late_spikes</span> <span class="k">else</span>
+            <span class="sa">f</span><span class="s2">&quot;On </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">n_late_spikes</span><span class="si">}</span><span class="s2"> packets arrived too late to be &quot;</span>
+            <span class="s2">&quot;processed in a given time step. Try increasing the &quot;</span>
+            <span class="s2">&quot;time_scale_factor located within the .spynnaker.cfg file or in &quot;</span>
+            <span class="s2">&quot;the pynn.setup() method.&quot;</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">ProvenanceDataItem</span><span class="p">(</span>
+            <span class="n">names</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">N_LATE_SPIKES_NAME</span><span class="p">],</span>
+            <span class="n">n_late_spikes</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="p">(</span><span class="n">n_late_spikes</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="n">message</span><span class="o">=</span><span class="n">late_message</span><span class="p">)</span>
+
+        <span class="k">yield</span> <span class="n">ProvenanceDataItem</span><span class="p">(</span>
+            <span class="n">names</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">BACKGROUND_MAX_QUEUED_NAME</span><span class="p">],</span>
+            <span class="n">max_bg</span><span class="p">,</span> <span class="p">(</span><span class="n">max_bg</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="sa">f</span><span class="s2">&quot;On </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">, a maximum of </span><span class="si">{</span><span class="n">max_bg</span><span class="si">}</span><span class="s2"> background tasks were queued. &quot;</span>
+            <span class="s2">&quot;Try increasing the time_scale_factor located within the &quot;</span>
+            <span class="s2">&quot;.spynnaker.cfg file or in the pynn.setup() method.&quot;</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">ProvenanceDataItem</span><span class="p">(</span>
+            <span class="n">names</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">BACKGROUND_OVERLOADS_NAME</span><span class="p">],</span>
+            <span class="n">n_bg_overloads</span><span class="p">,</span> <span class="p">(</span><span class="n">n_bg_overloads</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="sa">f</span><span class="s2">&quot;On </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">, the background queue overloaded </span><span class="si">{</span><span class="n">n_bg_overloads</span><span class="si">}</span><span class="s2"> &quot;</span>
+            <span class="s2">&quot;times. Try increasing the time_scale_factor located within the &quot;</span>
+            <span class="s2">&quot;.spynnaker.cfg file or in the pynn.setup() method.&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="DelayExtensionMachineVertex.get_n_keys_for_partition"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.get_n_keys_for_partition">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">MachineVertex</span><span class="o">.</span><span class="n">get_n_keys_for_partition</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_n_keys_for_partition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_partition</span><span class="p">):</span>
