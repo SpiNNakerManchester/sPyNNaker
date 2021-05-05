@@ -47,8 +47,7 @@ class AbstractMachineBitFieldRouterCompressor(object, metaclass=AbstractBase):
             self, routing_tables, transceiver, machine, app_id,
             provenance_file_path, machine_graph,
             placements, executable_finder, default_report_folder,
-            routing_infos, machine_time_step,
-            time_scale_factor, executable_targets, read_expander_iobuf,
+            routing_infos, executable_targets, read_expander_iobuf,
             provenance_data_objects=None):
         """ entrance for routing table compression with bit field
 
@@ -86,8 +85,6 @@ class AbstractMachineBitFieldRouterCompressor(object, metaclass=AbstractBase):
                 placements=placements, executable_finder=executable_finder,
                 default_report_folder=default_report_folder,
                 routing_infos=routing_infos,
-                machine_time_step=machine_time_step,
-                time_scale_factor=time_scale_factor,
                 executable_targets=executable_targets,
                 provenance_data_objects=provenance_data_objects)
 
