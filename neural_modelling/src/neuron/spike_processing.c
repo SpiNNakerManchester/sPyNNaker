@@ -294,29 +294,8 @@ static inline void setup_synaptic_dma_write(
     }
 }
 
-//! \brief Called when a multicast packet is received
-//! \param[in] key: The key of the packet. The spike.
-//! \param payload: the payload of the packet. The count.
-static void multicast_packet_received_callback(uint key, uint payload) {
-    p_per_ts_struct.packets_this_time_step += 1;
-
-    // handle the 2 cases separately
-    if (payload == 0) {
-        log_debug(
-            "Received spike %x at %d, DMA Busy = %d", key, time, dma_busy);
-        // set to 1 to work with the loop.
-        payload = 1;
-    } else {
-        log_debug(
-            "Received spike %x with payload %d at %d, DMA Busy = %d",
-            key, payload, time, dma_busy);
-    }
-
-    // cycle through the packet insertion
-    for (uint count = payload; count > 0; count--) {
-        in_spikes_add_spike(key);
-    }
-
+//! \brief Start the DMA processing loop if not already running
+static inline void start_dma_loop() {
     // If we're not already processing synaptic DMAs,
     // flag pipeline as busy and trigger a feed event
     // NOTE: locking is not used here because this is assumed to be FIQ
@@ -327,6 +306,35 @@ static void multicast_packet_received_callback(uint key, uint payload) {
         if (spin1_trigger_user_event(0, 0)) {
             dma_busy = true;
         }
+    }
+}
+
+//! \brief Called when a multicast packet is received
+//! \param[in] key: The key of the packet. The spike.
+//! \param payload: the payload of the packet. The count.
+static void multicast_packet_received_callback(uint key, UNUSED uint unused) {
+    p_per_ts_struct.packets_this_time_step += 1;
+    log_debug("Received spike %x at %d, DMA Busy = %d", key, time, dma_busy);
+    if (in_spikes_add_spike(key)) {
+        start_dma_loop();
+    }
+}
+
+//! \brief Called when a multicast packet is received
+//! \param[in] key: The key of the packet. The spike.
+//! \param payload: the payload of the packet. The count.
+static void multicast_packet_pl_received_callback(uint key, uint payload) {
+    p_per_ts_struct.packets_this_time_step += 1;
+    log_debug("Received spike %x with payload %d at %d, DMA Busy = %d",
+        key, payload, time, dma_busy);
+
+    // cycle through the packet insertion
+    bool added = false;
+    for (uint count = payload; count > 0; count--) {
+        added = in_spikes_add_spike(key);
+    }
+    if (added) {
+        start_dma_loop();
     }
 }
 
@@ -341,20 +349,20 @@ static void dma_complete_callback(UNUSED uint unused, uint tag) {
     // Disable DMA callback to allow us to check manually
     bool dma_started = false;
     bool write_back = false;
-//    uint32_t state = spin1_irq_disable();
-//    cback_t cback = callback[DMA_TRANSFER_DONE];
-//    spin1_callback_off(DMA_TRANSFER_DONE);
-    //do {
+    uint32_t state = spin1_irq_disable();
+    cback_t cback = callback[DMA_TRANSFER_DONE];
+    spin1_callback_off(DMA_TRANSFER_DONE);
+    do {
         // If a DMA was started, ack the DMA now, and re-clear the DMA queue.
         // As we control the DMA at this point, this is safe.  Note that we
         // allow the queue to be populated in case we need to exit this
         // loop with a DMA in progress and then handle that in the normal
         // interrupt handler in the API.
-        /*if (dma_started) {
+        if (dma_started) {
             dma[DMA_CTRL] = 0x8;
             dma_queue.start = dma_queue.end;
-        } */
-        // spin1_mode_restore(state);
+        }
+        spin1_mode_restore(state);
 
         // Get pointer to current buffer
         uint32_t current_buffer_index = buffer_being_read;
@@ -381,7 +389,7 @@ static void dma_complete_callback(UNUSED uint unused, uint tag) {
         bool plastic_only = true;
 
         // If rewiring, do rewiring first
-        for (uint32_t i = 0; i < n_rewires; i++) {
+        for (uint32_t i = n_rewires; i > 0; i--) {
             if (synaptogenesis_row_restructure(time, current_buffer->row)) {
                 write_back = true;
                 plastic_only = false;
@@ -420,17 +428,18 @@ static void dma_complete_callback(UNUSED uint unused, uint tag) {
         if (write_back) {
             setup_synaptic_dma_write(current_buffer_index, plastic_only);
         }
-        // state = spin1_irq_disable();
-    /*} while (!write_back && dma_started && (dma[DMA_STAT] & (1 << 10)));
+        state = spin1_irq_disable();
+    } while (!write_back && dma_started && (dma[DMA_STAT] & (1 << 10)));
 
     spin1_callback_on(DMA_TRANSFER_DONE, cback.cback, cback.priority);
-    spin1_mode_restore(state); */
+    spin1_mode_restore(state);
 }
 
 //! \brief Called when a user event is received
 //! \param unused0: unused
 //! \param unused1: unused
 void user_event_callback(UNUSED uint unused0, UNUSED uint unused1) {
+
     // Reset the counters as this is a new process
     dma_n_rewires = 0;
     dma_n_spikes = 0;
@@ -496,7 +505,7 @@ bool spike_processing_initialise( // EXPORTED
     spin1_callback_on(MC_PACKET_RECEIVED,
             multicast_packet_received_callback, mc_packet_callback_priority);
     spin1_callback_on(MCPL_PACKET_RECEIVED,
-            multicast_packet_received_callback, mc_packet_callback_priority);
+            multicast_packet_pl_received_callback, mc_packet_callback_priority);
     simulation_dma_transfer_done_callback_on(
             DMA_TAG_READ_SYNAPTIC_ROW, dma_complete_callback);
     spin1_callback_on(USER_EVENT, user_event_callback, user_event_priority);
@@ -535,17 +544,7 @@ bool spike_processing_do_rewiring(int number_of_rewires) {
     // disable interrupts
     uint cpsr = spin1_int_disable();
     rewires_to_do += number_of_rewires;
-
-    // If we're not already processing synaptic DMAs,
-    // flag pipeline as busy and trigger a feed event
-    if (!dma_busy) {
-        log_debug("Sending user event for rewiring");
-        if (spin1_trigger_user_event(0, 0)) {
-            dma_busy = true;
-        } else {
-            log_debug("Could not trigger user event\n");
-        }
-    }
+    start_dma_loop();
     // enable interrupts
     spin1_mode_restore(cpsr);
     return true;
