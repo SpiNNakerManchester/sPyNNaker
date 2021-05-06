@@ -22,11 +22,11 @@ import pytest
 
 from spinn_machine import SDRAM
 from spinn_machine.virtual_machine import virtual_machine
+from spinn_utilities.config_holder import load_config, set_config
 from pacman.model.placements import Placement
 from pacman.executor.injection_decorator import injection_context
 from pacman.operations.routing_info_allocator_algorithms import (
     ZonedRoutingInfoAllocator)
-from spinn_utilities.config_holder import set_config
 from data_specification import (
     DataSpecificationGenerator, DataSpecificationExecutor)
 from data_specification.constants import MAX_MEM_REGIONS
@@ -89,7 +89,7 @@ def test_write_data_spec():
     AbstractGenerateConnectorOnMachine.generate_on_machine = say_false
     machine = virtual_machine(2, 2)
     p.setup(1.0)
-    reset_configs()
+    load_config()
     set_config("Simulation", "one_to_one_connection_dtcm_max_bytes", 40)
     p.set_number_of_neurons_per_core(p.IF_curr_exp, 100)
     pre_pop = p.Population(
