@@ -16,6 +16,7 @@ import struct
 from enum import Enum
 import numpy
 
+from spinn_utilities.config_holder import get_config_int
 from data_specification.enums import DataType
 from spinn_front_end_common.interface.buffer_management import (
     recording_utilities)
@@ -320,7 +321,6 @@ class SpikeSourcePoissonMachineVertex(
         # write recording data
         spec.switch_write_focus(
             self.POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value)
-        from spinn_utilities.config_holder import get_config_int
         machine_time_step = get_config_int("Machine", "machine_time_step")
         sdram = self._app_vertex.get_recording_sdram_usage(
             self.vertex_slice, machine_time_step)
