@@ -64,14 +64,14 @@
     <span class="c1"># DO NOT DEFINE SLOTS! Multiple inheritance problems otherwise.</span>
     <span class="c1"># __slots__ = []</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">vertex</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param population: the population to record for</span>
 <span class="sd">        :type population: ~spynnaker.pyNN.models.populations.Population</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">moved_in_v6</span><span class="p">(</span><span class="s2">&quot;spynnaker8.models.recorder&quot;</span><span class="p">,</span>
                     <span class="s2">&quot;spynnaker.pyNN.models.recorder&quot;</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Recorder</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">population</span><span class="p">)</span></div>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Recorder</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">population</span><span class="p">,</span> <span class="n">vertex</span><span class="p">)</span></div>
 </pre></div>
 
             <div class="clearer"></div>
