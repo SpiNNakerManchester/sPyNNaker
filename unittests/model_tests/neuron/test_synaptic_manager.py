@@ -67,7 +67,6 @@ from spynnaker.pyNN.models.utility_models.delays import (
 from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
     SplitterDelayVertexSlice, AbstractSpynnakerSplitterDelay)
-from spynnaker.pyNN.models.neuron.master_pop_table import _MAX_N_NEURONS
 from unittests.mocks import MockSimulator, MockPopulation
 
 
