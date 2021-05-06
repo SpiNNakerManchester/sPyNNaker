@@ -601,8 +601,7 @@ class SynapticManager(object):
 
     def write_data_spec(
             self, spec, application_vertex, post_vertex_slice, machine_vertex,
-            machine_graph, application_graph, routing_info, weight_scale,
-            machine_time_step):
+            machine_graph, application_graph, routing_info, weight_scale):
         """
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to
@@ -619,8 +618,8 @@ class SynapticManager(object):
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
             How messages are routed
         :param float weight_scale: How to scale the weights of the synapses
-        :param float machine_time_step:
         """
+        machine_time_step = get_config_int("Machine", "machine_time_step")
 
         # Reserve the memory
         in_edges = application_graph.get_edges_ending_at_vertex(
