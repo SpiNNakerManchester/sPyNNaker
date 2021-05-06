@@ -72,4 +72,4 @@ class TestBigConnection(BaseTestCase):
             style += "advanced"
         else:
             style += "simple"
-        return "{}_test_big_connection".format()
+        return "{}_test_big_connection".format(style)
