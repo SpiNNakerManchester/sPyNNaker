@@ -24,7 +24,7 @@ from spinn_utilities.progress_bar import ProgressBar
 from data_specification.enums.data_type import DataType
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
-from pacman.config_holder import (
+from spinn_utilities.config_holder import (
     get_config_int, get_config_float, get_config_bool)
 from pacman.model.resources import MultiRegionSDRAM
 from spinn_front_end_common.abstract_models import (

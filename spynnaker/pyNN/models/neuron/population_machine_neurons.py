@@ -19,18 +19,11 @@ from spinn_utilities.abstract_base import abstractproperty, abstractmethod
 from spinn_utilities.overrides import overrides
 
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
-from spinn_front_end_common.interface.provenance import (
-    ProvidesProvenanceDataFromMachineImpl)
 from spinn_front_end_common.utilities import helpful_functions
 from spynnaker.pyNN.models.abstract_models import (
     AbstractReadParametersBeforeSet)
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
-
-
-get_placement_details = \
-    ProvidesProvenanceDataFromMachineImpl._get_placement_details
-add_name = ProvidesProvenanceDataFromMachineImpl._add_name
 
 
 class NeuronProvenance(ctypes.LittleEndianStructure):
@@ -112,34 +105,26 @@ class PopulationMachineNeurons(
         :rtype: .NeuronRegions
         """
 
-    def _append_neuron_provenance(
-            self, provenance_items, prov_list_from_machine, offset, placement):
-        """ Extract and add neuron provenance to the list of provenance items
+    def _parse_neuron_provenance(self, label, names, provenance_data):
+        """ Extract and yield neuron provenance
 
-        :param
-            list(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)\
-            provenance_items: The items already read, to append to
-        :param list(int) prov_list_from_machine:
-            The values read from the machine to be decoded
-        :param int offset: Where in the list from the machine to start reading
-        :param ~pacman.model.placements.Placement placement:
-            Which vertex are we retrieving from, and where was it
-        :return: The number of items read from the prov_list_from_machine
-        :type: int
+        :param str label: The label of the node
+        :param list(str) names: The hierarchy of names for the provenance data
+        :param list(int) provenance_data: A list of data items to interpret
+        :return: a list of provenance data items
+        :rtype: iterator of ProvenanceDataItem
         """
-        _, x, y, p, names = get_placement_details(placement)
-        neuron_prov = NeuronProvenance(
-            *prov_list_from_machine[offset:NeuronProvenance.N_ITEMS + offset])
+        neuron_prov = NeuronProvenance(*provenance_data)
 
-        provenance_items.append(ProvenanceDataItem(
-            add_name(names, "Last_timer_tic_the_core_ran_to"),
-            neuron_prov.current_timer_tick))
-        provenance_items.append(self._app_vertex.get_tdma_provenance_item(
-            names, x, y, p, neuron_prov.n_tdma_misses))
-        provenance_items.append(ProvenanceDataItem(
-            add_name(names, "Earliest_send_time"), neuron_prov.earliest_send))
-        provenance_items.append(ProvenanceDataItem(
-            add_name(names, "Latest_Send_time"), neuron_prov.latest_send))
+        yield ProvenanceDataItem(
+            names + ["Last_timer_tic_the_core_ran_to"],
+            neuron_prov.current_timer_tick)
+        yield self._app_vertex.get_tdma_provenance_item(
+            names, label, neuron_prov.n_tdma_misses)
+        yield ProvenanceDataItem(
+            names + ["Earliest_send_time"], neuron_prov.earliest_send)
+        yield ProvenanceDataItem(
+            names + ["Latest_Send_time"], neuron_prov.latest_send)
 
         return NeuronProvenance.N_ITEMS
 

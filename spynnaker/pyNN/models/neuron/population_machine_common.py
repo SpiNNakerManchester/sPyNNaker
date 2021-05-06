@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from collections import namedtuple
 from spinn_utilities.overrides import overrides
-from spinn_utilities.abstract_base import abstractmethod
 from pacman.model.graphs.machine import MachineVertex
 
 from spinn_front_end_common.interface.provenance import (
@@ -101,32 +100,6 @@ class PopulationMachineCommon(
     @overrides(ProvidesProvenanceDataFromMachineImpl._n_additional_data_items)
     def _n_additional_data_items(self):
         return self.__n_provenance_items
-
-    @overrides(ProvidesProvenanceDataFromMachineImpl.
-               get_provenance_data_from_machine)
-    def get_provenance_data_from_machine(self, transceiver, placement):
-        provenance_data = self._read_provenance_data(transceiver, placement)
-        provenance_items = self._read_basic_provenance_items(
-            provenance_data, placement)
-        prov_list_from_machine = self._get_remaining_provenance_data_items(
-            provenance_data)
-        self._append_additional_provenance(
-            provenance_items, prov_list_from_machine, placement)
-
-        return provenance_items
-
-    @abstractmethod
-    def _append_additional_provenance(
-            self, provenance_items, prov_list_from_machine, placement):
-        """ Append the additional provenance items to the set gathered for this
-            vertex.
-
-        :param list(ProvenanceDataItem) provenance_items:
-            List of provenance items gathered so far to append to
-        :param list(int): List of provenance values from the machine to be read
-        :param :param ~pacman.model.placements.Placement placement:
-            the placement from which the data was read
-        """
 
     @overrides(AbstractReceiveBuffersToHost.get_recording_region_base_address)
     def get_recording_region_base_address(self, txrx, placement):

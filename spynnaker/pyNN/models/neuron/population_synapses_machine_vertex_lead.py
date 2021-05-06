@@ -20,8 +20,6 @@ from .population_machine_common import PopulationMachineCommon
 from .population_machine_synapses import PopulationMachineSynapses
 from .population_synapses_machine_vertex_common import (
     PopulationSynapsesMachineVertexCommon)
-from .population_machine_synapses_provenance import (
-    PopulationMachineSynapsesProvenance)
 
 
 class PopulationSynapsesMachineVertexLead(
@@ -125,8 +123,7 @@ class PopulationSynapsesMachineVertexLead(
         # End the writing of this specification:
         spec.end_specification()
 
-    @overrides(PopulationMachineSynapsesProvenance._append_synapse_provenance)
-    def _append_synapse_provenance(
-            self, provenance_items, prov_list_from_machine, offset, placement):
-        PopulationMachineSynapsesProvenance._append_synapse_provenance(
-            self, provenance_items, prov_list_from_machine, offset, placement)
+    @overrides(PopulationSynapsesMachineVertexCommon._parse_synapse_provenance)
+    def _parse_synapse_provenance(self, label, names, provenance_data):
+        yield from PopulationMachineSynapses._parse_synapse_provenance(
+            self, label, names, provenance_data)

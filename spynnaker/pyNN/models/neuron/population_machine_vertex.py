@@ -21,19 +21,12 @@ from spinn_utilities.overrides import overrides
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification)
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
-from spinn_front_end_common.interface.provenance import (
-    ProvidesProvenanceDataFromMachineImpl)
 from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .population_machine_neurons import (
     NeuronRegions, PopulationMachineNeurons, NeuronProvenance)
 from .population_machine_synapses import (
     SynapseRegions, PopulationMachineSynapses)
 from .population_machine_synapses_provenance import SynapseProvenance
-
-
-get_placement_details = \
-    ProvidesProvenanceDataFromMachineImpl._get_placement_details
-add_name = ProvidesProvenanceDataFromMachineImpl._add_name
 
 
 class MainProvenance(ctypes.LittleEndianStructure):
@@ -198,36 +191,32 @@ class PopulationMachineVertex(
         # Reunite title and extension and return
         return name + app_vertex.synapse_executable_suffix + ext
 
-    @overrides(PopulationMachineCommon._append_additional_provenance)
-    def _append_additional_provenance(
-            self, provenance_items, prov_list_from_machine, placement):
-        # translate into provenance data items
-        offset = self._append_neuron_provenance(
-            provenance_items, prov_list_from_machine, 0, placement)
-        offset += self._append_synapse_provenance(
-            provenance_items, prov_list_from_machine, offset, placement)
-        main_prov = MainProvenance(
-            *prov_list_from_machine[offset:MainProvenance.N_ITEMS + offset])
-        label, x, y, p, names = get_placement_details(placement)
-        provenance_items.append(ProvenanceDataItem(
-            add_name(names, self._BACKGROUND_MAX_QUEUED_NAME),
+    @overrides(PopulationMachineCommon.parse_extra_provenance_items)
+    def parse_extra_provenance_items(self, label, names, provenance_data):
+        syn_offset = NeuronProvenance.N_ITEMS
+        com_offset = syn_offset + SynapseProvenance.N_ITEMS
+        yield from self._parse_neuron_provenance(
+            label, names, provenance_data[:NeuronProvenance.N_ITEMS])
+        yield from self._parse_synapse_provenance(
+            label, names, provenance_data[syn_offset:com_offset])
+
+        main_prov = MainProvenance(*provenance_data[-com_offset:])
+        yield ProvenanceDataItem(
+            names + [self._BACKGROUND_MAX_QUEUED_NAME],
             main_prov.max_background_queued,
-            report=main_prov.max_background_queued > 1,
-            message=(
-                "A maximum of {} background tasks were queued on {} on"
-                " {}, {}, {}.  Try increasing the time_scale_factor located"
-                " within the .spynnaker.cfg file or in the pynn.setup()"
-                " method.".format(
-                    main_prov.max_background_queued, label, x, y, p))))
-        provenance_items.append(ProvenanceDataItem(
-            add_name(names, self._BACKGROUND_OVERLOADS_NAME),
+            main_prov.max_background_queued > 1,
+            f"A maximum of {main_prov.max_background_queued} background"
+            f" tasks were queued on {label}.  Try increasing the"
+            " time_scale_factor located within the .spynnaker.cfg file or"
+            " in the pynn.setup() method.")
+        yield ProvenanceDataItem(
+            names + [self._BACKGROUND_OVERLOADS_NAME],
             main_prov.n_background_overloads,
-            report=main_prov.n_background_overloads > 0,
-            message=(
-                "On {} on {}, {}, {}, the background queue overloaded {}"
-                " times.  Try increasing the time_scale_factor located within"
-                " the .spynnaker.cfg file or in the pynn.setup() method."
-                .format(label, x, y, p, main_prov.n_background_overloads))))
+            main_prov.n_background_overloads > 0,
+            "The background queue overloaded "
+            f"{main_prov.n_background_overloads} times on {label}."
+            " Try increasing the time_scale_factor located within"
+            " the .spynnaker.cfg file or in the pynn.setup() method.")
 
     @overrides(PopulationMachineCommon.get_recorded_region_ids)
     def get_recorded_region_ids(self):

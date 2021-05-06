@@ -15,7 +15,6 @@
 from enum import Enum
 
 from spinn_utilities.overrides import overrides
-from spinn_utilities.abstract_base import abstractmethod
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.abstract_models import (
@@ -24,6 +23,7 @@ from spynnaker.pyNN.utilities.utility_calls import get_time_to_write_us
 from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .population_machine_synapses import SynapseRegions
 from .population_machine_synapses_provenance import SynapseProvenance
+from spinn_utilities.abstract_base import abstractmethod
 
 # Size of SDRAM params = 1 word for address + 1 word for size
 #  + 1 word for time to send
@@ -134,30 +134,6 @@ class PopulationSynapsesMachineVertexCommon(
         # Reunite title and extension and return
         return "synapses" + app_vertex.synapse_executable_suffix + ".aplx"
 
-    @overrides(PopulationMachineCommon._append_additional_provenance)
-    def _append_additional_provenance(
-            self, provenance_items, prov_list_from_machine, placement):
-        # translate into provenance data items
-        self._append_synapse_provenance(
-            provenance_items, prov_list_from_machine, 0, placement)
-
-    @abstractmethod
-    def _append_synapse_provenance(
-            self, provenance_items, prov_list_from_machine, offset, placement):
-        """ Extract and add synapse provenance to the list of provenance items
-
-        :param
-            list(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)\
-            provenance_items: The items already read, to append to
-        :param list(int) prov_list_from_machine:
-            The values read from the machine to be decoded
-        :param int offset: Where in the list from the machine to start reading
-        :param ~pacman.model.placements.Placement placement:
-            Which vertex are we retrieving from, and where was it
-        :return: The number of items read from prov_list_from_machine
-        :rtype: int
-        """
-
     @overrides(PopulationMachineCommon.get_recorded_region_ids)
     def get_recorded_region_ids(self):
         ids = self._app_vertex.synapse_recorder.recorded_ids_by_slice(
@@ -189,3 +165,13 @@ class PopulationSynapsesMachineVertexCommon(
             return sdram_machine_edge.post_vertex.n_bytes_for_transfer
         raise SynapticConfigurationException(
             "Unknown post vertex type in edge {}".format(sdram_machine_edge))
+
+    @overrides(PopulationMachineCommon.parse_extra_provenance_items)
+    def parse_extra_provenance_items(self, label, names, provenance_data):
+        yield from self._parse_synapse_provenance(
+            label, names, provenance_data)
+
+    @abstractmethod
+    def _parse_synapse_provenance(self, label, names, provenance_data):
+        """ Parse the synapse provenance data
+        """

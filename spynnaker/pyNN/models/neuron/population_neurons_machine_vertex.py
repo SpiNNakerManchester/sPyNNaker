@@ -21,8 +21,6 @@ from spinn_utilities.overrides import overrides
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from spinn_front_end_common.interface.provenance import (
-    ProvidesProvenanceDataFromMachineImpl)
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.abstract_models import (
@@ -31,10 +29,6 @@ from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .population_machine_neurons import (
     NeuronRegions, PopulationMachineNeurons, NeuronProvenance)
-
-get_placement_details = \
-    ProvidesProvenanceDataFromMachineImpl._get_placement_details
-add_name = ProvidesProvenanceDataFromMachineImpl._add_name
 
 # Size of SDRAM params = 1 word for address + 1 word for size
 # + 1 word for n_neurons + 1 word for n_synapse_types
@@ -169,25 +163,21 @@ class PopulationNeuronsMachineVertex(
         # Reunite title and extension and return
         return name + "_neuron" + ext
 
-    @overrides(PopulationMachineCommon._append_additional_provenance)
-    def _append_additional_provenance(
-            self, provenance_items, prov_list_from_machine, placement):
-        # translate into provenance data items
-        offset = self._append_neuron_provenance(
-            provenance_items, prov_list_from_machine, 0, placement)
-        label, x, y, p, names = get_placement_details(placement)
-        neuron_prov = NeuronMainProvenance(*prov_list_from_machine[
-            offset:NeuronMainProvenance.N_ITEMS + offset])
+    @overrides(PopulationMachineCommon.parse_extra_provenance_items)
+    def parse_extra_provenance_items(self, label, names, provenance_data):
+        yield from self._parse_neuron_provenance(
+            label, names, provenance_data[:NeuronProvenance.N_ITEMS])
 
-        provenance_items.append(ProvenanceDataItem(
-            add_name(names, "Timer tick overruns"),
-            neuron_prov.n_timer_overruns,
-            report=neuron_prov.n_timer_overruns > 0,
-            message="Vertex {} on {}, {}, {} overran on {} timesteps."
-                    " This may mean that the simulation results are invalid."
-                    " Try with fewer neurons per core, increasing the time"
-                    " scale factor, or reducing the number of spikes sent"
-                    .format(label, x, y, p, neuron_prov.n_timer_overruns)))
+        neuron_prov = NeuronMainProvenance(
+            *provenance_data[-NeuronMainProvenance.N_ITEMS:])
+
+        yield ProvenanceDataItem(
+            names + ["Timer tick overruns"],
+            neuron_prov.n_timer_overruns, neuron_prov.n_timer_overruns > 0,
+            f"Vertex {label} overran on {neuron_prov.n_timer_overruns} "
+            "timesteps. This may mean that the simulation results are invalid."
+            " Try with fewer neurons per core, increasing the time"
+            " scale factor, or reducing the number of spikes sent")
 
     @overrides(PopulationMachineCommon.get_recorded_region_ids)
     def get_recorded_region_ids(self):
