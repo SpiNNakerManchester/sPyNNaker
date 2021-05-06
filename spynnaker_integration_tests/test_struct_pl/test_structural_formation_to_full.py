@@ -55,7 +55,6 @@ def structural_formation_to_full():
     return conns, num_forms, num_elims, first_f
 
 
-
 class TestStructuralFormationToFull(BaseTestCase):
     def do_run(self):
         conns, num_forms, num_elims, first_f = structural_formation_to_full()
