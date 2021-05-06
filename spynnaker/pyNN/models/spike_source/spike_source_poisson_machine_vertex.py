@@ -283,8 +283,6 @@ class SpikeSourcePoissonMachineVertex(
         spec.end_specification()
 
     @inject_items({
-        "machine_time_step": "MachineTimeStep",
-        "time_scale_factor": "TimeScaleFactor",
         "routing_info": "MemoryRoutingInfos",
         "data_n_time_steps": "DataNTimeSteps",
         "graph": "MemoryMachineGraph",
@@ -293,16 +291,14 @@ class SpikeSourcePoissonMachineVertex(
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={
-            "machine_time_step", "time_scale_factor", "routing_info",
-            "data_n_time_steps", "graph", "first_machine_time_step"
+            "routing_info", "data_n_time_steps", "graph",
+            "first_machine_time_step"
         }
     )
     def generate_data_specification(
-            self, spec, placement, machine_time_step, time_scale_factor,
-            routing_info, data_n_time_steps, graph, first_machine_time_step):
+            self, spec, placement, routing_info, data_n_time_steps, graph,
+            first_machine_time_step):
         """
-        :param int machine_time_step:
-        :param int time_scale_factor:
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
         :param int data_n_time_steps:
         :param ~pacman.model.graphs.machine.MachineGraph graph:
@@ -319,12 +315,13 @@ class SpikeSourcePoissonMachineVertex(
         spec.switch_write_focus(
             self.POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value)
         spec.write_array(simulation_utilities.get_simulation_header_array(
-            placement.vertex.get_binary_file_name(), machine_time_step,
-            time_scale_factor))
+            placement.vertex.get_binary_file_name()))
 
         # write recording data
         spec.switch_write_focus(
             self.POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value)
+        from spinn_utilities.config_holder import get_config_int
+        machine_time_step = get_config_int("Machine", "machine_time_step")
         sdram = self._app_vertex.get_recording_sdram_usage(
             self.vertex_slice, machine_time_step)
         recorded_region_sizes = [sdram.get_total_sdram(data_n_time_steps)]

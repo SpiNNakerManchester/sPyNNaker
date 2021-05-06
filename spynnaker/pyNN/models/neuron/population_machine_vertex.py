@@ -368,8 +368,6 @@ class PopulationMachineVertex(
         return ExecutableType.USES_SIMULATION_INTERFACE
 
     @inject_items({
-        "machine_time_step": "MachineTimeStep",
-        "time_scale_factor": "TimeScaleFactor",
         "application_graph": "MemoryApplicationGraph",
         "machine_graph": "MemoryMachineGraph",
         "routing_info": "MemoryRoutingInfos",
@@ -379,17 +377,13 @@ class PopulationMachineVertex(
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={
-            "machine_time_step", "time_scale_factor",
             "application_graph", "machine_graph", "routing_info",
             "data_n_time_steps", "n_key_map"
         })
     def generate_data_specification(
-            self, spec, placement, machine_time_step, time_scale_factor,
-            application_graph, machine_graph, routing_info, data_n_time_steps,
-            n_key_map):
+            self, spec, placement, application_graph, machine_graph,
+            routing_info, data_n_time_steps, n_key_map):
         """
-        :param machine_time_step: (injected)
-        :param time_scale_factor: (injected)
         :param application_graph: (injected)
         :param machine_graph: (injected)
         :param routing_info: (injected)
@@ -415,7 +409,7 @@ class PopulationMachineVertex(
         # Write the setup region
         spec.switch_write_focus(POPULATION_BASED_REGIONS.SYSTEM.value)
         spec.write_array(simulation_utilities.get_simulation_header_array(
-            self.__binary_file_name, machine_time_step, time_scale_factor))
+            self.__binary_file_name))
 
         # Write the neuron recording region
         self._app_vertex.neuron_recorder.write_neuron_recording_region(
@@ -435,6 +429,8 @@ class PopulationMachineVertex(
         weight_scale = self._app_vertex.neuron_impl.get_global_weight_scale()
 
         # allow the synaptic matrix to write its data spec-able data
+        from spinn_utilities.config_holder import get_config_int
+        machine_time_step = get_config_int("Machine", "machine_time_step")
         self._app_vertex.synapse_manager.write_data_spec(
             spec, self._app_vertex, self.vertex_slice, self, machine_graph,
             application_graph, routing_info, weight_scale, machine_time_step)

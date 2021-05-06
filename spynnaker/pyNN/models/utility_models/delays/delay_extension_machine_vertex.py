@@ -220,22 +220,16 @@ class DelayExtensionMachineVertex(
 
     @inject_items({
         "machine_graph": "MemoryMachineGraph",
-        "routing_infos": "MemoryRoutingInfos",
-        "machine_time_step": "MachineTimeStep",
-        "time_scale_factor": "TimeScaleFactor"})
+        "routing_infos": "MemoryRoutingInfos"})
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={
-            "machine_graph", "routing_infos", "machine_time_step",
-            "time_scale_factor"})
+            "machine_graph", "routing_infos"})
     def generate_data_specification(
-            self, spec, placement, machine_graph, routing_infos,
-            machine_time_step, time_scale_factor):
+            self, spec, placement, machine_graph, routing_infos):
         """
         :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
         :param ~pacman.model.routing_info.RoutingInfo routing_infos:
-        :param int machine_time_step: machine time step of the sim.
-        :param int time_scale_factor: the time scale factor of the sim.
         """
         # pylint: disable=arguments-differ
 
@@ -267,9 +261,7 @@ class DelayExtensionMachineVertex(
         # reserve region for provenance
         self.reserve_provenance_data_region(spec)
 
-        self._write_setup_info(
-            spec, machine_time_step, time_scale_factor,
-            vertex.get_binary_file_name())
+        self._write_setup_info(spec, vertex.get_binary_file_name())
 
         spec.comment("\n*** Spec for Delay Extension Instance ***\n\n")
 
@@ -318,18 +310,15 @@ class DelayExtensionMachineVertex(
         # End-of-Spec:
         spec.end_specification()
 
-    def _write_setup_info(
-            self, spec, machine_time_step, time_scale_factor, binary_name):
+    def _write_setup_info(self, spec, binary_name):
         """
         :param ~data_specification.DataSpecificationGenerator spec:
-        :param int machine_time_step:v the machine time step
-        :param int time_scale_factor: the time scale factor
         :param str binary_name: the binary name
         """
         # Write this to the system region (to be picked up by the simulation):
         spec.switch_write_focus(self._DELAY_EXTENSION_REGIONS.SYSTEM.value)
         spec.write_array(simulation_utilities.get_simulation_header_array(
-            binary_name, machine_time_step, time_scale_factor))
+            binary_name))
 
     def write_delay_parameters(
             self, spec, vertex_slice, key, incoming_key, incoming_mask):
