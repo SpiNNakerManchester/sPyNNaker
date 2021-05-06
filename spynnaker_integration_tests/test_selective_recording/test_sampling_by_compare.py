@@ -23,15 +23,16 @@ from spinnaker_testbase import BaseTestCase
 """
 This is the original way of testing selective recording.
 
-It worked by running the same seeded script twice. 
+It worked by running the same seeded script twice.
 Once recording all and once with selective recording on.
 
-The main selective recording is now done by test_sampling 
+The main selective recording is now done by test_sampling
 based on the PatternSpiker.
 
 This is kept mainly for all the useful compare methods.
 Which is why most tests are commented out.
 """
+
 
 def run_script(
         simtime, n_neurons, run_split=1,

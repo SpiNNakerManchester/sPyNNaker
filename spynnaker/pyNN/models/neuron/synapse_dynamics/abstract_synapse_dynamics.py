@@ -128,9 +128,11 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
 
         :param str pre_population_label:
         :param str post_population_label:
+        :rtype:
+            iterable(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)
         """
         # pylint: disable=unused-argument
-        return list()
+        return []
 
     def get_delay_maximum(self, connector, synapse_info):
         """ Get the maximum delay for the synapses
