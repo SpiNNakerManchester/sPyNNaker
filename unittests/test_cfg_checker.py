@@ -16,14 +16,11 @@
 import os
 import unittest
 from spinn_utilities.config_holder import run_config_checks
+# This imports AbstractSpiNNakerCommon which calls set_cfg_files
+import spynnaker8  # noqa: F401
 
 
 class TestCfgChecker(unittest.TestCase):
-
-    @classmethod
-    def setUpClass(cls):
-        # This imports AbstractSpiNNakerCommon which calls set_cfg_files
-        module = __import__("spynnaker8")
 
     def test_config_checks(self):
         repeaters = [
