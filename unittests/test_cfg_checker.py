@@ -23,18 +23,10 @@ import spynnaker8  # noqa: F401
 class TestCfgChecker(unittest.TestCase):
 
     def test_config_checks(self):
-        repeaters = [
-            "application_to_machine_graph_algorithms",
-            "machine_graph_to_machine_algorithms",
-            "machine_graph_to_virtual_machine_algorithms",
-            "loading_algorithms"]
-        run_config_checks("spynnaker", repeaters=repeaters)
-
-    def test_config_checks(self):
         unittests = os.path.dirname(__file__)
         parent = os.path.dirname(unittests)
         spynnaker = os.path.join(parent, "spynnaker")
-        spynnaker8 = os.path.join(parent, "spynnaker8")
+        spy8 = os.path.join(parent, "spynnaker8")
         spynnaker_it = os.path.join(parent, "spynnaker_integration_tests")
         repeaters = [
             "application_to_machine_graph_algorithms",
@@ -42,5 +34,5 @@ class TestCfgChecker(unittest.TestCase):
             "machine_graph_to_virtual_machine_algorithms",
             "loading_algorithms"]
         run_config_checks(
-            directories=[spynnaker, spynnaker8, spynnaker_it, unittests],
+            directories=[spynnaker, spy8, spynnaker_it, unittests],
             repeaters=repeaters)
