@@ -436,7 +436,8 @@ class SynapticMatrices(object):
                     n_atoms_per_core != s.n_atoms):
                 return None
             next_high = s.hi_atom + 1
-            n_atoms_per_core = s.n_atoms
+            if n_atoms_per_core is None:
+                n_atoms_per_core = s.n_atoms
 
         # If the number of atoms per core is too big, this can't be done
         if n_atoms_per_core > self.__poptable.max_n_neurons_per_core:
