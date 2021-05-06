@@ -22,6 +22,7 @@
 #include "neuron.h"
 #include "neuron_recording.h"
 #include "implementations/neuron_impl.h"
+#include "current_sources/current_source_impl.h"
 #include "plasticity/synapse_dynamics.h"
 #include <debug.h>
 #include <tdma_processing.h>
@@ -76,7 +77,7 @@ bool neuron_resume(address_t address) { // EXPORTED
 }
 
 bool neuron_initialise(
-        address_t address, address_t recording_address, // EXPORTED
+        address_t address, address_t cs_address, address_t recording_address, // EXPORTED
         uint32_t *n_neurons_value, uint32_t *n_synapse_types_value,
         uint32_t *incoming_spike_buffer_size, uint32_t *n_rec_regions_used) {
     log_debug("neuron_initialise: starting");
@@ -122,6 +123,11 @@ bool neuron_initialise(
         return false;
     }
 
+    // Initialise for current sources
+    if (!current_source_impl_initialise(cs_address)) {
+        return false;
+    }
+
     // setup recording region
     if (!neuron_recording_initialise(
             recording_address, &recording_flags, n_neurons, n_rec_regions_used)) {
@@ -152,6 +158,9 @@ void neuron_do_timestep_update(timer_t time, uint timer_count) { // EXPORTED
     // Prepare recording for the next timestep
     neuron_recording_setup_for_next_recording();
 
+    // Get any input from an injected current source
+    REAL current_offset = current_source_get_offset(time);
+
     // update each neuron individually
     for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
 
@@ -161,7 +170,7 @@ void neuron_do_timestep_update(timer_t time, uint timer_count) { // EXPORTED
 
         // call the implementation function (boolean for spike)
         bool spike = neuron_impl_do_timestep_update(
-            neuron_index, external_bias);
+            neuron_index, external_bias, current_offset);
 
         // If the neuron has spiked
         if (spike) {

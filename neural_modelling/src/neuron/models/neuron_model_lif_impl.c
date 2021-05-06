@@ -41,7 +41,7 @@ void neuron_model_set_global_neuron_params(
 state_t neuron_model_state_update(
 		uint16_t num_excitatory_inputs, const input_t *exc_input,
 		uint16_t num_inhibitory_inputs, const input_t *inh_input,
-		input_t external_bias, neuron_t *restrict neuron) {
+		input_t external_bias, REAL current_offset, neuron_t *restrict neuron) {
 	log_debug("Exc 1: %12.6k, Exc 2: %12.6k", exc_input[0], exc_input[1]);
 	log_debug("Inh 1: %12.6k, Inh 2: %12.6k", inh_input[0], inh_input[1]);
 
@@ -56,9 +56,10 @@ state_t neuron_model_state_update(
 		for (int i=0; i< num_inhibitory_inputs; i++) {
 			total_inh += inh_input[i];
 		}
+
         // Get the input in nA
         input_t input_this_timestep =
-                total_exc - total_inh + external_bias + neuron->I_offset;
+                total_exc - total_inh + external_bias + neuron->I_offset + current_offset;
 
         lif_neuron_closed_form(
                 neuron, neuron->V_membrane, input_this_timestep);

@@ -49,7 +49,7 @@ static void neuron_impl_load_neuron_parameters(
 //! \param[in] external_bias: External input to be applied to the neuron
 //! \return True if a spike has occurred
 static bool neuron_impl_do_timestep_update(
-        index_t neuron_index, input_t external_bias);
+        index_t neuron_index, input_t external_bias, REAL current_offset);
 
 //! \brief Stores neuron parameters back into SDRAM
 //! \param[out] address: the address in SDRAM to start the store

@@ -248,7 +248,7 @@ SOMETIMES_UNUSED // Marked unused as only used sometimes
 //! \param[in] external_bias: External input to be applied to the neuron
 //! \return True if a spike has occurred
 static bool neuron_impl_do_timestep_update(index_t neuron_index,
-        input_t external_bias) {
+        input_t external_bias, REAL current_offset) {
     // Get the neuron itself
     neuron_t *this_neuron = &neuron_array[neuron_index];
 
@@ -319,7 +319,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
         state_t result = neuron_model_state_update(
                 NUM_EXCITATORY_RECEPTORS, exc_input_values,
                 NUM_INHIBITORY_RECEPTORS, inh_input_values,
-                external_bias, this_neuron);
+                external_bias, current_offset, this_neuron);
 
         // determine if a spike should occur
         bool spike_now =

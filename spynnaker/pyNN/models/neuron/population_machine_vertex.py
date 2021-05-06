@@ -40,6 +40,8 @@ from spynnaker.pyNN.utilities import constants, bit_field_utilities
 from spynnaker.pyNN.models.abstract_models import (
     AbstractSynapseExpandable, AbstractReadParametersBeforeSet)
 from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
+from spynnaker.pyNN.models.current_sources import CurrentSourceIDs
+from spynnaker.pyNN.utilities.utility_calls import convert_to
 from spinn_front_end_common.utilities import (
     constants as common_constants, helpful_functions)
 
@@ -474,7 +476,13 @@ class PopulationMachineVertex(
 
         # Write the neuron parameters
         self._write_neuron_parameters(
-            spec, key, constants.POPULATION_BASED_REGIONS.NEURON_PARAMS.value)
+            spec, key, POPULATION_BASED_REGIONS.NEURON_PARAMS.value)
+
+        # Write the current source parameters
+        if self._app_vertex.current_source is not None:
+            self._write_current_source_parameters(
+                spec, key,
+                POPULATION_BASED_REGIONS.CURRENT_SOURCE_PARAMS.value)
 
         # write profile data
         profile_utils.write_profile_region_data(
@@ -558,6 +566,8 @@ class PopulationMachineVertex(
 
         self._reserve_neuron_params_data_region(spec)
 
+        self._reserve_current_source_params_data_region(spec)
+
         spec.reserve_memory_region(
             region=POPULATION_BASED_REGIONS.NEURON_RECORDING.value,
             size=self._app_vertex.neuron_recorder.get_exact_static_sdram_usage(
@@ -595,6 +605,20 @@ class PopulationMachineVertex(
         spec.reserve_memory_region(
             region=POPULATION_BASED_REGIONS.NEURON_PARAMS.value,
             size=params_size, label='NeuronParams')
+
+    def _reserve_current_source_params_data_region(self, spec):
+        """ Reserve the current_source parameter data region.
+
+        :param ~data_specification.DataSpecificationGenerator spec:
+            the spec to write the DSG region to
+        :return: None
+        """
+        params_size = self._app_vertex.get_sdram_usage_for_current_source_params(
+            self.vertex_slice)
+        if params_size:
+            spec.reserve_memory_region(
+                region=POPULATION_BASED_REGIONS.CURRENT_SOURCE_PARAMS.value,
+                size=params_size, label='CurrentSourceParams')
 
     def _write_neuron_parameters(self, spec, key, region_id):
 
@@ -637,6 +661,44 @@ class PopulationMachineVertex(
             self._app_vertex.parameters, self._app_vertex.state_variables,
             self.vertex_slice)
         spec.write_array(neuron_data)
+
+    def _write_current_source_parameters(self, spec, key, region_id):
+        # pylint: disable=too-many-arguments
+        n_atoms = self.vertex_slice.n_atoms
+        spec.comment(
+            "\nWriting Current Source Parameters for {} Neurons:\n".format(
+                n_atoms))
+
+        # Set the focus to the memory region:
+        spec.switch_write_focus(region_id)
+
+        # Write whether the key is to be used, and then the key, or 0 if it
+        # isn't to be used (not sure about this bit?)
+        # if key is None:
+        #     spec.write_value(data=0)
+        #     spec.write_value(data=0)
+        # else:
+        #     spec.write_value(data=1)
+        #     spec.write_value(data=key)
+
+        # Now write the hash associated with the
+        current_source = self.app_vertex.current_source
+        # print("current_source is ", current_source)
+
+        # Generally speaking the parameters are single-valued dicts,
+        # apart from the StepCurrentSource case
+        cs_id = current_source.current_source_id
+        spec.write_value(cs_id)
+        cs_data_types = current_source.get_parameter_types
+        for key, value in current_source.get_parameters.items():
+            if (cs_id == CurrentSourceIDs.STEP_CURRENT_SOURCE.value):
+                spec.write_array(data=value, data_type=cs_data_types[key])
+            else:
+                value_convert = convert_to(
+                    value, cs_data_types[key]).view("uint32")
+                print("writing ", value, " data type ", cs_data_types[key],
+                      " converted to ", value_convert)
+                spec.write_value(data=value_convert)
 
     @overrides(AbstractSynapseExpandable.gen_on_machine)
     def gen_on_machine(self):

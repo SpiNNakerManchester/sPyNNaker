@@ -203,6 +203,7 @@ static bool initialise(void) {
     uint32_t n_regions_used;
     if (!neuron_initialise(
             data_specification_get_region(NEURON_PARAMS_REGION, ds_regions),
+            data_specification_get_region(CURRENT_SOURCE_PARAMS_REGION, ds_regions),
             data_specification_get_region(NEURON_RECORDING_REGION, ds_regions),
             &n_neurons, &n_synapse_types, &incoming_spike_buffer_size,
             &n_regions_used)) {

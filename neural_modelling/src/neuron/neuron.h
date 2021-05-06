@@ -50,9 +50,9 @@
 //! \param[out] n_rec_regions_used: The number of regions used by neuron recording
 //! \return True if the translation was successful, otherwise False
 bool neuron_initialise(
-        address_t address, address_t recording_address, uint32_t *n_neurons_value,
-        uint32_t *n_synapse_types_value, uint32_t *incoming_spike_buffer_size,
-        uint32_t *n_rec_regions_used);
+        address_t address, address_t cs_address, address_t recording_address,
+        uint32_t *n_neurons_value, uint32_t *n_synapse_types_value,
+        uint32_t *incoming_spike_buffer_size, uint32_t *n_rec_regions_used);
 
 //! \brief executes all the updates to neural parameters when a given timer
 //!        period has occurred.

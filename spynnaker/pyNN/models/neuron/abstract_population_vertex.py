@@ -70,7 +70,8 @@ class AbstractPopulationVertex(
         "__units",
         "__n_data_specs",
         "__initial_state_variables",
-        "__has_run"]
+        "__has_run",
+        "__current_source"]
 
     #: recording region IDs
     _SPIKE_RECORDING_REGION = 0
@@ -157,6 +158,9 @@ class AbstractPopulationVertex(
         self.__change_requires_data_generation = False
         self.__has_run = False
 
+        # Current source for this vertex
+        self.__current_source = None
+
         # Set up for profiling
         self.__n_profile_samples = get_config_int(
             "Reports", "n_profile_samples")
@@ -236,6 +240,21 @@ class AbstractPopulationVertex(
             self.BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
             self.tdma_sdram_size_in_bytes +
             self.__neuron_impl.get_sdram_usage_in_bytes(vertex_slice.n_atoms))
+
+    def get_sdram_usage_for_current_source_params(self, vertex_slice):
+        """ Calculate the SDRAM usage for the current source parameters region.
+
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            the slice of atoms.
+        :return: The SDRAM required for the current source region
+        """
+        if self.__current_source is None:
+            return BYTES_PER_WORD  # a single value for the CS ID = 0
+        else:
+            return (
+                BYTES_PER_WORD +  # the CS ID value
+                self.__current_source.get_sdram_usage_in_bytes(
+                    vertex_slice.n_atoms))
 
     @overrides(AbstractSpikeRecordable.is_recording_spikes)
     def is_recording_spikes(self):
@@ -507,6 +526,19 @@ class AbstractPopulationVertex(
 
     def get_synapse_id_by_target(self, target):
         return self.__neuron_impl.get_synapse_id_by_target(target)
+
+    def inject(self, current_source):
+        """ Inject method from population to set up current source
+
+        """
+        self.__current_source = current_source
+
+    @property
+    def current_source(self):
+        """ Current source needs to be available to machine vertex
+
+        """
+        return self.__current_source
 
     def __str__(self):
         return "{} with {} atoms".format(self.label, self.n_atoms)

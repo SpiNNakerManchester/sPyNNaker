@@ -105,6 +105,11 @@ from spynnaker.pyNN.models.populations import (
 # noinspection PyUnresolvedReferences
 from spynnaker.pyNN.models.projection import Projection as SpiNNakerProjection
 
+# current sources
+# noinspection PyUnresolvedReferences
+from spynnaker.pyNN.models.current_sources import (
+    DCSource, ACSource, StepCurrentSource, NoisyCurrentSource)
+
 from spynnaker8 import external_devices
 from spynnaker8 import extra_models
 
