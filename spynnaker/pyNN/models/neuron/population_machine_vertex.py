@@ -200,7 +200,7 @@ class PopulationMachineVertex(
         yield from self._parse_synapse_provenance(
             label, names, provenance_data[syn_offset:com_offset])
 
-        main_prov = MainProvenance(*provenance_data[-com_offset:])
+        main_prov = MainProvenance(*provenance_data[-MainProvenance.N_ITEMS:])
         yield ProvenanceDataItem(
             names + [self._BACKGROUND_MAX_QUEUED_NAME],
             main_prov.max_background_queued,

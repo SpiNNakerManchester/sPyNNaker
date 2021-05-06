@@ -118,7 +118,8 @@ def reserve_bit_field_regions(
 
     :param ~data_specification.DataSpecificationGenerator spec:
         dsg spec writer
-    :param list(Projection) incoming_projections:
+    :param list(~spynnaker.pyNN.models.projection.Projection)
+            incoming_projections:
         The projections to generate bitfields for
     :param int bit_field_builder_region: region id for the builder region
     :param int bit_filter_region: region id for the bitfield region
