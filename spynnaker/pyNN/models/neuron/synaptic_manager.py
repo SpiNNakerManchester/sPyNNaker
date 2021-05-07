@@ -616,8 +616,6 @@ class SynapticManager(object):
             How messages are routed
         :param float weight_scale: How to scale the weights of the synapses
         """
-        machine_time_step = get_config_int("Machine", "machine_time_step")
-
         # Reserve the memory
         in_edges = application_graph.get_edges_ending_at_vertex(
             application_vertex)
@@ -647,9 +645,8 @@ class SynapticManager(object):
             if isinstance(self.__synapse_dynamics,
                           AbstractSynapseDynamicsStructural):
                 self.__synapse_dynamics.write_structural_parameters(
-                    spec, self._struct_dynamics_region, machine_time_step,
-                    self.__weight_scales, machine_graph, machine_vertex,
-                    routing_info, matrices)
+                    spec, self._struct_dynamics_region, self.__weight_scales,
+                    machine_graph, machine_vertex, routing_info, matrices)
 
         self._write_on_machine_data_spec(spec, post_vertex_slice, gen_data)
 
