@@ -484,29 +484,31 @@ def test_set_synapse_dynamics():
 
 @pytest.mark.parametrize(
     "undelayed_indices_connected,delayed_indices_connected,n_pre_neurons,"
-    "neurons_per_core,expect_app_keys", [
+    "neurons_per_core,expect_app_keys,max_delay", [
         # Only undelayed, all edges exist
-        (set(range(10)), None, 1000, 100, True),
+        (set(range(10)), None, 1000, 100, True, None),
         # Only delayed, all edges exist
-        (None, set(range(10)), 1000, 100, True),
+        (None, set(range(10)), 1000, 100, True, 20),
         # All undelayed and delayed edges exist
-        (set(range(10)), set(range(10)), 1000, 100, True),
+        (set(range(10)), set(range(10)), 1000, 100, True, 20),
         # Only undelayed, some edges are filtered (app keys shouldn't work)
-        ({0, 1, 2, 3, 4}, None, 1000, 100, False),
+        ({0, 1, 2, 3, 4}, None, 1000, 100, False, None),
         # Only delayed, some edges are filtered (app keys shouldn't work)
-        (None, {5, 6, 7, 8, 9}, 1000, 100, False),
+        (None, {5, 6, 7, 8, 9}, 1000, 100, False, 20),
         # Both delayed and undelayed, some undelayed edges don't exist
-        ({3, 4, 5, 6, 7}, set(range(10)), 1000, 100, False),
+        ({3, 4, 5, 6, 7}, set(range(10)), 1000, 100, False, 20),
         # Both delayed and undelayed, some delayed edges don't exist
-        (set(range(10)), {4, 5, 6, 7}, 1000, 100, False),
+        (set(range(10)), {4, 5, 6, 7}, 1000, 100, False, 20),
         # Should work but number of neurons don't work out
-        (set(range(5)), None, 10000, 2048, False),
+        (set(range(5)), None, 10000, 2048, False, None),
         # Should work but number of cores doesn't work out
-        (set(range(2000)), None, 10000, 5, False)
+        (set(range(2000)), None, 10000, 5, False, None),
+        # Should work but number of neurons with delays don't work out
+        (None, set(range(4)), 1024, 256, False, 144)
     ])
 def test_pop_based_master_pop_table_standard(
         undelayed_indices_connected, delayed_indices_connected,
-        n_pre_neurons, neurons_per_core, expect_app_keys):
+        n_pre_neurons, neurons_per_core, expect_app_keys, max_delay):
     MockSimulator.setup()
     # Add an sdram so max SDRAM is high enough
     SDRAM(128000000)
@@ -539,9 +541,7 @@ def test_pop_based_master_pop_table_standard(
     # Add delays if needed
     if delayed_indices_connected:
         pre_app_delay_vertex = DelayExtensionVertex(
-            n_pre_neurons, 16.0, 4, pre_app_vertex)
-        pre_app_delay_vertex.set_new_n_delay_stages_and_delay_per_stage(
-            16, 20)
+            n_pre_neurons, 16.0, max_delay, pre_app_vertex)
         app_graph.add_vertex(pre_app_delay_vertex)
 
         for lo in range(0, n_pre_neurons, neurons_per_core):
