@@ -543,8 +543,8 @@ class SynapticManager(object):
                 max_weights[synapse_type] = min(
                     self._ring_buffer_expected_upper_bound(
                         stats.mean, stats.standard_deviation, rates.mean,
-                        machine_timestep, stats.n_items,
-                        self.__ring_buffer_sigma),
+                        get_config_int("Machine", "machine_time_step"),
+                        stats.n_items, self.__ring_buffer_sigma),
                     total_weights[synapse_type])
                 max_weights[synapse_type] = max(
                     max_weights[synapse_type], biggest_weight[synapse_type])
@@ -642,7 +642,7 @@ class SynapticManager(object):
         if self.__synapse_dynamics is not None:
             self.__synapse_dynamics.write_parameters(
                 spec, self._synapse_dynamics_region,
-                machine_time_step, self.__weight_scales)
+                self.__weight_scales)
 
             if isinstance(self.__synapse_dynamics,
                           AbstractSynapseDynamicsStructural):

@@ -70,12 +70,11 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def write_parameters(self, spec, region, machine_time_step, weight_scales):
+    def write_parameters(self, spec, region, weight_scales):
         """ Write the synapse parameters to the spec
 
         :param ~data_specification.DataSpecificationGenerator spec:
         :param int region: region ID
-        :param int machine_time_step:
         :param list(float) weight_scales:
         """
 

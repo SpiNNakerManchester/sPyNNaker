@@ -137,7 +137,7 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
         return 1
 
     @overrides(AbstractTimingDependence.write_parameters)
-    def write_parameters(self, spec, machine_time_step, weight_scales):
+    def write_parameters(self, spec, weight_scales):
 
         # Write lookup tables
         spec.write_array(self.__tau_plus_data)

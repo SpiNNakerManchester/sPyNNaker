@@ -82,7 +82,7 @@ class SynapseDynamicsStatic(
         return 0
 
     @overrides(AbstractStaticSynapseDynamics.write_parameters)
-    def write_parameters(self, spec, region, machine_time_step, weight_scales):
+    def write_parameters(self, spec, region, weight_scales):
         # Nothing to do here
         pass
 
