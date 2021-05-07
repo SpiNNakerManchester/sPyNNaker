@@ -17,7 +17,6 @@ import logging
 import numpy
 import neo
 import quantities
-from spinn_utilities.config_holder import get_config_int
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.ordered_set import OrderedSet
@@ -284,9 +283,7 @@ class Recorder(object):
 
         # assuming we got here, everything is OK, so we should go get the
         # spikes
-        return self.__vertex.get_spikes(
-            sim.placements, sim.buffer_manager,
-            get_config_int("Machine", "machine_time_step"))
+        return self.__vertex.get_spikes(sim.placements, sim.buffer_manager)
 
     def turn_off_all_recording(self, indexes=None):
         """ Turns off recording, is used by a pop saying ``.record()``

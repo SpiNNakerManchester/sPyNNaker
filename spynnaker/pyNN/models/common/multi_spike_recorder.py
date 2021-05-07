@@ -17,6 +17,7 @@ import math
 import logging
 import struct
 import numpy
+from spinn_utilities.config_holder import get_config_int
 from pacman.model.resources.constant_sdram import ConstantSDRAM
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
@@ -78,7 +79,7 @@ class MultiSpikeRecorder(object):
 
     def get_spikes(
             self, label, buffer_manager, region,
-            placements, application_vertex, machine_time_step):
+            placements, application_vertex):
         """
         :param str label:
         :param buffer_manager: the buffer manager object
@@ -89,7 +90,6 @@ class MultiSpikeRecorder(object):
         :param application_vertex:
         :type application_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
-        :param int machine_time_step: microseconds
         :return: A numpy array of 2-element arrays of (neuron_id, time)
             ordered by time, one element per event
         :rtype: ~numpy.ndarray(tuple(int,int))
@@ -97,7 +97,6 @@ class MultiSpikeRecorder(object):
         # pylint: disable=too-many-arguments
         spike_times = list()
         spike_ids = list()
-        ms_per_tick = machine_time_step / MICRO_TO_MILLISECOND_CONVERSION
 
         vertices = application_vertex.machine_vertices
         missing = []
@@ -113,7 +112,7 @@ class MultiSpikeRecorder(object):
             if data_missing:
                 missing.append(placement)
             self._process_spike_data(
-                vertex_slice, ms_per_tick,
+                vertex_slice,
                 int(math.ceil(vertex_slice.n_atoms / BITS_PER_WORD)),
                 neuron_param_data, spike_ids, spike_times)
 
@@ -133,17 +132,17 @@ class MultiSpikeRecorder(object):
 
     @staticmethod
     def _process_spike_data(
-            vertex_slice, ms_per_tick, n_words, raw_data, spike_ids,
-            spike_times):
+            vertex_slice, n_words, raw_data, spike_ids, spike_times):
         """
         :param ~pacman.model.graphs.common.Slice vertex_slice:
-        :param int ms_per_tick:
         :param int n_words:
         :param bytearray raw_data:
         :param list(~numpy.ndarray) spike_ids:
         :param list(~numpy.ndarray) spike_times:
         """
         # pylint: disable=too-many-arguments
+        ms_per_tick = (get_config_int("Machine", "machine_time_step") /
+                       MICRO_TO_MILLISECOND_CONVERSION)
         n_bytes_per_block = n_words * BYTES_PER_WORD
         offset = 0
         while offset < len(raw_data):
