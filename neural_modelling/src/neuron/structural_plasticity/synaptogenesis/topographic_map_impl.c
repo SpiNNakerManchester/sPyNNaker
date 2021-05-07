@@ -88,7 +88,7 @@ typedef struct structural_recording_values_t {
     uint32_t value;
 } structural_recording_values_t;
 
-structural_recording_values_t *structural_recording_values;
+structural_recording_values_t structural_recording_values;
 
 void print_post_to_pre_entry(void) {
     uint32_t n_elements =
@@ -202,12 +202,6 @@ bool synaptogenesis_dynamics_initialise(
         elimination_params[i] = synaptogenesis_elimination_init(&data);
     }
 
-    // I don't think this needs to be multiplied by n_neurons... ?
-    structural_recording_values = spin1_malloc(
-            sizeof(structural_recording_values_t));
-    structural_recording_values->time = 0;
-    structural_recording_values->value = 0;
-
     rewiring_recording_index = *recording_regions_used;
     *recording_regions_used = rewiring_recording_index + 1;
 
@@ -316,9 +310,9 @@ static inline bool row_restructure(
             uint32_t pre_id = current_state->key_atom_info->lo_atom + current_state->pre_syn_id;
             uint32_t id = current_state->post_syn_id;
             uint32_t record_value = ELIM_FLAG | (id << ID_SHIFT) | (pre_id << PRE_ID_SHIFT);
-            structural_recording_values->time = time;
-            structural_recording_values->value = record_value;
-            recording_record(rewiring_recording_index, structural_recording_values,
+            structural_recording_values.time = time;
+            structural_recording_values.value = record_value;
+            recording_record(rewiring_recording_index, &structural_recording_values,
                     sizeof(structural_recording_values_t));
 
             return true;
@@ -345,9 +339,9 @@ static inline bool row_restructure(
                     uint32_t id = current_state->post_syn_id;
                     uint32_t record_value = FORM_FLAG | (id << ID_SHIFT) |
                             (pre_id << PRE_ID_SHIFT);
-                    structural_recording_values->time = time;
-                    structural_recording_values->value = record_value;
-                    recording_record(rewiring_recording_index, structural_recording_values,
+                    structural_recording_values.time = time;
+                    structural_recording_values.value = record_value;
+                    recording_record(rewiring_recording_index, &structural_recording_values,
                             sizeof(structural_recording_values_t));
 
                     return true;
@@ -369,9 +363,9 @@ static inline bool row_restructure(
                         uint32_t id = current_state->post_syn_id;
                         uint32_t record_value = FORM_FLAG | (id << ID_SHIFT) |
                                 (pre_id << PRE_ID_SHIFT);
-                        structural_recording_values->time = time;
-                        structural_recording_values->value = record_value;
-                        recording_record(rewiring_recording_index, structural_recording_values,
+                        structural_recording_values.time = time;
+                        structural_recording_values.value = record_value;
+                        recording_record(rewiring_recording_index, &structural_recording_values,
                                 sizeof(structural_recording_values_t));
 
                         return true;

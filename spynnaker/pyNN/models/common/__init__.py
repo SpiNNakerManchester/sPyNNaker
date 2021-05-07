@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from .abstract_event_recordable import AbstractEventRecordable
 from .abstract_neuron_recordable import AbstractNeuronRecordable
 from .abstract_spike_recordable import AbstractSpikeRecordable
 from .eieio_spike_recorder import EIEIOSpikeRecorder
@@ -23,8 +24,8 @@ from .recording_utils import (
     needs_buffering, pull_off_cached_lists)
 from .simple_population_settable import SimplePopulationSettable
 
-__all__ = ["AbstractNeuronRecordable", "AbstractSpikeRecordable",
-           "EIEIOSpikeRecorder", "NeuronRecorder", "MultiSpikeRecorder",
-           "SimplePopulationSettable", "get_buffer_sizes", "get_data",
-           "needs_buffering", "get_recording_region_size_in_bytes",
-           "pull_off_cached_lists", ]
+__all__ = ["AbstractEventRecordable", "AbstractNeuronRecordable",
+           "AbstractSpikeRecordable", "EIEIOSpikeRecorder", "NeuronRecorder",
+           "MultiSpikeRecorder", "SimplePopulationSettable",
+           "get_buffer_sizes", "get_data", "needs_buffering",
+           "get_recording_region_size_in_bytes", "pull_off_cached_lists", ]

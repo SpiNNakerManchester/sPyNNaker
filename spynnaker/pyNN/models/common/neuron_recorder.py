@@ -155,11 +155,10 @@ class NeuronRecorder(object):
             self.__sampling_rates[variable] = 0
             self.__indexes[variable] = None
             self.__region_ids[variable] = region_id
-        event_region_id = region_id + 1
+        event_region_id = region_id
         for event_region_id, variable in enumerate(
                 events_per_core_variables, start=region_id + 1):
             self.__region_ids[variable] = event_region_id
-            # sampling_rates and indexes not yet specified for events?
         for ts_region_id, variable in enumerate(
                 per_timestep_variables, start=event_region_id + 1):
             self.__region_ids[variable] = ts_region_id
@@ -486,7 +485,37 @@ class NeuronRecorder(object):
         result = numpy.column_stack((spike_ids, spike_times))
         return result[numpy.lexsort((spike_times, spike_ids))]
 
-    def get_rewires(
+    def get_events(
+            self, label, buffer_manager, placements,
+            application_vertex, variable, machine_time_step):
+        """ Read events mapped to time and neuron IDs from the SpiNNaker\
+            machine.
+
+        :param str label: vertex label
+        :param buffer_manager: the manager for buffered data
+        :type buffer_manager:
+            ~spinn_front_end_common.interface.buffer_management.BufferManager
+        :param ~pacman.model.placements.Placements placements:
+            the placements object
+        :param application_vertex:
+        :type application_vertex:
+            ~pacman.model.graphs.application.ApplicationVertex
+        :param str variable:
+        :param int machine_time_step: microseconds
+        :return:
+        :rtype: ~numpy.ndarray(tuple(int,int,int,int))
+        """
+        if variable == self.REWIRING:
+            return self._get_rewires(label, buffer_manager, placements,
+                               application_vertex, variable, machine_time_step)
+        else:
+            # Unspecified event variable
+            msg = (
+                "Variable {} is not supported. Supported event variables are: "
+                "{}".format(variable, self.get_event_recordable_variables()))
+            raise ConfigurationException(msg) from e
+
+    def _get_rewires(
             self, label, buffer_manager, placements,
             application_vertex, variable, machine_time_step):
         """ Read rewires mapped to time and neuron IDs from the SpiNNaker\
@@ -585,6 +614,13 @@ class NeuronRecorder(object):
         variables = list(self.__sampling_rates.keys())
         variables.extend(self.__events_per_core_variables)
         variables.extend(self.__per_timestep_variables)
+        return variables
+
+    def get_event_recordable_variables(self):
+        """
+        :rtype: iterable(str)
+        """
+        variables = list(self.__events_per_core_variables)
         return variables
 
     def is_recording(self, variable):

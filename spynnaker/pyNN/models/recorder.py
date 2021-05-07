@@ -23,7 +23,7 @@ from spinn_utilities.ordered_set import OrderedSet
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.models.common import (
-    AbstractSpikeRecordable, AbstractNeuronRecordable)
+    AbstractSpikeRecordable, AbstractNeuronRecordable, AbstractEventRecordable)
 from spynnaker.pyNN.utilities.constants import (
     SPIKES, MEMBRANE_POTENTIAL, GSYN_EXCIT, GSYN_INHIB, REWIRING)
 from spynnaker.pyNN.exceptions import InvalidParameterType
@@ -287,7 +287,7 @@ class Recorder(object):
         return self.__vertex.get_spikes(
             sim.placements, sim.buffer_manager, sim.machine_time_step)
 
-    def get_rewires(self):
+    def get_events(self, variable):
         """ How to get rewiring events (of a post-population) from recorder
 
         :return: the rewires (event times, values) from the underlying vertex
@@ -295,7 +295,7 @@ class Recorder(object):
         """
 
         # check we're in a state where we can get rewires
-        if not isinstance(self.__vertex, AbstractNeuronRecordable):
+        if not isinstance(self.__vertex, AbstractEventRecordable):
             raise ConfigurationException(
                 "This population has not got the capability to record rewires")
         if not self.__vertex.is_recording(REWIRING):
@@ -314,8 +314,9 @@ class Recorder(object):
                 "truly ran, hence the rewires list will be empty")
             return numpy.zeros((0, 4))
 
-        return self.__vertex.get_rewires(
-            sim.placements, sim.buffer_manager, sim.machine_time_step)
+        return self.__vertex.get_events(
+            variable, sim.placements, sim.buffer_manager,
+            sim.machine_time_step)
 
     def turn_off_all_recording(self, indexes=None):
         """ Turns off recording, is used by a pop saying ``.record()``
@@ -475,7 +476,7 @@ class Recorder(object):
                 self.__read_in_event(
                     segment=segment,
                     block=block,
-                    event_array=self.get_rewires(),
+                    event_array=self.get_events(variable),
                     variable=variable,
                     recording_start_time=self._recording_start_time,
                     label=self.__population.label)

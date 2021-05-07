@@ -107,20 +107,3 @@ class AbstractNeuronRecordable(object, metaclass=AbstractBase):
         :param str variable: the variable being recorded
         :return: int the number of rows expected.
         """
-
-    @abstractmethod
-    def get_rewires(
-            self, placements, buffer_manager, machine_time_step):
-        """ Returns the rewiring events for a given runtime
-
-        :param ~pacman.model.placements.Placements placements:
-            the placements object
-        :param buffer_manager: the buffer manager object
-        :type buffer_manager:
-            ~spinn_front_end_common.interface.buffer_management.BufferManager
-        :param int machine_time_step:
-            the time step of the simulation, in microseconds
-        :return: A numpy array of 2-element arrays of (neuron_id, time)
-            ordered by time, one element per event
-        :rtype: ~numpy.ndarray(tuple(int,int))
-        """
