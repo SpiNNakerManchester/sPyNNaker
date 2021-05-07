@@ -509,14 +509,15 @@ class NeuronRecorder(object):
         :rtype: ~numpy.ndarray(tuple(int,int,int,int))
         """
         if variable == self.REWIRING:
-            return self._get_rewires(label, buffer_manager, placements,
-                               application_vertex, variable, machine_time_step)
+            return self._get_rewires(
+                label, buffer_manager, placements, application_vertex,
+                variable, machine_time_step)
         else:
             # Unspecified event variable
             msg = (
                 "Variable {} is not supported. Supported event variables are: "
                 "{}".format(variable, self.get_event_recordable_variables()))
-            raise ConfigurationException(msg) from e
+            raise ConfigurationException(msg)
 
     def _get_rewires(
             self, label, buffer_manager, placements,
@@ -1302,9 +1303,8 @@ class NeuronRecorder(object):
         data = list()
         for variable in self.__sampling_rates:
             # Do bitfields afterwards
-            if (variable in self.__bitfield_variables) or (
-                variable in self.__events_per_core_variables):
-                    continue
+            if variable in self.__bitfield_variables:
+                continue
             rate = self.__sampling_rates[variable]
             n_recording = self._count_recording_per_slice(
                 variable, vertex_slice)
