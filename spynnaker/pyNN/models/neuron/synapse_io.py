@@ -475,18 +475,18 @@ class SynapseIORowBased(object):
 
     @staticmethod
     def _rescale_connections(
-            connections, machine_time_step, weight_scales, synapse_info):
+            connections, weight_scales, synapse_info):
         """ Scale the connection data into machine values
 
         :param ~numpy.ndarray connections: The connections to be rescaled
-        :param int machine_time_step: The time step of the simulation
         :param list(float) weight_scales: The weight scale of each synapse type
         :param SynapseInformation synapse_info:
             The synapse information of the connections
         """
         # Return the delays values to milliseconds
         connections["delay"] /= (
-                MICRO_TO_MILLISECOND_CONVERSION / machine_time_step)
+                MICRO_TO_MILLISECOND_CONVERSION /
+                get_config_int("Machine", "machine_time_step"))
         # Undo the weight scaling
         connections["weight"] /= weight_scales[synapse_info.synapse_type]
         return connections
@@ -494,7 +494,7 @@ class SynapseIORowBased(object):
     def convert_to_connections(
             self, synapse_info, pre_vertex_slice, post_vertex_slice,
             max_row_length, n_synapse_types, weight_scales, data,
-            machine_time_step, delayed, post_vertex_max_delay_ticks):
+            delayed, post_vertex_max_delay_ticks):
         """ Read the synapses for a given projection synapse information\
             object out of the given data and convert to connection data
 
@@ -512,8 +512,6 @@ class SynapseIORowBased(object):
             The weight scaling of each synapse type
         :param bytearray data:
             The raw data containing the synapses
-        :param int machine_time_step:
-            The time step of the simulation
         :param bool delayed: True if the data should be considered delayed
         :param int post_vertex_max_delay_ticks:
             max delayed ticks supported from post vertex
@@ -549,7 +547,7 @@ class SynapseIORowBased(object):
 
         # Return the connections after appropriate scaling
         return self._rescale_connections(
-            connections, machine_time_step, weight_scales, synapse_info)
+            connections, weight_scales, synapse_info)
 
     def read_all_synapses(
             self, data, delayed_data, synapse_info, n_synapse_types,
@@ -576,7 +574,6 @@ class SynapseIORowBased(object):
         :rtype: ~numpy.ndarray
         """
         connections = []
-        machine_time_step = get_config_int("Machine", "machine_time_step")
         pre_vertex_slice = machine_edge.pre_vertex.vertex_slice
         post_vertex_slice = machine_edge.post_vertex.vertex_slice
         post_splitter = machine_edge.post_vertex.app_vertex.splitter
@@ -585,13 +582,12 @@ class SynapseIORowBased(object):
         delayed_max_row_length = max_row_info.delayed_max_words
         connections.append(self.convert_to_connections(
             synapse_info, pre_vertex_slice, post_vertex_slice, max_row_length,
-            n_synapse_types, weight_scales, data, machine_time_step,
-            delayed=False,
+            n_synapse_types, weight_scales, data, delayed=False,
             post_vertex_max_delay_ticks=post_vertex_max_delay_ticks))
         connections.append(self.convert_to_connections(
             synapse_info, pre_vertex_slice, post_vertex_slice,
             delayed_max_row_length, n_synapse_types, weight_scales,
-            delayed_data, machine_time_step, delayed=True,
+            delayed_data,delayed=True,
             post_vertex_max_delay_ticks=post_vertex_max_delay_ticks))
 
         # Join the connections into a single list and return it
