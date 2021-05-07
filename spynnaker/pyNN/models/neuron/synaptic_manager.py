@@ -458,14 +458,12 @@ class SynapticManager(object):
                 (sigma * math.sqrt(poisson_variance + weight_variance)))
 
     def _get_ring_buffer_to_input_left_shifts(
-            self, machine_vertex, machine_graph, machine_timestep,
-            weight_scale):
+            self, machine_vertex, machine_graph, weight_scale):
         """ Get the scaling of the ring buffer to provide as much accuracy as\
             possible without too much overflow
 
         :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:
         :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
-        :param int machine_timestep:
         :param float weight_scale:
         :rtype: list(int)
         """
@@ -477,7 +475,9 @@ class SynapticManager(object):
         biggest_weight = numpy.zeros(n_synapse_types)
         weights_signed = False
         rate_stats = [RunningStats() for _ in range(n_synapse_types)]
-        steps_per_second = MICRO_TO_SECOND_CONVERSION / machine_timestep
+        steps_per_second = (
+                MICRO_TO_SECOND_CONVERSION /
+                get_config_int("Machine", "machine_time_step"))
 
         synapse_map = dict()
         for machine_edge in machine_graph.get_edges_ending_at_vertex(
@@ -581,20 +581,17 @@ class SynapticManager(object):
         return float(math.pow(2, 16 - (ring_buffer_to_input_left_shift + 1)))
 
     def __update_ring_buffer_shifts_and_weight_scales(
-            self, machine_vertex, machine_graph, machine_time_step,
-            weight_scale):
+            self, machine_vertex, machine_graph, weight_scale):
         """ Update the ring buffer shifts and weight scales for this vertex
 
         :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:
         :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
-        :param float machine_time_step:
         :param float weight_scale:
         """
         if self.__ring_buffer_shifts is None:
             self.__ring_buffer_shifts = \
                 self._get_ring_buffer_to_input_left_shifts(
-                    machine_vertex, machine_graph, machine_time_step,
-                    weight_scale)
+                    machine_vertex, machine_graph, weight_scale)
             self.__weight_scales = numpy.array([
                 self.__get_weight_scale(r) * weight_scale
                 for r in self.__ring_buffer_shifts])
@@ -631,7 +628,7 @@ class SynapticManager(object):
             machine_vertex)
 
         self.__update_ring_buffer_shifts_and_weight_scales(
-            machine_vertex, machine_graph, machine_time_step, weight_scale)
+            machine_vertex, machine_graph, weight_scale)
         spec.switch_write_focus(self._synapse_params_region)
         # write the bool for deleting packets that were too late for a timer
         spec.write_value(int(self.__drop_late_spikes))
