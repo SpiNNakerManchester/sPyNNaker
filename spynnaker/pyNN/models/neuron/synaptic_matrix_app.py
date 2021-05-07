@@ -132,8 +132,7 @@ class SynapticMatrixApp(object):
             n_delay_stages = app_edge.delay_edge.pre_vertex.n_delay_stages
         self.__max_row_info = self.__synapse_io.get_max_row_info(
             synapse_info, self.__post_vertex_slice, n_delay_stages,
-            self.__poptable,
-            get_config_int("Machine", "machine_time_step"), app_edge)
+            self.__poptable, app_edge)
 
         # These are set directly later
         self.__all_syn_block_sz = None
@@ -312,8 +311,7 @@ class SynapticMatrixApp(object):
             is_app_key and is_delay_app_key and len(m_edges) > 1)
 
     def write_matrix(
-            self, spec, block_addr, single_addr, single_synapses,
-            machine_time_step):
+            self, spec, block_addr, single_addr, single_synapses):
         """ Write a synaptic matrix from host
 
         :param ~data_specification.DataSpecificationGenerator spec:
@@ -324,7 +322,6 @@ class SynapticMatrixApp(object):
             The address in the "direct" or "single" matrix to start at
         :param list(int) single_synapses:
             A list of "direct" or "single" synapses to write to
-        :param float machine_time_step: the simulation machine time step
         :return: The updated block_addr and single_addr
         :rtype: tuple(int, int)
         """
@@ -334,7 +331,7 @@ class SynapticMatrixApp(object):
 
             # Get a synaptic matrix for each machine edge
             matrix = self.__get_matrix(m_edge)
-            row_data, delay_row_data = matrix.get_row_data(machine_time_step)
+            row_data, delay_row_data = matrix.get_row_data()
             self.__update_connection_holders(row_data, delay_row_data, m_edge)
 
             if self.__use_app_keys:

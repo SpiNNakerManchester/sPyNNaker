@@ -640,7 +640,7 @@ class SynapticManager(object):
 
         gen_data = matrices.write_synaptic_matrix_and_master_population_table(
             spec, machine_vertex, all_syn_block_sz, self.__weight_scales,
-            routing_info, machine_graph, machine_time_step)
+            routing_info, machine_graph)
 
         if self.__synapse_dynamics is not None:
             self.__synapse_dynamics.write_parameters(
