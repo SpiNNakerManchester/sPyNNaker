@@ -247,20 +247,17 @@ class SpikeSourcePoissonMachineVertex(
         self.__change_requires_neuron_parameters_reload = new_value
 
     @inject_items({
-        "machine_time_step": "MachineTimeStep",
         "routing_info": "MemoryRoutingInfos",
         "graph": "MemoryMachineGraph",
         "first_machine_time_step": "FirstMachineTimeStep"})
     @overrides(
         AbstractRewritesDataSpecification.regenerate_data_specification,
         additional_arguments={
-            "machine_time_step", "routing_info", "graph",
-            "first_machine_time_step"})
+            "routing_info", "graph", "first_machine_time_step"})
     def regenerate_data_specification(
-            self, spec, placement, machine_time_step, routing_info, graph,
+            self, spec, placement, routing_info, graph,
             first_machine_time_step):
         """
-        :param int machine_time_step:
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
         :param ~pacman.model.graphs.machine.MachineGraph graph:
         :param int first_machine_time_step:
@@ -269,6 +266,7 @@ class SpikeSourcePoissonMachineVertex(
 
         # reserve the neuron parameters data region
         self._reserve_poisson_params_rates_region(placement, spec)
+        machine_time_step = get_config_int("Machine", "machine_time_step")
 
         # write parameters
         self._write_poisson_parameters(
@@ -321,13 +319,12 @@ class SpikeSourcePoissonMachineVertex(
         # write recording data
         spec.switch_write_focus(
             self.POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value)
-        machine_time_step = get_config_int("Machine", "machine_time_step")
-        sdram = self._app_vertex.get_recording_sdram_usage(
-            self.vertex_slice, machine_time_step)
+        sdram = self._app_vertex.get_recording_sdram_usage(self.vertex_slice)
         recorded_region_sizes = [sdram.get_total_sdram(data_n_time_steps)]
         spec.write_array(recording_utilities.get_recording_header_array(
             recorded_region_sizes))
 
+        machine_time_step = get_config_int("Machine", "machine_time_step")
         # write parameters
         self._write_poisson_parameters(
             spec, graph, placement, routing_info, machine_time_step)

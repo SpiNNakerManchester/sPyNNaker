@@ -402,11 +402,9 @@ class SpikeSourcePoissonVertex(
             if isinstance(machine_vertex, AbstractRewritesDataSpecification):
                 machine_vertex.set_reload_required(True)
 
-    def max_spikes_per_ts(self, machine_time_step):
-        """
-        :param int machine_time_step:
-        """
-        ts_per_second = MICRO_TO_SECOND_CONVERSION / float(machine_time_step)
+    def max_spikes_per_ts(self):
+        ts_per_second = (MICRO_TO_SECOND_CONVERSION /
+                         get_config_int("Machine", "machine_time_step"))
         if float(self.__max_rate) / ts_per_second < \
                 SLOW_RATE_PER_TICK_CUTOFF:
             return 1
@@ -418,28 +416,21 @@ class SpikeSourcePoissonVertex(
             float(self.__max_rate) / ts_per_second)
         return int(math.ceil(max_spikes_per_ts)) + 1.0
 
-    def get_recording_sdram_usage(self, vertex_slice, machine_time_step):
+    def get_recording_sdram_usage(self, vertex_slice):
         """
         :param ~pacman.model.graphs.common.Slice vertex_slice:
         :param int machine_time_step:
         """
         variable_sdram = self.__spike_recorder.get_sdram_usage_in_bytes(
-            vertex_slice.n_atoms, self.max_spikes_per_ts(machine_time_step))
+            vertex_slice.n_atoms, self.max_spikes_per_ts())
         constant_sdram = ConstantSDRAM(
             variable_sdram.per_timestep * OVERFLOW_TIMESTEPS_FOR_SDRAM)
         return variable_sdram + constant_sdram
 
-    @inject_items({
-        "machine_time_step": "MachineTimeStep"
-    })
-    @overrides(
-        LegacyPartitionerAPI.get_resources_used_by_atoms,
-        additional_arguments={"machine_time_step"}
-    )
-    def get_resources_used_by_atoms(self, vertex_slice, machine_time_step):
+    @overrides(LegacyPartitionerAPI.get_resources_used_by_atoms)
+    def get_resources_used_by_atoms(self, vertex_slice):
         """
         :param ~pacman.model.graphs.common.Slice vertex_slice:
-        :param int machine_time_step:
         """
         # pylint: disable=arguments-differ
         poisson_params_sz = get_rates_bytes(vertex_slice, self.__data["rates"])
@@ -451,8 +442,7 @@ class SpikeSourcePoissonVertex(
             recording_utilities.get_recording_data_constant_size(1) +
             profile_utils.get_profile_region_size(self.__n_profile_samples))
 
-        recording = self.get_recording_sdram_usage(
-            vertex_slice, machine_time_step)
+        recording = self.get_recording_sdram_usage(vertex_slice)
         # build resources as i currently know
         container = ResourceContainer(
             sdram=recording + other,
