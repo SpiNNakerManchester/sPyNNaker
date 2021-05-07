@@ -32,9 +32,9 @@ class TestRecordPacketsPerTimestep(BaseTestCase):
 
         weight = 5
         delay = 5
-        proj = sim.Projection(pop_src, pop_lif, sim.OneToOneConnector(),
-                              sim.StaticSynapse(weight=weight, delay=delay),
-                              receptor_type="excitatory")
+        sim.Projection(pop_src, pop_lif, sim.OneToOneConnector(),
+                       sim.StaticSynapse(weight=weight, delay=delay),
+                       receptor_type="excitatory")
 
         pop_lif.record("packets-per-timestep")
         sim.run(runtime)

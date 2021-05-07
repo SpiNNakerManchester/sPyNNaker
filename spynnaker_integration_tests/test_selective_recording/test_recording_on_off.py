@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 from neo.io import PickleIO
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 import spynnaker8 as sim
