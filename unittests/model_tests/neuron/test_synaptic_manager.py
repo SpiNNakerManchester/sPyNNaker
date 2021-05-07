@@ -263,7 +263,7 @@ def test_write_data_spec():
         spikes_per_second=100.0, drop_late_spikes=True)
     synaptic_manager.write_data_spec(
         spec, post_app_vertex, post_vertex_slice, post_vertex,
-        graph, app_graph, routing_info, 1.0, machine_time_step)
+        graph, app_graph, routing_info, 1.0)
     spec.end_specification()
 
     with io.FileIO(temp_spec, "rb") as spec_reader:
@@ -609,7 +609,7 @@ def test_pop_based_master_pop_table_standard(
         spikes_per_second=100.0, drop_late_spikes=True)
     synaptic_manager.write_data_spec(
         spec, post_app_vertex, post_vertex_slice, post_mac_vertex,
-        mac_graph, app_graph, routing_info, 1.0, 1000.0)
+        mac_graph, app_graph, routing_info, 1.0)
     spec.end_specification()
     with io.FileIO(temp_spec, "rb") as spec_reader:
         executor = DataSpecificationExecutor(

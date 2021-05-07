@@ -191,12 +191,13 @@ class AbstractSpiNNakerCommon(
         self._set_up_timings(timestep, min_delay, time_scale_factor)
         self.set_up_machine_specifics(hostname)
 
-        logger.info("Setting time scale factor to {}.",
-                    self.time_scale_factor)
+        logger.info(f'Setting time scale factor to '
+                    f'{get_config_int("Machine", "time_scale_factor")}.')
 
         # get the machine time step
-        logger.info("Setting machine time step to {} micro-seconds.",
-                    self.machine_time_step)
+        logger.info(f'Setting machine time step to '
+                    f'{get_config_int("Machine", "machine_time_step")} '
+                    f'micro-seconds.')
 
     def _set_up_timings(self, timestep, min_delay, time_scale_factor):
         """
