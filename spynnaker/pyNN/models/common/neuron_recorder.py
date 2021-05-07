@@ -115,6 +115,9 @@ class NeuronRecorder(object):
     #: rewiring data type
     REWIRING_TYPE = DataType.UINT32
 
+    #: max_rewires
+    MAX_REWIRES = "max_rewires"
+
     #: rewiring: shift values to decode recorded value
     _PRE_ID_SHIFT = 9
     _POST_ID_SHIFT = 1
@@ -147,6 +150,7 @@ class NeuronRecorder(object):
         self.__events_per_core_datatypes = events_per_core_datatypes
         self.__events_per_core_recording = set()
         self.__events_per_ts = dict()
+        self.__events_per_ts[self.MAX_REWIRES] = 0  # record('all')
 
         self.__region_ids = dict()
         region_id = 0
@@ -1009,7 +1013,7 @@ class NeuronRecorder(object):
             if variable not in self.__events_per_core_recording:
                 return 0
             size = self.__events_per_core_datatypes[variable].size
-            return self.__events_per_ts['max_rewires'] * (
+            return self.__events_per_ts[self.MAX_REWIRES] * (
                 self._N_BYTES_FOR_TIMESTAMP + size)
         n_neurons = self._count_recording_per_slice(variable, vertex_slice)
         if n_neurons == 0:
@@ -1322,7 +1326,7 @@ class NeuronRecorder(object):
         """
         :param int max_rewires_per_ts: the maximum rewires per timestep
         """
-        self.__events_per_ts['max_rewires'] = max_rewires_per_ts
+        self.__events_per_ts[self.MAX_REWIRES] = max_rewires_per_ts
 
     @property
     def _indexes(self):  # for testing only
