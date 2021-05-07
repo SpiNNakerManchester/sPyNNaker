@@ -265,17 +265,14 @@ class SpikeSourcePoissonMachineVertex(
 
         # reserve the neuron parameters data region
         self._reserve_poisson_params_rates_region(placement, spec)
-        machine_time_step = get_config_int("Machine", "machine_time_step")
 
         # write parameters
         self._write_poisson_parameters(
             spec=spec, graph=graph, placement=placement,
-            routing_info=routing_info,
-            machine_time_step=machine_time_step)
+            routing_info=routing_info)
 
         # write rates
-        self._write_poisson_rates(
-            spec, machine_time_step, first_machine_time_step)
+        self._write_poisson_rates(spec, first_machine_time_step)
 
         # end spec
         spec.end_specification()
@@ -323,14 +320,12 @@ class SpikeSourcePoissonMachineVertex(
         spec.write_array(recording_utilities.get_recording_header_array(
             recorded_region_sizes))
 
-        machine_time_step = get_config_int("Machine", "machine_time_step")
         # write parameters
         self._write_poisson_parameters(
-            spec, graph, placement, routing_info, machine_time_step)
+            spec, graph, placement, routing_info)
 
         # write rates
-        self._write_poisson_rates(
-            spec, machine_time_step, first_machine_time_step)
+        self._write_poisson_rates(spec, first_machine_time_step)
 
         # write profile data
         profile_utils.write_profile_region_data(
@@ -348,12 +343,11 @@ class SpikeSourcePoissonMachineVertex(
         spec.end_specification()
 
     def _write_poisson_rates(
-            self, spec, machine_time_step, first_machine_time_step):
+            self, spec, first_machine_time_step):
         """ Generate Rate data for Poisson spike sources
 
         :param ~data_specification.DataSpecification spec:
             the data specification writer
-        :param int machine_time_step: the time between timer tick updates.
         :param int first_machine_time_step:
             First machine time step to start from the correct index
         """
@@ -381,15 +375,14 @@ class SpikeSourcePoissonMachineVertex(
         rate_change = self._app_vertex.rate_change[self.vertex_slice.as_slice]
 
         # Convert start times to start time steps
-        starts_scaled = self._convert_ms_to_n_timesteps(
-            starts, machine_time_step)
+        starts_scaled = self._convert_ms_to_n_timesteps(starts)
 
         # Convert durations to end time steps, using the maximum for "None"
         # duration (which means "until the end")
         no_duration = numpy.isnan(durations)
         durations_filtered = numpy.where(no_duration, 0, durations)
         ends_scaled = self._convert_ms_to_n_timesteps(
-            durations_filtered, machine_time_step) + starts_scaled
+            durations_filtered) + starts_scaled
         ends_scaled = (
             numpy.where(no_duration, self._MAX_TIMESTEP, ends_scaled))
 
@@ -401,8 +394,8 @@ class SpikeSourcePoissonMachineVertex(
              for s in starts_split[:-1]])
 
         # Compute the spikes per tick for each rate for each atom
-        spikes_per_tick = rates * (float(machine_time_step) /
-                                   MICRO_TO_SECOND_CONVERSION)
+        spikes_per_tick = rates * (get_config_int(
+            "Machine", "machine_time_step") / MICRO_TO_SECOND_CONVERSION)
 
         # Determine the properties of the sources
         is_fast_source = spikes_per_tick >= self.SLOW_RATE_PER_TICK_CUTOFF
@@ -459,8 +452,7 @@ class SpikeSourcePoissonMachineVertex(
             for i, d in enumerate(core_data_split[:-1])])
         spec.write_array(final_data)
 
-    def _write_poisson_parameters(
-            self, spec, graph, placement, routing_info, machine_time_step):
+    def _write_poisson_parameters(self, spec, graph, placement, routing_info):
         """ Generate Parameter data for Poisson spike sources
 
         :param ~data_specification.DataSpecification spec:
@@ -468,7 +460,6 @@ class SpikeSourcePoissonMachineVertex(
         :param ~pacman.model.graphs.machine.MachineGraph graph:
         :param ~pacman.model.placements.Placement placement:
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
-        :param int machine_time_step: the time between timer tick updates.
         """
         # pylint: disable=too-many-arguments, too-many-locals
         spec.comment("\nWriting Parameters for {} poisson sources:\n"
@@ -501,6 +492,7 @@ class SpikeSourcePoissonMachineVertex(
         spec.write_value(incoming_mask)
 
         # Write the number of seconds per timestep (unsigned long fract)
+        machine_time_step = get_config_int("Machine", "machine_time_step")
         spec.write_value(
             data=float(machine_time_step) / MICRO_TO_SECOND_CONVERSION,
             data_type=DataType.U032)
@@ -586,16 +578,11 @@ class SpikeSourcePoissonMachineVertex(
             label='PoissonRates')
 
     @staticmethod
-    def _convert_ms_to_n_timesteps(value, machine_time_step):
+    def _convert_ms_to_n_timesteps(value):
         return numpy.round(
             value * (MICRO_TO_MILLISECOND_CONVERSION /
-                     float(machine_time_step))).astype("uint32")
-
-    @staticmethod
-    def _convert_n_timesteps_to_ms(value, machine_time_step):
-        return (
-            value / (MICRO_TO_MILLISECOND_CONVERSION /
-                     float(machine_time_step)))
+                     float(machine_time_step = get_config_int(
+                         "Machine", "machine_time_step")))).astype("uint32")
 
     def poisson_param_region_address(self, placement, transceiver):
         return helpful_functions.locate_memory_region_for_placement(
