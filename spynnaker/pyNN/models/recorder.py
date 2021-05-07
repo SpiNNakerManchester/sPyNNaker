@@ -250,8 +250,7 @@ class Recorder(object):
             # data
             results = self.__vertex.get_data(
                 variable, sim.no_machine_time_steps, sim.placements,
-                sim.buffer_manager,
-                get_config_int("Machine", "machine_time_step"))
+                sim.buffer_manager)
             (data, indexes, sampling_interval) = results
 
         return (data, indexes, sampling_interval)
