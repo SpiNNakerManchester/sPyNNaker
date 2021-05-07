@@ -281,7 +281,7 @@ class SynapticMatrices(object):
         generator_data = list()
         for app_matrix in generate_on_machine:
             block_addr = app_matrix.write_on_chip_matrix_data(
-                generator_data, block_addr, machine_time_step)
+                generator_data, block_addr)
             self.__gen_on_machine = True
 
         self.__on_chip_generated_block_addr = block_addr

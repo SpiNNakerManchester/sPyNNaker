@@ -406,8 +406,7 @@ class SynapticMatrix(object):
         return block_addr, self.__delay_syn_mat_offset
 
     def get_generator_data(
-            self, syn_mat_offset, d_mat_offset, max_delay_per_stage,
-            machine_time_step):
+            self, syn_mat_offset, d_mat_offset, max_delay_per_stage):
         """ Get the generator data for this matrix
 
         :param int syn_mat_offset:
@@ -419,7 +418,7 @@ class SynapticMatrix(object):
             holds.
         :rtype: GeneratorData
         """
-        self.__write_on_chip_delay_data(max_delay_per_stage, machine_time_step)
+        self.__write_on_chip_delay_data(max_delay_per_stage)
         return GeneratorData(
             syn_mat_offset, d_mat_offset,
             self.__max_row_info.undelayed_max_words,
@@ -431,10 +430,9 @@ class SynapticMatrix(object):
             self.__machine_edge.pre_vertex.vertex_slice,
             self.__machine_edge.post_vertex.vertex_slice,
             self.__synapse_info, self.__app_edge.n_delay_stages + 1,
-            max_delay_per_stage, machine_time_step)
+            max_delay_per_stage)
 
-    def __write_on_chip_delay_data(
-            self, max_delay_per_stage, machine_time_step):
+    def __write_on_chip_delay_data(self, max_delay_per_stage):
         """ Write data for delayed on-chip generation
 
         :param machine_time_step: sim machine time step
@@ -452,7 +450,7 @@ class SynapticMatrix(object):
                 self.__machine_edge.pre_vertex.vertex_slice,
                 self.__machine_edge.post_vertex.vertex_slice,
                 self.__synapse_info, self.__app_edge.n_delay_stages + 1,
-                max_delay_per_stage, machine_time_step)
+                max_delay_per_stage)
         elif self.__max_row_info.delayed_max_n_synapses != 0:
             raise Exception(
                 "Found delayed items but no delay machine edge for {}".format(

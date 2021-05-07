@@ -459,14 +459,12 @@ class SynapticMatrixApp(object):
 
         return block_addr
 
-    def write_on_chip_matrix_data(
-            self, generator_data, block_addr, machine_time_step):
+    def write_on_chip_matrix_data(self, generator_data, block_addr):
         """ Prepare to write a matrix using an on-chip generator
 
         :param list(GeneratorData) generator_data: List of data to add to
         :param int block_addr:
             The address in the synaptic matrix region to start writing at
-        :param float machine_time_step: the sim machine time step
         :return: The updated block address
         :rtype: int
         """
@@ -502,8 +500,7 @@ class SynapticMatrixApp(object):
             # generate since it is still doing it in chunks, so less local
             # memory is needed.
             generator_data.append(matrix.get_generator_data(
-                syn_mat_offset, d_mat_offset, max_delay_per_stage,
-                machine_time_step))
+                syn_mat_offset, d_mat_offset, max_delay_per_stage))
         return block_addr
 
     def __reserve_app_blocks(self, block_addr):
