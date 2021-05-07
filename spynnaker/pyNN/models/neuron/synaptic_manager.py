@@ -523,7 +523,7 @@ class SynapticManager(object):
                 if rate != 0:
                     spikes_per_second = rate
                 spikes_per_tick = \
-                    pre_vertex.max_spikes_per_ts(machine_timestep)
+                    pre_vertex.max_spikes_per_ts()
             rate_stats[synapse_type].add_items(
                 spikes_per_second, 0, n_connections)
             total_weights[synapse_type] += spikes_per_tick * (

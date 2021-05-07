@@ -87,7 +87,6 @@ class Projection(object):
                 "cells.".format(__version__))
 
         sim = get_simulator()
-        machine_time_step = get_config_int("Machine", "machine_time_step")
         self.__projection_edge = None
         self.__host_based_synapse_list = None
         self.__has_retrieved_synaptic_list_from_machine = False
@@ -143,6 +142,7 @@ class Projection(object):
 
         # round the delays to multiples of full timesteps
         # (otherwise SDRAM estimation calculations can go wrong)
+        machine_time_step = get_config_int("Machine", "machine_time_step")
         if ((not isinstance(synapse_dynamics.delay, RandomDistribution))
                 and (not isinstance(synapse_dynamics.delay, str))):
             synapse_dynamics.set_delay(

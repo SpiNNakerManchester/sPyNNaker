@@ -230,8 +230,8 @@ class SpikeSourcePoissonMachineVertex(
         return self.app_vertex.max_rate
 
     @overrides(AbstractMaxSpikes.max_spikes_per_ts)
-    def max_spikes_per_ts(self, machine_time_step):
-        return self.app_vertex.max_spikes_per_ts(machine_time_step)
+    def max_spikes_per_ts(self):
+        return self.app_vertex.max_spikes_per_ts()
 
     @inject_items({"first_machine_time_step": "FirstMachineTimeStep"})
     @overrides(AbstractRewritesDataSpecification.reload_required,

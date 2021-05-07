@@ -417,7 +417,6 @@ class SpikeSourcePoissonVertex(
     def get_recording_sdram_usage(self, vertex_slice):
         """
         :param ~pacman.model.graphs.common.Slice vertex_slice:
-        :param int machine_time_step:
         """
         variable_sdram = self.__spike_recorder.get_sdram_usage_in_bytes(
             vertex_slice.n_atoms, self.max_spikes_per_ts())
