@@ -165,8 +165,7 @@ class Projection(object):
             synapse_dynamics.weight, synapse_dynamics.delay)
 
         # Set projection information in connector
-        connector.set_projection_information(
-            machine_time_step, self.__synapse_information)
+        connector.set_projection_information(self.__synapse_information)
 
         # Find out if there is an existing edge between the populations
         edge_to_merge = self._find_existing_edge(pre_vertex, post_vertex)

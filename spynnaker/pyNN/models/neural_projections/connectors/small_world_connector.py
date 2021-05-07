@@ -76,8 +76,8 @@ class SmallWorldConnector(AbstractConnector):
                 " SmallWorldConnector on this platform")
 
     @overrides(AbstractConnector.set_projection_information)
-    def set_projection_information(self, machine_time_step, synapse_info):
-        super().set_projection_information(machine_time_step, synapse_info)
+    def set_projection_information(self, synapse_info):
+        super().set_projection_information(synapse_info)
         self._set_n_connections(synapse_info)
 
     def _set_n_connections(self, synapse_info):
