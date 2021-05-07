@@ -665,12 +665,11 @@ class SpikeSourcePoissonMachineVertex(
             spikes_per_tick[slow_elements] = 1.0 / isi[slow_elements]
 
             # Convert spikes per tick to rates
-            machine_time_step = (
-                globals_variables.get_simulator().machine_time_step)
             self._app_vertex.rates.set_value_by_id(
                 i,
                 spikes_per_tick *
-                (MICRO_TO_SECOND_CONVERSION / float(machine_time_step)))
+                (MICRO_TO_SECOND_CONVERSION /
+                 get_config_int("Machine", "machine_time_step")))
 
             # Store the updated time until next spike so that it can be
             # rewritten when the parameters are loaded

@@ -15,8 +15,8 @@
 import math
 import numpy
 
+from spinn_utilities.config_holder import get_config_int
 from pacman.model.graphs.common.slice import Slice
-from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
@@ -133,7 +133,7 @@ class SynapticMatrixApp(object):
         self.__max_row_info = self.__synapse_io.get_max_row_info(
             synapse_info, self.__post_vertex_slice, n_delay_stages,
             self.__poptable,
-            globals_variables.get_simulator().machine_time_step, app_edge)
+            get_config_int("Machine", "machine_time_step"), app_edge)
 
         # These are set directly later
         self.__all_syn_block_sz = None
@@ -701,7 +701,7 @@ class SynapticMatrixApp(object):
         :rtype: ~numpy.ndarray
         """
         pre_slice = Slice(0, self.__app_edge.pre_vertex.n_atoms + 1)
-        machine_time_step = globals_variables.get_simulator().machine_time_step
+        machine_time_step = get_config_int("Machine", "machine_time_step")
         connections = list()
 
         if self.__syn_mat_offset is not None:

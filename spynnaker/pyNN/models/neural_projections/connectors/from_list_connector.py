@@ -14,10 +14,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy
+from spinn_utilities.config_holder import get_config_int
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION)
-from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from .abstract_connector import AbstractConnector
 
@@ -355,7 +355,7 @@ class FromListConnector(AbstractConnector):
         self.__delays = None
         try:
             delay_column = column_names.index('delay') + _FIRST_PARAM
-            machine_time_step = get_simulator().machine_time_step
+            machine_time_step = get_config_int("Machine", "machine_time_step")
             self.__delays = (numpy.rint(
                 numpy.array(self.__conn_list[:, delay_column]) * (
                     MICRO_TO_MILLISECOND_CONVERSION / machine_time_step)) *

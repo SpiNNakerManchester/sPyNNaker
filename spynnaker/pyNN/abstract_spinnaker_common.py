@@ -17,6 +17,7 @@ import logging
 import math
 import os
 from spinn_utilities.abstract_base import AbstractBase
+from spinn_utilities.config_holder import get_config_int, set_config
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.config_holder import get_config_bool
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
@@ -76,7 +77,9 @@ class AbstractSpiNNakerCommon(
         :type n_chips_required: int or None
         :param n_boards_required:
         :type n_boards_required: int or None
-        :param int timestep:
+        :param timestep:
+            machine_time_step but in mirco seconds. If None uses the cfg value
+        :type timestep: float or None
         :param float max_delay:
         :param float min_delay:
         :param str hostname:
@@ -197,9 +200,10 @@ class AbstractSpiNNakerCommon(
 
     def _set_up_timings(self, timestep, min_delay, time_scale_factor):
         """
-        :param float timestep:
-        :param int min_delay:
-       :param float time_scale_factor:
+        :param timestep: machine_time_Step in micro seconds
+        :type timestep: float or None
+        :tpye min_delay: int or None
+        :type time_scale_factor: int or None
         """
 
         # Get the standard values
@@ -210,36 +214,40 @@ class AbstractSpiNNakerCommon(
                 math.ceil(timestep * MICRO_TO_MILLISECOND_CONVERSION),
                 time_scale_factor)
 
+        machine_time_step = get_config_int("Machine", "machine_time_step")
+
         # Sort out the minimum delay
         if (min_delay is not None and
                 (min_delay * MICRO_TO_MILLISECOND_CONVERSION) <
-                self.machine_time_step):
+                machine_time_step):
             raise ConfigurationException(
                 "Pacman does not support min delays below {} ms with the "
                 "current machine time step".format(
-                    constants.MIN_SUPPORTED_DELAY * self.machine_time_step))
+                    constants.MIN_SUPPORTED_DELAY * machine_time_step))
         if min_delay is not None:
             self.__min_delay = min_delay
         else:
             self.__min_delay = (
-                self.machine_time_step / MICRO_TO_MILLISECOND_CONVERSION)
+                machine_time_step / MICRO_TO_MILLISECOND_CONVERSION)
 
         # Sort out the time scale factor if not user specified
         # (including config)
-        if self.time_scale_factor is None:
-            self.time_scale_factor = max(
+        if get_config_int("Machine", "time_scale_factor") is None:
+            new_value = max(
                 1.0, math.ceil(
-                    MICRO_TO_MILLISECOND_CONVERSION / self.machine_time_step))
-            if self.time_scale_factor > 1:
+                    MICRO_TO_MILLISECOND_CONVERSION / machine_time_step))
+            set_config("Machine", "time_scale_factor", new_value)
+            if new_value > 1:
                 logger.warning(
                     "A timestep was entered that has forced sPyNNaker to "
                     "automatically slow the simulation down from real time "
                     "by a factor of {}. To remove this automatic behaviour, "
                     "please enter a timescaleFactor value in your .{}",
-                    self.time_scale_factor, CONFIG_FILE_NAME)
+                    new_value, CONFIG_FILE_NAME)
 
         # Check the combination of machine time step and time scale factor
-        if (self.machine_time_step * self.time_scale_factor <
+        if (machine_time_step *
+                get_config_int("Machine", "time_scale_factor") <
                 MICRO_TO_MILLISECOND_CONVERSION):
             if not get_config_bool(
                     "Mode", "violate_1ms_wall_clock_restriction"):

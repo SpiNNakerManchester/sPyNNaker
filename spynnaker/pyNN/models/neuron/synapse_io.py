@@ -16,9 +16,9 @@
 import math
 import numpy
 
+from spinn_utilities.config_holder import get_config_int
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION, BYTES_PER_WORD)
-from spinn_front_end_common.utilities import globals_variables
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
 from spynnaker.pyNN.exceptions import SynapseRowTooBigException
@@ -581,7 +581,7 @@ class SynapseIORowBased(object):
         :rtype: ~numpy.ndarray
         """
         connections = []
-        machine_time_step = globals_variables.get_simulator().machine_time_step
+        machine_time_step = get_config_int("Machine", "machine_time_step")
         pre_vertex_slice = machine_edge.pre_vertex.vertex_slice
         post_vertex_slice = machine_edge.post_vertex.vertex_slice
         post_splitter = machine_edge.post_vertex.app_vertex.splitter

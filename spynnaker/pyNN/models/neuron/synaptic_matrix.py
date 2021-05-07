@@ -15,7 +15,7 @@
 
 import numpy
 
-from spinn_front_end_common.utilities import globals_variables
+from spinn_utilities.config_holder import get_config_int
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsStatic
@@ -511,7 +511,7 @@ class SynapticMatrix(object):
         """
         pre_slice = self.__machine_edge.pre_vertex.vertex_slice
         post_slice = self.__machine_edge.post_vertex.vertex_slice
-        machine_time_step = globals_variables.get_simulator().machine_time_step
+        machine_time_step = get_config_int("Machine", "machine_time_step")
         connections = list()
 
         if self.__syn_mat_offset is not None:

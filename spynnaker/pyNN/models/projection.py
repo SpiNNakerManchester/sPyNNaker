@@ -16,6 +16,7 @@
 import functools
 import logging
 import numpy
+from spinn_utilities.config_holder import get_config_int
 from spinn_utilities.log import FormatAdapter
 from pyNN import common as pynn_common
 from pyNN.random import RandomDistribution
@@ -86,7 +87,7 @@ class Projection(object):
                 "cells.".format(__version__))
 
         sim = get_simulator()
-        machine_time_step = sim.machine_time_step
+        machine_time_step = get_config_int("Machine", "machine_time_step")
         self.__projection_edge = None
         self.__host_based_synapse_list = None
         self.__has_retrieved_synaptic_list_from_machine = False

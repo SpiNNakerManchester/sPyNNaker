@@ -17,6 +17,7 @@ import itertools
 import logging
 import math
 import numpy
+from spinn_utilities.config_holder import get_config_int
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.resources.variable_sdram import VariableSDRAM
@@ -54,7 +55,7 @@ def get_sampling_interval(sampling_rate):
     :return: Sampling interval in microseconds
     :rtype: float
     """
-    step = (globals_variables.get_simulator().machine_time_step /
+    step = (get_config_int("Machine", "machine_time_step") /
             MICRO_TO_MILLISECOND_CONVERSION)
     return sampling_rate * step
 
@@ -551,7 +552,7 @@ class NeuronRecorder(object):
             return 1
 
         step = (
-            globals_variables.get_simulator().machine_time_step /
+            get_config_int("Machine", "machine_time_step") /
             MICRO_TO_MILLISECOND_CONVERSION)
         rate = int(sampling_interval / step)
         if sampling_interval != rate * step:

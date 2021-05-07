@@ -15,6 +15,7 @@
 
 import logging
 import numpy
+from spinn_utilities.config_holder import get_config_int
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged import RangedListOfList
@@ -167,7 +168,7 @@ class SpikeSourceArrayVertex(
 
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
     def get_spikes_sampling_interval(self):
-        return globals_variables.get_simulator().machine_time_step
+        return get_config_int("Machine", "machine_time_step")
 
     @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(self, placements, buffer_manager, machine_time_step):
