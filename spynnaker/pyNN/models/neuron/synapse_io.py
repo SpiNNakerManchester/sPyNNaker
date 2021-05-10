@@ -587,7 +587,7 @@ class SynapseIORowBased(object):
         connections.append(self.convert_to_connections(
             synapse_info, pre_vertex_slice, post_vertex_slice,
             delayed_max_row_length, n_synapse_types, weight_scales,
-            delayed_data,delayed=True,
+            delayed_data,  delayed=True,
             post_vertex_max_delay_ticks=post_vertex_max_delay_ticks))
 
         # Join the connections into a single list and return it

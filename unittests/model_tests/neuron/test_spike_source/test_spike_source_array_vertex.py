@@ -36,7 +36,6 @@ class TestSpikeSourceArrayVertex(unittest.TestCase):
         globals_variables._failed_state = SpynnakerFailedState("test")
         globals_variables.set_simulator(MockSimulator())
 
-
     @classmethod
     def tearDownClass(cls):
         globals_variables.unset_simulator()

@@ -160,7 +160,7 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
 
         # Convert mean times into machine timesteps
         time_step_per_ms = (MICRO_TO_MILLISECOND_CONVERSION /
-            get_config_int("Machine", "machine_time_step"))
+                            get_config_int("Machine", "machine_time_step"))
 
         mean_pre_timesteps = float(self.__mean_pre_window * time_step_per_ms)
         mean_post_timesteps = float(self.__mean_post_window * time_step_per_ms)
