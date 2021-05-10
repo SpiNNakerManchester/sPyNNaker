@@ -90,9 +90,8 @@ class OnChipBitFieldGenerator(object):
 
     def __call__(
             self, placements, app_graph, executable_finder,
-            provenance_file_path, transceiver, write_bit_field_generator_iobuf,
-            default_report_folder, machine_graph,
-            routing_infos):
+            provenance_file_path, transceiver, default_report_folder,
+            machine_graph, routing_infos):
         """ Loads and runs the bit field generator on chip.
 
         :param ~pacman.model.placements.Placements placements: placements
@@ -105,7 +104,6 @@ class OnChipBitFieldGenerator(object):
             the path to where provenance data items are written
         :param ~spinnman.transceiver.Transceiver transceiver:
             the SpiNNMan instance
-        :param bool write_bit_field_generator_iobuf: flag for report
         :param str default_report_folder: the file path for reports
         :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
             the machine graph
@@ -133,8 +131,8 @@ class OnChipBitFieldGenerator(object):
         system_control_logic.run_system_application(
             expander_cores, bit_field_app_id, transceiver,
             provenance_file_path, executable_finder,
-            write_bit_field_generator_iobuf, self.__check_for_success,
-            [CPUState.FINISHED], False,
+            get_config_bool("Reports", "write_bit_field_iobuf"),
+            self.__check_for_success, [CPUState.FINISHED], False,
             "bit_field_expander_on_{}_{}_{}.txt", progress_bar=progress)
         # update progress bar
         progress.end()

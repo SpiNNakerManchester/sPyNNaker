@@ -149,8 +149,6 @@ class AbstractSpiNNakerCommon(
         self.update_extra_inputs({'UserDefinedMaxDelay': self.__max_delay})
 
         extra_mapping_inputs = dict()
-        extra_mapping_inputs["WriteBitFieldGeneratorIOBUF"] = \
-            get_config_bool("Reports", "write_bit_field_iobuf")
         extra_mapping_inputs["SynapticExpanderReadIOBuf"] = \
             get_config_bool("Reports", "write_expander_iobuf")
         if user_extra_mapping_inputs is not None:
