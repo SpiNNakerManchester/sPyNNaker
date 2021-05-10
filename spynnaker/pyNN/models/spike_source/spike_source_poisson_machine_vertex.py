@@ -581,7 +581,7 @@ class SpikeSourcePoissonMachineVertex(
     def _convert_ms_to_n_timesteps(value):
         return numpy.round(
             value * (MICRO_TO_MILLISECOND_CONVERSION /
-                     float(machine_time_step = get_config_int(
+                     float(get_config_int(
                          "Machine", "machine_time_step")))).astype("uint32")
 
     def poisson_param_region_address(self, placement, transceiver):
