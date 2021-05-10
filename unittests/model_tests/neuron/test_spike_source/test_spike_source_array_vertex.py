@@ -18,10 +18,11 @@ from spinn_front_end_common.utilities import globals_variables
 from spynnaker.pyNN.models.spike_source import SpikeSourceArrayVertex
 from spynnaker.pyNN.utilities.spynnaker_failed_state import (
     SpynnakerFailedState)
+# This imports AbstractSpiNNakerCommon which calls set_cfg_files
+import spynnaker8  # noqa: F401
 
 
 class MockSimulator():
-    machine_time_step = 1
     current_time = 10
 
     def get_current_time(self):
@@ -34,6 +35,7 @@ class TestSpikeSourceArrayVertex(unittest.TestCase):
     def setUpClass(cls):
         globals_variables._failed_state = SpynnakerFailedState("test")
         globals_variables.set_simulator(MockSimulator())
+
 
     @classmethod
     def tearDownClass(cls):
