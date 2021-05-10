@@ -15,7 +15,6 @@
 import math
 import numpy
 
-from spinn_utilities.config_holder import get_config_int
 from pacman.model.graphs.common.slice import Slice
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.helpful_functions import (
@@ -695,7 +694,6 @@ class SynapticMatrixApp(object):
         :rtype: ~numpy.ndarray
         """
         pre_slice = Slice(0, self.__app_edge.pre_vertex.n_atoms + 1)
-        machine_time_step = get_config_int("Machine", "machine_time_step")
         connections = list()
 
         if self.__syn_mat_offset is not None:
@@ -705,7 +703,7 @@ class SynapticMatrixApp(object):
                 self.__synapse_info, pre_slice, self.__post_vertex_slice,
                 self.__max_row_info.undelayed_max_words,
                 self.__n_synapse_types, self.__weight_scales, block,
-                machine_time_step, False, splitter.max_support_delay()))
+                False, splitter.max_support_delay()))
 
         if self.__delay_syn_mat_offset is not None:
             block = self.__get_delayed_block(
@@ -714,7 +712,7 @@ class SynapticMatrixApp(object):
             connections.append(self.__synapse_io.convert_to_connections(
                 self.__synapse_info, pre_slice, self.__post_vertex_slice,
                 self.__max_row_info.delayed_max_words, self.__n_synapse_types,
-                self.__weight_scales, block, machine_time_step, True,
+                self.__weight_scales, block, True,
                 splitter.max_support_delay()))
 
         return connections

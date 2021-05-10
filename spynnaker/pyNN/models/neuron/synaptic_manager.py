@@ -387,8 +387,8 @@ class SynapticManager(object):
 
     @staticmethod
     def _ring_buffer_expected_upper_bound(
-            weight_mean, weight_std_dev, spikes_per_second,
-            machine_timestep, n_synapses_in, sigma):
+            weight_mean, weight_std_dev, spikes_per_second, n_synapses_in,
+            sigma):
         """ Provides expected upper bound on accumulated values in a ring\
             buffer element.
 
@@ -404,7 +404,6 @@ class SynapticManager(object):
             microSiemens as required)
         :param float weight_std_dev: SD of weight distribution
         :param float spikes_per_second: Maximum expected Poisson rate in Hz
-        :param int machine_timestep: in us
         :param int n_synapses_in: No of connected synapses
         :param float sigma: How many SD above the mean to go for upper bound;
             a good starting choice is 5.0. Given length of simulation we can
@@ -412,7 +411,9 @@ class SynapticManager(object):
         :rtype: float
         """
         # E[ number of spikes ] in a timestep
-        steps_per_second = MICRO_TO_SECOND_CONVERSION / machine_timestep
+        steps_per_second = (MICRO_TO_SECOND_CONVERSION /
+                            get_config_int("Machine", "machine_time_step"))
+
         average_spikes_per_timestep = (
             float(n_synapses_in * spikes_per_second) / steps_per_second)
 
@@ -543,7 +544,6 @@ class SynapticManager(object):
                 max_weights[synapse_type] = min(
                     self._ring_buffer_expected_upper_bound(
                         stats.mean, stats.standard_deviation, rates.mean,
-                        get_config_int("Machine", "machine_time_step"),
                         stats.n_items, self.__ring_buffer_sigma),
                     total_weights[synapse_type])
                 max_weights[synapse_type] = max(
