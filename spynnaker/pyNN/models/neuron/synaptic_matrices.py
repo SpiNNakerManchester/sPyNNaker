@@ -440,7 +440,7 @@ class SynapticMatrices(object):
                 n_atoms_per_core = s.n_atoms
 
         # If the number of atoms per core is too big, this can't be done
-        if ((n_atoms_per_core * delay_stages) > 
+        if ((n_atoms_per_core * delay_stages) >
                 self.__poptable.max_n_neurons_per_core):
             return False
         return True
@@ -533,7 +533,7 @@ class SynapticMatrices(object):
             keys.append((rinfo.first_key, vertex_slice))
 
         if not self.__check_key_slices(
-                app_edge.pre_vertex.n_atoms, pre_slices, 
+                app_edge.pre_vertex.n_atoms, pre_slices,
                 app_edge.n_delay_stages):
             return None
 
