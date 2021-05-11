@@ -436,7 +436,7 @@ for fl in os.listdir("."):
         os.remove(fl)
 os.chdir("../..")  # WARNING! RELATIVE FILENAMES CHANGE MEANING HERE!
 apidoc.main([
-    '-q', '-o', _output_dir, ".",
+    '-o', _output_dir, ".",
     # Exclude test and setup code
     "spynnaker_integration_tests/*", "unittests/*", "setup.py",
     *filtered_files("spynnaker", _unfiltered_files),
