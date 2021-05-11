@@ -390,8 +390,9 @@ if _on_rtd:
 # Automatically called by sphinx at startup
 def setup(app):
     # NB: extra dot at end is deliberate!
-    trim = ("spynnaker.", "spynnaker8.", "pacman.", "spinnman.",
-            "spinn_machine.", "data_specification.", "spinn_utilities.")
+    trim = ("spynnaker.", "spynnaker8.", "spinn_front_end_common.", "pacman.",
+            "spinnman.", "spinn_machine.", "data_specification.",
+            "spinn_utilities.")
 
     # Magic to shorten the names of our classes to their public versions
     def skip_handler(_app, what, name, obj, skip, _options):
