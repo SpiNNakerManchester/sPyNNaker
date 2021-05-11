@@ -425,7 +425,7 @@ def filtered_files(base, unfiltered_files_filename):
                     yield full
 
 
-sys.path.append(os.path.abspath('../..'))
+# sys.path.append(os.path.abspath('../..'))
 _output_dir = os.path.abspath(".")
 _unfiltered_files = os.path.abspath("../unfiltered-files.txt")
 
