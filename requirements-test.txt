@@ -22,7 +22,7 @@ pytest-cov
 pytest-timeout
 pytest-forked
 pytest-progress
-sphinx >= 2
+sphinx >= 4
 testfixtures
 statistics
 mock
