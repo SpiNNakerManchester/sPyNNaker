@@ -4,11 +4,12 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>spynnaker.pyNN.models.neuron.builds package &#8212; sPyNNaker 6.0.1 documentation</title>
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
@@ -48,13 +49,13 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="spynnaker-pynn-models-neuron-builds-package">
+  <section id="spynnaker-pynn-models-neuron-builds-package">
 <h1>spynnaker.pyNN.models.neuron.builds package<a class="headerlink" href="#spynnaker-pynn-models-neuron-builds-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="module-spynnaker.pyNN.models.neuron.builds">
+<section id="module-spynnaker.pyNN.models.neuron.builds">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.models.neuron.builds" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="spynnaker.pyNN.models.neuron.builds.EIFConductanceAlphaPopulation">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.builds.</span></code><code class="sig-name descname"><span class="pre">EIFConductanceAlphaPopulation</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/builds/eif_cond_alpha_isfa_ista.html#EIFConductanceAlphaPopulation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.EIFConductanceAlphaPopulation" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.builds.EIFConductanceAlphaPopulation">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.builds.</span></span><span class="sig-name descname"><span class="pre">EIFConductanceAlphaPopulation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.EIFConductanceAlphaPopulation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Exponential integrate and fire neuron with spike triggered and         sub-threshold adaptation currents (isfa, ista reps.)</p>
 <div class="admonition warning">
@@ -62,20 +63,20 @@
 <p>Not currently supported by the tool chain.</p>
 </div>
 <dl class="py attribute">
-<dt id="spynnaker.pyNN.models.neuron.builds.EIFConductanceAlphaPopulation.default_initial_values">
-<code class="sig-name descname"><span class="pre">default_initial_values</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{'gsyn_exc':</span> <span class="pre">0.0,</span> <span class="pre">'gsyn_inh':</span> <span class="pre">0.0,</span> <span class="pre">'v':</span> <span class="pre">-70.6,</span> <span class="pre">'w':</span> <span class="pre">0.0}</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.EIFConductanceAlphaPopulation.default_initial_values" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.builds.EIFConductanceAlphaPopulation.default_initial_values">
+<span class="sig-name descname"><span class="pre">default_initial_values</span></span><em class="property"> <span class="pre">=</span> <span class="pre">{'gsyn_exc':</span> <span class="pre">0.0,</span> <span class="pre">'gsyn_inh':</span> <span class="pre">0.0,</span> <span class="pre">'v':</span> <span class="pre">-70.6,</span> <span class="pre">'w':</span> <span class="pre">0.0}</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.EIFConductanceAlphaPopulation.default_initial_values" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="spynnaker.pyNN.models.neuron.builds.EIFConductanceAlphaPopulation.default_parameters">
-<code class="sig-name descname"><span class="pre">default_parameters</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{'a':</span> <span class="pre">4.0,</span> <span class="pre">'b':</span> <span class="pre">0.0805,</span> <span class="pre">'cm':</span> <span class="pre">0.281,</span> <span class="pre">'delta_T':</span> <span class="pre">2.0,</span> <span class="pre">'e_rev_E':</span> <span class="pre">0.0,</span> <span class="pre">'e_rev_I':</span> <span class="pre">-80.0,</span> <span class="pre">'i_offset':</span> <span class="pre">0.0,</span> <span class="pre">'tau_m':</span> <span class="pre">9.3667,</span> <span class="pre">'tau_refrac':</span> <span class="pre">0.1,</span> <span class="pre">'tau_syn_E':</span> <span class="pre">5.0,</span> <span class="pre">'tau_syn_I':</span> <span class="pre">0.5,</span> <span class="pre">'tau_w':</span> <span class="pre">144.0,</span> <span class="pre">'v_reset':</span> <span class="pre">-70.6,</span> <span class="pre">'v_rest':</span> <span class="pre">-70.6,</span> <span class="pre">'v_spike':</span> <span class="pre">-40.0,</span> <span class="pre">'v_thresh':</span> <span class="pre">-50.4}</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.EIFConductanceAlphaPopulation.default_parameters" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.builds.EIFConductanceAlphaPopulation.default_parameters">
+<span class="sig-name descname"><span class="pre">default_parameters</span></span><em class="property"> <span class="pre">=</span> <span class="pre">{'a':</span> <span class="pre">4.0,</span> <span class="pre">'b':</span> <span class="pre">0.0805,</span> <span class="pre">'cm':</span> <span class="pre">0.281,</span> <span class="pre">'delta_T':</span> <span class="pre">2.0,</span> <span class="pre">'e_rev_E':</span> <span class="pre">0.0,</span> <span class="pre">'e_rev_I':</span> <span class="pre">-80.0,</span> <span class="pre">'i_offset':</span> <span class="pre">0.0,</span> <span class="pre">'tau_m':</span> <span class="pre">9.3667,</span> <span class="pre">'tau_refrac':</span> <span class="pre">0.1,</span> <span class="pre">'tau_syn_E':</span> <span class="pre">5.0,</span> <span class="pre">'tau_syn_I':</span> <span class="pre">0.5,</span> <span class="pre">'tau_w':</span> <span class="pre">144.0,</span> <span class="pre">'v_reset':</span> <span class="pre">-70.6,</span> <span class="pre">'v_rest':</span> <span class="pre">-70.6,</span> <span class="pre">'v_spike':</span> <span class="pre">-40.0,</span> <span class="pre">'v_thresh':</span> <span class="pre">-50.4}</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.EIFConductanceAlphaPopulation.default_parameters" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
-<dt id="spynnaker.pyNN.models.neuron.builds.HHCondExp">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.builds.</span></code><code class="sig-name descname"><span class="pre">HHCondExp</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/builds/hh_cond_exp.html#HHCondExp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.HHCondExp" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.builds.HHCondExp">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.builds.</span></span><span class="sig-name descname"><span class="pre">HHCondExp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.HHCondExp" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Single-compartment Hodgkin-Huxley model with exponentially decaying         current input.</p>
 <div class="admonition warning">
@@ -83,20 +84,20 @@
 <p>Not currently supported by the tool chain.</p>
 </div>
 <dl class="py attribute">
-<dt id="spynnaker.pyNN.models.neuron.builds.HHCondExp.default_initial_values">
-<code class="sig-name descname"><span class="pre">default_initial_values</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{'gsyn_exc':</span> <span class="pre">0.0,</span> <span class="pre">'gsyn_inh':</span> <span class="pre">0.0,</span> <span class="pre">'v':</span> <span class="pre">-65.0}</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.HHCondExp.default_initial_values" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.builds.HHCondExp.default_initial_values">
+<span class="sig-name descname"><span class="pre">default_initial_values</span></span><em class="property"> <span class="pre">=</span> <span class="pre">{'gsyn_exc':</span> <span class="pre">0.0,</span> <span class="pre">'gsyn_inh':</span> <span class="pre">0.0,</span> <span class="pre">'v':</span> <span class="pre">-65.0}</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.HHCondExp.default_initial_values" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="spynnaker.pyNN.models.neuron.builds.HHCondExp.default_parameters">
-<code class="sig-name descname"><span class="pre">default_parameters</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{'cm':</span> <span class="pre">0.2,</span> <span class="pre">'e_rev_E':</span> <span class="pre">0.0,</span> <span class="pre">'e_rev_I':</span> <span class="pre">-80,</span> <span class="pre">'e_rev_K':</span> <span class="pre">-90.0,</span> <span class="pre">'e_rev_Na':</span> <span class="pre">50.0,</span> <span class="pre">'e_rev_leak':</span> <span class="pre">-65.0,</span> <span class="pre">'g_leak':</span> <span class="pre">0.01,</span> <span class="pre">'gbar_K':</span> <span class="pre">6.0,</span> <span class="pre">'gbar_Na':</span> <span class="pre">20.0,</span> <span class="pre">'i_offset':</span> <span class="pre">0.0,</span> <span class="pre">'tau_syn_E':</span> <span class="pre">0.2,</span> <span class="pre">'tau_syn_I':</span> <span class="pre">2.0,</span> <span class="pre">'v_offset':</span> <span class="pre">-63}</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.HHCondExp.default_parameters" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.builds.HHCondExp.default_parameters">
+<span class="sig-name descname"><span class="pre">default_parameters</span></span><em class="property"> <span class="pre">=</span> <span class="pre">{'cm':</span> <span class="pre">0.2,</span> <span class="pre">'e_rev_E':</span> <span class="pre">0.0,</span> <span class="pre">'e_rev_I':</span> <span class="pre">-80,</span> <span class="pre">'e_rev_K':</span> <span class="pre">-90.0,</span> <span class="pre">'e_rev_Na':</span> <span class="pre">50.0,</span> <span class="pre">'e_rev_leak':</span> <span class="pre">-65.0,</span> <span class="pre">'g_leak':</span> <span class="pre">0.01,</span> <span class="pre">'gbar_K':</span> <span class="pre">6.0,</span> <span class="pre">'gbar_Na':</span> <span class="pre">20.0,</span> <span class="pre">'i_offset':</span> <span class="pre">0.0,</span> <span class="pre">'tau_syn_E':</span> <span class="pre">0.2,</span> <span class="pre">'tau_syn_I':</span> <span class="pre">2.0,</span> <span class="pre">'v_offset':</span> <span class="pre">-63}</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.HHCondExp.default_parameters" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
-<dt id="spynnaker.pyNN.models.neuron.builds.IFCondAlpha">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.builds.</span></code><code class="sig-name descname"><span class="pre">IFCondAlpha</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/builds/if_cond_alpha.html#IFCondAlpha"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCondAlpha" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.builds.IFCondAlpha">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.builds.</span></span><span class="sig-name descname"><span class="pre">IFCondAlpha</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCondAlpha" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Leaky integrate and fire neuron with an alpha-shaped current input.</p>
 <div class="admonition warning">
@@ -104,21 +105,21 @@
 <p>Not currently supported by the tool chain.</p>
 </div>
 <dl class="py attribute">
-<dt id="spynnaker.pyNN.models.neuron.builds.IFCondAlpha.default_initial_values">
-<code class="sig-name descname"><span class="pre">default_initial_values</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{'gsyn_exc':</span> <span class="pre">0.0,</span> <span class="pre">'gsyn_inh':</span> <span class="pre">0.0,</span> <span class="pre">'v':</span> <span class="pre">-65.0}</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCondAlpha.default_initial_values" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.builds.IFCondAlpha.default_initial_values">
+<span class="sig-name descname"><span class="pre">default_initial_values</span></span><em class="property"> <span class="pre">=</span> <span class="pre">{'gsyn_exc':</span> <span class="pre">0.0,</span> <span class="pre">'gsyn_inh':</span> <span class="pre">0.0,</span> <span class="pre">'v':</span> <span class="pre">-65.0}</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCondAlpha.default_initial_values" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="spynnaker.pyNN.models.neuron.builds.IFCondAlpha.default_parameters">
-<code class="sig-name descname"><span class="pre">default_parameters</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{'cm':</span> <span class="pre">1.0,</span> <span class="pre">'e_rev_E':</span> <span class="pre">0.0,</span> <span class="pre">'e_rev_I':</span> <span class="pre">-70.0,</span> <span class="pre">'i_offset':</span> <span class="pre">0,</span> <span class="pre">'tau_m':</span> <span class="pre">20,</span> <span class="pre">'tau_refrac':</span> <span class="pre">0.1,</span> <span class="pre">'tau_syn_E':</span> <span class="pre">0.3,</span> <span class="pre">'tau_syn_I':</span> <span class="pre">0.5,</span> <span class="pre">'v_reset':</span> <span class="pre">-65.0,</span> <span class="pre">'v_rest':</span> <span class="pre">-65.0,</span> <span class="pre">'v_thresh':</span> <span class="pre">-50.0}</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCondAlpha.default_parameters" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.builds.IFCondAlpha.default_parameters">
+<span class="sig-name descname"><span class="pre">default_parameters</span></span><em class="property"> <span class="pre">=</span> <span class="pre">{'cm':</span> <span class="pre">1.0,</span> <span class="pre">'e_rev_E':</span> <span class="pre">0.0,</span> <span class="pre">'e_rev_I':</span> <span class="pre">-70.0,</span> <span class="pre">'i_offset':</span> <span class="pre">0,</span> <span class="pre">'tau_m':</span> <span class="pre">20,</span> <span class="pre">'tau_refrac':</span> <span class="pre">0.1,</span> <span class="pre">'tau_syn_E':</span> <span class="pre">0.3,</span> <span class="pre">'tau_syn_I':</span> <span class="pre">0.5,</span> <span class="pre">'v_reset':</span> <span class="pre">-65.0,</span> <span class="pre">'v_rest':</span> <span class="pre">-65.0,</span> <span class="pre">'v_thresh':</span> <span class="pre">-50.0}</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCondAlpha.default_parameters" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
-<dt id="spynnaker.pyNN.models.neuron.builds.IFCondExpBase">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.builds.</span></code><code class="sig-name descname"><span class="pre">IFCondExpBase</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/builds/if_cond_exp_base.html#IFCondExpBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCondExpBase" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model_standard.AbstractPyNNNeuronModelStandard</span></code></p>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.builds.IFCondExpBase">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.builds.</span></span><span class="sig-name descname"><span class="pre">IFCondExpBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCondExpBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModelStandard" title="spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModelStandard"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModelStandard</span></code></a></p>
 <p>Leaky integrate and fire neuron with an exponentially decaying         conductance input.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -157,9 +158,9 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class=
 </dd></dl>
 
 <dl class="py class">
-<dt id="spynnaker.pyNN.models.neuron.builds.IFCondExpStoc">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.builds.</span></code><code class="sig-name descname"><span class="pre">IFCondExpStoc</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/builds/if_cond_exp_stoc.html#IFCondExpStoc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCondExpStoc" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model_standard.AbstractPyNNNeuronModelStandard</span></code></p>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.builds.IFCondExpStoc">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.builds.</span></span><span class="sig-name descname"><span class="pre">IFCondExpStoc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCondExpStoc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModelStandard" title="spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModelStandard"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModelStandard</span></code></a></p>
 <p>Leaky integrate and fire neuron with a stochastic threshold.</p>
 <p>Habenschuss S, Jonke Z, Maass W. Stochastic computations in cortical
 microcircuit models. <em>PLoS Computational Biology.</em> 2013;9(11):e1003311.
@@ -205,9 +206,9 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class=
 </dd></dl>
 
 <dl class="py class">
-<dt id="spynnaker.pyNN.models.neuron.builds.IFCurrAlpha">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.builds.</span></code><code class="sig-name descname"><span class="pre">IFCurrAlpha</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/builds/if_curr_alpha.html#IFCurrAlpha"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCurrAlpha" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model_standard.AbstractPyNNNeuronModelStandard</span></code></p>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.builds.IFCurrAlpha">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.builds.</span></span><span class="sig-name descname"><span class="pre">IFCurrAlpha</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCurrAlpha" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModelStandard" title="spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModelStandard"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModelStandard</span></code></a></p>
 <p>Leaky integrate and fire neuron with an alpha-shaped current-based        input.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -246,9 +247,9 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class=
 </dd></dl>
 
 <dl class="py class">
-<dt id="spynnaker.pyNN.models.neuron.builds.IFCurrDelta">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.builds.</span></code><code class="sig-name descname"><span class="pre">IFCurrDelta</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/builds/if_curr_delta.html#IFCurrDelta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCurrDelta" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model_standard.AbstractPyNNNeuronModelStandard</span></code></p>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.builds.IFCurrDelta">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.builds.</span></span><span class="sig-name descname"><span class="pre">IFCurrDelta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCurrDelta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModelStandard" title="spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModelStandard"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModelStandard</span></code></a></p>
 <p>Leaky integrate and fire neuron with an instantaneous current input.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -282,9 +283,9 @@ or (mapping) function</p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="spynnaker.pyNN.models.neuron.builds.IFCurrDualExpBase">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.builds.</span></code><code class="sig-name descname"><span class="pre">IFCurrDualExpBase</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/builds/if_curr_dual_exp_base.html#IFCurrDualExpBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCurrDualExpBase" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model_standard.AbstractPyNNNeuronModelStandard</span></code></p>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.builds.IFCurrDualExpBase">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.builds.</span></span><span class="sig-name descname"><span class="pre">IFCurrDualExpBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCurrDualExpBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModelStandard" title="spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModelStandard"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModelStandard</span></code></a></p>
 <p>Leaky integrate and fire neuron with two exponentially decaying         excitatory current inputs, and one exponentially decaying inhibitory         current input.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -323,9 +324,9 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class=
 </dd></dl>
 
 <dl class="py class">
-<dt id="spynnaker.pyNN.models.neuron.builds.IFCurrExpBase">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.builds.</span></code><code class="sig-name descname"><span class="pre">IFCurrExpBase</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/builds/if_curr_exp_base.html#IFCurrExpBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCurrExpBase" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model_standard.AbstractPyNNNeuronModelStandard</span></code></p>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.builds.IFCurrExpBase">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.builds.</span></span><span class="sig-name descname"><span class="pre">IFCurrExpBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCurrExpBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModelStandard" title="spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModelStandard"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModelStandard</span></code></a></p>
 <p>Leaky integrate and fire neuron with an exponentially decaying         current input.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -360,9 +361,9 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class=
 </dd></dl>
 
 <dl class="py class">
-<dt id="spynnaker.pyNN.models.neuron.builds.IFCurrExpCa2Adaptive">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.builds.</span></code><code class="sig-name descname"><span class="pre">IFCurrExpCa2Adaptive</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/builds/if_curr_exp_ca2_adaptive.html#IFCurrExpCa2Adaptive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCurrExpCa2Adaptive" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model_standard.AbstractPyNNNeuronModelStandard</span></code></p>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.builds.IFCurrExpCa2Adaptive">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.builds.</span></span><span class="sig-name descname"><span class="pre">IFCurrExpCa2Adaptive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCurrExpCa2Adaptive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModelStandard" title="spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModelStandard"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModelStandard</span></code></a></p>
 <p>Model from Liu, Y. H., &amp; Wang, X. J. (2001). Spike-frequency        adaptation of a generalized leaky integrate-and-fire model neuron.         <em>Journal of Computational Neuroscience</em>, 10(1), 25-45.         <a class="reference external" href="https://doi.org/10.1023/A:1008916026143">doi:10.1023/A:1008916026143</a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -403,9 +404,9 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class=
 </dd></dl>
 
 <dl class="py class">
-<dt id="spynnaker.pyNN.models.neuron.builds.IFCurrExpSEMDBase">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.builds.</span></code><code class="sig-name descname"><span class="pre">IFCurrExpSEMDBase</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/builds/if_curr_exp_semd_base.html#IFCurrExpSEMDBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCurrExpSEMDBase" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model_standard.AbstractPyNNNeuronModelStandard</span></code></p>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.builds.IFCurrExpSEMDBase">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.builds.</span></span><span class="sig-name descname"><span class="pre">IFCurrExpSEMDBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFCurrExpSEMDBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModelStandard" title="spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModelStandard"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModelStandard</span></code></a></p>
 <p>Leaky integrate and fire neuron with an exponentially decaying        current input, where the excitatory input depends upon the inhibitory        input (see <a class="reference external" href="https://www.cit-ec.de/en/nbs/spiking-insect-vision">https://www.cit-ec.de/en/nbs/spiking-insect-vision</a>)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -450,8 +451,8 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – </p></li>
 </dd></dl>
 
 <dl class="py class">
-<dt id="spynnaker.pyNN.models.neuron.builds.IFFacetsConductancePopulation">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.builds.</span></code><code class="sig-name descname"><span class="pre">IFFacetsConductancePopulation</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/builds/if_facets_hardware1.html#IFFacetsConductancePopulation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFFacetsConductancePopulation" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.builds.IFFacetsConductancePopulation">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.builds.</span></span><span class="sig-name descname"><span class="pre">IFFacetsConductancePopulation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFFacetsConductancePopulation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Leaky integrate and fire neuron with conductance-based synapses and        fixed threshold as it is resembled by the FACETS Hardware Stage 1</p>
 <div class="admonition warning">
@@ -459,21 +460,21 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – </p></li>
 <p>Not currently supported by the tool chain.</p>
 </div>
 <dl class="py attribute">
-<dt id="spynnaker.pyNN.models.neuron.builds.IFFacetsConductancePopulation.default_initial_values">
-<code class="sig-name descname"><span class="pre">default_initial_values</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{'v':</span> <span class="pre">-65.0}</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFFacetsConductancePopulation.default_initial_values" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.builds.IFFacetsConductancePopulation.default_initial_values">
+<span class="sig-name descname"><span class="pre">default_initial_values</span></span><em class="property"> <span class="pre">=</span> <span class="pre">{'v':</span> <span class="pre">-65.0}</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFFacetsConductancePopulation.default_initial_values" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="spynnaker.pyNN.models.neuron.builds.IFFacetsConductancePopulation.default_parameters">
-<code class="sig-name descname"><span class="pre">default_parameters</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{'e_rev_I':</span> <span class="pre">-80,</span> <span class="pre">'g_leak':</span> <span class="pre">40.0,</span> <span class="pre">'tau_syn_E':</span> <span class="pre">30.0,</span> <span class="pre">'tau_syn_I':</span> <span class="pre">30.0,</span> <span class="pre">'v_reset':</span> <span class="pre">-80.0,</span> <span class="pre">'v_rest':</span> <span class="pre">-65.0,</span> <span class="pre">'v_thresh':</span> <span class="pre">-55.0}</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFFacetsConductancePopulation.default_parameters" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.builds.IFFacetsConductancePopulation.default_parameters">
+<span class="sig-name descname"><span class="pre">default_parameters</span></span><em class="property"> <span class="pre">=</span> <span class="pre">{'e_rev_I':</span> <span class="pre">-80,</span> <span class="pre">'g_leak':</span> <span class="pre">40.0,</span> <span class="pre">'tau_syn_E':</span> <span class="pre">30.0,</span> <span class="pre">'tau_syn_I':</span> <span class="pre">30.0,</span> <span class="pre">'v_reset':</span> <span class="pre">-80.0,</span> <span class="pre">'v_rest':</span> <span class="pre">-65.0,</span> <span class="pre">'v_thresh':</span> <span class="pre">-55.0}</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IFFacetsConductancePopulation.default_parameters" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
-<dt id="spynnaker.pyNN.models.neuron.builds.IzkCondExpBase">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.builds.</span></code><code class="sig-name descname"><span class="pre">IzkCondExpBase</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/builds/izk_cond_exp_base.html#IzkCondExpBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IzkCondExpBase" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model_standard.AbstractPyNNNeuronModelStandard</span></code></p>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.builds.IzkCondExpBase">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.builds.</span></span><span class="sig-name descname"><span class="pre">IzkCondExpBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IzkCondExpBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModelStandard" title="spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModelStandard"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModelStandard</span></code></a></p>
 <p>Izhikevich neuron model with conductance inputs.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -510,9 +511,9 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class=
 </dd></dl>
 
 <dl class="py class">
-<dt id="spynnaker.pyNN.models.neuron.builds.IzkCurrExpBase">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.builds.</span></code><code class="sig-name descname"><span class="pre">IzkCurrExpBase</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/builds/izk_curr_exp_base.html#IzkCurrExpBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IzkCurrExpBase" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model_standard.AbstractPyNNNeuronModelStandard</span></code></p>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.builds.IzkCurrExpBase">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.builds.</span></span><span class="sig-name descname"><span class="pre">IzkCurrExpBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.builds.IzkCurrExpBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModelStandard" title="spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModelStandard"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModelStandard</span></code></a></p>
 <p>Izhikevich neuron model with current inputs.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -544,8 +545,8 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class=
 </dl>
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
             <div class="clearer"></div>
@@ -615,7 +616,7 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class=
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.4.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.1.
     </div>
   </body>
 </html>

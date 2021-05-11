@@ -6,9 +6,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>spynnaker.pyNN.models.spike_source.spike_source_array_vertex &#8212; sPyNNaker 6.0.1 documentation</title>
-    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../../_static/sphinxdoc.css" type="text/css" />
-    <script id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/sphinxdoc.css" />
+    <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
     <script src="../../../../../_static/jquery.js"></script>
     <script src="../../../../../_static/underscore.js"></script>
     <script src="../../../../../_static/doctools.js"></script>
@@ -84,7 +84,7 @@
         <span class="k">return</span> <span class="n">_as_numpy_ticks</span><span class="p">(</span><span class="n">spike_times</span><span class="p">,</span> <span class="n">time_step</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="SpikeSourceArrayVertex"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_array_vertex.SpikeSourceArrayVertex">[docs]</a><span class="k">class</span> <span class="nc">SpikeSourceArrayVertex</span><span class="p">(</span>
+<span class="k">class</span> <span class="nc">SpikeSourceArrayVertex</span><span class="p">(</span>
         <span class="n">ReverseIpTagMultiCastSource</span><span class="p">,</span> <span class="n">AbstractSpikeRecordable</span><span class="p">,</span>
         <span class="n">SimplePopulationSettable</span><span class="p">,</span> <span class="n">AbstractChangableAfterRun</span><span class="p">,</span>
         <span class="n">ProvidesKeyToAtomMappingImpl</span><span class="p">):</span>
@@ -122,7 +122,7 @@
     <span class="k">def</span> <span class="nf">requires_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__requires_mapping</span>
 
-<div class="viewcode-block" id="SpikeSourceArrayVertex.mark_no_changes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_array_vertex.SpikeSourceArrayVertex.mark_no_changes">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractChangableAfterRun</span><span class="o">.</span><span class="n">mark_no_changes</span><span class="p">)</span>
+<div class="viewcode-block" id="SpikeSourceArrayVertex.mark_no_changes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.mark_no_changes">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractChangableAfterRun</span><span class="o">.</span><span class="n">mark_no_changes</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">mark_no_changes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__requires_mapping</span> <span class="o">=</span> <span class="kc">False</span></div>
 
@@ -186,11 +186,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">send_buffer_times</span> <span class="o">=</span> <span class="n">_send_buffer_times</span><span class="p">(</span><span class="n">spike_times</span><span class="p">,</span> <span class="n">time_step</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_spike_times</span> <span class="o">=</span> <span class="n">spike_times</span>
 
-<div class="viewcode-block" id="SpikeSourceArrayVertex.is_recording_spikes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_array_vertex.SpikeSourceArrayVertex.is_recording_spikes">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpikeRecordable</span><span class="o">.</span><span class="n">is_recording_spikes</span><span class="p">)</span>
+<div class="viewcode-block" id="SpikeSourceArrayVertex.is_recording_spikes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.is_recording_spikes">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpikeRecordable</span><span class="o">.</span><span class="n">is_recording_spikes</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">is_recording_spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spike_recorder</span><span class="o">.</span><span class="n">record</span></div>
 
-<div class="viewcode-block" id="SpikeSourceArrayVertex.set_recording_spikes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_array_vertex.SpikeSourceArrayVertex.set_recording_spikes">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpikeRecordable</span><span class="o">.</span><span class="n">set_recording_spikes</span><span class="p">)</span>
+<div class="viewcode-block" id="SpikeSourceArrayVertex.set_recording_spikes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.set_recording_spikes">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpikeRecordable</span><span class="o">.</span><span class="n">set_recording_spikes</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">set_recording_spikes</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">new_state</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">indexes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">sampling_interval</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -203,11 +203,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__requires_mapping</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spike_recorder</span><span class="o">.</span><span class="n">record</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__spike_recorder</span><span class="o">.</span><span class="n">record</span> <span class="o">=</span> <span class="n">new_state</span></div>
 
-<div class="viewcode-block" id="SpikeSourceArrayVertex.get_spikes_sampling_interval"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_array_vertex.SpikeSourceArrayVertex.get_spikes_sampling_interval">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpikeRecordable</span><span class="o">.</span><span class="n">get_spikes_sampling_interval</span><span class="p">)</span>
+<div class="viewcode-block" id="SpikeSourceArrayVertex.get_spikes_sampling_interval"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.get_spikes_sampling_interval">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpikeRecordable</span><span class="o">.</span><span class="n">get_spikes_sampling_interval</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_spikes_sampling_interval</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">globals_variables</span><span class="o">.</span><span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">machine_time_step</span></div>
 
-<div class="viewcode-block" id="SpikeSourceArrayVertex.get_spikes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_array_vertex.SpikeSourceArrayVertex.get_spikes">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpikeRecordable</span><span class="o">.</span><span class="n">get_spikes</span><span class="p">)</span>
+<div class="viewcode-block" id="SpikeSourceArrayVertex.get_spikes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.get_spikes">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpikeRecordable</span><span class="o">.</span><span class="n">get_spikes</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spike_recorder</span><span class="o">.</span><span class="n">get_spikes</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span>
@@ -217,7 +217,7 @@
                 <span class="k">else</span> <span class="mi">0</span><span class="p">,</span>
             <span class="n">machine_time_step</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="SpikeSourceArrayVertex.clear_spike_recording"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_array_vertex.SpikeSourceArrayVertex.clear_spike_recording">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpikeRecordable</span><span class="o">.</span><span class="n">clear_spike_recording</span><span class="p">)</span>
+<div class="viewcode-block" id="SpikeSourceArrayVertex.clear_spike_recording"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.clear_spike_recording">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpikeRecordable</span><span class="o">.</span><span class="n">clear_spike_recording</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">clear_spike_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">machine_vertex</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">machine_vertices</span><span class="p">:</span>
             <span class="n">placement</span> <span class="o">=</span> <span class="n">placements</span><span class="o">.</span><span class="n">get_placement_of_vertex</span><span class="p">(</span><span class="n">machine_vertex</span><span class="p">)</span>
@@ -225,7 +225,7 @@
                 <span class="n">placement</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">p</span><span class="p">,</span>
                 <span class="n">SpikeSourceArrayVertex</span><span class="o">.</span><span class="n">SPIKE_RECORDING_REGION_ID</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="SpikeSourceArrayVertex.describe"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_array_vertex.SpikeSourceArrayVertex.describe">[docs]</a>    <span class="k">def</span> <span class="nf">describe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SpikeSourceArrayVertex.describe"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.describe">[docs]</a>    <span class="k">def</span> <span class="nf">describe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Returns a human-readable description of the cell or synapse type.</span>
 
 <span class="sd">        The output may be customised by specifying a different template\</span>
@@ -248,7 +248,7 @@
         <span class="p">}</span>
         <span class="k">return</span> <span class="n">context</span></div>
 
-<div class="viewcode-block" id="SpikeSourceArrayVertex.set_value_by_selector"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_array_vertex.SpikeSourceArrayVertex.set_value_by_selector">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">SimplePopulationSettable</span><span class="o">.</span><span class="n">set_value_by_selector</span><span class="p">)</span>
+<div class="viewcode-block" id="SpikeSourceArrayVertex.set_value_by_selector"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.set_value_by_selector">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">SimplePopulationSettable</span><span class="o">.</span><span class="n">set_value_by_selector</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">set_value_by_selector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selector</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;spike_times&quot;</span><span class="p">:</span>
             <span class="n">old_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
@@ -264,7 +264,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">ranged_list</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">SimplePopulationSettable</span><span class="o">.</span><span class="n">set_value_by_selector</span><span class="p">(</span>
-                <span class="bp">self</span><span class="p">,</span> <span class="n">selector</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div></div>
+                <span class="bp">self</span><span class="p">,</span> <span class="n">selector</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
 </pre></div>
 
             <div class="clearer"></div>
@@ -303,7 +303,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.4.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.1.
     </div>
   </body>
 </html>

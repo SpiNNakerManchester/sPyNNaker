@@ -6,9 +6,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>spynnaker.pyNN.protocols.munich_io_spinnaker_link_protocol &#8212; sPyNNaker 6.0.1 documentation</title>
-    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../_static/sphinxdoc.css" type="text/css" />
-    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sphinxdoc.css" />
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
     <script src="../../../../_static/jquery.js"></script>
     <script src="../../../../_static/underscore.js"></script>
     <script src="../../../../_static/doctools.js"></script>
@@ -267,7 +267,7 @@
 <span class="n">_PAYLOAD_MASTER_SLAVE_SET_MASTER_CLOCK_ACTIVE</span> <span class="o">=</span> <span class="mi">4</span>
 
 
-<div class="viewcode-block" id="RetinaKey"><a class="viewcode-back" href="../../../../spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.RetinaKey">[docs]</a><span class="k">class</span> <span class="nc">RetinaKey</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">RetinaKey</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
     <span class="n">FIXED_KEY</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
     <span class="n">NATIVE_128_X_128</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
     <span class="n">DOWNSAMPLE_64_X_64</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
@@ -289,10 +289,10 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">bits_per_coordinate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bits_per_coordinate</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bits_per_coordinate</span>
 
 
-<div class="viewcode-block" id="RetinaPayload"><a class="viewcode-back" href="../../../../spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.RetinaPayload">[docs]</a><span class="k">class</span> <span class="nc">RetinaPayload</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">RetinaPayload</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
     <span class="n">NO_PAYLOAD</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
     <span class="n">EVENTS_IN_PAYLOAD</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
     <span class="n">DELTA_TIMESTAMPS</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
@@ -306,22 +306,23 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_payload_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_payload_bytes</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_payload_bytes</span>
 
 
-<div class="viewcode-block" id="MunichIoSpiNNakerLinkProtocol"><a class="viewcode-back" href="../../../../spynnaker8.external_devices.html#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol">[docs]</a><span class="k">class</span> <span class="nc">MunichIoSpiNNakerLinkProtocol</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">MUNICH_MODES</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;types of modes supported by this protocol&quot;&quot;&quot;</span>
+    <span class="n">RESET_TO_DEFAULT</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">PUSH_BOT</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">SPOMNIBOT</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">BALL_BALANCER</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">MY_ORO_BOTICS</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">FREE</span> <span class="o">=</span> <span class="mi">5</span>
+
+
+<span class="k">class</span> <span class="nc">MunichIoSpiNNakerLinkProtocol</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Provides Multicast commands for the Munich SpiNNaker-Link protocol</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;__instance_key&quot;</span><span class="p">,</span> <span class="s2">&quot;__mode&quot;</span><span class="p">,</span> <span class="s2">&quot;__uart_id&quot;</span><span class="p">]</span>
-
-<div class="viewcode-block" id="MunichIoSpiNNakerLinkProtocol.MODES"><a class="viewcode-back" href="../../../../spynnaker8.external_devices.html#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES">[docs]</a>    <span class="k">class</span> <span class="nc">MODES</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;types of modes supported by this protocol&quot;&quot;&quot;</span>
-        <span class="n">RESET_TO_DEFAULT</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">PUSH_BOT</span> <span class="o">=</span> <span class="mi">1</span>
-        <span class="n">SPOMNIBOT</span> <span class="o">=</span> <span class="mi">2</span>
-        <span class="n">BALL_BALANCER</span> <span class="o">=</span> <span class="mi">3</span>
-        <span class="n">MY_ORO_BOTICS</span> <span class="o">=</span> <span class="mi">4</span>
-        <span class="n">FREE</span> <span class="o">=</span> <span class="mi">5</span></div>
 
     <span class="c1"># The instance of the protocol in use, to ensure that each vertex that is</span>
     <span class="c1"># to send commands to the PushBot uses a different outgoing key; the top</span>
@@ -335,7 +336,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param mode: The mode of operation of the protocol</span>
 <span class="sd">        :type modes:</span>
-<span class="sd">            ~spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES</span>
+<span class="sd">            ~spynnaker.pyNN.protocols.MUNICH_MODES</span>
 <span class="sd">        :param instance_key: The optional instance key to use</span>
 <span class="sd">        :type instance_key: int or None</span>
 <span class="sd">        :param int uart_id: The ID of the UART when needed</span>
@@ -358,7 +359,7 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">mode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :rtype: ~spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES</span>
+<span class="sd">        :rtype: ~spynnaker.pyNN.protocols.MUNICH_MODES</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mode</span>
 
@@ -687,7 +688,7 @@
             <span class="n">payload</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_check_for_pushbot_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mode</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">MODES</span><span class="o">.</span><span class="n">PUSH_BOT</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mode</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">MUNICH_MODES</span><span class="o">.</span><span class="n">PUSH_BOT</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
                 <span class="s2">&quot;The mode you configured is not the PushBot, and so this &quot;</span>
                 <span class="s2">&quot;message is invalid for mode </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__mode</span><span class="p">))</span>
@@ -902,7 +903,7 @@
         <span class="k">return</span> <span class="n">MultiCastCommand</span><span class="p">(</span>
             <span class="n">key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">set_retina_transmission_key</span><span class="p">,</span>
             <span class="n">payload</span><span class="o">=</span><span class="n">retina_key</span><span class="o">.</span><span class="n">value</span> <span class="o">|</span> <span class="n">retina_payload</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-            <span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">)</span></div></div>
+            <span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">)</span></div>
 </pre></div>
 
             <div class="clearer"></div>
@@ -941,7 +942,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.4.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.1.
     </div>
   </body>
 </html>

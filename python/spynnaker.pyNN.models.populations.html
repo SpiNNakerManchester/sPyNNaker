@@ -4,11 +4,12 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>spynnaker.pyNN.models.populations package &#8212; sPyNNaker 6.0.1 documentation</title>
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
@@ -46,9 +47,9 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="spynnaker-pynn-models-populations-package">
+  <section id="spynnaker-pynn-models-populations-package">
 <h1>spynnaker.pyNN.models.populations package<a class="headerlink" href="#spynnaker-pynn-models-populations-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="module-spynnaker.pyNN.models.populations">
+<section id="module-spynnaker.pyNN.models.populations">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.models.populations" title="Permalink to this headline">¶</a></h2>
 <p>A population is a group of neurons with the same neuron model and synaptic
 model, but possibly (usually!) varying connectivity and configuration
@@ -68,8 +69,8 @@ by adding them together:</p>
 <p>sPyNNaker only has incomplete support for assemblies; do not use.</p>
 </div>
 <dl class="py class">
-<dt id="spynnaker.pyNN.models.populations.Assembly">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.populations.</span></code><code class="sig-name descname"><span class="pre">Assembly</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">populations</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/assembly.html#Assembly"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Assembly" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Assembly">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.populations.</span></span><span class="sig-name descname"><span class="pre">Assembly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">populations</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.populations.Assembly" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pyNN.common.populations.Assembly</span></code></p>
 <p>A group of neurons, may be heterogeneous, in contrast to a Population
 where all the neurons are of the same type.</p>
@@ -86,8 +87,8 @@ where all the neurons are of the same type.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="spynnaker.pyNN.models.populations.IDMixin">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.populations.</span></code><code class="sig-name descname"><span class="pre">IDMixin</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">population</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/idmixin.html#IDMixin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.IDMixin">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.populations.</span></span><span class="sig-name descname"><span class="pre">IDMixin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">population</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Instead of storing IDs as integers, we store them as ID objects,
 which allows a syntax like:</p>
@@ -104,8 +105,8 @@ which allows a syntax like:</p>
 </dd>
 </dl>
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.IDMixin.as_view">
-<code class="sig-name descname"><span class="pre">as_view</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/idmixin.html#IDMixin.as_view"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.as_view" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.IDMixin.as_view">
+<span class="sig-name descname"><span class="pre">as_view</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/idmixin.html#IDMixin.as_view"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.as_view" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a PopulationView containing just this cell.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -114,9 +115,9 @@ which allows a syntax like:</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.IDMixin.celltype">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">celltype</span></code><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.celltype" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.IDMixin.celltype">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">celltype</span></span><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.celltype" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel" title="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel">AbstractPyNNModel</a></p>
@@ -125,8 +126,8 @@ which allows a syntax like:</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.IDMixin.get_initial_value">
-<code class="sig-name descname"><span class="pre">get_initial_value</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/idmixin.html#IDMixin.get_initial_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.get_initial_value" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.IDMixin.get_initial_value">
+<span class="sig-name descname"><span class="pre">get_initial_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/idmixin.html#IDMixin.get_initial_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.get_initial_value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the initial value of a state variable of the cell.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -139,19 +140,19 @@ which allows a syntax like:</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.IDMixin.get_parameters">
-<code class="sig-name descname"><span class="pre">get_parameters</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/idmixin.html#IDMixin.get_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.get_parameters" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.IDMixin.get_parameters">
+<span class="sig-name descname"><span class="pre">get_parameters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/idmixin.html#IDMixin.get_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.get_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a dict of all cell parameters.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a>(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a>, ..)</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a>(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a>, …)</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.IDMixin.id">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">id</span></code><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.id" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.IDMixin.id">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.id" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
@@ -160,14 +161,14 @@ which allows a syntax like:</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.IDMixin.initialize">
-<code class="sig-name descname"><span class="pre">initialize</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">initial_values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/idmixin.html#IDMixin.initialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.initialize" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.IDMixin.initialize">
+<span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">initial_values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/idmixin.html#IDMixin.initialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.initialize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the initial value of a state variable of the cell.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.IDMixin.inject">
-<code class="sig-name descname"><span class="pre">inject</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_source</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/idmixin.html#IDMixin.inject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.inject" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.IDMixin.inject">
+<span class="sig-name descname"><span class="pre">inject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_source</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/idmixin.html#IDMixin.inject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.inject" title="Permalink to this definition">¶</a></dt>
 <dd><p>Inject current from a current source object into the cell.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -176,9 +177,9 @@ which allows a syntax like:</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.IDMixin.is_standard_cell">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">is_standard_cell</span></code><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.is_standard_cell" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.IDMixin.is_standard_cell">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">is_standard_cell</span></span><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.is_standard_cell" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
@@ -186,9 +187,9 @@ which allows a syntax like:</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.IDMixin.local">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">local</span></code><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.local" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.IDMixin.local">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">local</span></span><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.local" title="Permalink to this definition">¶</a></dt>
 <dd><p>Whether this cell is local to the current MPI node.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -197,9 +198,9 @@ which allows a syntax like:</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.IDMixin.position">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">position</span></code><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.position" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.IDMixin.position">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">position</span></span><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.position" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the cell position in 3D space.            Cell positions are stored in an array in the parent Population,            if any, or within the ID object otherwise. Positions are generated            the first time they are requested and then cached.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -209,8 +210,8 @@ which allows a syntax like:</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.IDMixin.record">
-<code class="sig-name descname"><span class="pre">record</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/idmixin.html#IDMixin.record"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.record" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.IDMixin.record">
+<span class="sig-name descname"><span class="pre">record</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/idmixin.html#IDMixin.record"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.record" title="Permalink to this definition">¶</a></dt>
 <dd><p>Record the given variable(s) of this cell.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -228,25 +229,25 @@ simulation timestep.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.IDMixin.set_initial_value">
-<code class="sig-name descname"><span class="pre">set_initial_value</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/idmixin.html#IDMixin.set_initial_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.set_initial_value" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.IDMixin.set_initial_value">
+<span class="sig-name descname"><span class="pre">set_initial_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/idmixin.html#IDMixin.set_initial_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.set_initial_value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the initial value of a state variable of the cell.
 :param str variable: The name of the variable
 :param float value: The value of the variable</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.IDMixin.set_parameters">
-<code class="sig-name descname"><span class="pre">set_parameters</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/idmixin.html#IDMixin.set_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.set_parameters" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.IDMixin.set_parameters">
+<span class="sig-name descname"><span class="pre">set_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/idmixin.html#IDMixin.set_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.set_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set cell parameters, given as a sequence of parameter=value            arguments.</p>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
-<dt id="spynnaker.pyNN.models.populations.Population">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.populations.</span></code><code class="sig-name descname"><span class="pre">Population</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cellclass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cellparams</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additional_parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.populations.population_base.PopulationBase</span></code></p>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Population">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.populations.</span></span><span class="sig-name descname"><span class="pre">Population</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cellclass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cellparams</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additional_parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.populations.PopulationBase" title="spynnaker.pyNN.models.populations.PopulationBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.populations.PopulationBase</span></code></a></p>
 <p>PyNN 0.9 population object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -260,13 +261,13 @@ instantiated object.</p></li>
 <li><p><strong>initial_values</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>)</em>) – Initial values of state variables</p></li>
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – A label for the population</p></li>
 <li><p><strong>constraints</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v6.0)"><em>AbstractConstraint</em></a><em>)</em>) – Any constraints on how the population is deployed to SpiNNaker.</p></li>
-<li><p><strong>additional_parameters</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>..</em><em>)</em>) – Additional parameters to pass to the vertex creation function.</p></li>
+<li><p><strong>additional_parameters</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>...</em><em>)</em>) – Additional parameters to pass to the vertex creation function.</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.Population.add_placement_constraint">
-<code class="sig-name descname"><span class="pre">add_placement_constraint</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.add_placement_constraint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.add_placement_constraint" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Population.add_placement_constraint">
+<span class="sig-name descname"><span class="pre">add_placement_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.add_placement_constraint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.add_placement_constraint" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a placement constraint</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -280,8 +281,8 @@ instantiated object.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.Population.all">
-<code class="sig-name descname"><span class="pre">all</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.all" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Population.all">
+<span class="sig-name descname"><span class="pre">all</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.all" title="Permalink to this definition">¶</a></dt>
 <dd><p>Iterator over cell IDs on all MPI nodes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -290,9 +291,9 @@ instantiated object.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.Population.all_cells">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">all_cells</span></code><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.all_cells" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Population.all_cells">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">all_cells</span></span><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.all_cells" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference internal" href="#spynnaker.pyNN.models.populations.IDMixin" title="spynnaker.pyNN.models.populations.IDMixin">IDMixin</a>)</p>
@@ -300,20 +301,20 @@ instantiated object.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.Population.annotations">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">annotations</span></code><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.annotations" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Population.annotations">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">annotations</span></span><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.annotations" title="Permalink to this definition">¶</a></dt>
 <dd><p>The annotations given by the end user</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a>(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a>, ..)</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a>(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a>, …)</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.Population.can_record">
-<code class="sig-name descname"><span class="pre">can_record</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.can_record"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.can_record" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Population.can_record">
+<span class="sig-name descname"><span class="pre">can_record</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.can_record"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.can_record" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine whether <cite>variable</cite> can be recorded from this population.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -325,9 +326,9 @@ instantiated object.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.Population.celltype">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">celltype</span></code><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.celltype" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Population.celltype">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">celltype</span></span><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.celltype" title="Permalink to this definition">¶</a></dt>
 <dd><p>Implements the PyNN expected celltype property</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -339,9 +340,9 @@ instantiated object.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.Population.conductance_based">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">conductance_based</span></code><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.conductance_based" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Population.conductance_based">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">conductance_based</span></span><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.conductance_based" title="Permalink to this definition">¶</a></dt>
 <dd><p>True if the population uses conductance inputs</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -351,8 +352,8 @@ instantiated object.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.Population.create">
-<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">create</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cellclass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cellparams</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.create"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.create" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Population.create">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cellclass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cellparams</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.create"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.create" title="Permalink to this definition">¶</a></dt>
 <dd><p>Pass through method to the constructor defined by PyNN.        Create <code class="docutils literal notranslate"><span class="pre">n</span></code> cells all of the same type.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -372,8 +373,8 @@ instantiated object.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.Population.describe">
-<code class="sig-name descname"><span class="pre">describe</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">template</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'population_default.txt'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">engine</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'default'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.describe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.describe" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Population.describe">
+<span class="sig-name descname"><span class="pre">describe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">template</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'population_default.txt'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">engine</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'default'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.describe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.describe" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a human-readable description of the population.</p>
 <p>The output may be customized by specifying a different template
 together with an associated template engine (see
@@ -394,8 +395,8 @@ context will be returned.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.Population.find_units">
-<code class="sig-name descname"><span class="pre">find_units</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.find_units"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.find_units" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Population.find_units">
+<span class="sig-name descname"><span class="pre">find_units</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.find_units"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.find_units" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the units of a variable</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -410,9 +411,9 @@ context will be returned.</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.Population.first_id">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">first_id</span></code><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.first_id" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Population.first_id">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">first_id</span></span><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.first_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>The ID of the first member of the population.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -422,8 +423,8 @@ context will be returned.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.Population.get">
-<code class="sig-name descname"><span class="pre">get</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameter_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gather</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simplify</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.get" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Population.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameter_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gather</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simplify</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the values of a parameter for every local cell in the            population.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -446,8 +447,8 @@ is a list.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.Population.get_data">
-<code class="sig-name descname"><span class="pre">get_data</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gather</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clear</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.get_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.get_data" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Population.get_data">
+<span class="sig-name descname"><span class="pre">get_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gather</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clear</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.get_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.get_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a Neo Block containing the data            (spikes, state variables) recorded from the Assembly.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -464,7 +465,7 @@ this parameter is True.</p>
 </div>
 </p></li>
 <li><p><strong>clear</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether recorded data will be deleted from the <code class="docutils literal notranslate"><span class="pre">Assembly</span></code>.</p></li>
-<li><p><strong>annotations</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>..</em><em>)</em>) – annotations to put on the neo block</p></li>
+<li><p><strong>annotations</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>...</em><em>)</em>) – annotations to put on the neo block</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
@@ -478,8 +479,8 @@ record.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.Population.get_data_by_indexes">
-<code class="sig-name descname"><span class="pre">get_data_by_indexes</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indexes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clear</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.get_data_by_indexes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.get_data_by_indexes" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Population.get_data_by_indexes">
+<span class="sig-name descname"><span class="pre">get_data_by_indexes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indexes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clear</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.get_data_by_indexes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.get_data_by_indexes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a Neo <cite>Block</cite> containing the data            (spikes, state variables) recorded from the Assembly.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -491,7 +492,7 @@ Exception will be raised.</p></li>
 data. Clearly only neurons recording will actually have any data.
 If None will be taken as all recording as in <a class="reference internal" href="#spynnaker.pyNN.models.populations.Population.get_data" title="spynnaker.pyNN.models.populations.Population.get_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_data()</span></code></a></p></li>
 <li><p><strong>clear</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether recorded data will be deleted.</p></li>
-<li><p><strong>annotations</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>..</em><em>)</em>) – annotations to put on the neo block</p></li>
+<li><p><strong>annotations</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>...</em><em>)</em>) – annotations to put on the neo block</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
@@ -505,16 +506,16 @@ record.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.Population.get_initial_value">
-<code class="sig-name descname"><span class="pre">get_initial_value</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.get_initial_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.get_initial_value" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Population.get_initial_value">
+<span class="sig-name descname"><span class="pre">get_initial_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.get_initial_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.get_initial_value" title="Permalink to this definition">¶</a></dt>
 <dd><div class="deprecated">
 <p><span class="versionmodified deprecated">Deprecated since version 6.0: </span>Use <a class="reference internal" href="#spynnaker.pyNN.models.populations.Population.initial_values" title="spynnaker.pyNN.models.populations.Population.initial_values"><code class="xref py py-meth docutils literal notranslate"><span class="pre">initial_values()</span></code></a> instead.</p>
 </div>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.Population.get_spike_counts">
-<code class="sig-name descname"><span class="pre">get_spike_counts</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gather</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.get_spike_counts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.get_spike_counts" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Population.get_spike_counts">
+<span class="sig-name descname"><span class="pre">get_spike_counts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gather</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.get_spike_counts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.get_spike_counts" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the number of spikes for each neuron.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -524,8 +525,8 @@ record.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.Population.id_to_index">
-<code class="sig-name descname"><span class="pre">id_to_index</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.id_to_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.id_to_index" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Population.id_to_index">
+<span class="sig-name descname"><span class="pre">id_to_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.id_to_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.id_to_index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given the ID(s) of cell(s) in the Population, return its (their)            index (order in the Population).</p>
 <p>Defined by
 <a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/populations.html">http://neuralensemble.org/docs/PyNN/reference/populations.html</a></p>
@@ -540,8 +541,8 @@ record.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.Population.id_to_local_index">
-<code class="sig-name descname"><span class="pre">id_to_local_index</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.id_to_local_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.id_to_local_index" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Population.id_to_local_index">
+<span class="sig-name descname"><span class="pre">id_to_local_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.id_to_local_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.id_to_local_index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given the ID(s) of cell(s) in the Population, return its (their)            index (order in the Population), counting only cells on the local            MPI node.</p>
 <p>Defined by
 <a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/populations.html">http://neuralensemble.org/docs/PyNN/reference/populations.html</a></p>
@@ -556,8 +557,8 @@ record.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.Population.index_to_id">
-<code class="sig-name descname"><span class="pre">index_to_id</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.index_to_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.index_to_id" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Population.index_to_id">
+<span class="sig-name descname"><span class="pre">index_to_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.index_to_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.index_to_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given the index (order in the Population) of cell(s) in the            Population, return their ID(s)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -569,9 +570,9 @@ record.</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.Population.initial_values">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">initial_values</span></code><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.initial_values" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Population.initial_values">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">initial_values</span></span><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.initial_values" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
@@ -580,8 +581,8 @@ record.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.Population.initialize">
-<code class="sig-name descname"><span class="pre">initialize</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.initialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.initialize" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Population.initialize">
+<span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.initialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.initialize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set initial values of state variables, e.g. the membrane            potential.  Values passed to <code class="docutils literal notranslate"><span class="pre">initialize()</span></code> may be:</p>
 <ul class="simple">
 <li><p>single numeric values (all neurons set to the same value), or</p></li>
@@ -602,16 +603,16 @@ event per second).</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.Population.inject">
-<code class="sig-name descname"><span class="pre">inject</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_source</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.inject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.inject" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Population.inject">
+<span class="sig-name descname"><span class="pre">inject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_source</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.inject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.inject" title="Permalink to this definition">¶</a></dt>
 <dd><p>Connect a current source to all cells in the Population.</p>
 <p>Defined by
 <a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/populations.html">http://neuralensemble.org/docs/PyNN/reference/populations.html</a></p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.Population.label">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">label</span></code><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.label" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Population.label">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">label</span></span><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.label" title="Permalink to this definition">¶</a></dt>
 <dd><p>The label of the population</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -620,9 +621,9 @@ event per second).</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.Population.last_id">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">last_id</span></code><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.last_id" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Population.last_id">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">last_id</span></span><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.last_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>The ID of the last member of the population.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -631,23 +632,23 @@ event per second).</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.Population.local_size">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">local_size</span></code><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.local_size" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Population.local_size">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">local_size</span></span><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.local_size" title="Permalink to this definition">¶</a></dt>
 <dd><p>The number of local cells</p>
 <p>Defined by
 <a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/populations.html">http://neuralensemble.org/docs/PyNN/reference/populations.html</a></p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.Population.mark_no_changes">
-<code class="sig-name descname"><span class="pre">mark_no_changes</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.mark_no_changes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.mark_no_changes" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Population.mark_no_changes">
+<span class="sig-name descname"><span class="pre">mark_no_changes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.mark_no_changes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.mark_no_changes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Mark this population as not having changes to be mapped.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.Population.position_generator">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">position_generator</span></code><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.position_generator" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Population.position_generator">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">position_generator</span></span><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.position_generator" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>callable((<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>), <a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">ndarray</a>)</p>
@@ -655,9 +656,9 @@ event per second).</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.Population.positions">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">positions</span></code><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.positions" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Population.positions">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">positions</span></span><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.positions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the position array for structured populations.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -671,8 +672,8 @@ Each row is three long, for X,Y,Z</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.Population.record">
-<code class="sig-name descname"><span class="pre">record</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.record"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.record" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Population.record">
+<span class="sig-name descname"><span class="pre">record</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.record"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.record" title="Permalink to this definition">¶</a></dt>
 <dd><p>Record the specified variable or variables for all cells in the            Population or view.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -690,9 +691,9 @@ multiple of the simulation timestep.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.Population.requires_mapping">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">requires_mapping</span></code><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.requires_mapping" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Population.requires_mapping">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">requires_mapping</span></span><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.requires_mapping" title="Permalink to this definition">¶</a></dt>
 <dd><p>Whether this population requires mapping.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -702,14 +703,14 @@ multiple of the simulation timestep.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.Population.sample">
-<code class="sig-name descname"><span class="pre">sample</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.sample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.sample" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Population.sample">
+<span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.sample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.sample" title="Permalink to this definition">¶</a></dt>
 <dd><p>Randomly sample <cite>n</cite> cells from the Population, and return a            PopulationView object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of cells to put in the view.</p></li>
-<li><p><strong>rng</strong> (<a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.NumpyRNG" title="(in PyNN v0.9)"><em>NumpyRNG</em></a>) – The random number generator to use</p></li>
+<li><p><strong>rng</strong> (<a class="reference internal" href="spynnaker8.html#spynnaker8.NumpyRNG" title="pyNN.random.NumpyRNG"><em>NumpyRNG</em></a>) – The random number generator to use</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
@@ -719,8 +720,8 @@ multiple of the simulation timestep.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.Population.set">
-<code class="sig-name descname"><span class="pre">set</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.set" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Population.set">
+<span class="sig-name descname"><span class="pre">set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.set" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set parameters of this population.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -730,8 +731,8 @@ multiple of the simulation timestep.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.Population.set_by_selector">
-<code class="sig-name descname"><span class="pre">set_by_selector</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.set_by_selector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.set_by_selector" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Population.set_by_selector">
+<span class="sig-name descname"><span class="pre">set_by_selector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.set_by_selector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.set_by_selector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set one or more parameters for selected cell in the population.</p>
 <p>param can be a dict, in which case value should not be supplied, or a
 string giving the parameter name, in which case value is the parameter
@@ -754,8 +755,8 @@ pass through method</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.Population.set_constraint">
-<code class="sig-name descname"><span class="pre">set_constraint</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constraint</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.set_constraint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.set_constraint" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Population.set_constraint">
+<span class="sig-name descname"><span class="pre">set_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constraint</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.set_constraint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.set_constraint" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply a constraint to a population that restricts the processor            onto which its atoms will be placed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -765,16 +766,16 @@ pass through method</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.Population.set_initial_value">
-<code class="sig-name descname"><span class="pre">set_initial_value</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.set_initial_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.set_initial_value" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Population.set_initial_value">
+<span class="sig-name descname"><span class="pre">set_initial_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.set_initial_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.set_initial_value" title="Permalink to this definition">¶</a></dt>
 <dd><div class="deprecated">
 <p><span class="versionmodified deprecated">Deprecated since version 6.0: </span>Use <a class="reference internal" href="#spynnaker.pyNN.models.populations.Population.initialize" title="spynnaker.pyNN.models.populations.Population.initialize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">initialize()</span></code></a> instead.</p>
 </div>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.Population.set_mapping_constraint">
-<code class="sig-name descname"><span class="pre">set_mapping_constraint</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constraint_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.set_mapping_constraint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.set_mapping_constraint" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Population.set_mapping_constraint">
+<span class="sig-name descname"><span class="pre">set_mapping_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constraint_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.set_mapping_constraint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.set_mapping_constraint" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a placement constraint - for backwards compatibility</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -785,8 +786,8 @@ ints as values</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.Population.set_max_atoms_per_core">
-<code class="sig-name descname"><span class="pre">set_max_atoms_per_core</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_atoms_per_core</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.set_max_atoms_per_core"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.set_max_atoms_per_core" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Population.set_max_atoms_per_core">
+<span class="sig-name descname"><span class="pre">set_max_atoms_per_core</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_atoms_per_core</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.set_max_atoms_per_core"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.set_max_atoms_per_core" title="Permalink to this definition">¶</a></dt>
 <dd><p>Supports the setting of this population’s max atoms per core</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -795,9 +796,9 @@ ints as values</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.Population.size">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">size</span></code><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.size" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Population.size">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">size</span></span><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.size" title="Permalink to this definition">¶</a></dt>
 <dd><p>The number of neurons in the population</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -807,8 +808,8 @@ ints as values</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.Population.spinnaker_get_data">
-<code class="sig-name descname"><span class="pre">spinnaker_get_data</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.spinnaker_get_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.spinnaker_get_data" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Population.spinnaker_get_data">
+<span class="sig-name descname"><span class="pre">spinnaker_get_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.spinnaker_get_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.spinnaker_get_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Public accessor for getting data as a numpy array, instead of            the neo based object</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -825,9 +826,9 @@ Exception will be raised.</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.Population.structure">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">structure</span></code><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.structure" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Population.structure">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">structure</span></span><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.structure" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the structure for the population.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -837,16 +838,16 @@ Exception will be raised.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.Population.tset">
-<code class="sig-name descname"><span class="pre">tset</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.tset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.tset" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Population.tset">
+<span class="sig-name descname"><span class="pre">tset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.tset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.tset" title="Permalink to this definition">¶</a></dt>
 <dd><div class="deprecated">
 <p><span class="versionmodified deprecated">Deprecated since version 5.0: </span>Use <code class="docutils literal notranslate"><span class="pre">set(parametername=value_array)</span></code> instead.</p>
 </div>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.Population.write_data">
-<code class="sig-name descname"><span class="pre">write_data</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">io</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gather</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clear</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.write_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.write_data" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.Population.write_data">
+<span class="sig-name descname"><span class="pre">write_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">io</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gather</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clear</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.write_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.Population.write_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write recorded data to file, using one of the file formats            supported by Neo.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -862,7 +863,7 @@ Exception will be raised.</p></li>
 </div>
 </p></li>
 <li><p><strong>clear</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – clears the storage data if set to true after reading it back</p></li>
-<li><p><strong>annotations</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>..</em><em>)</em>) – annotations to put on the neo block</p></li>
+<li><p><strong>annotations</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>...</em><em>)</em>) – annotations to put on the neo block</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises</dt>
@@ -875,15 +876,15 @@ record.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="spynnaker.pyNN.models.populations.PopulationBase">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.populations.</span></code><code class="sig-name descname"><span class="pre">PopulationBase</span></code><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationBase">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.populations.</span></span><span class="sig-name descname"><span class="pre">PopulationBase</span></span><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Shared methods between <a class="reference internal" href="#spynnaker.pyNN.models.populations.Population" title="spynnaker.pyNN.models.populations.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a>s and
 <a class="reference internal" href="#spynnaker.pyNN.models.populations.PopulationView" title="spynnaker.pyNN.models.populations.PopulationView"><code class="xref py py-class docutils literal notranslate"><span class="pre">PopulationView</span></code></a>s.</p>
 <p>Mainly pass through and not implemented.</p>
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationBase.all_cells">
-<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">all_cells</span></code><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.all_cells" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationBase.all_cells">
+<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">all_cells</span></span><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.all_cells" title="Permalink to this definition">¶</a></dt>
 <dd><p>An array containing the cell IDs of all neurons in the            Population (all MPI nodes).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -893,16 +894,16 @@ record.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationBase.getSpikes">
-<code class="sig-name descname"><span class="pre">getSpikes</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.getSpikes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.getSpikes" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationBase.getSpikes">
+<span class="sig-name descname"><span class="pre">getSpikes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.getSpikes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.getSpikes" title="Permalink to this definition">¶</a></dt>
 <dd><div class="deprecated">
 <p><span class="versionmodified deprecated">Deprecated since version 5.0: </span>Use <code class="docutils literal notranslate"><span class="pre">get_data('spikes')</span></code> instead.</p>
 </div>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationBase.get_data">
-<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">get_data</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gather</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clear</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.get_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.get_data" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationBase.get_data">
+<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">get_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gather</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clear</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.get_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.get_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a Neo Block containing the data(spikes, state variables)            recorded from the Population.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -920,7 +921,7 @@ from the cells simulated on the local node.</p>
 </div>
 </p></li>
 <li><p><strong>clear</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – If this is True, recorded data will be deleted from the Population.</p></li>
-<li><p><strong>annotations</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>..</em><em>)</em>) – annotations to put on the neo block</p></li>
+<li><p><strong>annotations</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>...</em><em>)</em>) – annotations to put on the neo block</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
@@ -930,16 +931,16 @@ from the cells simulated on the local node.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationBase.get_gsyn">
-<code class="sig-name descname"><span class="pre">get_gsyn</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.get_gsyn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.get_gsyn" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationBase.get_gsyn">
+<span class="sig-name descname"><span class="pre">get_gsyn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.get_gsyn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.get_gsyn" title="Permalink to this definition">¶</a></dt>
 <dd><div class="deprecated">
 <p><span class="versionmodified deprecated">Deprecated since version 5.0: </span>Use <code class="docutils literal notranslate"><span class="pre">get_data(['gsyn_exc',</span> <span class="pre">'gsyn_inh'])</span></code> instead.</p>
 </div>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationBase.get_spike_counts">
-<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">get_spike_counts</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gather</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.get_spike_counts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.get_spike_counts" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationBase.get_spike_counts">
+<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">get_spike_counts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gather</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.get_spike_counts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.get_spike_counts" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a dict containing the number of spikes for each neuron.</p>
 <p>The dict keys are neuron IDs, not indices.</p>
 <dl class="field-list simple">
@@ -961,16 +962,16 @@ simulated on the local node.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationBase.get_v">
-<code class="sig-name descname"><span class="pre">get_v</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.get_v"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.get_v" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationBase.get_v">
+<span class="sig-name descname"><span class="pre">get_v</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.get_v"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.get_v" title="Permalink to this definition">¶</a></dt>
 <dd><div class="deprecated">
 <p><span class="versionmodified deprecated">Deprecated since version 5.0: </span>Use <code class="docutils literal notranslate"><span class="pre">get_data('v')</span></code> instead.</p>
 </div>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationBase.inject">
-<code class="sig-name descname"><span class="pre">inject</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_source</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.inject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.inject" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationBase.inject">
+<span class="sig-name descname"><span class="pre">inject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_source</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.inject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.inject" title="Permalink to this definition">¶</a></dt>
 <dd><p>Connect a current source to all cells in the Population.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -984,8 +985,8 @@ simulated on the local node.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationBase.is_local">
-<code class="sig-name descname"><span class="pre">is_local</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.is_local"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.is_local" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationBase.is_local">
+<span class="sig-name descname"><span class="pre">is_local</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.is_local"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.is_local" title="Permalink to this definition">¶</a></dt>
 <dd><p>Indicates whether the cell with the given ID exists on the            local MPI node.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -994,9 +995,9 @@ simulated on the local node.</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationBase.local_cells">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">local_cells</span></code><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.local_cells" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationBase.local_cells">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">local_cells</span></span><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.local_cells" title="Permalink to this definition">¶</a></dt>
 <dd><p>An array containing the cell IDs of those neurons in the            Population that exist on the local MPI node.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1005,9 +1006,9 @@ simulated on the local node.</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationBase.local_size">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">local_size</span></code><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.local_size" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationBase.local_size">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">local_size</span></span><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.local_size" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the number of cells in the population on the local MPI node.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1017,16 +1018,16 @@ simulated on the local node.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationBase.meanSpikeCount">
-<code class="sig-name descname"><span class="pre">meanSpikeCount</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.meanSpikeCount"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.meanSpikeCount" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationBase.meanSpikeCount">
+<span class="sig-name descname"><span class="pre">meanSpikeCount</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.meanSpikeCount"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.meanSpikeCount" title="Permalink to this definition">¶</a></dt>
 <dd><div class="deprecated">
 <p><span class="versionmodified deprecated">Deprecated since version 5.0: </span>Use <code class="docutils literal notranslate"><span class="pre">mean_spike_count()</span></code> instead.</p>
 </div>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationBase.mean_spike_count">
-<code class="sig-name descname"><span class="pre">mean_spike_count</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gather</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.mean_spike_count"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.mean_spike_count" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationBase.mean_spike_count">
+<span class="sig-name descname"><span class="pre">mean_spike_count</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gather</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.mean_spike_count"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.mean_spike_count" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the mean number of spikes per neuron.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1047,8 +1048,8 @@ simulated on the local node.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationBase.nearest">
-<code class="sig-name descname"><span class="pre">nearest</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">position</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.nearest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.nearest" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationBase.nearest">
+<span class="sig-name descname"><span class="pre">nearest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">position</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.nearest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.nearest" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the neuron closest to the specified position.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -1056,9 +1057,9 @@ simulated on the local node.</p>
 </div>
 </dd></dl>
 
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationBase.position_generator">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">position_generator</span></code><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.position_generator" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationBase.position_generator">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">position_generator</span></span><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.position_generator" title="Permalink to this definition">¶</a></dt>
 <dd><div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>NO PyNN description of this method.</p>
@@ -1069,9 +1070,9 @@ simulated on the local node.</p>
 </div>
 </dd></dl>
 
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationBase.positions">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">positions</span></code><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.positions" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationBase.positions">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">positions</span></span><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.positions" title="Permalink to this definition">¶</a></dt>
 <dd><div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>NO PyNN description of this method.</p>
@@ -1088,8 +1089,8 @@ simulated on the local node.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationBase.printSpikes">
-<code class="sig-name descname"><span class="pre">printSpikes</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gather</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.printSpikes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.printSpikes" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationBase.printSpikes">
+<span class="sig-name descname"><span class="pre">printSpikes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gather</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.printSpikes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.printSpikes" title="Permalink to this definition">¶</a></dt>
 <dd><div class="deprecated">
 <p><span class="versionmodified deprecated">Deprecated since version 5.0: </span>Use <code class="docutils literal notranslate"><span class="pre">write_data(file,</span> <span class="pre">'spikes')</span></code> instead.</p>
 </div>
@@ -1100,8 +1101,8 @@ simulated on the local node.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationBase.print_gsyn">
-<code class="sig-name descname"><span class="pre">print_gsyn</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gather</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.print_gsyn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.print_gsyn" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationBase.print_gsyn">
+<span class="sig-name descname"><span class="pre">print_gsyn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gather</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.print_gsyn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.print_gsyn" title="Permalink to this definition">¶</a></dt>
 <dd><div class="deprecated">
 <p><span class="versionmodified deprecated">Deprecated since version 5.0: </span>Use <code class="docutils literal notranslate"><span class="pre">write_data(file,</span> <span class="pre">['gsyn_exc',</span> <span class="pre">'gsyn_inh'])</span></code> instead.</p>
 </div>
@@ -1112,8 +1113,8 @@ simulated on the local node.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationBase.print_v">
-<code class="sig-name descname"><span class="pre">print_v</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gather</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.print_v"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.print_v" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationBase.print_v">
+<span class="sig-name descname"><span class="pre">print_v</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gather</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.print_v"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.print_v" title="Permalink to this definition">¶</a></dt>
 <dd><div class="deprecated">
 <p><span class="versionmodified deprecated">Deprecated since version 5.0: </span>Use <code class="docutils literal notranslate"><span class="pre">write_data(file,</span> <span class="pre">'v')</span></code> instead.</p>
 </div>
@@ -1124,8 +1125,8 @@ simulated on the local node.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationBase.receptor_types">
-<code class="sig-name descname"><span class="pre">receptor_types</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.receptor_types"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.receptor_types" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationBase.receptor_types">
+<span class="sig-name descname"><span class="pre">receptor_types</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.receptor_types"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.receptor_types" title="Permalink to this definition">¶</a></dt>
 <dd><div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>NO PyNN description of this method.</p>
@@ -1137,8 +1138,8 @@ simulated on the local node.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationBase.record">
-<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">record</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.record"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.record" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationBase.record">
+<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">record</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.record"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.record" title="Permalink to this definition">¶</a></dt>
 <dd><p>Record the specified variable or variables for all cells in the            Population or view.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1156,8 +1157,8 @@ multiple of the simulation timestep.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationBase.record_gsyn">
-<code class="sig-name descname"><span class="pre">record_gsyn</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sampling_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.record_gsyn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.record_gsyn" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationBase.record_gsyn">
+<span class="sig-name descname"><span class="pre">record_gsyn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sampling_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.record_gsyn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.record_gsyn" title="Permalink to this definition">¶</a></dt>
 <dd><div class="deprecated">
 <p><span class="versionmodified deprecated">Deprecated since version 5.0: </span>Use <code class="docutils literal notranslate"><span class="pre">record(['gsyn_exc',</span> <span class="pre">'gsyn_inh'])</span></code> instead.</p>
 </div>
@@ -1169,8 +1170,8 @@ with the extra non-PyNN <cite>sampling_interval</cite> and <cite>indexes</cite><
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationBase.record_v">
-<code class="sig-name descname"><span class="pre">record_v</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sampling_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.record_v"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.record_v" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationBase.record_v">
+<span class="sig-name descname"><span class="pre">record_v</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sampling_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.record_v"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.record_v" title="Permalink to this definition">¶</a></dt>
 <dd><div class="deprecated">
 <p><span class="versionmodified deprecated">Deprecated since version 5.0: </span>Use <code class="docutils literal notranslate"><span class="pre">record('v')</span></code> instead.</p>
 </div>
@@ -1182,16 +1183,16 @@ with the extra non-PyNN <cite>sampling_interval</cite> and <cite>indexes</cite><
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationBase.rset">
-<code class="sig-name descname"><span class="pre">rset</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.rset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.rset" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationBase.rset">
+<span class="sig-name descname"><span class="pre">rset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.rset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.rset" title="Permalink to this definition">¶</a></dt>
 <dd><div class="deprecated">
 <p><span class="versionmodified deprecated">Deprecated since version 5.0: </span>Use <code class="docutils literal notranslate"><span class="pre">set(parametername=rand_distr)</span></code> instead.</p>
 </div>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationBase.save_positions">
-<code class="sig-name descname"><span class="pre">save_positions</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.save_positions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.save_positions" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationBase.save_positions">
+<span class="sig-name descname"><span class="pre">save_positions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.save_positions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.save_positions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Save positions to file. The output format is index x y z</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -1199,9 +1200,9 @@ with the extra non-PyNN <cite>sampling_interval</cite> and <cite>indexes</cite><
 </div>
 </dd></dl>
 
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationBase.structure">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">structure</span></code><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.structure" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationBase.structure">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">structure</span></span><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.structure" title="Permalink to this definition">¶</a></dt>
 <dd><p>The spatial structure of the parent Population.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -1215,16 +1216,16 @@ with the extra non-PyNN <cite>sampling_interval</cite> and <cite>indexes</cite><
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationBase.tset">
-<code class="sig-name descname"><span class="pre">tset</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.tset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.tset" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationBase.tset">
+<span class="sig-name descname"><span class="pre">tset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.tset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.tset" title="Permalink to this definition">¶</a></dt>
 <dd><div class="deprecated">
 <p><span class="versionmodified deprecated">Deprecated since version 5.0: </span>Use <code class="docutils literal notranslate"><span class="pre">set(parametername=value_array)</span></code> instead.</p>
 </div>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationBase.write_data">
-<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">write_data</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">io</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gather</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clear</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.write_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.write_data" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationBase.write_data">
+<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">write_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">io</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gather</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clear</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.write_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.write_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write recorded data to file, using one of the file formats            supported by Neo.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1244,7 +1245,7 @@ sPyNNaker.</p>
 </div>
 </p></li>
 <li><p><strong>clear</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – clears the storage data if set to true after reading it back</p></li>
-<li><p><strong>annotations</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>..</em><em>)</em>) – annotations to put on the Neo block</p></li>
+<li><p><strong>annotations</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>...</em><em>)</em>) – annotations to put on the Neo block</p></li>
 </ul>
 </dd>
 </dl>
@@ -1253,9 +1254,9 @@ sPyNNaker.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="spynnaker.pyNN.models.populations.PopulationView">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.populations.</span></code><code class="sig-name descname"><span class="pre">PopulationView</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_view.html#PopulationView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.populations.population_base.PopulationBase</span></code></p>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationView">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.populations.</span></span><span class="sig-name descname"><span class="pre">PopulationView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.populations.PopulationBase" title="spynnaker.pyNN.models.populations.PopulationBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.populations.PopulationBase</span></code></a></p>
 <p>A view of a subset of neurons within a        <a class="reference internal" href="#spynnaker.pyNN.models.populations.Population" title="spynnaker.pyNN.models.populations.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a>.</p>
 <p>In most ways, Populations and PopulationViews have the same behaviour,
 i.e., they can be recorded, connected with Projections, etc.
@@ -1289,8 +1290,8 @@ i.e. if <cite>p.size == 5</cite> then:</p>
 </dd>
 </dl>
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationView.all">
-<code class="sig-name descname"><span class="pre">all</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_view.html#PopulationView.all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.all" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationView.all">
+<span class="sig-name descname"><span class="pre">all</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_view.html#PopulationView.all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.all" title="Permalink to this definition">¶</a></dt>
 <dd><p>Iterator over cell IDs (on all MPI nodes).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1299,9 +1300,9 @@ i.e. if <cite>p.size == 5</cite> then:</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationView.all_cells">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">all_cells</span></code><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.all_cells" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationView.all_cells">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">all_cells</span></span><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.all_cells" title="Permalink to this definition">¶</a></dt>
 <dd><p>An array containing the cell IDs of all neurons in the            Population (all MPI nodes).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1311,8 +1312,8 @@ i.e. if <cite>p.size == 5</cite> then:</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationView.can_record">
-<code class="sig-name descname"><span class="pre">can_record</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_view.html#PopulationView.can_record"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.can_record" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationView.can_record">
+<span class="sig-name descname"><span class="pre">can_record</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_view.html#PopulationView.can_record"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.can_record" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine whether variable can be recorded from this population.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1321,9 +1322,9 @@ i.e. if <cite>p.size == 5</cite> then:</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationView.celltype">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">celltype</span></code><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.celltype" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationView.celltype">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">celltype</span></span><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.celltype" title="Permalink to this definition">¶</a></dt>
 <dd><p>The type of neurons making up the underlying Population.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1332,9 +1333,9 @@ i.e. if <cite>p.size == 5</cite> then:</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationView.conductance_based">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">conductance_based</span></code><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.conductance_based" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationView.conductance_based">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">conductance_based</span></span><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.conductance_based" title="Permalink to this definition">¶</a></dt>
 <dd><p>Indicates whether the post-synaptic response is modelled as a            change in conductance or a change in current.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1344,8 +1345,8 @@ i.e. if <cite>p.size == 5</cite> then:</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationView.describe">
-<code class="sig-name descname"><span class="pre">describe</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">template</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'populationview_default.txt'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">engine</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'default'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_view.html#PopulationView.describe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.describe" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationView.describe">
+<span class="sig-name descname"><span class="pre">describe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">template</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'populationview_default.txt'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">engine</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'default'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_view.html#PopulationView.describe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.describe" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a human-readable description of the population view.</p>
 <p>The output may be customized by specifying a different template
 together with an associated template engine (see pyNN.descriptions).</p>
@@ -1365,8 +1366,8 @@ context will be returned.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationView.find_units">
-<code class="sig-name descname"><span class="pre">find_units</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_view.html#PopulationView.find_units"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.find_units" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationView.find_units">
+<span class="sig-name descname"><span class="pre">find_units</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_view.html#PopulationView.find_units"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.find_units" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the units of a variable</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -1386,8 +1387,8 @@ context will be returned.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationView.get">
-<code class="sig-name descname"><span class="pre">get</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameter_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gather</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simplify</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_view.html#PopulationView.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.get" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationView.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameter_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gather</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simplify</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_view.html#PopulationView.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the values of the given parameters for every local cell in            the population, or, if <code class="docutils literal notranslate"><span class="pre">gather=True</span></code>,            for all cells in the population.</p>
 <p>Values will be expressed in the standard PyNN units (i.e. millivolts,
 nanoamps, milliseconds, microsiemens, nanofarads, event per second).</p>
@@ -1410,8 +1411,8 @@ nanoamps, milliseconds, microsiemens, nanofarads, event per second).</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationView.get_data">
-<code class="sig-name descname"><span class="pre">get_data</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gather</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clear</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_view.html#PopulationView.get_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.get_data" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationView.get_data">
+<span class="sig-name descname"><span class="pre">get_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gather</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clear</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_view.html#PopulationView.get_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.get_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a Neo Block containing the data(spikes, state variables)            recorded from the Population.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1430,7 +1431,7 @@ simulated on the local node.</p>
 </div>
 </p></li>
 <li><p><strong>clear</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – If True, recorded data will be deleted from the Population.</p></li>
-<li><p><strong>annotations</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>..</em><em>)</em>) – annotations to put on the neo block</p></li>
+<li><p><strong>annotations</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>...</em><em>)</em>) – annotations to put on the neo block</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
@@ -1444,8 +1445,8 @@ record.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationView.get_spike_counts">
-<code class="sig-name descname"><span class="pre">get_spike_counts</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gather</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_view.html#PopulationView.get_spike_counts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.get_spike_counts" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationView.get_spike_counts">
+<span class="sig-name descname"><span class="pre">get_spike_counts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gather</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_view.html#PopulationView.get_spike_counts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.get_spike_counts" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a dict containing the number of spikes for each neuron.</p>
 <p>The dict keys are neuron IDs, not indices.</p>
 <div class="admonition note">
@@ -1468,9 +1469,9 @@ does not support indexes.</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationView.grandparent">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">grandparent</span></code><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.grandparent" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationView.grandparent">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">grandparent</span></span><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.grandparent" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the parent Population at the root of the tree (since the            immediate parent may itself be a PopulationView).</p>
 <p>The name “grandparent” is of course a little misleading, as it could
 be just the parent, or the great, great, great, …, grandparent.</p>
@@ -1482,8 +1483,8 @@ be just the parent, or the great, great, great, …, grandparent.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationView.id_to_index">
-<code class="sig-name descname"><span class="pre">id_to_index</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_view.html#PopulationView.id_to_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.id_to_index" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationView.id_to_index">
+<span class="sig-name descname"><span class="pre">id_to_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_view.html#PopulationView.id_to_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.id_to_index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given the ID(s) of cell(s) in the PopulationView, return its /            their index / indices(order in the PopulationView).</p>
 <p>assert pv.id_to_index(pv[3]) == 3</p>
 <dl class="field-list simple">
@@ -1497,8 +1498,8 @@ be just the parent, or the great, great, great, …, grandparent.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationView.index_in_grandparent">
-<code class="sig-name descname"><span class="pre">index_in_grandparent</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indices</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_view.html#PopulationView.index_in_grandparent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.index_in_grandparent" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationView.index_in_grandparent">
+<span class="sig-name descname"><span class="pre">index_in_grandparent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indices</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_view.html#PopulationView.index_in_grandparent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.index_in_grandparent" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given an array of indices, return the indices in the parent            population at the root of the tree.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1510,20 +1511,20 @@ be just the parent, or the great, great, great, …, grandparent.</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationView.initial_values">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">initial_values</span></code><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.initial_values" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationView.initial_values">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">initial_values</span></span><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.initial_values" title="Permalink to this definition">¶</a></dt>
 <dd><p>A dict containing the initial values of the state variables.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a>(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a>, ..)</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a>(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a>, …)</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationView.initialize">
-<code class="sig-name descname"><span class="pre">initialize</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">initial_values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_view.html#PopulationView.initialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.initialize" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationView.initialize">
+<span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">initial_values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_view.html#PopulationView.initialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.initialize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set initial values of state variables, e.g. the membrane            potential.  Values passed to <code class="docutils literal notranslate"><span class="pre">initialize()</span></code> may be:</p>
 <ul class="simple">
 <li><p>single numeric values (all neurons set to the same value), or</p></li>
@@ -1543,9 +1544,9 @@ events per second).</p>
 </div>
 </dd></dl>
 
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationView.label">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">label</span></code><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.label" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationView.label">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">label</span></span><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.label" title="Permalink to this definition">¶</a></dt>
 <dd><p>A label for the Population View.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1554,9 +1555,9 @@ events per second).</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationView.mask">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">mask</span></code><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.mask" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationView.mask">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">mask</span></span><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.mask" title="Permalink to this definition">¶</a></dt>
 <dd><p>The selector mask that was used to create this view.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1566,9 +1567,9 @@ events per second).</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationView.parent">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">parent</span></code><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.parent" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationView.parent">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">parent</span></span><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.parent" title="Permalink to this definition">¶</a></dt>
 <dd><p>A reference to the parent Population (that this is a view of).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1578,8 +1579,8 @@ events per second).</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationView.record">
-<code class="sig-name descname"><span class="pre">record</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_view.html#PopulationView.record"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.record" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationView.record">
+<span class="sig-name descname"><span class="pre">record</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_view.html#PopulationView.record"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.record" title="Permalink to this definition">¶</a></dt>
 <dd><p>Record the specified variable or variables for all cells in the            Population or view.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1599,14 +1600,14 @@ simulation timestep.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationView.sample">
-<code class="sig-name descname"><span class="pre">sample</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_view.html#PopulationView.sample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.sample" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationView.sample">
+<span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_view.html#PopulationView.sample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.sample" title="Permalink to this definition">¶</a></dt>
 <dd><p>Randomly sample <cite>n</cite> cells from the Population view, and return a            new PopulationView object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of cells to select</p></li>
-<li><p><strong>rng</strong> (<a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.NumpyRNG" title="(in PyNN v0.9)"><em>NumpyRNG</em></a>) – Random number generator</p></li>
+<li><p><strong>rng</strong> (<a class="reference internal" href="spynnaker8.html#spynnaker8.NumpyRNG" title="pyNN.random.NumpyRNG"><em>NumpyRNG</em></a>) – Random number generator</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
@@ -1616,8 +1617,8 @@ simulation timestep.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationView.set">
-<code class="sig-name descname"><span class="pre">set</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_view.html#PopulationView.set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.set" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationView.set">
+<span class="sig-name descname"><span class="pre">set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_view.html#PopulationView.set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.set" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set one or more parameters for every cell in the population.            Values passed to <cite>set()</cite> may be:</p>
 <ul class="simple">
 <li><p>single values,</p></li>
@@ -1639,9 +1640,9 @@ event per second).</p>
 </div>
 </dd></dl>
 
-<dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationView.size">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">size</span></code><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.size" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationView.size">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">size</span></span><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.size" title="Permalink to this definition">¶</a></dt>
 <dd><p>The total number of neurons in the Population View.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1651,8 +1652,8 @@ event per second).</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="spynnaker.pyNN.models.populations.PopulationView.write_data">
-<code class="sig-name descname"><span class="pre">write_data</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">io</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gather</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clear</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_view.html#PopulationView.write_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.write_data" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationView.write_data">
+<span class="sig-name descname"><span class="pre">write_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">io</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gather</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clear</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_view.html#PopulationView.write_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.write_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write recorded data to file, using one of the file formats            supported by Neo.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1671,7 +1672,7 @@ containing only data from the cells simulated on that node.</p>
 </div>
 </p></li>
 <li><p><strong>clear</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – If this is True, recorded data will be deleted from the Population.</p></li>
-<li><p><strong>annotations</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>..</em><em>)</em>) – should be a dict containing simple data types such
+<li><p><strong>annotations</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>...</em><em>)</em>) – should be a dict containing simple data types such
 as numbers and strings. The contents will be written into the
 output data file as metadata.</p></li>
 </ul>
@@ -1685,8 +1686,8 @@ record.</p>
 
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
             <div class="clearer"></div>
@@ -1755,7 +1756,7 @@ record.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.4.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.1.
     </div>
   </body>
 </html>

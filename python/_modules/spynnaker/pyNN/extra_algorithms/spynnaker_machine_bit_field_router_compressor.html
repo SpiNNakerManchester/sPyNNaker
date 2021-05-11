@@ -6,9 +6,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor &#8212; sPyNNaker 6.0.1 documentation</title>
-    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../_static/sphinxdoc.css" type="text/css" />
-    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sphinxdoc.css" />
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
     <script src="../../../../_static/jquery.js"></script>
     <script src="../../../../_static/underscore.js"></script>
     <script src="../../../../_static/doctools.js"></script>
@@ -72,7 +72,7 @@
 <span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
 
 
-<div class="viewcode-block" id="AbstractMachineBitFieldRouterCompressor"><a class="viewcode-back" href="../../../../spynnaker.pyNN.extra_algorithms.html#spynnaker.pyNN.extra_algorithms.AbstractMachineBitFieldRouterCompressor">[docs]</a><span class="k">class</span> <span class="nc">AbstractMachineBitFieldRouterCompressor</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">AbstractBase</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">AbstractMachineBitFieldRouterCompressor</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">AbstractBase</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Algorithm that adds in regeneration of synaptic matrices to bitfield\</span>
 <span class="sd">    compression to\</span>
 <span class="sd">    :py:class:`spinn_front_end_common.interface.interface_functions.\</span>
@@ -229,7 +229,7 @@
                 <span class="n">synaptic_expander_rerun_cores</span><span class="p">,</span> <span class="n">expander_app_id</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span>
                 <span class="n">provenance_file_path</span><span class="p">,</span> <span class="n">executable_finder</span><span class="p">,</span> <span class="n">read_expander_iobuf</span><span class="p">,</span>
                 <span class="kc">None</span><span class="p">,</span> <span class="p">[</span><span class="n">CPUState</span><span class="o">.</span><span class="n">FINISHED</span><span class="p">],</span> <span class="n">needs_sync_barrier</span><span class="p">,</span>
-                <span class="bp">cls</span><span class="o">.</span><span class="n">_RERUN_IOBUF_NAME_PATTERN</span><span class="p">)</span></div>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">_RERUN_IOBUF_NAME_PATTERN</span><span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">SpynnakerMachineBitFieldOrderedCoveringCompressor</span><span class="p">(</span>
@@ -239,7 +239,7 @@
         <span class="k">return</span> <span class="n">MachineBitFieldOrderedCoveringCompressor</span><span class="p">()</span>
 
 
-<div class="viewcode-block" id="SpynnakerMachineBitFieldUnorderedRouterCompressor"><a class="viewcode-back" href="../../../../spynnaker.pyNN.extra_algorithms.html#spynnaker.pyNN.extra_algorithms.SpynnakerMachineBitFieldUnorderedRouterCompressor">[docs]</a><span class="k">class</span> <span class="nc">SpynnakerMachineBitFieldUnorderedRouterCompressor</span><span class="p">(</span>
+<span class="k">class</span> <span class="nc">SpynnakerMachineBitFieldUnorderedRouterCompressor</span><span class="p">(</span>
         <span class="n">SpynnakerMachineBitFieldOrderedCoveringCompressor</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; DEPRACATED use SpynnakerMachineBitFieldOrderedCoveringCompressor &quot;&quot;&quot;</span>
 
@@ -254,14 +254,14 @@
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractMachineBitFieldRouterCompressor</span><span class="o">.</span><span class="n">_compressor_factory</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">_compressor_factory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">MachineBitFieldOrderedCoveringCompressor</span><span class="p">()</span></div>
+        <span class="k">return</span> <span class="n">MachineBitFieldOrderedCoveringCompressor</span><span class="p">()</span>
 
 
-<div class="viewcode-block" id="SpynnakerMachineBitFieldPairRouterCompressor"><a class="viewcode-back" href="../../../../spynnaker.pyNN.extra_algorithms.html#spynnaker.pyNN.extra_algorithms.SpynnakerMachineBitFieldPairRouterCompressor">[docs]</a><span class="k">class</span> <span class="nc">SpynnakerMachineBitFieldPairRouterCompressor</span><span class="p">(</span>
+<span class="k">class</span> <span class="nc">SpynnakerMachineBitFieldPairRouterCompressor</span><span class="p">(</span>
         <span class="n">AbstractMachineBitFieldRouterCompressor</span><span class="p">):</span>
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractMachineBitFieldRouterCompressor</span><span class="o">.</span><span class="n">_compressor_factory</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">_compressor_factory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">MachineBitFieldPairRouterCompressor</span><span class="p">()</span></div>
+        <span class="k">return</span> <span class="n">MachineBitFieldPairRouterCompressor</span><span class="p">()</span>
 </pre></div>
 
             <div class="clearer"></div>
@@ -300,7 +300,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.4.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.1.
     </div>
   </body>
 </html>

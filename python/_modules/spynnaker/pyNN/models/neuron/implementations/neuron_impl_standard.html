@@ -6,9 +6,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard &#8212; sPyNNaker 6.0.1 documentation</title>
-    <link rel="stylesheet" href="../../../../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../../../_static/sphinxdoc.css" type="text/css" />
-    <script id="documentation_options" data-url_root="../../../../../../" src="../../../../../../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/sphinxdoc.css" />
+    <script data-url_root="../../../../../../" id="documentation_options" src="../../../../../../_static/documentation_options.js"></script>
     <script src="../../../../../../_static/jquery.js"></script>
     <script src="../../../../../../_static/underscore.js"></script>
     <script src="../../../../../../_static/doctools.js"></script>
@@ -67,7 +67,7 @@
 <span class="n">_DEFAULT_N_STEPS_PER_TIMESTEP</span> <span class="o">=</span> <span class="mi">1</span>
 
 
-<div class="viewcode-block" id="NeuronImplStandard"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard">[docs]</a><span class="k">class</span> <span class="nc">NeuronImplStandard</span><span class="p">(</span><span class="n">AbstractNeuronImpl</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">NeuronImplStandard</span><span class="p">(</span><span class="n">AbstractNeuronImpl</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; The standard componentised neuron implementation.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -264,7 +264,7 @@
                 <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">component</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
         <span class="c1"># ... or fail</span>
         <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;&#39;</span><span class="si">{}</span><span class="s2">&#39; object has no attribute </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
 </pre></div>
 
             <div class="clearer"></div>
@@ -303,7 +303,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.4.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.1.
     </div>
   </body>
 </html>

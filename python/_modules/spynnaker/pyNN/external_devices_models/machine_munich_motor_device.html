@@ -6,9 +6,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>spynnaker.pyNN.external_devices_models.machine_munich_motor_device &#8212; sPyNNaker 6.0.1 documentation</title>
-    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../_static/sphinxdoc.css" type="text/css" />
-    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sphinxdoc.css" />
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
     <script src="../../../../_static/jquery.js"></script>
     <script src="../../../../_static/underscore.js"></script>
     <script src="../../../../_static/doctools.js"></script>
@@ -73,7 +73,7 @@
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SpynnakerException</span>
 
 
-<div class="viewcode-block" id="MachineMunichMotorDevice"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice">[docs]</a><span class="k">class</span> <span class="nc">MachineMunichMotorDevice</span><span class="p">(</span>
+<span class="k">class</span> <span class="nc">MachineMunichMotorDevice</span><span class="p">(</span>
         <span class="n">MachineVertex</span><span class="p">,</span> <span class="n">AbstractGeneratesDataSpecification</span><span class="p">,</span>
         <span class="n">AbstractHasAssociatedBinary</span><span class="p">,</span> <span class="n">ProvidesKeyToAtomMappingImpl</span><span class="p">,</span>
         <span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="p">):</span>
@@ -247,7 +247,7 @@
         <span class="k">if</span> <span class="n">_partition</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">MOTOR_PARTITION_ID</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_MOTOR_N_KEYS</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">MachineMunichMotorDevice</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_n_keys_for_partition</span><span class="p">(</span>
-            <span class="n">_partition</span><span class="p">)</span></div></div>
+            <span class="n">_partition</span><span class="p">)</span></div>
 </pre></div>
 
             <div class="clearer"></div>
@@ -286,7 +286,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.4.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.1.
     </div>
   </body>
 </html>

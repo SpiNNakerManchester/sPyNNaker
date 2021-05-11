@@ -6,9 +6,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>spynnaker.pyNN.models.neural_projections.connectors.abstract_connector &#8212; sPyNNaker 6.0.1 documentation</title>
-    <link rel="stylesheet" href="../../../../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../../../_static/sphinxdoc.css" type="text/css" />
-    <script id="documentation_options" data-url_root="../../../../../../" src="../../../../../../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/sphinxdoc.css" />
+    <script data-url_root="../../../../../../" id="documentation_options" src="../../../../../../_static/documentation_options.js"></script>
     <script src="../../../../../../_static/jquery.js"></script>
     <script src="../../../../../../_static/underscore.js"></script>
     <script src="../../../../../../_static/doctools.js"></script>
@@ -77,7 +77,7 @@
     <span class="n">numpy</span><span class="o">.</span><span class="n">maximum</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">minimum</span><span class="p">,</span> <span class="n">e</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">e</span><span class="p">,</span> <span class="n">pi</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="AbstractConnector"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector">[docs]</a><span class="k">class</span> <span class="nc">AbstractConnector</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">AbstractBase</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">AbstractConnector</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">AbstractBase</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Abstract class that all PyNN Connectors extend.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># pylint: disable=unused-argument,too-many-arguments</span>
@@ -742,7 +742,7 @@
                            <span class="n">label</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">temp</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">temp</span>
         <span class="k">raise</span> <span class="n">SpynnakerException</span><span class="p">(</span>
-            <span class="s2">&quot;Size of </span><span class="si">{}</span><span class="s2"> must be an int, received </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">size</span><span class="p">))</span></div>
+            <span class="s2">&quot;Size of </span><span class="si">{}</span><span class="s2"> must be an int, received </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">size</span><span class="p">))</span>
 </pre></div>
 
             <div class="clearer"></div>
@@ -781,7 +781,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.4.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.1.
     </div>
   </body>
 </html>

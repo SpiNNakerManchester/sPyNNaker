@@ -6,9 +6,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>spynnaker.pyNN.models.neural_projections.delay_afferent_application_edge &#8212; sPyNNaker 6.0.1 documentation</title>
-    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../../_static/sphinxdoc.css" type="text/css" />
-    <script id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/sphinxdoc.css" />
+    <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
     <script src="../../../../../_static/jquery.js"></script>
     <script src="../../../../../_static/underscore.js"></script>
     <script src="../../../../../_static/doctools.js"></script>
@@ -56,7 +56,7 @@
 <span class="kn">from</span> <span class="nn">pacman.model.partitioner_interfaces</span> <span class="kn">import</span> <span class="n">AbstractSlicesConnect</span>
 
 
-<div class="viewcode-block" id="DelayAfferentApplicationEdge"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.DelayAfferentApplicationEdge">[docs]</a><span class="k">class</span> <span class="nc">DelayAfferentApplicationEdge</span><span class="p">(</span><span class="n">ApplicationEdge</span><span class="p">,</span> <span class="n">AbstractSlicesConnect</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">DelayAfferentApplicationEdge</span><span class="p">(</span><span class="n">ApplicationEdge</span><span class="p">,</span> <span class="n">AbstractSlicesConnect</span><span class="p">):</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_vertex</span><span class="p">,</span> <span class="n">delay_vertex</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -70,7 +70,7 @@
 <div class="viewcode-block" id="DelayAfferentApplicationEdge.could_connect"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.DelayAfferentApplicationEdge.could_connect">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSlicesConnect</span><span class="o">.</span><span class="n">could_connect</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">could_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_slice</span><span class="p">,</span> <span class="n">post_slice</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">((</span><span class="n">pre_slice</span><span class="o">.</span><span class="n">lo_atom</span> <span class="o">==</span> <span class="n">post_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">)</span> <span class="ow">and</span>
-                <span class="p">(</span><span class="n">post_slice</span><span class="o">.</span><span class="n">hi_atom</span> <span class="o">==</span> <span class="n">pre_slice</span><span class="o">.</span><span class="n">hi_atom</span><span class="p">))</span></div></div>
+                <span class="p">(</span><span class="n">post_slice</span><span class="o">.</span><span class="n">hi_atom</span> <span class="o">==</span> <span class="n">pre_slice</span><span class="o">.</span><span class="n">hi_atom</span><span class="p">))</span></div>
 </pre></div>
 
             <div class="clearer"></div>
@@ -109,7 +109,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.4.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.1.
     </div>
   </body>
 </html>
