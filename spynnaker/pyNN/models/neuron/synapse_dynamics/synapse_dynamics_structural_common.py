@@ -265,7 +265,7 @@ class SynapseDynamicsStructuralCommon(
             spec.write_value(int(self_connected), data_type=DataType.UINT16)
             # Delay
             delay_scale = (
-                    MICRO_TO_SECOND_CONVERSION /
+                    MICRO_TO_MILLISECOND_CONVERSION /
                     get_config_int("Machine", "machine_time_step"))
             if isinstance(dynamics.initial_delay, collections.Iterable):
                 spec.write_value(int(dynamics.initial_delay[0] * delay_scale),
