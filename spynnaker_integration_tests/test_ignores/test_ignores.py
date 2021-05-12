@@ -15,7 +15,6 @@
 
 from unittest import SkipTest
 from spinn_utilities.config_holder import set_config
-from spinn_machine.ignores import IgnoreChip, IgnoreCore, IgnoreLink
 from spinnman.processes.get_machine_process import GetMachineProcess
 from spinnaker_testbase import BaseTestCase
 import spynnaker8 as sim
