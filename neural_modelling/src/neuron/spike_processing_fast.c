@@ -158,7 +158,8 @@ static inline bool wait_for_dma_to_complete(bool term_on_end) {
     // Wait for completion of DMA
     term_on_end = false;
     uint32_t n_loops = 0;
-    while ((!term_on_end || !is_end_of_time_step()) && !(dma[DMA_STAT] & (1 << 10)) && n_loops < 10000) {
+    while ((!term_on_end || !is_end_of_time_step()) &&
+            !(dma[DMA_STAT] & (1 << 10)) && n_loops < 10000) {
         n_loops++;
     }
     if ((!term_on_end || !is_end_of_time_step()) && !(dma[DMA_STAT] & (1 << 10))) {

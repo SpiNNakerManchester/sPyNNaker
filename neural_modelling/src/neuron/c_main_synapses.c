@@ -184,8 +184,9 @@ static bool initialise(void) {
             *sdram_config, ring_buffers))
 
     // Do bitfield configuration last to only use any unused memory
-    if (!population_table_load_bitfields(data_specification_get_region(
-            SYNAPSE_REGIONS.bitfield_filter, ds_regions))) {
+    if (!population_table_load_bitfields(
+            data_specification_get_region(
+                SYNAPSE_REGIONS.bitfield_filter, ds_regions))) {
         return false;
     }
 
