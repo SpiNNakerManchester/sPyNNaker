@@ -318,6 +318,9 @@ static bool initialise(void) {
             *(sdram_word++) = 0;
         }
     }
+    // Set timer tick (in microseconds)
+    log_debug("setting timer tick callback for %d microseconds", timer_period);
+    spin1_set_timer_tick(timer_period);
 
     log_debug("Initialise: finished");
     return true;

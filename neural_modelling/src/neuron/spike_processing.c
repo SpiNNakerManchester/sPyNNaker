@@ -513,29 +513,14 @@ bool spike_processing_initialise( // EXPORTED
     return true;
 }
 
-uint32_t spike_processing_get_buffer_overflows(void) { // EXPORTED
-    // Check for buffer overflow
-    return in_spikes_get_n_buffer_overflows();
-}
-
-uint32_t spike_processing_get_dma_complete_count(void) {
-    return dma_complete_count;
-}
-
-uint32_t spike_processing_get_spike_processing_count(void) {
-    return spike_processing_count;
-}
-
-uint32_t spike_processing_get_successful_rewires(void) { // EXPORTED
-    return n_successful_rewires;
-}
-
-uint32_t spike_processing_get_n_packets_dropped_from_lateness(void) { // EXPORTED
-    return count_input_buffer_packets_late;
-}
-
-uint32_t spike_processing_get_max_filled_input_buffer_size(void) { // EXPORTED
-    return biggest_fill_size_of_input_buffer;
+void spike_processing_store_provenance(struct synapse_provenance *prov) {
+    prov->n_input_buffer_overflows = in_spikes_get_n_buffer_overflows();
+    prov->n_dmas_complete = dma_complete_count;
+    prov->n_spikes_processed = spike_processing_count;
+    prov->n_rewires = n_successful_rewires;
+    prov->n_packets_dropped_from_lateness = count_input_buffer_packets_late;
+    prov->spike_processing_get_max_filled_input_buffer_size =
+            biggest_fill_size_of_input_buffer;
 }
 
 //! \brief set the number of times spike_processing has to attempt rewiring

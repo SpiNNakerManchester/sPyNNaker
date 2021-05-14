@@ -167,7 +167,7 @@ OTHER_SOURCES_CONVERTED := $(call strip_source_dirs,$(OTHER_SOURCES))
 SOURCES = neuron/c_main_synapses.c \
           neuron/synapses.c \
           neuron/direct_synapses.c \
-          neuron/spike_processing.c \
+          neuron/spike_processing_fast.c \
           neuron/population_table/population_table_$(POPULATION_TABLE_IMPL)_impl.c \
           $(SYNAPSE_DYNAMICS) $(WEIGHT_DEPENDENCE) \
           $(TIMING_DEPENDENCE) $(SYNAPTOGENESIS_DYNAMICS) \
@@ -190,8 +190,8 @@ $(BUILD_DIR)neuron/direct_synapses.o: $(MODIFIED_DIR)neuron/direct_synapses.c
 	-mkdir -p $(dir $@)
 	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
 
-$(BUILD_DIR)neuron/spike_processing.o: $(MODIFIED_DIR)neuron/spike_processing.c
-	#spike_processing.c
+$(BUILD_DIR)neuron/spike_processing_fast.o: $(MODIFIED_DIR)neuron/spike_processing_fast.c
+	#spike_processing_fast.c
 	-@mkdir -p $(dir $@)
 	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
 

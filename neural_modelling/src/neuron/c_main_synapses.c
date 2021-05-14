@@ -35,11 +35,12 @@
 
 #include "c_main_synapse.h"
 #include "c_main_common.h"
+#include "spike_processing_fast.h"
 #include <spin1_api_params.h>
 
 //! values for the priority for each callback
 typedef enum callback_priorities {
-    MC = -1, DMA = 0, USER = 0, TIMER = 0, SDP = 0
+    MC = -1, DMA = -2, USER = -2, TIMER = 0, SDP = 0
 } callback_priorities;
 
 enum regions {
@@ -85,25 +86,6 @@ const struct synapse_priorities SYNAPSE_PRIORITIES = {
     .receive_packet = MC
 };
 
-//! A region of SDRAM used to transfer synapses
-struct sdram_config {
-    //! The address of the input data to be transferred
-    uint32_t *address;
-    //! The size of the input data to be transferred
-    uint32_t size_in_bytes;
-    //! The time of the transfer in us
-    uint32_t time_for_transfer;
-};
-
-static const uint32_t DMA_FLAGS = DMA_WIDTH << 24 | DMA_BURST_SIZE << 21
-        | DMA_WRITE << 19;
-
-//! A tag to indicate that the DMA of synaptic inputs is complete
-#define DMA_COMPLETE_TAG 10
-
-//! The number of clock cycles of overhead for the callback
-#define CALLBACK_OVERHEAD_CLOCKS 20
-
 // Globals
 
 //! The current timer tick value.
@@ -122,42 +104,14 @@ static uint32_t infinite_run;
 //! The recording flags indicating if anything is recording
 static uint32_t recording_flags = 0;
 
-//! Where synaptic input is to be written
-static struct sdram_config sdram_inputs;
-
-// The ring buffers to use
-static weight_t *ring_buffers;
-
-// The time to transfer
-static uint32_t clocks_to_transfer;
-
-// The number of words in the ring buffer to skip to get to the next time
-static uint32_t ring_buffer_skip_words;
-
-static inline void write(weight_t *tcm_address, uint32_t *system_address,
-        uint32_t length) {
-    uint32_t desc = DMA_FLAGS | length;
-    dma[DMA_ADRS] = (uint32_t) system_address;
-    dma[DMA_ADRT] = (uint32_t) tcm_address;
-    dma[DMA_DESC] = desc;
-
-    // Wait for completion of DMA
-    uint32_t n_loops = 0;
-    while (!(dma[DMA_STAT] & (1 << 10)) && n_loops < 10000) {
-        n_loops++;
-    }
-    if (!(dma[DMA_STAT] & (1 << 10))) {
-        log_error("Timeout on DMA loop: DMA stat = 0x%08x!", dma[DMA_STAT]);
-        rt_error(RTE_SWERR);
-    }
-    dma[DMA_CTRL] = 0x8;
-}
+static bool restart = true;
 
 //! \brief Callback to store provenance data (format: neuron_provenance).
 //! \param[out] provenance_region: Where to write the provenance data
 static void store_provenance_data(address_t provenance_region) {
     struct synapse_provenance *prov = (void *) provenance_region;
     store_synapse_provenance(prov);
+    spike_processing_fast_store_provenance(prov);
 }
 
 //! \brief the function to call when resuming a simulation
@@ -169,83 +123,27 @@ void resume_callback(void) {
     // Resume synapses
     // NOTE: at reset, time is set to UINT_MAX ahead of timer_callback(...)
     synapses_resume(time + 1);
+
+    // Prepare to process spikes again
+    restart = true;
 }
 
-static inline void process_ring_buffers(uint32_t local_time) {
-    // Get the index of the first ring buffer for the next time step
-    uint32_t first_ring_buffer = synapse_row_get_first_ring_buffer_index(local_time,
-            synapse_type_index_bits, synapse_delay_mask);
-    // Do the DMA transfer; note this won't be interrupted by the callback.
-    log_debug("Writing %d bytes to 0x%08x from ring buffer %d",
-             sdram_inputs.size_in_bytes, sdram_inputs.address, first_ring_buffer);
-    write(&ring_buffers[first_ring_buffer], sdram_inputs.address,
-            sdram_inputs.size_in_bytes);
-}
-
-static inline void write_contributions(uint32_t local_time) {
-    // Clear any outstanding spikes
-    spike_processing_clear_input_buffer(local_time);
-    // Copy things out of DTCM
-    process_ring_buffers(local_time + 1);
-}
-
-//! \brief writes synaptic inputs to SDRAM
-INT_HANDLER timer2_callback(void) {
-    // Disable interrupts to stop DMAs and MC getting in the way of this bit
-    uint32_t state = spin1_int_disable();
-    // Clear interrupt in timer and ACK the vic (safe as interrupts off anyway)
-    tc[T2_INT_CLR] = 1;
-    vic[VIC_VADDR] = 1;
-
-    // Write the contributions
-    write_contributions(time);
-
-    // Restore interrupts
-    spin1_mode_restore(state);
-}
-
-//! \brief Timer interrupt callback
-//! \param[in] timer_count: the number of times this call back has been
-//!            executed since start of simulation
-//! \param[in] unused: unused parameter kept for API consistency
-void timer_callback(UNUSED uint timer_count, UNUSED uint unused) {
+void timer_callback(UNUSED uint unused0, UNUSED uint unused1) {
     time++;
-    uint32_t state = spin1_int_disable();
-
-    /* if a fixed number of simulation ticks that were specified at startup
-     * then do reporting for finishing */
     if (simulation_is_finished()) {
-        // Finally, clear the ring buffers
-
         // Enter pause and resume state to avoid another tick
         simulation_handle_pause_resume(resume_callback);
+
+        spike_processing_fast_pause(time);
 
         // Pause common functions
         common_pause(recording_flags);
 
-        // Subtract 1 from the time so this tick gets done again on the next
-        // run
-        time--;
-
         simulation_ready_to_read();
-        spin1_mode_restore(state);
         return;
     }
 
-    // Now clear the ring buffers
-    synapses_flush_ring_buffers(time - 1);
-
-    // Setup to call back enough before the end of the timestep to transfer
-    // synapses to SDRAM for the next timestep
-    tc[T2_CONTROL] = 0;
-    uint32_t time_to_wait = tc[T1_COUNT] - clocks_to_transfer;
-    tc[T2_LOAD] = time_to_wait;
-    tc[T2_CONTROL] = 0xe3;
-
-    // Do rewiring as needed
-    synaptogenesis_do_timestep_update();
-
-    spin1_mode_restore(state);
+    spike_processing_fast_time_step_loop(time);
 }
 
 //! \brief Initialises the model by reading in the regions and checking
@@ -265,53 +163,44 @@ static bool initialise(void) {
     // Setup synapses
     uint32_t n_neurons;
     uint32_t n_synapse_types;
+    uint32_t incoming_spike_buffer_size;
+    uint32_t row_max_n_words;
+    bool clear_input_buffer_of_late_packets;
+    weight_t *ring_buffers;
     if (!initialise_synapse_regions(
-            ds_regions, SYNAPSE_REGIONS, SYNAPSE_PRIORITIES, 0,
-            &n_neurons, &n_synapse_types, &ring_buffers)) {
+            ds_regions, SYNAPSE_REGIONS, &n_neurons, &n_synapse_types,
+            &ring_buffers, &row_max_n_words, &incoming_spike_buffer_size,
+            &clear_input_buffer_of_late_packets)) {
         return false;
     }
 
     // Setup for writing synaptic inputs at the end of each run
     struct sdram_config * sdram_config = data_specification_get_region(
             SDRAM_PARAMS_REGION, ds_regions);
-    spin1_memcpy(&sdram_inputs, sdram_config, sizeof(struct sdram_config));
 
-    // Measure the time to do an upload
-    tc[T2_LOAD] = 0xFFFFFFFF;
-    tc[T2_CONTROL] = 0x82;
-    write_contributions(0);
-    clocks_to_transfer = (0xFFFFFFFF - tc[T2_COUNT]) + CALLBACK_OVERHEAD_CLOCKS;
-    log_info("Transfer of %u bytes to 0x%08x took %u cycles",
-            sdram_inputs.size_in_bytes, sdram_inputs.address, clocks_to_transfer);
-    recording_reset();
+    if (!spike_processing_fast_initialise(
+            row_max_n_words, incoming_spike_buffer_size,
+            clear_input_buffer_of_late_packets, 0,
+            *sdram_config, ring_buffers))
 
-    // Prepare to receive the timer (disable timer then enable VIC entry)
-    tc[T2_CONTROL] = 0;
-    sark_vic_set(TIMER2_PRIORITY, TIMER2_INT, 1, timer2_callback);
-
-    // Wipe the inputs using word writes
-    for (uint32_t i = 0; i < sdram_inputs.size_in_bytes >> 2; i++) {
-        sdram_inputs.address[i] = 0;
+    // Do bitfield configuration last to only use any unused memory
+    if (!population_table_load_bitfields(data_specification_get_region(
+            SYNAPSE_REGIONS.bitfield_filter, ds_regions))) {
+        return false;
     }
 
-    // Work out how many ring buffer entries between time steps.
-    // Take the number of ring buffer entries per time step which is
-    // identified by the number of bits needed by all the synapse types and
-    // neuron indicies.  The number of words is this divided by 2 (the size
-    // of each ring buffer entry) which is the same as shifting by 1 less.
-    ring_buffer_skip_words = 1 << (synapse_type_index_bits - 1);
+    // Set timer tick (in microseconds)
+    log_debug("setting timer tick callback for %d microseconds", timer_period);
+    spin1_set_timer_tick(timer_period);
 
+    recording_reset();
 
     log_debug("Initialise: finished");
     return true;
 }
 
-
 //! \brief The entry point for this model.
 void c_main(void) {
-
-    // Start the time at "-1" so that the first tick will be 0
-    time = UINT32_MAX;
 
     // initialise the model
     if (!initialise()) {

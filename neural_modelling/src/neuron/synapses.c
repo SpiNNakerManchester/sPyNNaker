@@ -77,6 +77,8 @@ uint32_t synapse_delay_mask;
 //! Count of the number of times the ring buffers have saturated
 uint32_t synapses_saturation_count = 0;
 
+static uint32_t n_neurons_peak;
+
 
 /* PRIVATE FUNCTIONS */
 
@@ -296,6 +298,8 @@ bool synapses_initialise(
     synapse_delay_bits = log_max_delay;
     synapse_delay_mask = (1 << synapse_delay_bits) - 1;
 
+    n_neurons_peak = 1 << log_n_neurons;
+
     uint32_t n_ring_buffer_bits =
             log_n_neurons + log_n_synapse_types + synapse_delay_bits;
     ring_buffer_size = 1 << (n_ring_buffer_bits);
@@ -316,18 +320,17 @@ bool synapses_initialise(
 
 // Flush ring buffers for the given time
 void synapses_flush_ring_buffers(timer_t time) {
-    for (uint32_t neuron_index = 0; neuron_index < n_neurons;
-                neuron_index++) {
-        // Loop through all synapse types
-        for (uint32_t synapse_type_index = 0;
-                synapse_type_index < n_synapse_types; synapse_type_index++) {
-            // Get index in the ring buffers for the current time slot for
-            // this synapse type and neuron
-            uint32_t ring_buffer_index = synapse_row_get_ring_buffer_index(
-                    time, synapse_type_index, neuron_index,
-                    synapse_type_index_bits, synapse_index_bits, synapse_delay_mask);
+    uint32_t synapse_index = 0;
+    uint32_t ring_buffer_index = synapse_row_get_first_ring_buffer_index(
+            time, synapse_type_index_bits, synapse_delay_mask);;
+    for (uint32_t s_i = n_synapse_types; s_i > 0; s_i--) {
+        uint32_t neuron_index = 0;
+        for (uint32_t n_i = n_neurons_peak; n_i > 0; n_i--) {
             ring_buffers[ring_buffer_index] = 0;
+            ring_buffer_index++;
+            neuron_index++;
         }
+        synapse_index++;
     }
 }
 

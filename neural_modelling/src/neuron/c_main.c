@@ -38,6 +38,7 @@
 #include "c_main_common.h"
 #include "regions.h"
 #include "profile_tags.h"
+#include "spike_processing.h"
 
 //! The combined provenance from synapses and neurons
 struct combined_provenance {
@@ -131,6 +132,7 @@ static void c_main_store_provenance_data(address_t provenance_region) {
     prov->max_backgrounds_queued = max_backgrounds_queued;
     store_neuron_provenance(&prov->neuron_provenance);
     store_synapse_provenance(&prov->synapse_provenance);
+    spike_processing_store_provenance(&prov->synapse_provenance);
 }
 
 //! \brief the function to call when resuming a simulation
@@ -259,11 +261,33 @@ static bool initialise(void) {
     }
 
     // Setup synapses
+    uint32_t incoming_spike_buffer_size;
+    bool clear_input_buffer_of_late_packets;
+    uint32_t row_max_n_words;
     if (!initialise_synapse_regions(
-            ds_regions, SYNAPSE_REGIONS, SYNAPSE_PRIORITIES,
-            n_rec_regions_used, &n_neurons, &n_synapse_types, &ring_buffers)) {
+            ds_regions, SYNAPSE_REGIONS, &n_neurons, &n_synapse_types,
+            &ring_buffers, &row_max_n_words, &incoming_spike_buffer_size,
+            &clear_input_buffer_of_late_packets)) {
         return false;
     }
+
+    // Setup spike processing
+    if (!spike_processing_initialise(
+            row_max_n_words, SYNAPSE_PRIORITIES.receive_packet,
+            SYNAPSE_PRIORITIES.process_synapses, incoming_spike_buffer_size,
+            clear_input_buffer_of_late_packets, n_rec_regions_used)) {
+        return false;
+    }
+
+    // Do bitfield configuration last to only use any unused memory
+    if (!population_table_load_bitfields(data_specification_get_region(
+            SYNAPSE_REGIONS.bitfield_filter, ds_regions))) {
+        return false;
+    }
+
+    // Set timer tick (in microseconds)
+    log_debug("setting timer tick callback for %d microseconds", timer_period);
+    spin1_set_timer_tick(timer_period);
 
     log_debug("Initialise: finished");
     return true;

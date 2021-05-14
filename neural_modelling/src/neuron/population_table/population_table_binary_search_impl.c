@@ -122,7 +122,8 @@ static uint32_t last_neuron_id = 0;
 static uint16_t next_item = 0;
 
 //! The number of relevant items remaining in the ::address_list
-static uint16_t items_to_go = 0;
+//! NOTE: Exported for speed of check
+uint16_t items_to_go = 0;
 
 //! The bitfield map
 static bit_field_t *connectivity_bit_field = NULL;
