@@ -563,8 +563,8 @@ class PopulationMachineVertex(
             the spec to write the DSG region to
         :return: None
         """
-        params_size = self._app_vertex.get_sdram_usage_for_current_source_params(
-            self.vertex_slice)
+        params_size = self._app_vertex.\
+            get_sdram_usage_for_current_source_params(self.vertex_slice)
         if params_size:
             spec.reserve_memory_region(
                 region=POPULATION_BASED_REGIONS.CURRENT_SOURCE_PARAMS.value,

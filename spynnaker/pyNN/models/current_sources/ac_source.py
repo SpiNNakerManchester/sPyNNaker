@@ -152,8 +152,6 @@ class ACSource(AbstractCurrentSource):
         # Set final value to zero
         amplitudes[-1] = 0.0
 
-        print("Check: times, amplitudes: ", times, amplitudes, time_minus_start)
-
         return times, amplitudes
 
     def _get_frequency(self, frequency):

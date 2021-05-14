@@ -37,7 +37,7 @@ class NoisyCurrentSource(AbstractCurrentSource):
         "__dt",
         "__rng",
         "__parameters",
-        "__parameter_types",]
+        "__parameter_types"]
 
     def __init__(self, mean=0.0, stdev=0.0, start=0.0, stop=0.0, dt=1.0,
                  rng=None):
@@ -76,7 +76,6 @@ class NoisyCurrentSource(AbstractCurrentSource):
         self.__parameters['dt'] = self.__dt
         self.__parameters['seed'] = utility_calls.create_mars_kiss_seeds(
             self.__rng)
-
 
     def set_parameters(self, parameters):
         """ Set the current source parameters
