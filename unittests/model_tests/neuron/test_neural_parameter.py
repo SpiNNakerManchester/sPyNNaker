@@ -74,8 +74,7 @@ def test_range_list():
 
 
 def _generator(size):
-    for i in range(size):
-        yield i
+    yield from range(size)
 
 
 def range_list_as_list(spec):

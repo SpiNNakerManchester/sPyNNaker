@@ -20,7 +20,6 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 from spinnaker_testbase import BaseTestCase
 
 
-
 def post_spike_same_time():
     """ Check that the offsets between send times of different spike source
         arrays don't change the outcome of STDP

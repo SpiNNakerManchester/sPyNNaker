@@ -31,6 +31,7 @@ class WeightDependenceAdditiveTriplet(
         "__a3_plus",
         "__w_max",
         "__w_min"]
+    __PARAM_NAMES = ('w_min', 'w_max', 'A3_plus', 'A3_minus')
 
     default_parameters = {'w_min': 0.0, 'w_max': 1.0, 'A3_plus': 0.01,
                           'A3_minus': 0.01}
@@ -153,4 +154,4 @@ class WeightDependenceAdditiveTriplet(
 
     @overrides(AbstractWeightDependence.get_parameter_names)
     def get_parameter_names(self):
-        return ['w_min', 'w_max', 'A3_plus', 'A3_minus']
+        return self.__PARAM_NAMES
