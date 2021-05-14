@@ -48,15 +48,6 @@ typedef struct dma_buffer {
 //! Mask to apply to perform modulo on the DMA buffer index
 #define DMA_BUFFER_MOD_MASK 0x1
 
-//! The base time taken for any DMA (RTT)
-#define DMA_BASE_TRANSFER_TIME 50
-
-//! The extra time taken for a DMA per word
-#define DMA_CLOCKS_PER_WORD 4
-
-//! The time taken to process per word
-#define PROCESSING_CLOCKS_PER_WORD 7
-
 //! The extra overhead to add to the transfer time
 #define TRANSFER_OVERHEAD_CLOCKS 100
 
@@ -130,13 +121,6 @@ static inline void clear_end_of_time_step(void) {
     tc[T2_INT_CLR] = 1;
 }
 
-static inline bool is_time_to_process(uint32_t n_bytes) {
-    uint32_t n_words = n_bytes >> 2;
-    uint32_t time_for_dma = DMA_BASE_TRANSFER_TIME + (n_words * DMA_CLOCKS_PER_WORD);
-    uint32_t time_for_process = n_words * PROCESSING_CLOCKS_PER_WORD;
-    return tc[T2_COUNT] >= (time_for_dma + time_for_process);
-}
-
 static inline void do_fast_dma_write(void *tcm_address, void *system_address,
         uint32_t n_bytes) {
     uint32_t desc = DMA_WRITE_FLAGS | n_bytes;
@@ -154,24 +138,35 @@ static inline void do_fast_dma_read(void *system_address, void *tcm_address,
     dma[DMA_DESC] = desc;
 }
 
-static inline bool wait_for_dma_to_complete(bool term_on_end) {
+static inline void wait_for_dma_to_complete(void) {
     // Wait for completion of DMA
-    term_on_end = false;
     uint32_t n_loops = 0;
-    while ((!term_on_end || !is_end_of_time_step()) &&
-            !(dma[DMA_STAT] & (1 << 10)) && n_loops < 10000) {
+    while (!(dma[DMA_STAT] & (1 << 10)) && n_loops < 10000) {
         n_loops++;
     }
-    if ((!term_on_end || !is_end_of_time_step()) && !(dma[DMA_STAT] & (1 << 10))) {
+    if (!(dma[DMA_STAT] & (1 << 10))) {
         log_error("Timeout on DMA loop: DMA stat = 0x%08x!", dma[DMA_STAT]);
         rt_error(RTE_SWERR);
     }
-    bool end = term_on_end && is_end_of_time_step();
+    dma[DMA_CTRL] = 0x8;
+}
+
+static inline bool wait_for_dma_to_complete_or_end(void) {
+    // Wait for completion of DMA
+    uint32_t n_loops = 0;
+    while (!is_end_of_time_step() && !(dma[DMA_STAT] & (1 << 10)) && n_loops < 10000) {
+        n_loops++;
+    }
+    if (!is_end_of_time_step() && !(dma[DMA_STAT] & (1 << 10))) {
+        log_error("Timeout on DMA loop: DMA stat = 0x%08x!", dma[DMA_STAT]);
+        rt_error(RTE_SWERR);
+    }
+    bool end = is_end_of_time_step();
     if (end) {
         dma[DMA_CTRL] = 0x1f;
     }
     dma[DMA_CTRL] = 0x8;
-    return true;
+    return !end;
 }
 
 static inline void transfer_buffers(uint32_t time) {
@@ -211,7 +206,7 @@ static inline bool start_first_dma(spike_t *spike) {
             read_synaptic_row(*spike, row, n_bytes);
             return true;
         }
-    } while (get_next_spike(spike));
+    } while (!is_end_of_time_step() && get_next_spike(spike));
 
     return false;
 }
@@ -223,7 +218,7 @@ static inline bool get_next_dma(spike_t *spike, synaptic_row_t *row,
         return true;
     }
 
-    while (get_next_spike(spike)) {
+    while (!is_end_of_time_step() && get_next_spike(spike)) {
         if (population_table_get_first_address(*spike, row, n_bytes)) {
             return true;
         }
@@ -240,7 +235,7 @@ static inline void process_end_of_time_step(uint32_t time) {
 
     // Start transferring buffer data for next time step
     transfer_buffers(time);
-    wait_for_dma_to_complete(false);
+    wait_for_dma_to_complete();
 
 // TODO: Make this extra provenance
 //    uint32_t end = tc[T1_COUNT];
@@ -276,7 +271,8 @@ static inline void process_current_row(uint32_t time) {
         void *system_address = synapse_row_plastic_region(
                 buffer->sdram_writeback_address);
         void *tcm_address = synapse_row_plastic_region(buffer->row);
-        wait_for_dma_to_complete(true);
+        // TODO: Do this properly
+        wait_for_dma_to_complete_or_end();
         do_fast_dma_write(tcm_address, system_address, n_bytes);
     }
     next_buffer_to_process = (next_buffer_to_process + 1) & DMA_BUFFER_MOD_MASK;
@@ -304,7 +300,7 @@ static inline void measure_transfer_time(void) {
     tc[T2_LOAD] = 0xFFFFFFFF;
     tc[T2_CONTROL] = 0x82;
     transfer_buffers(0);
-    wait_for_dma_to_complete(false);
+    wait_for_dma_to_complete();
     clocks_to_transfer = (0xFFFFFFFF - tc[T2_COUNT]) + TRANSFER_OVERHEAD_CLOCKS;
     tc[T2_CONTROL] = 0;
     log_info("Transfer of %u bytes to 0x%08x took %u cycles",
@@ -374,7 +370,7 @@ void spike_processing_fast_time_step_loop(uint32_t time) {
             dma_in_progress = get_next_dma(&spike, &row, &n_bytes);
 
             // Finish the current DMA before starting the next
-            if (!wait_for_dma_to_complete(true)) {
+            if (!wait_for_dma_to_complete_or_end()) {
                 break;
             }
             dma_complete_count++;
