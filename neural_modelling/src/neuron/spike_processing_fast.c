@@ -164,6 +164,10 @@ static inline bool wait_for_dma_to_complete_or_end(void) {
     bool end = is_end_of_time_step();
     if (end) {
         dma[DMA_CTRL] = 0x1f;
+        while (dma[DMA_STAT] & 0x1) {
+            continue;
+        }
+        dma[DMA_CTRL] = 0xd;
     }
     dma[DMA_CTRL] = 0x8;
     return !end;
@@ -371,6 +375,7 @@ void spike_processing_fast_time_step_loop(uint32_t time) {
 
             // Finish the current DMA before starting the next
             if (!wait_for_dma_to_complete_or_end()) {
+                count_input_buffer_packets_late += 1;
                 break;
             }
             dma_complete_count++;
