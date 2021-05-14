@@ -13,17 +13,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import math
+import numpy
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
-from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_front_end_common.utilities.constants import (
+    BYTES_PER_WORD, MICRO_TO_MILLISECOND_CONVERSION)
+from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.exceptions import SpynnakerException
 from .abstract_current_source import AbstractCurrentSource, CurrentSourceIDs
 
 
 class ACSource(AbstractCurrentSource):
     """ AC current source (i.e. sine wave) turned on at "start" and off at
-        "stop", given (y-)offset, (initial) amplitude, frequency and phase
+        "stop", given (y-)offset, amplitude, frequency and phase
 
     """
     __slots__ = [
@@ -33,6 +35,7 @@ class ACSource(AbstractCurrentSource):
         "__offset",
         "__frequency",
         "__phase",
+        "__local_parameters",
         "__parameters",
         "__parameter_types"]
 
@@ -44,26 +47,27 @@ class ACSource(AbstractCurrentSource):
         self.__stop = stop
         self.__amplitude = amplitude
         self.__offset = offset
-        # convert frequency and phase into radians, remembering that
-        # frequency is given in Hz but we are using ms for timesteps
-        self.__frequency = (frequency * 2 * math.pi) / 1000.0
-        self.__phase = phase / (2 * math.pi)
+        self.__frequency = self._get_frequency(frequency)
+        self.__phase = self._get_phase(phase)
+
+        self.__local_parameters = dict()
+        self.__local_parameters['start'] = start
+        self.__local_parameters['stop'] = stop
+        self.__local_parameters['amplitude'] = amplitude
+        self.__local_parameters['offset'] = offset
+        self.__local_parameters['frequency'] = self.__frequency
+        self.__local_parameters['phase'] = self.__phase
+
+        times, amplitudes = self._get_params(
+            start, stop, amplitude, offset, self.__frequency, self.__phase)
 
         self.__parameter_types = dict()
-        self.__parameter_types['start'] = DataType.UINT32
-        self.__parameter_types['stop'] = DataType.UINT32
-        self.__parameter_types['amplitude'] = DataType.S1615
-        self.__parameter_types['offset'] = DataType.S1615
-        self.__parameter_types['frequency'] = DataType.S1615
-        self.__parameter_types['phase'] = DataType.S1615
+        self.__parameter_types['times'] = DataType.UINT32
+        self.__parameter_types['amplitudes'] = DataType.S1615
 
         self.__parameters = dict()
-        self.__parameters['start'] = self.__start
-        self.__parameters['stop'] = self.__stop
-        self.__parameters['amplitude'] = self.__amplitude
-        self.__parameters['offset'] = self.__offset
-        self.__parameters['frequency'] = self.__frequency
-        self.__parameters['phase'] = self.__phase
+        self.__parameters['times'] = times
+        self.__parameters['amplitudes'] = amplitudes
 
     def set_parameters(self, parameters):
         """ Set the current source parameters
@@ -71,12 +75,28 @@ class ACSource(AbstractCurrentSource):
         :param dict(str, Any) parameters: the parameters to set
         """
         for key, value in parameters.items():
-            if key not in self.__parameters.keys():
+            if key not in self.__local_parameters.keys():
                 # throw an exception
-                msg = "{} is not a parameter of {}".format(key, self)
+                msg = "{} is not a (local) parameter of {}".format(key, self)
                 raise SpynnakerException(msg)
             else:
-                self.__parameters[key] = value
+                if key == 'frequency':
+                    self.__local_parameters[key] = self._get_frequency(value)
+                elif key == 'phase':
+                    self.__local_parameters[key] = self._get_phase(value)
+                else:
+                    self.__local_parameters[key] = value
+
+        times, amplitudes = self._get_params(
+            self.__local_parameters['start'],
+            self.__local_parameters['stop'],
+            self.__local_parameters['amplitude'],
+            self.__local_parameters['offset'],
+            self.__local_parameters['frequency'],
+            self.__local_parameters['phase'])
+
+        self.__parameters['times'] = times
+        self.__parameters['amplitudes'] = amplitudes
 
     @property
     @overrides(AbstractCurrentSource.get_parameters)
@@ -111,4 +131,43 @@ class ACSource(AbstractCurrentSource):
 
         :rtype: int
         """
-        return n_neurons * (len(self.__parameters) + 1) * BYTES_PER_WORD
+        return n_neurons * (((len(
+            self.__parameters['times']) + 1) * 2) + 1) * BYTES_PER_WORD
+
+    def _get_params(self, start, stop, amplitude, offset, frequency, phase):
+        """ Convert parameters into arrays.
+
+        :rtype: list, list
+        """
+        # Convert to timestep indices rather than just using start and stop
+        sim = get_simulator()
+        machine_ts = sim.machine_time_step
+        time_convert_ms = MICRO_TO_MILLISECOND_CONVERSION / machine_ts
+        times = numpy.arange(int(start) * time_convert_ms,
+                             (int(stop)+1) * time_convert_ms)
+        time_minus_start = numpy.arange(0, (stop+1.0-start) * time_convert_ms)
+        amplitudes = offset + (amplitude * numpy.sin(
+            (time_minus_start * frequency / time_convert_ms) + phase))
+
+        # Set final value to zero
+        amplitudes[-1] = 0.0
+
+        print("Check: times, amplitudes: ", times, amplitudes, time_minus_start)
+
+        return times, amplitudes
+
+    def _get_frequency(self, frequency):
+        """ Convert frequency to radian-friendly value.
+
+        :rtype: float
+        """
+        # convert frequency and phase into radians, remembering that
+        # frequency is given in Hz but we are using ms for timesteps
+        return (frequency * 2 * numpy.pi) / 1000.0
+
+    def _get_phase(self, phase):
+        """ Convert phase to radian-friendly value.
+
+        :rtype: float
+        """
+        return phase * (numpy.pi / 180.0)

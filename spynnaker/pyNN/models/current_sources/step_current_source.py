@@ -15,7 +15,9 @@
 
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
-from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_front_end_common.utilities.constants import (
+    BYTES_PER_WORD, MICRO_TO_MILLISECOND_CONVERSION)
+from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.exceptions import SpynnakerException
 from .abstract_current_source import AbstractCurrentSource, CurrentSourceIDs
 
@@ -25,17 +27,24 @@ class StepCurrentSource(AbstractCurrentSource):
 
     """
     __slots__ = [
-        "__amplitude",
-        "__start",
-        "__stop",
+        "__amplitudes",
+        "__times",
         "__parameters",
         "__parameter_types"]
 
     def __init__(self, times=[], amplitudes=[]):
         # There's probably no need to actually store these as you can't
         # access them directly in pynn anyway
-        self.__times = times
+        sim = get_simulator()
+        machine_ts = sim.machine_time_step
+        time_convert_ms = MICRO_TO_MILLISECOND_CONVERSION / machine_ts
+        self.__times = [times[i] * time_convert_ms for i in range(len(times))]
         self.__amplitudes = amplitudes
+
+        if (len(times) != len(amplitudes)):
+            msg = "len(times) is {}, but len(amplitudes) is {}".format(
+                len(times), len(amplitudes))
+            raise SpynnakerException(msg)
 
         self.__parameter_types = dict()
         self.__parameter_types['times'] = DataType.UINT32  # arrays?
@@ -84,3 +93,11 @@ class StepCurrentSource(AbstractCurrentSource):
         :rtype: int
         """
         return CurrentSourceIDs.STEP_CURRENT_SOURCE.value
+
+    @overrides(AbstractCurrentSource.get_sdram_usage_in_bytes)
+    def get_sdram_usage_in_bytes(self, n_neurons):
+        """ The sdram usage of the current source.
+
+        :rtype: int
+        """
+        return n_neurons * (((len(self.__times) + 1) * 2) + 1) * BYTES_PER_WORD

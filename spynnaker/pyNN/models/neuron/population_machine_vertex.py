@@ -672,33 +672,34 @@ class PopulationMachineVertex(
         # Set the focus to the memory region:
         spec.switch_write_focus(region_id)
 
-        # Write whether the key is to be used, and then the key, or 0 if it
-        # isn't to be used (not sure about this bit?)
-        # if key is None:
-        #     spec.write_value(data=0)
-        #     spec.write_value(data=0)
-        # else:
-        #     spec.write_value(data=1)
-        #     spec.write_value(data=key)
-
         # Now write the hash associated with the
         current_source = self.app_vertex.current_source
-        # print("current_source is ", current_source)
 
-        # Generally speaking the parameters are single-valued dicts,
-        # apart from the StepCurrentSource case
+        # Generally speaking the parameters are single-valued dicts
         cs_id = current_source.current_source_id
         spec.write_value(cs_id)
         cs_data_types = current_source.get_parameter_types
         for key, value in current_source.get_parameters.items():
-            if (cs_id == CurrentSourceIDs.STEP_CURRENT_SOURCE.value):
-                spec.write_array(data=value, data_type=cs_data_types[key])
+            # StepCurrentSource and ACSource are currently handled with arrays
+            if ((cs_id == CurrentSourceIDs.STEP_CURRENT_SOURCE.value) or (
+                    cs_id == CurrentSourceIDs.AC_SOURCE.value)):
+                n_params = len(current_source.get_parameters[key])
+                spec.write_value(n_params)
+                for n in range(n_params):
+                    value_convert = convert_to(
+                        value[n], cs_data_types[key]).view("uint32")
+                    spec.write_value(data=value_convert)
+            # DCSource and NoisyCurrentSource just have single-valued params
             else:
-                value_convert = convert_to(
-                    value, cs_data_types[key]).view("uint32")
-                print("writing ", value, " data type ", cs_data_types[key],
-                      " converted to ", value_convert)
-                spec.write_value(data=value_convert)
+                if hasattr(value, "__getitem__"):
+                    for n in range(len(value)):
+                        value_convert = convert_to(
+                            value[n], cs_data_types[key]).view("uint32")
+                        spec.write_value(data=value_convert)
+                else:
+                    value_convert = convert_to(
+                        value, cs_data_types[key]).view("uint32")
+                    spec.write_value(data=value_convert)
 
     @overrides(AbstractSynapseExpandable.gen_on_machine)
     def gen_on_machine(self):
