@@ -181,12 +181,13 @@ static bool initialise(void) {
     if (!spike_processing_fast_initialise(
             row_max_n_words, incoming_spike_buffer_size,
             clear_input_buffer_of_late_packets, 0,
-            *sdram_config, ring_buffers))
+            *sdram_config, ring_buffers)) {
+        return false;
+    }
 
     // Do bitfield configuration last to only use any unused memory
-    if (!population_table_load_bitfields(
-            data_specification_get_region(
-                SYNAPSE_REGIONS.bitfield_filter, ds_regions))) {
+    if (!population_table_load_bitfields(data_specification_get_region(
+            SYNAPSE_REGIONS.bitfield_filter, ds_regions))) {
         return false;
     }
 
