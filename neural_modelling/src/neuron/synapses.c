@@ -46,6 +46,9 @@ static weight_t *ring_buffers;
 //! Ring buffer size
 static uint32_t ring_buffer_size;
 
+//! Ring buffer mask
+static uint32_t ring_buffer_mask;
+
 //! Amount to left shift the ring buffer by to make it an input
 static uint32_t *ring_buffer_to_input_left_shifts;
 
@@ -192,8 +195,6 @@ static inline void process_fixed_synapses(
 
     num_fixed_pre_synaptic_events += fixed_synapse;
 
-    // Get the ring buffer mask
-    uint32_t rbi_mask = (1 << (synapse_type_index_bits + synapse_delay_bits)) - 1;
     // Pre-mask the time
     uint32_t masked_time = (time & synapse_delay_mask) << synapse_type_index_bits;
 
@@ -206,7 +207,7 @@ static inline void process_fixed_synapses(
         // in the synaptic word directly, and then masking off the whole index.
         // The addition of the masked time to the delay even with the mask might
         // overflow into the weight at worst but can't affect the lower bits.
-        uint32_t ring_buffer_index = (synaptic_word + masked_time) & rbi_mask;
+        uint32_t ring_buffer_index = (synaptic_word + masked_time) & ring_buffer_mask;
         uint32_t weight = synapse_row_sparse_weight(synaptic_word);
 
         // Add weight to current ring buffer value
@@ -303,6 +304,7 @@ bool synapses_initialise(
     uint32_t n_ring_buffer_bits =
             log_n_neurons + log_n_synapse_types + synapse_delay_bits;
     ring_buffer_size = 1 << (n_ring_buffer_bits);
+    ring_buffer_mask = ring_buffer_size - 1;
 
     ring_buffers = spin1_malloc(ring_buffer_size * sizeof(weight_t));
     if (ring_buffers == NULL) {

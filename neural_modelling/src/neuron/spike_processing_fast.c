@@ -238,8 +238,8 @@ static inline void process_end_of_time_step(uint32_t time) {
     uint32_t cspr = spin1_int_disable();
 
     // Start transferring buffer data for next time step
-    //transfer_buffers(time);
-    //wait_for_dma_to_complete();
+    transfer_buffers(time);
+    wait_for_dma_to_complete();
 
 // TODO: Make this extra provenance
 //    uint32_t end = tc[T1_COUNT];

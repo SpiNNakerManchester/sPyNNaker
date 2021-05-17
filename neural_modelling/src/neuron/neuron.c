@@ -183,6 +183,10 @@ void neuron_transfer(weight_t *syns) { // EXPORTED
         for (uint32_t n_i = n_neurons_peak; n_i > 0; n_i--) {
             weight_t value = syns[ring_buffer_index];
             if (value > 0) {
+                if (neuron_index > n_neurons) {
+                    log_error("Neuron index %u out of range", neuron_index);
+                    rt_error(RTE_SWERR);
+                }
                 input_t val_to_add = synapse_row_convert_weight_to_input(
                         value, rb_shift);
                 neuron_impl_add_inputs(synapse_index, neuron_index, val_to_add);
