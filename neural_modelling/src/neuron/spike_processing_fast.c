@@ -238,8 +238,8 @@ static inline void process_end_of_time_step(uint32_t time) {
     uint32_t cspr = spin1_int_disable();
 
     // Start transferring buffer data for next time step
-    transfer_buffers(time);
-    wait_for_dma_to_complete();
+    //transfer_buffers(time);
+    //wait_for_dma_to_complete();
 
 // TODO: Make this extra provenance
 //    uint32_t end = tc[T1_COUNT];
@@ -452,7 +452,7 @@ bool spike_processing_fast_initialise(
     spin1_callback_on(MCPL_PACKET_RECEIVED, multicast_packet_pl_received_callback, -1);
 
     // Wipe the inputs using word writes
-    for (uint32_t i = 0; i < sdram_inputs.size_in_bytes >> 2; i++) {
+    for (uint32_t i = 0; i < (sdram_inputs.size_in_bytes >> 2); i++) {
         sdram_inputs.address[i] = 0;
     }
 
