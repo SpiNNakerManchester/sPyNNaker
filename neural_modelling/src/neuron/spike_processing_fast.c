@@ -258,7 +258,24 @@ static inline void handle_row_error(dma_buffer *buffer) {
     // Print out the row for debugging
     address_t row = (address_t) buffer->row;
     for (uint32_t i = 0; i < (buffer->n_bytes_transferred >> 2); i++) {
-        log_error("%u: 0x%08x", i, row[i]);
+        log_error("    %u: 0x%08x", i, row[i]);
+    }
+
+    // Print out parsed data for static synapses
+    synapse_row_fixed_part_t *fixed_region = synapse_row_fixed_region(buffer->row);
+    uint32_t *synaptic_words = synapse_row_fixed_weight_controls(fixed_region);
+    uint32_t fixed_synapse = synapse_row_num_fixed_synapses(fixed_region);
+    log_error("\nFixed-Fixed Region (%u synapses):", fixed_synapse);
+    for (; fixed_synapse > 0; fixed_synapse--) {
+        uint32_t synaptic_word = *synaptic_words++;
+
+        uint32_t delay = synapse_row_sparse_delay(
+                synaptic_word, synapse_type_index_bits, synapse_delay_mask);
+        uint32_t type = synapse_row_sparse_type(
+                synaptic_word, synapse_index_bits, synapse_type_mask);
+        uint32_t neuron = synapse_row_sparse_index(
+                synaptic_word, synapse_index_mask);
+        log_error("    Delay %u, Synapse Type %u, Neuron %u", delay, type, neuron);
     }
     rt_error(RTE_SWERR);
 }
