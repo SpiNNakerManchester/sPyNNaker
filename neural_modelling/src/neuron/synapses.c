@@ -212,7 +212,7 @@ static inline bool process_fixed_synapses(
 
         uint32_t synapse_index = synaptic_word & synapse_index_mask;
         if (synapse_index >= n_neurons) {
-            log_error("Neuron index %u out of range");
+            log_error("Neuron index %u out of range", synapse_index);
             return false;
         }
 
