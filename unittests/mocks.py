@@ -13,10 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import configparser
 import numpy
-from spinn_front_end_common.interface.simulator_state import Simulator_State
-from spinn_front_end_common.utilities import globals_variables
 
 
 class MockPopulation(object):
