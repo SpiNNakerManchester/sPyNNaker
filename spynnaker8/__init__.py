@@ -35,7 +35,6 @@ from spinn_front_end_common.utilities.exceptions import (
     ConfigurationException, SimmulatorNotSetupException,
     SimmulatorShutdownException)
 from spinn_front_end_common.utilities import globals_variables
-from spinn_front_end_common.utilities.failed_state import FAILED_STATE_MSG
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 
 # connections
@@ -118,6 +117,8 @@ SPYNNAKER_AUTO_TIMESTEP = 1.0
 
 #: The number of timesteps of delay to use as max_delay if "auto" is specified
 SPYNNAKER_AUTO_MAX_DELAY = 144
+
+FAILED_STATE_MSG = "This call is only valid between setup and end/stop"
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
