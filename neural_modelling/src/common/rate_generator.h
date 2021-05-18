@@ -20,7 +20,7 @@
 
 static inline REAL out_rate(REAL v) {
 
-    //v = (v >> 2) + 0.5k;
+    v = (v >> 2) + 0.5k;
 
     if(v > 1.0k)
         return 1.0k;

@@ -91,7 +91,7 @@ static inline void generate_background_activity(uint32_t n_neurons) {
         background_activity[i] = 0.1k * gaussian_dist_variate(
                                             mars_kiss64_seed,
                                             seeds);
-        io_printf(IO_BUF, "rand %k\n", background_activity[i]);
+        //io_printf(IO_BUF, "rand %k\n", background_activity[i]);
     }
 }
 
