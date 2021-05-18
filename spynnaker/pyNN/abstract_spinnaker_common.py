@@ -26,7 +26,6 @@ from spinn_front_end_common.utilities.constants import (
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utility_models import CommandSender
 from spinn_front_end_common.utilities.utility_objs import ExecutableFinder
-from spinn_front_end_common.utilities.globals_variables import unset_simulator
 from spynnaker.pyNN import extra_algorithms, model_binaries
 from spynnaker.pyNN.config_setup import CONFIG_FILE_NAME, reset_configs
 from spynnaker.pyNN.utilities import constants
