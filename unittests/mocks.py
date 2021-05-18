@@ -15,6 +15,7 @@
 
 import configparser
 import numpy
+from spinn_front_end_common.interface.simulator_state import Simulator_State
 from spinn_front_end_common.utilities import globals_variables
 from spynnaker8.spinnaker import Spynnaker8FailedState
 
@@ -152,3 +153,7 @@ class MockSimulator(object):
     @property
     def t(self):
         return 0
+
+    @property
+    def state(self):
+        return Simulator_State.INIT
