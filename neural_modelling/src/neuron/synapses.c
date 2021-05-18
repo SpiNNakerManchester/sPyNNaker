@@ -192,7 +192,6 @@ static inline bool process_fixed_synapses(
         synapse_row_fixed_part_t *fixed_region, uint32_t time) {
     uint32_t *synaptic_words = synapse_row_fixed_weight_controls(fixed_region);
     uint32_t fixed_synapse = synapse_row_num_fixed_synapses(fixed_region);
-    volatile uint32_t fixed_synapse_copy = fixed_synapse;
 
     num_fixed_pre_synaptic_events += fixed_synapse;
 
@@ -210,16 +209,6 @@ static inline bool process_fixed_synapses(
         // overflow into the weight at worst but can't affect the lower bits.
         uint32_t ring_buffer_index = (synaptic_word + masked_time) & ring_buffer_mask;
         uint32_t weight = synapse_row_sparse_weight(synaptic_word);
-
-        uint32_t synapse_index = synaptic_word & synapse_index_mask;
-        if (synapse_index >= n_neurons) {
-            uint32_t *synaptic_words = synapse_row_fixed_weight_controls(fixed_region);
-
-            log_error("Neuron index %u out of range, fixed_synapse = %u, start copy = %u", synapse_index, fixed_synapse, fixed_synapse_copy);
-            log_error("First word = 0x%08x", synaptic_words[0]);
-            log_error("N synapses should be %u", synapse_row_num_fixed_synapses(fixed_region));
-            return false;
-        }
 
         // Add weight to current ring buffer value
         uint32_t accumulation = ring_buffers[ring_buffer_index] + weight;
