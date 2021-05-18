@@ -51,6 +51,10 @@ typedef struct dma_buffer {
 //! The extra overhead to add to the transfer time
 #define TRANSFER_OVERHEAD_CLOCKS 100
 
+#define DMA_COMPLETE 0x400
+
+#define DMA_CHECK_MASK 0x401
+
 //! The DTCM buffers for the synapse rows
 static dma_buffer dma_buffers[N_DMA_BUFFERS];
 
@@ -110,6 +114,10 @@ static weight_t *ring_buffers;
 
 static bool write_data_next = false;
 
+static inline bool dma_done(void) {
+    return (dma[DMA_STAT] & DMA_CHECK_MASK) == DMA_COMPLETE;
+}
+
 //! \brief Determine if this is the end of the time step
 //! \return True if end of time step
 static inline bool is_end_of_time_step(void) {
@@ -123,6 +131,11 @@ static inline void clear_end_of_time_step(void) {
 
 static inline void do_fast_dma_write(void *tcm_address, void *system_address,
         uint32_t n_bytes) {
+    uint32_t stat = dma[DMA_STAT];
+    if (stat & 0x1FFFFF) {
+        log_error("DMA pending or in progress on write: 0x%08x", stat);
+        rt_error(RTE_SWERR);
+    }
     uint32_t desc = DMA_WRITE_FLAGS | n_bytes;
     dma[DMA_ADRS] = (uint32_t) system_address;
     dma[DMA_ADRT] = (uint32_t) tcm_address;
@@ -132,6 +145,11 @@ static inline void do_fast_dma_write(void *tcm_address, void *system_address,
 //! \brief perform a DMA transfer from SDRAM to TCM
 static inline void do_fast_dma_read(void *system_address, void *tcm_address,
         uint32_t n_bytes) {
+    uint32_t stat = dma[DMA_STAT];
+    if (stat & 0x1FFFFF) {
+        log_error("DMA pending or in progress on read: 0x%08x", stat);
+        rt_error(RTE_SWERR);
+    }
     uint32_t desc = DMA_READ_FLAGS | n_bytes;
     dma[DMA_ADRS] = (uint32_t) system_address;
     dma[DMA_ADRT] = (uint32_t) tcm_address;
@@ -141,42 +159,40 @@ static inline void do_fast_dma_read(void *system_address, void *tcm_address,
 static inline void wait_for_dma_to_complete(void) {
     // Wait for completion of DMA
     uint32_t n_loops = 0;
-    while (!(dma[DMA_STAT] & (1 << 10)) && n_loops < 10000) {
+    while (!dma_done() && n_loops < 10000) {
         n_loops++;
     }
-    if (!(dma[DMA_STAT] & (1 << 10))) {
+    if (!dma_done()) {
         log_error("Timeout on DMA loop: DMA stat = 0x%08x!", dma[DMA_STAT]);
         rt_error(RTE_SWERR);
     }
     dma[DMA_CTRL] = 0x8;
-}
-
-static inline void cancel_dmas(void) {
-    dma[DMA_CTRL] = 0x3;
-    while (dma[DMA_STAT] & 0x1) {
-        continue;
-    }
-    dma[DMA_CTRL] = 0xc;
 }
 
 static inline bool wait_for_dma_to_complete_or_end(void) {
     // Wait for completion of DMA
     uint32_t n_loops = 0;
-    while (!is_end_of_time_step() && !(dma[DMA_STAT] & (1 << 10)) && n_loops < 10000) {
+    while (!is_end_of_time_step() && !dma_done() && n_loops < 10000) {
         n_loops++;
     }
-    if (!is_end_of_time_step() && !(dma[DMA_STAT] & (1 << 10))) {
+    if (!is_end_of_time_step() && !dma_done()) {
         log_error("Timeout on DMA loop: DMA stat = 0x%08x!", dma[DMA_STAT]);
         rt_error(RTE_SWERR);
     }
     dma[DMA_CTRL] = 0x8;
 
-    bool end = is_end_of_time_step();
-    if (end) {
-        cancel_dmas();
-        return false;
+    return !is_end_of_time_step();
+}
+
+static inline void cancel_dmas(void) {
+    dma[DMA_CTRL] = 0x3F;
+    while (dma[DMA_STAT] & 0x1) {
+        continue;
     }
-    return true;
+    dma[DMA_CTRL] = 0xD;
+    while (dma[DMA_CTRL] & 0xD) {
+        continue;
+    }
 }
 
 static inline void transfer_buffers(uint32_t time) {
@@ -187,6 +203,26 @@ static inline void transfer_buffers(uint32_t time) {
              &ring_buffers[first_ring_buffer]);
     do_fast_dma_write(&ring_buffers[first_ring_buffer], sdram_inputs.address,
             sdram_inputs.size_in_bytes);
+}
+
+//! \brief Do processing related to the end of the time step
+static inline void process_end_of_time_step(uint32_t time) {
+    // Stop interrupt processing
+    uint32_t cspr = spin1_int_disable();
+
+    cancel_dmas();
+
+    // Start transferring buffer data for next time step
+    transfer_buffers(time);
+    wait_for_dma_to_complete();
+
+// TODO: Make this extra provenance
+//    uint32_t end = tc[T1_COUNT];
+//    if (end > clocks_to_transfer) {
+//        log_info("Transfer took too long; clocks now %d", end);
+//    }
+
+    spin1_mode_restore(cspr);
 }
 
 static inline void read_synaptic_row(spike_t spike, synaptic_row_t row,
@@ -235,25 +271,6 @@ static inline bool get_next_dma(spike_t *spike, synaptic_row_t *row,
     }
 
     return false;
-}
-
-
-//! \brief Do processing related to the end of the time step
-static inline void process_end_of_time_step(uint32_t time) {
-    // Stop interrupt processing
-    uint32_t cspr = spin1_int_disable();
-
-    // Start transferring buffer data for next time step
-    transfer_buffers(time);
-    wait_for_dma_to_complete();
-
-// TODO: Make this extra provenance
-//    uint32_t end = tc[T1_COUNT];
-//    if (end > clocks_to_transfer) {
-//        log_info("Transfer took too long; clocks now %d", end);
-//    }
-
-    spin1_mode_restore(cspr);
 }
 
 static inline void handle_row_error(dma_buffer *buffer) {
@@ -336,6 +353,8 @@ static inline void measure_transfer_time(void) {
 
 void spike_processing_fast_time_step_loop(uint32_t time) {
     uint32_t cspr = spin1_int_disable();
+    next_buffer_to_fill = 0;
+    next_buffer_to_process = 0;
 
     // We do this here rather than during init, as it should have similar
     // contention to the expected time of execution
@@ -409,8 +428,6 @@ void spike_processing_fast_time_step_loop(uint32_t time) {
             // Process the row we already have while the DMA progresses
             process_current_row(time);
         }
-
-        cancel_dmas();
     }
 }
 
