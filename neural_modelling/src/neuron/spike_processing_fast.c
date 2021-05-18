@@ -151,6 +151,14 @@ static inline void wait_for_dma_to_complete(void) {
     dma[DMA_CTRL] = 0x8;
 }
 
+static inline void cancel_dmas(void) {
+    dma[DMA_CTRL] = 0x3;
+    while (dma[DMA_STAT] & 0x1) {
+        continue;
+    }
+    dma[DMA_CTRL] = 0xc;
+}
+
 static inline bool wait_for_dma_to_complete_or_end(void) {
     // Wait for completion of DMA
     uint32_t n_loops = 0;
@@ -161,16 +169,14 @@ static inline bool wait_for_dma_to_complete_or_end(void) {
         log_error("Timeout on DMA loop: DMA stat = 0x%08x!", dma[DMA_STAT]);
         rt_error(RTE_SWERR);
     }
+    dma[DMA_CTRL] = 0x8;
+
     bool end = is_end_of_time_step();
     if (end) {
-        dma[DMA_CTRL] = 0x1f;
-        while (dma[DMA_STAT] & 0x1) {
-            continue;
-        }
-        dma[DMA_CTRL] = 0xd;
+        cancel_dmas();
+        return false;
     }
-    dma[DMA_CTRL] = 0x8;
-    return !end;
+    return true;
 }
 
 static inline void transfer_buffers(uint32_t time) {
@@ -281,8 +287,9 @@ static inline void handle_row_error(dma_buffer *buffer) {
 }
 
 static inline void process_current_row(uint32_t time) {
-    bool write_back;
+    bool write_back = false;
     dma_buffer *buffer = &dma_buffers[next_buffer_to_process];
+
     if (!synapses_process_synaptic_row(time, buffer->row, &write_back)) {
         handle_row_error(buffer);
     }
@@ -292,8 +299,7 @@ static inline void process_current_row(uint32_t time) {
         void *system_address = synapse_row_plastic_region(
                 buffer->sdram_writeback_address);
         void *tcm_address = synapse_row_plastic_region(buffer->row);
-        // TODO: Do this properly
-        wait_for_dma_to_complete_or_end();
+        wait_for_dma_to_complete();
         do_fast_dma_write(tcm_address, system_address, n_bytes);
     }
     next_buffer_to_process = (next_buffer_to_process + 1) & DMA_BUFFER_MOD_MASK;
@@ -404,6 +410,7 @@ void spike_processing_fast_time_step_loop(uint32_t time) {
             process_current_row(time);
         }
 
+        cancel_dmas();
     }
 }
 

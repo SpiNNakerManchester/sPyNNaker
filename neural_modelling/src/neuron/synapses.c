@@ -188,7 +188,7 @@ static inline void print_ring_buffers(uint32_t time) {
 //!     be put into the ring buffer.
 //! \param[in] fixed_region: The fixed region of the synaptic matrix
 //! \param[in] time: The current simulation time
-static inline bool process_fixed_synapses(
+static inline void process_fixed_synapses(
         synapse_row_fixed_part_t *fixed_region, uint32_t time) {
     uint32_t *synaptic_words = synapse_row_fixed_weight_controls(fixed_region);
     uint32_t fixed_synapse = synapse_row_num_fixed_synapses(fixed_region);
@@ -210,12 +210,6 @@ static inline bool process_fixed_synapses(
         uint32_t ring_buffer_index = (synaptic_word + masked_time) & ring_buffer_mask;
         uint32_t weight = synapse_row_sparse_weight(synaptic_word);
 
-        uint32_t synapse_index = synaptic_word & synapse_index_mask;
-        if (synapse_index >= n_neurons) {
-            log_error("Neuron index %u out of range", synapse_index);
-            return false;
-        }
-
         // Add weight to current ring buffer value
         uint32_t accumulation = ring_buffers[ring_buffer_index] + weight;
 
@@ -232,7 +226,6 @@ static inline bool process_fixed_synapses(
         // Store saturated value back in ring-buffer
         ring_buffers[ring_buffer_index] = accumulation;
     }
-    return true;
 }
 
 //! Print output debug data on the synapses
@@ -378,7 +371,8 @@ bool synapses_process_synaptic_row(
     // **NOTE** this is done after initiating DMA in an attempt
     // to hide cost of DMA behind this loop to improve the chance
     // that the DMA controller is ready to read next synaptic row afterwards
-    return process_fixed_synapses(fixed_region, time);
+    process_fixed_synapses(fixed_region, time);
+    return true;
     //}
 }
 
