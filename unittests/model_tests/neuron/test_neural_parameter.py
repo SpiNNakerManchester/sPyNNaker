@@ -24,7 +24,6 @@ from spynnaker.pyNN.models.neural_properties import NeuronParameter
 from spynnaker.pyNN.models.neural_properties.neural_parameter import (
     _Range_Iterator, _Get_Iterator, _SingleValue_Iterator)
 from spynnaker.pyNN.utilities.ranged import SpynnakerRangedList
-from unittests.mocks import MockSimulator
 
 
 def _iterate_parameter_values(iterator, data_type):
@@ -41,7 +40,6 @@ def _iterate_parameter_values(iterator, data_type):
 
 
 def run_spec_check(method):
-    MockSimulator.setup()
     if platform.system() == "Windows":
         spec_writer = io.FileIO("test.dat", "wb")
         spec = DataSpecificationGenerator(spec_writer, None)

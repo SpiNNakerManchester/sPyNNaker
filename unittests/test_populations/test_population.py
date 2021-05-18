@@ -15,11 +15,11 @@
 
 from spynnaker.pyNN.models.neuron.builds import IFCurrExpBase
 from spynnaker.pyNN.models.populations.population import Population
-from unittests.mocks import MockSimulator
+import spynnaker8
 
 
 def test_selector():
-    MockSimulator.setup()
+    spynnaker8.setup()
     model = IFCurrExpBase()
     pop_1 = Population(
         size=5, label="Test", constraints=None, cellclass=model,
@@ -41,7 +41,7 @@ def test_selector():
 
 
 def test_round():
-    MockSimulator.setup()
+    spynnaker8.setup()
     model = IFCurrExpBase()
     pop_1 = Population(
         size=4.999999, label="Test", cellclass=model,

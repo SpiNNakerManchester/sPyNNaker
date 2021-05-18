@@ -21,7 +21,7 @@ from pacman.model.graphs.common import Slice
 from spynnaker.pyNN.models.neural_projections.connectors import (
     FixedNumberPreConnector, FixedNumberPostConnector,
     FixedProbabilityConnector, IndexBasedProbabilityConnector)
-from unittests.mocks import MockSimulator, MockPopulation, MockSynapseInfo
+from unittests.mocks import MockPopulation, MockSynapseInfo
 
 
 @pytest.fixture(scope="module", params=[10, 100])
@@ -83,8 +83,6 @@ def delay(request):
 
 def test_connectors(
         n_pre, n_post, n_in_slice, create_connector, weight, delay):
-
-    MockSimulator.setup()
 
     max_target = 0
     max_source = 0

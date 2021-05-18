@@ -26,7 +26,7 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
     WeightDependenceAdditive)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
     TimingDependenceSpikePair)
-from unittests.mocks import MockSimulator
+import spynnaker8
 
 
 @pytest.mark.parametrize(
@@ -50,7 +50,7 @@ from unittests.mocks import MockSimulator
       20, None, 20)])
 def test_get_allowed_row_length(
         dynamics_class, timing, weight, size, exception, max_size):
-    MockSimulator.setup()
+    spynnaker8.setup()
     if timing is not None and weight is not None:
         dynamics = dynamics_class(timing(), weight())
     else:
