@@ -131,11 +131,15 @@ static inline void clear_end_of_time_step(void) {
 
 static inline void do_fast_dma_write(void *tcm_address, void *system_address,
         uint32_t n_bytes) {
+#if LOG_LEVEL >= LOG_DEBUG
+    // Useful for checking when things are going wrong, but shouldn't be
+    // needed in normal code
     uint32_t stat = dma[DMA_STAT];
     if (stat & 0x1FFFFF) {
         log_error("DMA pending or in progress on write: 0x%08x", stat);
         rt_error(RTE_SWERR);
     }
+#endif
     uint32_t desc = DMA_WRITE_FLAGS | n_bytes;
     dma[DMA_ADRS] = (uint32_t) system_address;
     dma[DMA_ADRT] = (uint32_t) tcm_address;
@@ -145,11 +149,15 @@ static inline void do_fast_dma_write(void *tcm_address, void *system_address,
 //! \brief perform a DMA transfer from SDRAM to TCM
 static inline void do_fast_dma_read(void *system_address, void *tcm_address,
         uint32_t n_bytes) {
+#if LOG_LEVEL >= LOG_DEBUG
+    // Useful for checking when things are going wrong, but shouldn't be
+    // needed in normal code
     uint32_t stat = dma[DMA_STAT];
     if (stat & 0x1FFFFF) {
         log_error("DMA pending or in progress on read: 0x%08x", stat);
         rt_error(RTE_SWERR);
     }
+#endif
     uint32_t desc = DMA_READ_FLAGS | n_bytes;
     dma[DMA_ADRS] = (uint32_t) system_address;
     dma[DMA_ADRT] = (uint32_t) tcm_address;
@@ -157,7 +165,9 @@ static inline void do_fast_dma_read(void *system_address, void *tcm_address,
 }
 
 static inline void wait_for_dma_to_complete(void) {
-    // Wait for completion of DMA
+#if LOG_LEVEL >= LOG_DEBUG
+    // Useful for checking when things are going wrong, but shouldn't be
+    // needed in normal code
     uint32_t n_loops = 0;
     while (!dma_done() && n_loops < 10000) {
         n_loops++;
@@ -166,11 +176,19 @@ static inline void wait_for_dma_to_complete(void) {
         log_error("Timeout on DMA loop: DMA stat = 0x%08x!", dma[DMA_STAT]);
         rt_error(RTE_SWERR);
     }
+#else
+    // This is the normal loop, done without checking
+    while (!dma_done()) {
+        continue;
+    }
+#endif
     dma[DMA_CTRL] = 0x8;
 }
 
 static inline bool wait_for_dma_to_complete_or_end(void) {
-    // Wait for completion of DMA
+#if LOG_LEVEL >= LOG_DEBUG
+    // Useful for checking when things are going wrong, but shouldn't be
+    // needed in normal code
     uint32_t n_loops = 0;
     while (!is_end_of_time_step() && !dma_done() && n_loops < 10000) {
         n_loops++;
@@ -179,6 +197,12 @@ static inline bool wait_for_dma_to_complete_or_end(void) {
         log_error("Timeout on DMA loop: DMA stat = 0x%08x!", dma[DMA_STAT]);
         rt_error(RTE_SWERR);
     }
+#else
+    // This is the normal loop, done without checking
+    while (!dma_done()) {
+        continue;
+    }
+#endif
     dma[DMA_CTRL] = 0x8;
 
     return !is_end_of_time_step();
@@ -353,6 +377,8 @@ static inline void measure_transfer_time(void) {
 
 void spike_processing_fast_time_step_loop(uint32_t time) {
     uint32_t cspr = spin1_int_disable();
+
+    // Reset these to ensure consistency
     next_buffer_to_fill = 0;
     next_buffer_to_process = 0;
 
@@ -434,6 +460,8 @@ void spike_processing_fast_time_step_loop(uint32_t time) {
 void spike_processing_fast_pause(uint32_t time) {
     store_data(time - 1);
     write_data_next = false;
+
+    // TODO: Make this provenance data
     log_info("Max packets received = %d", max_spikes_received);
     log_info("Max spikes processed = %d", max_spikes_processed);
 }
