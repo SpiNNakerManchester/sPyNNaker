@@ -23,16 +23,13 @@ from spinn_front_end_common.utilities.constants import (
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
     AbstractSpinnakerBase)
 from spynnaker.pyNN.abstract_spinnaker_common import AbstractSpiNNakerCommon
-from spynnaker.pyNN.spynnaker_simulator_interface import (
-    SpynnakerSimulatorInterface)
 from spynnaker import _version
 
 _NAME = "SpiNNaker_under_version({}-{})".format(
     _version.__version__, _version.__version_name__)
 
 
-class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
-                SpynnakerSimulatorInterface):
+class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState):
     """ Main interface for the sPyNNaker implementation of PyNN 0.8/0.9
     """
 

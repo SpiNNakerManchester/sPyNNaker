@@ -29,17 +29,13 @@ from spinn_front_end_common.utilities.utility_objs import ExecutableFinder
 from spynnaker.pyNN import extra_algorithms, model_binaries
 from spynnaker.pyNN.config_setup import CONFIG_FILE_NAME, reset_configs
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.spynnaker_simulator_interface import (
-    SpynnakerSimulatorInterface)
 from spynnaker.pyNN.utilities.extracted_data import ExtractedData
 from spynnaker import __version__ as version
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-class AbstractSpiNNakerCommon(
-        AbstractSpinnakerBase, SpynnakerSimulatorInterface,
-        metaclass=AbstractBase):
+class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
     """ Main interface for neural code.
     """
     __slots__ = [
