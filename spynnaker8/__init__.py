@@ -31,7 +31,9 @@ from pyNN.space import (
     Space, Line, Grid2D, Grid3D, Cuboid, Sphere, RandomStructure)
 from pyNN.space import distance as _pynn_distance
 from spinn_utilities.log import FormatAdapter
-from spinn_front_end_common.utilities.exceptions import ConfigurationException
+from spinn_front_end_common.utilities.exceptions import (
+    ConfigurationException, SimmulatorNotSetupException,
+    SimmulatorShutdownException)
 from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.failed_state import FAILED_STATE_MSG
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
@@ -449,12 +451,20 @@ def end(_=True):
     :param _: was named compatible_output, which we don't care about,
         so is a non-existent parameter
     """
+    try:
+        simulator = globals_variables.get_simulator()
+    except SimmulatorShutdownException:
+        logger.warning("Second call to end ignored")
+        return
+    except SimmulatorNotSetupException:
+        logger.exception("Calling end before setup makes no sense ignoring!")
+        return
     for (population, variables, filename) in \
-            globals_variables.get_simulator().write_on_end:
+            simulator.write_on_end:
         io = get_io(filename)
         population.write_data(io, variables)
-    globals_variables.get_simulator().write_on_end = []
-    globals_variables.get_simulator().stop()
+    simulator.write_on_end = []
+    simulator.stop()
 
 
 def record_v(source, filename):
