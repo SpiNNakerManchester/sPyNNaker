@@ -155,5 +155,5 @@ class MockSimulator(object):
         return 0
 
     @property
-    def state(self):
+    def _state(self):
         return Simulator_State.INIT
