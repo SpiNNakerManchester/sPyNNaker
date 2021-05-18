@@ -51,8 +51,10 @@ typedef struct dma_buffer {
 //! The extra overhead to add to the transfer time
 #define TRANSFER_OVERHEAD_CLOCKS 100
 
+//! Value of the masked DMA status register when transfer is complete
 #define DMA_COMPLETE 0x400
 
+//! Mask to apply to the DMA status register to check for completion
 #define DMA_CHECK_MASK 0x401
 
 //! The DTCM buffers for the synapse rows
@@ -83,37 +85,48 @@ static uint32_t biggest_fill_size_of_input_buffer;
 //!     end of a timer tick.
 static bool clear_input_buffers_of_late_packets;
 
+//! The number of CPU cycles taken to transfer spikes (measured later)
 static uint32_t clocks_to_transfer = 0;
 
+//! The number of successful rewiring attempts
 static uint32_t n_successful_rewires = 0;
 
+//! The number of DMAs successfully completed
 static uint32_t dma_complete_count = 0;
 
+//! The number of spikes successfully processed
 static uint32_t spike_processing_count = 0;
 
+//! The maximum number of spikes received in a time step
 static uint32_t max_spikes_received = 0;
 
+//! The number of spikes processed this time step
 static uint32_t spikes_processed_this_time_step = 0;
 
+//! The maximum number of spikes processed in a time step
 static uint32_t max_spikes_processed = 0;
 
-//! the number of packets received this time step
+//! The number of packets received this time step for recording
 static struct {
     uint32_t time;
     uint32_t packets_this_time_step;
 } p_per_ts_struct;
 
-//! the region to record the packets per timestep in
+//! the region to record the packets per time step in
 static uint32_t p_per_ts_region;
 
 //! Where synaptic input is to be written
 static struct sdram_config sdram_inputs;
 
-// The ring buffers to use
+//! The ring buffers to use
 static weight_t *ring_buffers;
 
+//! Whether recording data should be written in the next time step.  Needed
+//! because some things are recorded for time step t in time step t + 1.
 static bool write_data_next = false;
 
+//! \brief Is there a DMA currently running?
+//! \return True if there is something transferring now.
 static inline bool dma_done(void) {
     return (dma[DMA_STAT] & DMA_CHECK_MASK) == DMA_COMPLETE;
 }
@@ -124,11 +137,16 @@ static inline bool is_end_of_time_step(void) {
     return tc[T2_COUNT] == 0;
 }
 
-//! \brief Clear end of time step
+//! \brief Clear end of time step so it can be detected again
 static inline void clear_end_of_time_step(void) {
     tc[T2_INT_CLR] = 1;
 }
 
+//! \brief Start the DMA doing a write; the write may not be finished at the
+//!        end of this call.
+//! \param[in] tcm_address: The local DTCM address to read the data from
+//! \param[in] system_address: The SDRAM address to write the data to
+//! \param[in] n_bytes: The number of bytes to be written from DTCM to SDRAM
 static inline void do_fast_dma_write(void *tcm_address, void *system_address,
         uint32_t n_bytes) {
 #if LOG_LEVEL >= LOG_DEBUG
@@ -146,7 +164,11 @@ static inline void do_fast_dma_write(void *tcm_address, void *system_address,
     dma[DMA_DESC] = desc;
 }
 
-//! \brief perform a DMA transfer from SDRAM to TCM
+//! \brief Start the DMA doing a read; the read may not be finished at the end
+//!        of this call.
+//! \param[in] system_address: The SDRAM address to read the data from
+//! \param[in] tcm_address: The DTCM address to write the data to
+//! \param[in] n_bytes: The number of bytes to be read from SDRAM to DTCM
 static inline void do_fast_dma_read(void *system_address, void *tcm_address,
         uint32_t n_bytes) {
 #if LOG_LEVEL >= LOG_DEBUG
@@ -164,6 +186,7 @@ static inline void do_fast_dma_read(void *system_address, void *tcm_address,
     dma[DMA_DESC] = desc;
 }
 
+//! \brief Wait for a DMA transfer to complete.
 static inline void wait_for_dma_to_complete(void) {
 #if LOG_LEVEL >= LOG_DEBUG
     // Useful for checking when things are going wrong, but shouldn't be
@@ -185,6 +208,9 @@ static inline void wait_for_dma_to_complete(void) {
     dma[DMA_CTRL] = 0x8;
 }
 
+//! \brief Wait for a DMA to complete or the end of a time step, whichever
+//!        happens first.
+//! \return True if the DMA is completed first, False if the time step ended first
 static inline bool wait_for_dma_to_complete_or_end(void) {
 #if LOG_LEVEL >= LOG_DEBUG
     // Useful for checking when things are going wrong, but shouldn't be
@@ -208,6 +234,7 @@ static inline bool wait_for_dma_to_complete_or_end(void) {
     return !is_end_of_time_step();
 }
 
+//! \brief Cancel any outstanding DMA transfers
 static inline void cancel_dmas(void) {
     dma[DMA_CTRL] = 0x3F;
     while (dma[DMA_STAT] & 0x1) {
@@ -219,6 +246,9 @@ static inline void cancel_dmas(void) {
     }
 }
 
+//! \brief Transfer the front of the ring buffers to SDRAM to be read by the
+//!        neuron core at the next time step.
+//! \param[in] time The current time step being executed.
 static inline void transfer_buffers(uint32_t time) {
     uint32_t first_ring_buffer = synapse_row_get_first_ring_buffer_index(
             time + 1, synapse_type_index_bits, synapse_delay_mask);
@@ -230,6 +260,7 @@ static inline void transfer_buffers(uint32_t time) {
 }
 
 //! \brief Do processing related to the end of the time step
+//! \param[in] time The time step that is ending.
 static inline void process_end_of_time_step(uint32_t time) {
     // Stop interrupt processing
     uint32_t cspr = spin1_int_disable();
@@ -249,6 +280,7 @@ static inline void process_end_of_time_step(uint32_t time) {
     spin1_mode_restore(cspr);
 }
 
+//! \brief Read a synaptic row from SDRAM into a local buffer.
 static inline void read_synaptic_row(spike_t spike, synaptic_row_t row,
         uint32_t n_bytes) {
     dma_buffer *buffer = &dma_buffers[next_buffer_to_fill];
@@ -259,6 +291,9 @@ static inline void read_synaptic_row(spike_t spike, synaptic_row_t row,
     next_buffer_to_fill = (next_buffer_to_fill + 1) & DMA_BUFFER_MOD_MASK;
 }
 
+//! \brief Get the next spike, keeping track of provenance data
+//! \param[out] spike: Pointer to receive the next spike
+//! \return True if a spike was retrieved
 static inline bool get_next_spike(spike_t *spike) {
     uint32_t n_spikes = in_spikes_size();
     if (biggest_fill_size_of_input_buffer < n_spikes) {
@@ -267,6 +302,11 @@ static inline bool get_next_spike(spike_t *spike) {
     return in_spikes_get_next_spike(spike);
 }
 
+//! \brief Start the first DMA after awaking from spike reception.  Loops over
+//!        available spikes until one causes a DMA.
+//! \param[in/out] spike Starts as the first spike received, but might change
+//!                      if the first spike doesn't cause a DMA
+//! \return True if a DMA was started
 static inline bool start_first_dma(spike_t *spike) {
     synaptic_row_t row;
     uint32_t n_bytes;
@@ -281,6 +321,11 @@ static inline bool start_first_dma(spike_t *spike) {
     return false;
 }
 
+//! \brief Get the details for the next DMA, but don't start it.
+//! \param[out] spike Pointer to receive the spike the DMA relates to
+//! \param[out] row Pointer to receive the address to be transferred
+//! \param[out] n_bytes Pointer to receive the number of bytes to transfer
+//! \return True if there is a DMA to do
 static inline bool get_next_dma(spike_t *spike, synaptic_row_t *row,
         uint32_t *n_bytes) {
     if (population_table_is_next() && population_table_get_next_address(
@@ -297,6 +342,8 @@ static inline bool get_next_dma(spike_t *spike, synaptic_row_t *row,
     return false;
 }
 
+//! \brief Handle a synapse processing error.
+//! \param[in] buffer The DMA buffer that was being processed
 static inline void handle_row_error(dma_buffer *buffer) {
     log_error(
         "Error processing spike 0x%.8x for address 0x%.8x (local=0x%.8x)",
@@ -327,6 +374,8 @@ static inline void handle_row_error(dma_buffer *buffer) {
     rt_error(RTE_SWERR);
 }
 
+//! \brief Process a row that has been transferred
+//! \param[in] time The current time step of the simulation
 static inline void process_current_row(uint32_t time) {
     bool write_back = false;
     dma_buffer *buffer = &dma_buffers[next_buffer_to_process];
@@ -347,6 +396,8 @@ static inline void process_current_row(uint32_t time) {
     spikes_processed_this_time_step++;
 }
 
+//! \brief Store data for provenance and recordings
+//! \param[in] time The time step of the simulation
 static inline void store_data(uint32_t time) {
     // Record the number of packets still left
     count_input_buffer_packets_late += in_spikes_size();
@@ -363,6 +414,7 @@ static inline void store_data(uint32_t time) {
     }
 }
 
+//! \brief Measure how long it takes to transfer buffers
 static inline void measure_transfer_time(void) {
     // Measure the time to do an upload to know when to schedule the timer
     tc[T2_LOAD] = 0xFFFFFFFF;
@@ -421,7 +473,9 @@ void spike_processing_fast_time_step_loop(uint32_t time) {
         // Wait for a spike, or the timer to expire
         uint32_t spike;
         while (!is_end_of_time_step() && !get_next_spike(&spike)) {
-            // TODO: Work out why T2 doesn't cause an interrupt
+            // This doesn't wait for interrupt currently because there isn't
+            // a way to have a T2 interrupt without a callback function, and
+            // a callback function is too slow!  This is therefore a busy wait.
             // wait_for_interrupt();
         }
 
