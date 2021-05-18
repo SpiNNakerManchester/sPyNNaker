@@ -207,6 +207,14 @@ class PopulationView(PopulationBase):
         """
         return self.__population.conductance_based
 
+    def inject(self, current_source):
+        """ Injects the specified current_source into this PopulationView.
+
+        :param ~pyNN.neuron.standardmodels.electrodes.NeuronCurrentSource\
+            current_source: the CurrentSource to be injected
+        """
+        self._vertex.inject(current_source, self.__indexes)
+
     def describe(self, template='populationview_default.txt',
                  engine='default'):
         """ Returns a human-readable description of the population view.

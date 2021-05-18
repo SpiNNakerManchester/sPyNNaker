@@ -124,7 +124,7 @@ bool neuron_initialise(
     }
 
     // Initialise for current sources
-    if (!current_source_impl_initialise(cs_address)) {
+    if (!current_source_impl_initialise(cs_address, n_neurons)) {
         return false;
     }
 
@@ -158,11 +158,10 @@ void neuron_do_timestep_update(timer_t time, uint timer_count) { // EXPORTED
     // Prepare recording for the next timestep
     neuron_recording_setup_for_next_recording();
 
-    // Get any input from an injected current source
-    REAL current_offset = current_source_get_offset(time);
-
     // update each neuron individually
     for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
+        // Get any input from an injected current source
+        REAL current_offset = current_source_get_offset(time, neuron_index);
 
         // Get external bias from any source of intrinsic plasticity
         input_t external_bias =

@@ -72,7 +72,7 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def get_sdram_usage_in_bytes(self, n_neurons):
+    def get_sdram_usage_in_bytes(self):
         """ The sdram usage in bytes of the current source.
 
         :rtype: int

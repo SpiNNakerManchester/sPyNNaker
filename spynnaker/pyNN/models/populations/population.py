@@ -808,7 +808,7 @@ class Population(PopulationBase):
         http://neuralensemble.org/docs/PyNN/reference/populations.html
         """
         # Pass this into the vertex
-        self.__vertex.inject(current_source)
+        self.__vertex.inject(current_source, [n for n in range(self._size)])
 
     def __len__(self):
         """ Get the total number of cells in the population.

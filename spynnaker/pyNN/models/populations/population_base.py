@@ -147,6 +147,7 @@ class PopulationBase(object, metaclass=AbstractBase):
             'Call transfered to get_data("v") without additional arguments')
         return self.get_data("v")
 
+    @abstractmethod
     def inject(self, current_source):
         """ Connect a current source to all cells in the Population.
 
@@ -158,7 +159,7 @@ class PopulationBase(object, metaclass=AbstractBase):
             pyNN.neuron.standardmodels.electrodes.NeuronCurrentSource
         """
         # TODO:
-        _we_dont_do_this_now(current_source)  # pragma: no cover
+        # _we_dont_do_this_now(current_source)  # pragma: no cover
 
     def is_local(self,
                  id):  # pylint: disable=unused-argument, redefined-builtin

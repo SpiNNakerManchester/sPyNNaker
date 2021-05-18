@@ -95,9 +95,9 @@ class StepCurrentSource(AbstractCurrentSource):
         return CurrentSourceIDs.STEP_CURRENT_SOURCE.value
 
     @overrides(AbstractCurrentSource.get_sdram_usage_in_bytes)
-    def get_sdram_usage_in_bytes(self, n_neurons):
+    def get_sdram_usage_in_bytes(self):
         """ The sdram usage of the current source.
 
         :rtype: int
         """
-        return n_neurons * (((len(self.__times) + 1) * 2) + 1) * BYTES_PER_WORD
+        return (((len(self.__times) + 1) * 2) + 1) * BYTES_PER_WORD

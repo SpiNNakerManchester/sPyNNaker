@@ -126,16 +126,16 @@ class ACSource(AbstractCurrentSource):
         return CurrentSourceIDs.AC_SOURCE.value
 
     @overrides(AbstractCurrentSource.get_sdram_usage_in_bytes)
-    def get_sdram_usage_in_bytes(self, n_neurons):
+    def get_sdram_usage_in_bytes(self):
         """ The sdram usage of the current source.
 
         :rtype: int
         """
-        return n_neurons * (((len(
+        return (((len(
             self.__parameters['times']) + 1) * 2) + 1) * BYTES_PER_WORD
 
     def _get_params(self, start, stop, amplitude, offset, frequency, phase):
-        """ Convert parameters into arrays.
+        """ Convert provided parameters into arrays.
 
         :rtype: list, list
         """
@@ -144,12 +144,14 @@ class ACSource(AbstractCurrentSource):
         machine_ts = sim.machine_time_step
         time_convert_ms = MICRO_TO_MILLISECOND_CONVERSION / machine_ts
         times = numpy.arange(int(start) * time_convert_ms,
-                             (int(stop)+1) * time_convert_ms)
-        time_minus_start = numpy.arange(0, (stop+1.0-start) * time_convert_ms)
+                             (int(stop) * time_convert_ms) + 1)
+        time_minus_start = numpy.arange(
+            0, ((stop-start) * time_convert_ms) + 1)
+        # Work out the amplitudes based on the provided parameters
         amplitudes = offset + (amplitude * numpy.sin(
             (time_minus_start * frequency / time_convert_ms) + phase))
 
-        # Set final value to zero
+        # Set final value to zero to turn off the source
         amplitudes[-1] = 0.0
 
         return times, amplitudes

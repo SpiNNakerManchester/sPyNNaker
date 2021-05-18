@@ -162,7 +162,7 @@ class IDMixin(object):
         :param ~pyNN.neuron.standardmodels.electrodes.NeuronCurrentSource\
             current_source:
         """
-        raise NotImplementedError  # pragma: no cover
+        self.__population._vertex.inject(current_source, [self.__id])
 
     def get_initial_value(self, variable):
         """ Get the initial value of a state variable of the cell.
