@@ -545,7 +545,8 @@ void multicast_packet_pl_received_callback(uint key, uint payload) {
 bool spike_processing_fast_initialise(
         uint32_t row_max_n_words, uint32_t spike_buffer_size,
         bool discard_late_packets, uint32_t pkts_per_ts_rec_region,
-        struct sdram_config sdram_inputs_param, weight_t *ring_buffers_param) {
+        uint32_t multicast_priority, struct sdram_config sdram_inputs_param,
+        weight_t *ring_buffers_param) {
     // Allocate the DMA buffers
     for (uint32_t i = 0; i < N_DMA_BUFFERS; i++) {
         dma_buffers[i].row = spin1_malloc(row_max_n_words * sizeof(uint32_t));
@@ -571,8 +572,10 @@ bool spike_processing_fast_initialise(
     ring_buffers = ring_buffers_param;
 
     // Configure for multicast reception
-    spin1_callback_on(MC_PACKET_RECEIVED, multicast_packet_received_callback, -1);
-    spin1_callback_on(MCPL_PACKET_RECEIVED, multicast_packet_pl_received_callback, -1);
+    spin1_callback_on(MC_PACKET_RECEIVED, multicast_packet_received_callback,
+            multicast_priority);
+    spin1_callback_on(MCPL_PACKET_RECEIVED, multicast_packet_pl_received_callback,
+            multicast_priority);
 
     // Wipe the inputs using word writes
     for (uint32_t i = 0; i < (sdram_inputs.size_in_bytes >> 2); i++) {

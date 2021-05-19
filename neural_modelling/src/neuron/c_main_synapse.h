@@ -45,14 +45,6 @@ struct synapse_regions {
     uint32_t bitfield_filter;
 };
 
-//! The priorities used by synapse processing
-struct synapse_priorities {
-    //! Receive a multicast packet
-    uint32_t receive_packet;
-    //! Start processing synapses
-    uint32_t process_synapses;
-};
-
 //! \brief Callback to store synapse provenance data (format: synapse_provenance).
 //! \param[out] prov: The data structure to store the provenance data in
 static inline void store_synapse_provenance(struct synapse_provenance *prov) {

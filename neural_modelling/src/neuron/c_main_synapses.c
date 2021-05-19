@@ -40,7 +40,7 @@
 
 //! values for the priority for each callback
 typedef enum callback_priorities {
-    MC = -1, DMA = -2, USER = -2, TIMER = 0, SDP = 0
+    MC = -1, DMA = -2, TIMER = 0, SDP = 0
 } callback_priorities;
 
 enum regions {
@@ -55,7 +55,8 @@ enum regions {
     SYNAPSE_DYNAMICS_REGION,
     STRUCTURAL_DYNAMICS_REGION,
     BIT_FIELD_FILTER_REGION,
-    SDRAM_PARAMS_REGION
+    SDRAM_PARAMS_REGION,
+    KEY_REGION
 };
 
 const struct common_regions COMMON_REGIONS = {
@@ -79,11 +80,6 @@ const struct synapse_regions SYNAPSE_REGIONS = {
     .synapse_dynamics = SYNAPSE_DYNAMICS_REGION,
     .structural_dynamics = STRUCTURAL_DYNAMICS_REGION,
     .bitfield_filter = BIT_FIELD_FILTER_REGION
-};
-
-const struct synapse_priorities SYNAPSE_PRIORITIES = {
-    .process_synapses = USER,
-    .receive_packet = MC
 };
 
 // Globals
@@ -180,8 +176,8 @@ static bool initialise(void) {
 
     if (!spike_processing_fast_initialise(
             row_max_n_words, incoming_spike_buffer_size,
-            clear_input_buffer_of_late_packets, 0,
-            *sdram_config, ring_buffers)) {
+            clear_input_buffer_of_late_packets, 0, MC, *sdram_config,
+            ring_buffers)) {
         return false;
     }
 
