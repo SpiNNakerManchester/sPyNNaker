@@ -348,7 +348,6 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
             globals_variables.get_simulator().clear()
         except Exception:  # pylint: disable=broad-except
             logger.exception("Error forcing previous simulation to clear")
-            globals_variables.unset_simulator()
 
     # add default label if needed
     if graph_label is None:
@@ -384,7 +383,7 @@ def name():
 
     :rtype: str
     """
-    return globals_variables.get_simulator().name
+    return globals_variables.get_last_simulator().name
 
 
 def Projection(
