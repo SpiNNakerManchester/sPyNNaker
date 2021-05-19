@@ -531,6 +531,16 @@ class AbstractPopulationVertex(
         """ Inject method from population to set up current source
 
         """
+        # Check that this type of current source has not already been used
+        for n in range(self.__n_atoms):
+            if current_source != self.__current_sources[n]:
+                if (self.__current_sources[n] is not None and
+                        (current_source.current_source_id ==
+                         self.__current_sources[n].current_source_id)):
+                    raise NotImplementedError(
+                        "Injecting two current sources of the same type "
+                        "into the same Population is not yet implemented")
+
         for n in range(self.__n_atoms):
             if n in neuron_list:
                 self.__current_sources[n] = current_source
