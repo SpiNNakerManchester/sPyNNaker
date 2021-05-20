@@ -23,6 +23,8 @@ from spinn_utilities.config_holder import (
     get_config_float, get_config_int, get_config_bool)
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, MICRO_TO_SECOND_CONVERSION)
+from spinn_front_end_common.utilities.globals_variables import (
+    machine_time_step)
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.abstract_models import AbstractMaxSpikes
 from spynnaker.pyNN.models.neuron.synapse_io import SynapseIORowBased
@@ -412,7 +414,7 @@ class SynapticManager(object):
         """
         # E[ number of spikes ] in a timestep
         steps_per_second = (MICRO_TO_SECOND_CONVERSION /
-                            get_config_int("Machine", "machine_time_step"))
+                            machine_time_step())
 
         average_spikes_per_timestep = (
             float(n_synapses_in * spikes_per_second) / steps_per_second)
@@ -478,7 +480,7 @@ class SynapticManager(object):
         rate_stats = [RunningStats() for _ in range(n_synapse_types)]
         steps_per_second = (
                 MICRO_TO_SECOND_CONVERSION /
-                get_config_int("Machine", "machine_time_step"))
+                machine_time_step())
 
         synapse_map = dict()
         for machine_edge in machine_graph.get_edges_ending_at_vertex(

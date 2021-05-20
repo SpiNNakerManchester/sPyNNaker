@@ -15,7 +15,6 @@
 
 import logging
 import numpy
-from spinn_utilities.config_holder import get_config_int
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged import RangedListOfList
@@ -23,7 +22,8 @@ from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
-from spinn_front_end_common.utilities import globals_variables
+from spinn_front_end_common.utilities.globals_variables import (
+    get_simulator, machine_time_step)
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, EIEIOSpikeRecorder, SimplePopulationSettable)
 from spynnaker.pyNN.utilities import constants
@@ -103,7 +103,7 @@ class SpikeSourceArrayVertex(
 
         :param iterable(int spike_times:
         """
-        current_time = globals_variables.get_simulator().get_current_time()
+        current_time = get_simulator().get_current_time()
         for i in range(len(spike_times)):
             if spike_times[i] > current_time:
                 logger.warning(
@@ -121,7 +121,7 @@ class SpikeSourceArrayVertex(
 
         :param iterable(iterable(int) spike_times:
         """
-        current_time = globals_variables.get_simulator().get_current_time()
+        current_time = get_simulator().get_current_time()
         for neuron_id in range(0, self.n_atoms):
             id_times = spike_times[neuron_id]
             for i in range(len(id_times)):
@@ -168,7 +168,7 @@ class SpikeSourceArrayVertex(
 
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
     def get_spikes_sampling_interval(self):
-        return get_config_int("Machine", "machine_time_step")
+        return machine_time_step()
 
     @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(self, placements, buffer_manager):

@@ -13,11 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from spinn_utilities.config_holder import get_config_int
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, BYTES_PER_SHORT, MICRO_TO_MILLISECOND_CONVERSION)
+    BYTES_PER_WORD, BYTES_PER_SHORT)
+from spinn_front_end_common.utilities.globals_variables import (
+    machine_time_step_ms)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
     AbstractTimingDependence)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
@@ -54,9 +55,8 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
 
         self.__synapse_structure = SynapseStructureWeightOnly()
 
-        ts = get_config_int("Machine", "machine_time_step")
-        ts = ts / MICRO_TO_MILLISECOND_CONVERSION
-        self.__tau_data = get_exp_lut_array(ts, self.__tau)
+        self.__tau_data = get_exp_lut_array(
+            machine_time_step_ms(), self.__tau)
 
     @property
     def alpha(self):

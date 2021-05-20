@@ -14,11 +14,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import logging
 
-from spinn_utilities.config_holder import get_config_int
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
-from spinn_front_end_common.utilities.constants import (
-    MICRO_TO_MILLISECOND_CONVERSION)
+from spinn_front_end_common.utilities.globals_variables import (
+    machine_time_step_ms)
 from spynnaker.pyNN.exceptions import DelayExtensionException
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
     AbstractSpynnakerSplitterDelay, SplitterDelayVertexSlice)
@@ -226,13 +225,9 @@ class DelaySupportAdder(object):
                 self.INVALID_SPLITTER_FOR_DELAYS_ERROR_MSG.format(
                     app_edge.post_vertex, post_splitter, app_edge))
 
-        machine_time_step_ms = (
-            get_config_int("Machine", "machine_time_step") /
-            MICRO_TO_MILLISECOND_CONVERSION)
-
         post_vertex_max_delay = (
                 app_edge.post_vertex.splitter.max_support_delay() *
-                machine_time_step_ms)
+                machine_time_step_ms())
 
         # if does not need a delay extension, run away
         if post_vertex_max_delay >= max_delay_needed:
@@ -249,7 +244,7 @@ class DelaySupportAdder(object):
         total_supported_delay = (
             post_vertex_max_delay +
             (DelayExtensionVertex.get_max_delay_ticks_supported(
-                post_vertex_max_delay) * machine_time_step_ms))
+                post_vertex_max_delay) * machine_time_step_ms()))
         if total_supported_delay < max_delay_needed:
             raise DelayExtensionException(
                 self.NOT_SUPPORTED_DELAY_ERROR_MSG.format(

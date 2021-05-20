@@ -13,10 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from spinn_utilities.config_holder import get_config_int
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_SHORT, BYTES_PER_WORD, MICRO_TO_MILLISECOND_CONVERSION)
+    BYTES_PER_SHORT, BYTES_PER_WORD)
+from spinn_front_end_common.utilities.globals_variables import (
+    machine_time_step_ms)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
     get_exp_lut_array)
 from .abstract_timing_dependence import AbstractTimingDependence
@@ -53,8 +54,7 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
         self.__synapse_structure = SynapseStructureWeightOnly()
 
         # provenance data
-        ts = get_config_int("Machine", "machine_time_step")
-        ts = ts / MICRO_TO_MILLISECOND_CONVERSION
+        ts = machine_time_step_ms()
         self.__tau_plus_data = get_exp_lut_array(ts, self.__tau_plus)
         self.__tau_minus_data = get_exp_lut_array(ts, self.__tau_minus)
 

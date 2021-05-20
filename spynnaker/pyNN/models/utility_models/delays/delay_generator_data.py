@@ -14,10 +14,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy
-from spinn_utilities.config_holder import get_config_int
 from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION, BYTES_PER_WORD)
+from spinn_front_end_common.utilities.globals_variables import (
+    machine_time_step)
 
 
 class DelayGeneratorData(object):
@@ -91,7 +92,7 @@ class DelayGeneratorData(object):
             self.__delay_per_stage,
             DataType.S1615.encode_as_int(
                 MICRO_TO_MILLISECOND_CONVERSION /
-                get_config_int("Machine", "machine_time_step")),
+                machine_time_step()),
             connector.gen_connector_id,
             connector.gen_delays_id(self.__synapse_information.delays)],
             dtype="uint32"))

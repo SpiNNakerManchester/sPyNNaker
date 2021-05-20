@@ -17,14 +17,13 @@ import logging
 import math
 import re
 import numpy
-from spinn_utilities.config_holder import get_config_int
 from spinn_utilities.log import FormatAdapter
 from pyNN.random import NumpyRNG, RandomDistribution
 
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.safe_eval import SafeEval
-from spinn_front_end_common.utilities.constants import (
-    MICRO_TO_MILLISECOND_CONVERSION)
+from spinn_front_end_common.utilities.globals_variables import (
+    machine_time_step_ms)
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spynnaker.pyNN.utilities import utility_calls
@@ -97,9 +96,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         :param SynapseInformation synapse_info: the synapse info
         """
         self._rng = (self._rng or NumpyRNG())
-        self.__min_delay = (
-                get_config_int("Machine", "machine_time_step") /
-                MICRO_TO_MILLISECOND_CONVERSION)
+        self.__min_delay = machine_time_step_ms()
 
     def _check_parameter(self, values, name, allow_lists):
         """ Check that the types of the values is supported.

@@ -17,14 +17,15 @@ import itertools
 import logging
 import math
 import numpy
-from spinn_utilities.config_holder import get_config_int
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.resources.variable_sdram import VariableSDRAM
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, MICRO_TO_MILLISECOND_CONVERSION, BITS_PER_WORD)
+    BYTES_PER_WORD, BITS_PER_WORD)
+from spinn_front_end_common.utilities.globals_variables import (
+    machine_time_step_ms)
 from spinn_front_end_common.interface.buffer_management.recording_utilities \
     import (
         get_recording_header_array, get_recording_header_size,
@@ -54,9 +55,7 @@ def get_sampling_interval(sampling_rate):
     :return: Sampling interval in microseconds
     :rtype: float
     """
-    step = (get_config_int("Machine", "machine_time_step") /
-            MICRO_TO_MILLISECOND_CONVERSION)
-    return sampling_rate * step
+    return sampling_rate * machine_time_step_ms()
 
 
 class NeuronRecorder(object):
@@ -422,9 +421,7 @@ class NeuronRecorder(object):
             else:
                 raw_data = record_raw
             if len(raw_data) > 0:
-                ms_per_tick = (get_config_int("Machine", "machine_time_step") /
-                               MICRO_TO_MILLISECOND_CONVERSION)
-                record_time = raw_data[:, 0] * float(ms_per_tick)
+                record_time = raw_data[:, 0] * machine_time_step_ms()
                 spikes = raw_data[:, 1:].byteswap().view("uint8")
                 bits = numpy.fliplr(numpy.unpackbits(spikes).reshape(
                     (-1, 32))).reshape((-1, n_bytes * 8))
@@ -550,9 +547,7 @@ class NeuronRecorder(object):
         if sampling_interval is None:
             return 1
 
-        step = (
-            get_config_int("Machine", "machine_time_step") /
-            MICRO_TO_MILLISECOND_CONVERSION)
+        step = machine_time_step_ms()
         rate = int(sampling_interval / step)
         if sampling_interval != rate * step:
             msg = "sampling_interval {} is not an an integer multiple of the "\
