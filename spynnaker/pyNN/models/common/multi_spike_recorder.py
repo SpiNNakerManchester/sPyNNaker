@@ -22,7 +22,8 @@ from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
 from spynnaker.pyNN.models.common import recording_utils
 from pacman.model.resources.variable_sdram import VariableSDRAM
-from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_front_end_common.utilities.constants import (
+    BYTES_PER_WORD, BITS_PER_WORD)
 from spinn_front_end_common.utilities.globals_variables import (
     machine_time_step_ms)
 

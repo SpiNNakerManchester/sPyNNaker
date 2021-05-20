@@ -16,8 +16,7 @@
 import math
 import numpy
 
-from spinn_front_end_common.utilities.constants import (
-    MICRO_TO_MILLISECOND_CONVERSION, BYTES_PER_WORD)
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.globals_variables import (
     machine_time_step_ms, machine_time_step_per_ms)
 from spynnaker.pyNN.models.neural_projections.connectors import (
@@ -398,7 +397,7 @@ class SynapseIORowBased(object):
 
         # Convert delays to timesteps
         connections["delay"] = numpy.rint(
-            connections["delay"] * machine_time_step_us())
+            connections["delay"] * machine_time_step_ms())
 
         # Scale weights
         connections["weight"] = (connections["weight"] * weight_scales[
