@@ -56,8 +56,9 @@ bool synaptogenesis_row_restructure(uint32_t time, synaptic_row_t row);
 //! \param[in] spike: The received spike
 void synaptogenesis_spike_received(uint32_t time, spike_t spike);
 
-//! \brief Do a timestep of synaptogenesis
-void synaptogenesis_do_timestep_update(void);
+//! \brief Number of updates to do of synaptogenesis this time step
+//! \return The number of updates to do this time step
+uint32_t synaptogenesis_n_updates(void);
 
 //! \brief Print a certain data object
 void print_post_to_pre_entry(void);

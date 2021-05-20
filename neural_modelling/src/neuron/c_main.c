@@ -168,7 +168,7 @@ void background_callback(uint timer_count, uint local_time) {
 
     log_debug("Timer tick %u \n", local_time);
 
-    synaptogenesis_do_timestep_update();
+    spike_processing_do_rewiring(synaptogenesis_n_updates());
 
     // Now do neuron time step update
     neuron_do_timestep_update(local_time, timer_count);

@@ -36,6 +36,7 @@
 #include "c_main_synapse.h"
 #include "c_main_common.h"
 #include "spike_processing_fast.h"
+#include "structural_plasticity/synaptogenesis_dynamics.h"
 #include <spin1_api_params.h>
 
 //! values for the priority for each callback
@@ -139,7 +140,8 @@ void timer_callback(UNUSED uint unused0, UNUSED uint unused1) {
         return;
     }
 
-    spike_processing_fast_time_step_loop(time);
+    uint32_t n_rewires = synaptogenesis_n_updates();
+    spike_processing_fast_time_step_loop(time, n_rewires);
 }
 
 //! \brief Initialises the model by reading in the regions and checking

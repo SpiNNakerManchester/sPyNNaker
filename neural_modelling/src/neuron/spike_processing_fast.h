@@ -70,7 +70,7 @@ bool spike_processing_fast_initialise(
 //! \brief The main loop of spike processing to be run once per time step.
 //!        Note that this function will not return until the end of the time
 //!        step; it will only be interrupted by SDP or MC packets.
-void spike_processing_fast_time_step_loop(uint32_t time);
+void spike_processing_fast_time_step_loop(uint32_t time, uint32_t n_rewires);
 
 //! \brief Store any provenance data gathered from spike processing
 //! \param[in] prov The structure to store the provenance data in

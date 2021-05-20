@@ -495,7 +495,73 @@ static inline void prepare_timestep(uint32_t time) {
     spin1_mode_restore(cspr);
 }
 
-void spike_processing_fast_time_step_loop(uint32_t time) {
+static inline void do_rewiring(uint32_t time, uint32_t n_rewires) {
+    uint32_t spike;
+    synaptic_row_t row;
+    uint32_t n_bytes;
+
+    uint32_t current_buffer = 0;
+    uint32_t next_buffer = 0;
+    bool dma_in_progress = false;
+
+    // Start the first transfer
+    uint32_t rewires_to_go = n_rewires;
+    while (rewires_to_go > 0 && !dma_in_progress) {
+        if (synaptogenesis_dynamics_rewire(time, &spike, &row, &n_bytes)) {
+            dma_buffers[next_buffer].sdram_writeback_address = row;
+            dma_buffers[next_buffer].n_bytes_transferred = n_bytes;
+            do_fast_dma_read(row, dma_buffers[next_buffer].row, n_bytes);
+            next_buffer = (next_buffer + 1) & DMA_BUFFER_MOD_MASK;
+            dma_in_progress = true;
+        }
+        rewires_to_go--;
+    }
+
+    // Go in a loop until all done
+    while (dma_in_progress) {
+
+        dma_in_progress = false;
+        while (rewires_to_go > 0 && !dma_in_progress) {
+            if (synaptogenesis_dynamics_rewire(time, &spike, &row, &n_bytes)) {
+                dma_in_progress = true;
+            }
+            rewires_to_go--;
+        }
+
+        // Wait for the last DMA to complete
+        wait_for_dma_to_complete();
+
+        // Start the next DMA read
+        if (dma_in_progress) {
+            dma_buffers[next_buffer].sdram_writeback_address = row;
+            dma_buffers[next_buffer].n_bytes_transferred = n_bytes;
+            do_fast_dma_read(row, dma_buffers[next_buffer].row, n_bytes);
+            next_buffer = (next_buffer + 1) & DMA_BUFFER_MOD_MASK;
+        }
+
+        // If the row has been restructured, transfer back to SDRAM
+        if (synaptogenesis_row_restructure(
+                time, dma_buffers[current_buffer].row)) {
+            n_successful_rewires++;
+            if (dma_in_progress) {
+                wait_for_dma_to_complete();
+            }
+            do_fast_dma_write(
+                    dma_buffers[current_buffer].sdram_writeback_address,
+                    dma_buffers[current_buffer].row,
+                    dma_buffers[current_buffer].n_bytes_transferred);
+            if (!dma_in_progress) {
+                wait_for_dma_to_complete();
+            }
+        }
+        current_buffer = (current_buffer + 1) & DMA_BUFFER_MOD_MASK;
+    }
+}
+
+void spike_processing_fast_time_step_loop(uint32_t time, uint32_t n_rewires) {
+    // Do rewiring
+    do_rewiring(time, n_rewires);
+
     // Prepare for the start
     prepare_timestep(time);
 

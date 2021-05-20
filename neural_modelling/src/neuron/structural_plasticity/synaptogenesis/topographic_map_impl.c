@@ -295,17 +295,17 @@ static inline bool row_restructure(
                 return synaptogenesis_formation_rule(current_state,
                         formation_params[current_state->post_to_pre.pop_index], time, row);
             } else {
-        	    // A synapse cannot be added if one exists between the current pair of neurons
-        	    if (!synapse_dynamics_find_neuron(
-        	            current_state->post_syn_id, row,
-						&(current_state->weight), &(current_state->delay),
-						&(current_state->offset), &(current_state->synapse_type))) {
-        		    return synaptogenesis_formation_rule(current_state,
-        		        formation_params[current_state->post_to_pre.pop_index], time, row);
-        		} else {
-        		    log_debug("Post neuron %u already in row", current_state->post_syn_id);
-        		    return false;
-        		}
+              // A synapse cannot be added if one exists between the current pair of neurons
+              if (!synapse_dynamics_find_neuron(
+                      current_state->post_syn_id, row,
+            &(current_state->weight), &(current_state->delay),
+            &(current_state->offset), &(current_state->synapse_type))) {
+                return synaptogenesis_formation_rule(current_state,
+                    formation_params[current_state->post_to_pre.pop_index], time, row);
+            } else {
+                log_debug("Post neuron %u already in row", current_state->post_syn_id);
+                return false;
+            }
             }
         }
     }
@@ -322,14 +322,16 @@ void synaptogenesis_spike_received(uint32_t time, spike_t spike) {
     partner_spike_received(time, spike);
 }
 
-void synaptogenesis_do_timestep_update(void) {
+uint32_t synaptogenesis_n_updates(void) {
     if (rewiring_data.fast) {
-        spike_processing_do_rewiring(rewiring_data.p_rew);
-    } else {
-        last_rewiring_time++;
-        if (last_rewiring_time >= rewiring_data.p_rew) {
-            last_rewiring_time = 0;
-            spike_processing_do_rewiring(1);
-        }
+        return rewiring_data.p_rew;
     }
+
+    last_rewiring_time++;
+    if (last_rewiring_time >= rewiring_data.p_rew) {
+        last_rewiring_time = 0;
+        return 1;
+    }
+
+    return 0;
 }
