@@ -454,7 +454,7 @@ static inline void measure_transfer_time(void) {
 }
 
 //! \brief Prepare the start of a time step
-static inline void prepare_timestep(void) {
+static inline void prepare_timestep(uint32_t time) {
     uint32_t cspr = spin1_int_disable();
 
     // Reset these to ensure consistency
@@ -497,7 +497,7 @@ static inline void prepare_timestep(void) {
 
 void spike_processing_fast_time_step_loop(uint32_t time) {
     // Prepare for the start
-    prepare_timestep();
+    prepare_timestep(time);
 
     // Loop until the end of a time step is reached
     while (true) {
