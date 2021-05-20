@@ -331,10 +331,10 @@ static bool _test_will_fire(packet_firing_data_t *packet_firing) {
 SOMETIMES_UNUSED // Marked unused as only used sometimes
 //! \brief Do the timestep update for the particular implementation
 //! \param[in] neuron_index: The index of the neuron to update
+//! \param[in] time: The time step of the update
 //! \param[in] external_bias: External input to be applied to the neuron
-//! \return True if a spike has occurred
 static void neuron_impl_do_timestep_update(
-        uint32_t timer_count, uint32_t time, uint32_t n_neurons) {
+        uint32_t timer_count, UNUSED uint32_t time, uint32_t n_neurons) {
 
     for (uint32_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
         // Get the neuron itself

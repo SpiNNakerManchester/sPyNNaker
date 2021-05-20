@@ -83,11 +83,6 @@ const struct synapse_regions SYNAPSE_REGIONS = {
     .bitfield_filter = BIT_FIELD_FILTER_REGION
 };
 
-const struct synapse_priorities SYNAPSE_PRIORITIES = {
-    .process_synapses = USER,
-    .receive_packet = MC
-};
-
 // Globals
 
 //! The current timer tick value.
@@ -273,8 +268,7 @@ static bool initialise(void) {
 
     // Setup spike processing
     if (!spike_processing_initialise(
-            row_max_n_words, SYNAPSE_PRIORITIES.receive_packet,
-            SYNAPSE_PRIORITIES.process_synapses, incoming_spike_buffer_size,
+            row_max_n_words, MC, USER, incoming_spike_buffer_size,
             clear_input_buffer_of_late_packets, n_rec_regions_used)) {
         return false;
     }
